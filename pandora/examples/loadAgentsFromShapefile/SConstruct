@@ -1,0 +1,74 @@
+nameProgram = 'loadAgentsFromShapefile'
+
+agents = ['ShpAgent']
+namespaceAgents = ['Examples']
+
+srcFiles = Split("main.cxx ShpWorld.cxx ShpAgent.cxx")
+
+import os, sys
+from subprocess import call
+
+sys.path.append('../../scripts/')
+import generateMpi 
+
+release = ARGUMENTS.get('release', 1)
+mareNostrum = ARGUMENTS.get('mn', 0)
+localmpich = ARGUMENTS.get('localmpich',0)
+
+if int(localmpich) == 1 :
+	env = Environment(ENV=os.environ, CXX='/usr/local/bin/mpicxx')
+else :
+	env = Environment(ENV=os.environ, CXX='mpicxx')
+	
+generateMPICodeBuilder = Builder(action=generateMpi.execute)
+env.Append( BUILDERS = {'GenerateMPICode' : generateMPICodeBuilder})
+
+if int(mareNostrum) == 1:
+	env['CXX'] = '/opt/osshpc/mpich-mx/64/bin/mpicxx'
+else:
+	if int(localmpich) == 1 :
+		env['CXX'] = '/usr/local/bin/mpicxx'
+	else :
+		env['CXX'] = 'mpicxx'
+
+if int(release) == 0:
+	env['CCFLAGS'] = Split('-g -O0 -Wall -DTIXML_USE_STL')
+	libs = Split('pthread mpich pandorad gdal hdf5 tinyxml grass_gis')
+	linkFlags = Split('')
+else:
+	env['CCFLAGS'] = Split('-O3 -DTIXML_USE_STL -fopenmp')
+	libs = Split('pthread mpich pandora gdal hdf5 tinyxml grass_gis')
+	linkFlags = Split('-fopenmp')
+
+
+includeDirs = Split('./ ../../ ../../analysis/')
+
+if int(mareNostrum)==1:	
+	includeDirs = Split('../../analysis/ /gpfs/apps/HDF5/1.8.9/64/include')
+	includeDirs += ['/gpfs/apps/BOOST/1_48_0/include/']
+	includeDirs += ['/gpfs/apps/TINYXML/2.6.2/64/STL/include']
+	includeDirs += ['/gpfs/apps/GDAL/1.7.1/64/include']	
+	libDirs = Split('/gpfs/apps/HDF5/1.8.9/64/lib /opt/ibmcmp/vacpp/10.1/lib64/ /gpfs/apps/GDAL/1.7.1/64/lib /gpfs/apps/TINYXML/2.6.2/64/STL/lib')
+	libDirs += ['/gpfs/apps/BOOST/1_48_0/lib/']
+	libs += ['gpfs']
+	libs += ['xl']
+else:
+	libDirs = Split('../../ /usr/local/lib/ /usr/local/hdf5/lib/') 
+	includeDirs += ['/usr/local/include/', '../../../libs/libmdp','/usr/local/hdf5/include','/usr/include/gdal/']
+	libDirs += ['/usr/lib/grass64/lib/']
+
+# if debug && mare nostrum mpitrace is added
+if int(release)==0 and int(mareNostrum)==1:
+	libs += ['mpitrace']
+	libDirs += ['/gpfs/apps/CEPBATOOLS/mpitrace-stable-1.2-mx/lib']
+
+# add the list of mpi code that must be generated & compiled
+mpiAgentsSrc = ['mpiCode/FactoryCode.cxx']
+agentsSrc = ['main.cxx']
+for agent in agents:	
+	if agent != '':
+		agentsSrc.append(agent+".cxx")
+		mpiAgentsSrc.append("mpiCode/"+agent+"_mpi.cxx")
+env['namespaces'] = namespaceAgents
+env.GenerateMPICode( target=mpiAgentsSrc, source=agentsSrc)
+env.Program(nameProgram, srcFiles+mpiAgentsSrc, CPPPATH=includeDirs, LIBS=libs, LIBPATH=libDirs, LINKFLAGS=linkFlags)

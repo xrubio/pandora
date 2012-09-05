@@ -1,0 +1,108 @@
+.TH "QwtWeedingCurveFitter" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtWeedingCurveFitter \- 
+.PP
+A curve fitter implementing Douglas and Peucker algorithm.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_curve_fitter.h>\fP
+.PP
+Inherits \fBQwtCurveFitter\fP.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtWeedingCurveFitter\fP (double tolerance=1.0)"
+.br
+.ti -1c
+.RI "virtual \fB~QwtWeedingCurveFitter\fP ()"
+.br
+.ti -1c
+.RI "void \fBsetTolerance\fP (double)"
+.br
+.ti -1c
+.RI "double \fBtolerance\fP () const "
+.br
+.ti -1c
+.RI "virtual QPolygonF \fBfitCurve\fP (const QPolygonF &) const "
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+A curve fitter implementing Douglas and Peucker algorithm. 
+
+The purpose of the Douglas and Peucker algorithm is that given a 'curve' composed of line segments to find a curve not too dissimilar but that has fewer points. The algorithm defines 'too dissimilar' based on the maximum distance (tolerance) between the original curve and the smoothed curve.
+.PP
+The smoothed curve consists of a subset of the points that defined the original curve.
+.PP
+In opposite to \fBQwtSplineCurveFitter\fP the Douglas and Peucker algorithm reduces the number of points. By adjusting the tolerance parameter according to the axis scales \fBQwtSplineCurveFitter\fP can be used to implement different level of details to speed up painting of curves of many points. 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtWeedingCurveFitter::QwtWeedingCurveFitter (doubletolerance = \fC1.0\fP)"Constructor
+.PP
+\fBParameters:\fP
+.RS 4
+\fItolerance\fP Tolerance 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetTolerance()\fP, \fBtolerance()\fP 
+.RE
+.PP
+
+.SS "QwtWeedingCurveFitter::~QwtWeedingCurveFitter ()\fC [virtual]\fP"
+.PP
+Destructor. 
+.SH "Member Function Documentation"
+.PP 
+.SS "QPolygonF QwtWeedingCurveFitter::fitCurve (const QPolygonF &points) const\fC [virtual]\fP"\fBParameters:\fP
+.RS 4
+\fIpoints\fP Series of data points 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Curve points 
+.RE
+.PP
+
+.PP
+Implements \fBQwtCurveFitter\fP.
+.SS "void QwtWeedingCurveFitter::setTolerance (doubletolerance)"Assign the tolerance
+.PP
+The tolerance is the maximum distance, that is accaptable between the original curve and the smoothed curve.
+.PP
+Increasing the tolerance will reduce the number of the resulting points.
+.PP
+\fBParameters:\fP
+.RS 4
+\fItolerance\fP Tolerance
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBtolerance()\fP 
+.RE
+.PP
+
+.SS "double QwtWeedingCurveFitter::tolerance () const"\fBReturns:\fP
+.RS 4
+Tolerance 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetTolerance()\fP 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

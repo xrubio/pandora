@@ -1,0 +1,409 @@
+.TH "QwtWheel" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtWheel \- 
+.PP
+The Wheel Widget.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_wheel.h>\fP
+.PP
+Inherits \fBQwtAbstractSlider\fP.
+.SS "Public Slots"
+
+.in +1c
+.ti -1c
+.RI "void \fBsetTotalAngle\fP (double)"
+.br
+.ti -1c
+.RI "void \fBsetViewAngle\fP (double)"
+.br
+.in -1c
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtWheel\fP (QWidget *parent=NULL)"
+.br
+.ti -1c
+.RI "virtual \fB~QwtWheel\fP ()"
+.br
+.ti -1c
+.RI "virtual void \fBsetOrientation\fP (Qt::Orientation)"
+.br
+.ti -1c
+.RI "double \fBtotalAngle\fP () const "
+.br
+.ti -1c
+.RI "double \fBviewAngle\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetTickCnt\fP (int)"
+.br
+.ti -1c
+.RI "int \fBtickCnt\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetMass\fP (double)"
+.br
+.ti -1c
+.RI "double \fBmass\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetWheelWidth\fP (int)"
+.br
+.ti -1c
+.RI "int \fBwheelWidth\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetWheelBorderWidth\fP (int)"
+.br
+.ti -1c
+.RI "int \fBwheelBorderWidth\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetBorderWidth\fP (int)"
+.br
+.ti -1c
+.RI "int \fBborderWidth\fP () const "
+.br
+.ti -1c
+.RI "QRect \fBwheelRect\fP () const "
+.br
+.ti -1c
+.RI "virtual QSize \fBsizeHint\fP () const "
+.br
+.ti -1c
+.RI "virtual QSize \fBminimumSizeHint\fP () const "
+.br
+.in -1c
+.SS "Protected Member Functions"
+
+.in +1c
+.ti -1c
+.RI "virtual void \fBpaintEvent\fP (QPaintEvent *)"
+.br
+.ti -1c
+.RI "virtual void \fBresizeEvent\fP (QResizeEvent *)"
+.br
+.ti -1c
+.RI "virtual void \fBdrawTicks\fP (QPainter *, const QRectF &)"
+.br
+.ti -1c
+.RI "virtual void \fBdrawWheelBackground\fP (QPainter *, const QRectF &)"
+.br
+.ti -1c
+.RI "virtual void \fBvalueChange\fP ()"
+.br
+.ti -1c
+.RI "virtual double \fBgetValue\fP (const QPoint &)"
+.br
+.ti -1c
+.RI "virtual void \fBgetScrollMode\fP (const QPoint &, \fBQwtAbstractSlider::ScrollMode\fP &, int &direction) const "
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+The Wheel Widget. 
+
+The wheel widget can be used to change values over a very large range in very small steps. Using the setMass member, it can be configured as a flywheel.
+.PP
+\fBSee also:\fP
+.RS 4
+The radio example. 
+.RE
+.PP
+
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtWheel::QwtWheel (QWidget *parent = \fCNULL\fP)\fC [explicit]\fP"
+.PP
+Constructor. 
+.SS "QwtWheel::~QwtWheel ()\fC [virtual]\fP"
+.PP
+Destructor. 
+.SH "Member Function Documentation"
+.PP 
+.SS "int QwtWheel::borderWidth () const"\fBReturns:\fP
+.RS 4
+Border width 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetBorderWidth()\fP 
+.RE
+.PP
+
+.SS "void QwtWheel::drawTicks (QPainter *painter, const QRectF &rect)\fC [protected, virtual]\fP"Draw the Wheel's ticks
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpainter\fP Painter 
+.br
+\fIrect\fP Rectangle for the wheel 
+.RE
+.PP
+
+.SS "void QwtWheel::drawWheelBackground (QPainter *painter, const QRectF &rect)\fC [protected, virtual]\fP"Draw the Wheel's background gradient
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpainter\fP Painter 
+.br
+\fIrect\fP Rectangle for the wheel 
+.RE
+.PP
+
+.SS "void QwtWheel::getScrollMode (const QPoint &p, \fBQwtAbstractSlider::ScrollMode\fP &scrollMode, int &direction) const\fC [protected, virtual]\fP"
+.PP
+Determine the scrolling mode and direction corresponding to a specified point. \fBParameters:\fP
+.RS 4
+\fIp\fP point 
+.br
+\fIscrollMode\fP scrolling mode 
+.br
+\fIdirection\fP direction 
+.RE
+.PP
+
+.PP
+Implements \fBQwtAbstractSlider\fP.
+.SS "double QwtWheel::getValue (const QPoint &p)\fC [protected, virtual]\fP"
+.PP
+Determine the value corresponding to a specified point. 
+.PP
+Implements \fBQwtAbstractSlider\fP.
+.SS "double QwtWheel::mass () const\fC [virtual]\fP"\fBReturns:\fP
+.RS 4
+mass 
+.RE
+.PP
+
+.PP
+Reimplemented from \fBQwtAbstractSlider\fP.
+.SS "QSize QwtWheel::minimumSizeHint () const\fC [virtual]\fP"
+.PP
+Return a minimum size hint. \fBWarning:\fP
+.RS 4
+The return value is based on the wheel width. 
+.RE
+.PP
+
+.SS "void QwtWheel::paintEvent (QPaintEvent *event)\fC [protected, virtual]\fP"
+.PP
+Qt Paint Event. \fBParameters:\fP
+.RS 4
+\fIevent\fP Paint event 
+.RE
+.PP
+
+.SS "void QwtWheel::resizeEvent (QResizeEvent *event)\fC [protected, virtual]\fP"
+.PP
+Qt Resize Event. \fBParameters:\fP
+.RS 4
+\fIevent\fP Resize event 
+.RE
+.PP
+
+.SS "void QwtWheel::setBorderWidth (intwidth)"
+.PP
+Set the border width. The border defaults to 2.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIwidth\fP Border width 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBborderWidth()\fP 
+.RE
+.PP
+
+.SS "void QwtWheel::setMass (doublemass)\fC [virtual]\fP"
+.PP
+Set the mass of the wheel. Assigning a mass turns the wheel into a flywheel. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImass\fP The wheel's mass 
+.RE
+.PP
+
+.PP
+Reimplemented from \fBQwtAbstractSlider\fP.
+.SS "void QwtWheel::setOrientation (Qt::Orientationo)\fC [virtual]\fP"
+.PP
+Set the wheel's orientation. \fBParameters:\fP
+.RS 4
+\fIo\fP Orientation. Allowed values are Qt::Horizontal and Qt::Vertical. Defaults to Qt::Horizontal. 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBQwtAbstractSlider::orientation()\fP 
+.RE
+.PP
+
+.PP
+Reimplemented from \fBQwtAbstractSlider\fP.
+.SS "void QwtWheel::setTickCnt (intcnt)"
+.PP
+Adjust the number of grooves in the wheel's surface. The number of grooves is limited to 6 <= cnt <= 50. Values outside this range will be clipped. The default value is 10.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcnt\fP Number of grooves per 360 degrees 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBtickCnt()\fP 
+.RE
+.PP
+
+.SS "void QwtWheel::setTotalAngle (doubleangle)\fC [slot]\fP"
+.PP
+Set the total angle which the wheel can be turned. One full turn of the wheel corresponds to an angle of 360 degrees. A total angle of n*360 degrees means that the wheel has to be turned n times around its axis to get from the minimum value to the maximum value.
+.PP
+The default setting of the total angle is 360 degrees.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIangle\fP total angle in degrees 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBtotalAngle()\fP 
+.RE
+.PP
+
+.SS "void QwtWheel::setViewAngle (doubleangle)\fC [slot]\fP"
+.PP
+Specify the visible portion of the wheel. You may use this function for fine-tuning the appearance of the wheel. The default value is 175 degrees. The value is limited from 10 to 175 degrees.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIangle\fP Visible angle in degrees 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBviewAngle()\fP, \fBsetTotalAngle()\fP 
+.RE
+.PP
+
+.SS "void QwtWheel::setWheelBorderWidth (intborderWidth)"
+.PP
+Set the wheel border width of the wheel. The wheel border must not be smaller than 1 and is limited in dependence on the wheel's size. Values outside the allowed range will be clipped.
+.PP
+The wheel border defaults to 2.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIborderWidth\fP Border width 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+internalBorder() 
+.RE
+.PP
+
+.SS "void QwtWheel::setWheelWidth (intwidth)"
+.PP
+Set the width of the wheel. Corresponds to the wheel height for horizontal orientation, and the wheel width for vertical orientation.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIwidth\fP the wheel's width 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBwheelWidth()\fP 
+.RE
+.PP
+
+.SS "QSize QwtWheel::sizeHint () const\fC [virtual]\fP"\fBReturns:\fP
+.RS 4
+a size hint 
+.RE
+.PP
+
+.SS "int QwtWheel::tickCnt () const"\fBReturns:\fP
+.RS 4
+Number of grooves in the wheel's surface. 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetTickCnt()\fP 
+.RE
+.PP
+
+.SS "double QwtWheel::totalAngle () const"\fBReturns:\fP
+.RS 4
+Total angle which the wheel can be turned. 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetTotalAngle()\fP 
+.RE
+.PP
+
+.SS "void QwtWheel::valueChange ()\fC [protected, virtual]\fP"
+.PP
+Notify value change. 
+.PP
+Reimplemented from \fBQwtAbstractSlider\fP.
+.SS "double QwtWheel::viewAngle () const"\fBReturns:\fP
+.RS 4
+Visible portion of the wheel 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetViewAngle()\fP, \fBtotalAngle()\fP 
+.RE
+.PP
+
+.SS "int QwtWheel::wheelBorderWidth () const"\fBReturns:\fP
+.RS 4
+Wheel border width 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetWheelBorderWidth()\fP 
+.RE
+.PP
+
+.SS "QRect QwtWheel::wheelRect () const"\fBReturns:\fP
+.RS 4
+Rectangle of the wheel without the outer border 
+.RE
+.PP
+
+.SS "int QwtWheel::wheelWidth () const"\fBReturns:\fP
+.RS 4
+Width of the wheel 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetWheelWidth()\fP 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

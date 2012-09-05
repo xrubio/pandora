@@ -1,0 +1,107 @@
+.TH "QwtSeriesData" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtSeriesData \- 
+.PP
+Abstract interface for iterating over samples.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_series_data.h>\fP
+.PP
+Inherited by \fBQwtArraySeriesData< T >\fP.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtSeriesData\fP ()"
+.br
+.ti -1c
+.RI "virtual \fB~QwtSeriesData\fP ()"
+.br
+.ti -1c
+.RI "virtual size_t \fBsize\fP () const =0"
+.br
+.ti -1c
+.RI "virtual T \fBsample\fP (size_t i) const =0"
+.br
+.ti -1c
+.RI "virtual QRectF \fBboundingRect\fP () const =0"
+.br
+.ti -1c
+.RI "virtual void \fBsetRectOfInterest\fP (const QRectF &)"
+.br
+.in -1c
+.SS "Protected Attributes"
+
+.in +1c
+.ti -1c
+.RI "QRectF \fBd_boundingRect\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.SS "template<typename T> class QwtSeriesData< T >"
+Abstract interface for iterating over samples. 
+
+Qwt offers several implementations of the \fBQwtSeriesData\fP API, but in situations, where data of an application specific format needs to be displayed, without having to copy it, it is recommended to implement an individual data access. 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "template<typename T > \fBQwtSeriesData\fP< T >::\fBQwtSeriesData\fP ()"
+.PP
+Constructor. 
+.SS "template<typename T > \fBQwtSeriesData\fP< T >::~\fBQwtSeriesData\fP ()\fC [virtual]\fP"
+.PP
+Destructor. 
+.SH "Member Function Documentation"
+.PP 
+.SS "template<typename T> virtual QRectF \fBQwtSeriesData\fP< T >::boundingRect () const\fC [pure virtual]\fP"Calculate the bounding rect of all samples
+.PP
+The bounding rect is necessary for autoscaling and can be used for a couple of painting optimizations.
+.PP
+qwtBoundingRect(...) offers slow implementations iterating over the samples. For large sets it is recommended to implement something faster f.e. by caching the bounding rect. 
+.PP
+Implemented in \fBQwtPointSeriesData\fP, \fBQwtPoint3DSeriesData\fP, \fBQwtIntervalSeriesData\fP, \fBQwtSetSeriesData\fP, \fBQwtPointArrayData\fP, \fBQwtCPointerData\fP, and \fBQwtSyntheticPointData\fP.
+.SS "template<typename T> virtual T \fBQwtSeriesData\fP< T >::sample (size_ti) const\fC [pure virtual]\fP"Return a sample 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIi\fP Index 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Sample at position i 
+.RE
+.PP
+
+.PP
+Implemented in \fBQwtArraySeriesData< T >\fP, \fBQwtPointArrayData\fP, \fBQwtCPointerData\fP, \fBQwtSyntheticPointData\fP, \fBQwtArraySeriesData< QwtIntervalSample >\fP, \fBQwtArraySeriesData< QPointF >\fP, \fBQwtArraySeriesData< QwtPoint3D >\fP, and \fBQwtArraySeriesData< QwtSetSample >\fP.
+.SS "template<typename T > void \fBQwtSeriesData\fP< T >::setRectOfInterest (const QRectF &)\fC [virtual]\fP"Set a the 'rect of interest'
+.PP
+\fBQwtPlotSeriesItem\fP defines the current area of the plot canvas as 'rect of interest' ( \fBQwtPlotSeriesItem::updateScaleDiv()\fP ). It can be used to implement different levels of details.
+.PP
+The default implementation does nothing. 
+.PP
+Reimplemented in \fBQwtSyntheticPointData\fP.
+.SS "template<typename T> virtual size_t \fBQwtSeriesData\fP< T >::size () const\fC [pure virtual]\fP"\fBReturns:\fP
+.RS 4
+Number of samples 
+.RE
+.PP
+
+.PP
+Implemented in \fBQwtArraySeriesData< T >\fP, \fBQwtPointArrayData\fP, \fBQwtCPointerData\fP, \fBQwtSyntheticPointData\fP, \fBQwtArraySeriesData< QwtIntervalSample >\fP, \fBQwtArraySeriesData< QPointF >\fP, \fBQwtArraySeriesData< QwtPoint3D >\fP, and \fBQwtArraySeriesData< QwtSetSample >\fP.
+.SH "Member Data Documentation"
+.PP 
+.SS "template<typename T> QRectF \fBQwtSeriesData\fP< T >::\fBd_boundingRect\fP\fC [mutable, protected]\fP"
+.PP
+Can be used to cache a calculated bounding rectangle. 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

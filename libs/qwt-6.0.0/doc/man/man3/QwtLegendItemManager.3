@@ -1,0 +1,86 @@
+.TH "QwtLegendItemManager" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtLegendItemManager \- 
+.PP
+Abstract API to bind plot items to the legend.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_legend_itemmanager.h>\fP
+.PP
+Inherited by \fBQwtPlotItem\fP.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtLegendItemManager\fP ()"
+.br
+.ti -1c
+.RI "virtual \fB~QwtLegendItemManager\fP ()"
+.br
+.ti -1c
+.RI "virtual void \fBupdateLegend\fP (\fBQwtLegend\fP *legend) const =0"
+.br
+.ti -1c
+.RI "virtual QWidget * \fBlegendItem\fP () const =0"
+.br
+.ti -1c
+.RI "virtual void \fBdrawLegendIdentifier\fP (QPainter *, const QRectF &) const "
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Abstract API to bind plot items to the legend. 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtLegendItemManager::QwtLegendItemManager ()\fC [inline]\fP"
+.PP
+Constructor. 
+.SS "virtual QwtLegendItemManager::~QwtLegendItemManager ()\fC [inline, virtual]\fP"
+.PP
+Destructor. 
+.SH "Member Function Documentation"
+.PP 
+.SS "virtual void QwtLegendItemManager::drawLegendIdentifier (QPainter *, const QRectF &) const\fC [inline, virtual]\fP"\fBQwtLegendItem\fP can display an icon-identifier followed by a text. The icon helps to identify a plot item on the plot canvas and depends on the type of information, that is displayed.
+.PP
+The default implementation paints nothing. 
+.PP
+Reimplemented in \fBQwtPlotCurve\fP, \fBQwtPlotHistogram\fP, \fBQwtPlotIntervalCurve\fP, and \fBQwtPlotMarker\fP.
+.SS "virtual QWidget* QwtLegendItemManager::legendItem () const\fC [pure virtual]\fP"Allocate the widget that represents the item on the legend 
+.PP
+\fBReturns:\fP
+.RS 4
+Allocated widget 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBupdateLegend()\fP QwtLegend() 
+.RE
+.PP
+
+.PP
+Implemented in \fBQwtPlotItem\fP.
+.SS "virtual void QwtLegendItemManager::updateLegend (\fBQwtLegend\fP *legend) const\fC [pure virtual]\fP"Update the widget that represents the item on the legend 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIlegend\fP Legend 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBlegendItem()\fP 
+.RE
+.PP
+
+.PP
+Implemented in \fBQwtPlotCurve\fP, \fBQwtPlotItem\fP, and \fBQwtPlotMarker\fP.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

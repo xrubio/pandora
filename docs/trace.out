@@ -1,0 +1,463 @@
+Fri Dec 11 12:27:19 CET 2009
+Debug level= 1
+Ensure level= 1
+FMMPI_DEBUG=1
+FMMPI_pre_init() started.
+Debug level= 1
+Ensure level= 1
+Debug level= 1
+Ensure level= 1
+Debug level= 1
+Ensure level= 1
+FMMPI_DEBUG=1
+FMMPI_pre_init() started.
+FMMPI_DEBUG=1
+FMMPI_pre_init() started.
+FMMPI_DEBUG=1
+FMMPI_pre_init() started.
+mpitrace: Tracing package is located on /gpfs/apps/CEPBATOOLS/mpitrace/64/
+mpitrace: Generating intermediate files for Paraver traces.
+mpitrace: MPI routines will collect HW counters information.
+mpitrace: Tracing 3 level(s) of MPI callers: [ 1 2 3 ]
+mpitrace: <sampling> tag at <Callers> level will be ignored. This library does not support SAMPLING.
+mpitrace: PAPI domain set to ALL for HWC set 1
+mpitrace: HWC set 1 contains following counters < PAPI_TOT_INS (0x80000032) PAPI_TOT_CYC (0x8000003b) PAPI_L1_DCM (0x80000000) >
+mpitrace: PAPI domain set to USER for HWC set 2
+mpitrace: HWC set 2 contains following counters < PAPI_TOT_INS (0x80000032) PAPI_FP_INS (0x80000034) PAPI_TOT_CYC (0x8000003b) >
+mpitrace: Network counters are disabled.
+mpitrace: Resource usage is disabled at flush buffer.
+mpitrace: Tracing buffer can hold 150000 events
+mpitrace: Intermediate traces will be stored in /gpfs/home/bsc21/bsc21887/simulador/fishsim/examples/randomTest
+mpitrace: Tracing mode is set to: Detail.
+mpitrace: Tracing enabled for process 16226 (counters enabled).
+mpitrace: Tracing enabled for process 16173 (counters enabled).
+mpitrace: Tracing enabled for process 16314 (counters enabled).
+mpitrace: Tracing enabled for process 16198 (counters enabled).
+mpitrace: Successfully initiated with 4 tasks
+
+FMMPI_nodeid=0, FMMPI_numnodes=4
+FMMPI_nodeid=1, FMMPI_numnodes=4
+FMMPI_nodeid=3, FMMPI_numnodes=4
+NODEINFO="4:4@localhost:0"
+FMMPI_nodeid=2, FMMPI_numnodes=4
+	MyIndex=0
+NODEINFO="4:4@localhost:1"
+NODEINFO="4:4@localhost:3"
+NODEINFO="4:4@localhost:2"
+	MyIndex=1
+FM_initialize() started.
+	MyIndex=3
+Sizeof(MixFMData)== 6.07 MB.
+	MyIndex=2
+FM_initialize() started.
+FM_initialize() started.
+FM_initialize() started.
+Sizeof(MixFMData)== 6.07 MB.
+Sizeof(MixFMData)== 6.07 MB.
+Sizeof(MixFMData)== 6.07 MB.
+Note: No network description file "net.txt".
+Assuming shared memory & LAN (TCP) connectivity among all nodes...
+Note: No network description file "net.txt".
+Assuming shared memory & LAN (TCP) connectivity among all nodes...
+FMMPI_initialize() started.
+Note: No network description file "net.txt".
+Assuming shared memory & LAN (TCP) connectivity among all nodes...
+Note: No network description file "net.txt".
+Assuming shared memory & LAN (TCP) connectivity among all nodes...
+1:FMMPI joining barrier
+FMMPI_initialize() started.
+0:FMMPI joining barrier
+FMMPI_initialize() started.
+FMMPI_initialize() started.
+3:FMMPI joining barrier
+0:FMMPI done barrier
+FMMPI_initialize() done.
+2:FMMPI joining barrier
+1:FMMPI done barrier
+FMMPI_initialize() done.
+FM_initialize() done.
+FM_initialize() done.
+3:FMMPI done barrier
+FMMPI_initialize() done.
+2:FMMPI done barrier
+FMMPI_initialize() done.
+FM_initialize() done.
+FM_initialize() done.
+world: 0 initialized
+world: 2 initialized
+world: 3 initialized
+world: 1 initialized
+Simulator: 0 creating initial resources
+Simulator: 2 creating initial resources
+Simulator: 3 creating initial resources
+Simulator: 1 creating initial resources
+Simulator: 0 pos: 0/0 with value: 2
+Simulator: 0 pos: 0/1 with value: 1
+Simulator: 0 pos: 0/2 with value: 7
+Simulator: 0 pos: 0/3 with value: 2
+Simulator: 0 pos: 1/0 with value: 3
+Simulator: 0 pos: 1/1 with value: 4
+Simulator: 2 pos: 0/0 with value: 5
+Simulator: 0 pos: 1/2 with value: 6
+Simulator: 0 pos: 1/3 with value: 6
+Simulator: 2 pos: 0/1 with value: 7
+Simulator: 3 pos: 0/0 with value: 5
+Simulator: 1 pos: 0/0 with value: 5
+Simulator: 0 pos: 2/0 with value: 8
+Simulator: 2 pos: 0/2 with value: 8
+Simulator: 2 pos: 0/3 with value: 0
+Simulator: 3 pos: 0/1 with value: 7
+Simulator: 3 pos: 0/2 with value: 8
+Simulator: 1 pos: 0/1 with value: 7
+Simulator: 0 pos: 2/1 with value: 9
+Simulator: 0 pos: 2/2 with value: 0
+Simulator: 2 pos: 1/0 with value: 5
+Simulator: 3 pos: 0/3 with value: 0
+Simulator: 0 pos: 2/3 with value: 2
+Simulator: 2 pos: 1/1 with value: 6
+Simulator: 3 pos: 1/0 with value: 5
+Simulator: 3 pos: 1/1 with value: 6
+Simulator: 0 pos: 3/0 with value: 5
+Simulator: 2 pos: 1/2 with value: 0
+Simulator: 3 pos: 1/2 with value: 0
+Simulator: 1 pos: 0/2 with value: 8
+Simulator: 1 pos: 0/3 with value: 0
+Simulator: 0 pos: 3/1 with value: 2
+Simulator: 2 pos: 1/3 with value: 5
+Simulator: 2 pos: 2/0 with value: 3
+Simulator: 3 pos: 1/3 with value: 5
+Simulator: 3 pos: 2/0 with value: 3
+Simulator: 1 pos: 1/0 with value: 5
+Simulator: 0 pos: 3/2 with value: 9
+Simulator: 2 pos: 2/1 with value: 9
+Simulator: 3 pos: 2/1 with value: 9
+Simulator: 3 pos: 2/2 with value: 8
+Simulator: 1 pos: 1/1 with value: 6
+Simulator: 1 pos: 1/2 with value: 0
+Simulator: 0 pos: 3/3 with value: 2
+Simulator: 2 pos: 2/2 with value: 8
+Simulator: 2 pos: 2/3 with value: 8
+Simulator: 3 pos: 2/3 with value: 8
+Simulator: 1 pos: 1/3 with value: 5
+Simulator: 2 pos: 3/0 with value: 5
+Simulator: 3 pos: 3/0 with value: 5
+Simulator: 3 pos: 3/1 with value: 4
+Simulator: 1 pos: 2/0 with value: 3
+Simulator: 1 pos: 2/1 with value: 9
+Simulator: 1 pos: 2/2 with value: 8
+Simulator: 2 pos: 3/1 with value: 4
+Simulator: 3 pos: 3/2 with value: 4
+Simulator: 1 pos: 2/3 with value: 8
+Simulator: 1 pos: 3/0 with value: 5
+Simulator: 2 pos: 3/2 with value: 4
+Simulator: 2 pos: 3/3 with value: 7
+Simulator: 3 pos: 3/3 with value: 7
+Simulator: 1 pos: 3/1 with value: 4
+Simulator: 1 pos: 3/2 with value: 4
+adding agents
+adding agents
+Simulator: 1 pos: 3/3 with value: 7
+adding agents
+adding agents
+0: TMRed initialized.
+Simulator started.
+1: TMRed initialized.
+Simulator started.
+2: TMRed initialized.
+Simulator started.
+3: TMRed initialized.
+Simulator started.
+[0,0] executing init at time: 0:0
+total num environments: 4 for feds: 4
+[0,1] executing init at time: 0:0
+[0,2] executing init at time: 0:0
+[0,3] executing init at time: 0:0
+[0,0] at position: 0/0 will fill resources
+[0,0] pos: 1/1 copying data: 2/2 from point: 0/0
+total num environments: 4 for feds: 4
+total num environments: 4 for feds: 4
+[0,1] at position: 4/0 will fill resources
+[0,2] at position: 0/4 will fill resources
+total num environments: 4 for feds: 4
+[0,1] pos: 0/1 copying data: 5/5 from point: 3/0
+[0,0] pos: 1/2 copying data: 1/1 from point: 0/1
+[0,2] pos: 1/0 copying data: 0/0 from point: 0/3
+[0,3] at position: 4/4 will fill resources
+[0,0] pos: 1/3 copying data: 7/7 from point: 0/2
+[0,2] pos: 2/0 copying data: 5/5 from point: 1/3
+[0,3] pos: 0/0 copying data: 7/7 from point: 3/3
+[0,1] pos: 0/2 copying data: 4/4 from point: 3/1
+[0,0] pos: 2/1 copying data: 3/3 from point: 1/0
+[0,0] pos: 2/2 copying data: 4/4 from point: 1/1
+[0,2] pos: 3/0 copying data: 8/8 from point: 2/3
+This host is big-endian!
+[0,1] pos: 0/3 copying data: 4/4 from point: 3/2
+[0,0] pos: 2/3 copying data: 6/6 from point: 1/2
+[0,0] pos: 3/1 copying data: 8/8 from point: 2/0
+This host is big-endian!
+[0,0] pos: 3/2 copying data: 9/9 from point: 2/1
+[0,0] pos: 3/3 copying data: 0/0 from point: 2/2
+This host is big-endian!
+This host is big-endian!
+[1,0] executing init at time: 0:1
+total num environments: 4 for feds: 4
+[1,0] at position: 2/0 will fill resources
+[1,0] pos: 0/1 copying data: 3/3 from point: 1/0
+[1,1] executing init at time: 0:1
+[1,0] pos: 0/2 copying data: 4/4 from point: 1/1
+[1,2] executing init at time: 0:1
+[1,0] pos: 0/3 copying data: 6/6 from point: 1/2
+[1,3] executing init at time: 0:1
+[1,0] pos: 1/1 copying data: 8/8 from point: 2/0
+total num environments: 4 for feds: 4
+[1,0] pos: 1/2 copying data: 9/9 from point: 2/1
+[1,1] at position: 6/0 will fill resources
+[1,0] pos: 1/3 copying data: 0/0 from point: 2/2
+total num environments: 4 for feds: 4
+[1,0] pos: 2/1 copying data: 5/5 from point: 3/0
+[1,2] at position: 2/4 will fill resources
+total num environments: 4 for feds: 4
+[1,0] pos: 2/2 copying data: 2/2 from point: 3/1
+[1,2] pos: 0/0 copying data: 5/5 from point: 1/3
+[1,3] at position: 6/4 will fill resources
+[1,0] pos: 2/3 copying data: 9/9 from point: 3/2
+[1,2] pos: 1/0 copying data: 8/8 from point: 2/3
+[1,2] pos: 2/0 copying data: 7/7 from point: 3/3
+[2,0] executing init at time: 0:2
+total num environments: 4 for feds: 4
+[2,0] at position: 0/2 will fill resources
+[2,2] executing init at time: 0:2
+[2,1] executing init at time: 0:2
+[2,0] pos: 1/0 copying data: 1/1 from point: 0/1
+[2,3] executing init at time: 0:2
+[2,0] pos: 1/1 copying data: 7/7 from point: 0/2
+[2,0] pos: 1/2 copying data: 2/2 from point: 0/3
+[2,0] pos: 2/0 copying data: 4/4 from point: 1/1
+[2,0] pos: 2/1 copying data: 6/6 from point: 1/2
+total num environments: 4 for feds: 4
+total num environments: 4 for feds: 4
+[2,0] pos: 2/2 copying data: 6/6 from point: 1/3
+[2,2] at position: 0/6 will fill resources
+total num environments: 4 for feds: 4
+[2,1] at position: 4/2 will fill resources
+[2,0] pos: 3/0 copying data: 9/9 from point: 2/1
+[2,3] at position: 4/6 will fill resources
+[2,1] pos: 0/0 copying data: 4/4 from point: 3/1
+[2,0] pos: 3/1 copying data: 0/0 from point: 2/2
+[2,1] pos: 0/1 copying data: 4/4 from point: 3/2
+[2,0] pos: 3/2 copying data: 2/2 from point: 2/3
+[2,1] pos: 0/2 copying data: 7/7 from point: 3/3
+[3,0] executing init at time: 0:3
+total num environments: 4 for feds: 4
+[3,1] executing init at time: 0:3
+[3,2] executing init at time: 0:3
+[3,3] executing init at time: 0:3
+[3,0] at position: 2/2 will fill resources
+[3,0] pos: 0/0 copying data: 4/4 from point: 1/1
+[3,0] pos: 0/1 copying data: 6/6 from point: 1/2
+[3,0] pos: 0/2 copying data: 6/6 from point: 1/3
+total num environments: 4 for feds: 4
+[3,0] pos: 1/0 copying data: 9/9 from point: 2/1
+total num environments: 4 for feds: 4
+[3,1] at position: 6/2 will fill resources
+[3,0] pos: 1/1 copying data: 0/0 from point: 2/2
+[3,2] at position: 2/6 will fill resources
+total num environments: 4 for feds: 4
+[3,0] pos: 1/2 copying data: 2/2 from point: 2/3
+[3,3] at position: 6/6 will fill resources
+[3,0] pos: 2/0 copying data: 2/2 from point: 3/1
+[3,0] pos: 2/1 copying data: 9/9 from point: 3/2
+[3,0] pos: 2/2 copying data: 2/2 from point: 3/3
+[0,0] sending S copy event with starting point: 0/0
+	[0,0] data index: 0=0 copied from pos: 0/2
+[0,1] sending S copy event with starting point: 0/0
+	[0,0] data index: 1=1 copied from pos: 1/2
+[0,2] sending N copy event with starting point: 0/2
+[0,3] sending N copy event with starting point: 0/2
+	[0,0] data index: 2=4 copied from pos: 2/2
+	[0,0] data index: 3=9 copied from pos: 3/2
+	[0,0] data index: 4=0 copied from pos: 0/3
+	[0,1] data index: 0=4 copied from pos: 0/2
+	[0,0] data index: 5=7 copied from pos: 1/3
+	[0,2] data index: 0=0 copied from pos: 0/0
+	[0,2] data index: 1=0 copied from pos: 1/0
+	[0,3] data index: 0=7 copied from pos: 0/0
+	[0,3] data index: 1=0 copied from pos: 1/0
+	[0,1] data index: 1=0 copied from pos: 1/2
+	[0,0] data index: 6=6 copied from pos: 2/3
+	[0,2] data index: 2=5 copied from pos: 2/0
+	[0,3] data index: 2=0 copied from pos: 2/0
+	[0,1] data index: 2=0 copied from pos: 2/2
+	[0,0] data index: 7=0 copied from pos: 3/3
+[0,0] will send data to: [2,0]
+	[0,2] data index: 3=8 copied from pos: 3/0
+	[0,3] data index: 3=0 copied from pos: 3/0
+	[0,1] data index: 3=0 copied from pos: 3/2
+[0,0] sending E copy event with starting point: 0/0
+	[0,2] data index: 4=0 copied from pos: 0/1
+	[0,3] data index: 4=0 copied from pos: 0/1
+	[0,1] data index: 4=4 copied from pos: 0/3
+	[0,0] data index: 0=0 copied from pos: 2/0
+	[0,2] data index: 5=0 copied from pos: 1/1
+	[0,3] data index: 5=0 copied from pos: 1/1
+	[0,1] data index: 5=0 copied from pos: 1/3
+	[0,0] data index: 1=3 copied from pos: 2/1
+	[0,2] data index: 6=0 copied from pos: 2/1
+	[0,3] data index: 6=0 copied from pos: 2/1
+	[0,3] data index: 7=0 copied from pos: 3/1
+[0,3] will send data to: [2,1]
+	[0,1] data index: 6=0 copied from pos: 2/3
+	[0,0] data index: 2=4 copied from pos: 2/2
+	[0,2] data index: 7=0 copied from pos: 3/1
+[0,2] will send data to: [2,0]
+[0,3] sending S copy event with starting point: 0/0
+	[0,1] data index: 7=0 copied from pos: 3/3
+	[0,0] data index: 3=6 copied from pos: 2/3
+[0,2] sending S copy event with starting point: 0/0
+[0,1] will send data to: [2,1]
+	[0,0] data index: 4=0 copied from pos: 3/0
+[0,1] sending W copy event with starting point: 2/0
+	[0,0] data index: 5=8 copied from pos: 3/1
+	[0,1] data index: 0=0 copied from pos: 0/0
+	[0,0] data index: 6=9 copied from pos: 3/2
+	[0,0] data index: 7=0 copied from pos: 3/3
+[0,0] will send data to: [1,0]
+	[0,3] data index: 0=0 copied from pos: 0/2
+	[0,1] data index: 1=5 copied from pos: 0/1
+[0,0] sending SE copy event with starting point: 0/0
+	[0,3] data index: 1=0 copied from pos: 1/2
+	[0,1] data index: 2=4 copied from pos: 0/2
+	[0,0] data index: 0=4 copied from pos: 2/2
+	[0,2] data index: 0=0 copied from pos: 0/2
+	[0,3] data index: 2=0 copied from pos: 2/2
+	[0,1] data index: 3=4 copied from pos: 0/3
+	[0,0] data index: 1=9 copied from pos: 3/2
+	[0,2] data index: 1=0 copied from pos: 1/2
+	[0,3] data index: 3=0 copied from pos: 3/2
+	[0,1] data index: 4=0 copied from pos: 1/0
+	[0,0] data index: 2=6 copied from pos: 2/3
+	[0,2] data index: 2=0 copied from pos: 2/2
+	[0,3] data index: 4=0 copied from pos: 0/3
+	[0,1] data index: 5=0 copied from pos: 1/1
+	[0,0] data index: 3=0 copied from pos: 3/3
+	[0,2] data index: 3=0 copied from pos: 3/2
+	[0,3] data index: 5=0 copied from pos: 1/3
+	[0,3] data index: 6=0 copied from pos: 2/3
+	[0,1] data index: 6=0 copied from pos: 1/2
+[0,0] will send data to: [3,0]
+[0,0] has finished step: 0 of: 5 , next pid to be executed: [1,0]
+	[0,2] data index: 4=0 copied from pos: 0/3
+	[0,3] data index: 7=0 copied from pos: 3/3
+	[0,1] data index: 7=0 copied from pos: 1/3
+	[0,2] data index: 5=0 copied from pos: 1/3
+[0,3] will send data to: [2,3]
+[0,1] will send data to: [1,0]
+	[0,2] data index: 6=0 copied from pos: 2/3
+[0,3] sending W copy event with starting point: 2/0
+[0,1] sending E copy event with starting point: 0/0
+	[0,2] data index: 7=0 copied from pos: 3/3
+[0,2] will send data to: [2,2]
+	[0,3] data index: 0=7 copied from pos: 0/0
+[0,2] sending E copy event with starting point: 0/0
+	[0,3] data index: 1=0 copied from pos: 0/1
+	[0,2] data index: 0=5 copied from pos: 2/0
+	[0,3] data index: 2=0 copied from pos: 0/2
+	[0,2] data index: 1=0 copied from pos: 2/1
+	[0,3] data index: 3=0 copied from pos: 0/3
+	[0,3] data index: 4=0 copied from pos: 1/0
+	[0,2] data index: 2=0 copied from pos: 2/2
+	[0,3] data index: 5=0 copied from pos: 1/1
+	[0,1] data index: 0=0 copied from pos: 2/0
+	[0,2] data index: 3=0 copied from pos: 2/3
+	[0,3] data index: 6=0 copied from pos: 1/2
+	[0,1] data index: 1=0 copied from pos: 2/1
+	[0,2] data index: 4=8 copied from pos: 3/0
+	[0,3] data index: 7=0 copied from pos: 1/3
+[0,3] will send data to: [1,2]
+	[0,1] data index: 2=0 copied from pos: 2/2
+	[0,2] data index: 5=0 copied from pos: 3/1
+[0,3] sending E copy event with starting point: 0/0
+	[0,1] data index: 3=0 copied from pos: 2/3
+	[0,1] data index: 4=0 copied from pos: 3/0
+	[0,3] data index: 0=0 copied from pos: 2/0
+	[0,3] data index: 1=0 copied from pos: 2/1
+	[0,1] data index: 5=0 copied from pos: 3/1
+	[0,3] data index: 2=0 copied from pos: 2/2
+	[0,1] data index: 6=0 copied from pos: 3/2
+	[0,3] data index: 3=0 copied from pos: 2/3
+	[0,1] data index: 7=0 copied from pos: 3/3
+	[0,3] data index: 4=0 copied from pos: 3/0
+[0,1] will send data to: [1,1]
+	[0,2] data index: 6=0 copied from pos: 3/2
+	[0,3] data index: 5=0 copied from pos: 3/1
+[0,1] sending SW copy event with starting point: 2/0
+	[0,2] data index: 7=0 copied from pos: 3/3
+	[0,3] data index: 6=0 copied from pos: 3/2
+	[0,1] data index: 0=4 copied from pos: 0/2
+[0,2] will send data to: [1,2]
+	[0,3] data index: 7=0 copied from pos: 3/3
+	[0,1] data index: 1=0 copied from pos: 1/2
+[0,2] sending NE copy event with starting point: 0/2
+[0,3] will send data to: [1,3]
+[0,3] sending NW copy event with starting point: 2/2
+	[0,1] data index: 2=4 copied from pos: 0/3
+	[0,2] data index: 0=5 copied from pos: 2/0
+	[0,2] data index: 1=8 copied from pos: 3/0
+	[0,3] data index: 0=7 copied from pos: 0/0
+	[0,1] data index: 3=0 copied from pos: 1/3
+	[0,2] data index: 2=0 copied from pos: 2/1
+	[0,3] data index: 1=0 copied from pos: 1/0
+[0,1] will send data to: [3,0]
+	[0,2] data index: 3=0 copied from pos: 3/1
+	[0,3] data index: 2=0 copied from pos: 0/1
+[0,1] sending SE copy event with starting point: 0/0
+[0,2] will send data to: [3,0]
+	[0,3] data index: 3=0 copied from pos: 1/1
+	[0,1] data index: 0=0 copied from pos: 2/2
+[0,2] sending SE copy event with starting point: 0/0
+[0,3] will send data to: [3,0]
+	[0,1] data index: 1=0 copied from pos: 3/2
+	[0,2] data index: 0=0 copied from pos: 2/2
+[0,3] sending SW copy event with starting point: 2/0
+	[0,1] data index: 2=0 copied from pos: 2/3
+	[0,2] data index: 1=0 copied from pos: 3/2
+	[0,1] data index: 3=0 copied from pos: 3/3
+	[0,2] data index: 2=0 copied from pos: 2/3
+[0,1] will send data to: [3,1]
+	[0,2] data index: 3=0 copied from pos: 3/3
+[0,1] has finished step: 0 of: 5 , next pid to be executed: [1,1]
+[0,2] will send data to: [3,2]
+	[0,3] data index: 0=0 copied from pos: 0/2
+[0,2] has finished step: 0 of: 5 , next pid to be executed: [1,2]
+	[0,3] data index: 1=0 copied from pos: 1/2
+	[0,3] data index: 2=0 copied from pos: 0/3
+	[0,3] data index: 3=0 copied from pos: 1/3
+[0,3] will send data to: [3,2]
+[0,3] sending NE copy event with starting point: 0/2
+	[0,3] data index: 0=0 copied from pos: 2/0
+	[0,3] data index: 1=0 copied from pos: 3/0
+	[0,3] data index: 2=0 copied from pos: 2/1
+	[0,3] data index: 3=0 copied from pos: 3/1
+[0,3] will send data to: [3,1]
+[0,3] sending SE copy event with starting point: 0/0
+	[0,3] data index: 0=0 copied from pos: 2/2
+	[0,3] data index: 1=0 copied from pos: 3/2
+	[0,3] data index: 2=0 copied from pos: 2/3
+	[0,3] data index: 3=0 copied from pos: 3/3
+[0,3] will send data to: [3,3]
+[0,3] has finished step: 0 of: 5 , next pid to be executed: [1,3]
+[2,0] has received copy overlap event from starting point: 0/2 and size: 8, being horizontal: 1
+	[2,0] resource pos: 0/2=0
+	[2,0] resource pos: 1/2=0
+[2,1] has received copy overlap event from starting point: 0/2 and size: 8, being horizontal: 1
+	[2,0] resource pos: 2/2=0
+	[2,0] resource pos: 3/2=269312496
+	[2,1] resource pos: 0/2=4
+	[2,1] resource pos: 1/2=0
+	[2,1] resource pos: 2/2=0
+	[2,1] resource pos: 3/2=0
+	[2,1] resource pos: 0/3=4
+exception thrown: ResourceField::setResource - value: 269312496 bigger than max value: 2 at position: 3/2
+exception thrown: ResourceField::setResource - value: 4 bigger than max value: 0 at position: 0/3
+Fri Dec 11 12:27:31 CET 2009
+DONE

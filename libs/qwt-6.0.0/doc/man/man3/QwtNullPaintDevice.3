@@ -1,0 +1,197 @@
+.TH "QwtNullPaintDevice" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtNullPaintDevice \- 
+.PP
+A null paint device doing nothing.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_null_paintdevice.h>\fP
+.PP
+Inherited by QwtStyleSheetRecorder.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtNullPaintDevice\fP (QPaintEngine::PaintEngineFeatures)"
+.br
+.ti -1c
+.RI "\fBQwtNullPaintDevice\fP (const QSize &size, QPaintEngine::PaintEngineFeatures)"
+.br
+.ti -1c
+.RI "virtual \fB~QwtNullPaintDevice\fP ()"
+.br
+.ti -1c
+.RI "void \fBsetSize\fP (const QSize &)"
+.br
+.ti -1c
+.RI "QSize \fBsize\fP () const "
+.br
+.ti -1c
+.RI "virtual QPaintEngine * \fBpaintEngine\fP () const "
+.br
+.ti -1c
+.RI "virtual int \fBmetric\fP (PaintDeviceMetric metric) const "
+.br
+.ti -1c
+.RI "virtual void \fBdrawRects\fP (const QRect *, int)"
+.br
+.ti -1c
+.RI "virtual void \fBdrawRects\fP (const QRectF *, int)"
+.br
+.ti -1c
+.RI "virtual void \fBdrawLines\fP (const QLine *, int)"
+.br
+.ti -1c
+.RI "virtual void \fBdrawLines\fP (const QLineF *, int)"
+.br
+.ti -1c
+.RI "virtual void \fBdrawEllipse\fP (const QRectF &)"
+.br
+.ti -1c
+.RI "virtual void \fBdrawEllipse\fP (const QRect &)"
+.br
+.ti -1c
+.RI "virtual void \fBdrawPath\fP (const QPainterPath &)"
+.br
+.ti -1c
+.RI "virtual void \fBdrawPoints\fP (const QPointF *, int)"
+.br
+.ti -1c
+.RI "virtual void \fBdrawPoints\fP (const QPoint *, int)"
+.br
+.ti -1c
+.RI "virtual void \fBdrawPolygon\fP (const QPointF *, int, QPaintEngine::PolygonDrawMode)"
+.br
+.ti -1c
+.RI "virtual void \fBdrawPolygon\fP (const QPoint *, int, QPaintEngine::PolygonDrawMode)"
+.br
+.ti -1c
+.RI "virtual void \fBdrawPixmap\fP (const QRectF &, const QPixmap &, const QRectF &)"
+.br
+.ti -1c
+.RI "virtual void \fBdrawTextItem\fP (const QPointF &, const QTextItem &)"
+.br
+.ti -1c
+.RI "virtual void \fBdrawTiledPixmap\fP (const QRectF &, const QPixmap &, const QPointF &s)"
+.br
+.ti -1c
+.RI "virtual void \fBdrawImage\fP (const QRectF &, const QImage &, const QRectF &, Qt::ImageConversionFlags)"
+.br
+.ti -1c
+.RI "virtual void \fBupdateState\fP (const QPaintEngineState &state)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+A null paint device doing nothing. 
+
+Sometimes important layout/rendering geometries are not available or changable from the public Qt class interface. ( f.e hidden in the style implementation ).
+.PP
+\fBQwtNullPaintDevice\fP can be used to manipulate or filter out these informations by analyzing the stream of paint primitives.
+.PP
+F.e. \fBQwtNullPaintDevice\fP is used by \fBQwtPlotCanvas\fP to identify styled backgrounds with rounded corners. 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtNullPaintDevice::QwtNullPaintDevice (QPaintEngine::PaintEngineFeaturesfeatures)"
+.PP
+Constructor. 
+.SS "QwtNullPaintDevice::QwtNullPaintDevice (const QSize &size, QPaintEngine::PaintEngineFeaturesfeatures)"
+.PP
+Constructor. 
+.SS "QwtNullPaintDevice::~QwtNullPaintDevice ()\fC [virtual]\fP"
+.PP
+Destructor. 
+.SH "Member Function Documentation"
+.PP 
+.SS "void QwtNullPaintDevice::drawEllipse (const QRectF &rect)\fC [virtual]\fP"
+.PP
+See QPaintEngine::drawEllipse() 
+.SS "void QwtNullPaintDevice::drawEllipse (const QRect &rect)\fC [virtual]\fP"
+.PP
+See QPaintEngine::drawEllipse() 
+.SS "void QwtNullPaintDevice::drawImage (const QRectF &rect, const QImage &image, const QRectF &subRect, Qt::ImageConversionFlagsflags)\fC [virtual]\fP"
+.PP
+See QPaintEngine::drawImage() 
+.SS "void QwtNullPaintDevice::drawLines (const QLineF *lines, intlineCount)\fC [virtual]\fP"
+.PP
+See QPaintEngine::drawLines() 
+.SS "void QwtNullPaintDevice::drawLines (const QLine *lines, intlineCount)\fC [virtual]\fP"
+.PP
+See QPaintEngine::drawLines() 
+.SS "void QwtNullPaintDevice::drawPath (const QPainterPath &path)\fC [virtual]\fP"
+.PP
+See QPaintEngine::drawPath() 
+.SS "void QwtNullPaintDevice::drawPixmap (const QRectF &rect, const QPixmap &pm, const QRectF &subRect)\fC [virtual]\fP"
+.PP
+See QPaintEngine::drawPixmap() 
+.SS "void QwtNullPaintDevice::drawPoints (const QPointF *points, intpointCount)\fC [virtual]\fP"
+.PP
+See QPaintEngine::drawPoints() 
+.SS "void QwtNullPaintDevice::drawPoints (const QPoint *points, intpointCount)\fC [virtual]\fP"
+.PP
+See QPaintEngine::drawPoints() 
+.SS "void QwtNullPaintDevice::drawPolygon (const QPoint *points, intpointCount, QPaintEngine::PolygonDrawModemode)\fC [virtual]\fP"
+.PP
+See QPaintEngine::drawPolygon() 
+.SS "void QwtNullPaintDevice::drawPolygon (const QPointF *points, intpointCount, QPaintEngine::PolygonDrawModemode)\fC [virtual]\fP"
+.PP
+See QPaintEngine::drawPolygon() 
+.SS "void QwtNullPaintDevice::drawRects (const QRectF *rects, intrectCount)\fC [virtual]\fP"
+.PP
+See QPaintEngine::drawRects() 
+.SS "void QwtNullPaintDevice::drawRects (const QRect *rects, intrectCount)\fC [virtual]\fP"
+.PP
+See QPaintEngine::drawRects() 
+.SS "void QwtNullPaintDevice::drawTextItem (const QPointF &pos, const QTextItem &textItem)\fC [virtual]\fP"
+.PP
+See QPaintEngine::drawTextItem() 
+.SS "void QwtNullPaintDevice::drawTiledPixmap (const QRectF &rect, const QPixmap &pixmap, const QPointF &s)\fC [virtual]\fP"
+.PP
+See QPaintEngine::drawTiledPixmap() 
+.SS "int QwtNullPaintDevice::metric (PaintDeviceMetricmetric) const\fC [virtual]\fP"See QPaintDevice::metric() 
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetSize()\fP 
+.RE
+.PP
+
+.SS "QPaintEngine * QwtNullPaintDevice::paintEngine () const\fC [virtual]\fP"
+.PP
+See QPaintDevice::paintEngine() 
+.SS "void QwtNullPaintDevice::setSize (const QSize &size)"Set the size of the paint device
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsize\fP Size 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsize()\fP 
+.RE
+.PP
+
+.SS "QSize QwtNullPaintDevice::size () const"\fBReturns:\fP
+.RS 4
+Size of the paint device 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetSize()\fP 
+.RE
+.PP
+
+.SS "void QwtNullPaintDevice::updateState (const QPaintEngineState &state)\fC [virtual]\fP"
+.PP
+See QPaintEngine::updateState() 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

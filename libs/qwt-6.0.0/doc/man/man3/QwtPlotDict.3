@@ -1,0 +1,139 @@
+.TH "QwtPlotDict" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtPlotDict \- 
+.PP
+A dictionary for plot items.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_plot_dict.h>\fP
+.PP
+Inherited by \fBQwtPlot\fP.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtPlotDict\fP ()"
+.br
+.ti -1c
+.RI "virtual \fB~QwtPlotDict\fP ()"
+.br
+.ti -1c
+.RI "void \fBsetAutoDelete\fP (bool)"
+.br
+.ti -1c
+.RI "bool \fBautoDelete\fP () const "
+.br
+.ti -1c
+.RI "const QwtPlotItemList & \fBitemList\fP () const "
+.br
+.ti -1c
+.RI "QwtPlotItemList \fBitemList\fP (int rtti) const "
+.br
+.ti -1c
+.RI "void \fBdetachItems\fP (int rtti=QwtPlotItem::Rtti_PlotItem, bool autoDelete=true)"
+.br
+.in -1c
+.SS "Friends"
+
+.in +1c
+.ti -1c
+.RI "class \fBQwtPlotItem\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+A dictionary for plot items. 
+
+\fBQwtPlotDict\fP organizes plot items in increasing z-order. If \fBautoDelete()\fP is enabled, all attached items will be deleted in the destructor of the dictionary.
+.PP
+\fBSee also:\fP
+.RS 4
+\fBQwtPlotItem::attach()\fP, \fBQwtPlotItem::detach()\fP, \fBQwtPlotItem::z()\fP 
+.RE
+.PP
+
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtPlotDict::QwtPlotDict ()\fC [explicit]\fP"Constructor
+.PP
+Auto deletion is enabled. 
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetAutoDelete()\fP, attachItem() 
+.RE
+.PP
+
+.SS "QwtPlotDict::~QwtPlotDict ()\fC [virtual]\fP"Destructor
+.PP
+If autoDelete is on, all attached items will be deleted 
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetAutoDelete()\fP, \fBautoDelete()\fP, attachItem() 
+.RE
+.PP
+
+.SH "Member Function Documentation"
+.PP 
+.SS "bool QwtPlotDict::autoDelete () const"\fBReturns:\fP
+.RS 4
+true if auto deletion is enabled 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetAutoDelete()\fP, attachItem() 
+.RE
+.PP
+
+.SS "void QwtPlotDict::detachItems (intrtti = \fCQwtPlotItem::Rtti_PlotItem\fP, boolautoDelete = \fCtrue\fP)"Detach items from the dictionary
+.PP
+\fBParameters:\fP
+.RS 4
+\fIrtti\fP In case of QwtPlotItem::Rtti_PlotItem detach all items otherwise only those items of the type rtti. 
+.br
+\fIautoDelete\fP If true, delete all detached items 
+.RE
+.PP
+
+.SS "QwtPlotItemList QwtPlotDict::itemList (intrtti) const"\fBReturns:\fP
+.RS 4
+List of all attached plot items of a specific type. 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBQwtPlotItem::rtti()\fP 
+.RE
+.PP
+
+.SS "const QwtPlotItemList & QwtPlotDict::itemList () const"
+.PP
+A QwtPlotItemList of all attached plot items. Use caution when iterating these lists, as removing/detaching an item will invalidate the iterator. Instead you can place pointers to objects to be removed in a removal list, and traverse that list later.
+.PP
+\fBReturns:\fP
+.RS 4
+List of all attached plot items. 
+.RE
+.PP
+
+.SS "void QwtPlotDict::setAutoDelete (boolautoDelete)"En/Disable Auto deletion
+.PP
+If Auto deletion is on all attached plot items will be deleted in the destructor of \fBQwtPlotDict\fP. The default value is on.
+.PP
+\fBSee also:\fP
+.RS 4
+\fBautoDelete()\fP, attachItem() 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

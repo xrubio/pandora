@@ -1,0 +1,822 @@
+
+
+
+WORLD : M[L,L]
+
+load a gif of the raster from the web with World::loadFile
+as if it were a tiff :
+    1.- el gif/tiff està a la distrib que t'has baixat de NetLog o
+    sourceforge
+    2.- mira el codi de NetLogo per veure com omple el lattice i
+    ho repliques
+
+********************************************************
+cell { (called site)
+  int[n] resource
+  int[n] maxResource
+  int[m] pollutionLevel
+  int[m] fluxes
+  SUGAgent* occupant
+
+  resourceGrowth()
+  pollutionDeposition()
+  transport() / diffussion()
+  
+  };
+
+********************************************************
+SUGAgent {
+  int?           vision         
+  int[n]         metabolism
+  2DPoint        location
+  resource[n]	 resourceAccumulations
+  int 		 age
+  int[]? "ages related to childbearing(puberty age, for example)"
+  enum		 childBearing in { 0=childhood, 1=puberty, 2=mature, 3=pausia }
+  int            deathAge
+  SUGAgent*[2]   parents
+  bitmask[k1]    culturaTags
+  bitmask[k2]    immuneSystem
+  List<SUGAgent> children
+  List<SUGAgent> friends
+  List<>	 borrowing
+  List<>	 lending
+  List<>	 diseases
+  enum		 sex; // {MALE,FEMALE}
+  int		 tribe // PENDENT initialization? dinamics??
+  //methods
+
+  metabolism()
+  move()
+  producePollution()
+  sexualReproduction()
+  inheritance()
+  culturalTransmission()
+  groupMembership()
+  combat()
+  trade()
+  credit()
+  immuneResponse()
+  diseaseTransmission()
+  
+  welfare()
+  MRS()
+};
+********************************************************
+Gini coefficient:
+rank agents with Gini coefficient, order them
+given an agent, its Gini neighbours must be accessible
+
+********************************************************
+Agent hierarchy:
+
+SUGAgent_chap2 : public Agent
+
+SUGAgent_chap3 : public SUGAgent_chap2 
+
+SUGAgent_chap4 : public SUGAgent_chap3
+
+efficiency : define everything in a single agent ( nowadays compiler arrange it )
+
+option1:
+
+SUGAgent { all the methods defined in Apendixes and for all cases }
+
+SUGAgent       : public Agent
+
+SUGAgent_chap2 : public SUGAgent
+
+SUGAgent_chap3 : public SUGAgent
+
+SUGAgent_chap4 : public SUGAgent
+
+each SUGAgent_chap_i uses the methods from SUGAgent that needs for its policy
+
+
+********************************************************
+Agent population Object:
+
+statisticsObject:
+  average age
+  fertility
+  min agent wealth
+  max inheritance gift
+
+highest agent in Gini ranked list
+lowest agent in Gini ranked list
+  
+census ( birth/death )
+
+maybe all these goes in SugarWorld
+
+********************************************************
+FORMULAE & RULES not in APPENDIXES
+********************************************************
+ENVIRONMENT
+--------------------------------------
+chapter 1 : 
+Growback rule: G(alpha=1/0)
+--------------------------------------
+initial sugar amount
+
+load raster ( max capacity at each cell)
+for each cell : cell.sugar = cell.maxSugar
+********************************************************
+AGENTS
+--------------------------------------
+deathRule
+	after metabolicBrun : agent.sugarStore == 0 
+--------------------------------------
+initial agent 
+	amount = 400		// experiment 1
+	position = random
+--------------------------------------
+agent DNA={_metabolism,_vision, _maximumAge}
+// PENDENT what about adding childBearing and pausia age?
+--------------------------------------
+agent._metabolism = Uniform[1..4]
+agent._vision = Uniform[1..6]
+agent._sugar in [0..1/0]  
+agent._sugar does not decay
+agent._age in [0..MAX]; config.MAX : 1..+inf 
+--------------------------------------
+agent.move(): 1 per step
+--------------------------------------
+forall a1,a2 : Agents : a1!=a2 <->a1._position!=a2.position
+--------------------------------------
+
+--------------------------------------
+--------------------------------------
+--------------------------------------
+********************************************************
+Experiment Wealth Distribution
+--------------------------------------
+    agent 
+		{
+		initial amount = 250
+		initial endowment = Uniform[5..25]
+		Replacement Rule : R_[60,100]
+		Gini Coefficient
+			{
+			at chapter 2
+			}
+		}
+	environment
+		{
+		Growback Rule G_1
+		}
+	comments
+		{
+		book.PDF.page46 : reproduce the histrograms
+		}
+--------------------------------------
+Experiment Sugar Model 1.0
+--------------------------------------
+    agent 
+		{
+		initial amount = 250
+		_metabolism = Uniform[1..4]
+		_vision = Uniform[1..6]
+		initial endowment = Uniform[5..25]
+		Replacement Rule : R_[60,100]
+		}
+	environment
+		{
+		Growback Rule G_1
+		}
+--------------------------------------
+Experiment Sugar Model 1.1
+--------------------------------------
+    agent 
+		{
+		initial amount = 250
+		initial endowment = Uniform[50..100]
+		mating
+		childBearing begin : Uniform[12..15]
+		women pausia begin : Uniform[40..50]
+		men pausia begin : Uniform[50..60]
+		maxAge : Uniform[60..100]		
+		}
+	environment
+		{
+		Growback Rule G_1
+		}
+--------------------------------------
+Experiment Sugar Model 2.0
+--------------------------------------
+    agent 
+		{
+		initial amount = 250
+		initial endowment = Uniform[50..100]
+		mating
+		childBearing begin : Uniform[12..15]
+		women pausia begin : Uniform[40..50]
+		men pausia begin : Uniform[50..60]
+		maxAge : Uniform[60..100]		
+		}
+	environment
+		{
+		Growback Rule G_1
+		Pollution Rule
+			alpha =
+			beta =
+		}
+--------------------------------------
+
+********************************************************
+FORMULAE & RULES from APPENDIXES
+
+--------------------------------------
+sugarscapeGrowback()	// G_alpha
+
+  M[i,j] at t_u = min(C,alpha + M[i,j]) at t_u-1, M[i,j] <= C
+
+
+  called at SUGWorld::step()
+--------------------------------------
+move(Agent a)	// M Movement 
+
+  a.location == M[i,j]
+  Neighbourhood = vision
+  at M[i,j], look N,S,E,W
+  select M[u,v] | 
+    !(u!=i && v!=j)
+    |u-i| <= vision && |v-j| <= vision
+    && M[u,v].agent = NULL    
+//PENDENT no es pot colar (u,v)==(i,j)?
+
+  Implement:
+    Explore each direction N,S,E,W and select a position with a maximal.
+    Compare maximals from N,S,E,W, choose the greater and nearer.
+    Ties, what do you do? random? YES
+
+  M[u,v].resources maximal M, and nearest
+  mutex{  
+    a.location == M[u,v]
+    a.resources = a.resources + M[u,v].resources
+    M[u,v].resources = 0
+    }
+--------------------------------------
+replace(SUGAgent x,int a,b) // R_[a,b] Agent Replacement
+
+  x.state == dead
+// PENDENT is dead due to age? is dead due to starvation?
+// it does not matter?
+
+  Implement:
+    y = new Agent
+
+    y.age = 0
+    y.dna = random
+    y.position = random
+    y.endowment = random[5..25] //*? initial resources ??
+				
+    y.maxAge = Uniform[a,b]
+
+    addAgent(y)
+
+  SUGAgent.setState(s)
+    if (s == dead) call replace(this,a,b)
+
+--------------------------------------
+seasonalGrowback() // S_a_b_g Seasonal Growback
+
+-->
+call it from SUGWorld::step() : 
+    if (crono % g == 0) seasonalChange()
+
+seasonalChange() :
+  flipSeasonConditions()
+    
+flipSeasonConditions() :
+  foo = seasonNorth
+  seasonNorth = seasonSouth
+  seasonSouth = foo
+
+at grow function sugarGrow(i,j):
+  
+  if (season == WINTER)
+    {
+    if (t%beta) r += alpha
+    }
+  else 
+    {
+    r += alpha
+    }
+
+  if (r>max) r=max;
+  // optional formula : r = r + alpha - (seasonFactor * f(t,beta) * alpha)
+
+
+at world initialization :
+  seasonNorth = WINTER
+  seasonSouth = SUMMER
+  pay attention : t=0 -> t mod g = 0 -> season change
+  assign to North the South value for coherence with change at t=0
+
+SUGWorld{
+
+  enum seasonCategories = { SUMMER, WINTER }
+  enum seasonCategories seasonNorth;
+  enum seasonCategories seasonSouth;
+}
+
+--------------------------------------
+pollutionFormation() // P_pi_X, P_a_b
+
+
+appendix : p194 of PDF
+
+v. chapter 2, pg 47(59 pdf)
+
+
+pollut_t = pollut_t-1 + _aPollut*s + _bPollut*m
+
+s=gathered sugar
+m=metabolized sugar
+
+amenity < 0 (agents do not like it)
+
+decreases cell score
+
+cell score = sugar / (1 - pollution)
+
+
+
+--------------------------------------
+pollutionDiffusion(d)
+
+	called at SUGWorld::step()
+
+	M  = raster "pollution"
+	MF = Future state for raster "pollution"
+
+	forall M[i,j]
+		if (time % d == 0)
+			compute pollution flux --> chapter 2 ??
+			Pollution diffusion rule D_a:
+			1.- Each alpha time periods and at each site, compute the 
+			pollution flux - the average pollution level over all von 
+			Neumann neighboring sites
+			2.- Each site's flux becomes its new pollution level.
+
+	forall M[i,j]
+		if (time % d == 0)
+			flux = (M[i,j]+M[i,j-1]+M[i,j+1]+M[i-1,j]+M[i+1,j])/5;
+	M=MF;
+
+2 rasters are needed : time_i and time_i+1
+
+time_i : the values to compute the raster at time time_i+1
+time_i+1 : where to leave the new computed state.
+
+
+--------------------------------------
+agentMating() // S Agent mating
+ 
+// PENDENT : Appendix description seems ambigous, search a Chapter
+
+// multiple mating per round allowed? YES
+while(remain neighbours untouched)
+  {
+  x = select random agent from neighbourhood: N,S,E,W
+  if (x.sex != this->sex)
+    mate(x)
+  }
+
+bool SugarAgent::isFertile() 
+	{ return ageMating==childBearing
+			&& _sugar >= _initialEndowment }
+//PENDENT ageMating, reproductionStage, ageType,.. choose one
+
+Implementation:
+	SUGAgent::agentMating()
+	require(this->ifFertile())
+	(i,j) = this->location
+
+	List<Object> l;
+	for (u,v) | |u-i|<=1 && |v-j|<=1 && !(u!=i && v!=j)  
+		if (M[u,v].agent!=NULL)
+			if (M[u,v].agent.sex != this->sex 
+				&& M[u,v].agent._childBearing==mature
+				&& isFertile() 
+				&& p = allocateNewBorn(this,M[u,v].agent))
+			{
+	  			l = l ++ (M[u,v].agent, p);
+			}
+//PENDENT state==DEAD --> fertile=false
+	l.shuffle()
+
+	forall x in l
+		if (M[(2Dpoint)x[1].x, (2Dpoint)x[1].y].agent==NULL)
+			child = this->mate((SUGAgent)x[0])
+			child.position=(2Dpoint)x[1]
+			if (child._sugar==0) child.die()
+
+Code for agentMating() could be inside SUGAgent or inside SUGWorld plus
+the loop that travels the lattice.
+
+
+SUGAgent::mate(SUGAgent x)
+  SUGAgent child = new SUGAgent
+  child.dna = crossover(this->dna, x.dna)
+  child.sex = random[0,1]
+  child.culture = crossover(this->culture, x.culture)
+  // child.sugar = f(this->sugar,x.sugar)
+  child._sugar=father._initialEndowment/2 
+				+ mother._initialEndowment/2
+			
+  return child
+
+// agent DNA={_metabolism,_vision, _maximumAge}
+SUGAgent::crossOver(SUGAgent x,SUGAgent y)
+	{
+	if(UniformRandom(0,1))
+		_metabolism = x._metabolism
+	else
+		_metabolism = y._metabolism
+	
+	if(UniformRandom(0,1))
+		_vision = x._vision
+	else
+		_vision = y._vision
+	
+	if(UniformRandom(0,1))
+		_maximumAge = x._maximumAge
+	else
+		_maximumAge = y._maximumAge
+
+	}
+
+
+--------------------------------------
+inheritance()	// I Agent inheritance
+
+SUGAgent::inheritance()
+  ensure(this->isDead())
+  ensure(this->state==DEAD)
+  
+  n = this->children.size()
+  forall c in this->children
+    if(c.state!=DEAD)
+      c.resources += resources/n
+--------------------------------------
+culturalTransmission()
+
+    (i,j) = this->location
+
+    List<Object> l;
+    for (u,v) | |u-i|<=1 && |v-j|<=1 && !(u!=i && v!=j)  
+//PENDENT no es pot colar (u,v)==(i,j)?
+      if (M[u,v].agent!=NULL)
+	if (M[u,v].agent.state != DEAD) //PENDENT bloca mètodes segons l'estat
+	  l = l ++ (M[u,v].agent,p);
+
+    l.shuffle()
+
+    forall x in l
+      i = Uniform[0..this->culture.size()]
+      if (culture[i] != x.culture[i])
+	x.setCulture(i,culture[i])
+
+--------------------------------------
+group membership:
+
+
+SUGAgent::setCulture(int i,int c)
+
+  if (c==1)     
+    cultZeroes--;    
+  else (c==0)
+    cultZeroes++;    
+
+if (cultZeroes > culture.size() - cultZeroes)
+  groupMembership = BLUE
+else
+  groupMembership = RED
+
+define attribs in SUGAgent: 
+    int cultZeroes; 
+    enum groupMembership;
+
+--------------------------------------
+Agent Culture = { cultural Transmission + group Membership}
+--------------------------------------
+combat()
+
+v. chapter
+
+    (i,j) = this->location
+
+    List<Object> l;
+    for (u,v) | |u-i|<=vision && |v-j|<=vision && !(u!=i && v!=j)  
+//PENDENT no es pot colar (u,v)==(i,j)?
+      if (M[u,v].agent.tribe != tribe 
+	&& M[u,v].agent.wealth < wealth
+	&& noRetaliation(M[u,v]))
+	  {
+	  int reward;
+	  reward = M[u,v].resource
+	  if (M[u,v].agent!=NULL)
+	    {
+	    reward = minimum alpha + M[u,v].agent.wealth
+	    M[u,v].agent.wealth = 0 //PENDENT aixi??
+	    }
+	  l = l ++ (u,v,reward)
+	  }
+
+    int d          = vision +1
+    int maxReward  = 0
+    2DPoint chosen = null
+    List<2DPoint> targets;
+    forall e:l
+      {
+      2DPoint x
+      int reward
+      (x,reward) = e
+      if (|x.position - position| < d && reward > maxReward)
+	{
+	d         = |x.position - position|
+	maxReward = reward
+	chosen    = x
+	targets.delete()
+	targets   = targets ++ x	
+//PENDENT which OPTIMIZATION/SELECTION criteria is followed??
+bound:<d=4,maxReward=5>, found elements <d=3,reward=5>,<d=4,reward=6>
+which one would the system choose to place the new bound? give
+same weight for the distance and reward? choose randomly??? search
+for pertinent chapter.    
+	}
+      else if (|x.position - position| == d && reward == maxReward)
+	{
+	targets = targets ++ x
+	}
+      }
+
+    targets.shuffle()
+
+    resources += M[targets[0].i,targets[0].j].resources
+		  + minimum alpha
+		  + M[targets[0].i,targets[0].j].agent.wealth
+    
+    M[targets[0].i,targets[0].j].agent.wealth = 0
+    M[targets[0].i,targets[0].j].agent.setSTATE(DEAD)
+    
+
+--------------------------------------
+trade()	// T Agent trade
+
+//PENDENT requires 2 rasters : sugar + spice
+// v. chapter trade
+
+    (i,j) = this->location
+    for (u,v) | |u-i|<=1 && |v-j|<=1 && !(u!=i && v!=j)  
+//PENDENT no es pot colar (u,v)==(i,j)?    
+      if (M[u,v].agent.state != DEAD)
+	  myMRS    = MRS()
+	  neighMRS = M[u,v].agent.MRS()
+	  if (myMRS != neighMRS)
+	      {
+	      float p = sqrt(myMRS*neighMRS); // geomMean
+	      // geomMean > 1 --> p spice = 1 sugar
+	      // geomMean < 1 --> 1/p sugar = 1 spice
+	      SUGAgent *sugarer;
+	      SUGAgent *spicer;
+	      if (myMRS < neighMRS)
+		{
+		// my_sugar --> neigh
+		// neigh_spice --> this
+		sugarer = this
+		spicer  = M[u,v].agent
+		}
+	      if (myMRS > neighMRS)
+		{
+		// neigh_sugar --> this
+		// my_spice --> neigh
+		spicer   = this
+		sugarer  = M[u,v].agent
+		}
+	      if (p > 1)
+		  {//--> p spice = 1 sugar
+		  sugarer.sugar--;
+		  sugarer.spice += p;
+		  spicer.sugar++;
+		  spicer.spice -= p;
+		  }
+	      if (p < 1)	// PENDENT 1/p : float? to int??
+		  {//--> 1/p sugar = 1 spice
+		  sugarer.sugar -= 1.0/p;
+		  sugarer.spice++;
+		  spicer.spice--;
+		  spicer.sugar += 1.0/p;
+		  }
+	      
+	      }
+
+//PENDENT MRS() method
+
+--------------------------------------
+credit()	// L_d_r Agent credit
+
+// LENDER, BORROWER Conditions
+
+boolean isPotentialLender   = false
+boolean isPotentialBorrower = false
+int maxPotentialLend
+
+if (this->childBearing == PAUSIA) // age >= pausia age
+  { // potential lender
+  maxPotentialLend  = this->wealth /2
+  isPotentialLender = true;
+  }
+
+if (this->childBearing == FERTILE 
+  && this->wealth > this->wealthToHaveChildren + excess) // age<pausia age
+  { // potential lender
+  maxPotentialLend  = excess // PENDENT excess? v trade chapter
+  isPotentialLender = true;
+  }
+
+if (this->childBearing == FERTILE 
+  && this->wealth < this->wealthToHaveChildren
+  && isCreditTrustable(this->resources,this->metabolism,this->loanObligations,lenderTerms)) // age<pausia age
+  {  
+  isPotentialBorrower = true
+  }
+
+//PENDENT :
+implement isCreditTrustable(this->resources,this->metabolism,this->loanObligations,lenderTerms) // PENDENT v. trade chapter
+
+// PENDENT define agent wealth vs agent resources, are the same?
+// there is functional interdependence?
+
+checkPotentialCredit(position p, position q, int d, int r)
+  {
+  // ensure p,q neighbours
+  SUGAgent * lender   = NULL;
+  SUGAgent * borrower = NULL;
+  if (p.agent->isPotentialLender() 
+    && q.agent->isPotentialBorrower(loanTerms)) // PENDENT loanTerms??
+      {
+      lender   = p.agent;
+      borrower = q.agent;    
+      }
+  else if if (q.agent.isPotentialLender() 
+    && p.agent.isPotentialBorrower(loanTerms))
+      {
+      lender   = q.agent;
+      borrower = p.agent;    
+      }
+  if (lender != NULL && borrower != NULL)
+      {
+      int loanAmount = ....
+      LoanObject loan = new LoanObject(loanAmount,d,r,lender,borrower)
+      lender->lendLoan(loan)
+      borrower->borrowLoan(loan)
+      //lender->resources   = lender->resources - loan;
+      //borrower->resources = borrower->resources + loan;      
+      }
+  }
+
+
+//PENDENT : 
+  implement :
+    SUGAgent::lendLoan(LoanObject)
+    SUGAgent::borrowLoan(LoanObject)
+    LoanObject{
+      int loanAmount
+      int duration 	// years
+      int rate		// percent
+      SUGAgent lender
+      SUGAgent borrower
+      }  
+
+loanDueDate(loanObject loan,...,) 
+// PENDENT put this method in loanObject? put this method in
+// the world time scheduler??
+  if (borrower.wealth >= loan.loanDue)
+    {
+    borrower.wealth = borrower.wealth - loan.loanDue    
+    lender.wealth   = lender.wealth + loan.loanDue   
+    loan.payAmount(loan.loanDue) // terminate it?
+    }
+  else
+    {    
+    borrower.wealth = borrower.wealth / 2;
+    lender.wealth   = lender.wealth + borrower.wealth
+    loan.payAmount(borrower.wealth) // terminate it    
+
+    int loanAmount = loan.remainingDue()
+    newLoan = new LoanObject(loanAmount,loan.d,loan.r,lender,borrower)
+    lender->lendLoan(newLoan)
+    borrower->borrowLoan(newLoan)      
+    
+    remove old loan
+    }
+  
+loanBorrowerDies()
+  {
+  // option1: when an agent dies that method is called
+  // over the due loans.
+  // Weak point of option1: You must add a rule to Die 
+  // method of the agent.
+
+  // option2: at due date the system checks wheter lender
+  // is dead or not, if so, calls that method.
+  // Strong point of option2: reduces interdependency of
+  // objects and methods
+  // Weak point of option2: lender should know a borrower
+  // has died to know he will get no reward.
+  terminate loan
+  // lender takes a loss
+  }
+
+loanLenderDies()
+  {
+  // option1: when an agent dies that method is called
+  // over the lent loans.
+  // Weak point of option1: You must add a rule to Die 
+  // method of the agent.
+
+  // option2: at due date the system checks wheter lender
+  // is dead or not, if so, calls that method.
+  // Strong point of option2: reduces interdependency of
+  // objects and methods
+  if (inheritance rule "I" is active)
+      {
+      loan.lender.clear
+      loan.lender = lender.inheritors
+      }
+  else
+      {
+      terminate loan // revisa
+      }
+  }
+
+Sign up these methods to the time scheduler +- cron process in linux
+--> Observer Pattern 
+
+--------------------------------------
+agentInmuneResponse()
+
+if (agent.DNA.containsString(disease.DNA.toString))
+	{
+	return; // yet inmune
+	}
+else
+	{
+	// PENDENT optimize to avoid temporal string creation
+	x = agent.DNA.selectSegmentWitMinHammingDistance(disease.DNA.toString)
+	y = x.MaximalPrefix(disease.DNA.toString)
+	x[y.length] = disease.DNA.toString[y.length]
+	}
+
+// PENDENT optimizing : integrate both branches of "if" and the prefix calculus in a single automaton scan
+
+--------------------------------------
+diseaseTransmission(Agent a)
+
+array diseases = a.diseases
+
+forall x in a.neighbours
+	{
+	i = random[0..diseases.length -1]
+	x.receiveDisease(diseases[i]);
+	}
+
+--------------------------------------
+E agent disease processes : 
+
+agentInmuneResponse + diseaseTransmission 
+
+--------------------------------------
+--------------------------------------
+--------------------------------------
+
+
+********************************************************
+********************************************************
+********************************************************
+********************************************************
+********************************************************
+********************************************************
+********************************************************
+********************************************************
+********************************************************
+********************************************************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

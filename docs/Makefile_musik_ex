@@ -1,0 +1,27 @@
+#------------------------------------------------------------------------------
+# Author: Kalyan S. Perumalla <www.cc.gatech.edu/~kalyan> 04Jan04
+# Updated: $Revision: 1.21 $ $Name: v12aug05 $ $Date: 2005/08/12 02:48:57 $
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+MUSIKDIR   = ..
+
+CFLAGS     = -I$(MUSIKDIR) $(MUSIKCOPTS) $(SYNKINCL)
+LDFLAGSEX	   = $(LDFLAGS) -L$(MUSIKDIR) -L/gpfs/apps/CEPBATOOLS/mpitrace-stable-1.2-mx/lib -lmusik -lmpitrace
+
+#------------------------------------------------------------------------------
+ALLTESTS   = pqtest pictest phold phold-rc threadsim spacecraft spacecraft-rc mindiff pep
+#------------------------------------------------------------------------------
+default:
+	cd $(MUSIKDIR); $(MAKE) ex
+
+all: $(ALLTESTS)
+
+clean:
+	rm -f $(ALLTESTS) *.o
+#------------------------------------------------------------------------------
+.SUFFIXES:
+.SUFFIXES: .cpp .o
+.cpp:
+	$(MUSIKCXX) -o $@ $(CFLAGS) $< $(LDFLAGSEX)
+

@@ -1,0 +1,46 @@
+.TH "QwtPickerTrackerMachine" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtPickerTrackerMachine \- 
+.PP
+A state machine for indicating mouse movements.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_picker_machine.h>\fP
+.PP
+Inherits \fBQwtPickerMachine\fP.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtPickerTrackerMachine\fP ()"
+.br
+.ti -1c
+.RI "virtual QList< \fBCommand\fP > \fBtransition\fP (const \fBQwtEventPattern\fP &, const QEvent *)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+A state machine for indicating mouse movements. 
+
+\fBQwtPickerTrackerMachine\fP supports displaying information corresponding to mouse movements, but is not intended for selecting anything. Begin/End are related to Enter/Leave events. 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtPickerTrackerMachine::QwtPickerTrackerMachine ()"
+.PP
+Constructor. 
+.SH "Member Function Documentation"
+.PP 
+.SS "QList< \fBQwtPickerMachine::Command\fP > QwtPickerTrackerMachine::transition (const \fBQwtEventPattern\fP &, const QEvent *e)\fC [virtual]\fP"
+.PP
+Transition. 
+.PP
+Implements \fBQwtPickerMachine\fP.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

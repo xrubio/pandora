@@ -1,0 +1,103 @@
+.TH "QwtMathMLDocument" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtMathMLDocument \- 
+.PP
+The \fBQwtMathMLDocument\fP class renders mathematical formulas written in MathML 2.0.  
+
+.SH SYNOPSIS
+.br
+.PP
+.SS "Public Types"
+
+.in +1c
+.ti -1c
+.RI "enum \fBMmlFont\fP { \fBNormalFont\fP, \fBFrakturFont\fP, \fBSansSerifFont\fP, \fBScriptFont\fP, \fBMonospaceFont\fP, \fBDoublestruckFont\fP }"
+.br
+.in -1c
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtMathMLDocument\fP ()"
+.br
+.ti -1c
+.RI "\fB~QwtMathMLDocument\fP ()"
+.br
+.ti -1c
+.RI "void \fBclear\fP ()"
+.br
+.ti -1c
+.RI "bool \fBsetContent\fP (QString text, QString *errorMsg=0, int *errorLine=0, int *errorColumn=0)"
+.br
+.ti -1c
+.RI "void \fBpaint\fP (QPainter *p, const QPoint &pos) const "
+.br
+.ti -1c
+.RI "QSize \fBsize\fP () const "
+.br
+.ti -1c
+.RI "QString \fBfontName\fP (MmlFont type) const "
+.br
+.ti -1c
+.RI "void \fBsetFontName\fP (MmlFont type, const QString &name)"
+.br
+.ti -1c
+.RI "int \fBbaseFontPointSize\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetBaseFontPointSize\fP (int size)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+The \fBQwtMathMLDocument\fP class renders mathematical formulas written in MathML 2.0. 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtMathMLDocument::QwtMathMLDocument ()"Constructs an empty MML document. 
+.SS "QwtMathMLDocument::~QwtMathMLDocument ()"Destroys the MML document. 
+.SH "Member Function Documentation"
+.PP 
+.SS "int QwtMathMLDocument::baseFontPointSize () const"Returns the point size of the font used to render expressions whose scriptlevel is 0.
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetBaseFontPointSize()\fP \fBfontName()\fP \fBsetFontName()\fP 
+.RE
+.PP
+
+.SS "void QwtMathMLDocument::clear ()"Clears the contents of this MML document. 
+.SS "QString QwtMathMLDocument::fontName (QwtMathMLDocument::MmlFonttype) const"Returns the name of the font used to render the font \fItype\fP.
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetFontName()\fP \fBsetBaseFontPointSize()\fP \fBbaseFontPointSize()\fP QwtMathMLDocument::MmlFont 
+.RE
+.PP
+
+.SS "void QwtMathMLDocument::paint (QPainter *p, const QPoint &pos) const"Renders this MML document with the painter \fIp\fP at position \fIpos\fP. 
+.SS "void QwtMathMLDocument::setBaseFontPointSize (intsize)"Sets the point \fIsize\fP of the font used to render expressions whose scriptlevel is 0.
+.PP
+\fBSee also:\fP
+.RS 4
+\fBbaseFontPointSize()\fP \fBfontName()\fP \fBsetFontName()\fP 
+.RE
+.PP
+
+.SS "bool QwtMathMLDocument::setContent (QStringtext, QString *errorMsg = \fC0\fP, int *errorLine = \fC0\fP, int *errorColumn = \fC0\fP)"Sets the MathML expression to be rendered. The expression is given in the string \fItext\fP. If the expression is successfully parsed, this method returns true; otherwise it returns false. If an error occured \fIerrorMsg\fP is set to a diagnostic message, while \fIerrorLine\fP and \fIerrorColumn\fP contain the location of the error. Any of \fIerrorMsg\fP, \fIerrorLine\fP and \fIerrorColumn\fP may be 0, in which case they are not set.
+.PP
+\fItext\fP should contain MathML 2.0 presentation markup elements enclosed in a <math> element. 
+.SS "void QwtMathMLDocument::setFontName (QwtMathMLDocument::MmlFonttype, const QString &name)"Sets the name of the font used to render the font \fItype\fP to \fIname\fP.
+.PP
+\fBSee also:\fP
+.RS 4
+\fBfontName()\fP \fBsetBaseFontPointSize()\fP \fBbaseFontPointSize()\fP QwtMathMLDocument::MmlFont 
+.RE
+.PP
+
+.SS "QSize QwtMathMLDocument::size () const"Returns the size of this MML document, as rendered, in pixels. 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

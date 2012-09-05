@@ -1,0 +1,129 @@
+.TH "QwtPoint3D" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtPoint3D \- 
+.PP
+\fBQwtPoint3D\fP class defines a 3D point in double coordinates.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_point_3d.h>\fP
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtPoint3D\fP ()"
+.br
+.ti -1c
+.RI "\fBQwtPoint3D\fP (double x, double y, double z)"
+.br
+.ti -1c
+.RI "\fBQwtPoint3D\fP (const \fBQwtPoint3D\fP &)"
+.br
+.ti -1c
+.RI "\fBQwtPoint3D\fP (const QPointF &)"
+.br
+.ti -1c
+.RI "bool \fBisNull\fP () const "
+.br
+.ti -1c
+.RI "double \fBx\fP () const "
+.br
+.ti -1c
+.RI "double \fBy\fP () const "
+.br
+.ti -1c
+.RI "double \fBz\fP () const "
+.br
+.ti -1c
+.RI "double & \fBrx\fP ()"
+.br
+.ti -1c
+.RI "double & \fBry\fP ()"
+.br
+.ti -1c
+.RI "double & \fBrz\fP ()"
+.br
+.ti -1c
+.RI "void \fBsetX\fP (double x)"
+.br
+.ti -1c
+.RI "void \fBsetY\fP (double y)"
+.br
+.ti -1c
+.RI "void \fBsetZ\fP (double y)"
+.br
+.ti -1c
+.RI "QPointF \fBtoPoint\fP () const "
+.br
+.ti -1c
+.RI "bool \fBoperator==\fP (const \fBQwtPoint3D\fP &) const "
+.br
+.ti -1c
+.RI "bool \fBoperator!=\fP (const \fBQwtPoint3D\fP &) const "
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+\fBQwtPoint3D\fP class defines a 3D point in double coordinates. 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtPoint3D::QwtPoint3D ()\fC [inline]\fP"Constructs a null point. 
+.PP
+\fBSee also:\fP
+.RS 4
+\fBisNull()\fP 
+.RE
+.PP
+
+.SS "QwtPoint3D::QwtPoint3D (doublex, doubley, doublez = \fC0.0\fP)\fC [inline]\fP"
+.PP
+Constructs a point with coordinates specified by x, y and z. 
+.SS "QwtPoint3D::QwtPoint3D (const \fBQwtPoint3D\fP &other)\fC [inline]\fP"Copy constructor. Constructs a point using the values of the point specified. 
+.SS "QwtPoint3D::QwtPoint3D (const QPointF &other)\fC [inline]\fP"Constructs a point with x and y coordinates from a 2D point, and a z coordinate of 0. 
+.SH "Member Function Documentation"
+.PP 
+.SS "bool QwtPoint3D::isNull () const\fC [inline]\fP"Returns true if the point is null; otherwise returns false.
+.PP
+A point is considered to be null if x, y and z-coordinates are equal to zero. 
+.SS "bool QwtPoint3D::operator!= (const \fBQwtPoint3D\fP &other) const\fC [inline]\fP"
+.PP
+Returns true if this rect and other are different; otherwise returns false. 
+.SS "bool QwtPoint3D::operator== (const \fBQwtPoint3D\fP &other) const\fC [inline]\fP"
+.PP
+Returns true if this point and other are equal; otherwise returns false. 
+.SS "double & QwtPoint3D::rx ()\fC [inline]\fP"
+.PP
+Returns a reference to the x-coordinate of the point. 
+.SS "double & QwtPoint3D::ry ()\fC [inline]\fP"
+.PP
+Returns a reference to the y-coordinate of the point. 
+.SS "double & QwtPoint3D::rz ()\fC [inline]\fP"
+.PP
+Returns a reference to the z-coordinate of the point. 
+.SS "void QwtPoint3D::setX (doublex)\fC [inline]\fP"
+.PP
+Sets the x-coordinate of the point to the value specified by x. 
+.SS "void QwtPoint3D::setY (doubley)\fC [inline]\fP"
+.PP
+Sets the y-coordinate of the point to the value specified by y. 
+.SS "void QwtPoint3D::setZ (doubley)\fC [inline]\fP"
+.PP
+Sets the z-coordinate of the point to the value specified by z. 
+.SS "QPointF QwtPoint3D::toPoint () const\fC [inline]\fP"Rounds 2D point, where the z coordinate is dropped. 
+.SS "double QwtPoint3D::x () const\fC [inline]\fP"
+.PP
+Returns the x-coordinate of the point. 
+.SS "double QwtPoint3D::y () const\fC [inline]\fP"
+.PP
+Returns the y-coordinate of the point. 
+.SS "double QwtPoint3D::z () const\fC [inline]\fP"
+.PP
+Returns the z-coordinate of the point. 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

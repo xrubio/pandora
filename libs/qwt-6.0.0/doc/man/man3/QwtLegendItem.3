@@ -1,0 +1,284 @@
+.TH "QwtLegendItem" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtLegendItem \- 
+.PP
+A widget representing something on a QwtLegend().  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_legend_item.h>\fP
+.PP
+Inherits \fBQwtTextLabel\fP.
+.SS "Public Slots"
+
+.in +1c
+.ti -1c
+.RI "void \fBsetChecked\fP (bool on)"
+.br
+.in -1c
+.SS "Signals"
+
+.in +1c
+.ti -1c
+.RI "void \fBclicked\fP ()"
+.br
+.ti -1c
+.RI "void \fBpressed\fP ()"
+.br
+.ti -1c
+.RI "void \fBreleased\fP ()"
+.br
+.ti -1c
+.RI "void \fBchecked\fP (bool)"
+.br
+.in -1c
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtLegendItem\fP (QWidget *parent=0)"
+.br
+.ti -1c
+.RI "virtual \fB~QwtLegendItem\fP ()"
+.br
+.ti -1c
+.RI "void \fBsetItemMode\fP (\fBQwtLegend::LegendItemMode\fP)"
+.br
+.ti -1c
+.RI "\fBQwtLegend::LegendItemMode\fP \fBitemMode\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetSpacing\fP (int spacing)"
+.br
+.ti -1c
+.RI "int \fBspacing\fP () const "
+.br
+.ti -1c
+.RI "virtual void \fBsetText\fP (const \fBQwtText\fP &)"
+.br
+.ti -1c
+.RI "void \fBsetIdentifier\fP (const QPixmap &)"
+.br
+.ti -1c
+.RI "QPixmap \fBidentifier\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetIdentifierSize\fP (const QSize &)"
+.br
+.ti -1c
+.RI "QSize \fBidentifierSize\fP () const "
+.br
+.ti -1c
+.RI "virtual QSize \fBsizeHint\fP () const "
+.br
+.ti -1c
+.RI "bool \fBisChecked\fP () const "
+.br
+.in -1c
+.SS "Protected Member Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBsetDown\fP (bool)"
+.br
+.ti -1c
+.RI "bool \fBisDown\fP () const "
+.br
+.ti -1c
+.RI "virtual void \fBpaintEvent\fP (QPaintEvent *)"
+.br
+.ti -1c
+.RI "virtual void \fBmousePressEvent\fP (QMouseEvent *)"
+.br
+.ti -1c
+.RI "virtual void \fBmouseReleaseEvent\fP (QMouseEvent *)"
+.br
+.ti -1c
+.RI "virtual void \fBkeyPressEvent\fP (QKeyEvent *)"
+.br
+.ti -1c
+.RI "virtual void \fBkeyReleaseEvent\fP (QKeyEvent *)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+A widget representing something on a QwtLegend(). 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtLegendItem::QwtLegendItem (QWidget *parent = \fC0\fP)\fC [explicit]\fP"\fBParameters:\fP
+.RS 4
+\fIparent\fP Parent widget 
+.RE
+.PP
+
+.SS "QwtLegendItem::~QwtLegendItem ()\fC [virtual]\fP"
+.PP
+Destructor. 
+.SH "Member Function Documentation"
+.PP 
+.SS "void QwtLegendItem::checked (bool)\fC [signal]\fP"
+.PP
+Signal, when the legend item has been toggled. 
+.SS "void QwtLegendItem::clicked ()\fC [signal]\fP"
+.PP
+Signal, when the legend item has been clicked. 
+.SS "QPixmap QwtLegendItem::identifier () const"\fBReturns:\fP
+.RS 4
+pixmap representing a plot item 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetIdentifier()\fP 
+.RE
+.PP
+
+.SS "QSize QwtLegendItem::identifierSize () const"Return the width of the identifier
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetIdentifierSize()\fP 
+.RE
+.PP
+
+.SS "bool QwtLegendItem::isChecked () const"
+.PP
+Return true, if the item is checked. 
+.SS "bool QwtLegendItem::isDown () const\fC [protected]\fP"
+.PP
+Return true, if the item is down. 
+.SS "\fBQwtLegend::LegendItemMode\fP QwtLegendItem::itemMode () const"Return the item mode
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetItemMode()\fP 
+.RE
+.PP
+
+.SS "void QwtLegendItem::keyPressEvent (QKeyEvent *e)\fC [protected, virtual]\fP"
+.PP
+Handle key press events. 
+.SS "void QwtLegendItem::keyReleaseEvent (QKeyEvent *e)\fC [protected, virtual]\fP"
+.PP
+Handle key release events. 
+.SS "void QwtLegendItem::mousePressEvent (QMouseEvent *e)\fC [protected, virtual]\fP"
+.PP
+Handle mouse press events. 
+.SS "void QwtLegendItem::mouseReleaseEvent (QMouseEvent *e)\fC [protected, virtual]\fP"
+.PP
+Handle mouse release events. 
+.SS "void QwtLegendItem::paintEvent (QPaintEvent *e)\fC [protected, virtual]\fP"
+.PP
+Paint event. 
+.PP
+Reimplemented from \fBQwtTextLabel\fP.
+.SS "void QwtLegendItem::pressed ()\fC [signal]\fP"
+.PP
+Signal, when the legend item has been pressed. 
+.SS "void QwtLegendItem::released ()\fC [signal]\fP"
+.PP
+Signal, when the legend item has been relased. 
+.SS "void QwtLegendItem::setChecked (boolon)\fC [slot]\fP"Check/Uncheck a the item
+.PP
+\fBParameters:\fP
+.RS 4
+\fIon\fP check/uncheck 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetItemMode()\fP 
+.RE
+.PP
+
+.SS "void QwtLegendItem::setDown (booldown)\fC [protected]\fP"
+.PP
+Set the item being down. 
+.SS "void QwtLegendItem::setIdentifier (const QPixmap &identifier)"Assign the identifier The identifier needs to be created according to the identifierWidth()
+.PP
+\fBParameters:\fP
+.RS 4
+\fIidentifier\fP Pixmap representing a plot item
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBidentifier()\fP, identifierWidth() 
+.RE
+.PP
+
+.SS "void QwtLegendItem::setIdentifierSize (const QSize &size)"Set the size for the identifier Default is 8x8 pixels
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsize\fP New size
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBidentifierSize()\fP 
+.RE
+.PP
+
+.SS "void QwtLegendItem::setItemMode (\fBQwtLegend::LegendItemMode\fPmode)"Set the item mode The default is \fBQwtLegend::ReadOnlyItem\fP
+.PP
+\fBParameters:\fP
+.RS 4
+\fImode\fP Item mode 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBitemMode()\fP 
+.RE
+.PP
+
+.SS "void QwtLegendItem::setSpacing (intspacing)"Change the spacing 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIspacing\fP Spacing 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBspacing()\fP, identifierWidth(), \fBQwtTextLabel::margin()\fP 
+.RE
+.PP
+
+.SS "void QwtLegendItem::setText (const \fBQwtText\fP &text)\fC [virtual]\fP"Set the text to the legend item
+.PP
+\fBParameters:\fP
+.RS 4
+\fItext\fP Text label 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBQwtTextLabel::text()\fP 
+.RE
+.PP
+
+.PP
+Reimplemented from \fBQwtTextLabel\fP.
+.SS "QSize QwtLegendItem::sizeHint () const\fC [virtual]\fP"
+.PP
+Return a size hint. 
+.PP
+Reimplemented from \fBQwtTextLabel\fP.
+.SS "int QwtLegendItem::spacing () const"Return the spacing 
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetSpacing()\fP, identifierWidth(), \fBQwtTextLabel::margin()\fP 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

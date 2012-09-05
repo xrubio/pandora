@@ -1,0 +1,206 @@
+.TH "QwtTextLabel" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtTextLabel \- 
+.PP
+A Widget which displays a \fBQwtText\fP.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_text_label.h>\fP
+.PP
+Inherited by \fBQwtLegendItem\fP.
+.SS "Public Slots"
+
+.in +1c
+.ti -1c
+.RI "void \fBsetText\fP (const QString &, \fBQwtText::TextFormat\fP textFormat=QwtText::AutoText)"
+.br
+.ti -1c
+.RI "virtual void \fBsetText\fP (const \fBQwtText\fP &)"
+.br
+.ti -1c
+.RI "void \fBclear\fP ()"
+.br
+.in -1c
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtTextLabel\fP (QWidget *parent=NULL)"
+.br
+.ti -1c
+.RI "\fBQwtTextLabel\fP (const \fBQwtText\fP &, QWidget *parent=NULL)"
+.br
+.ti -1c
+.RI "virtual \fB~QwtTextLabel\fP ()"
+.br
+.ti -1c
+.RI "const \fBQwtText\fP & \fBtext\fP () const "
+.br
+.ti -1c
+.RI "int \fBindent\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetIndent\fP (int)"
+.br
+.ti -1c
+.RI "int \fBmargin\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetMargin\fP (int)"
+.br
+.ti -1c
+.RI "virtual QSize \fBsizeHint\fP () const "
+.br
+.ti -1c
+.RI "virtual QSize \fBminimumSizeHint\fP () const "
+.br
+.ti -1c
+.RI "virtual int \fBheightForWidth\fP (int) const "
+.br
+.ti -1c
+.RI "QRect \fBtextRect\fP () const "
+.br
+.in -1c
+.SS "Protected Member Functions"
+
+.in +1c
+.ti -1c
+.RI "virtual void \fBpaintEvent\fP (QPaintEvent *e)"
+.br
+.ti -1c
+.RI "virtual void \fBdrawContents\fP (QPainter *)"
+.br
+.ti -1c
+.RI "virtual void \fBdrawText\fP (QPainter *, const QRect &)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+A Widget which displays a \fBQwtText\fP. 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtTextLabel::QwtTextLabel (QWidget *parent = \fCNULL\fP)\fC [explicit]\fP"Constructs an empty label. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIparent\fP Parent widget 
+.RE
+.PP
+
+.SS "QwtTextLabel::QwtTextLabel (const \fBQwtText\fP &text, QWidget *parent = \fCNULL\fP)\fC [explicit]\fP"Constructs a label that displays the text, text 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIparent\fP Parent widget 
+.br
+\fItext\fP Text 
+.RE
+.PP
+
+.SS "QwtTextLabel::~QwtTextLabel ()\fC [virtual]\fP"
+.PP
+Destructor. 
+.SH "Member Function Documentation"
+.PP 
+.SS "void QwtTextLabel::clear ()\fC [slot]\fP"
+.PP
+Clear the text and all \fBQwtText\fP attributes. 
+.SS "void QwtTextLabel::drawContents (QPainter *painter)\fC [protected, virtual]\fP"
+.PP
+Redraw the text and focus indicator. 
+.SS "void QwtTextLabel::drawText (QPainter *painter, const QRect &textRect)\fC [protected, virtual]\fP"
+.PP
+Redraw the text. 
+.SS "int QwtTextLabel::heightForWidth (intwidth) const\fC [virtual]\fP"Returns the preferred height for this widget, given the width. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIwidth\fP Width 
+.RE
+.PP
+
+.SS "int QwtTextLabel::indent () const"
+.PP
+Return label's text indent in pixels. 
+.SS "int QwtTextLabel::margin () const"
+.PP
+Return label's text indent in pixels. 
+.SS "QSize QwtTextLabel::minimumSizeHint () const\fC [virtual]\fP"
+.PP
+Return a minimum size hint. 
+.SS "void QwtTextLabel::paintEvent (QPaintEvent *event)\fC [protected, virtual]\fP"Qt paint event 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIevent\fP Paint event 
+.RE
+.PP
+
+.PP
+Reimplemented in \fBQwtLegendItem\fP.
+.SS "void QwtTextLabel::setIndent (intindent)"Set label's text indent in pixels 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIindent\fP Indentation in pixels 
+.RE
+.PP
+
+.SS "void QwtTextLabel::setMargin (intmargin)"Set label's margin in pixels 
+.PP
+\fBParameters:\fP
+.RS 4
+\fImargin\fP Margin in pixels 
+.RE
+.PP
+
+.SS "void QwtTextLabel::setText (const \fBQwtText\fP &text)\fC [virtual, slot]\fP"Change the label's text 
+.PP
+\fBParameters:\fP
+.RS 4
+\fItext\fP New text 
+.RE
+.PP
+
+.PP
+Reimplemented in \fBQwtLegendItem\fP.
+.SS "void QwtTextLabel::setText (const QString &text, \fBQwtText::TextFormat\fPtextFormat = \fCQwtText::AutoText\fP)\fC [slot]\fP"Change the label's text, keeping all other \fBQwtText\fP attributes 
+.PP
+\fBParameters:\fP
+.RS 4
+\fItext\fP New text 
+.br
+\fItextFormat\fP Format of text
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBQwtText\fP 
+.RE
+.PP
+
+.SS "QSize QwtTextLabel::sizeHint () const\fC [virtual]\fP"
+.PP
+Return label's margin in pixels. 
+.PP
+Reimplemented in \fBQwtLegendItem\fP.
+.SS "const \fBQwtText\fP & QwtTextLabel::text () const"
+.PP
+Return the text. 
+.SS "QRect QwtTextLabel::textRect () const"Calculate the rect for the text in widget coordinates 
+.PP
+\fBReturns:\fP
+.RS 4
+Text rect 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

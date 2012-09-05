@@ -1,0 +1,169 @@
+.TH "QwtPlotSeriesItem" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtPlotSeriesItem \- 
+.PP
+Class template for plot items representing a series of samples.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_plot_seriesitem.h>\fP
+.PP
+Inherits \fBQwtPlotAbstractSeriesItem\fP.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtPlotSeriesItem\fP (const QString &title=QString::null)"
+.br
+.ti -1c
+.RI "\fBQwtPlotSeriesItem\fP (const \fBQwtText\fP &title)"
+.br
+.ti -1c
+.RI "virtual \fB~QwtPlotSeriesItem\fP ()"
+.br
+.ti -1c
+.RI "void \fBsetData\fP (\fBQwtSeriesData\fP< T > *)"
+.br
+.ti -1c
+.RI "\fBQwtSeriesData\fP< T > * \fBdata\fP ()"
+.br
+.ti -1c
+.RI "const \fBQwtSeriesData\fP< T > * \fBdata\fP () const "
+.br
+.ti -1c
+.RI "size_t \fBdataSize\fP () const "
+.br
+.ti -1c
+.RI "T \fBsample\fP (int index) const "
+.br
+.ti -1c
+.RI "virtual QRectF \fBboundingRect\fP () const "
+.br
+.ti -1c
+.RI "virtual void \fBupdateScaleDiv\fP (const \fBQwtScaleDiv\fP &, const \fBQwtScaleDiv\fP &)"
+.br
+.in -1c
+.SS "Protected Attributes"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtSeriesData\fP< T > * \fBd_series\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.SS "template<typename T> class QwtPlotSeriesItem< T >"
+Class template for plot items representing a series of samples. 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "template<typename T > \fBQwtPlotSeriesItem\fP< T >::\fBQwtPlotSeriesItem\fP (const QString &title = \fCQString::null\fP)\fC [explicit]\fP"Constructor 
+.PP
+\fBParameters:\fP
+.RS 4
+\fItitle\fP Title of the series item 
+.RE
+.PP
+
+.SS "template<typename T > \fBQwtPlotSeriesItem\fP< T >::\fBQwtPlotSeriesItem\fP (const \fBQwtText\fP &title)\fC [explicit]\fP"Constructor 
+.PP
+\fBParameters:\fP
+.RS 4
+\fItitle\fP Title of the series item 
+.RE
+.PP
+
+.SS "template<typename T > \fBQwtPlotSeriesItem\fP< T >::~\fBQwtPlotSeriesItem\fP ()\fC [virtual]\fP"
+.PP
+Destructor. 
+.SH "Member Function Documentation"
+.PP 
+.SS "template<typename T > QRectF \fBQwtPlotSeriesItem\fP< T >::boundingRect () const\fC [virtual]\fP"\fBReturns:\fP
+.RS 4
+Bounding rectangle of the data. If there is no bounding rect, like for empty data the rectangle is invalid.
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBQwtSeriesData<T>::boundingRect()\fP, QRectF::isValid() 
+.RE
+.PP
+
+.PP
+Reimplemented from \fBQwtPlotItem\fP.
+.PP
+Reimplemented in \fBQwtPlotHistogram\fP, and \fBQwtPlotIntervalCurve\fP.
+.SS "template<typename T > \fBQwtSeriesData\fP< T > * \fBQwtPlotSeriesItem\fP< T >::data ()\fC [inline]\fP"\fBReturns:\fP
+.RS 4
+the the curve data 
+.RE
+.PP
+
+.SS "template<typename T > const \fBQwtSeriesData\fP< T > * \fBQwtPlotSeriesItem\fP< T >::data () const\fC [inline]\fP"\fBReturns:\fP
+.RS 4
+the the curve data 
+.RE
+.PP
+
+.SS "template<typename T > size_t \fBQwtPlotSeriesItem\fP< T >::dataSize () const"Return the size of the data arrays 
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetData()\fP 
+.RE
+.PP
+
+.SS "template<typename T > T \fBQwtPlotSeriesItem\fP< T >::sample (intindex) const\fC [inline]\fP"\fBParameters:\fP
+.RS 4
+\fIindex\fP Index 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Sample at position index 
+.RE
+.PP
+
+.SS "template<typename T> void \fBQwtPlotSeriesItem\fP< T >::setData (\fBQwtSeriesData\fP< T > *data)"Assign a series of samples
+.PP
+\fBParameters:\fP
+.RS 4
+\fIdata\fP Data 
+.RE
+.PP
+\fBWarning:\fP
+.RS 4
+The item takes ownership of the data object, deleting it when its not used anymore. 
+.RE
+.PP
+
+.SS "template<typename T > void \fBQwtPlotSeriesItem\fP< T >::updateScaleDiv (const \fBQwtScaleDiv\fP &xScaleDiv, const \fBQwtScaleDiv\fP &yScaleDiv)\fC [virtual]\fP"Update the rect of interest according to the current scale ranges
+.PP
+\fBParameters:\fP
+.RS 4
+\fIxScaleDiv\fP Scale division of the x-axis 
+.br
+\fIyScaleDiv\fP Scale division of the y-axis
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBQwtSeriesData<T>::setRectOfInterest()\fP 
+.RE
+.PP
+
+.PP
+Reimplemented from \fBQwtPlotItem\fP.
+.SH "Member Data Documentation"
+.PP 
+.SS "template<typename T> \fBQwtSeriesData\fP<T>* \fBQwtPlotSeriesItem\fP< T >::\fBd_series\fP\fC [protected]\fP"
+.PP
+Series. 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

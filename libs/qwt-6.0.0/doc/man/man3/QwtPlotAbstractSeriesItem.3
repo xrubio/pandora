@@ -1,0 +1,129 @@
+.TH "QwtPlotAbstractSeriesItem" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtPlotAbstractSeriesItem \- 
+.PP
+Base class for plot items representing a series of samples.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_plot_seriesitem.h>\fP
+.PP
+Inherits \fBQwtPlotItem\fP.
+.PP
+Inherited by \fBQwtPlotSeriesItem< T >\fP, \fBQwtPlotSeriesItem< QPointF >\fP, \fBQwtPlotSeriesItem< QwtIntervalSample >\fP, and \fBQwtPlotSeriesItem< QwtPoint3D >\fP.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtPlotAbstractSeriesItem\fP (const QString &title=QString::null)"
+.br
+.ti -1c
+.RI "\fBQwtPlotAbstractSeriesItem\fP (const \fBQwtText\fP &title)"
+.br
+.ti -1c
+.RI "virtual \fB~QwtPlotAbstractSeriesItem\fP ()"
+.br
+.ti -1c
+.RI "void \fBsetOrientation\fP (Qt::Orientation)"
+.br
+.ti -1c
+.RI "Qt::Orientation \fBorientation\fP () const "
+.br
+.ti -1c
+.RI "virtual void \fBdraw\fP (QPainter *p, const \fBQwtScaleMap\fP &xMap, const \fBQwtScaleMap\fP &yMap, const QRectF &) const "
+.br
+.ti -1c
+.RI "virtual void \fBdrawSeries\fP (QPainter *painter, const \fBQwtScaleMap\fP &xMap, const \fBQwtScaleMap\fP &yMap, const QRectF &canvasRect, int from, int to) const =0"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Base class for plot items representing a series of samples. 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtPlotAbstractSeriesItem::QwtPlotAbstractSeriesItem (const QString &title = \fCQString::null\fP)\fC [explicit]\fP"Constructor 
+.PP
+\fBParameters:\fP
+.RS 4
+\fItitle\fP Title of the curve 
+.RE
+.PP
+
+.SS "QwtPlotAbstractSeriesItem::QwtPlotAbstractSeriesItem (const \fBQwtText\fP &title)\fC [explicit]\fP"Constructor 
+.PP
+\fBParameters:\fP
+.RS 4
+\fItitle\fP Title of the curve 
+.RE
+.PP
+
+.SS "QwtPlotAbstractSeriesItem::~QwtPlotAbstractSeriesItem ()\fC [virtual]\fP"
+.PP
+Destructor. 
+.SH "Member Function Documentation"
+.PP 
+.SS "void QwtPlotAbstractSeriesItem::draw (QPainter *painter, const \fBQwtScaleMap\fP &xMap, const \fBQwtScaleMap\fP &yMap, const QRectF &canvasRect) const\fC [virtual]\fP"
+.PP
+Draw the complete series. \fBParameters:\fP
+.RS 4
+\fIpainter\fP Painter 
+.br
+\fIxMap\fP Maps x-values into pixel coordinates. 
+.br
+\fIyMap\fP Maps y-values into pixel coordinates. 
+.br
+\fIcanvasRect\fP Contents rect of the canvas 
+.RE
+.PP
+
+.PP
+Implements \fBQwtPlotItem\fP.
+.SS "virtual void QwtPlotAbstractSeriesItem::drawSeries (QPainter *painter, const \fBQwtScaleMap\fP &xMap, const \fBQwtScaleMap\fP &yMap, const QRectF &canvasRect, intfrom, intto) const\fC [pure virtual]\fP"Draw a subset of the samples
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpainter\fP Painter 
+.br
+\fIxMap\fP Maps x-values into pixel coordinates. 
+.br
+\fIyMap\fP Maps y-values into pixel coordinates. 
+.br
+\fIcanvasRect\fP Contents rect of the canvas 
+.br
+\fIfrom\fP Index of the first point to be painted 
+.br
+\fIto\fP Index of the last point to be painted. If to < 0 the curve will be painted to its last point. 
+.RE
+.PP
+
+.PP
+Implemented in \fBQwtPlotCurve\fP, \fBQwtPlotHistogram\fP, \fBQwtPlotIntervalCurve\fP, and \fBQwtPlotSpectroCurve\fP.
+.SS "Qt::Orientation QwtPlotAbstractSeriesItem::orientation () const"\fBReturns:\fP
+.RS 4
+Orientation of the plot item 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetOrientation()\fP 
+.RE
+.PP
+
+.SS "void QwtPlotAbstractSeriesItem::setOrientation (Qt::Orientationorientation)"Set the orientation of the item.
+.PP
+The \fBorientation()\fP might be used in specific way by a plot item. F.e. a \fBQwtPlotCurve\fP uses it to identify how to display the curve int \fBQwtPlotCurve::Steps\fP or \fBQwtPlotCurve::Sticks\fP style.
+.PP
+\fBSee also:\fP
+.RS 4
+\fBorientation()\fP 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

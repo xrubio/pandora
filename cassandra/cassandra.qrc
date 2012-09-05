@@ -1,0 +1,32 @@
+<!DOCTYPE RCC><RCC version="1.0">
+	<qresource>
+		<file>resources/icons/project_open.png</file>
+		<file>resources/icons/project_save.png</file>
+		<file>resources/icons/project_save_as.png</file>
+		<file>resources/icons/project_new.png</file>
+
+		<file>resources/icons/simulation_select.png</file>
+
+		<file>resources/icons/final.png</file>
+		<file>resources/icons/next.png</file>
+		<file>resources/icons/openFile.png</file>
+		<file>resources/icons/previous.png</file>
+		<file>resources/icons/restart.png</file>
+		<file>resources/icons/zoomIn.png</file>
+		<file>resources/icons/zoomOut.png</file>		
+		<file>resources/icons/play.png</file>		
+		<file>resources/icons/agents.png</file>		
+
+		<file>resources/agentIcons/default_agent_1.png</file>
+		<file>resources/agentIcons/default_agent_2.png</file>
+		<file>resources/agentIcons/default_agent_3.png</file>
+		<file>resources/agentIcons/default_agent_4.png</file>
+		<file>resources/agentIcons/default_agent_5.png</file>
+		<file>resources/agentIcons/default_agent_6.png</file>
+		<file>resources/agentIcons/default_agent_7.png</file>
+		<file>resources/agentIcons/default_agent_8.png</file>
+		<file>resources/agentIcons/default_agent_9.png</file>
+		<file>resources/agentIcons/default_agent_10.png</file>
+	</qresource>
+</RCC>
+

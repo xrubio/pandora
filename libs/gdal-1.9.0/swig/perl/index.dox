@@ -1,0 +1,148 @@
+/*! \mainpage Geo::GDAL
+
+\section index_version Version
+
+These pages document the development version of the GDAL Perl API,
+which is extended from the released versions APIs.
+
+<a href="http://geoinformatics.tkk.fi/doc/Geo-GDAL-1.4/html/index.html">The
+documentation for the version 1.4 API.</a>
+
+<a href="http://geoinformatics.tkk.fi/doc/Geo-GDAL-1.5/html/index.html">The
+documentation for the version 1.5 API.</a>
+
+<a href="http://geoinformatics.tkk.fi/doc/Geo-GDAL-1.6/html/index.html">The
+documentation for the version 1.6 API.</a>
+
+<a href="http://geoinformatics.tkk.fi/doc/Geo-GDAL-1.7/html/index.html">The
+documentation for the version 1.7 API.</a>
+
+<a href="http://geoinformatics.tkk.fi/doc/Geo-GDAL-1.8/html/index.html">The
+documentation for the version 1.8 API.</a>
+
+\section index_intro Introduction
+
+The Geo::GDAL modules are the Perl bindings to the GDAL/OGR
+library. The modules allow you to use Perl to access and manipulate
+all geospatial data that the installed GDAL library is configured to
+access and manipulate.
+
+This documentation covers mainly the syntax of the bindings. For more
+in-depth documentation see the main documentation of <a
+href="http://www.gdal.org/">GDAL</a> and <a
+href="http://www.gdal.org/ogr/">OGR</a>.
+
+Some arguments are optional and have a default value. This is
+illustrated like this:
+
+SomeMethod(arg1, arg2 = 4);
+
+arg1 is a required argument.
+
+arg2 may be left out and if left out, will get the value 4 (in this
+case).
+
+Only the last argument or arguments can be optional.
+
+In some cases a method can be called in a traditional way and with
+named arguments (i.e. with a hash):
+
+\code
+$object->method(1, 2, 3);
+$object->method(number=>1, param=>2, other=>3);
+$object->method({number=>1, param=>2, other=>3});
+\endcode
+
+Note especially the difference between the second and the third
+versions. In some cases the named arguments must be given in an
+anonymous hash.
+
+In some cases a method may behave differently depending on the
+parameters that it gets:
+
+\code
+$object->method($hashref); # a method called with a reference to a hash
+$object->method($arrayref); # a method called with a reference to an array
+\endcode
+
+In some cases a method may examine the context in which it is called,
+and behave differently:
+
+\code
+$object->method();
+$return = $object->method(); # method called in scalar context
+@return = $object->method(); # method called in list context
+\endcode
+
+Many of the methods may throw an error, which can be caught by putting
+the call into eval{}; and then examining the contents of $@.
+
+\section class_methods_vs_object_methods Class methods vs object methods
+
+Some methods are class methods and some methods are object
+methods. Object methods are always invoked for objects, i.e.
+
+\code
+$object->method();
+\endcode
+
+while class methods are invoked either as methods
+
+\code
+Geo::GDAL::Class->method();
+\endcode
+
+or as subroutines
+
+\code
+Geo::GDAL::Class::subroutine();
+\endcode
+
+The disctinction between class methods and subroutines is subtle but
+often important. The method invocation passes the class name as the
+first argument while the subroutine invocation does not. Thus
+constructors (new and create) must be called as class methods.
+
+\section index_exceptions Exceptions
+
+Geo::GDAL uses the Perl exception mechanism. This means that
+exceptions that GDAL classifies as failures or fatal errors trigger a
+Perl exception, and an exception that is classified as a warning
+triggers a Perl warning.
+
+Perl exceptions can be caught by \a eval() and Perl warnings can be
+caught by signal '__WARN__'. Examples:
+
+\code
+use Geo::GDAL;
+eval {
+    $point = Geo::OGR::Geometry->create(WKT=>"POINTXX(1 1)");
+};
+print STDERR "Error: $@";
+\endcode
+
+Prints:
+\code
+Error: RuntimeError OGR Error: Unsupported geometry type
+\endcode
+
+\code
+use Geo::GDAL;
+BEGIN { $SIG{'__WARN__'} = sub {  print STDERR "Warning: @_"; } }
+Geo::GDAL::Driver('GTiff')->Create('x',10,10,1,'Byte',{a=>'b'});
+\endcode
+
+Prints: 
+\code
+Warning: Driver GTiff does not support a creation option at site/lib/Geo/GDAL.pm line 771.
+\endcode
+
+\section index_footer Note
+
+This documentation is generated from files within the GDAL
+distribution (directory swig/perl) with a tweaked version of <a
+href="http://www.bigsister.ch/doxygenfilter/">Perl Doxygen Filter</a>
+with Doxygen. The modified version is available <a
+href="https://geoinformatics.tkk.fi/svn/doxygenfilter/">here</a>.
+
+*/

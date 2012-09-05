@@ -1,0 +1,615 @@
+.TH "QwtPlotItem" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtPlotItem \- 
+.PP
+Base class for items on the plot canvas.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_plot_item.h>\fP
+.PP
+Inherits \fBQwtLegendItemManager\fP.
+.PP
+Inherited by \fBQwtPlotAbstractSeriesItem\fP, \fBQwtPlotGrid\fP, \fBQwtPlotMarker\fP, \fBQwtPlotRasterItem\fP, \fBQwtPlotScaleItem\fP, and \fBQwtPlotSvgItem\fP.
+.SS "Public Types"
+
+.in +1c
+.ti -1c
+.RI "enum \fBRttiValues\fP { \fBRtti_PlotItem\fP =  0, \fBRtti_PlotGrid\fP, \fBRtti_PlotScale\fP, \fBRtti_PlotMarker\fP, \fBRtti_PlotCurve\fP, \fBRtti_PlotSpectroCurve\fP, \fBRtti_PlotIntervalCurve\fP, \fBRtti_PlotHistogram\fP, \fBRtti_PlotSpectrogram\fP, \fBRtti_PlotSVG\fP, \fBRtti_PlotUserItem\fP =  1000 }"
+.br
+.ti -1c
+.RI "enum \fBItemAttribute\fP { \fBLegend\fP =  0x01, \fBAutoScale\fP =  0x02 }"
+.br
+.ti -1c
+.RI "enum \fBRenderHint\fP { \fBRenderAntialiased\fP =  1 }"
+.br
+.ti -1c
+.RI "typedef QFlags< \fBItemAttribute\fP > \fBItemAttributes\fP"
+.br
+.ti -1c
+.RI "typedef QFlags< \fBRenderHint\fP > \fBRenderHints\fP"
+.br
+.in -1c
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtPlotItem\fP (const \fBQwtText\fP &title=\fBQwtText\fP())"
+.br
+.ti -1c
+.RI "virtual \fB~QwtPlotItem\fP ()"
+.br
+.ti -1c
+.RI "void \fBattach\fP (\fBQwtPlot\fP *plot)"
+.br
+.ti -1c
+.RI "void \fBdetach\fP ()"
+.br
+.ti -1c
+.RI "\fBQwtPlot\fP * \fBplot\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetTitle\fP (const QString &title)"
+.br
+.ti -1c
+.RI "void \fBsetTitle\fP (const \fBQwtText\fP &title)"
+.br
+.ti -1c
+.RI "const \fBQwtText\fP & \fBtitle\fP () const "
+.br
+.ti -1c
+.RI "virtual int \fBrtti\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetItemAttribute\fP (\fBItemAttribute\fP, bool on=true)"
+.br
+.ti -1c
+.RI "bool \fBtestItemAttribute\fP (\fBItemAttribute\fP) const "
+.br
+.ti -1c
+.RI "void \fBsetRenderHint\fP (\fBRenderHint\fP, bool on=true)"
+.br
+.ti -1c
+.RI "bool \fBtestRenderHint\fP (\fBRenderHint\fP) const "
+.br
+.ti -1c
+.RI "double \fBz\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetZ\fP (double z)"
+.br
+.ti -1c
+.RI "void \fBshow\fP ()"
+.br
+.ti -1c
+.RI "void \fBhide\fP ()"
+.br
+.ti -1c
+.RI "virtual void \fBsetVisible\fP (bool)"
+.br
+.ti -1c
+.RI "bool \fBisVisible\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetAxes\fP (int xAxis, int yAxis)"
+.br
+.ti -1c
+.RI "void \fBsetXAxis\fP (int axis)"
+.br
+.ti -1c
+.RI "int \fBxAxis\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetYAxis\fP (int axis)"
+.br
+.ti -1c
+.RI "int \fByAxis\fP () const "
+.br
+.ti -1c
+.RI "virtual void \fBitemChanged\fP ()"
+.br
+.ti -1c
+.RI "virtual void \fBdraw\fP (QPainter *painter, const \fBQwtScaleMap\fP &xMap, const \fBQwtScaleMap\fP &yMap, const QRectF &canvasRect) const =0"
+.br
+.ti -1c
+.RI "virtual QRectF \fBboundingRect\fP () const "
+.br
+.ti -1c
+.RI "virtual void \fBupdateLegend\fP (\fBQwtLegend\fP *) const "
+.br
+.ti -1c
+.RI "virtual void \fBupdateScaleDiv\fP (const \fBQwtScaleDiv\fP &, const \fBQwtScaleDiv\fP &)"
+.br
+.ti -1c
+.RI "virtual QWidget * \fBlegendItem\fP () const "
+.br
+.ti -1c
+.RI "QRectF \fBscaleRect\fP (const \fBQwtScaleMap\fP &, const \fBQwtScaleMap\fP &) const "
+.br
+.ti -1c
+.RI "QRectF \fBpaintRect\fP (const \fBQwtScaleMap\fP &, const \fBQwtScaleMap\fP &) const "
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Base class for items on the plot canvas. 
+
+A plot item is 'something', that can be painted on the plot canvas, or only affects the scales of the plot widget. They can be categorized as:
+.PP
+.IP "\(bu" 2
+Representator
+.br
+ A 'Representator' is an item that represents some sort of data on the plot canvas. The different representator classes are organized according to the characteristics of the data:
+.IP "  \(bu" 4
+\fBQwtPlotMarker\fP Represents a point or a horizontal/vertical coordinate
+.IP "  \(bu" 4
+\fBQwtPlotCurve\fP Represents a series of points
+.IP "  \(bu" 4
+\fBQwtPlotSpectrogram\fP ( \fBQwtPlotRasterItem\fP ) Represents raster data
+.IP "  \(bu" 4
+...
+.PP
+
+.PP
+.PP
+.IP "\(bu" 2
+Decorators
+.br
+ A 'Decorator' is an item, that displays additional information, that is not related to any data:
+.IP "  \(bu" 4
+\fBQwtPlotGrid\fP
+.IP "  \(bu" 4
+\fBQwtPlotScaleItem\fP
+.IP "  \(bu" 4
+\fBQwtPlotSvgItem\fP
+.IP "  \(bu" 4
+...
+.PP
+
+.PP
+.PP
+Depending on the \fBQwtPlotItem::ItemAttribute\fP flags, an item is included into autoscaling or has an entry on the legnd.
+.PP
+Before misusing the existing item classes it might be better to implement a new type of plot item ( don't implement a watermark as spectrogram ). Deriving a new type of \fBQwtPlotItem\fP primarily means to implement the YourPlotItem::draw() method.
+.PP
+\fBSee also:\fP
+.RS 4
+The cpuplot example shows the implementation of additional \fBplot\fP items. 
+.RE
+.PP
+
+.SH "Member Typedef Documentation"
+.PP 
+.SS "typedef QFlags<\fBItemAttribute\fP> \fBQwtPlotItem::ItemAttributes\fP"
+.PP
+Plot Item Attributes. 
+.SS "typedef QFlags<\fBRenderHint\fP> \fBQwtPlotItem::RenderHints\fP"
+.PP
+Render hints. 
+.SH "Member Enumeration Documentation"
+.PP 
+.SS "enum \fBQwtPlotItem::ItemAttribute\fP"Plot Item Attributes 
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetItemAttribute()\fP, \fBtestItemAttribute()\fP 
+.RE
+.PP
+
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fILegend \fP\fP
+The item is represented on the legend. 
+.TP
+\fB\fIAutoScale \fP\fP
+The \fBboundingRect()\fP of the item is included in the autoscaling calculation. 
+.SS "enum \fBQwtPlotItem::RenderHint\fP"
+.PP
+Render hints. 
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fIRenderAntialiased \fP\fP
+Enable antialiasing. 
+.SS "enum \fBQwtPlotItem::RttiValues\fP"
+.PP
+Runtime type information. RttiValues is used to cast plot items, without having to enable runtime type information of the compiler. 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtPlotItem::QwtPlotItem (const \fBQwtText\fP &title = \fC\fBQwtText\fP()\fP)\fC [explicit]\fP"Constructor 
+.PP
+\fBParameters:\fP
+.RS 4
+\fItitle\fP Title of the item 
+.RE
+.PP
+
+.SS "QwtPlotItem::~QwtPlotItem ()\fC [virtual]\fP"
+.PP
+Destroy the \fBQwtPlotItem\fP. 
+.SH "Member Function Documentation"
+.PP 
+.SS "void QwtPlotItem::attach (\fBQwtPlot\fP *plot)"
+.PP
+Attach the item to a plot. This method will attach a \fBQwtPlotItem\fP to the \fBQwtPlot\fP argument. It will first detach the \fBQwtPlotItem\fP from any plot from a previous call to attach (if necessary). If a NULL argument is passed, it will detach from any \fBQwtPlot\fP it was attached to.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIplot\fP Plot widget 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBdetach()\fP 
+.RE
+.PP
+
+.SS "QRectF QwtPlotItem::boundingRect () const\fC [virtual]\fP"\fBReturns:\fP
+.RS 4
+An invalid bounding rect: QRectF(1.0, 1.0, -2.0, -2.0) 
+.RE
+.PP
+
+.PP
+Reimplemented in \fBQwtPlotHistogram\fP, \fBQwtPlotIntervalCurve\fP, \fBQwtPlotMarker\fP, \fBQwtPlotRasterItem\fP, \fBQwtPlotSeriesItem< T >\fP, \fBQwtPlotSvgItem\fP, \fBQwtPlotSeriesItem< QwtIntervalSample >\fP, \fBQwtPlotSeriesItem< QPointF >\fP, and \fBQwtPlotSeriesItem< QwtPoint3D >\fP.
+.SS "void QwtPlotItem::detach ()"
+.PP
+This method detaches a \fBQwtPlotItem\fP from any \fBQwtPlot\fP it has been associated with. \fBdetach()\fP is equivalent to calling attach( NULL ) 
+.PP
+\fBSee also:\fP
+.RS 4
+\fBattach()\fP 
+.RE
+.PP
+
+.SS "virtual void QwtPlotItem::draw (QPainter *painter, const \fBQwtScaleMap\fP &xMap, const \fBQwtScaleMap\fP &yMap, const QRectF &canvasRect) const\fC [pure virtual]\fP"
+.PP
+Draw the item. \fBParameters:\fP
+.RS 4
+\fIpainter\fP Painter 
+.br
+\fIxMap\fP Maps x-values into pixel coordinates. 
+.br
+\fIyMap\fP Maps y-values into pixel coordinates. 
+.br
+\fIcanvasRect\fP Contents rect of the canvas in painter coordinates 
+.RE
+.PP
+
+.PP
+Implemented in \fBQwtPlotGrid\fP, \fBQwtPlotMarker\fP, \fBQwtPlotRasterItem\fP, \fBQwtPlotScaleItem\fP, \fBQwtPlotAbstractSeriesItem\fP, \fBQwtPlotSpectrogram\fP, and \fBQwtPlotSvgItem\fP.
+.SS "void QwtPlotItem::hide ()"
+.PP
+Hide the item. 
+.SS "bool QwtPlotItem::isVisible () const"\fBReturns:\fP
+.RS 4
+true if visible 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetVisible()\fP, \fBshow()\fP, \fBhide()\fP 
+.RE
+.PP
+
+.SS "void QwtPlotItem::itemChanged ()\fC [virtual]\fP"Update the legend and call \fBQwtPlot::autoRefresh\fP for the parent plot.
+.PP
+\fBSee also:\fP
+.RS 4
+\fBupdateLegend()\fP 
+.RE
+.PP
+
+.SS "QWidget * QwtPlotItem::legendItem () const\fC [virtual]\fP"
+.PP
+Allocate the widget that represents the item on the legend. The default implementation returns a QwtLegendItem(), but an item could be represented by any type of widget, by overloading \fBlegendItem()\fP and \fBupdateLegend()\fP.
+.PP
+\fBReturns:\fP
+.RS 4
+QwtLegendItem() 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBupdateLegend()\fP QwtLegend() 
+.RE
+.PP
+
+.PP
+Implements \fBQwtLegendItemManager\fP.
+.SS "QRectF QwtPlotItem::paintRect (const \fBQwtScaleMap\fP &xMap, const \fBQwtScaleMap\fP &yMap) const"
+.PP
+Calculate the bounding paint rect of 2 maps. \fBParameters:\fP
+.RS 4
+\fIxMap\fP X map 
+.br
+\fIyMap\fP X map
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Bounding paint rect of the scale maps, normalized 
+.RE
+.PP
+
+.SS "\fBQwtPlot\fP * QwtPlotItem::plot () const"
+.PP
+Return attached plot. 
+.SS "int QwtPlotItem::rtti () const\fC [virtual]\fP"Return rtti for the specific class represented. \fBQwtPlotItem\fP is simply a virtual interface class, and base classes will implement this method with specific rtti values so a user can differentiate them.
+.PP
+The rtti value is useful for environments, where the runtime type information is disabled and it is not possible to do a dynamic_cast<...>.
+.PP
+\fBReturns:\fP
+.RS 4
+rtti value 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBRttiValues\fP 
+.RE
+.PP
+
+.PP
+Reimplemented in \fBQwtPlotCurve\fP, \fBQwtPlotGrid\fP, \fBQwtPlotHistogram\fP, \fBQwtPlotIntervalCurve\fP, \fBQwtPlotMarker\fP, \fBQwtPlotScaleItem\fP, \fBQwtPlotSpectroCurve\fP, \fBQwtPlotSpectrogram\fP, and \fBQwtPlotSvgItem\fP.
+.SS "QRectF QwtPlotItem::scaleRect (const \fBQwtScaleMap\fP &xMap, const \fBQwtScaleMap\fP &yMap) const"
+.PP
+Calculate the bounding scale rect of 2 maps. \fBParameters:\fP
+.RS 4
+\fIxMap\fP X map 
+.br
+\fIyMap\fP X map
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Bounding scale rect of the scale maps, normalized 
+.RE
+.PP
+
+.SS "void QwtPlotItem::setAxes (intxAxis, intyAxis)"Set X and Y axis
+.PP
+The item will painted according to the coordinates its Axes.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIxAxis\fP X Axis 
+.br
+\fIyAxis\fP Y Axis
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetXAxis()\fP, \fBsetYAxis()\fP, \fBxAxis()\fP, \fByAxis()\fP 
+.RE
+.PP
+
+.SS "void QwtPlotItem::setItemAttribute (\fBItemAttribute\fPattribute, boolon = \fCtrue\fP)"Toggle an item attribute
+.PP
+\fBParameters:\fP
+.RS 4
+\fIattribute\fP Attribute type 
+.br
+\fIon\fP true/false
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBtestItemAttribute()\fP, \fBItemAttribute\fP 
+.RE
+.PP
+
+.SS "void QwtPlotItem::setRenderHint (\fBRenderHint\fPhint, boolon = \fCtrue\fP)"Toggle an render hint
+.PP
+\fBParameters:\fP
+.RS 4
+\fIhint\fP Render hint 
+.br
+\fIon\fP true/false
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBtestRenderHint()\fP, \fBRenderHint\fP 
+.RE
+.PP
+
+.SS "void QwtPlotItem::setTitle (const QString &title)"Set a new title
+.PP
+\fBParameters:\fP
+.RS 4
+\fItitle\fP Title 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBtitle()\fP 
+.RE
+.PP
+
+.SS "void QwtPlotItem::setTitle (const \fBQwtText\fP &title)"Set a new title
+.PP
+\fBParameters:\fP
+.RS 4
+\fItitle\fP Title 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBtitle()\fP 
+.RE
+.PP
+
+.SS "void QwtPlotItem::setVisible (boolon)\fC [virtual]\fP"Show/Hide the item
+.PP
+\fBParameters:\fP
+.RS 4
+\fIon\fP Show if true, otherwise hide 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBisVisible()\fP, \fBshow()\fP, \fBhide()\fP 
+.RE
+.PP
+
+.SS "void QwtPlotItem::setXAxis (intaxis)"Set the X axis
+.PP
+The item will painted according to the coordinates its Axes.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIaxis\fP X Axis 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetAxes()\fP, \fBsetYAxis()\fP, \fBxAxis()\fP 
+.RE
+.PP
+
+.SS "void QwtPlotItem::setYAxis (intaxis)"Set the Y axis
+.PP
+The item will painted according to the coordinates its Axes.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIaxis\fP Y Axis 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetAxes()\fP, \fBsetXAxis()\fP, \fByAxis()\fP 
+.RE
+.PP
+
+.SS "void QwtPlotItem::setZ (doublez)"
+.PP
+Set the z value. Plot items are painted in increasing z-order.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIz\fP Z-value 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBz()\fP, \fBQwtPlotDict::itemList()\fP 
+.RE
+.PP
+
+.SS "void QwtPlotItem::show ()"
+.PP
+Show the item. 
+.SS "bool QwtPlotItem::testItemAttribute (\fBItemAttribute\fPattribute) const"Test an item attribute
+.PP
+\fBParameters:\fP
+.RS 4
+\fIattribute\fP Attribute type 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+true/false 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetItemAttribute()\fP, \fBItemAttribute\fP 
+.RE
+.PP
+
+.SS "bool QwtPlotItem::testRenderHint (\fBRenderHint\fPhint) const"Test a render hint
+.PP
+\fBParameters:\fP
+.RS 4
+\fIhint\fP Render hint 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+true/false 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetRenderHint()\fP, \fBRenderHint\fP 
+.RE
+.PP
+
+.SS "const \fBQwtText\fP & QwtPlotItem::title () const"\fBReturns:\fP
+.RS 4
+Title of the item 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetTitle()\fP 
+.RE
+.PP
+
+.SS "void QwtPlotItem::updateLegend (\fBQwtLegend\fP *legend) const\fC [virtual]\fP"
+.PP
+Update the widget that represents the item on the legend. \fBupdateLegend()\fP is called from \fBitemChanged()\fP to adopt the widget representing the item on the legend to its new configuration.
+.PP
+The default implementation updates a QwtLegendItem(), but an item could be represented by any type of widget, by overloading \fBlegendItem()\fP and \fBupdateLegend()\fP.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIlegend\fP Legend
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBlegendItem()\fP, \fBitemChanged()\fP, QwtLegend() 
+.RE
+.PP
+
+.PP
+Implements \fBQwtLegendItemManager\fP.
+.PP
+Reimplemented in \fBQwtPlotCurve\fP, and \fBQwtPlotMarker\fP.
+.SS "void QwtPlotItem::updateScaleDiv (const \fBQwtScaleDiv\fP &xScaleDiv, const \fBQwtScaleDiv\fP &yScaleDiv)\fC [virtual]\fP"
+.PP
+Update the item to changes of the axes scale division. Update the item, when the axes of plot have changed. The default implementation does nothing, but items that depend on the scale division (like QwtPlotGrid()) have to reimplement \fBupdateScaleDiv()\fP
+.PP
+\fBParameters:\fP
+.RS 4
+\fIxScaleDiv\fP Scale division of the x-axis 
+.br
+\fIyScaleDiv\fP Scale division of the y-axis
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBQwtPlot::updateAxes()\fP 
+.RE
+.PP
+
+.PP
+Reimplemented in \fBQwtPlotGrid\fP, \fBQwtPlotScaleItem\fP, \fBQwtPlotSeriesItem< T >\fP, \fBQwtPlotSeriesItem< QwtIntervalSample >\fP, \fBQwtPlotSeriesItem< QPointF >\fP, and \fBQwtPlotSeriesItem< QwtPoint3D >\fP.
+.SS "int QwtPlotItem::xAxis () const"
+.PP
+Return xAxis. 
+.SS "int QwtPlotItem::yAxis () const"
+.PP
+Return yAxis. 
+.SS "double QwtPlotItem::z () const"Plot items are painted in increasing z-order.
+.PP
+\fBReturns:\fP
+.RS 4
+\fBsetZ()\fP, \fBQwtPlotDict::itemList()\fP 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

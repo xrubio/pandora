@@ -1,0 +1,253 @@
+.TH "QwtScaleDiv" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtScaleDiv \- 
+.PP
+A class representing a scale division.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_scale_div.h>\fP
+.SS "Public Types"
+
+.in +1c
+.ti -1c
+.RI "enum \fBTickType\fP { \fBNoTick\fP =  -1, \fBMinorTick\fP, \fBMediumTick\fP, \fBMajorTick\fP, \fBNTickTypes\fP }"
+.br
+.in -1c
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtScaleDiv\fP ()"
+.br
+.ti -1c
+.RI "\fBQwtScaleDiv\fP (const \fBQwtInterval\fP &, QList< double >[NTickTypes])"
+.br
+.ti -1c
+.RI "\fBQwtScaleDiv\fP (double lowerBound, double upperBound, QList< double >[NTickTypes])"
+.br
+.ti -1c
+.RI "bool \fBoperator==\fP (const \fBQwtScaleDiv\fP &s) const "
+.br
+.ti -1c
+.RI "bool \fBoperator!=\fP (const \fBQwtScaleDiv\fP &s) const "
+.br
+.ti -1c
+.RI "void \fBsetInterval\fP (double lowerBound, double upperBound)"
+.br
+.ti -1c
+.RI "void \fBsetInterval\fP (const \fBQwtInterval\fP &)"
+.br
+.ti -1c
+.RI "\fBQwtInterval\fP \fBinterval\fP () const "
+.br
+.ti -1c
+.RI "double \fBlowerBound\fP () const "
+.br
+.ti -1c
+.RI "double \fBupperBound\fP () const "
+.br
+.ti -1c
+.RI "double \fBrange\fP () const "
+.br
+.ti -1c
+.RI "bool \fBcontains\fP (double v) const "
+.br
+.ti -1c
+.RI "void \fBsetTicks\fP (int type, const QList< double > &)"
+.br
+.ti -1c
+.RI "const QList< double > & \fBticks\fP (int type) const "
+.br
+.ti -1c
+.RI "void \fBinvalidate\fP ()"
+.br
+.ti -1c
+.RI "bool \fBisValid\fP () const "
+.br
+.ti -1c
+.RI "void \fBinvert\fP ()"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+A class representing a scale division. 
+
+A scale division consists of its limits and 3 list of tick values qualified as major, medium and minor ticks.
+.PP
+In most cases scale divisions are calculated by a \fBQwtScaleEngine\fP.
+.PP
+\fBSee also:\fP
+.RS 4
+subDivideInto(), subDivide() 
+.RE
+.PP
+
+.SH "Member Enumeration Documentation"
+.PP 
+.SS "enum \fBQwtScaleDiv::TickType\fP"
+.PP
+Scale tick types. 
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fINoTick \fP\fP
+No ticks. 
+.TP
+\fB\fIMinorTick \fP\fP
+Minor ticks. 
+.TP
+\fB\fIMediumTick \fP\fP
+Medium ticks. 
+.TP
+\fB\fIMajorTick \fP\fP
+Major ticks. 
+.TP
+\fB\fINTickTypes \fP\fP
+Number of valid tick types. 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtScaleDiv::QwtScaleDiv ()\fC [explicit]\fP"
+.PP
+Construct an invalid \fBQwtScaleDiv\fP instance. 
+.SS "QwtScaleDiv::QwtScaleDiv (const \fBQwtInterval\fP &interval, QList< double >ticks[NTickTypes])\fC [explicit]\fP"Construct \fBQwtScaleDiv\fP instance.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinterval\fP Interval 
+.br
+\fIticks\fP List of major, medium and minor ticks 
+.RE
+.PP
+
+.SS "QwtScaleDiv::QwtScaleDiv (doublelowerBound, doubleupperBound, QList< double >ticks[NTickTypes])\fC [explicit]\fP"Construct \fBQwtScaleDiv\fP instance.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIlowerBound\fP First interval limit 
+.br
+\fIupperBound\fP Second interval limit 
+.br
+\fIticks\fP List of major, medium and minor ticks 
+.RE
+.PP
+
+.SH "Member Function Documentation"
+.PP 
+.SS "bool QwtScaleDiv::contains (doublevalue) const"Return if a value is between \fBlowerBound()\fP and \fBupperBound()\fP
+.PP
+\fBParameters:\fP
+.RS 4
+\fIvalue\fP Value 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+true/false 
+.RE
+.PP
+
+.SS "\fBQwtInterval\fP QwtScaleDiv::interval () const\fC [inline]\fP"\fBReturns:\fP
+.RS 4
+lowerBound -> upperBound 
+.RE
+.PP
+
+.SS "void QwtScaleDiv::invalidate ()"
+.PP
+Invalidate the scale division. 
+.SS "void QwtScaleDiv::invert ()"
+.PP
+Invert the scale divison. 
+.SS "bool QwtScaleDiv::isValid () const"
+.PP
+Check if the scale division is valid. 
+.SS "double QwtScaleDiv::lowerBound () const\fC [inline]\fP"\fBReturns:\fP
+.RS 4
+lower bound 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBupperBound()\fP 
+.RE
+.PP
+
+.SS "bool QwtScaleDiv::operator!= (const \fBQwtScaleDiv\fP &s) const"
+.PP
+Inequality. \fBReturns:\fP
+.RS 4
+true if this instance is not equal to s 
+.RE
+.PP
+
+.SS "bool QwtScaleDiv::operator== (const \fBQwtScaleDiv\fP &other) const"
+.PP
+Equality operator. \fBReturns:\fP
+.RS 4
+true if this instance is equal to other 
+.RE
+.PP
+
+.SS "double QwtScaleDiv::range () const\fC [inline]\fP"\fBReturns:\fP
+.RS 4
+\fBupperBound()\fP - \fBlowerBound()\fP 
+.RE
+.PP
+
+.SS "void QwtScaleDiv::setInterval (const \fBQwtInterval\fP &interval)"Change the interval 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIinterval\fP Interval 
+.RE
+.PP
+
+.SS "void QwtScaleDiv::setInterval (doublelowerBound, doubleupperBound)\fC [inline]\fP"Change the interval 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIlowerBound\fP lower bound 
+.br
+\fIupperBound\fP upper bound 
+.RE
+.PP
+
+.SS "void QwtScaleDiv::setTicks (inttype, const QList< double > &ticks)"Assign ticks
+.PP
+\fBParameters:\fP
+.RS 4
+\fItype\fP MinorTick, MediumTick or MajorTick 
+.br
+\fIticks\fP Values of the tick positions 
+.RE
+.PP
+
+.SS "const QList< double > & QwtScaleDiv::ticks (inttype) const"Return a list of ticks
+.PP
+\fBParameters:\fP
+.RS 4
+\fItype\fP MinorTick, MediumTick or MajorTick 
+.RE
+.PP
+
+.SS "double QwtScaleDiv::upperBound () const\fC [inline]\fP"\fBReturns:\fP
+.RS 4
+upper bound 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBlowerBound()\fP 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

@@ -1,0 +1,45 @@
+
+
+example :
+
+<?xml version="1.0" ?>
+<config>  
+  <path 	name="path" 		type="string"  value="./data/"/>
+  <resource_map type="file">
+    <file type="string" value=""/>
+  </resource_map>
+  <numAgents 	name="numAgents" 	type="int"  value="400"/>
+  <numSteps 	name="numSteps" 	type="int"  value="100"/>
+  <HomeRange 	name="HomeRange" 	type="int"  min="3" max="3"/>
+  <SplitChance 	name="SplitChance" 	type="int"  min="1" max="1"/>
+  <Cannibalism 	name="Cannibalism" 	type="int"  min="0" max="10"/>  
+
+  <Neandertal>
+    <resources 			type="int"  value=""/>
+    <population 		type="int"  value=""/>
+    <homeRange 			type="int"  value=""/>
+    <cannibalism 		type="int"  value=""/>
+    <stepsUsingCannibalism 	type="int"  value=""/>
+    <age 			type="int"  value=""/>
+    <splitChance 		type="int"  value=""/>
+    <children 			type="int"  value=""/>
+    <minForkResources 		type="int"  value=""/>
+    <splitWaste 		type="int"  value=""/>
+    <maxAge 			type="int"  value=""/>
+    <minFoodToEat 		type="int"  value=""/>
+    <minFoodToMove 		type="int"  value=""/>
+  </Neandertal>
+
+</config>
+
+
+<resource_map type={ "distrib" | "file" | "peak" }>
+    <distrib type="string" value={ "random" | "exp" | "uniform" }/>
+    <size type="int"  value="50"/> size nomes  si !exist file    
+    <file type="string" value="/dir1/dir2/.../dirN/filename.ext">
+    <peak type="int" value="200">
+    <param> // no cal per les distribs, PER ARA.
+      
+example:
+
+      

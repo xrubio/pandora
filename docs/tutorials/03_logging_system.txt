@@ -1,0 +1,32 @@
+
+The logging system of Pandora allows the developer of new simulations to verify that the written source code is working correctly. It has been designed to be as simple and efficient as possible, without cluttering your program with additional calls.
+These are some additional features provided by the system:
+	- Three logging levels: Info, Debug and Extreme Debug.
+	- Possibility to use several different log files.
+	- Message generation is built on STL streams.
+
+To use the system, you will have to include the file 'Logger.hxx' in your source code:
+
+#include <Logger.hxx>
+
+There are three possible calls, depending on the level at which you want to receive the log:
+	- log_INFO -> This level of messages will always be written
+	- log_DEBUG -> Debug logs are written if you compile your code with debug symbols using the command 'scons release=0'
+	- log_EDEBUG -> Extreme Debug logs are useful if you want to verify extensively a particular section of your code. These message are only written if you compile the code using the command 'scons release=0 edebug=1'
+
+All the calls receive two parameters: the name of the file where the message will be stored, at the content of the it. You can combine different levels at the same file. For example:
+
+log_INFO("test", "This is a info log");
+log_INFO("test2", "This is a info log for log file test2.log");
+log_DEBUG("test", "This is a debug log");
+log_EDEBUG("test", "This is a extreme debug log");
+
+Pandora will create files 'test.log' and 'test2.log' inside the directory 'logs'. If you are interested on changing the name of this directory it can be done creating a Configuration for your app (check TUTORIAL CONFIGURATION).
+
+In addition you can use STL streams inside the message:
+
+int variable1 = 5;
+float variable2 = 0.3f;
+
+log_INFO("test", "The value of variable1 is: " << variable1 << " and variable2: " << variable2);
+

@@ -1,0 +1,454 @@
+.TH "QwtCounter" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtCounter \- 
+.PP
+The Counter Widget.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_counter.h>\fP
+.PP
+Inherits \fBQwtDoubleRange\fP.
+.SS "Public Types"
+
+.in +1c
+.ti -1c
+.RI "enum \fBButton\fP { \fBButton1\fP, \fBButton2\fP, \fBButton3\fP, \fBButtonCnt\fP }"
+.br
+.in -1c
+.SS "Signals"
+
+.in +1c
+.ti -1c
+.RI "void \fBbuttonReleased\fP (double value)"
+.br
+.ti -1c
+.RI "void \fBvalueChanged\fP (double value)"
+.br
+.in -1c
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtCounter\fP (QWidget *parent=NULL)"
+.br
+.ti -1c
+.RI "virtual \fB~QwtCounter\fP ()"
+.br
+.ti -1c
+.RI "bool \fBeditable\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetEditable\fP (bool)"
+.br
+.ti -1c
+.RI "void \fBsetNumButtons\fP (int n)"
+.br
+.ti -1c
+.RI "int \fBnumButtons\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetIncSteps\fP (\fBQwtCounter::Button\fP btn, int nSteps)"
+.br
+.ti -1c
+.RI "int \fBincSteps\fP (\fBQwtCounter::Button\fP btn) const "
+.br
+.ti -1c
+.RI "virtual void \fBsetValue\fP (double)"
+.br
+.ti -1c
+.RI "virtual QSize \fBsizeHint\fP () const "
+.br
+.ti -1c
+.RI "double \fBstep\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetStep\fP (double s)"
+.br
+.ti -1c
+.RI "double \fBminValue\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetMinValue\fP (double m)"
+.br
+.ti -1c
+.RI "double \fBmaxValue\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetMaxValue\fP (double m)"
+.br
+.ti -1c
+.RI "void \fBsetStepButton1\fP (int nSteps)"
+.br
+.ti -1c
+.RI "int \fBstepButton1\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetStepButton2\fP (int nSteps)"
+.br
+.ti -1c
+.RI "int \fBstepButton2\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetStepButton3\fP (int nSteps)"
+.br
+.ti -1c
+.RI "int \fBstepButton3\fP () const "
+.br
+.ti -1c
+.RI "virtual double \fBvalue\fP () const "
+.br
+.in -1c
+.SS "Protected Member Functions"
+
+.in +1c
+.ti -1c
+.RI "virtual bool \fBevent\fP (QEvent *)"
+.br
+.ti -1c
+.RI "virtual void \fBwheelEvent\fP (QWheelEvent *)"
+.br
+.ti -1c
+.RI "virtual void \fBkeyPressEvent\fP (QKeyEvent *)"
+.br
+.ti -1c
+.RI "virtual void \fBrangeChange\fP ()"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+The Counter Widget. 
+
+A Counter consists of a label displaying a number and one ore more (up to three) push buttons on each side of the label which can be used to increment or decrement the counter's value.
+.PP
+A Counter has a range from a minimum value to a maximum value and a step size. The range can be specified using QwtDblRange::setRange(). The counter's value is an integer multiple of the step size. The number of steps by which a button increments or decrements the value can be specified using \fBQwtCounter::setIncSteps()\fP. The number of buttons can be changed with \fBQwtCounter::setNumButtons()\fP.
+.PP
+Holding the space bar down with focus on a button is the fastest method to step through the counter values. When the counter underflows/overflows, the focus is set to the smallest up/down button and counting is disabled. Counting is re-enabled on a button release event (mouse or space bar).
+.PP
+Example: 
+.PP
+.nf
+#include '../include/qwt_counter.h>
+
+QwtCounter *cnt;
+
+cnt = new QwtCounter(parent, name);
+
+cnt->setRange(0.0, 100.0, 1.0);             // From 0.0 to 100, step 1.0
+cnt->setNumButtons(2);                      // Two buttons each side
+cnt->setIncSteps(QwtCounter::Button1, 1);   // Button 1 increments 1 step
+cnt->setIncSteps(QwtCounter::Button2, 20);  // Button 2 increments 20 steps
+
+connect(cnt, SIGNAL(valueChanged(double)), my_class, SLOT(newValue(double)));
+
+.fi
+.PP
+ 
+.SH "Member Enumeration Documentation"
+.PP 
+.SS "enum \fBQwtCounter::Button\fP"
+.PP
+Button index. 
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fIButton1 \fP\fP
+Button intended for minor steps. 
+.TP
+\fB\fIButton2 \fP\fP
+Button intended for medium steps. 
+.TP
+\fB\fIButton3 \fP\fP
+Button intended for large steps. 
+.TP
+\fB\fIButtonCnt \fP\fP
+Number of buttons. 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtCounter::QwtCounter (QWidget *parent = \fCNULL\fP)\fC [explicit]\fP"The default number of buttons is set to 2. The default increments are: 
+.PD 0
+
+.IP "\(bu" 2
+Button 1: 1 step 
+.IP "\(bu" 2
+Button 2: 10 steps 
+.IP "\(bu" 2
+Button 3: 100 steps
+.PP
+\fBParameters:\fP
+.RS 4
+\fIparent\fP 
+.RE
+.PP
+
+.SS "QwtCounter::~QwtCounter ()\fC [virtual]\fP"
+.PP
+Destructor. 
+.SH "Member Function Documentation"
+.PP 
+.SS "void QwtCounter::buttonReleased (doublevalue)\fC [signal]\fP"This signal is emitted when a button has been released 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIvalue\fP The new value 
+.RE
+.PP
+
+.SS "bool QwtCounter::editable () const"
+.PP
+returns whether the line edit is edatble. (default is yes) 
+.SS "bool QwtCounter::event (QEvent *event)\fC [protected, virtual]\fP"Handle PolishRequest events 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIevent\fP Event 
+.RE
+.PP
+
+.SS "int QwtCounter::incSteps (\fBQwtCounter::Button\fPbutton) const"\fBReturns:\fP
+.RS 4
+the number of steps by which a specified button increments the value or 0 if the button is invalid. 
+.RE
+.PP
+\fBParameters:\fP
+.RS 4
+\fIbutton\fP Button index
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetIncSteps()\fP 
+.RE
+.PP
+
+.SS "void QwtCounter::keyPressEvent (QKeyEvent *event)\fC [protected, virtual]\fP"Handle key events
+.PP
+.IP "\(bu" 2
+Ctrl + Qt::Key_Home
+.br
+ Step to \fBminValue()\fP
+.IP "\(bu" 2
+Ctrl + Qt::Key_End
+.br
+ Step to \fBmaxValue()\fP
+.IP "\(bu" 2
+Qt::Key_Up
+.br
+ Increment by incSteps(QwtCounter::Button1)
+.IP "\(bu" 2
+Qt::Key_Down
+.br
+ Decrement by incSteps(QwtCounter::Button1)
+.IP "\(bu" 2
+Qt::Key_PageUp
+.br
+ Increment by incSteps(QwtCounter::Button2)
+.IP "\(bu" 2
+Qt::Key_PageDown
+.br
+ Decrement by incSteps(QwtCounter::Button2)
+.IP "\(bu" 2
+Shift + Qt::Key_PageUp
+.br
+ Increment by incSteps(QwtCounter::Button3)
+.IP "\(bu" 2
+Shift + Qt::Key_PageDown
+.br
+ Decrement by incSteps(QwtCounter::Button3)
+.PP
+.PP
+\fBParameters:\fP
+.RS 4
+\fIevent\fP Key event 
+.RE
+.PP
+
+.SS "double QwtCounter::maxValue () const"
+.PP
+returns the maximum value of the range 
+.PP
+Reimplemented from \fBQwtDoubleRange\fP.
+.SS "double QwtCounter::minValue () const"
+.PP
+returns the minimum value of the range 
+.PP
+Reimplemented from \fBQwtDoubleRange\fP.
+.SS "int QwtCounter::numButtons () const"\fBReturns:\fP
+.RS 4
+The number of buttons on each side of the widget. 
+.RE
+.PP
+
+.SS "void QwtCounter::rangeChange ()\fC [protected, virtual]\fP"
+.PP
+Notify change of range. This function updates the enabled property of all buttons contained in \fBQwtCounter\fP. 
+.PP
+Reimplemented from \fBQwtDoubleRange\fP.
+.SS "void QwtCounter::setEditable (booleditable)"
+.PP
+Allow/disallow the user to manually edit the value. \fBParameters:\fP
+.RS 4
+\fIeditable\fP true enables editing 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBeditable()\fP 
+.RE
+.PP
+
+.SS "void QwtCounter::setIncSteps (\fBQwtCounter::Button\fPbutton, intnSteps)"Specify the number of steps by which the value is incremented or decremented when a specified button is pushed.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIbutton\fP Button index 
+.br
+\fInSteps\fP Number of steps
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBincSteps()\fP 
+.RE
+.PP
+
+.SS "void QwtCounter::setMaxValue (doublevalue)"Set the maximum value of the range
+.PP
+\fBParameters:\fP
+.RS 4
+\fIvalue\fP Maximum value 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetMinValue()\fP, maxVal() 
+.RE
+.PP
+
+.SS "void QwtCounter::setMinValue (doublevalue)"Set the minimum value of the range
+.PP
+\fBParameters:\fP
+.RS 4
+\fIvalue\fP Minimum value 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetMaxValue()\fP, \fBminValue()\fP 
+.RE
+.PP
+
+.SS "void QwtCounter::setNumButtons (intnumButtons)"
+.PP
+Specify the number of buttons on each side of the label. \fBParameters:\fP
+.RS 4
+\fInumButtons\fP Number of buttons 
+.RE
+.PP
+
+.SS "void QwtCounter::setStep (doublestepSize)"Set the step size 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIstepSize\fP Step size 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBQwtDoubleRange::setStep()\fP 
+.RE
+.PP
+
+.PP
+Reimplemented from \fBQwtDoubleRange\fP.
+.SS "void QwtCounter::setStepButton1 (intnSteps)"Set the number of increment steps for button 1 
+.PP
+\fBParameters:\fP
+.RS 4
+\fInSteps\fP Number of steps 
+.RE
+.PP
+
+.SS "void QwtCounter::setStepButton2 (intnSteps)"Set the number of increment steps for button 2 
+.PP
+\fBParameters:\fP
+.RS 4
+\fInSteps\fP Number of steps 
+.RE
+.PP
+
+.SS "void QwtCounter::setStepButton3 (intnSteps)"Set the number of increment steps for button 3 
+.PP
+\fBParameters:\fP
+.RS 4
+\fInSteps\fP Number of steps 
+.RE
+.PP
+
+.SS "void QwtCounter::setValue (doublevalue)\fC [virtual]\fP"
+.PP
+Set a new value. Calls \fBQwtDoubleRange::setValue\fP and does all visual updates.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIvalue\fP New value 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBQwtDoubleRange::setValue()\fP 
+.RE
+.PP
+
+.PP
+Reimplemented from \fBQwtDoubleRange\fP.
+.SS "QSize QwtCounter::sizeHint () const\fC [virtual]\fP"
+.PP
+A size hint. 
+.SS "double QwtCounter::step () const"
+.PP
+returns the step size 
+.PP
+Reimplemented from \fBQwtDoubleRange\fP.
+.SS "int QwtCounter::stepButton1 () const"
+.PP
+returns the number of increment steps for button 1 
+.SS "int QwtCounter::stepButton2 () const"
+.PP
+returns the number of increment steps for button 2 
+.SS "int QwtCounter::stepButton3 () const"
+.PP
+returns the number of increment steps for button 3 
+.SS "double QwtCounter::value () const\fC [virtual]\fP"\fBReturns:\fP
+.RS 4
+Current value 
+.RE
+.PP
+
+.PP
+Reimplemented from \fBQwtDoubleRange\fP.
+.SS "void QwtCounter::valueChanged (doublevalue)\fC [signal]\fP"This signal is emitted when the counter's value has changed 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIvalue\fP The new value 
+.RE
+.PP
+
+.SS "void QwtCounter::wheelEvent (QWheelEvent *event)\fC [protected, virtual]\fP"Handle wheel events 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIevent\fP Wheel event 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

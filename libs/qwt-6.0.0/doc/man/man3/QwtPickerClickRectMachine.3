@@ -1,0 +1,53 @@
+.TH "QwtPickerClickRectMachine" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtPickerClickRectMachine \- 
+.PP
+A state machine for rectangle selections.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_picker_machine.h>\fP
+.PP
+Inherits \fBQwtPickerMachine\fP.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtPickerClickRectMachine\fP ()"
+.br
+.ti -1c
+.RI "virtual QList< \fBCommand\fP > \fBtransition\fP (const \fBQwtEventPattern\fP &, const QEvent *)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+A state machine for rectangle selections. 
+
+Pressing QwtEventPattern::MouseSelect1 starts the selection, releasing it selects the first point. Pressing it again selects the second point and terminates the selection. Pressing QwtEventPattern::KeySelect1 also starts the selection, a second press selects the first point. A third one selects the second point and terminates the selection.
+.PP
+\fBSee also:\fP
+.RS 4
+\fBQwtEventPattern::MousePatternCode\fP, \fBQwtEventPattern::KeyPatternCode\fP 
+.RE
+.PP
+
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtPickerClickRectMachine::QwtPickerClickRectMachine ()"
+.PP
+Constructor. 
+.SH "Member Function Documentation"
+.PP 
+.SS "QList< \fBQwtPickerMachine::Command\fP > QwtPickerClickRectMachine::transition (const \fBQwtEventPattern\fP &eventPattern, const QEvent *e)\fC [virtual]\fP"
+.PP
+Transition. 
+.PP
+Implements \fBQwtPickerMachine\fP.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

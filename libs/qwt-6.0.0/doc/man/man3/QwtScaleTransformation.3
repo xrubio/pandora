@@ -1,0 +1,133 @@
+.TH "QwtScaleTransformation" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtScaleTransformation \- 
+.PP
+Operations for linear or logarithmic (base 10) transformations.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_scale_map.h>\fP
+.SS "Public Types"
+
+.in +1c
+.ti -1c
+.RI "enum \fBType\fP { \fBLinear\fP, \fBLog10\fP, \fBOther\fP }"
+.br
+.in -1c
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtScaleTransformation\fP (\fBType\fP type)"
+.br
+.ti -1c
+.RI "virtual \fB~QwtScaleTransformation\fP ()"
+.br
+.ti -1c
+.RI "virtual double \fBxForm\fP (double x, double s1, double s2, double p1, double p2) const "
+.br
+.ti -1c
+.RI "virtual double \fBinvXForm\fP (double x, double s1, double s2, double p1, double p2) const "
+.br
+.ti -1c
+.RI "\fBType\fP \fBtype\fP () const "
+.br
+.ti -1c
+.RI "virtual \fBQwtScaleTransformation\fP * \fBcopy\fP () const "
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Operations for linear or logarithmic (base 10) transformations. 
+.SH "Member Enumeration Documentation"
+.PP 
+.SS "enum \fBQwtScaleTransformation::Type\fP"
+.PP
+Transformation type. 
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fILinear \fP\fP
+Transformation between 2 linear scales. 
+.TP
+\fB\fILog10 \fP\fP
+Transformation between a linear and a logarithmic ( base 10 ) scale. 
+.TP
+\fB\fIOther \fP\fP
+Any other type of transformation. 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtScaleTransformation::QwtScaleTransformation (\fBType\fPtype)"
+.PP
+Constructor for a linear transformation. 
+.SS "QwtScaleTransformation::~QwtScaleTransformation ()\fC [virtual]\fP"
+.PP
+Destructor. 
+.SH "Member Function Documentation"
+.PP 
+.SS "\fBQwtScaleTransformation\fP * QwtScaleTransformation::copy () const\fC [virtual]\fP"
+.PP
+Create a clone of the transformation. 
+.SS "double QwtScaleTransformation::invXForm (doublep, doublep1, doublep2, doubles1, doubles2) const\fC [virtual]\fP"
+.PP
+Transform a value from a linear to a logarithmic interval. \fBParameters:\fP
+.RS 4
+\fIp\fP value related to the linear interval [p1, p2] 
+.br
+\fIp1\fP first border of linear interval 
+.br
+\fIp2\fP second border of linear interval 
+.br
+\fIs1\fP first border of logarithmic interval 
+.br
+\fIs2\fP second border of logarithmic interval 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+.IP "\fBexp((p - p1) / (p2 - p1) * log(s2 / s1)) * s1; \fP" 1c
+.PP
+.RE
+.PP
+
+.SS "\fBQwtScaleTransformation::Type\fP QwtScaleTransformation::type () const\fC [inline]\fP"\fBReturns:\fP
+.RS 4
+Transformation type 
+.RE
+.PP
+
+.SS "double QwtScaleTransformation::xForm (doubles, doubles1, doubles2, doublep1, doublep2) const\fC [virtual]\fP"
+.PP
+Transform a value between 2 linear intervals. \fBParameters:\fP
+.RS 4
+\fIs\fP value related to the interval [s1, s2] 
+.br
+\fIs1\fP first border of scale interval 
+.br
+\fIs2\fP second border of scale interval 
+.br
+\fIp1\fP first border of target interval 
+.br
+\fIp2\fP second border of target interval 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+.IP "\fBlinear mapping:\fP" 1c
+p1 + (p2 - p1) / (s2 - s1) * (s - s1) 
+.PP
+.IP "\fBlog10 mapping: \fP" 1c
+p1 + (p2 - p1) / log(s2 / s1) * log(s / s1) 
+.PP
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

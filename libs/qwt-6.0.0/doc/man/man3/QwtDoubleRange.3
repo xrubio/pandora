@@ -1,0 +1,326 @@
+.TH "QwtDoubleRange" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtDoubleRange \- 
+.PP
+A class which controls a value within an interval.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_double_range.h>\fP
+.PP
+Inherited by \fBQwtAbstractSlider\fP, and \fBQwtCounter\fP.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtDoubleRange\fP ()"
+.br
+.ti -1c
+.RI "virtual \fB~QwtDoubleRange\fP ()"
+.br
+.ti -1c
+.RI "void \fBsetRange\fP (double vmin, double vmax, double vstep=0.0, int pagesize=1)"
+.br
+.ti -1c
+.RI "void \fBsetValid\fP (bool)"
+.br
+.ti -1c
+.RI "bool \fBisValid\fP () const "
+.br
+.ti -1c
+.RI "virtual void \fBsetValue\fP (double)"
+.br
+.ti -1c
+.RI "double \fBvalue\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetPeriodic\fP (bool tf)"
+.br
+.ti -1c
+.RI "bool \fBperiodic\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetStep\fP (double)"
+.br
+.ti -1c
+.RI "double \fBstep\fP () const "
+.br
+.ti -1c
+.RI "double \fBmaxValue\fP () const "
+.br
+.ti -1c
+.RI "double \fBminValue\fP () const "
+.br
+.ti -1c
+.RI "int \fBpageSize\fP () const "
+.br
+.ti -1c
+.RI "virtual void \fBincValue\fP (int)"
+.br
+.ti -1c
+.RI "virtual void \fBincPages\fP (int)"
+.br
+.ti -1c
+.RI "virtual void \fBfitValue\fP (double)"
+.br
+.in -1c
+.SS "Protected Member Functions"
+
+.in +1c
+.ti -1c
+.RI "double \fBexactValue\fP () const "
+.br
+.ti -1c
+.RI "double \fBexactPrevValue\fP () const "
+.br
+.ti -1c
+.RI "double \fBprevValue\fP () const "
+.br
+.ti -1c
+.RI "virtual void \fBvalueChange\fP ()"
+.br
+.ti -1c
+.RI "virtual void \fBstepChange\fP ()"
+.br
+.ti -1c
+.RI "virtual void \fBrangeChange\fP ()"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+A class which controls a value within an interval. 
+
+This class is useful as a base class or a member for sliders. It represents an interval of type double within which a value can be moved. The value can be either an arbitrary point inside the interval (see \fBQwtDoubleRange::setValue\fP), or it can be fitted into a step raster (see \fBQwtDoubleRange::fitValue\fP and \fBQwtDoubleRange::incValue\fP).
+.PP
+As a special case, a \fBQwtDoubleRange\fP can be periodic, which means that a value outside the interval will be mapped to a value inside the interval when \fBQwtDoubleRange::setValue()\fP, \fBQwtDoubleRange::fitValue()\fP, \fBQwtDoubleRange::incValue()\fP or \fBQwtDoubleRange::incPages()\fP are called. 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtDoubleRange::QwtDoubleRange ()"The range is initialized to [0.0, 100.0], the step size to 1.0, and the value to 0.0. 
+.SS "QwtDoubleRange::~QwtDoubleRange ()\fC [virtual]\fP"
+.PP
+Destroys the \fBQwtDoubleRange\fP. 
+.SH "Member Function Documentation"
+.PP 
+.SS "double QwtDoubleRange::exactPrevValue () const\fC [protected]\fP"
+.PP
+Returns the exact previous value. 
+.SS "double QwtDoubleRange::exactValue () const\fC [protected]\fP"
+.PP
+Returns the exact value. The exact value is the value which \fBQwtDoubleRange::value\fP would return if the value were not adjusted to the step raster. It differs from the current value only if \fBfitValue()\fP or \fBincValue()\fP have been used before. This function is intended for internal use in derived classes. 
+.SS "void QwtDoubleRange::fitValue (doublex)\fC [virtual]\fP"
+.PP
+Adjust the value to the closest point in the step raster. \fBParameters:\fP
+.RS 4
+\fIx\fP value 
+.RE
+.PP
+\fBWarning:\fP
+.RS 4
+The value is clipped when it lies outside the range. When the range is \fBQwtDoubleRange::periodic\fP, it will be mapped to a point in the interval such that 
+.PP
+.nf
+new value := x + n * (max. value - min. value)
+.fi
+.PP
+ with an integer number n. 
+.RE
+.PP
+
+.PP
+Reimplemented in \fBQwtAbstractSlider\fP.
+.SS "void QwtDoubleRange::incPages (intnPages)\fC [virtual]\fP"
+.PP
+Increment the value by a specified number of pages. \fBParameters:\fP
+.RS 4
+\fInPages\fP Number of pages to increment. A negative number decrements the value. 
+.RE
+.PP
+\fBWarning:\fP
+.RS 4
+The Page size is specified in the constructor. 
+.RE
+.PP
+
+.SS "void QwtDoubleRange::incValue (intnSteps)\fC [virtual]\fP"
+.PP
+Increment the value by a specified number of steps. \fBParameters:\fP
+.RS 4
+\fInSteps\fP Number of steps to increment 
+.RE
+.PP
+\fBWarning:\fP
+.RS 4
+As a result of this operation, the new value will always be adjusted to the step raster. 
+.RE
+.PP
+
+.PP
+Reimplemented in \fBQwtAbstractSlider\fP.
+.SS "bool QwtDoubleRange::isValid () const"
+.PP
+Indicates if the value is valid. 
+.PP
+Reimplemented in \fBQwtAbstractSlider\fP.
+.SS "double QwtDoubleRange::maxValue () const"
+.PP
+Returns the value of the second border of the range. maxValue returns the value which has been specified as the second parameter in \fBQwtDoubleRange::setRange\fP.
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetRange()\fP 
+.RE
+.PP
+
+.PP
+Reimplemented in \fBQwtCounter\fP.
+.SS "double QwtDoubleRange::minValue () const"
+.PP
+Returns the value at the first border of the range. minValue returns the value which has been specified as the first parameter in \fBsetRange()\fP.
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetRange()\fP 
+.RE
+.PP
+
+.PP
+Reimplemented in \fBQwtCounter\fP.
+.SS "int QwtDoubleRange::pageSize () const"
+.PP
+Returns the page size in steps. 
+.SS "bool QwtDoubleRange::periodic () const"
+.PP
+Returns true if the range is periodic. \fBSee also:\fP
+.RS 4
+\fBsetPeriodic()\fP 
+.RE
+.PP
+
+.SS "double QwtDoubleRange::prevValue () const\fC [protected]\fP"
+.PP
+Returns the previous value. 
+.SS "void QwtDoubleRange::rangeChange ()\fC [protected, virtual]\fP"
+.PP
+Notify a change of the range. This virtual function is called whenever the range changes. The default implementation does nothing. 
+.PP
+Reimplemented in \fBQwtCounter\fP, \fBQwtDial\fP, and \fBQwtSlider\fP.
+.SS "void QwtDoubleRange::setPeriodic (booltf)"
+.PP
+Make the range periodic. When the range is periodic, the value will be set to a point inside the interval such that
+.PP
+.PP
+.nf
+point = value + n * width .fi
+.PP
+.PP
+if the user tries to set a new value which is outside the range. If the range is nonperiodic (the default), values outside the range will be clipped.
+.PP
+\fBParameters:\fP
+.RS 4
+\fItf\fP true for a periodic range 
+.RE
+.PP
+
+.SS "void QwtDoubleRange::setRange (doublevmin, doublevmax, doublevstep = \fC0.0\fP, intpageSize = \fC1\fP)"
+.PP
+Specify range and step size. \fBParameters:\fP
+.RS 4
+\fIvmin\fP lower boundary of the interval 
+.br
+\fIvmax\fP higher boundary of the interval 
+.br
+\fIvstep\fP step width 
+.br
+\fIpageSize\fP page size in steps 
+.RE
+.PP
+\fBWarning:\fP
+.RS 4
+.PD 0
+.IP "\(bu" 2
+A change of the range changes the value if it lies outside the new range. The current value will *not* be adjusted to the new step raster. 
+.IP "\(bu" 2
+vmax < vmin is allowed. 
+.IP "\(bu" 2
+If the step size is left out or set to zero, it will be set to 1/100 of the interval length. 
+.IP "\(bu" 2
+If the step size has an absurd value, it will be corrected to a better one. 
+.PP
+.RE
+.PP
+
+.SS "void QwtDoubleRange::setStep (doublevstep)"
+.PP
+Change the step raster. \fBParameters:\fP
+.RS 4
+\fIvstep\fP new step width 
+.RE
+.PP
+\fBWarning:\fP
+.RS 4
+The value will \fInot\fP be adjusted to the new step raster. 
+.RE
+.PP
+
+.PP
+Reimplemented in \fBQwtCounter\fP.
+.SS "void QwtDoubleRange::setValid (boolisValid)"
+.PP
+Set the value to be valid/invalid. 
+.PP
+Reimplemented in \fBQwtAbstractSlider\fP.
+.SS "void QwtDoubleRange::setValue (doublex)\fC [virtual]\fP"
+.PP
+Set a new value without adjusting to the step raster. \fBParameters:\fP
+.RS 4
+\fIx\fP new value 
+.RE
+.PP
+\fBWarning:\fP
+.RS 4
+The value is clipped when it lies outside the range. When the range is \fBQwtDoubleRange::periodic\fP, it will be mapped to a point in the interval such that 
+.PP
+.nf
+new value := x + n * (max. value - min. value)
+.fi
+.PP
+ with an integer number n. 
+.RE
+.PP
+
+.PP
+Reimplemented in \fBQwtAbstractSlider\fP, and \fBQwtCounter\fP.
+.SS "double QwtDoubleRange::step () const"\fBReturns:\fP
+.RS 4
+the step size 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetStep()\fP, \fBsetRange()\fP 
+.RE
+.PP
+
+.PP
+Reimplemented in \fBQwtCounter\fP.
+.SS "void QwtDoubleRange::stepChange ()\fC [protected, virtual]\fP"
+.PP
+Notify a change of the step size. This virtual function is called whenever the step size changes. The default implementation does nothing. 
+.SS "double QwtDoubleRange::value () const"
+.PP
+Returns the current value. 
+.PP
+Reimplemented in \fBQwtCounter\fP.
+.SS "void QwtDoubleRange::valueChange ()\fC [protected, virtual]\fP"
+.PP
+Notify a change of value. This virtual function is called whenever the value changes. The default implementation does nothing. 
+.PP
+Reimplemented in \fBQwtAbstractSlider\fP, \fBQwtDial\fP, \fBQwtSlider\fP, and \fBQwtWheel\fP.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

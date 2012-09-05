@@ -1,0 +1,98 @@
+.TH "QwtDialScaleDraw" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtDialScaleDraw \- 
+.PP
+A special scale draw made for \fBQwtDial\fP.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_dial.h>\fP
+.PP
+Inherits \fBQwtRoundScaleDraw\fP.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtDialScaleDraw\fP (\fBQwtDial\fP *)"
+.br
+.ti -1c
+.RI "virtual \fBQwtText\fP \fBlabel\fP (double value) const "
+.br
+.ti -1c
+.RI "void \fBsetPenWidth\fP (double)"
+.br
+.ti -1c
+.RI "double \fBpenWidth\fP () const "
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+A special scale draw made for \fBQwtDial\fP. 
+
+\fBSee also:\fP
+.RS 4
+\fBQwtDial\fP, \fBQwtCompass\fP 
+.RE
+.PP
+
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtDialScaleDraw::QwtDialScaleDraw (\fBQwtDial\fP *parent)\fC [explicit]\fP"Constructor
+.PP
+\fBParameters:\fP
+.RS 4
+\fIparent\fP Parent dial widget 
+.RE
+.PP
+
+.SH "Member Function Documentation"
+.PP 
+.SS "\fBQwtText\fP QwtDialScaleDraw::label (doublevalue) const\fC [virtual]\fP"Call \fBQwtDial::scaleLabel\fP of the parent dial widget.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIvalue\fP Value to display
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBQwtDial::scaleLabel()\fP 
+.RE
+.PP
+
+.PP
+Reimplemented from \fBQwtAbstractScaleDraw\fP.
+.SS "double QwtDialScaleDraw::penWidth () const"\fBReturns:\fP
+.RS 4
+Pen width used for painting the scale 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetPenWidth\fP, \fBQwtDial::drawScale()\fP 
+.RE
+.PP
+
+.PP
+Reimplemented from \fBQwtAbstractScaleDraw\fP.
+.SS "void QwtDialScaleDraw::setPenWidth (doublepenWidth)"Set the pen width used for painting the scale
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpenWidth\fP Pen width 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBpenWidth()\fP, \fBQwtDial::drawScale()\fP 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

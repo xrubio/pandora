@@ -1,0 +1,279 @@
+.TH "QwtLegend" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtLegend \- 
+.PP
+The legend widget.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_legend.h>\fP
+.SS "Public Types"
+
+.in +1c
+.ti -1c
+.RI "enum \fBLegendItemMode\fP { \fBReadOnlyItem\fP, \fBClickableItem\fP, \fBCheckableItem\fP }"
+.br
+.in -1c
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtLegend\fP (QWidget *parent=NULL)"
+.br
+.ti -1c
+.RI "virtual \fB~QwtLegend\fP ()"
+.br
+.ti -1c
+.RI "void \fBsetItemMode\fP (\fBLegendItemMode\fP)"
+.br
+.ti -1c
+.RI "\fBLegendItemMode\fP \fBitemMode\fP () const "
+.br
+.ti -1c
+.RI "QWidget * \fBcontentsWidget\fP ()"
+.br
+.ti -1c
+.RI "const QWidget * \fBcontentsWidget\fP () const "
+.br
+.ti -1c
+.RI "void \fBinsert\fP (const \fBQwtLegendItemManager\fP *, QWidget *)"
+.br
+.ti -1c
+.RI "void \fBremove\fP (const \fBQwtLegendItemManager\fP *)"
+.br
+.ti -1c
+.RI "QWidget * \fBfind\fP (const \fBQwtLegendItemManager\fP *) const "
+.br
+.ti -1c
+.RI "\fBQwtLegendItemManager\fP * \fBfind\fP (const QWidget *) const "
+.br
+.ti -1c
+.RI "virtual QList< QWidget * > \fBlegendItems\fP () const "
+.br
+.ti -1c
+.RI "void \fBclear\fP ()"
+.br
+.ti -1c
+.RI "bool \fBisEmpty\fP () const "
+.br
+.ti -1c
+.RI "uint \fBitemCount\fP () const "
+.br
+.ti -1c
+.RI "virtual bool \fBeventFilter\fP (QObject *, QEvent *)"
+.br
+.ti -1c
+.RI "virtual QSize \fBsizeHint\fP () const "
+.br
+.ti -1c
+.RI "virtual int \fBheightForWidth\fP (int w) const "
+.br
+.ti -1c
+.RI "QScrollBar * \fBhorizontalScrollBar\fP () const "
+.br
+.ti -1c
+.RI "QScrollBar * \fBverticalScrollBar\fP () const "
+.br
+.in -1c
+.SS "Protected Member Functions"
+
+.in +1c
+.ti -1c
+.RI "virtual void \fBlayoutContents\fP ()"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+The legend widget. 
+
+The \fBQwtLegend\fP widget is a tabular arrangement of legend items. Legend items might be any type of widget, but in general they will be a \fBQwtLegendItem\fP.
+.PP
+\fBSee also:\fP
+.RS 4
+\fBQwtLegendItem\fP, \fBQwtLegendItemManager\fP \fBQwtPlot\fP 
+.RE
+.PP
+
+.SH "Member Enumeration Documentation"
+.PP 
+.SS "enum \fBQwtLegend::LegendItemMode\fP"
+.PP
+Interaction mode for the legend items. The default is \fBQwtLegend::ReadOnlyItem\fP.
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetItemMode()\fP, \fBitemMode()\fP, QwtLegendItem::IdentifierMode \fBQwtLegendItem::clicked()\fP, \fBQwtLegendItem::checked()\fP, \fBQwtPlot::legendClicked()\fP, \fBQwtPlot::legendChecked()\fP 
+.RE
+.PP
+
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fIReadOnlyItem \fP\fP
+The legend item is not interactive, like a label. 
+.TP
+\fB\fIClickableItem \fP\fP
+The legend item is clickable, like a push button. 
+.TP
+\fB\fICheckableItem \fP\fP
+The legend item is checkable, like a checkable button. 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtLegend::QwtLegend (QWidget *parent = \fCNULL\fP)\fC [explicit]\fP"Constructor
+.PP
+\fBParameters:\fP
+.RS 4
+\fIparent\fP Parent widget 
+.RE
+.PP
+
+.SS "QwtLegend::~QwtLegend ()\fC [virtual]\fP"
+.PP
+Destructor. 
+.SH "Member Function Documentation"
+.PP 
+.SS "void QwtLegend::clear ()"
+.PP
+Remove all items. 
+.SS "QWidget * QwtLegend::contentsWidget ()"The contents widget is the only child of the viewport of the internal QScrollArea and the parent widget of all legend items.
+.PP
+\fBReturns:\fP
+.RS 4
+Container widget of the legend items 
+.RE
+.PP
+
+.SS "const QWidget * QwtLegend::contentsWidget () const"The contents widget is the only child of the viewport of the internal QScrollArea and the parent widget of all legend items.
+.PP
+\fBReturns:\fP
+.RS 4
+Container widget of the legend items 
+.RE
+.PP
+
+.SS "bool QwtLegend::eventFilter (QObject *object, QEvent *event)\fC [virtual]\fP"Handle QEvent::ChildRemoved andQEvent::LayoutRequest events for the \fBcontentsWidget()\fP.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIobject\fP Object to be filtered 
+.br
+\fIevent\fP Event 
+.RE
+.PP
+
+.SS "\fBQwtLegendItemManager\fP * QwtLegend::find (const QWidget *legendItem) const"Find the widget that represents a plot item
+.PP
+\fBParameters:\fP
+.RS 4
+\fIlegendItem\fP Legend item 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Widget on the legend, or NULL 
+.RE
+.PP
+
+.SS "QWidget * QwtLegend::find (const \fBQwtLegendItemManager\fP *plotItem) const"Find the widget that represents a plot item
+.PP
+\fBParameters:\fP
+.RS 4
+\fIplotItem\fP Plot item 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Widget on the legend, or NULL 
+.RE
+.PP
+
+.SS "int QwtLegend::heightForWidth (intwidth) const\fC [virtual]\fP"\fBReturns:\fP
+.RS 4
+The preferred height, for the width w. 
+.RE
+.PP
+\fBParameters:\fP
+.RS 4
+\fIwidth\fP Width 
+.RE
+.PP
+
+.SS "QScrollBar * QwtLegend::horizontalScrollBar () const"\fBReturns:\fP
+.RS 4
+Horizontal scrollbar 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBverticalScrollBar()\fP 
+.RE
+.PP
+
+.SS "void QwtLegend::insert (const \fBQwtLegendItemManager\fP *plotItem, QWidget *legendItem)"Insert a new item for a plot item 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIplotItem\fP Plot item 
+.br
+\fIlegendItem\fP New legend item 
+.RE
+.PP
+\fBNote:\fP
+.RS 4
+The parent of item will be changed to \fBcontentsWidget()\fP 
+.RE
+.PP
+
+.SS "bool QwtLegend::isEmpty () const"
+.PP
+Return true, if there are no legend items. 
+.SS "uint QwtLegend::itemCount () const"
+.PP
+Return the number of legend items. 
+.SS "\fBQwtLegend::LegendItemMode\fP QwtLegend::itemMode () const"\fBSee also:\fP
+.RS 4
+\fBLegendItemMode\fP 
+.RE
+.PP
+
+.SS "void QwtLegend::layoutContents ()\fC [protected, virtual]\fP"Adjust contents widget and item layout to the size of the viewport(). 
+.SS "QList< QWidget * > QwtLegend::legendItems () const\fC [virtual]\fP"
+.PP
+Return a list of all legend items. 
+.SS "void QwtLegend::remove (const \fBQwtLegendItemManager\fP *plotItem)"Find the corresponding item for a plotItem and remove it from the item list.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIplotItem\fP Plot item 
+.RE
+.PP
+
+.SS "void QwtLegend::setItemMode (\fBLegendItemMode\fPmode)"\fBSee also:\fP
+.RS 4
+\fBLegendItemMode\fP 
+.RE
+.PP
+
+.SS "QSize QwtLegend::sizeHint () const\fC [virtual]\fP"
+.PP
+Return a size hint. 
+.SS "QScrollBar * QwtLegend::verticalScrollBar () const"\fBReturns:\fP
+.RS 4
+Vertical scrollbar 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBhorizontalScrollBar()\fP 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

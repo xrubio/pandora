@@ -1,0 +1,512 @@
+.TH "QwtAbstractSlider" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtAbstractSlider \- 
+.PP
+An abstract base class for slider widgets.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_abstract_slider.h>\fP
+.PP
+Inherits \fBQwtDoubleRange\fP.
+.PP
+Inherited by \fBQwtDial\fP, \fBQwtKnob\fP, \fBQwtSlider\fP, and \fBQwtWheel\fP.
+.SS "Public Types"
+
+.in +1c
+.ti -1c
+.RI "enum \fBScrollMode\fP { \fBScrNone\fP, \fBScrMouse\fP, \fBScrTimer\fP, \fBScrDirect\fP, \fBScrPage\fP }"
+.br
+.in -1c
+.SS "Public Slots"
+
+.in +1c
+.ti -1c
+.RI "virtual void \fBsetValue\fP (double val)"
+.br
+.ti -1c
+.RI "virtual void \fBfitValue\fP (double val)"
+.br
+.ti -1c
+.RI "virtual void \fBincValue\fP (int steps)"
+.br
+.ti -1c
+.RI "virtual void \fBsetReadOnly\fP (bool)"
+.br
+.in -1c
+.SS "Signals"
+
+.in +1c
+.ti -1c
+.RI "void \fBvalueChanged\fP (double value)"
+.br
+.ti -1c
+.RI "void \fBsliderPressed\fP ()"
+.br
+.ti -1c
+.RI "void \fBsliderReleased\fP ()"
+.br
+.ti -1c
+.RI "void \fBsliderMoved\fP (double value)"
+.br
+.in -1c
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtAbstractSlider\fP (Qt::Orientation, QWidget *parent=NULL)"
+.br
+.ti -1c
+.RI "virtual \fB~QwtAbstractSlider\fP ()"
+.br
+.ti -1c
+.RI "void \fBsetUpdateTime\fP (int t)"
+.br
+.ti -1c
+.RI "void \fBstopMoving\fP ()"
+.br
+.ti -1c
+.RI "void \fBsetTracking\fP (bool enable)"
+.br
+.ti -1c
+.RI "virtual void \fBsetMass\fP (double val)"
+.br
+.ti -1c
+.RI "virtual double \fBmass\fP () const "
+.br
+.ti -1c
+.RI "virtual void \fBsetOrientation\fP (Qt::Orientation o)"
+.br
+.ti -1c
+.RI "Qt::Orientation \fBorientation\fP () const "
+.br
+.ti -1c
+.RI "bool \fBisReadOnly\fP () const "
+.br
+.ti -1c
+.RI "bool \fBisValid\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetValid\fP (bool valid)"
+.br
+.in -1c
+.SS "Protected Member Functions"
+
+.in +1c
+.ti -1c
+.RI "virtual void \fBsetPosition\fP (const QPoint &)"
+.br
+.ti -1c
+.RI "virtual void \fBvalueChange\fP ()"
+.br
+.ti -1c
+.RI "virtual void \fBtimerEvent\fP (QTimerEvent *e)"
+.br
+.ti -1c
+.RI "virtual void \fBmousePressEvent\fP (QMouseEvent *e)"
+.br
+.ti -1c
+.RI "virtual void \fBmouseReleaseEvent\fP (QMouseEvent *e)"
+.br
+.ti -1c
+.RI "virtual void \fBmouseMoveEvent\fP (QMouseEvent *e)"
+.br
+.ti -1c
+.RI "virtual void \fBkeyPressEvent\fP (QKeyEvent *e)"
+.br
+.ti -1c
+.RI "virtual void \fBwheelEvent\fP (QWheelEvent *e)"
+.br
+.ti -1c
+.RI "virtual double \fBgetValue\fP (const QPoint &p)=0"
+.br
+.ti -1c
+.RI "virtual void \fBgetScrollMode\fP (const QPoint &pos, \fBScrollMode\fP &scrollMode, int &direction) const =0"
+.br
+.ti -1c
+.RI "void \fBsetMouseOffset\fP (double)"
+.br
+.ti -1c
+.RI "double \fBmouseOffset\fP () const "
+.br
+.ti -1c
+.RI "int \fBscrollMode\fP () const "
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+An abstract base class for slider widgets. 
+
+\fBQwtAbstractSlider\fP is a base class for slider widgets. It handles mouse events and updates the slider's value accordingly. Derived classes only have to implement the \fBgetValue()\fP and \fBgetScrollMode()\fP members, and should react to a \fBvalueChange()\fP, which normally requires repainting. 
+.SH "Member Enumeration Documentation"
+.PP 
+.SS "enum \fBQwtAbstractSlider::ScrollMode\fP"Scroll mode 
+.PP
+\fBSee also:\fP
+.RS 4
+\fBgetScrollMode()\fP 
+.RE
+.PP
+
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fIScrNone \fP\fP
+Scrolling switched off. Don't change the value. 
+.TP
+\fB\fIScrMouse \fP\fP
+Change the value while the user keeps the button pressed and moves the mouse. 
+.TP
+\fB\fIScrTimer \fP\fP
+Automatic scrolling. Increment the value in the specified direction as long as the user keeps the button pressed. 
+.TP
+\fB\fIScrPage \fP\fP
+Automatic scrolling. Same as ScrTimer, but increment by page size. 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtAbstractSlider::QwtAbstractSlider (Qt::Orientationorientation, QWidget *parent = \fCNULL\fP)\fC [explicit]\fP"
+.PP
+Constructor. \fBParameters:\fP
+.RS 4
+\fIorientation\fP Orientation 
+.br
+\fIparent\fP Parent widget 
+.RE
+.PP
+
+.SS "QwtAbstractSlider::~QwtAbstractSlider ()\fC [virtual]\fP"
+.PP
+Destructor. 
+.SH "Member Function Documentation"
+.PP 
+.SS "void QwtAbstractSlider::fitValue (doublevalue)\fC [virtual, slot]\fP"
+.PP
+Set the slider's value to the nearest integer multiple of the step size. \fBParameters:\fP
+.RS 4
+\fIvalue\fP Value 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetValue()\fP, \fBincValue()\fP 
+.RE
+.PP
+
+.PP
+Reimplemented from \fBQwtDoubleRange\fP.
+.SS "virtual void QwtAbstractSlider::getScrollMode (const QPoint &pos, \fBScrollMode\fP &scrollMode, int &direction) const\fC [protected, pure virtual]\fP"
+.PP
+Determine what to do when the user presses a mouse button. This function is abstract and has to be implemented by derived classes. It is called on a mousePress event. The derived class can determine what should happen next in dependence of the position where the mouse was pressed by returning scrolling mode and direction.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpos\fP point where the mouse was pressed 
+.RE
+.PP
+\fBReturn values:\fP
+.RS 4
+\fIscrollMode\fP The scrolling mode 
+.br
+\fIdirection\fP direction: 1, 0, or -1. 
+.RE
+.PP
+
+.PP
+Implemented in \fBQwtDial\fP, \fBQwtKnob\fP, \fBQwtSlider\fP, and \fBQwtWheel\fP.
+.SS "virtual double QwtAbstractSlider::getValue (const QPoint &p)\fC [protected, pure virtual]\fP"
+.PP
+Determine the value corresponding to a specified poind. This is an abstract virtual function which is called when the user presses or releases a mouse button or moves the mouse. It has to be implemented by the derived class. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIp\fP point 
+.RE
+.PP
+
+.PP
+Implemented in \fBQwtDial\fP, \fBQwtKnob\fP, \fBQwtSlider\fP, and \fBQwtWheel\fP.
+.SS "void QwtAbstractSlider::incValue (intsteps)\fC [virtual, slot]\fP"
+.PP
+Increment the value by a specified number of steps. \fBParameters:\fP
+.RS 4
+\fIsteps\fP number of steps 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetValue()\fP 
+.RE
+.PP
+
+.PP
+Reimplemented from \fBQwtDoubleRange\fP.
+.SS "bool QwtAbstractSlider::isReadOnly () const"In read only mode the slider can't be controlled by mouse or keyboard.
+.PP
+\fBReturns:\fP
+.RS 4
+true if read only 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetReadOnly()\fP 
+.RE
+.PP
+
+.SS "bool QwtAbstractSlider::isValid () const\fC [inline]\fP"\fBSee also:\fP
+.RS 4
+QwtDblRange::isValid() 
+.RE
+.PP
+
+.PP
+Reimplemented from \fBQwtDoubleRange\fP.
+.SS "void QwtAbstractSlider::keyPressEvent (QKeyEvent *e)\fC [protected, virtual]\fP"Handles key events
+.PP
+.IP "\(bu" 2
+Key_Down, KeyLeft
+.br
+ Decrement by 1
+.IP "\(bu" 2
+Key_Up, Key_Right
+.br
+ Increment by 1
+.PP
+.PP
+\fBParameters:\fP
+.RS 4
+\fIe\fP Key event 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBisReadOnly()\fP 
+.RE
+.PP
+
+.PP
+Reimplemented in \fBQwtCompass\fP, and \fBQwtDial\fP.
+.SS "double QwtAbstractSlider::mass () const\fC [virtual]\fP"\fBReturns:\fP
+.RS 4
+mass 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetMass()\fP 
+.RE
+.PP
+
+.PP
+Reimplemented in \fBQwtWheel\fP.
+.SS "void QwtAbstractSlider::mouseMoveEvent (QMouseEvent *e)\fC [protected, virtual]\fP"Mouse Move Event handler 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIe\fP Mouse event 
+.RE
+.PP
+
+.SS "double QwtAbstractSlider::mouseOffset () const\fC [protected]\fP"\fBSee also:\fP
+.RS 4
+\fBsetMouseOffset()\fP 
+.RE
+.PP
+
+.SS "void QwtAbstractSlider::mousePressEvent (QMouseEvent *e)\fC [protected, virtual]\fP"Mouse press event handler 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIe\fP Mouse event 
+.RE
+.PP
+
+.SS "void QwtAbstractSlider::mouseReleaseEvent (QMouseEvent *e)\fC [protected, virtual]\fP"Mouse Release Event handler 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIe\fP Mouse event 
+.RE
+.PP
+
+.SS "Qt::Orientation QwtAbstractSlider::orientation () const"\fBReturns:\fP
+.RS 4
+Orientation 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetOrientation()\fP 
+.RE
+.PP
+
+.SS "int QwtAbstractSlider::scrollMode () const\fC [protected]\fP"
+.PP
+sa ScrollMode 
+.SS "void QwtAbstractSlider::setMass (doubleval)\fC [virtual]\fP"
+.PP
+Set the slider's mass for flywheel effect. If the slider's mass is greater then 0, it will continue to move after the mouse button has been released. Its speed decreases with time at a rate depending on the slider's mass. A large mass means that it will continue to move for a long time.
+.PP
+Derived widgets may overload this function to make it public.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIval\fP New mass in kg
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBmass()\fP 
+.RE
+.PP
+
+.PP
+Reimplemented in \fBQwtWheel\fP.
+.SS "void QwtAbstractSlider::setMouseOffset (doubleoffset)\fC [protected]\fP"\fBSee also:\fP
+.RS 4
+\fBmouseOffset()\fP 
+.RE
+.PP
+
+.SS "void QwtAbstractSlider::setOrientation (Qt::Orientationo)\fC [virtual]\fP"
+.PP
+Set the orientation. \fBParameters:\fP
+.RS 4
+\fIo\fP Orientation. Allowed values are Qt::Horizontal and Qt::Vertical. 
+.RE
+.PP
+
+.PP
+Reimplemented in \fBQwtSlider\fP, and \fBQwtWheel\fP.
+.SS "void QwtAbstractSlider::setPosition (const QPoint &p)\fC [protected, virtual]\fP"Move the slider to a specified point, adjust the value and emit signals if necessary. 
+.SS "void QwtAbstractSlider::setReadOnly (boolreadOnly)\fC [virtual, slot]\fP"En/Disable read only mode
+.PP
+In read only mode the slider can't be controlled by mouse or keyboard.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIreadOnly\fP Enables in case of true 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBisReadOnly()\fP 
+.RE
+.PP
+
+.SS "void QwtAbstractSlider::setTracking (boolenable)"
+.PP
+Enables or disables tracking. If tracking is enabled, the slider emits a \fBvalueChanged()\fP signal whenever its value changes (the default behaviour). If tracking is disabled, the value changed() signal will only be emitted if:
+.PD 0
+
+.IP "\(bu" 2
+the user releases the mouse button and the value has changed or 
+.IP "\(bu" 2
+at the end of automatic scrolling.
+.PP
+Tracking is enabled by default. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIenable\fP \fCtrue\fP (enable) or \fCfalse\fP (disable) tracking. 
+.RE
+.PP
+
+.SS "void QwtAbstractSlider::setUpdateTime (intt)"
+.PP
+Specify the update interval for automatic scrolling. \fBParameters:\fP
+.RS 4
+\fIt\fP update interval in milliseconds 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBgetScrollMode()\fP 
+.RE
+.PP
+
+.SS "void QwtAbstractSlider::setValid (boolvalid)\fC [inline]\fP"\fBParameters:\fP
+.RS 4
+\fIvalid\fP true/false 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+QwtDblRange::isValid() 
+.RE
+.PP
+
+.PP
+Reimplemented from \fBQwtDoubleRange\fP.
+.SS "void QwtAbstractSlider::setValue (doubleval)\fC [virtual, slot]\fP"
+.PP
+Move the slider to a specified value. This function can be used to move the slider to a value which is not an integer multiple of the step size. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIval\fP new value 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBfitValue()\fP 
+.RE
+.PP
+
+.PP
+Reimplemented from \fBQwtDoubleRange\fP.
+.SS "void QwtAbstractSlider::sliderMoved (doublevalue)\fC [signal]\fP"This signal is emitted when the user moves the slider with the mouse. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIvalue\fP new value 
+.RE
+.PP
+
+.SS "void QwtAbstractSlider::sliderPressed ()\fC [signal]\fP"This signal is emitted when the user presses the movable part of the slider (start ScrMouse Mode). 
+.SS "void QwtAbstractSlider::sliderReleased ()\fC [signal]\fP"This signal is emitted when the user releases the movable part of the slider. 
+.SS "void QwtAbstractSlider::stopMoving ()"
+.PP
+Stop updating if automatic scrolling is active. 
+.SS "void QwtAbstractSlider::timerEvent (QTimerEvent *e)\fC [protected, virtual]\fP"Qt timer event 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIe\fP Timer event 
+.RE
+.PP
+
+.SS "void QwtAbstractSlider::valueChange ()\fC [protected, virtual]\fP"Notify change of value
+.PP
+This function can be reimplemented by derived classes in order to keep track of changes, i.e. repaint the widget. The default implementation emits a \fBvalueChanged()\fP signal if tracking is enabled. 
+.PP
+Reimplemented from \fBQwtDoubleRange\fP.
+.PP
+Reimplemented in \fBQwtDial\fP, \fBQwtSlider\fP, and \fBQwtWheel\fP.
+.SS "void QwtAbstractSlider::valueChanged (doublevalue)\fC [signal]\fP"
+.PP
+Notify a change of value. In the default setting (tracking enabled), this signal will be emitted every time the value changes ( see \fBsetTracking()\fP ). 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIvalue\fP new value 
+.RE
+.PP
+
+.SS "void QwtAbstractSlider::wheelEvent (QWheelEvent *e)\fC [protected, virtual]\fP"Wheel Event handler 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIe\fP Whell event 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

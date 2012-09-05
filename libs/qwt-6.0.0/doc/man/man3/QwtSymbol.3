@@ -1,0 +1,385 @@
+.TH "QwtSymbol" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtSymbol \- 
+.PP
+A class for drawing symbols.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_symbol.h>\fP
+.SS "Public Types"
+
+.in +1c
+.ti -1c
+.RI "enum \fBStyle\fP { \fBNoSymbol\fP =  -1, \fBEllipse\fP, \fBRect\fP, \fBDiamond\fP, \fBTriangle\fP, \fBDTriangle\fP, \fBUTriangle\fP, \fBLTriangle\fP, \fBRTriangle\fP, \fBCross\fP, \fBXCross\fP, \fBHLine\fP, \fBVLine\fP, \fBStar1\fP, \fBStar2\fP, \fBHexagon\fP, \fBUserStyle\fP =  1000 }"
+.br
+.in -1c
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtSymbol\fP (\fBStyle\fP=NoSymbol)"
+.br
+.ti -1c
+.RI "\fBQwtSymbol\fP (\fBStyle\fP, const QBrush &, const QPen &, const QSize &)"
+.br
+.ti -1c
+.RI "\fBQwtSymbol\fP (const \fBQwtSymbol\fP &)"
+.br
+.ti -1c
+.RI "virtual \fB~QwtSymbol\fP ()"
+.br
+.ti -1c
+.RI "\fBQwtSymbol\fP & \fBoperator=\fP (const \fBQwtSymbol\fP &)"
+.br
+.ti -1c
+.RI "bool \fBoperator==\fP (const \fBQwtSymbol\fP &) const "
+.br
+.ti -1c
+.RI "bool \fBoperator!=\fP (const \fBQwtSymbol\fP &) const "
+.br
+.ti -1c
+.RI "void \fBsetSize\fP (const QSize &)"
+.br
+.ti -1c
+.RI "void \fBsetSize\fP (int width, int height=-1)"
+.br
+.ti -1c
+.RI "const QSize & \fBsize\fP () const "
+.br
+.ti -1c
+.RI "virtual void \fBsetColor\fP (const QColor &)"
+.br
+.ti -1c
+.RI "void \fBsetBrush\fP (const QBrush &b)"
+.br
+.ti -1c
+.RI "const QBrush & \fBbrush\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetPen\fP (const QPen &)"
+.br
+.ti -1c
+.RI "const QPen & \fBpen\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetStyle\fP (\fBStyle\fP)"
+.br
+.ti -1c
+.RI "\fBStyle\fP \fBstyle\fP () const "
+.br
+.ti -1c
+.RI "void \fBdrawSymbol\fP (QPainter *, const QPointF &) const "
+.br
+.ti -1c
+.RI "void \fBdrawSymbols\fP (QPainter *, const QPolygonF &) const "
+.br
+.ti -1c
+.RI "virtual QSize \fBboundingSize\fP () const "
+.br
+.in -1c
+.SS "Protected Member Functions"
+
+.in +1c
+.ti -1c
+.RI "virtual void \fBdrawSymbols\fP (QPainter *, const QPointF *, int numPoints) const "
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+A class for drawing symbols. 
+.SH "Member Enumeration Documentation"
+.PP 
+.SS "enum \fBQwtSymbol::Style\fP"Symbol Style 
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetStyle()\fP, \fBstyle()\fP 
+.RE
+.PP
+
+.PP
+\fBEnumerator: \fP
+.in +1c
+.TP
+\fB\fINoSymbol \fP\fP
+No Style. The symbol cannot be drawn. 
+.TP
+\fB\fIEllipse \fP\fP
+Ellipse or circle. 
+.TP
+\fB\fIRect \fP\fP
+Rectangle. 
+.TP
+\fB\fIDiamond \fP\fP
+Diamond. 
+.TP
+\fB\fITriangle \fP\fP
+Triangle pointing upwards. 
+.TP
+\fB\fIDTriangle \fP\fP
+Triangle pointing downwards. 
+.TP
+\fB\fIUTriangle \fP\fP
+Triangle pointing upwards. 
+.TP
+\fB\fILTriangle \fP\fP
+Triangle pointing left. 
+.TP
+\fB\fIRTriangle \fP\fP
+Triangle pointing right. 
+.TP
+\fB\fICross \fP\fP
+Cross (+) 
+.TP
+\fB\fIXCross \fP\fP
+Diagonal cross (X) 
+.TP
+\fB\fIHLine \fP\fP
+Horizontal line. 
+.TP
+\fB\fIVLine \fP\fP
+Vertical line. 
+.TP
+\fB\fIStar1 \fP\fP
+X combined with +. 
+.TP
+\fB\fIStar2 \fP\fP
+Six-pointed star. 
+.TP
+\fB\fIHexagon \fP\fP
+Hexagon. 
+.TP
+\fB\fIUserStyle \fP\fP
+Styles >= QwtSymbol::UserSymbol are reserved for derived classes of \fBQwtSymbol\fP that overload \fBdrawSymbols()\fP with additional application specific symbol types. 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtSymbol::QwtSymbol (\fBStyle\fPstyle = \fCNoSymbol\fP)"Default Constructor 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIstyle\fP Symbol Style
+.RE
+.PP
+The symbol is constructed with gray interior, black outline with zero width, no size and style 'NoSymbol'. 
+.SS "QwtSymbol::QwtSymbol (\fBQwtSymbol::Style\fPstyle, const QBrush &brush, const QPen &pen, const QSize &size)"
+.PP
+Constructor. \fBParameters:\fP
+.RS 4
+\fIstyle\fP Symbol Style 
+.br
+\fIbrush\fP brush to fill the interior 
+.br
+\fIpen\fP outline pen 
+.br
+\fIsize\fP size
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetStyle()\fP, \fBsetBrush()\fP, \fBsetPen()\fP, \fBsetSize()\fP 
+.RE
+.PP
+
+.SS "QwtSymbol::QwtSymbol (const \fBQwtSymbol\fP &other)"
+.PP
+Copy constructor. \fBParameters:\fP
+.RS 4
+\fIother\fP Symbol 
+.RE
+.PP
+
+.SS "QwtSymbol::~QwtSymbol ()\fC [virtual]\fP"
+.PP
+Destructor. 
+.SH "Member Function Documentation"
+.PP 
+.SS "QSize QwtSymbol::boundingSize () const\fC [virtual]\fP"\fBReturns:\fP
+.RS 4
+Size of the bounding rectangle of a symbol 
+.RE
+.PP
+
+.SS "const QBrush & QwtSymbol::brush () const"\fBReturns:\fP
+.RS 4
+Brush 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetBrush()\fP 
+.RE
+.PP
+
+.SS "void QwtSymbol::drawSymbol (QPainter *painter, const QPointF &pos) const\fC [inline]\fP"
+.PP
+Draw the symbol at a specified position. \fBParameters:\fP
+.RS 4
+\fIpainter\fP Painter 
+.br
+\fIpos\fP Position of the symbol in screen coordinates 
+.RE
+.PP
+
+.SS "void QwtSymbol::drawSymbols (QPainter *painter, const QPointF *points, intnumPoints) const\fC [protected, virtual]\fP"Draw an array of symbols
+.PP
+Painting several symbols is more effective than drawing symbols one by one, as a couple of layout calculations and setting of pen/brush can be done once for the complete array.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpainter\fP Painter 
+.br
+\fIpoints\fP Array of points 
+.br
+\fInumPoints\fP Number of points 
+.RE
+.PP
+
+.SS "void QwtSymbol::drawSymbols (QPainter *painter, const QPolygonF &points) const\fC [inline]\fP"
+.PP
+Draw symbols at the specified points. \fBParameters:\fP
+.RS 4
+\fIpainter\fP Painter 
+.br
+\fIpoints\fP Positions of the symbols in screen coordinates 
+.RE
+.PP
+
+.SS "bool QwtSymbol::operator!= (const \fBQwtSymbol\fP &other) const"
+.PP
+Compare two symbols. 
+.SS "\fBQwtSymbol\fP & QwtSymbol::operator= (const \fBQwtSymbol\fP &other)"
+.PP
+Assignment operator. 
+.SS "bool QwtSymbol::operator== (const \fBQwtSymbol\fP &other) const"
+.PP
+Compare two symbols. 
+.SS "const QPen & QwtSymbol::pen () const"\fBReturns:\fP
+.RS 4
+Pen 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetPen()\fP, \fBbrush()\fP 
+.RE
+.PP
+
+.SS "void QwtSymbol::setBrush (const QBrush &brush)"
+.PP
+Assign a brush. The brush is used to draw the interior of the symbol. 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIbrush\fP Brush
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBbrush()\fP 
+.RE
+.PP
+
+.SS "void QwtSymbol::setColor (const QColor &color)\fC [virtual]\fP"
+.PP
+Set the color of the symbol. Change the color of the brush for symbol types with a filled area. For all other symbol types the color will be assigned to the pen.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIcolor\fP Color
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetBrush()\fP, \fBsetPen()\fP, \fBbrush()\fP, \fBpen()\fP 
+.RE
+.PP
+
+.SS "void QwtSymbol::setPen (const QPen &pen)"Assign a pen
+.PP
+The pen is used to draw the symbol's outline.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpen\fP Pen 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBpen()\fP, \fBsetBrush()\fP 
+.RE
+.PP
+
+.SS "void QwtSymbol::setSize (intwidth, intheight = \fC-1\fP)"
+.PP
+Specify the symbol's size. If the 'h' parameter is left out or less than 0, and the 'w' parameter is greater than or equal to 0, the symbol size will be set to (w,w). 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIwidth\fP Width 
+.br
+\fIheight\fP Height (defaults to -1)
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsize()\fP 
+.RE
+.PP
+
+.SS "void QwtSymbol::setSize (const QSize &size)"Set the symbol's size 
+.PP
+\fBParameters:\fP
+.RS 4
+\fIsize\fP Size
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsize()\fP 
+.RE
+.PP
+
+.SS "void QwtSymbol::setStyle (\fBQwtSymbol::Style\fPstyle)"Specify the symbol style
+.PP
+\fBParameters:\fP
+.RS 4
+\fIstyle\fP Style 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBstyle()\fP 
+.RE
+.PP
+
+.SS "const QSize & QwtSymbol::size () const"\fBReturns:\fP
+.RS 4
+Size 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetSize()\fP 
+.RE
+.PP
+
+.SS "\fBQwtSymbol::Style\fP QwtSymbol::style () const"\fBReturns:\fP
+.RS 4
+Current symbol style 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetStyle()\fP 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

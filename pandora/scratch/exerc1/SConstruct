@@ -1,0 +1,48 @@
+
+import os
+
+release = ARGUMENTS.get('release', 1)
+mareNostrum = ARGUMENTS.get('mn', 0)
+
+env = Environment(ENV=os.environ, CXX='mpicxx')
+
+if int(mareNostrum) == 1:
+	env = Environment(CXX='/opt/osshpc/mpich-mx/64/bin/mpicxx')
+else:
+	env = Environment(CXX='mpicxx')
+
+if int(release) == 0:
+	env['CCFLAGS'] = Split('-g -O1 -Wall')
+	libs = Split('pthread mpich pandorad gdal hdf5')
+else:
+	env['CCFLAGS'] = Split('-O3')
+	libs = Split('pthread mpich pandora gdal hdf5')
+
+srcFiles = Split('main.cxx NEDWorld.cxx NeandertalGroup.cxx SapiensGroup.cxx NEDConfig.cxx')
+includeDirs = Split('./ ../../')
+
+if int(mareNostrum)==1:
+	libDirs = Split('../../ /gpfs/apps/HDF5/1.6.5/lib /gpfs/apps/GDAL/1.7.1/64/lib /opt/ibmcmp/vacpp/10.1/lib64/')  
+	includeDirs += ['/gpfs/apps/HDF5/1.6.5/include']
+	includeDirs += ['/gpfs/apps/GDAL/1.7.1/64/include']
+	includeDirs += ['/gpfs/apps/BOOST/1_39_0/64/include/boost-1_39/']
+	libs += ['gpfs']
+	libs += ['z']
+	libs += ['xl']
+else:
+	libDirs = Split('../../ /usr/local/lib/') 
+	includeDirs += ['/usr/local/include/']
+
+# if debug && mare nostrum mpitrace is added
+if int(release)==0 and int(mareNostrum)==1:
+	libs += ['mpitrace']
+	libDirs += ['/gpfs/apps/CEPBATOOLS/mpitrace-stable-1.2-mx/lib']
+
+## tinyxml
+includeDirs += ['../../../lib/tinyxml']
+libDirs += ['../../../lib/tinyxml']
+libs += ['tinyxml']
+##f tinyxml
+
+env.Program('ned', srcFiles, CPPPATH=includeDirs, LIBS=libs, LIBPATH=libDirs)
+

@@ -1,0 +1,305 @@
+.TH "QwtScaleMap" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtScaleMap \- 
+.PP
+A scale map.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_scale_map.h>\fP
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "\fBQwtScaleMap\fP ()"
+.br
+.ti -1c
+.RI "\fBQwtScaleMap\fP (const \fBQwtScaleMap\fP &)"
+.br
+.ti -1c
+.RI "\fB~QwtScaleMap\fP ()"
+.br
+.ti -1c
+.RI "\fBQwtScaleMap\fP & \fBoperator=\fP (const \fBQwtScaleMap\fP &)"
+.br
+.ti -1c
+.RI "void \fBsetTransformation\fP (\fBQwtScaleTransformation\fP *)"
+.br
+.ti -1c
+.RI "const \fBQwtScaleTransformation\fP * \fBtransformation\fP () const "
+.br
+.ti -1c
+.RI "void \fBsetPaintInterval\fP (double p1, double p2)"
+.br
+.ti -1c
+.RI "void \fBsetScaleInterval\fP (double s1, double s2)"
+.br
+.ti -1c
+.RI "double \fBtransform\fP (double s) const "
+.br
+.ti -1c
+.RI "double \fBinvTransform\fP (double p) const "
+.br
+.ti -1c
+.RI "double \fBp1\fP () const "
+.br
+.ti -1c
+.RI "double \fBp2\fP () const "
+.br
+.ti -1c
+.RI "double \fBs1\fP () const "
+.br
+.ti -1c
+.RI "double \fBs2\fP () const "
+.br
+.ti -1c
+.RI "double \fBpDist\fP () const "
+.br
+.ti -1c
+.RI "double \fBsDist\fP () const "
+.br
+.ti -1c
+.RI "bool \fBisInverting\fP () const "
+.br
+.in -1c
+.SS "Static Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "static QRectF \fBtransform\fP (const \fBQwtScaleMap\fP &, const \fBQwtScaleMap\fP &, const QRectF &)"
+.br
+.ti -1c
+.RI "static QRectF \fBinvTransform\fP (const \fBQwtScaleMap\fP &, const \fBQwtScaleMap\fP &, const QRectF &)"
+.br
+.ti -1c
+.RI "static QPointF \fBtransform\fP (const \fBQwtScaleMap\fP &, const \fBQwtScaleMap\fP &, const QPointF &)"
+.br
+.ti -1c
+.RI "static QPointF \fBinvTransform\fP (const \fBQwtScaleMap\fP &, const \fBQwtScaleMap\fP &, const QPointF &)"
+.br
+.in -1c
+.SS "Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "QT_STATIC_CONST double \fBLogMin\fP = 1.0e-150"
+.br
+.ti -1c
+.RI "QT_STATIC_CONST double \fBLogMax\fP = 1.0e150"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+A scale map. 
+
+\fBQwtScaleMap\fP offers transformations from a scale into a paint interval and vice versa. 
+.SH "Constructor & Destructor Documentation"
+.PP 
+.SS "QwtScaleMap::QwtScaleMap ()"
+.PP
+Constructor. The scale and paint device intervals are both set to [0,1]. 
+.SS "QwtScaleMap::QwtScaleMap (const \fBQwtScaleMap\fP &other)"
+.PP
+Copy constructor. 
+.SS "QwtScaleMap::~QwtScaleMap ()"Destructor 
+.SH "Member Function Documentation"
+.PP 
+.SS "double QwtScaleMap::invTransform (doublep) const\fC [inline]\fP"Transform an paint device value into a value in the interval of the scale.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIp\fP Value relative to the coordinates of the paint device 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBtransform()\fP 
+.RE
+.PP
+
+.SS "QPointF QwtScaleMap::invTransform (const \fBQwtScaleMap\fP &xMap, const \fBQwtScaleMap\fP &yMap, const QPointF &pos)\fC [static]\fP"Transform a rectangle from paint to scale coordinates
+.PP
+\fBParameters:\fP
+.RS 4
+\fIxMap\fP X map 
+.br
+\fIyMap\fP Y map 
+.br
+\fIpos\fP Position in paint coordinates 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Position in scale coordinates 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBtransform()\fP 
+.RE
+.PP
+
+.SS "QRectF QwtScaleMap::invTransform (const \fBQwtScaleMap\fP &xMap, const \fBQwtScaleMap\fP &yMap, const QRectF &rect)\fC [static]\fP"Transform a rectangle from paint to scale coordinates
+.PP
+\fBParameters:\fP
+.RS 4
+\fIxMap\fP X map 
+.br
+\fIyMap\fP Y map 
+.br
+\fIrect\fP Rectangle in paint coordinates 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Rectangle in scale coordinates 
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBtransform()\fP 
+.RE
+.PP
+
+.SS "bool QwtScaleMap::isInverting () const\fC [inline]\fP"\fBReturns:\fP
+.RS 4
+True, when ( \fBp1()\fP < \fBp2()\fP ) != ( \fBs1()\fP < \fBs2()\fP ) 
+.RE
+.PP
+
+.SS "\fBQwtScaleMap\fP & QwtScaleMap::operator= (const \fBQwtScaleMap\fP &other)"
+.PP
+Assignment operator. 
+.SS "double QwtScaleMap::p1 () const\fC [inline]\fP"\fBReturns:\fP
+.RS 4
+First border of the paint interval 
+.RE
+.PP
+
+.SS "double QwtScaleMap::p2 () const\fC [inline]\fP"\fBReturns:\fP
+.RS 4
+Second border of the paint interval 
+.RE
+.PP
+
+.SS "double QwtScaleMap::pDist () const\fC [inline]\fP"\fBReturns:\fP
+.RS 4
+qwtAbs(\fBp2()\fP - \fBp1()\fP) 
+.RE
+.PP
+
+.SS "double QwtScaleMap::s1 () const\fC [inline]\fP"\fBReturns:\fP
+.RS 4
+First border of the scale interval 
+.RE
+.PP
+
+.SS "double QwtScaleMap::s2 () const\fC [inline]\fP"\fBReturns:\fP
+.RS 4
+Second border of the scale interval 
+.RE
+.PP
+
+.SS "double QwtScaleMap::sDist () const\fC [inline]\fP"\fBReturns:\fP
+.RS 4
+qwtAbs(\fBs2()\fP - \fBs1()\fP) 
+.RE
+.PP
+
+.SS "void QwtScaleMap::setPaintInterval (doublep1, doublep2)"
+.PP
+Specify the borders of the paint device interval. \fBParameters:\fP
+.RS 4
+\fIp1\fP first border 
+.br
+\fIp2\fP second border 
+.RE
+.PP
+
+.SS "void QwtScaleMap::setScaleInterval (doubles1, doubles2)"
+.PP
+Specify the borders of the scale interval. \fBParameters:\fP
+.RS 4
+\fIs1\fP first border 
+.br
+\fIs2\fP second border 
+.RE
+.PP
+\fBWarning:\fP
+.RS 4
+logarithmic scales might be aligned to [LogMin, LogMax] 
+.RE
+.PP
+
+.SS "void QwtScaleMap::setTransformation (\fBQwtScaleTransformation\fP *transformation)"Initialize the map with a transformation 
+.SS "QPointF QwtScaleMap::transform (const \fBQwtScaleMap\fP &xMap, const \fBQwtScaleMap\fP &yMap, const QPointF &pos)\fC [static]\fP"Transform a point from scale to paint coordinates
+.PP
+\fBParameters:\fP
+.RS 4
+\fIxMap\fP X map 
+.br
+\fIyMap\fP Y map 
+.br
+\fIpos\fP Position in scale coordinates 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Position in paint coordinates
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBinvTransform()\fP 
+.RE
+.PP
+
+.SS "double QwtScaleMap::transform (doubles) const\fC [inline]\fP"Transform a point related to the scale interval into an point related to the interval of the paint device
+.PP
+\fBParameters:\fP
+.RS 4
+\fIs\fP Value relative to the coordinates of the scale 
+.RE
+.PP
+
+.SS "QRectF QwtScaleMap::transform (const \fBQwtScaleMap\fP &xMap, const \fBQwtScaleMap\fP &yMap, const QRectF &rect)\fC [static]\fP"Transform a rectangle from scale to paint coordinates
+.PP
+\fBParameters:\fP
+.RS 4
+\fIxMap\fP X map 
+.br
+\fIyMap\fP Y map 
+.br
+\fIrect\fP Rectangle in scale coordinates 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Rectangle in paint coordinates
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBinvTransform()\fP 
+.RE
+.PP
+
+.SS "const \fBQwtScaleTransformation\fP * QwtScaleMap::transformation () const"
+.PP
+Get the transformation. 
+.SH "Member Data Documentation"
+.PP 
+.SS "QT_STATIC_CONST_IMPL double \fBQwtScaleMap::LogMax\fP = 1.0e150"
+.PP
+Largest allowed value for logarithmic scales: 1.0e150. 
+.SS "QT_STATIC_CONST_IMPL double \fBQwtScaleMap::LogMin\fP = 1.0e-150"
+.PP
+Smallest allowed value for logarithmic scales: 1.0e-150. 
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

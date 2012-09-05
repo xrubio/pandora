@@ -1,0 +1,95 @@
+
+import os
+
+release = ARGUMENTS.get('release', 1)
+mareNostrum = ARGUMENTS.get('mn', 0)
+extremeDebug = ARGUMENTS.get('edebug', 0)
+localmpich = ARGUMENTS.get('localmpich',0)
+
+if int(localmpich) == 1 :
+	env = Environment(ENV=os.environ, CXX='/usr/local/bin/mpicxx')
+else :
+	env = Environment(ENV=os.environ, CXX='mpicxx')
+
+env.VariantDir('build', '.')
+
+libs = Split('pthread mpich gdal hdf5 z tinyxml grass_gis boost_filesystem boost_system')
+
+if int(release) == 0:
+	env['CCFLAGS'] = Split('-g -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG')
+	if int(extremeDebug)==1:
+		env['CCFLAGS'] += ['-DPANDORAEDEBUG']
+	libraryName = 'pandorad'
+	pythonLibraryName = 'pyPandorad'
+else:
+	env['CCFLAGS'] = Split('-O3 -Wall -DTIXML_USE_STL -fopenmp')
+	libraryName = 'pandora'
+	pythonLibraryName = 'pyPandora'
+
+
+coreFiles = Split('World.cxx StaticRaster.cxx Raster.cxx Agent.cxx Statistics.cxx SimulationRecord.cxx AgentRecord.cxx Serializer.cxx Simulation.cxx Config.cxx MpiFactory.cxx IncrementalRaster.cxx RasterLoader.cxx Action.cxx LoggerBase.cxx GeneralState.cxx ShpLoader.cxx')
+
+analysisFiles = Split('analysis/Analysis.cxx analysis/AgentMean.cxx analysis/AgentSum.cxx analysis/AgentNum.cxx analysis/Results.cxx analysis/RasterSum.cxx analysis/RasterMean.cxx analysis/AgentHDFtoSHP.cxx analysis/AgentHistogram.cxx')
+
+
+srcFiles = coreFiles + analysisFiles
+
+srcBaseFiles = [] 
+for src in srcFiles:
+	srcBaseFiles.append('build/'+src)
+
+if int(mareNostrum)==1:
+	includeDirs = Split('. analysis/ /gpfs/apps/HDF5/1.8.9/64/include')
+	includeDirs += ['/gpfs/apps/BOOST/1_48_0/include/']
+	includeDirs += ['/gpfs/apps/TINYXML/2.6.2/64/STL/include']
+	includeDirs += ['/gpfs/apps/GDAL/1.7.1/64/include']
+	includeDirs += ['/gpfs/apps/GRASS/6.4.2/grass-6.4.2/include/']
+
+	libDirs = Split('/gpfs/apps/HDF5/1.8.9/64/lib /opt/ibmcmp/vacpp/10.1/lib64/ /gpfs/apps/GDAL/1.7.1/64/lib /gpfs/apps/TINYXML/2.6.2/64/STL/lib')
+	libDirs += ['/gpfs/apps/BOOST/1_48_0/lib/']
+	libDirs += ['/gpfs/apps/GRASS/6.4.2/grass-6.4.2/lib/']
+	libs += ['gpfs']
+	libs += ['xl']
+else:
+	includeDirs = Split('. analysis/ /usr/local/include /usr/local/hdf5/include /usr/lib/grass64/include/ /usr/include/gdal/')
+	libDirs = Split('. /usr/local/lib /usr/local/hdf5/lib/ /usr/lib/grass64/lib/')
+	libs += ['mpl']
+
+# if debug && mare nostrum mpitrace is added
+#if int(release)==0 and int(mareNostrum)==1:
+#	libs += ['mpitrace']
+#	libDirs += ['/gpfs/apps/CEPBATOOLS/mpitrace-stable-1.2-mx/lib']
+
+env.SharedLibrary(libraryName, srcBaseFiles, CPPPATH=includeDirs, LIBS=libs, LIBPATH=libDirs)
+
+if int(mareNostrum)==0:
+	if int(localmpich) == 1 :
+		envPython = Environment(ENV=os.environ, CXX='/usr/local/bin/mpicxx')
+	else :
+		envPython = Environment(ENV=os.environ, CXX='mpicxx')
+
+	envPython['LINKFLAGS'] = Split('-Wl,--export-dynamic,-no-undefined')
+	envPython.VariantDir('build_py', '.')
+
+	if int(release) == 0:
+		envPython['CCFLAGS'] = Split('-g -Wall -DTIXML_USE_STL -DPANDORADEBUG')	
+		if int(extremeDebug)==1:
+			env['CCFLAGS'] += ['-DPANDORAEDEBUG']
+	else:
+		envPython['CCFLAGS'] = Split('-O3 -Wall -DTIXML_USE_STL')
+	
+	srcPyFiles = [] 
+	for src in srcFiles:
+		srcPyFiles.append('build_py/'+src)
+
+	srcPyFiles.append('build/pyBindings.cxx')
+	srcPyFiles.append('build/MpiStubCode.cxx')
+
+	libsPython = libs
+	libsPython += ['boost_python']
+	libsPython += ['python2.7']
+	includeDirsPython = includeDirs
+	includeDirsPython += ['/usr/include/python2.7/']
+
+	envPython.SharedLibrary(pythonLibraryName, srcPyFiles, CPPPATH=includeDirsPython, LIBS=libsPython, LIBPATH=libDirs )
+

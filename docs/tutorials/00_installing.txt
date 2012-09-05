@@ -1,0 +1,83 @@
+
+This tutorial will explain how to install Pandora framework.
+
+- Requirements
+You will need a PC with GNU/Linux installed. The tutorial will explain how to install Pandora on Ubuntu 12.04 (Precise Pangolin), but any other distribution would work (probably with additional effort related to looking for the correct packages and versions).
+
+- Installing dependencies
+First of all, open a console terminal (like Konsole or xterm) and upgrade your system to the last updates:
+
+$ sudo apt-get update
+$ sudo apt-get upgrate
+
+Once it is done, this is the full list of external dependencies of Pandora, that need to be installed:
+
+- XML support
+libtinyxml-dev
+
+- Cassandra GUI
+libdevil-dev
+freeglut3-dev
+libqwt-dev
+libqwt6
+libqt4-dev
+
+- GIS support
+
+grass
+grass-dev
+libgdal1-dev
+
+- MPI support
+mpich2
+
+- Compiling System
+scons
+
+You can install all of them with this command:
+$ sudo apt-get install libtinyxml-dev libdevil-dev freeglut3-dev libqwt-dev libqwt6 libqt4-dev grass grass-dev libgdal1-dev mpich2 scons libboost1.48-all-dev build-essential
+
+- Compiling HDF5
+Ubuntu dependencies forces you to install the serial version of HDF5 as grass dependency. For this reason, we will need to download, compile and install hdf5.
+	* Go to HDF5 webpage and download the sources:
+		$ cd ~/
+		$ mkdir hdf5
+		$ cd hdf5
+		$ wget "http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.9.tar.bz2"
+
+	* Unzip the file:
+		$ tar jxvf hdf5-1.8.9.tar.bz2
+
+	* configure the library:
+		$ cd hdf5-1.8.9
+		$ ./configure --enable-parallel --prefix=/usr/local/hdf5
+		(if you want more information type ./configure --help)
+
+	* compile and install:
+		$ make
+		$ sudo make install
+
+- Compiling Pandora
+	* Go to the folder where Pandora is deployed:
+		$ cd PATHTOPANDORA/pandora/
+	* Compile:
+		$ scons
+		(if you want to compile in debug mode type: $ scons release=0 )
+
+	* Go to any example or app and compile it:
+		$ cd examples/randomWalkers/
+		$ scons
+	
+	* Execute it:
+		$ ./randomWalkers
+	
+- Compiling cassandra
+	* Go to the folder where Cassandra is deployed:
+		$ cd PATHTOPANDORA/cassandra
+	* Compile:
+		$ qmake
+		$ make
+	* Execute it:
+		$ ./cassandra
+	* Finally, check whether the results of randomWalkers (they should be inside a 'data' directory) are loaded correctly in cassandra.
+

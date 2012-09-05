@@ -1,0 +1,103 @@
+.TH "QwtScaleArithmetic" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtScaleArithmetic \- 
+.PP
+Arithmetic including a tolerance.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_scale_engine.h>\fP
+.SS "Static Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "static double \fBceilEps\fP (double value, double intervalSize)"
+.br
+.ti -1c
+.RI "static double \fBfloorEps\fP (double value, double intervalSize)"
+.br
+.ti -1c
+.RI "static double \fBdivideEps\fP (double interval, double steps)"
+.br
+.ti -1c
+.RI "static double \fBceil125\fP (double x)"
+.br
+.ti -1c
+.RI "static double \fBfloor125\fP (double x)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Arithmetic including a tolerance. 
+.SH "Member Function Documentation"
+.PP 
+.SS "double QwtScaleArithmetic::ceil125 (doublex)\fC [static]\fP"Find the smallest value out of {1,2,5}*10^n with an integer number n which is greater than or equal to x
+.PP
+\fBParameters:\fP
+.RS 4
+\fIx\fP Input value 
+.RE
+.PP
+
+.SS "double QwtScaleArithmetic::ceilEps (doublevalue, doubleintervalSize)\fC [static]\fP"Ceil a value, relative to an interval
+.PP
+\fBParameters:\fP
+.RS 4
+\fIvalue\fP Value to ceil 
+.br
+\fIintervalSize\fP Interval size
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBfloorEps()\fP 
+.RE
+.PP
+
+.SS "double QwtScaleArithmetic::divideEps (doubleintervalSize, doublenumSteps)\fC [static]\fP"
+.PP
+Divide an interval into steps. $stepSize = (intervalSize - intervalSize * 10e^{-6}) / numSteps$.PP
+\fBParameters:\fP
+.RS 4
+\fIintervalSize\fP Interval size 
+.br
+\fInumSteps\fP Number of steps 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+Step size 
+.RE
+.PP
+
+.SS "double QwtScaleArithmetic::floor125 (doublex)\fC [static]\fP"
+.PP
+Find the largest value out of {1,2,5}*10^n with an integer number n which is smaller than or equal to x. \fBParameters:\fP
+.RS 4
+\fIx\fP Input value 
+.RE
+.PP
+
+.SS "double QwtScaleArithmetic::floorEps (doublevalue, doubleintervalSize)\fC [static]\fP"Floor a value, relative to an interval
+.PP
+\fBParameters:\fP
+.RS 4
+\fIvalue\fP Value to floor 
+.br
+\fIintervalSize\fP Interval size
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBfloorEps()\fP 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.

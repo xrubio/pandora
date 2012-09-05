@@ -1,0 +1,38 @@
+#------------------------------------------------------------------------------
+# Author: Kalyan S. Perumalla <www.cc.gatech.edu/~kalyan> 08Jan03
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+LIBSYNK = synk.lib
+LIBOBJS = fm.obj fmshm.obj fmgm.obj fmtcp.obj fmmpi.obj rm.obj rmbar.obj tm.obj tmred.obj tmnull.obj
+TESTS   = gmtest.exe fmtest.exe rmtest.exe
+
+#------------------------------------------------------------------------------
+# Set COMPOSITETIME=1 to enable "composite timestamps";
+#                     to disable, comment out or set to zero.
+# Set MPI_AVAILABLE=1 to enable MPI;
+#                     to disable, comment out or set to zero.
+# Also,
+#      If MPI_AVAILABLE=1, then set CC to mpicc (or mpcc, etc).
+#------------------------------------------------------------------------------
+MORECFLAGS = /DCOMPOSITETIME=1 /DMPI_AVAILABLE=0 /DGM_AVAILABLE=0
+
+#------------------------------------------------------------------------------
+CFLAGS  = /nologo /I. $(MORECFLAGS) /O2
+.SUFFIXES: .c .obj .lib .exe
+.c.exe:
+	$(CC) $(CFLAGS) /o $*.obj /c $*.c
+	$(CC) $(CFLAGS) /o $@ $*.obj $(LIBSYNK) ws2_32.lib
+
+#------------------------------------------------------------------------------
+all: $(LIBSYNK) $(TESTS)
+
+#------------------------------------------------------------------------------
+$(LIBSYNK): $(LIBOBJS)
+	lib /nologo /out:$(LIBSYNK) $(LIBOBJS)
+
+#------------------------------------------------------------------------------
+clean:
+	del $(LIBOBJS) $(LIBSYNK) $(TESTS) *.obj
+
+#------------------------------------------------------------------------------

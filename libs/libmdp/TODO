@@ -1,0 +1,6 @@
+- Implement efficient backup prop using array indexed by depth
+- Check computation of deltas in aot?
+- Delete ao1.h, ao2.h and ao3.h
+- Implement better revision strategy for aot* to increase convergence time
+- Unify parameter classes
+- Move evaluation.h to engine

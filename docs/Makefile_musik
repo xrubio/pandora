@@ -1,0 +1,70 @@
+#------------------------------------------------------------------------------
+# Author: Kalyan S. Perumalla <www.cc.gatech.edu/~kalyan> 04Jan04
+# Updated: $Revision: 1.17 $ $Name: v12aug05 $ $Date: 2005/08/12 02:48:46 $
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# Libsynk is needed for distributed simulation support, downloadable from:
+#     http://www.cc.gatech.edu/fac/kalyan/libsynk.htm
+# After installing libSynk, set the path to your installation here.
+#------------------------------------------------------------------------------
+SYNKDIR    = $(HOME)/simulador/libsynk
+SYNKINCL   = -I$(SYNKDIR)
+SYNKLIB    = -lsynk
+SYNKLD    = -L$(SYNKDIR) $(SYNKLIB)
+#------------------------------------------------------------------------------
+MUSIKCXX   = /opt/osshpc/mpich-mx/64/bin/mpicxx
+#MUSIKCXX   = mpicxx
+MUSIKINCL  = -I.
+MUSIKLIB   = libmusik.so
+MUSIKLD   = -lpthread
+MUSIKOBJS  = musik.o
+MUSIKCOPTS = -O3
+LDFLAGS = $(SYNKLD) $(MUSIKLD)
+#------------------------------------------------------------------------------
+CFLAGS     = $(SYNKINCL) $(MUSIKINCL) $(MUSIKCOPTS) 
+
+#------------------------------------------------------------------------------
+.SUFFIXES:
+.SUFFIXES: .cpp .o
+.cpp.o:
+	$(MUSIKCXX) -o $@ $(CFLAGS) -c $<
+
+#------------------------------------------------------------------------------
+all: $(MUSIKLIB) ex
+
+#------------------------------------------------------------------------------
+$(MUSIKLIB): $(MUSIKOBJS)
+	$(MUSIKCXX) -o $@ -shared $(LDFLAGS) $(MUSIKOBJS)
+
+#------------------------------------------------------------------------------
+ex: EXAMPLES
+	@ cd EXAMPLES; $(MAKE) all MUSIKCXX="$(MUSIKCXX)" SYNKINCL="$(SYNKINCL)" MUSIKCOPTS="$(MUSIKCOPTS)" LDFLAGS="$(LDFLAGS)"
+#------------------------------------------------------------------------------
+pdf: pdf-ext pdf-int
+
+pdf-ext: DOC
+	@ echo ------------- Making musik.pdf ----------------
+	doxygen DOC/doxy.cfg
+	(cd DOC/latex; cp ../musik-style.sty .; \
+	 make; mv -f refman.pdf ../musik.pdf)
+
+pdf-int: DOC-INT
+	@ echo ------------- Making musik-int.pdf ----------------
+	doxygen DOC-INT/doxy-int.cfg
+	(cd DOC-INT/latex; cp ../../DOC/musik-style.sty .; \
+	 make; mv -f refman.pdf ../musik-int.pdf)
+
+#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+clean: mainclean docclean
+
+mainclean:
+	rm -f $(MUSIKOBJS) $(MUSIKLIB)
+	cd EXAMPLES; $(MAKE) clean
+
+docclean:
+	cd DOC; rm -rf musik.pdf latex html rtf man
+	cd DOC-INT; rm -rf musik-int.pdf latex html rtf man
+
+#------------------------------------------------------------------------------

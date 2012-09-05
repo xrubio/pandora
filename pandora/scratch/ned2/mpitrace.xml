@@ -1,0 +1,80 @@
+<?xml version='1.0'?>
+
+<trace enabled="no"
+ home="/gpfs/apps/CEPBATOOLS/mpitrace/64/"
+ initial-mode="detail"
+ type="paraver"
+ xml-parser-id="Id: xml-parse.c,v 1.29 2009/06/10 17:41:56 gllort Exp $"
+>
+  <mpi enabled="yes">
+    <counters enabled="yes" />
+  </mpi>
+
+  <openmp enabled="no">
+    <locks enabled="no" />
+    <counters enabled="yes" />
+  </openmp>
+
+  <callers enabled="yes">
+    <mpi enabled="yes">1-3</mpi>
+    <sampling enabled="no">1-5</sampling>
+  </callers>
+
+  <user-functions enabled="no" list="/home/bsc41/bsc41273/user-functions.dat">
+    <max-depth enabled="no">3</max-depth>
+    <counters enabled="yes" />
+  </user-functions>
+
+  <counters enabled="yes">
+    <cpu enabled="yes" starting-set-distribution="1">
+      <set enabled="yes" domain="all" changeat-globalops="5">
+        PAPI_TOT_INS,PAPI_TOT_CYC,PAPI_L1_DCM
+        <sampling enabled="no" frequency="100000000">PAPI_TOT_CYC</sampling>
+      </set>
+      <set enabled="yes" domain="user" changeat-globalops="5">
+        PAPI_TOT_INS,PAPI_FP_INS,PAPI_TOT_CYC
+      </set>
+    </cpu>
+
+    <network enabled="no" />
+
+    <resource-usage enabled="no" />
+  </counters>
+
+  <storage enabled="no">
+    <trace-prefix enabled="yes">TRACE</trace-prefix>
+    <size enabled="no">5</size>
+    <temporal-directory enabled="yes" make-dir="no">/scratch</temporal-directory>
+    <final-directory enabled="yes" make-dir="no">/gpfs/scratch/bsc41/bsc41273</final-directory>
+    <gather-mpits enabled="no" />
+  </storage>
+
+  <buffer enabled="yes">
+    <size enabled="yes">150000</size>
+    <circular enabled="no" />
+  </buffer>
+
+  <trace-control enabled="yes">
+    <file enabled="no" frequency="5m">/gpfs/scratch/bsc41/bsc41273/control</file>
+    <global-ops enabled="no"></global-ops>
+    <remote-control enabled="no">
+      <signal enabled="no" which="USR1"/>
+    </remote-control>
+  </trace-control>
+
+  <others enabled="yes">
+    <minimum-time enabled="no">10m</minimum-time>
+  </others>
+
+  <bursts enabled="no">
+    <threshold enabled="yes">500u</threshold>
+    <mpi-statistics enabled="yes" />
+  </bursts>
+
+  <cell enabled="no">
+    <spu-file-size enabled="yes">5</spu-file-size>
+    <spu-buffer-size enabled="yes">64</spu-buffer-size>
+    <spu-dma-channel enabled="yes">2</spu-dma-channel>
+  </cell>
+
+</trace>

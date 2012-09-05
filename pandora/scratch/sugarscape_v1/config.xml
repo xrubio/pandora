@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<config>  
+	<path 	name="path" 		type="string"  value="./data/"/>
+	<resource_map name="resource_map"	type="file">
+		<file    type="string" value="resources/resources_sugar_52.tiff"/>
+		<size    type="int"    value="52"/>
+	</resource_map>
+	<numAgents 	name="numAgents" 	type="int"  value="250"/>
+	<numSteps 	name="numSteps" 	type="int"  value="1000"/>
+	<SugarAgent name="SugarAgent" type="object">
+		<vision 		name="vision" 		type="int"  min="1" max="6"/>
+		<metabolism 	name="metabolism" 	type="int"  min="1" max="4"/>
+		<deathAge 		name="deathAge" 	type="int"  min="60" max="100"/>
+		<childBearing	name="childBearing"	type="int"  min="12" max="15"/>
+		<pausiaWomen 	name="pausiaWomen"	type="int"  min="40" max="50"/>
+		<pausiaMen 		name="pausiaMen"	type="int"  min="50" max="60"/>
+		<endowment 		name="endowment" 	type="int"  min="5" max="25"/>		  
+	</SugarAgent>
+	<AppliedRules>
+		<rule name="GrowBackRule">
+			<alpha name="alpha" type="int" value="1"/>
+		</rule>
+		<rule name="Replacement">
+			<age name="age" type="int" min="60" max="100"/>
+		</rule>		
+	<AppliedRules/>
+	
+</config>
+
+      

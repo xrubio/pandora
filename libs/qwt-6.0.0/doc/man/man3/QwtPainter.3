@@ -1,0 +1,302 @@
+.TH "QwtPainter" 3 "Fri Apr 15 2011" "Version 6.0.0" "Qwt User's Guide" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+QwtPainter \- 
+.PP
+A collection of QPainter workarounds.  
+
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <qwt_painter.h>\fP
+.SS "Static Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "static void \fBsetPolylineSplitting\fP (bool)"
+.br
+.ti -1c
+.RI "static bool \fBpolylineSplitting\fP ()"
+.br
+.ti -1c
+.RI "static void \fBsetRoundingAlignment\fP (bool)"
+.br
+.ti -1c
+.RI "static bool \fBroundingAlignment\fP ()"
+.br
+.ti -1c
+.RI "static bool \fBroundingAlignment\fP (QPainter *)"
+.br
+.ti -1c
+.RI "static void \fBdrawText\fP (QPainter *, double x, double y, const QString &)"
+.br
+.ti -1c
+.RI "static void \fBdrawText\fP (QPainter *, const QPointF &, const QString &)"
+.br
+.ti -1c
+.RI "static void \fBdrawText\fP (QPainter *, double x, double y, double w, double h, int flags, const QString &)"
+.br
+.ti -1c
+.RI "static void \fBdrawText\fP (QPainter *, const QRectF &, int flags, const QString &)"
+.br
+.ti -1c
+.RI "static void \fBdrawSimpleRichText\fP (QPainter *, const QRectF &, int flags, const QTextDocument &)"
+.br
+.ti -1c
+.RI "static void \fBdrawRect\fP (QPainter *, double x, double y, double w, double h)"
+.br
+.ti -1c
+.RI "static void \fBdrawRect\fP (QPainter *, const QRectF &rect)"
+.br
+.ti -1c
+.RI "static void \fBfillRect\fP (QPainter *, const QRectF &, const QBrush &)"
+.br
+.ti -1c
+.RI "static void \fBdrawEllipse\fP (QPainter *, const QRectF &)"
+.br
+.ti -1c
+.RI "static void \fBdrawPie\fP (QPainter *, const QRectF &r, int a, int alen)"
+.br
+.ti -1c
+.RI "static void \fBdrawLine\fP (QPainter *, double x1, double y1, double x2, double y2)"
+.br
+.ti -1c
+.RI "static void \fBdrawLine\fP (QPainter *, const QPointF &p1, const QPointF &p2)"
+.br
+.ti -1c
+.RI "static void \fBdrawLine\fP (QPainter *, const QLineF &)"
+.br
+.ti -1c
+.RI "static void \fBdrawPolygon\fP (QPainter *, const QPolygonF &pa)"
+.br
+.ti -1c
+.RI "static void \fBdrawPolyline\fP (QPainter *, const QPolygonF &pa)"
+.br
+.ti -1c
+.RI "static void \fBdrawPolyline\fP (QPainter *, const QPointF *, int pointCount)"
+.br
+.ti -1c
+.RI "static void \fBdrawPoint\fP (QPainter *, double x, double y)"
+.br
+.ti -1c
+.RI "static void \fBdrawPoint\fP (QPainter *, const QPointF &)"
+.br
+.ti -1c
+.RI "static void \fBdrawPath\fP (QPainter *, const QPainterPath &)"
+.br
+.ti -1c
+.RI "static void \fBdrawImage\fP (QPainter *, const QRectF &, const QImage &)"
+.br
+.ti -1c
+.RI "static void \fBdrawPixmap\fP (QPainter *, const QRectF &, const QPixmap &)"
+.br
+.ti -1c
+.RI "static void \fBdrawRoundedFrame\fP (QPainter *, const QRectF &, double xRadius, double yRadius, const QPalette &, int lineWidth, int frameStyle)"
+.br
+.ti -1c
+.RI "static void \fBdrawFocusRect\fP (QPainter *, QWidget *)"
+.br
+.ti -1c
+.RI "static void \fBdrawFocusRect\fP (QPainter *, QWidget *, const QRect &)"
+.br
+.ti -1c
+.RI "static void \fBdrawColorBar\fP (QPainter *painter, const \fBQwtColorMap\fP &, const \fBQwtInterval\fP &, const \fBQwtScaleMap\fP &, Qt::Orientation, const QRectF &)"
+.br
+.ti -1c
+.RI "static bool \fBisAligning\fP (QPainter *painter)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+A collection of QPainter workarounds. 
+.SH "Member Function Documentation"
+.PP 
+.SS "void QwtPainter::drawColorBar (QPainter *painter, const \fBQwtColorMap\fP &colorMap, const \fBQwtInterval\fP &interval, const \fBQwtScaleMap\fP &scaleMap, Qt::Orientationorientation, const QRectF &rect)\fC [static]\fP"Draw a color bar into a rectangle
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpainter\fP Painter 
+.br
+\fIcolorMap\fP Color map 
+.br
+\fIinterval\fP Value range 
+.br
+\fIscaleMap\fP Scale map 
+.br
+\fIorientation\fP Orientation 
+.br
+\fIrect\fP Traget rectangle 
+.RE
+.PP
+
+.SS "void QwtPainter::drawEllipse (QPainter *painter, const QRectF &rect)\fC [static]\fP"
+.PP
+Wrapper for QPainter::drawEllipse() 
+.SS "void QwtPainter::drawFocusRect (QPainter *painter, QWidget *widget)\fC [static]\fP"
+.PP
+Draw a focus rectangle on a widget using its style. 
+.SS "void QwtPainter::drawFocusRect (QPainter *painter, QWidget *widget, const QRect &rect)\fC [static]\fP"
+.PP
+Draw a focus rectangle on a widget using its style. 
+.SS "void QwtPainter::drawImage (QPainter *painter, const QRectF &rect, const QImage &image)\fC [static]\fP"
+.PP
+Wrapper for QPainter::drawImage() 
+.SS "void QwtPainter::drawLine (QPainter *painter, doublex1, doubley1, doublex2, doubley2)\fC [inline, static]\fP"
+.PP
+Wrapper for QPainter::drawLine() 
+.SS "void QwtPainter::drawLine (QPainter *painter, const QPointF &p1, const QPointF &p2)\fC [static]\fP"
+.PP
+Wrapper for QPainter::drawLine() 
+.SS "void QwtPainter::drawLine (QPainter *painter, const QLineF &line)\fC [inline, static]\fP"
+.PP
+Wrapper for QPainter::drawLine() 
+.SS "void QwtPainter::drawPath (QPainter *painter, const QPainterPath &path)\fC [static]\fP"
+.PP
+Wrapper for QPainter::drawPath() 
+.SS "void QwtPainter::drawPie (QPainter *painter, const QRectF &r, inta, intalen)\fC [static]\fP"
+.PP
+Wrapper for QPainter::drawPie() 
+.SS "void QwtPainter::drawPixmap (QPainter *painter, const QRectF &rect, const QPixmap &pixmap)\fC [static]\fP"
+.PP
+Wrapper for QPainter::drawPixmap() 
+.SS "void QwtPainter::drawPoint (QPainter *painter, doublex, doubley)\fC [inline, static]\fP"
+.PP
+Wrapper for QPainter::drawPoint() 
+.SS "void QwtPainter::drawPoint (QPainter *painter, const QPointF &pos)\fC [static]\fP"
+.PP
+Wrapper for QPainter::drawPoint() 
+.SS "void QwtPainter::drawPolygon (QPainter *painter, const QPolygonF &pa)\fC [static]\fP"
+.PP
+Wrapper for QPainter::drawPolygon() 
+.SS "void QwtPainter::drawPolyline (QPainter *painter, const QPointF *points, intpointCount)\fC [static]\fP"
+.PP
+Wrapper for QPainter::drawPolyline() 
+.SS "void QwtPainter::drawPolyline (QPainter *painter, const QPolygonF &pa)\fC [static]\fP"
+.PP
+Wrapper for QPainter::drawPolyline() 
+.SS "void QwtPainter::drawRect (QPainter *painter, doublex, doubley, doublew, doubleh)\fC [static]\fP"
+.PP
+Wrapper for QPainter::drawRect() 
+.SS "void QwtPainter::drawRect (QPainter *painter, const QRectF &rect)\fC [static]\fP"
+.PP
+Wrapper for QPainter::drawRect() 
+.SS "void QwtPainter::drawRoundedFrame (QPainter *painter, const QRectF &rect, doublexRadius, doubleyRadius, const QPalette &palette, intlineWidth, intframeStyle)\fC [static]\fP"Draw a frame with rounded borders
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpainter\fP Painter 
+.br
+\fIrect\fP Frame rectangle 
+.br
+\fIxRadius\fP x-radius of the ellipses defining the corners 
+.br
+\fIyRadius\fP y-radius of the ellipses defining the corners 
+.br
+\fIpalette\fP QPalette::WindowText is used for plain borders QPalette::Dark and QPalette::Light for raised or sunken borders 
+.br
+\fIlineWidth\fP Line width 
+.br
+\fIframeStyle\fP bitwise OR´ed value of QFrame::Shape and QFrame::Shadow 
+.RE
+.PP
+
+.SS "void QwtPainter::drawSimpleRichText (QPainter *painter, const QRectF &rect, intflags, const QTextDocument &text)\fC [static]\fP"Draw a text document into a rectangle
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpainter\fP Painter 
+.br
+\fIrect\fP Traget rectangle 
+.br
+\fIflags\fP Alignments/Text flags, see QPainter::drawText() 
+.br
+\fItext\fP Text document 
+.RE
+.PP
+
+.SS "void QwtPainter::drawText (QPainter *painter, const QRectF &rect, intflags, const QString &text)\fC [static]\fP"
+.PP
+Wrapper for QPainter::drawText() 
+.SS "void QwtPainter::drawText (QPainter *painter, doublex, doubley, const QString &text)\fC [static]\fP"
+.PP
+Wrapper for QPainter::drawText() 
+.SS "void QwtPainter::drawText (QPainter *painter, const QPointF &pos, const QString &text)\fC [static]\fP"
+.PP
+Wrapper for QPainter::drawText() 
+.SS "void QwtPainter::drawText (QPainter *painter, doublex, doubley, doublew, doubleh, intflags, const QString &text)\fC [static]\fP"
+.PP
+Wrapper for QPainter::drawText() 
+.SS "void QwtPainter::fillRect (QPainter *painter, const QRectF &rect, const QBrush &brush)\fC [static]\fP"
+.PP
+Wrapper for QPainter::fillRect() 
+.SS "bool QwtPainter::isAligning (QPainter *painter)\fC [static]\fP"Check if the painter is using a paint engine, that aligns coordinates to integers. Today these are all paint engines beside QPaintEngine::Pdf and QPaintEngine::SVG.
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpainter\fP Painter 
+.RE
+.PP
+\fBReturns:\fP
+.RS 4
+true, when the paint engine is aligning
+.RE
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetRoundingAlignment()\fP 
+.RE
+.PP
+
+.SS "bool QwtPainter::polylineSplitting ()\fC [inline, static]\fP"Returns whether line splitting for the raster paint engine is enabled. 
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetPolylineSplitting()\fP 
+.RE
+.PP
+
+.SS "bool QwtPainter::roundingAlignment ()\fC [inline, static]\fP"Returns whether coordinates should be rounded, before they are painted to a paint engine that floors to integer values. For other paint engines this ( Pdf, SVG ), this flag has no effect.
+.PP
+\fBSee also:\fP
+.RS 4
+\fBsetRoundingAlignment()\fP, \fBisAligning()\fP 
+.RE
+.PP
+
+.SS "bool QwtPainter::roundingAlignment (QPainter *painter)\fC [inline, static]\fP"\fBReturns:\fP
+.RS 4
+\fBroundingAlignment()\fP && isAligning(painter); 
+.RE
+.PP
+\fBParameters:\fP
+.RS 4
+\fIpainter\fP Painter 
+.RE
+.PP
+
+.SS "void QwtPainter::setPolylineSplitting (boolenable)\fC [static]\fP"
+.PP
+En/Disable line splitting for the raster paint engine. The raster paint engine paints polylines of many points much faster when they are splitted in smaller chunks.
+.PP
+\fBSee also:\fP
+.RS 4
+\fBpolylineSplitting()\fP 
+.RE
+.PP
+
+.SS "void QwtPainter::setRoundingAlignment (boolenable)\fC [static]\fP"Enable whether coordinates should be rounded, before they are painted to a paint engine that floors to integer values. For other paint engines this ( Pdf, SVG ), this flag has no effect. \fBQwtPainter\fP stores this flag only, the rounding itsself is done in the painting code ( f.e the plot items ).
+.PP
+The default setting is true.
+.PP
+\fBSee also:\fP
+.RS 4
+\fBroundingAlignment()\fP, \fBisAligning()\fP 
+.RE
+.PP
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Qwt User's Guide from the source code.
