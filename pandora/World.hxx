@@ -82,8 +82,7 @@ protected:
 	std::vector<Rectangle<int> > _sections;
 	std::vector<int> _neighbors;
 
-	//! list of already executed agents
-	//AgentsList _executedAgents;
+	//! map of already executed agents
 	std::map<std::string, Agent *> _executedAgentsHash;	
 	//! global list of agents
 	AgentsList _agents;
@@ -131,8 +130,6 @@ private:
 	// if this variable is set to true, getNeighbours will look through the list of agents instead of searching by position. It is false by default
 	bool _searchAgents;
 	
-	//std::vector<Environment * > _environments;
-
 	// method to send a list of agents to their respective future world
 	void sendAgents( AgentsList & agentsToSend );
 	// Method to send overlap zones in the section we have executed 

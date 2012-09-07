@@ -180,16 +180,6 @@ bool World::hasBeenExecuted( Agent * agent )
 		return false;
 	}
 	return true;
-	/*
-	for(AgentsList::iterator it=_executedAgents.begin(); it!=_executedAgents.end(); it++)
-	{
-		if((*it)->getId().compare(agent->getId())==0)
-		{
-			return true;
-		}
-	}
-	return false;
-	*/
 }
 
 bool World::willBeRemoved( Agent * agent )
@@ -455,10 +445,7 @@ void World::stepSection( const int & sectionIndex )
 	// execute actions
 	for(int i=0; i<agentsToExecute.size(); i++)
 	{
-//	while(it!=_agents.end())
-//	{
-		Agent * agent = agentsToExecute[i];
-		//Agent * agent = *it;
+		Agent * agent = agentsToExecute.at(i);
 		if(_sections[sectionIndex].isInside(agent->getPosition()) && !hasBeenExecuted(agent))
 		{
 			log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << " agent: " << agent << " being executed at index: " << sectionIndex << " of task: "<< _simulation.getId() << " in step: " << _step );
@@ -471,29 +458,20 @@ void World::stepSection( const int & sectionIndex )
 				agentsToSend.push_back(agent);
 
 				// the agent is no longer property of this world
-				it = getOwnedAgent(agent->getId());
-				//it = _agents.erase(it);
-				_agents.erase(it);
-				// it will be deleted				
+				AgentsList::iterator itErase  = getOwnedAgent(agent->getId());
+				// it will be deleted
+				_agents.erase(itErase);
 				_overlapAgents.push_back(agent);
 				log_DEBUG(logName.str(), MPI_Wtime() - _initialTime <<  "putting agent: " << agent << " to overlap");
 			}
 			else
 			{
 				log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << " finished agent: " << agent);
-				it++;
 			}
-			//_executedAgents.push_back(agent);
 			_executedAgentsHash.insert(make_pair(agent->getId(), agent));
 			numExecutedAgents++;
+			log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << " num executed agents: " << numExecutedAgents );
 		}
-		/*
-		else
-		{
-			//std::cout << _simulation.getId() << " agent: " << agent << " not executed" << std::endl;
-			it++;
-		}
-		*/
 	}
 
 	log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << " sending agents in section: " << sectionIndex << " and step: " << _step);
@@ -731,7 +709,6 @@ void World::receiveAgents( const int & sectionIndex )
 				delete package;
 				agent->receiveVectorAttributes(_neighbors[i]);
 				_executedAgentsHash.insert(make_pair(agent->getId(), agent));
-				//_executedAgents.push_back(agent);
 				addAgent(agent);
 			}
 		}
@@ -838,10 +815,6 @@ void World::step()
 	}
 	log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << " step: " << _step << " has executed update overlap");
 
-	//std::cout << MPI_Wtime() - _initialTime << " - world: " << _simulation.getId() << " at pos: " << _worldPos << " executing step: " << _step << " has executed stepAgents" << std::endl;	
-	// TODO shuffle
-	//random_shuffle(_agents.begin(), _agents.end());
-	//_executedAgents.clear();
 	_executedAgentsHash.clear();
 
 	std::stringstream logNameMpi;
@@ -1063,81 +1036,6 @@ World::AgentsVector World::getAgent( const Point2D<int> & position, const std::s
 	return result;
 }
 
-/*
-World::AgentsList World::getAgentsNear( const Position<int> & position, const int & radius, const bool & includeCenter )
-{	
-	AgentsList agents;
-	if(_searchAgents)
-	{
-		for(AgentsList::iterator it=_agents.begin(); it!=_agents.end(); it++)
-		{
-			Agent * agent = (*it);
-			// we are not using distance method of Position, as this is not a Manhattan distance
-			int distanceX = std::abs(agent->getPosition()._x - position._x);
-			int distanceY = std::abs(agent->getPosition()._y - position._y);
-			if(distanceX <= radius && distanceY <= radius)
-			{
-				// if include center and is the same point
-				if(!includeCenter)
-				{
-					if(distanceX!=0 || distanceY!=0)
-					{
-						agents.push_back(agent);
-					}
-				}
-				else
-				{
-					agents.push_back(agent);
-				}
-			}
-		}
-		for(AgentsList::iterator it=_overlapAgents.begin(); it!=_overlapAgents.end(); it++)
-		{
-			Agent * agent = (*it);
-			// we are not using distance method of Position, as this is not a Manhattan distance
-			int distanceX = std::abs(agent->getPosition()._x - position._x);
-			int distanceY = std::abs(agent->getPosition()._y - position._y);
-			if(distanceX <= radius && distanceY <= radius)
-			{
-				// if include center and is the same point
-				if(!includeCenter)
-				{
-					if(distanceX!=0 || distanceY!=0)
-					{
-						agents.push_back(agent);
-					}
-				}
-				else
-				{
-					agents.push_back(agent);
-				}
-			}
-		}
-
-	}
-	else
-	{
-		Position<int> index;
-		for(index._x=position._x-radius; index._x!=position._x+radius+1; index._x++)
-		{
-			for(index._y=position._y-radius; index._y!=position._y+radius+1; index._y++)
-			{
-				//std::cout << _simulation.getId() << " checking near agents: " << index << " from pos: " << position << " with radius: " << radius << std::endl;
-				if(includeCenter || index!=position)
-				{
-					Agent * agent = getAgent(index);
-					if(agent)
-					{
-						//std::cout << _simulation.getId() << " agent: " << agent << " is neighbor of position: " << position << std::endl;
-						agents.push_back(agent);
-					}
-				}
-			}
-		}
-	}
-	return agents;
-}
-*/
 int World::getCurrentStep() const
 {
 	return _step;
@@ -1320,7 +1218,6 @@ const StaticRaster & World::getRasterTmp( const std::string & key ) const
 void World::setValue( const std::string & key, const Point2D<int> & position, int value )
 {
 	Point2D<int> localPosition(position - _overlapBoundaries._origin);
-	//std::cout << _simulation.getId() << " with boundaries: " << _boundaries << " is setting global pos: " << position << " and value: " << value << " to local: " << localPosition << std::endl;
 	getDynamicRaster(key).setValue(localPosition, value);
 }
 
@@ -1333,7 +1230,6 @@ int World::getValue( const std::string & key, const Point2D<int> & position ) co
 void World::setMaxValue( const std::string & key, const Point2D<int> & position, int value )
 {
 	Point2D<int> localPosition(position - _overlapBoundaries._origin);
-	//std::cout << _simulation.getId() << " with boundaries: " << _boundaries << " is setting global pos: " << position << " and value: " << value << " to local: " << localPosition << std::endl;
 	getDynamicRaster(key).setMaxValue(localPosition, value);
 }
 
@@ -1943,92 +1839,6 @@ World::AgentsVector World::getNeighbours( Agent * target, const double & radius,
 	std::copy(overlapAgentsVector.begin(), overlapAgentsVector.end(), std::back_inserter(agentsVector));
 	std::random_shuffle(agentsVector.begin(), agentsVector.end());
 	return agentsVector;
-//	.merge(for_each(_overlapAgents.begin(), _overlapAgents.end(), aggregatorGet<Engine::Agent>(radius,*target, type))._neighbors);
-	/*
-	AgentsList neighbours;
-	bool particularType = type.compare("all");
-	if(_searchAgents)
-	{
-		for(AgentsList::iterator it=_agents.begin(); it!=_agents.end(); it++)
-		{
-			Agent * agent = (*it);
-			if(agent!=target && agent->exists())
-			{
-				// we are not using distance method of Position, as this is not a Manhattan distance
-				//int distanceX = std::abs(agent->getPosition()._x - target->getPosition()._x);
-				//int distanceY = std::abs(agent->getPosition()._y - target->getPosition()._y);
-				int distance = agent->getPosition().distance(target->getPosition());
-				// sqrt(distanceX*distanceX + distanceY*distanceY);
-				if(distance<(float)radius)
-				{
-					if(particularType)
-					{	
-						if(agent->isType(type))
-						{
-							neighbours.push_back(agent);
-						}
-					}
-					else
-					{
-						neighbours.push_back(agent);
-					}
-				}			
-			}
-		}
-		for(AgentsList::iterator it=_overlapAgents.begin(); it!=_overlapAgents.end(); it++)
-		{
-			Agent * agent = (*it);
-			if(agent!=target && agent->exists())
-			{
-				// we are not using distance method of Position, as this is not a Manhattan distance
-				int distanceX = std::abs(agent->getPosition()._x - target->getPosition()._x);
-				int distanceY = std::abs(agent->getPosition()._y - target->getPosition()._y);
-				int distance = sqrt(distanceX*distanceX + distanceY*distanceY);
-				if(distance<(float)radius)
-				{
-					if(particularType)
-					{	
-						if(agent->isType(type))
-						{
-							neighbours.push_back(agent);
-						}
-					}
-					else
-					{
-						neighbours.push_back(agent);
-					}
-				}	
-			}
-		}
-
-	}
-	else
-	{
-		Engine::Point2D<int> newPosition;
-		for(newPosition._x=target->getPosition()._x-radius; newPosition._x<=target->getPosition()._x+radius; newPosition._x++)
-		{
-			for(newPosition._y=target->getPosition()._y-radius; newPosition._y<=target->getPosition()._y+radius; newPosition._y++)
-			{
-				Agent * agent = getAgent(newPosition);
-				if(agent && agent!=target && agent->exists())
-				{
-					if(particularType)
-					{
-						if(agent->isType(type))
-						{
-							neighbours.push_back(agent);
-						}
-					}
-					else
-					{
-						neighbours.push_back(agent);
-					}
-				}
-			}
-		}
-	}
-	return neighbours;
-	*/
 }
 
 const int & World::getOverlap()
