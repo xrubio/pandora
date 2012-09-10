@@ -2,6 +2,7 @@
 <config>  
 	<!-- Global simulation parameters -->
 	<output resultsFile="./data/gujarat.h5" logsDir="./logs"/>
+	<input load="true" file="./last_data/gujarat.h5"/>
 	<numSteps value="50"/>
 	<!-- g to KJ -->
 	<massToEnergyRate value="20" />
