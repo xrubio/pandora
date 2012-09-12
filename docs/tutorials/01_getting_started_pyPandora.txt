@@ -6,13 +6,13 @@ To begin this tutorial you will need to have Python and Pandora installed on you
 We will create a simple Agent-Based Model with a basic World and a type of agents. These agents will randomly move through the World, and collect resources from the environment.
 
 1) Create a python scripting file. It is recommended to have some basic background on Python programming language (LINK PYTHON).
-First of all, create an empty text file 'tutorialPandora.py' with this header:
+First of all, create an empty text file 'tutorial_pandora_01.py' with this header:
 
 #!/usr/bin/python
 
 This is an execution file, so you will need to grant it execution privileges, from the command console:
 
-chmod +x tutorialPandora.py
+chmod +x tutorial_pyPandora.py
 
 02) Create a 'main' function
 
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     main()
 
 Finally, save the file and execute it from command line:
-'./tutorialPandora.py
+'./tutorial_pyPandora.py
 
 You should see, as an output, these lines:
 
@@ -73,7 +73,7 @@ We create an instance of Simulation class called mySimulation. It contains two p
 Let's try to execute this code. It will throw a critical error!
 
 Traceback (most recent call last):
-  File "./tutorialPandora.py", line 3, in <module>
+  File "./tutorial_pyPandora.py", line 3, in <module>
     class MyWorld(World):
 NameError: name 'World' is not defined
 
@@ -86,7 +86,7 @@ sys.path.append('..')
 sys.path.append('../../')
 from pyPandora import Simulation, World
 
-After adding these lines, the execution of tutorialPandora.py should throw an output like this:
+After adding these lines, the execution of tutorial_pyPandora.py should throw an output like this:
 
 getting started with pyPandora
 constructing MyWorld
@@ -119,7 +119,7 @@ creating rasters
 creating agents
 simulation finished
 
-We can check that pyPandora has called our two init methods (createRasters and createAgents), and 1 task (with id=0) was created, that executed MyWorld for 10 time steps. If we take a closer look to the directory where tutorialPandora.py is, we will see that a new 'data' directory has been created, containing to files: 'agents-0.abm' and 'results.h5'. You can view the results of the simulation using Cassandra application (check what this app is in this document (TUTORIAL CASSANDRA)
+We can check that pyPandora has called our two init methods (createRasters and createAgents), and 1 task (with id=0) was created, that executed MyWorld for 10 time steps. If we take a closer look to the directory where tutorial_pyPandora.py is, we will see that a new 'data' directory has been created, containing to files: 'agents-0.abm' and 'results.h5'. You can view the results of the simulation using Cassandra application (check what this app is in this document (TUTORIAL CASSANDRA)
 Open cassandra (COM OBRIR CASSANDRA), and go to File->Select Simulation. Look for the directory where you are working, and select 'results.h5' from 'data' folder. You will see a small square of 64x64 points, and a few more things, nothing spectacular. Anyway, it is the proof that your code works and is generating something, congratulations!
 
 4) Create some rasters
@@ -132,7 +132,7 @@ self.getDynamicRaster("resources").setInitValues(0, 10, 0)
 The first line tells World that it needs to register a new dynamic raster map (it can be modified). The first parameter states that this raster map is called resources, and the second one that it must be stored in 'results.h5' file.
 The second line sets the initialized values of the entire raster map. The first two parameters are the minimum and maximum value for the entire world, and the third one is the default init value.
 
-If you execute again 'tutorialPandora.py', and check 'results.h5' with cassandra you will realize that a 'resources' raster map has been created. Try to 'play' the simulation; the default behavior for a raster map is to increate the value of each cell 1 unit until reaching the maximum value, so if you check the step number 9 you can check that every cell has a value of '9'. (LINK A figure_01.png)
+If you execute again 'tutorial_pyPandora.py', and check 'results.h5' with cassandra you will realize that a 'resources' raster map has been created. Try to 'play' the simulation; the default behavior for a raster map is to increate the value of each cell 1 unit until reaching the maximum value, so if you check the step number 9 you can check that every cell has a value of '9'. (LINK A figure_01.png)
 
 5) Define MyAgent
 
@@ -192,7 +192,7 @@ def createAgents(self):
 		newAgent.setRandomPosition()
 
 Pretty straightforward; with these lines we are creating 10 agents (called MyAgent_0, MyAgent_1, until MyAgent_9), adding them to the World, and setting initial positions for all of them. 
-Everything ready! If we execute again tutorialPandora.py we will get a list of messages communicating us that 10 agents have been created, and a sequence of 'updateState' and 'serialize' methods have been executed. If we check 'results.h5' with cassandra we should see something like Figure 2 (LINK figure_02.png)
+Everything ready! If we execute again tutorial_pyPandora.py we will get a list of messages communicating us that 10 agents have been created, and a sequence of 'updateState' and 'serialize' methods have been executed. If we check 'results.h5' with cassandra we should see something like Figure 2 (LINK figure_02.png)
 
 8) Gathering resources
 To finish this tutorial we will modify MyAgent to gather 'resources' from MyWorld, and serialize this value. We go again to the 'updateState' method and add these lines:
