@@ -40,8 +40,8 @@ Finally, we will need to add these classes in the import section:
 
 from pyPandora import SimulationRecord, AgentResults, AgentMean, AgentSum, AgentNum, AgentHDFtoSHP, RasterMean, RasterSum, RasterResults
 
-and compute results:
+and apply results:
 
-agentResults.compute()
-rasterResults.compute()
+agentResults.apply()
+rasterResults.apply()
 

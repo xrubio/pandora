@@ -4,9 +4,9 @@ intro - ok
 01 -> PyPandora interface - ok
 02 -> C++ interface - ok
 03 -> Logging system - ok
-04 -> Analysis with pyPandora
-05 -> Analysis with C++ Pandora
-06 -> Parrallelization
+04 -> Analysis with pyPandora - ok
+05 -> Analysis with C++ Pandora - ok
+06 -> Parallelization
 07 -> Advanced AI
 08 -> GIS
 09 -> R

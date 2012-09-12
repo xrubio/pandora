@@ -16,11 +16,11 @@ agentResults.addAnalysis(AgentMean('resources'))
 agentResults.addAnalysis(AgentSum('resources'))
 agentResults.addAnalysis(AgentHDFtoSHP('shp/agents.shp', -1))
 
-agentResults.compute()
+agentResults.apply()
 
 rasterResults = RasterResults(record, 'rasters.csv', 'resources', ';')
 rasterResults.addAnalysis(RasterMean())
 rasterResults.addAnalysis(RasterSum())
 
-rasterResults.compute()
+rasterResults.apply()
 
