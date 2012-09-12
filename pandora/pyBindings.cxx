@@ -347,7 +347,7 @@ BOOST_PYTHON_MODULE(libpyPandora)
 
 	// Results classes
 	boost::python::class_< ResultsWrap, boost::noncopyable >("ResultsStub", boost::python::init< const Engine::SimulationRecord & , const std::string &, const std::string &, const std::string & >() )
-	.def("compute", &Analysis::Results::apply)
+	.def("apply", &Analysis::Results::apply)
 	.def("addAnalysis", &passAnalysisOwnership)
 	.def("concreteApply", boost::python::pure_virtual(&Analysis::Results::concreteApply))
 	;	
