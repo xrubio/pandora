@@ -60,20 +60,24 @@ void GujaratWorld::createRasters()
 	// we need to keep track of resource fractions
 	registerDynamicRaster("resourcesFraction", false);
 	getDynamicRaster("resourcesFraction").setInitValues(0, 100, 0);
-	
+
+	/*
 	registerDynamicRaster("forageActivity", _config.isStorageRequired("forageActivity")); 
 	getDynamicRaster("forageActivity").setInitValues(0, std::numeric_limits<int>::max(), 0);
 	registerDynamicRaster("homeActivity", _config.isStorageRequired("homeActivity"));
 	getDynamicRaster("homeActivity").setInitValues(0, std::numeric_limits<int>::max(), 0);
 	registerDynamicRaster("farmingActivity", _config.isStorageRequired("farmingActivity"));
 	getDynamicRaster("farmingActivity").setInitValues(0, std::numeric_limits<int>::max(), 0);
+	*/
 
+	/*
 	registerDynamicRaster("resourceType", _config.isStorageRequired("resourceType")); // type of resources: wild, domesticated or fallow
 	getDynamicRaster("resourceType").setInitValues(0, SEASONALFALLOW, WILD);
 	registerDynamicRaster("consecutiveYears", _config.isStorageRequired("consecutiveYears")); // years passed using a given cell for a particular use
 	getDynamicRaster("consecutiveYears").setInitValues(0, 3, 0);
 	registerDynamicRaster("sectors", _config.isStorageRequired("sectors"));
 	getDynamicRaster("sectors").setInitValues(0, _config._numSectors, 0);
+	*/
 
 	/*
 	registerDynamicRaster("tmpDunes", true); 
@@ -333,6 +337,8 @@ void GujaratWorld::updateResources()
 
 void GujaratWorld::recomputeYearlyBiomass()
 {
+	std::stringstream logName;
+	logName << "World_" << _simulation.getId();
 	// 1. Compute factor between actual rain and average rain		
 	float raininessFactor = _climate.getRain() / _climate.getMeanAnnualRain();
 	
@@ -345,8 +351,9 @@ void GujaratWorld::recomputeYearlyBiomass()
 	_yearlyBiomass[WATER] = 0.0f;
 	_yearlyBiomass[DUNE] = areaOfCell*_config._duneBiomass * raininessFactor * _config._duneEfficiency;
 	_yearlyBiomass[INTERDUNE] = areaOfCell*_config._interduneBiomass * _config._interduneEfficiency * raininessFactor;
-	std::cout << "step: " << getCurrentStep() << " yearly biomass of dune: " << _yearlyBiomass[DUNE] << " and interdune: " << _yearlyBiomass[INTERDUNE] << " with rain: " << _climate.getRain() << " and mean rain: " << _climate.getMeanAnnualRain() << std::endl;
-
+	
+	log_INFO(logName.str(), MPI_Wtime() - _initialTime << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " rain: " << _climate.getRain() << " with mean: " << _climate.getMeanAnnualRain());
+	log_INFO(logName.str(), MPI_Wtime() - _initialTime << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " yearly biomass of dune: " << _yearlyBiomass[DUNE] << " and interdune: " << _yearlyBiomass[INTERDUNE]);
 
 	// yearly biomass is the area of a triangle with max height at the end of wet season
 	// A_1 + A_2 = biomass, being A_1 = daysPerSeason*h/2 and A_2 = 2*daysPerSeason*h/2
@@ -356,12 +363,12 @@ void GujaratWorld::recomputeYearlyBiomass()
 	double heightInterDune = _yearlyBiomass[INTERDUNE]/(_config._daysPerSeason*3/2);
 	_dailyRainSeasonBiomassIncrease[INTERDUNE] = heightInterDune/_config._daysPerSeason;
 	_dailyDrySeasonBiomassDecrease[INTERDUNE] = heightInterDune/(2*_config._daysPerSeason);
-	std::cout << "height interdune: " << heightInterDune << " increment: " << _dailyRainSeasonBiomassIncrease[INTERDUNE] << " and decrease: " << _dailyDrySeasonBiomassDecrease[INTERDUNE] << std::endl;
+	log_INFO(logName.str(), MPI_Wtime() - _initialTime << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " height interdune: " << heightInterDune << " increment: " << _dailyRainSeasonBiomassIncrease[INTERDUNE] << " and decrease: " << _dailyDrySeasonBiomassDecrease[INTERDUNE]);
 
 	double heightDune = _yearlyBiomass[DUNE]/(_config._daysPerSeason*3/2);
 	_dailyRainSeasonBiomassIncrease[DUNE] = heightDune/_config._daysPerSeason;
 	_dailyDrySeasonBiomassDecrease[DUNE] = heightDune/(2*_config._daysPerSeason);
-	std::cout << "height dune: " << heightDune << " increment: " << _dailyRainSeasonBiomassIncrease[DUNE] << " and decrease: " << _dailyDrySeasonBiomassDecrease[DUNE] << std::endl;
+	log_INFO(logName.str(), MPI_Wtime() - _initialTime << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " height dune: " << heightDune << " increment: " << _dailyRainSeasonBiomassIncrease[DUNE] << " and decrease: " << _dailyDrySeasonBiomassDecrease[DUNE]);
 
 	_dailyRainSeasonBiomassIncrease[WATER] = 0.0f;
 	_dailyDrySeasonBiomassDecrease[WATER] = 0.0f;
@@ -371,18 +378,21 @@ void GujaratWorld::stepEnvironment()
 {
 	// at the end of simulation
 	_climate.advanceSeason();
+
+	std::stringstream logName;
+	logName << "World_" << _simulation.getId();
+
 	// if this is the first step of a wet season, rainfall and biomass are calculated for the entire year
 	if ( _climate.rainSeasonStarted() )
 	{
+		log_INFO(logName.str(), MPI_Wtime() - _initialTime << " timestep: " << getCurrentTimeStep() << " num agents: " << _agents.size());
+		std::cout << MPI_Wtime() - _initialTime << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " num agents: " << _agents.size() << std::endl;
 		updateRainfall();
 		recomputeYearlyBiomass();
 	}
 	// resources are updated each time step
 	updateResources();
 	getDynamicRaster("resources").updateCurrentMinMaxValues();
-
-	std::stringstream logName;
-	logName << "World_" << _simulation.getId();
 
 	log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << " timestep=" << getCurrentTimeStep());
 	log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << "\tagentPopulation=" << _agents.size());
@@ -405,7 +415,7 @@ void GujaratWorld::stepEnvironment()
 	log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << "\tavgCurrentResources=" << getDynamicRaster("resources").getAvgValue() );
 
 	// these rasters are only updated at the beginning of seasons
-	if ( !_climate.cellUpdateRequired() ) return;
+//	if ( !_climate.cellUpdateRequired() ) return;
 
 
 	//updateMoisture();

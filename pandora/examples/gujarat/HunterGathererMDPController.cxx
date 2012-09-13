@@ -21,7 +21,7 @@ HunterGathererMDPController::~HunterGathererMDPController()
 	delete _model;
 }
 
-MDPAction * HunterGathererMDPController::selectAction( GujaratAgent & agent )
+std::list<MDPAction*> HunterGathererMDPController::selectActions( GujaratAgent & agent )
 {
 	log_DEBUG(agent.getId()+"_controller",  "timestep=" << agent.getWorld()->getCurrentTimeStep());
 	log_DEBUG(agent.getId()+"_controller",  "\tagent.position=" << agent.getPosition());
@@ -38,8 +38,10 @@ MDPAction * HunterGathererMDPController::selectAction( GujaratAgent & agent )
 	delete uctPolicy;
 
 	log_DEBUG(agent.getId()+"_controller",  "\taction_selected=" << a->describe());
-	
-	return a;
+
+	std::list<MDPAction*> actions;
+	actions.push_back(a);
+	return actions;
 }
 
 }

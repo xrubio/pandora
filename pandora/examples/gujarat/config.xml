@@ -35,14 +35,14 @@
 	<!-- * Available Forage Time = # hours a day the forage action takes -->
 	<!-- * forageTimeCost = how much time (in hours) does it cost the agent to exploit a tile resources -->
 	<hunterGatherers 
-		num="10" homeRange="299"
+		num="1" homeRange="299"
 		adulthoodAge="15"
 		numSectors="8"
 		walkingSpeedHour="3000"
 		forageTimeCost="0.5"
 		availableForageTime="4.5"
 		demographicsModel="original"
-		controllerType="MDP" >
+		controllerType="DecisionTree" >
 		<!-- * width = number of trials before selecting an action, the higher the
 		 	the number, the more informed is the action selection and more
 			computation time is required -->

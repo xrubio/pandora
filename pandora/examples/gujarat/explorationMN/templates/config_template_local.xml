@@ -2,13 +2,13 @@
 <config>  
 	<!-- Global simulation parameters -->
 	<output resultsFile="data_controllerCTYPE_sizeMAPSIZE_hgNUMHG_exNUMEXEC/gujarat.h5" logsDir="logs_controllerCTYPE_sizeMAPSIZE_hgNUMHG_exNUMEXEC"/>
-	<numSteps value="3600"/>
+	<numSteps value="7200"/>
 	<!-- g to KJ -->
 	<massToEnergyRate value="20" />
 	<!-- 1 Cal = 4.184 KJ, Conversion Rate = 1/4.184 -->
 	<energyToCaloriesRate value="0.239006" />
 	<!-- Global agent parameters !-->
-	<socialRange value="100" />
+	<socialRange value="299" />
 	<!-- Simulation time scale -->
 	<daysPerSeason value="120" />
 	<daysPerYear value="360" />
@@ -34,7 +34,7 @@
 	<!-- * Available Forage Time = # hours a day the forage action takes -->
 	<!-- * forageTimeCost = how much time (in hours) does it cost the agent to exploit a tile resources -->
 	<hunterGatherers 
-		num="NUMHG" homeRange="100"
+		num="NUMHG" homeRange="299"
 		adulthoodAge="15"
 		numSectors="8"
 		walkingSpeedHour="3000"

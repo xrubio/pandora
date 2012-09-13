@@ -13,7 +13,7 @@ namespace Gujarat
 {
 
 ForageAction::ForageAction( Sector* loc, bool ownsPointer )
-	: _forageArea( loc ), _ownsForageAreaPointer( ownsPointer ), _biomassCollected(0), _caloriesCollected(0)
+	: _forageArea( loc ), _ownsForageAreaPointer( ownsPointer ), _biomassCollected(0), _caloriesCollected(0), _useFullPopulation(true)
 {
 }
 
@@ -48,7 +48,7 @@ void ForageAction::execute( Engine::Agent & a )
 	HunterGatherer& agent = (HunterGatherer&) a;
 
 	// 1. collect nr adults
-	double  maxDistAgentWalk = agent.computeMaxForagingDistance();
+	double  maxDistAgentWalk = agent.computeMaxForagingDistance( _useFullPopulation );
 		
 	// 2. select nearest cell
 	Engine::Point2D<int> nearest = _forageArea->getNearestTo( agent.getPosition() );
@@ -59,6 +59,7 @@ void ForageAction::execute( Engine::Agent & a )
 
 	_caloriesCollected = agent.convertBiomassToCalories( _biomassCollected );
 	agent.updateResources( _caloriesCollected );
+	std::cout << "executing forage for agent: " << agent << " calories: " << _caloriesCollected << " with full pop: " << _useFullPopulation << " and needs: " << agent.computeConsumedResources(1) << std::endl;
 }
 
 void	ForageAction::selectBestNearestCell( 	const Engine::Point2D<int>& n,
@@ -110,6 +111,7 @@ void	ForageAction::doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0,
 
 	while ( ( walkedDist + distHome ) < maxDist )
 	{
+		//std::cout << "walked dist: " << walkedDist << " dist home: " << distHome << " max dist: " << maxDist << " biomass collected: " << collected << " calories: " << agent.convertBiomassToCalories(collected) << std::endl;
 		Engine::Point2D<int> best;
 		int bestScore = 0;
 		selectBestNearestCell( n, r, bestScore, best );
@@ -119,8 +121,8 @@ void	ForageAction::doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0,
 		n = best;
 		distHome = n0.distance(n);	
 		int amtCollected = agent.computeEffectiveBiomassForaged( bestScore );
-		int prevActivity = agent.getWorld()->getValue( "forageActivity", n );
-		agent.getWorld()->setValue( "forageActivity", n, prevActivity + 1 );
+		//int prevActivity = agent.getWorld()->getValue( "forageActivity", n );
+		//agent.getWorld()->setValue( "forageActivity", n, prevActivity + 1 );
 		collected += amtCollected;
 
 		// 4. update cell resources & amount collected
@@ -169,5 +171,9 @@ void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>
 	sp.addResources( agent.convertBiomassToCalories(collected));
 }
 
+void ForageAction::setFullPopulation( bool useFullPopulation )
+{
+	_useFullPopulation = useFullPopulation;
+}
 
 }

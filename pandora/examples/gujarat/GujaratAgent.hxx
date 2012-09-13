@@ -53,7 +53,7 @@ protected:
 	//float _emigrationProbability; 
 	//float _reproductionProbability;
 
-	int _starved; // MpiBasicAttribute
+	float _starved; // MpiBasicAttribute
 	
 	Engine::Point2D<int> getNearLocation( int range );
 
@@ -87,7 +87,8 @@ public:
 
 	int	getOnHandResources() const { return _collectedResources; }
 	virtual int	computeConsumedResources( int timeSteps ) const;
-	double	computeMaxForagingDistance( ) const;
+	// if fullPopulation = false, only half the individuals will contribute to the action (the rest is moving home)
+	double	computeMaxForagingDistance( bool fullPopulation = true ) const;
 	int	computeEffectiveBiomassForaged( int nominal ) const;
 	int	convertBiomassToCalories( int biomass ) const;
 //	bool	starvationLastTimeStep() const { return _starved; }

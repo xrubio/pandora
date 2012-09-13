@@ -2,7 +2,7 @@
 import fileinput, sys, os, random
 
 #mapSizes = ['400','800','1600']
-mapSizes = ['800']
+mapSizes = ['1600']
 
 numExecutions = 1
 numHGs = ['50']

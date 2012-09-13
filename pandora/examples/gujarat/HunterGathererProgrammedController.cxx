@@ -23,10 +23,12 @@ HunterGathererProgrammedController::~HunterGathererProgrammedController()
 {
 }
 
-MDPAction*	HunterGathererProgrammedController::selectAction( GujaratAgent & agent )
+std::list<MDPAction*> HunterGathererProgrammedController::selectActions( GujaratAgent & agent )
 {
+	std::list<MDPAction*> actions;
 	// TODO: which order must follow the actions? random?
 	// now random
+	HunterGatherer & agentConcrete = dynamic_cast<HunterGatherer&>( agent );
 
 	// action pack : move Home, hunting, gathering
 	int dice = Engine::GeneralState::statistics().getUniformDistValue(1,10);
@@ -47,10 +49,15 @@ MDPAction*	HunterGathererProgrammedController::selectAction( GujaratAgent & agen
 				delete possibleActions[i];
 			}
 		}
-		return selectedAction;
+	
+		do
+		{
+			dice = Engine::GeneralState::statistics().getUniformDistValue( 0, agentConcrete.getSectors().size()-1 );
+		} while ( agentConcrete.getSectors()[dice]->isEmpty() );
+		actions.push_back(new ForageAction( agentConcrete.getSectors()[dice], false));
+		actions.push_back(selectedAction);
+		return actions;
 	}
-
-	HunterGatherer & agentConcrete =  dynamic_cast<HunterGatherer&>( agent );
 
 	do
 	{
@@ -58,7 +65,8 @@ MDPAction*	HunterGathererProgrammedController::selectAction( GujaratAgent & agen
 	
 	} while ( agentConcrete.getSectors()[dice]->isEmpty() );
 
-	return new ForageAction( agentConcrete.getSectors()[dice] );
+	actions.push_back(new ForageAction( agentConcrete.getSectors()[dice] ));
+	return actions;
 }
 
 } // namespace Gujarat

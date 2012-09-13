@@ -134,7 +134,7 @@ void HunterGatherer::updateKnowledge()
 				continue;
 			}
 			_sectors[indexSector]->addCell( p );
-			getWorld()->setValue( "sectors", p, 1 );
+			//getWorld()->setValue( "sectors", p, 1 );
 		}
 	}
 	log_DEBUG(logName.str(), "update features");
@@ -150,7 +150,12 @@ void HunterGatherer::updateKnowledge()
 
 void HunterGatherer::selectActions()
 {
-	_actions.push_back( (Engine::Action*)(GujaratState::controller().selectAction(*this)) );
+	std::list<MDPAction*> actions = GujaratState::controller().selectActions(*this);
+	for(std::list<MDPAction*>::iterator it=actions.begin(); it!=actions.end(); it++)
+	{
+		_actions.push_back((Engine::Action*)(*it));
+	}
+	//_actions.push_back( (Engine::Action*)(GujaratState::controller().selectAction(*this)) );
 }
 
 GujaratAgent * HunterGatherer::createNewAgent()

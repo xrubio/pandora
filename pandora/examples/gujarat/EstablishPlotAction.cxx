@@ -20,8 +20,8 @@ void EstablishPlotAction::execute( Engine::Agent & agent )
 {
 	AgroPastoralist & agroPastoralist = (AgroPastoralist&)agent;
 	agroPastoralist.acquireCultivatedField(_plotLocation);
-	int oldValue = agroPastoralist.getWorld()->getValue( "farmingActivity", _plotLocation );
-	agroPastoralist.getWorld()->setValue( "farmingActivity", _plotLocation, oldValue + 1 );
+	//int oldValue = agroPastoralist.getWorld()->getValue( "farmingActivity", _plotLocation );
+	//agroPastoralist.getWorld()->setValue( "farmingActivity", _plotLocation, oldValue + 1 );
 	std::cout << "DEBUG: Agent " << agent.getId() << " executing Establish Plot action..." << std::endl;
 }
 

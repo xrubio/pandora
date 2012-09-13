@@ -16,7 +16,7 @@ namespace Gujarat
 GujaratAgent::GujaratAgent( const std::string & id ) 
 	: Engine::Agent(id), 
 	 _spentTime(0), _collectedResources(0), _age(0),
-	_socialRange( 50 ), _starved( 0 )
+	_socialRange( 50 ), _starved( 0.0f )
 {
 	//_emigrationProbability = 0.0;
 	//_reproductionProbability = 0.0;
@@ -85,9 +85,10 @@ void GujaratAgent::updateState()
 	log_DEBUG( logName.str(), "\tagent.collectedResourcesAfterConsumption=" << surplus);
 	if ( surplus < 0 )
 	{
+		_starved += 1.0f-((float)_collectedResources/(float)(computeConsumedResources(1)));
+		std::cout << "starved: " << _starved << " with colleted: " << _collectedResources << " and needed: " << computeConsumedResources(1) << std::endl;
 		//_emigrationProbability += 1.0f/(float)(((GujaratWorld*)_world)->getConfig()._daysPerSeason);
 		log_DEBUG( logName.str(),  "\tagent.isStarving=yes");
-		_starved++;
 	}
 	else
 	{
@@ -167,10 +168,13 @@ double 	GujaratAgent::getTimeSpentForagingTile() const
 	return getForageTimeCost() * getWalkingSpeedHour();
 }
 
-double	GujaratAgent::computeMaxForagingDistance() const
+double	GujaratAgent::computeMaxForagingDistance( bool fullPopulation ) const
 {
-	int 	nAdults = getNrAvailableAdults();		
-
+	int nAdults = getNrAvailableAdults();
+	if(!fullPopulation)
+	{
+		nAdults /= 2;
+	}
 	return  getWalkingSpeedHour() * getAvailableForageTime() * (double)nAdults;
 }
 
@@ -499,7 +503,7 @@ void GujaratAgent::createInitialPopulation()
 float GujaratAgent::getPercentageOfStarvingDays() const
 {
 	GujaratWorld * world = (GujaratWorld*)_world;
-	return float(_starved*100)/float((world->getConfig()._daysPerYear));
+	return (_starved*100.0f)/float((world->getConfig()._daysPerYear));
 }
 
 } // namespace Gujarat

@@ -22,6 +22,7 @@ class ForageAction : public MDPAction
 	bool _ownsForageAreaPointer;
 	int	_biomassCollected;
 	int	_caloriesCollected;
+	bool _useFullPopulation;
 
 	void selectBestNearestCell( const Engine::Point2D<int>& n, const Engine::Raster& r, int& bestScore, Engine::Point2D<int>& best ) const; 
 
@@ -32,7 +33,8 @@ public:
 	ForageAction( Sector* loc, bool ownsPointer = false );
 	virtual ~ForageAction();
 
-	void execute( Engine::Agent& agent );
+	// if fullPopulation = false, only half the individuals will contribute to the action (the rest is moving home)
+	void execute( Engine::Agent& agent);
 	virtual void executeMDP( const GujaratAgent& agent, const HunterGathererMDPState& s, HunterGathererMDPState& sp ) const;
 
 	int	getTimeNeeded() const { return 1; }
@@ -41,6 +43,8 @@ public:
 	
 	int	getBiomassCollected() const { return _biomassCollected; }
 	int	getCaloriesCollected() const { return _caloriesCollected; }
+	
+	void setFullPopulation( bool useFullPopulation );
 };
 
 }

@@ -12,7 +12,7 @@ public:
 	HunterGathererProgrammedController();
 	virtual ~HunterGathererProgrammedController();
 
-	virtual	MDPAction*	selectAction( GujaratAgent & agent );
+	std::list<MDPAction*> selectActions( GujaratAgent & agent );
 };
 
 }
