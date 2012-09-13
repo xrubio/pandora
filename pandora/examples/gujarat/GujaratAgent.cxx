@@ -86,7 +86,6 @@ void GujaratAgent::updateState()
 	if ( surplus < 0 )
 	{
 		_starved += 1.0f-((float)_collectedResources/(float)(computeConsumedResources(1)));
-		std::cout << "starved: " << _starved << " with colleted: " << _collectedResources << " and needed: " << computeConsumedResources(1) << std::endl;
 		//_emigrationProbability += 1.0f/(float)(((GujaratWorld*)_world)->getConfig()._daysPerSeason);
 		log_DEBUG( logName.str(),  "\tagent.isStarving=yes");
 	}
@@ -97,6 +96,7 @@ void GujaratAgent::updateState()
 		// Decay factor, modeling spoilage
 		//_collectedResources *= getSurplusSpoilageFactor();
 	}
+	std::cout << this << " starved: " << _starved << " with collected: " << _collectedResources << " and needed: " << computeConsumedResources(1) << std::endl;
 
 	/*
 	if ( (getWorld()->getCurrentTimeStep() % ((GujaratWorld*)_world)->getConfig()._daysPerSeason == 0) 

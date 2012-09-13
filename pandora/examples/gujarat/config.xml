@@ -3,7 +3,7 @@
 	<!-- Global simulation parameters -->
 	<output resultsFile="./data/gujarat.h5" logsDir="./logs"/>
 	<input load="true" file="./last_data/gujarat.h5"/>
-	<numSteps value="50"/>
+	<numSteps value="1080"/>
 	<!-- g to KJ -->
 	<massToEnergyRate value="20" />
 	<!-- 1 KCal = 4.184 KJ, Conversion Rate = 1/4.184 -->
@@ -27,7 +27,7 @@
 	<dem fileName="./resources/1600/dem_1600.tiff" size="1600"/>
 	<duneMap fileName="./resources/1600/dunes_1600_low.tiff" size="1600"/>
 	<!-- Climatic model parameters -->
-	<climateSeed value="3123124"/>
+	<climateSeed value="243254"/>
 	<rainHistoricalDistribution shape="2.628" scale="5278.807" mean="4643.847826087"/>
 	<!-- Agents definition -->
 	<!-- overlap will be defined as homeRange + 1. It must be < 1/4 of world size -->

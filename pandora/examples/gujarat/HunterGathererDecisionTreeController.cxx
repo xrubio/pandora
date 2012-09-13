@@ -50,9 +50,9 @@ Sector* HunterGathererDecisionTreeController::getMaxBiomassSector(  HunterGather
 	if( validActionSectors.empty() ) return NULL;
 
 	// Find Sector with Maximum Biomass to Forage 
-	int maxBiomass = validActionSectors[0]->getBiomassAmount();
+	int maxBiomass = 0;
 	unsigned maxBiomassIdx = 0;
-	for ( unsigned i = 1; i < validActionSectors.size(); i++ )
+	for ( unsigned i = 0; i < validActionSectors.size(); i++ )
 	{
 		if( validActionSectors[i]->getBiomassAmount() > maxBiomass )
 		{
@@ -91,14 +91,16 @@ MDPAction* HunterGathererDecisionTreeController::shouldForage( HunterGatherer & 
 	
 	MDPAction* forage = NULL;
 	int biomass = maxSector->getBiomassAmount();
-	biomass = agent.computeEffectiveBiomassForaged(biomass);
 
 	// thinking that the agent will forage at most 9 cells
 	int numCells = maxSector->numCells();
 
-	float maxNumCells = agent.getAvailableForageTime()/agent.getForageTimeCost();
+	float maxNumCells = agent.getNrAvailableAdults()*agent.getAvailableForageTime()/agent.getForageTimeCost();
 	float percentageOfCells = maxNumCells/numCells;
-	if( percentageOfCells*(agent.convertBiomassToCalories(biomass)) >= agent.computeConsumedResources(1) )
+	std::cout << agent << " required needs: " << agent.computeConsumedResources(1) << " max biomass: " << biomass << " potential calories: " << agent.convertBiomassToCalories(biomass) << " adults: " << agent.getNrAvailableAdults() << " max num cells: " << maxNumCells << " percentage: " << percentageOfCells << " estimation: " <<  0.5*percentageOfCells*(agent.convertBiomassToCalories(biomass)) << std::endl;
+
+	// we check if, collecting 50% of real biomass, needs will be arrived
+	if( 0.5*percentageOfCells*(agent.convertBiomassToCalories(biomass)) >= agent.computeConsumedResources(1) )
 	{
 		forage = new ForageAction( maxSector, true );
 	}
@@ -189,7 +191,7 @@ MDPAction* HunterGathererDecisionTreeController::shouldMoveHome( HunterGatherer 
 	}
 	uint32_t diceSelectOneRandomDune = Engine::GeneralState::statistics().getUniformDistValue(0, dunes.size()-1);
 	newHomeLocation = dunes[ diceSelectOneRandomDune ];
-	moveHome = new MoveHomeAction( dunes[ diceSelectOneRandomDune ], getMaxBiomassSector(agent));
+	moveHome = new MoveHomeAction( dunes[ diceSelectOneRandomDune ]);
 
 	assert( moveHome != NULL );
 	candidates.clear();

@@ -66,11 +66,10 @@ void	OriginalDemographics::checkReproduction( GujaratAgent& agent )
 	if (!agent.canReproduce()) return;
 	
 	// regular behavior is 1 child every 2 years
-//	if(Engine::GeneralState::statistics().getUniformDistValue(0,1)==0)
-//	{
-//		agent.addNewChild();
-//	}
-	agent.addNewChild();
+	if(Engine::GeneralState::statistics().getUniformDistValue(0,1)==0)
+	{
+		agent.addNewChild();
+	}
 }
 
 }

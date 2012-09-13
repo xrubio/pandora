@@ -16,15 +16,13 @@ namespace Gujarat
 {
 
 class GujaratAgent;
-class Sector;
 	
 class MoveHomeAction : public MDPAction
 {
 	Engine::Point2D<int>	_newHomeLoc;
-	Sector * _sectorToForage;
 
 public:
-	MoveHomeAction( const Engine::Point2D<int>& p, Sector * sectorToForage );
+	MoveHomeAction( const Engine::Point2D<int>& p );
 	virtual ~MoveHomeAction();
 	// TODO templatitzar classe per agent
 	void execute( Engine::Agent & agent );

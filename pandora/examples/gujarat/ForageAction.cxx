@@ -59,7 +59,7 @@ void ForageAction::execute( Engine::Agent & a )
 
 	_caloriesCollected = agent.convertBiomassToCalories( _biomassCollected );
 	agent.updateResources( _caloriesCollected );
-	std::cout << "executing forage for agent: " << agent << " calories: " << _caloriesCollected << " with full pop: " << _useFullPopulation << " and needs: " << agent.computeConsumedResources(1) << std::endl;
+	std::cout << agent << " executing forage calories: " << _caloriesCollected << " with full pop: " << _useFullPopulation << " and needs: " << agent.computeConsumedResources(1) << std::endl;
 }
 
 void	ForageAction::selectBestNearestCell( 	const Engine::Point2D<int>& n,

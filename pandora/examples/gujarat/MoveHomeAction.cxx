@@ -19,7 +19,7 @@
 namespace Gujarat
 {
 
-MoveHomeAction::MoveHomeAction( const Engine::Point2D<int>& p, Sector * sectorToForage ) : _newHomeLoc( p ), _sectorToForage(sectorToForage)
+MoveHomeAction::MoveHomeAction( const Engine::Point2D<int>& p ) : _newHomeLoc( p )
 {
 }
 
@@ -29,7 +29,7 @@ MoveHomeAction::~MoveHomeAction()
 
 MDPAction * MoveHomeAction::copy() const
 {
-	return new MoveHomeAction( _newHomeLoc, _sectorToForage );
+	return new MoveHomeAction( _newHomeLoc );
 }
 
 std::string MoveHomeAction::describe() const
@@ -115,7 +115,7 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent& agent,
 			continue;
 		}
 		uint32_t diceSelectOneRandomDune = Engine::GeneralState::statistics().getUniformDistValue(0, dunes.size()-1);
-		actions.push_back( new MoveHomeAction( dunes[ diceSelectOneRandomDune ], 0 ) );
+		actions.push_back( new MoveHomeAction( dunes[ diceSelectOneRandomDune ] ) );
 	}
 	assert( !actions.empty() );
 	candidates.clear();
@@ -127,14 +127,6 @@ void MoveHomeAction::execute( Engine::Agent & agent )
 	std::stringstream logName;
 	logName << agent.getWorld()->getId() << "_" << agent.getId() << "_actions";
 	log_DEBUG(logName.str(), " executing MoveHome action"); 
-
-	if(_sectorToForage)
-	{
-		ForageAction * action = new ForageAction(_sectorToForage);
-		action->setFullPopulation(false);
-		action->execute(agent);	
-		delete action;
-	}
 
 	//int prevHomeActivity = agent.getWorld()->getValue( "homeActivity", _newHomeLoc );
 	//agent.getWorld()->setValue( "homeActivity", _newHomeLoc, prevHomeActivity + 1 );
