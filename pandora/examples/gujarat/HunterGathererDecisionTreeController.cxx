@@ -6,6 +6,7 @@
 
 #include <MoveHomeAction.hxx>
 #include <ForageAction.hxx>
+#include <HalfForageAction.hxx>
 #include <DoNothingAction.hxx>
 #include <HunterGatherer.hxx>
 #include <SettlementAreas.hxx>
@@ -204,8 +205,6 @@ MDPAction* HunterGathererDecisionTreeController::shouldMoveHome( HunterGatherer 
 
 void HunterGathererDecisionTreeController::selectActions( GujaratAgent & agent, std::list<MDPAction*> & actions )
 {	
-	std::stringstream logName;
-	logName << "actions_" << agent.getWorld()->getId();
 	HunterGatherer & agentConcrete = dynamic_cast<HunterGatherer&>( agent );
         //Decission Tree: DoNothing --> Forage --> MoveHome
 
@@ -224,7 +223,6 @@ void HunterGathererDecisionTreeController::selectActions( GujaratAgent & agent, 
 	if(selectedAction)
 	{
 		actions.push_back(selectedAction);
-		log_INFO(logName.str(), "timestep: " << agent.getWorld()->getCurrentTimeStep() << " agent: " << agent << " will forage");
 		return;
 	}
 	selectedAction = shouldMoveHome(agentConcrete);
@@ -233,12 +231,11 @@ void HunterGathererDecisionTreeController::selectActions( GujaratAgent & agent, 
 		Sector* maxSector = getMaxBiomassSector(agentConcrete);
 		if(maxSector)
 		{
-			ForageAction * forageAction = new ForageAction(maxSector, true);
-			forageAction->setFullPopulation(false);
-			actions.push_back(forageAction);
+			HalfForageAction * halfForageAction = new HalfForageAction(maxSector, true);
+			//forageAction->setFullPopulation(false);
+			actions.push_back(halfForageAction);
 		}
 		actions.push_back(selectedAction);
-		log_INFO(logName.str(), "timestep: " << agent.getWorld()->getCurrentTimeStep() << " agent: " << agent << " will move");
 	}
 }
 

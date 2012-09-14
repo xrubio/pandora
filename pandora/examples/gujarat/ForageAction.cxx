@@ -13,7 +13,7 @@ namespace Gujarat
 {
 
 ForageAction::ForageAction( Sector* loc, bool ownsPointer )
-	: _forageArea( loc ), _ownsForageAreaPointer( ownsPointer ), _biomassCollected(0), _caloriesCollected(0), _useFullPopulation(true)
+	: _forageArea( loc ), _ownsForageAreaPointer( ownsPointer ), _biomassCollected(0), _caloriesCollected(0)//, _useFullPopulation(true)
 {
 }
 
@@ -47,8 +47,12 @@ void ForageAction::execute( Engine::Agent & a )
 
 	HunterGatherer& agent = (HunterGatherer&) a;
 
+	std::stringstream logName2;
+	logName2 << "actions_" << agent.getWorld()->getId();
+	log_INFO(logName2.str(), "timestep: " << agent.getWorld()->getCurrentTimeStep() << " agent: " << agent << " executes Forage");
+
 	// 1. collect nr adults
-	double  maxDistAgentWalk = agent.computeMaxForagingDistance( _useFullPopulation );
+	double  maxDistAgentWalk = agent.computeMaxForagingDistance( true); //_useFullPopulation );
 		
 	// 2. select nearest cell
 	Engine::Point2D<int> nearest = _forageArea->getNearestTo( agent.getPosition() );
@@ -59,7 +63,7 @@ void ForageAction::execute( Engine::Agent & a )
 
 	_caloriesCollected = agent.convertBiomassToCalories( _biomassCollected );
 	agent.updateResources( _caloriesCollected );
-	std::cout << agent << " executing forage calories: " << _caloriesCollected << " with full pop: " << _useFullPopulation << " and needs: " << agent.computeConsumedResources(1) << std::endl;
+	std::cout << agent << " executing forage calories: " << _caloriesCollected << " with full pop and needs: " << agent.computeConsumedResources(1) << std::endl;
 }
 
 void	ForageAction::selectBestNearestCell( 	const Engine::Point2D<int>& n,
@@ -171,9 +175,11 @@ void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>
 	sp.addResources( agent.convertBiomassToCalories(collected));
 }
 
+/*
 void ForageAction::setFullPopulation( bool useFullPopulation )
 {
 	_useFullPopulation = useFullPopulation;
 }
+*/
 
 }

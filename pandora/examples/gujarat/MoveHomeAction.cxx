@@ -128,6 +128,11 @@ void MoveHomeAction::execute( Engine::Agent & agent )
 	logName << agent.getWorld()->getId() << "_" << agent.getId() << "_actions";
 	log_DEBUG(logName.str(), " executing MoveHome action"); 
 
+	std::stringstream logName2;
+	logName2 << "actions_" << agent.getWorld()->getId();
+	log_INFO(logName2.str(), "timestep: " << agent.getWorld()->getCurrentTimeStep() << " agent: " << agent << " executes MoveHome");
+
+
 	//int prevHomeActivity = agent.getWorld()->getValue( "homeActivity", _newHomeLoc );
 	//agent.getWorld()->setValue( "homeActivity", _newHomeLoc, prevHomeActivity + 1 );
 	agent.setPosition( _newHomeLoc );

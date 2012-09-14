@@ -6,6 +6,7 @@
 
 #include <MoveHomeAction.hxx>
 #include <ForageAction.hxx>
+#include <HalfForageAction.hxx>
 #include <HunterGatherer.hxx>
 #include <DoNothingAction.hxx>
 
@@ -64,7 +65,7 @@ void HunterGathererProgrammedController::selectActions( GujaratAgent & agent, st
 	
 	} while ( agentConcrete.getSectors()[dice]->isEmpty() );
 
-	actions.push_back(new ForageAction( agentConcrete.getSectors()[dice] ));
+	actions.push_back(new HalfForageAction( agentConcrete.getSectors()[dice] ));
 }
 
 } // namespace Gujarat
