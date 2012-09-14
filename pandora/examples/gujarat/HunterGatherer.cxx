@@ -150,12 +150,14 @@ void HunterGatherer::updateKnowledge()
 
 void HunterGatherer::selectActions()
 {
-	std::list<MDPAction*> actions = GujaratState::controller().selectActions(*this);
-	for(std::list<MDPAction*>::iterator it=actions.begin(); it!=actions.end(); it++)
+	std::list<MDPAction*> actions;
+	GujaratState::controller().selectActions(*this, actions);
+	std::list<MDPAction*>::iterator it=actions.begin();
+	while(it!=actions.end())
 	{
 		_actions.push_back((Engine::Action*)(*it));
+		it = actions.erase(it);
 	}
-	//_actions.push_back( (Engine::Action*)(GujaratState::controller().selectAction(*this)) );
 }
 
 GujaratAgent * HunterGatherer::createNewAgent()

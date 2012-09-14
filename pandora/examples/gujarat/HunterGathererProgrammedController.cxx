@@ -23,9 +23,8 @@ HunterGathererProgrammedController::~HunterGathererProgrammedController()
 {
 }
 
-std::list<MDPAction*> HunterGathererProgrammedController::selectActions( GujaratAgent & agent )
+void HunterGathererProgrammedController::selectActions( GujaratAgent & agent, std::list<MDPAction*> & actions )
 {
-	std::list<MDPAction*> actions;
 	// TODO: which order must follow the actions? random?
 	// now random
 	HunterGatherer & agentConcrete = dynamic_cast<HunterGatherer&>( agent );
@@ -56,7 +55,7 @@ std::list<MDPAction*> HunterGathererProgrammedController::selectActions( Gujarat
 		} while ( agentConcrete.getSectors()[dice]->isEmpty() );
 		actions.push_back(new ForageAction( agentConcrete.getSectors()[dice], false));
 		actions.push_back(selectedAction);
-		return actions;
+		return;
 	}
 
 	do
@@ -66,7 +65,6 @@ std::list<MDPAction*> HunterGathererProgrammedController::selectActions( Gujarat
 	} while ( agentConcrete.getSectors()[dice]->isEmpty() );
 
 	actions.push_back(new ForageAction( agentConcrete.getSectors()[dice] ));
-	return actions;
 }
 
 } // namespace Gujarat

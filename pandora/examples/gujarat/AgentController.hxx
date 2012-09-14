@@ -15,9 +15,8 @@ public:
 	
 	AgentController();
 	virtual ~AgentController();
-
-	// MRJ: returned object ownership is caller's
-	virtual std::list<MDPAction*> selectActions( GujaratAgent & agent ) = 0;
+	
+	virtual void selectActions( GujaratAgent & agent, std::list<MDPAction*> & actions ) = 0;
 };
 
 }

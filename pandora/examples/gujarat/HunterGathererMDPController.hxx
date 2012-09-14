@@ -20,7 +20,7 @@ public:
 	virtual ~HunterGathererMDPController();
 
 
-	virtual	std::list<MDPAction*> selectActions( GujaratAgent & agent );
+	void selectActions( GujaratAgent & agent, std::list<MDPAction*> & actions );
 
 private:
 	typedef		Online::Policy::random_t< HunterGathererMDPState >	BasePolicy;

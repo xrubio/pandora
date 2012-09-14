@@ -15,9 +15,9 @@ public:
 	HunterGathererDecisionTreeController();
 	virtual ~HunterGathererDecisionTreeController();
 
-	virtual	std::list<MDPAction*> selectActions( GujaratAgent & agent );
+	void selectActions( GujaratAgent & agent, std::list<MDPAction*> & actions );
 	
-	MDPAction*         shouldDoNothing(  HunterGatherer & agent  );
+	//MDPAction*         shouldDoNothing(  HunterGatherer & agent  );
 	MDPAction*         shouldForage(  HunterGatherer & agent  );
 	MDPAction*         shouldMoveHome(  HunterGatherer & agent  );
 	

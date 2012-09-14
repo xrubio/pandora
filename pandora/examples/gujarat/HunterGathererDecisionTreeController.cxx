@@ -69,6 +69,7 @@ Sector* HunterGathererDecisionTreeController::getMaxBiomassSector(  HunterGather
 
 }
 
+/*
 MDPAction* HunterGathererDecisionTreeController::shouldDoNothing( HunterGatherer & agent )
 {	
 	// CollectedResources > ConsumedResourcesByAgent * #days
@@ -81,15 +82,16 @@ MDPAction* HunterGathererDecisionTreeController::shouldDoNothing( HunterGatherer
 		return NULL;
 	}
 }
-
+*/
 MDPAction* HunterGathererDecisionTreeController::shouldForage( HunterGatherer & agent )
 {	
 	Sector* maxSector = getMaxBiomassSector(agent);	
 
-	if( maxSector == NULL) 
-		return NULL;
-	
-	MDPAction* forage = NULL;
+	if(!maxSector) 
+	{
+		return 0;
+	}
+
 	int biomass = maxSector->getBiomassAmount();
 
 	// thinking that the agent will forage at most 9 cells
@@ -102,9 +104,10 @@ MDPAction* HunterGathererDecisionTreeController::shouldForage( HunterGatherer & 
 	// we check if, collecting 50% of real biomass, needs will be arrived
 	if( 0.5*percentageOfCells*(agent.convertBiomassToCalories(biomass)) >= agent.computeConsumedResources(1) )
 	{
-		forage = new ForageAction( maxSector, true );
+		return new ForageAction(maxSector, true);
 	}
-	return forage;
+	delete maxSector;
+	return 0;
 }
 
 MDPAction* HunterGathererDecisionTreeController::shouldMoveHome( HunterGatherer & agent )
@@ -199,44 +202,44 @@ MDPAction* HunterGathererDecisionTreeController::shouldMoveHome( HunterGatherer 
 	return moveHome;
 }
 
-std::list<MDPAction*> HunterGathererDecisionTreeController::selectActions( GujaratAgent & agent )
+void HunterGathererDecisionTreeController::selectActions( GujaratAgent & agent, std::list<MDPAction*> & actions )
 {	
 	std::stringstream logName;
 	logName << "actions_" << agent.getWorld()->getId();
 	HunterGatherer & agentConcrete = dynamic_cast<HunterGatherer&>( agent );
         //Decission Tree: DoNothing --> Forage --> MoveHome
 
-	std::list<MDPAction*> actions;
-	MDPAction * selectedAction = shouldDoNothing(agentConcrete);
+	/*
+	MDPAction * selectedAction = 0;
+	selectedAction = shouldDoNothing(agentConcrete);
 	if(selectedAction)
 	{
 		actions.push_back(selectedAction);
 		log_INFO(logName.str(), "timestep: " << agent.getWorld()->getCurrentTimeStep() << " agent: " << agent << " will do nothing");
 		return actions;
 	}
+	*/
 
-	selectedAction = shouldForage(agentConcrete);
+	MDPAction * selectedAction = shouldForage(agentConcrete);
 	if(selectedAction)
 	{
 		actions.push_back(selectedAction);
 		log_INFO(logName.str(), "timestep: " << agent.getWorld()->getCurrentTimeStep() << " agent: " << agent << " will forage");
-		return actions;
+		return;
 	}
-
 	selectedAction = shouldMoveHome(agentConcrete);
 	if(selectedAction)
 	{
 		Sector* maxSector = getMaxBiomassSector(agentConcrete);
 		if(maxSector)
 		{
-			ForageAction * forageAction = new ForageAction(maxSector, false);
+			ForageAction * forageAction = new ForageAction(maxSector, true);
 			forageAction->setFullPopulation(false);
 			actions.push_back(forageAction);
 		}
 		actions.push_back(selectedAction);
 		log_INFO(logName.str(), "timestep: " << agent.getWorld()->getCurrentTimeStep() << " agent: " << agent << " will move");
 	}
-	return actions;
 }
 
 }
