@@ -62,8 +62,7 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent& agent,
 	Engine::Point2D<int> boxSize(boxSizeX,boxSizeY);	
 	Engine::Rectangle<int> unTrimmedHomeBox(boxOrigin,boxSize);
 	Engine::Rectangle<int> homeBox;
-	//TODO look out sectors, MPI regions, etc... Decide getBoundaries? or getOverlapBoundaries?
-	// MRJ: As I understand it, this should be getOverlapBoundaries(), very much as it was before
+	
 	unTrimmedHomeBox.intersection(agent.getWorld()->getOverlapBoundaries(),homeBox);
 	
 	// Retrieve the areas that have intersection non zero with homeBox
