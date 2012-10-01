@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 
 namespace Analysis
 {
@@ -67,7 +68,7 @@ void Results::apply() const
 		{
 			if((*itL)->writeResults())
 			{
-				newLine << (*itL)->getResult(i) << _separator;				
+				newLine << std::setprecision(2) << std::fixed << (*itL)->getResult(i) << _separator;				
 			}
 		}
 		file << newLine.str() << std::endl;
