@@ -7,7 +7,7 @@ srcFiles = Split("""
 main.cxx GujaratWorld.cxx GujaratConfig.cxx 
 Climate.cxx GujaratAgent.cxx AgroPastoralist.cxx 
 HunterGatherer.cxx MDPAction.cxx MoveHomeAction.cxx 
-CultivatedField.cxx Sector.cxx ForageAction.cxx HalfForageAction.cxx
+CultivatedField.cxx Sector.cxx ForageAction.cxx
 SettlementAreas.cxx HunterGathererMDPConfig.cxx 
 HunterGathererMDPState.cxx HunterGathererMDPModel.cxx DoNothingAction.cxx 
 AgentController.cxx HunterGathererProgrammedController.cxx HunterGathererDecisionTreeController.cxx 

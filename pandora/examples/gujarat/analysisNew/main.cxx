@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 
 	try
 	{
-		Engine::SimulationRecord simRecord( 10, false);
+		Engine::SimulationRecord simRecord( 30, false);
 		simRecord.loadHDF5(argv[1], false, true);
 
 		Analysis::AgentResults agentResults(simRecord, argv[2], "HunterGatherer");
@@ -49,7 +49,10 @@ int main(int argc, char *argv[])
 		agentResults.addAnalysis(new Analysis::AgentMean("children"));
 		agentResults.addAnalysis(new Analysis::AgentSum("children"));
 		agentResults.addAnalysis(new Analysis::AgentMean("collected resources"));
-		agentResults.addAnalysis(new Analysis::AgentMean("starving"));
+		agentResults.addAnalysis(new Analysis::AgentMean("starving %"));
+		agentResults.addAnalysis(new Analysis::AgentMean("starving days x 100"));
+		agentResults.addAnalysis(new Analysis::AgentMean("Forage actions"));
+		agentResults.addAnalysis(new Analysis::AgentMean("MoveHome actions"));
 //		agentResults.addAnalysis(new Analysis::AgentHDFtoSHP(argv[4], Engine::Point2D<int>(774000,2623000), 31.5f, "EPSG:24312"));
 
 		agentResults.apply();
