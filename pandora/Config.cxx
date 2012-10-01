@@ -158,6 +158,32 @@ void Config::retrieveAttributeOptional( TiXmlElement* elem, const std::string & 
 	value = atoi(retrievedStr->c_str());
 
 }
+void Config::retrieveAttributeMandatory( TiXmlElement* elem, const std::string & attrName, long int& value )
+{
+	const std::string * retrievedStr = elem->Attribute( attrName );
+	if(!retrievedStr)
+	{
+		std::stringstream sstr;
+		sstr << "[CONFIG]: ERROR: Attribute " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
+		throw Engine::Exception(sstr.str());
+	}
+	value = atol(retrievedStr->c_str());
+}
+
+void Config::retrieveAttributeOptional( TiXmlElement* elem, const std::string & attrName, long int& value )
+{	
+	const std::string * retrievedStr = elem->Attribute( attrName );
+	if(!retrievedStr)
+	{
+		std::stringstream sstr;
+		std::cerr << "[CONFIG]: WARNING: Attribute " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
+		value = 0;
+		return;	
+	}
+	value = atol(retrievedStr->c_str());
+
+}
+
 
 void Config::retrieveAttributeMandatory( TiXmlElement* elem, const std::string & attrName, float& value )
 {
