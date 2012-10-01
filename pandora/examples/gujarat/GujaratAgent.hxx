@@ -56,6 +56,8 @@ protected:
 	float _starved; // MpiBasicAttribute
 	
 	Engine::Point2D<int> getNearLocation( int range );
+	int _forageActionsExecuted;
+	int _moveHomeActionsExecuted;
 
 public:
 	GujaratAgent( const std::string & id );
@@ -77,8 +79,8 @@ public:
 	// MRJ: Kills 1 out of every 10 people in the agent (on average)
 	void	decimatePopulation();
 	// MRJ: Checks if agent member dies with chance%, with age in [min,max]
-	void	checkDeath( int minAge, int maxAge, int chance );
-	void	checkDeathByAging( int minAge );
+	void	checkDeath( int minAge, int maxAge, float chance );
+	//void	checkDeathByAging( int minAge );
 	// if male or female died, reproduction is impossible	
 	//void	checkIndividualStarvationDeath(int index, int deficitRatioPer1000);
 	bool	canReproduce() const;
@@ -88,7 +90,7 @@ public:
 	int	getOnHandResources() const { return _collectedResources; }
 	virtual int	computeConsumedResources( int timeSteps ) const;
 	// if fullPopulation = false, only half the individuals will contribute to the action (the rest is moving home)
-	double	computeMaxForagingDistance( bool fullPopulation = true ) const;
+	float computeMaxForagingDistance( bool fullPopulation = true ) const;
 	int	computeEffectiveBiomassForaged( int nominal ) const;
 	int	convertBiomassToCalories( int biomass ) const;
 //	bool	starvationLastTimeStep() const { return _starved; }
@@ -104,8 +106,9 @@ public:
 	void	setForageTimeCost( float v ) { _forageTimeCost = v; }
 	float	getForageTimeCost() const { return _forageTimeCost; }
 
-	void	setAvailableForageTime( float v ) { _availableForageTime = v; }
-	float	getAvailableForageTime() const { return _availableForageTime; }
+	float getAvailableTime() const;
+//	void	setAvailableForageTime( float v ) { _availableForageTime = v; }
+//	float	getAvailableForageTime() const { return _availableForageTime; }
 
 	//void	setEmigrationProbability( float v ) { _emigrationProbability = v; }
 	//float	getEmigrationProbability() const { return _emigrationProbability; }
@@ -124,6 +127,10 @@ public:
 	void createInitialPopulation();
 	float getPercentageOfStarvingDays() const;
 	int getStarved() const {return _starved;}
+	
+	void incrementMoveHomeActionsExecuted(){_moveHomeActionsExecuted++;}
+	void incrementForageActionsExecuted(){_forageActionsExecuted++;}
+
 };
 
 } // namespace Gujarat

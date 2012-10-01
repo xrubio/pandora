@@ -22,7 +22,7 @@ class ForageAction : public MDPAction
 	bool _ownsForageAreaPointer;
 	int	_biomassCollected;
 	int	_caloriesCollected;
-//	bool _useFullPopulation;
+	bool _useFullPopulation;
 
 	void selectBestNearestCell( const Engine::Point2D<int>& n, const Engine::Raster& r, int& bestScore, Engine::Point2D<int>& best ) const; 
 
@@ -37,14 +37,15 @@ public:
 	void execute( Engine::Agent& agent);
 	virtual void executeMDP( const GujaratAgent& agent, const HunterGathererMDPState& s, HunterGathererMDPState& sp ) const;
 
-	int	getTimeNeeded() const { return 2; }
+	int	getTimeNeeded() const { return 1; }
 	virtual MDPAction* copy() const;
 	virtual std::string describe() const;
 	
 	int	getBiomassCollected() const { return _biomassCollected; }
 	int	getCaloriesCollected() const { return _caloriesCollected; }
 	
-//	void setFullPopulation( bool useFullPopulation );
+	void setFullPopulation( bool useFullPopulation );
+	const Sector & getSector() const {return *_forageArea;}
 };
 
 }

@@ -13,28 +13,38 @@ namespace Gujarat
 {
 
 ForageAction::ForageAction( Sector* loc, bool ownsPointer )
-	: _forageArea( loc ), _ownsForageAreaPointer( ownsPointer ), _biomassCollected(0), _caloriesCollected(0)//, _useFullPopulation(true)
+	: _forageArea( loc ), _ownsForageAreaPointer( ownsPointer ), _biomassCollected(0), _caloriesCollected(0), _useFullPopulation(true)
 {
+//	std::cout << "creating ForageAction with sector: " << _forageArea << " resources: " << _forageArea->getBiomassAmount() << std::endl;
 }
 
 ForageAction::~ForageAction()
 {
 	if ( _ownsForageAreaPointer )
+	{
 		delete _forageArea;
+	}
 }
 
 MDPAction*	ForageAction::copy() const
 {
-	if ( !_ownsForageAreaPointer )
-		return new ForageAction( _forageArea, false );
-	
-	return new ForageAction( new Sector( *_forageArea ), true );
+	ForageAction * newAction = 0;
+	if( !_ownsForageAreaPointer )
+	{
+		newAction = new ForageAction(_forageArea, false);
+	}
+	else
+	{
+		newAction = new ForageAction( new Sector( *_forageArea ), true);
+	}
+	newAction->setFullPopulation(_useFullPopulation);
+	return newAction;
 }
 
 std::string ForageAction::describe() const
 {
 	std::stringstream logForage;
-	logForage << "forage(" << _forageArea->biomassClass() << ")," << getBiomassCollected() << "," << getCaloriesCollected();
+	logForage << "forage(" << _forageArea->getBiomassAmount() << ")," << getBiomassCollected() << "," << getCaloriesCollected();
 	return logForage.str();
 }
 
@@ -47,12 +57,14 @@ void ForageAction::execute( Engine::Agent & a )
 
 	HunterGatherer& agent = (HunterGatherer&) a;
 
+	/*
 	std::stringstream logName2;
 	logName2 << "actions_" << agent.getWorld()->getId();
-	log_INFO(logName2.str(), "timestep: " << agent.getWorld()->getCurrentTimeStep() << " agent: " << agent << " executes Forage");
+	log_INFO(logName2.str(), "timestep: " << agent.getWorld()->getCurrentTimeStep() << " agent: " << agent << " executes Forage with pop: " << _useFullPopulation);
+	*/
 
 	// 1. collect nr adults
-	double  maxDistAgentWalk = agent.computeMaxForagingDistance( true); //_useFullPopulation );
+	double  maxDistAgentWalk = agent.computeMaxForagingDistance( _useFullPopulation );
 		
 	// 2. select nearest cell
 	Engine::Point2D<int> nearest = _forageArea->getNearestTo( agent.getPosition() );
@@ -61,9 +73,15 @@ void ForageAction::execute( Engine::Agent & a )
 	_biomassCollected = 0;
 	doWalk( (GujaratAgent&)a, nearest, maxDistAgentWalk, agent.getWorld()->getDynamicRaster("resources"), _biomassCollected );	
 
+	//std::cout << "biomass collected: " << _biomassCollected << " to calories: " << agent.convertBiomassToCalories(_biomassCollected) << std::endl;
 	_caloriesCollected = agent.convertBiomassToCalories( _biomassCollected );
 	agent.updateResources( _caloriesCollected );
-	std::cout << agent << " executing forage calories: " << _caloriesCollected << " with full pop and needs: " << agent.computeConsumedResources(1) << std::endl;
+	std::cout << agent << " executing forage in zone with max: " << _forageArea->getBiomassAmount() << " collected calories: " << _caloriesCollected << " with pop: " << _useFullPopulation << " and needs: " << agent.computeConsumedResources(1) << std::endl;
+	// if not using full pop, is a movehome
+	if(_useFullPopulation)
+	{
+		agent.incrementForageActionsExecuted();
+	}
 }
 
 void	ForageAction::selectBestNearestCell( 	const Engine::Point2D<int>& n,
@@ -125,6 +143,7 @@ void	ForageAction::doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0,
 		n = best;
 		distHome = n0.distance(n);	
 		int amtCollected = agent.computeEffectiveBiomassForaged( bestScore );
+		//std::cout << "collected: " << amtCollected << " from: " << bestScore << " walkeddist: " << walkedDist << " distHome: " << distHome << " maxdist: " << maxDist << std::endl;
 		//int prevActivity = agent.getWorld()->getValue( "forageActivity", n );
 		//agent.getWorld()->setValue( "forageActivity", n, prevActivity + 1 );
 		collected += amtCollected;
@@ -164,7 +183,7 @@ void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>
 
  void ForageAction::executeMDP( const GujaratAgent& agent, const HunterGathererMDPState& s, HunterGathererMDPState& sp ) const
 {
-	double  maxDist= agent.computeMaxForagingDistance();
+	double  maxDist= agent.computeMaxForagingDistance(_useFullPopulation);
 		
 	Engine::Point2D<int> nearest = _forageArea->getNearestTo( s.getLocation() );
 
@@ -173,13 +192,12 @@ void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>
 	doWalk( agent, nearest, maxDist, sp.getResourcesRaster(), collected );
 
 	sp.addResources( agent.convertBiomassToCalories(collected));
+	std::cout << "executeMDP - time index: " << s.getTimeIndex() << " ForageAction with full pop: " << _useFullPopulation << " from area with max biomass: " << _forageArea->getBiomassAmount() << " loc->resources: " << s.getLocation() << " -> " << s.getOnHandResources() << " to: " << sp.getLocation() << " -> " << sp.getOnHandResources() << " days starving: " << s.getDaysStarving() << std::endl;
 }
 
-/*
 void ForageAction::setFullPopulation( bool useFullPopulation )
 {
 	_useFullPopulation = useFullPopulation;
 }
-*/
 
 }

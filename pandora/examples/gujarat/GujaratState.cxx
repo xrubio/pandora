@@ -21,8 +21,8 @@ namespace Gujarat
 {
 
 GujaratState * GujaratState::_instance = 0;
-CaloricRequirementsTable * GujaratState::_hgCaloricRequirements = 0;
-CaloricRequirementsTable * GujaratState::_apCaloricRequirements = 0;
+//CaloricRequirementsTable * GujaratState::_hgCaloricRequirements = 0;
+//CaloricRequirementsTable * GujaratState::_apCaloricRequirements = 0;
 GujaratDemographics * GujaratState::_demographics = 0;
 
 GujaratState & GujaratState::instance()
@@ -40,16 +40,13 @@ GujaratState::GujaratState()
 
 GujaratState::~GujaratState()
 {
-	if ( _hgCaloricRequirements )		
-	{
-		delete _hgCaloricRequirements;
-		_hgCaloricRequirements = 0;
-	}
-	if ( _apCaloricRequirements )
+	/*
+	if( _apCaloricRequirements )
 	{
 		delete _apCaloricRequirements;
 		_apCaloricRequirements = 0;
 	}
+	*/
 	if(_demographics)
 	{
 		delete _demographics;
@@ -64,36 +61,70 @@ GujaratState::~GujaratState()
 	_hgControllers.clear();
 }
 
-void GujaratState::setHGCaloricRequirements( TiXmlElement * element )
+void GujaratState::setHGCaloricRequirements( int minAge, int adultAge, float minValue, float adultValue )
 {
-	if(_hgCaloricRequirements)
+	if(!instance()._hgCaloricRequirements.empty())
 	{
-		delete _hgCaloricRequirements;
+		instance()._hgCaloricRequirements.clear();
 	}
-	_hgCaloricRequirements = new CaloricRequirementsTable(element);
+	instance()._hgCaloricRequirements.resize(adultAge+1);
+
+	for(int i=0; i<minAge; i++)
+	{
+		instance()._hgCaloricRequirements.at(i) = 0;
+	}
+	for(int i=minAge; i<adultAge; i++)
+	{
+		instance()._hgCaloricRequirements.at(i) = minValue+float(i-minAge)*float((adultValue-minValue)/(adultAge-minAge));
+		std::cout << "calories for age: " << i << " are: " << instance()._hgCaloricRequirements.at(i) << std::endl;
+	}
+	instance()._hgCaloricRequirements.at(adultAge) = adultValue;
+	std::cout << "calories for adults are: " << instance()._hgCaloricRequirements.at(adultAge) << std::endl;
 }
 
-void GujaratState::setAPCaloricRequirements( TiXmlElement * element )
+void GujaratState::setHGAvailableForageTime( int minAge, int adultAge, float minValue, float adultValue )
 {
-	if(_apCaloricRequirements)
+	if(!instance()._hgAvailableForageTime.empty())
 	{
-		delete _apCaloricRequirements;
+		instance()._hgAvailableForageTime.clear();
 	}
-	_apCaloricRequirements = new CaloricRequirementsTable(element);
+	instance()._hgAvailableForageTime.resize(adultAge+1);
+
+	for(int i=0; i<minAge; i++)
+	{
+		instance()._hgAvailableForageTime.at(i) = 0;
+	}
+	for(int i=minAge; i<adultAge; i++)
+	{
+		instance()._hgAvailableForageTime.at(i) = minValue+float(i-minAge)*float((adultValue-minValue)/(adultAge-minAge));
+		std::cout << "time for age: " << i << " is: " << instance()._hgAvailableForageTime.at(i) << std::endl;
+	}
+	instance()._hgAvailableForageTime.at(adultAge) = adultValue;
+	std::cout << "time for adults is: " << instance()._hgAvailableForageTime.at(adultAge) << std::endl;
+
 }
 
-CaloricRequirementsTable & GujaratState::caloricRequirements( const std::string & type )
+int GujaratState::caloricRequirements( const std::string & type, int age )
 {
 	if(type.compare("HunterGatherer")==0)
 	{
-		if(!_hgCaloricRequirements)
+		if(instance()._hgCaloricRequirements.empty())
 		{
 			std::stringstream oss;
-			oss << "GujaratState::caloricRequirements() - hg table not initialized";
+			oss << "GujaratState::caloricRequirements() - hg caloric needs not initialized";
 			throw Engine::Exception(oss.str());
 		}
-		return *(instance()._hgCaloricRequirements);
+		if(age<instance()._hgCaloricRequirements.size())
+		{
+			return instance()._hgCaloricRequirements.at(age);
+
+		}
+		else
+		{
+			return instance()._hgCaloricRequirements.at(instance()._hgCaloricRequirements.size()-1);
+		}
 	}
+	/*
 	else if(type.compare("AgroPastoralist")==0)
 	{
 		if(!_apCaloricRequirements)
@@ -104,12 +135,51 @@ CaloricRequirementsTable & GujaratState::caloricRequirements( const std::string 
 		}
 		return *(instance()._apCaloricRequirements);
 	}
+	*/
 	std::stringstream oss;
-	oss << "GujaratState::caloricRequirements() - asking for table with unknown type: " << type;
+	oss << "GujaratState::caloricRequirements() - asking for needs with unknown type: " << type;
 	throw Engine::Exception(oss.str());
 
 }
+
+float GujaratState::availableForageTime( const std::string & type, int age )
+{
+	if(type.compare("HunterGatherer")==0)
+	{
+		if(instance()._hgAvailableForageTime.empty())
+		{
+			std::stringstream oss;
+			oss << "GujaratState::availableForageTime() - forage time not initialized";
+			throw Engine::Exception(oss.str());
+		}	
+		if(age<instance()._hgAvailableForageTime.size())
+		{
+			return instance()._hgAvailableForageTime.at(age);
+
+		}
+		else
+		{
+			return instance()._hgAvailableForageTime.at(instance()._hgAvailableForageTime.size()-1);
+		}
+	}
+	/*
+	else if(type.compare("AgroPastoralist")==0)
+	{
+		if(!_apCaloricRequirements)
+		{
+			std::stringstream oss;
+			oss << "GujaratState::caloricRequirements() - ap table not initialized";
+			throw Engine::Exception(oss.str());
+		}
+		return *(instance()._apCaloricRequirements);
+	}
+	*/
+	std::stringstream oss;
+	oss << "GujaratState::caloricRequirements() - asking for forage time with unknown type: " << type;
+	throw Engine::Exception(oss.str());
+}
 	
+
 void GujaratState::setDemographics( const std::string & model )
 {
 	if(_demographics)

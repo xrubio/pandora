@@ -72,8 +72,10 @@ float HunterGathererMDPModel::cost( const HunterGathererMDPState& s,
 					action_t a ) const
 {
 	// TODO XRC: what is that 10??
-	float cost = s.getDaysStarving()*10;
-	cost += s.availableActions(a)->getTimeNeeded();
+	//float cost = s.getDaysStarving()*10;
+	float cost = s.getDaysStarving()*10.0f + s.availableActions(a)->getTimeNeeded();
+	//float cost = 1000000 - s.getOnHandResources();//s.availableActions(a)->getTimeNeeded();
+	std::cout << "cost for action: " << s.availableActions(a)->describe() << " is: " << cost << " days starving: " << s.getDaysStarving() << " x10: " << s.getDaysStarving()*10.0f << " get time needed: " << s.availableActions(a)->getTimeNeeded() << std::endl;
 	return cost;
 }
 
@@ -100,10 +102,11 @@ void	HunterGathererMDPModel::applyFrameEffects( const HunterGathererMDPState& s,
 
 void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) const
 {
+	std::cout << "creating actions for state with time index: " << s.getTimeIndex() << " and resources: " << s.getOnHandResources() << std::endl;
 	assert( s.numAvailableActions() == 0 );
 	// Make Do Nothing
-	if ( _config.isDoNothingAllowed() )
-		s.addAction( new DoNothingAction() );	
+	//if ( _config.isDoNothingAllowed() )
+	//	s.addAction( new DoNothingAction() );	
 	
 	// Make Forage actions
 	std::vector< Sector* > validActionSectors;
@@ -121,13 +124,14 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 		}
 		validActionSectors.push_back( actionSectors[i] );
 	}	
-
 	std::random_shuffle( validActionSectors.begin(), validActionSectors.end() );
 	std::sort( validActionSectors.begin(), validActionSectors.end(), SectorBestFirstSortPtrVecPredicate() );
 	if ( _config.getNumberForageActions() >= validActionSectors.size() )
 	{
 		for ( unsigned i = 0; i < validActionSectors.size(); i++ )
+		{
 			s.addAction( new ForageAction( validActionSectors[i], true ) );	
+		}
 	}
 	else
 	{
@@ -136,7 +140,8 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 		for ( unsigned i = _config.getNumberForageActions(); i < validActionSectors.size(); i++ )
 			delete validActionSectors[i];
 	}
-	
+	std::cout << "number of valid forage actions: " << s.numAvailableActions() << " for number of valid sectors: " << validActionSectors.size() << std::endl;
+
 	// Make Move Home
 	std::vector< MoveHomeAction* > possibleMoveHomeActions;
 	MoveHomeAction::generatePossibleActions( agentRef(), s.getLocation(), possibleMoveHomeActions );
@@ -154,6 +159,7 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 			delete possibleMoveHomeActions[i];
 	}
 	assert( s.numAvailableActions() > 0 );
+	std::cout << "finished creating actions for state with time index: " << s.getTimeIndex() << " and resources: " << s.getOnHandResources() << std::endl;
 } 
 
 }

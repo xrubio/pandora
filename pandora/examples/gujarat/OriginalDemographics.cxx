@@ -46,8 +46,8 @@ void	OriginalDemographics::checkMortality( GujaratAgent& agent )
 	popSize = agent.getPopulationSize();
 
 	// Adult mortality check
-	agent.checkDeath( 15, 1000, 2 );
-	agent.checkDeath( 3, 15, 2 );
+	agent.checkDeath( 15, 1000, 1.5f );
+	agent.checkDeath( 3, 15, 1.5f );
 	int adultsNaturalDeath = popSize - agent.getPopulationSize();
 	popSize = agent.getPopulationSize();
 	// Children mortality check

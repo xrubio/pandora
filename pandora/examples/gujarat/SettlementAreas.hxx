@@ -15,17 +15,21 @@ namespace Gujarat
 	class SettlementAreas
 	{
 
-		std::vector< Engine::Rectangle<int> > 	_areas;
-		std::vector<int> 			_scoreAreas;
+		std::vector< Engine::Rectangle<int> > _areas;
+		std::vector<float> _scoreAreas;
 
 	protected: 
 		// expands rectangle r to include point newPoint
 		void updateArea(const Engine::Point2D<int> & newPoint, Engine::Rectangle<int> & r);
 		// create new area that will expand from point loc
-		void setNewArea(const Engine::Point2D<int> & position, GujaratWorld &w,std::vector<bool> & duneInArea);
+		//void setNewArea(const Engine::Point2D<int> & position, GujaratWorld &w,std::vector<bool> & duneInArea);
 
 		// this method checks wether is there dunes inside newArea; if it is the case, newArea is added to _areas.
 		void testDuneInside( const Engine::Rectangle<int> & newArea, GujaratWorld & world );
+
+		// the score of an area is the percentage of areas where foraging is possible
+		float computeAreaScore(const Engine::Rectangle<int> & newArea, GujaratWorld &w);
+
 	public:
 
 		SettlementAreas();
@@ -34,10 +38,8 @@ namespace Gujarat
 		void generateAreas(GujaratWorld &w, int lowResolution);
 		const std::vector< Engine::Rectangle<int> >& getAreas() const { return _areas; } 
 		const Engine::Rectangle<int> & getAreaById(int id) const { return _areas[id]; }
-		int getScoreByAreaId(int id) const { return _scoreAreas[id]; } 
- 
-		int ComputeAreaScore(const Engine::Rectangle<int> & newArea, GujaratWorld &w);
-  
+		float getScoreByAreaId(int id) const { return _scoreAreas[id]; } 
+
 		void intersectionFilter(Engine::Rectangle<int> & r, std::vector<int> & candidates) const;
 		//!! Returns a list of Area/Rectngle identifiers. The corresponding Areas have non empty
 		//!! intersection with the Rectangle 'r'.

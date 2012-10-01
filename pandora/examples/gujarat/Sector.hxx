@@ -27,7 +27,7 @@ class Sector
 	const Engine::World & _world;
 	std::vector< Engine::Point2D<int> >	_cells;
 	int					_biomassAmount;
-	BiomassAmountClass			_biomassAmountClass;
+//	BiomassAmountClass			_biomassAmountClass;
 
 private:
 
@@ -63,16 +63,18 @@ public:
 		return _biomassAmount;
 	}
 
+	/*
 	BiomassAmountClass	getBiomassAmountClass() const
 	{
 		return _biomassAmountClass;
 	}
+	*/
 
 	void	updateFeatures();
 	void	updateFeatures( const Engine::Raster& r );
 
-	void	showFeatures( std::ostream& );
-	std::string	biomassClass() const;
+	//void	showFeatures( std::ostream& );
+	//std::string	biomassClass() const;
 	const Engine::World & getWorld() const;
 };
 
@@ -81,8 +83,10 @@ class SectorBestFirstSortPtrVecPredicate
 public:
 	bool operator()( const Sector* s1, const Sector* s2 ) const
 	{
-		if ( s1->getBiomassAmountClass() > s2->getBiomassAmountClass() )
+		if ( s1->getBiomassAmount() > s2->getBiomassAmount() )
+		{
 			return true;
+		}
 		return false;
 	}
 };

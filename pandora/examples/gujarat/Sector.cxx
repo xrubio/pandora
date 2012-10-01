@@ -48,7 +48,7 @@ Engine::Point2D<int>	Sector::getNearestTo( Engine::Point2D<int> p ) const
 void	Sector::computeBiomassAmount( const Engine::Raster& r )
 {
 	_biomassAmount = 0;
-	int maxBiomassAmount = r.getCurrentMaxValue();
+//	int maxBiomassAmount = r.getCurrentMaxValue();
 
 
 	// TODO refactor
@@ -56,7 +56,7 @@ void	Sector::computeBiomassAmount( const Engine::Raster& r )
 	{
 		_biomassAmount += r.getValue( _cells[i]-_world.getOverlapBoundaries()._origin );
 	}
-	
+/*	
 	double normAmount = (double)_biomassAmount;
 	if ( maxBiomassAmount > 0 )
 		normAmount /= ((double)_cells.size()*maxBiomassAmount);
@@ -69,7 +69,7 @@ void	Sector::computeBiomassAmount( const Engine::Raster& r )
 		_biomassAmountClass = BIOMASS_AMOUNT_MED;
 	else
 		_biomassAmountClass = BIOMASS_AMOUNT_HI;
-	
+	*/
 }
 
 void	Sector::updateFeatures( const Engine::Raster& r )
@@ -82,7 +82,7 @@ void	Sector::updateFeatures()
 	const Engine::Raster & raster = _world.getConstDynamicRaster("resources");
 	computeBiomassAmount(raster);
 }
-
+/*
 std::string Sector::biomassClass() const
 {
 	std::string bioclass;
@@ -100,7 +100,9 @@ std::string Sector::biomassClass() const
 	}
 	return bioclass;	
 }
+*/
 
+/*
 void	Sector::showFeatures( std::ostream& stream )
 {
 	stream << "\tFeature: BioMassAmount: " << _biomassAmount << std::endl;
@@ -120,6 +122,7 @@ void	Sector::showFeatures( std::ostream& stream )
 	}
 	stream << "\tFeature: BioMassAmountClass: " << bioclass << std::endl;
 }
+*/
 
 void	Sector::getAdjacent( Engine::Point2D<int> p, std::vector<Engine::Point2D<int> >& adjList ) const
 {

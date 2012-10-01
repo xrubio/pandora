@@ -3,15 +3,12 @@
 namespace Gujarat
 {
 
-HunterGathererMDPState::HunterGathererMDPState()
-	: _timeIndex(0), _onHandResources(0), _isCopy( false)
+HunterGathererMDPState::HunterGathererMDPState() : _timeIndex(0), _mapLocation(-1,-1), _onHandResources(0), _maxResources(0), _resourcesDivider(1), _daysStarving(0), _isCopy( false)
 {
 }
 
-HunterGathererMDPState::HunterGathererMDPState(Engine::Point2D<int> loc, int initResources, 
-	const Engine::Raster& resourcesRaster, int maxResources, int divider )
-	: _timeIndex(0), _mapLocation( loc ), _onHandResources( initResources/divider ), _resources( resourcesRaster ),
-	_maxResources( maxResources ), _resourcesDivider( divider ), _daysStarving( 0 ), _isCopy(false)
+HunterGathererMDPState::HunterGathererMDPState(Engine::Point2D<int> loc, int initResources, const Engine::Raster& resourcesRaster, int maxResources, int divider )
+	: _timeIndex(0), _mapLocation( loc ), _onHandResources( initResources ), _resources( resourcesRaster ), _maxResources( maxResources ), _resourcesDivider( divider ), _daysStarving( 0 ), _isCopy(false)
 {
 	computeHash();
 }
@@ -119,6 +116,7 @@ bool	HunterGathererMDPState::operator!=( const HunterGathererMDPState& s ) const
 
 bool	HunterGathererMDPState::operator<( const HunterGathererMDPState& s ) const
 {
+	std::cout << "evaluating between " << this << " and: " << &s << std::endl;
 	return  ( _timeIndex < s._timeIndex ) ||
 			( ( _timeIndex == s._timeIndex ) && ( _onHandResources < s._onHandResources ) ) ||
 			( ( _timeIndex == s._timeIndex ) && ( _onHandResources == s._onHandResources) &&

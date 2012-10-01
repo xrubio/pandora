@@ -52,11 +52,14 @@ class GujaratWorld : public Engine::World
 	void loadFile( const std::string & fileName, const std::string & rasterKey);
 
 	void updateRainfall();
-	void updateMoisture();
+	//void updateMoisture();
 	void updateSoilCondition();
 	void updateResources();
 
 	void recomputeYearlyBiomass();
+
+	//Engine::Point2D<int> findNearestWater( const Engine::Point2D<int> & point );
+	float getBiomassVariation( bool wetSeason, Soils & cellSoil, const Engine::Point2D<int> & index ) const;
 public:
 	GujaratWorld( Engine::Simulation & simulation, const GujaratConfig & config );
 	virtual ~GujaratWorld();

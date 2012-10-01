@@ -36,7 +36,7 @@ public:
 	int  getHomeRange() const { return _homeRange; }
 	void setNumSectors( int v ) { _numSectors = v; }
 	int  getNumSectors() const { return _numSectors; }
-	std::vector<Sector *>&	getSectors() { return _sectors; }
+	const std::vector<Sector *> & getSectors() const { return _sectors; }
 
 	//void setSurplusForReproductionThreshold( int v ) { _surplusForReproductionThreshold = v; }
 	//void setSurplusWanted( int v ) { _surplusWanted = v; }
@@ -57,6 +57,7 @@ public:
 	void * fillPackage();
 	void sendVectorAttributes( int target );
 	void receiveVectorAttributes( int target );
+
 };
 
 } // namespace Gujarat

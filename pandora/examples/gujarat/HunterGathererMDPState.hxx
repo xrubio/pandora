@@ -37,28 +37,46 @@ public:
 	void					increaseTimeIndex() { _timeIndex++; }
 	unsigned				getTimeIndex() const { return _timeIndex; }
 	int					getOnHandResources() const { return _onHandResources; }
-	void					addResources( int amt ) 
-	{ 
+	void addResources( int amt )
+	{
+		_onHandResources += amt;
+		/*
+		if(_onHandResources > _resourcesDivider*_maxResources)
+		{
+			_onHandResources = _resourcesDivider*_maxResources;
+		}
+		*/
+		/*
 		_onHandResources = _onHandResources + (amt / _resourcesDivider); 
 		if ( _onHandResources > _maxResources )
 			_onHandResources = _maxResources;
+			*/
 	}
 
-	void					consume() 
+	void consume() 
 	{ 
-		if ( _onHandResources > 0 ) 
+		if( _onHandResources < _resourcesDivider )
 		{
-			_onHandResources--;
-			_daysStarving=0;
+			_daysStarving += 1000.0f*(1.0f-((float)_onHandResources/(float)_resourcesDivider));
+			//std::cout << "consume of this: " << this << " with days starving: " << _daysStarving << std::endl;
+			//_onHandResources -= _resourcesDivider;
+			//_daysStarving=0;
 		}
+		//_onHandResources = 0;
+		/*
 		else
 		{
 			_onHandResources = 0;
-			_daysStarving=1;
+			_daysStarving++;
 		}
+		*/
 	}
 	
-	int					getDaysStarving() const { return _daysStarving; }
+	float getDaysStarving() const
+	{
+		//std::cout << "getDaysStarving for: " << this << " days starving: " << _daysStarving << " fraction: " << (float)_daysStarving/1000.0f << std::endl;
+		return (float)_daysStarving/1000.0f;
+	}
 
 	//void					spoilage( float v ) { _onHandResources = (float)_onHandResources * v; }
 	void					setLocation( Engine::Point2D<int> newLoc ) { _mapLocation = newLoc; }
@@ -85,7 +103,7 @@ private:
 	std::vector<MDPAction*>		_availableActions;
 	int				_maxResources;
 	int				_resourcesDivider;
-	int				_daysStarving;
+	int _daysStarving;
 	bool				_isCopy;
 };
 

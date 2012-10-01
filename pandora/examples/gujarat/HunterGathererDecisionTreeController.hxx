@@ -22,7 +22,7 @@ public:
 	MDPAction*         shouldMoveHome(  HunterGatherer & agent  );
 	
 	Sector*         getMaxBiomassSector( HunterGatherer & agent );
-	unsigned        getDoNothingDaysCovered() const { return _DoNothingDaysCovered; } 
+//	unsigned        getDoNothingDaysCovered() const { return _DoNothingDaysCovered; } 
 
 private:
 	unsigned                _DoNothingDaysCovered;

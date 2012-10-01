@@ -21,6 +21,7 @@ SettlementAreas::~SettlementAreas()
 }
 
 
+/*
 void SettlementAreas::updateArea( const Engine::Point2D<int> & newPoint, Engine::Rectangle<int> & r)
 {
 
@@ -44,45 +45,32 @@ void SettlementAreas::updateArea( const Engine::Point2D<int> & newPoint, Engine:
 		r._size._y = newPoint._y - r._origin._y + 1;    
 	}
 }
-
-int SettlementAreas::ComputeAreaScore(const Engine::Rectangle<int> & newArea, GujaratWorld &w)
+*/
+float SettlementAreas::computeAreaScore(const Engine::Rectangle<int> & newArea, GujaratWorld &w)
 {
-	int result = 0;
-	/*
-	int wilds    = 0;
-	float dunes  = 0;
-	float cells  = 0;
-	*/	
-	float wilds  = 0.0;
-	float dunes  = 0.0;
-	float cells  = 0.0;	
+	int numInterdune = 0;
+	int numCells = 0;
 
 	Engine::Point2D<int> index;
 	for(index._x = newArea._origin._x; index._x < newArea._origin._x + newArea._size._x ; index._x++)
 	{
 		for(index._y = newArea._origin._y; index._y < newArea._origin._y + newArea._size._y ; index._y++)
 		{	
-			cells++;
-			if (w.getValue("soils",index) != DUNE)
+			numCells++;
+			if (w.getValue("soils",index) == INTERDUNE)
 			{
-				wilds++;
-			}
-			if (w.getValue("soils",index) == DUNE)
-			{
-				dunes++;
+				numInterdune++;
 			}
 		}
 	}
-	dunes++;
-	cells++;
-	wilds++;
-	result = (int)(1000.0*(   (1.0 - (dunes/cells)) + (wilds/cells) + (1.0/sqrt(sqrt(cells)))  ));
-	//result = wilds;
-	//std::cout << "SET SCORE:" << result << std::endl;
-	
-	return result;
+	if(!numCells)
+	{
+		return 0.0f;
+	}
+	return (float)numInterdune/numCells;
 }
 
+/*
 void SettlementAreas::setNewArea( const Engine::Point2D<int> & position,GujaratWorld &w,std::vector<bool> & duneInArea)
 {
 	std::stringstream logName;
@@ -145,8 +133,9 @@ void SettlementAreas::setNewArea( const Engine::Point2D<int> & position,GujaratW
 	log_EDEBUG(logName.str(), "\tsetNewArea finished for position: " << position);
 	//std::cout << loc._x << " "<< loc._y << " newArea: "<<newArea<<std::endl;
 	_areas.push_back(newArea);
-	_scoreAreas.push_back(ComputeAreaScore(newArea,w));
+	_scoreAreas.push_back(computeAreaScore(newArea,w));
 }
+*/
 
 void SettlementAreas::testDuneInside( const Engine::Rectangle<int> & newArea, GujaratWorld & w )
 {
@@ -156,14 +145,16 @@ void SettlementAreas::testDuneInside( const Engine::Rectangle<int> & newArea, Gu
 		for(insidePosition._y=newArea._origin._y; insidePosition._y<newArea._origin._y+newArea._size._y; insidePosition._y++)
 		{
 			// if only one point is dune, add new area
-			if(w.getValue("duneMap", insidePosition)==DUNE)
+			if(w.getValue("soils", insidePosition)==DUNE)
 			{
 				_areas.push_back(newArea);
-				_scoreAreas.push_back(ComputeAreaScore(newArea,w));
+				_scoreAreas.push_back(computeAreaScore(newArea,w));
+				//std::cout << "created area with rectangle: " << newArea << " and score: " << computeAreaScore(newArea,w) << std::endl;				
 				return;
 			}
 		}
 	}
+	//std::cout << "area without dune with rectangle: " << newArea << std::endl;				
 }
 
 void SettlementAreas::generateAreas(GujaratWorld &w, int lowResolution)

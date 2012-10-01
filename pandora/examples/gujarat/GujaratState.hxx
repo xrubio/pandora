@@ -14,7 +14,6 @@ class TiXmlElement;
 namespace Gujarat 
 {
 
-class CaloricRequirementsTable;
 class GujaratDemographics;
 class AgentController;
 class HunterGathererMDPConfig;
@@ -27,8 +26,8 @@ public:
 private:
 	static GujaratState * _instance;
 
-	static CaloricRequirementsTable * _hgCaloricRequirements;
-	static CaloricRequirementsTable * _apCaloricRequirements;
+	std::vector<int> _hgCaloricRequirements;
+	std::vector<float> _hgAvailableForageTime;
 
 	std::vector<AgentController*> _hgControllers;
 
@@ -43,11 +42,14 @@ public:
 	static GujaratState & instance();
 	virtual ~GujaratState();
 
-	static void setHGCaloricRequirements( TiXmlElement * element );
-	static void setAPCaloricRequirements( TiXmlElement * element );
+	static void setHGCaloricRequirements( int minAge, int adultAge, float minValue, float adultValue );
+	static void setHGAvailableForageTime( int minAge, int adultAge, float minValue, float adultValue );
+	//static void setAPCaloricRequirements( TiXmlElement * element );
 	static void setDemographics( const std::string & model );
 
-	static CaloricRequirementsTable & caloricRequirements( const std::string & type );
+	static int caloricRequirements( const std::string & type, int age );
+	static float availableForageTime( const std::string & type, int age );
+	//static CaloricRequirementsTable & caloricRequirements( const std::string & type );
 	static GujaratDemographics & demographics();
 
 	static void setHGController( const std::string & type, const HunterGathererMDPConfig & config );

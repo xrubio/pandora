@@ -28,6 +28,8 @@ void HunterGatherer::registerAttributes()
 	
 	log_DEBUG(logName.str(), "registering attributes for type: " << getType());
 
+	registerIntAttribute("MoveHome actions");
+	registerIntAttribute("Forage actions");
 	registerIntAttribute("agent age");
 	registerIntAttribute("male alive");
 	registerIntAttribute("male age");
@@ -35,7 +37,8 @@ void HunterGatherer::registerAttributes()
 	registerIntAttribute("female age");
 	registerIntAttribute("children");
 	registerIntAttribute("collected resources");
-	registerIntAttribute("starving");
+	registerIntAttribute("starving %");
+	registerIntAttribute("starving days x 100");
 	log_DEBUG(logName.str(), "registering attributes for type: " << getType() << " finished");
 }
 
@@ -178,7 +181,7 @@ GujaratAgent * HunterGatherer::createNewAgent()
 
 	agent->setWalkingSpeedHour( _walkingSpeedHour );
 	agent->setForageTimeCost( _forageTimeCost );
-	agent->setAvailableForageTime( _availableForageTime );
+	//agent->setAvailableForageTime( _availableForageTime );
 	agent->setMassToCaloriesRate( _massToCaloriesRate );
 	agent->setNumSectors( _sectors.size() );
 	
@@ -260,7 +263,10 @@ void HunterGatherer::serialize()
 	}
 	serializeAttribute("children", numChildren);
 	serializeAttribute("collected resources", _collectedResources);
-	serializeAttribute("starving", getPercentageOfStarvingDays());
+	serializeAttribute("starving %", getPercentageOfStarvingDays());
+	serializeAttribute("starving days x 100", _starved*100.0f);
+	serializeAttribute("MoveHome actions", _moveHomeActionsExecuted);
+	serializeAttribute("Forage actions", _forageActionsExecuted);
 }
 
 } // namespace Gujarat

@@ -7,7 +7,8 @@
 #include <string>
 #include <sstream>
 #include <map>
-#include <CaloricRequirementsTable.hxx>
+#include <vector>
+//#include <CaloricRequirementsTable.hxx>
 #include <AgentInitializer.hxx>
 
 namespace Gujarat
@@ -21,7 +22,10 @@ class GujaratConfig : public Engine::Config
 	int 		_size;		
 	std::string 	_soilFile;
 	std::string 	_demFile;
-	std::string 	_duneMapFile;
+	std::string 	_distWaterFile;
+	std::string 	_weightWaterFile;
+	// constant equal to Numcells/sum of weights to water
+	double _waterDistConstant;
 	int		_climateSeed;
 	// Agent home range expressed in # of underlying GIS
 	// data grid (~30m)
@@ -38,12 +42,14 @@ class GujaratConfig : public Engine::Config
 	// MRJ: Hunter Gatherers attributes
 	int		_surplusForReproductionThreshold;
 	int		_surplusWanted;	
-	float   _hgFoodNeedsForReproduction;
+	//float   _hgFoodNeedsForReproduction;
 	//float   _hgSpoilageFoodFactor;	
 	int		_adulthoodAge;
 	float	_walkingSpeedHour;
 	float	_forageTimeCost;
-	float	_availableForageTime;
+	// available forage time for each age until adulthood
+	std::vector<float> _availableForageTime;
+	std::vector<int> _caloricRequirements;
 	
 
 	// MRJ: Agro Pastoralists attributes
@@ -67,8 +73,8 @@ class GujaratConfig : public Engine::Config
 	std::string	_hunterGathererController;
 	std::string	_demographicsModel;
 
-	CaloricRequirementsTable* _hgCaloryRequirements;
-	CaloricRequirementsTable* _apCaloryRequirements;
+	//CaloricRequirementsTable* _hgCaloryRequirements;
+	//CaloricRequirementsTable* _apCaloryRequirements;
 	AgentInitializer*	  _hgInitializer;
 	AgentInitializer*	  _apInitializer;
 
@@ -77,6 +83,7 @@ class GujaratConfig : public Engine::Config
 	int _numHG;
 	int _numAP;
 	std::map< std::string, bool > _storeRasters;
+	std::string _biomassDistribution;
 
 	void 	parseSoilInfo(TiXmlElement * element);
 	void	parseHGMDPConfig( TiXmlElement* element );
