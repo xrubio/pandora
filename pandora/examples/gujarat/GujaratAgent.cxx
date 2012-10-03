@@ -488,32 +488,20 @@ void	GujaratAgent::addNewChild()
 	// we look for an empty space or add a new one
 }
 
-void GujaratAgent::createInitialPopulation()
+void GujaratAgent::createInitialPopulation( int adulthoodAge )
 {
-	/*
-	_populationAges.resize(4);
-	_populationAges[0] = 25;
-	_populationAges[1] = 22;
-	_populationAges[2] = 5;
-	_populationAges[3] = 7;
-	*/
-	
 	_populationAges.resize(2);
 	_populationAges.at(0) = Engine::GeneralState::statistics().getUniformDistValue(15, 50);
 	_populationAges.at(1) = Engine::GeneralState::statistics().getUniformDistValue(15, 50);
-	int reproductiveYears = std::min(_populationAges.at(0), _populationAges.at(1));
-	// if more than 15 years, stick to 15 because other children are already independent
-	reproductiveYears = std::min(15,reproductiveYears);
+	int reproductiveYears = std::min(_populationAges.at(0)-adulthoodAge, _populationAges.at(1)-adulthoodAge);
+	// if more than adulthood age, stick to that because other children are already independent
+	reproductiveYears = std::min(adulthoodAge,reproductiveYears);
 
 	// we create a set of children, taking into account mortality. It is assumed that parents survived the entire init period
 	for(int i=0; i<reproductiveYears; i++)
 	{		
 		GujaratState::demographics().checkReproduction(*this);	
-		// 2% of starvation every year
-		checkDeath( 0, 15, 2);
-
-		checkDeath( 0, 3, 10 );
-		checkDeath( 3, 15, 2 );
+		GujaratState::demographics().checkMortality(*this);	
 		for(int j=2; j<_populationAges.size(); j++)
 		{
 			if(_populationAges.at(j) != -1)

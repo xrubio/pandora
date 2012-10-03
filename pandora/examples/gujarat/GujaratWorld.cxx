@@ -185,7 +185,7 @@ void GujaratWorld::createAgents()
 			addAgent(agent);
 			//_config._hgInitializer->initialize(agent);
 			
-			agent->createInitialPopulation();
+			agent->createInitialPopulation(_config._adulthoodAge);
 
 			agent->setSocialRange( _config._socialRange );
 			agent->setHomeMobilityRange( _config._homeRange );
