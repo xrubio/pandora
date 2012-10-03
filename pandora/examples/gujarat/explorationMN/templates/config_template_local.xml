@@ -2,7 +2,7 @@
 <config>  
 	<!-- Global simulation parameters -->
 	<output resultsFile="data_controllerCTYPE_sizeMAPSIZE_hgNUMHG_exNUMEXEC/gujarat.h5" logsDir="logs_controllerCTYPE_sizeMAPSIZE_hgNUMHG_exNUMEXEC"/>
-	<numSteps value="18000"/>
+	<numSteps value="36000"/>
 	<!-- g to KJ -->
 	<massToEnergyRate value="20" />
 	<!-- 1 Cal = 4.184 KJ, Conversion Rate = 1/4.184 -->

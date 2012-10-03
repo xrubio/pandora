@@ -4,12 +4,12 @@ import fileinput, sys, os, random
 #mapSizes = ['400','800','1600']
 mapSizes = ['1600']
 
-numExecutions = 2
-numHGs = ['100']
+numExecutions = 1
+numHGs = ['500']
 controllers = ['DecisionTree']
 #controllers = ['DecisionTree', 'MDP', 'Random']
 #biomassDistributions = ['standard', 'logDecayFromWater', 'linDecayFromWater']
-biomassDistributions = ['linDecayFromWater']
+biomassDistributions = ['logDecayFromWater']
 
 xmlTemplate = 'templates/config_template_local.xml'
 

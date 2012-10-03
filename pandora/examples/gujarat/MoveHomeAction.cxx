@@ -157,7 +157,7 @@ void MoveHomeAction::execute( Engine::Agent & agent )
 	log_INFO(logName2.str(), "timestep: " << agent.getWorld()->getCurrentTimeStep() << " agent: " << agent << " executes MoveHome");
 	*/
 
-	std::cout << agent << " executing move home from pos: " << agent.getPosition() << " to: " << _newHomeLoc << std::endl;
+	//std::cout << agent << " executing move home from pos: " << agent.getPosition() << " to: " << _newHomeLoc << std::endl;
 	if(_forageAction)
 	{
 		_forageAction->execute(agent);
