@@ -76,10 +76,8 @@ void GujaratState::setHGCaloricRequirements( int minAge, int adultAge, float min
 	for(int i=minAge; i<adultAge; i++)
 	{
 		instance()._hgCaloricRequirements.at(i) = minValue+float(i-minAge)*float((adultValue-minValue)/(adultAge-minAge));
-		std::cout << "calories for age: " << i << " are: " << instance()._hgCaloricRequirements.at(i) << std::endl;
 	}
 	instance()._hgCaloricRequirements.at(adultAge) = adultValue;
-	std::cout << "calories for adults are: " << instance()._hgCaloricRequirements.at(adultAge) << std::endl;
 }
 
 void GujaratState::setHGAvailableForageTime( int minAge, int adultAge, float minValue, float adultValue )
@@ -97,10 +95,8 @@ void GujaratState::setHGAvailableForageTime( int minAge, int adultAge, float min
 	for(int i=minAge; i<adultAge; i++)
 	{
 		instance()._hgAvailableForageTime.at(i) = minValue+float(i-minAge)*float((adultValue-minValue)/(adultAge-minAge));
-		std::cout << "time for age: " << i << " is: " << instance()._hgAvailableForageTime.at(i) << std::endl;
 	}
 	instance()._hgAvailableForageTime.at(adultAge) = adultValue;
-	std::cout << "time for adults is: " << instance()._hgAvailableForageTime.at(adultAge) << std::endl;
 
 }
 
