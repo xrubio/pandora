@@ -5,6 +5,7 @@ release = ARGUMENTS.get('release', 1)
 mareNostrum = ARGUMENTS.get('mn', 0)
 extremeDebug = ARGUMENTS.get('edebug', 0)
 localmpich = ARGUMENTS.get('localmpich',0)
+useMpi = ARGUMENTS.get('mpi', 1)
 
 if int(localmpich) == 1 :
 	env = Environment(ENV=os.environ, CXX='/usr/local/bin/mpicxx')
@@ -26,6 +27,8 @@ else:
 	libraryName = 'pandora'
 	pythonLibraryName = 'pyPandora'
 
+if int(useMpi)==1:
+	env['CCFLAGS'] += ['-DPANDORAMPI']
 
 coreFiles = Split('World.cxx StaticRaster.cxx Raster.cxx Agent.cxx Statistics.cxx SimulationRecord.cxx AgentRecord.cxx Serializer.cxx Simulation.cxx Config.cxx MpiFactory.cxx IncrementalRaster.cxx RasterLoader.cxx Action.cxx LoggerBase.cxx GeneralState.cxx ShpLoader.cxx')
 
@@ -74,7 +77,9 @@ if int(mareNostrum)==0:
 	if int(release) == 0:
 		envPython['CCFLAGS'] = Split('-g -Wall -DTIXML_USE_STL -DPANDORADEBUG')	
 		if int(extremeDebug)==1:
-			env['CCFLAGS'] += ['-DPANDORAEDEBUG']
+			envPython['CCFLAGS'] += ['-DPANDORAEDEBUG']
+		if int(useMpi)==1:
+			envPython['CCFLAGS'] += ['-DPANDORAMPI']
 	else:
 		envPython['CCFLAGS'] = Split('-O3 -Wall -DTIXML_USE_STL')
 	
