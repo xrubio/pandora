@@ -1,6 +1,6 @@
 # Compiled source #
 *.o
-*/.sconsign.dblite
+*.sconsign.dblite
 pandora/build/
 pandora/build_py/
 *.swp
