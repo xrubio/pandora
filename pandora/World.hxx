@@ -343,7 +343,7 @@ public:
 	virtual void createRasters() = 0;
 
 	int	getCurrentTimeStep() const { return _step; }
-	double getMpiTime() const;
+	double getWallTime() const;
 };
 
 } // namespace Engine

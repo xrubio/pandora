@@ -74,7 +74,7 @@ void GujaratWorld::createRasters()
 {
 	std::stringstream logName;
 	logName << "simulation_" << _simulation.getId();
-	log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << " creating static rasters");
+	log_DEBUG(logName.str(), getWallTime() << " creating static rasters");
 	registerStaticRaster("soils", _config.isStorageRequired("soils"));
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("soils"), _config._soilFile, this);	
 
@@ -97,7 +97,7 @@ void GujaratWorld::createRasters()
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("duneMap"), _config._duneMapFile, this);
 	*/
 
-	log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << " creating dynamic rasters");
+	log_DEBUG(logName.str(), getWallTime() << " creating dynamic rasters");
 	/*
 	registerDynamicRaster("moisture", _config.isStorageRequired("moisture"));
 	getDynamicRaster("moisture").setInitValues(0, std::numeric_limits<int>::max(), 0);
@@ -162,23 +162,23 @@ void GujaratWorld::createRasters()
 	getDynamicRaster("tmpDunes").setInitValues(0, 100, 0);
 	*/
 
-	log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << " generating settlement areas");
+	log_DEBUG(logName.str(), getWallTime() << " generating settlement areas");
 	_settlementAreas.generateAreas( *this, _config._lowResolution);
-	//log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << " updating moisture");
+	//log_DEBUG(logName.str(), getWallTime() << " updating moisture");
 	//updateMoisture();
-	log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << " create rasters done");
+	log_DEBUG(logName.str(), getWallTime() << " create rasters done");
 }
 
 void GujaratWorld::createAgents()
 {
 	std::stringstream logName;
 	logName << "simulation_" << _simulation.getId();
-	log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << " creating agents");
+	log_DEBUG(logName.str(), getWallTime() << " creating agents");
 	for(int i=0; i<_config._numHG; i++)
 	{ 
 		if((i%_simulation.getNumTasks())==_simulation.getId())
 		{			
-			log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << " new HG with index: " << i);
+			log_DEBUG(logName.str(), getWallTime() << " new HG with index: " << i);
 			std::ostringstream oss;
  			oss << "HunterGatherer_" << i;
 			HunterGatherer * agent = new HunterGatherer(oss.str());
@@ -202,7 +202,7 @@ void GujaratWorld::createAgents()
 			agent->setNumSectors( _config._numSectors );
 
 			agent->initializePosition();
-			log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << " new HG: " << agent);
+			log_DEBUG(logName.str(), getWallTime() << " new HG: " << agent);
 		}
 	}
 
@@ -424,8 +424,8 @@ void GujaratWorld::recomputeYearlyBiomass()
 	_yearlyBiomass[DUNE] = areaOfCell*_config._duneBiomass * raininessFactor * _config._duneEfficiency;
 	_yearlyBiomass[INTERDUNE] = areaOfCell*_config._interduneBiomass * _config._interduneEfficiency * raininessFactor;
 	
-	log_INFO(logName.str(), MPI_Wtime() - _initialTime << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " rain: " << _climate.getRain() << " with mean: " << _climate.getMeanAnnualRain());
-	log_INFO(logName.str(), MPI_Wtime() - _initialTime << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " yearly biomass of dune: " << _yearlyBiomass[DUNE] << " and interdune: " << _yearlyBiomass[INTERDUNE]);
+	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " rain: " << _climate.getRain() << " with mean: " << _climate.getMeanAnnualRain());
+	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " yearly biomass of dune: " << _yearlyBiomass[DUNE] << " and interdune: " << _yearlyBiomass[INTERDUNE]);
 
 	// yearly biomass is the area of a triangle with max height at the end of wet season
 	// A_1 + A_2 = biomass, being A_1 = daysPerSeason*h/2 and A_2 = 2*daysPerSeason*h/2
@@ -435,14 +435,14 @@ void GujaratWorld::recomputeYearlyBiomass()
 	double heightInterDune = _yearlyBiomass[INTERDUNE]/(_config._daysPerSeason*3/2);
 	_dailyRainSeasonBiomassIncrease[INTERDUNE] = heightInterDune/_config._daysPerSeason;
 	_dailyDrySeasonBiomassDecrease[INTERDUNE] = heightInterDune/(2*_config._daysPerSeason);
-	log_INFO(logName.str(), MPI_Wtime() - _initialTime << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " biomass height interdune: " << heightInterDune << " increment: " << _dailyRainSeasonBiomassIncrease[INTERDUNE] << " and decrease: " << _dailyDrySeasonBiomassDecrease[INTERDUNE]);
-	log_INFO(logName.str(), MPI_Wtime() - _initialTime << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " calories height interdune: " << _config._massToEnergyRate*_config._energyToCalRate*heightInterDune << " increment: " << _config._massToEnergyRate*_config._energyToCalRate*_dailyRainSeasonBiomassIncrease[INTERDUNE] << " and decrease: " << _config._massToEnergyRate*_config._energyToCalRate*_dailyDrySeasonBiomassDecrease[INTERDUNE]);
+	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " biomass height interdune: " << heightInterDune << " increment: " << _dailyRainSeasonBiomassIncrease[INTERDUNE] << " and decrease: " << _dailyDrySeasonBiomassDecrease[INTERDUNE]);
+	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " calories height interdune: " << _config._massToEnergyRate*_config._energyToCalRate*heightInterDune << " increment: " << _config._massToEnergyRate*_config._energyToCalRate*_dailyRainSeasonBiomassIncrease[INTERDUNE] << " and decrease: " << _config._massToEnergyRate*_config._energyToCalRate*_dailyDrySeasonBiomassDecrease[INTERDUNE]);
 
 	double heightDune = _yearlyBiomass[DUNE]/(_config._daysPerSeason*3/2);
 	_dailyRainSeasonBiomassIncrease[DUNE] = heightDune/_config._daysPerSeason;
 	_dailyDrySeasonBiomassDecrease[DUNE] = heightDune/(2*_config._daysPerSeason);
-	log_INFO(logName.str(), MPI_Wtime() - _initialTime << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " biomass height dune: " << heightDune << " increment: " << _dailyRainSeasonBiomassIncrease[DUNE] << " and decrease: " << _dailyDrySeasonBiomassDecrease[DUNE]);
-	log_INFO(logName.str(), MPI_Wtime() - _initialTime << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " calories height dune: " << _config._massToEnergyRate*_config._energyToCalRate*heightDune << " increment: " << _config._massToEnergyRate*_config._energyToCalRate*_dailyRainSeasonBiomassIncrease[DUNE] << " and decrease: " << _config._massToEnergyRate*_config._energyToCalRate*_dailyDrySeasonBiomassDecrease[DUNE]);
+	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " biomass height dune: " << heightDune << " increment: " << _dailyRainSeasonBiomassIncrease[DUNE] << " and decrease: " << _dailyDrySeasonBiomassDecrease[DUNE]);
+	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " calories height dune: " << _config._massToEnergyRate*_config._energyToCalRate*heightDune << " increment: " << _config._massToEnergyRate*_config._energyToCalRate*_dailyRainSeasonBiomassIncrease[DUNE] << " and decrease: " << _config._massToEnergyRate*_config._energyToCalRate*_dailyDrySeasonBiomassDecrease[DUNE]);
 
 	_dailyRainSeasonBiomassIncrease[WATER] = 0.0f;
 	_dailyDrySeasonBiomassDecrease[WATER] = 0.0f;
@@ -479,8 +479,7 @@ void GujaratWorld::stepEnvironment()
 	// if this is the first step of a wet season, rainfall and biomass are calculated for the entire year
 	if ( _climate.rainSeasonStarted() )
 	{
-		log_INFO(logName.str(), MPI_Wtime() - _initialTime << " timestep: " << getCurrentTimeStep() << " num agents: " << _agents.size());
-		std::cout << MPI_Wtime() - _initialTime << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " num agents: " << _agents.size() << std::endl;
+		log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " num agents: " << _agents.size());
 		updateRainfall();
 		recomputeYearlyBiomass();
 	}
@@ -488,25 +487,15 @@ void GujaratWorld::stepEnvironment()
 	updateResources();
 	getDynamicRaster("resources").updateCurrentMinMaxValues();
 
-	log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << " timestep=" << getCurrentTimeStep());
-	log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << "\tagentPopulation=" << _agents.size());
-
 	unsigned nrAdults = 0;
 	for ( AgentsList::iterator it = _agents.begin(); 
 		it != _agents.end(); it++ )
 		nrAdults += dynamic_cast<GujaratAgent*>((*it))->getNrAvailableAdults();	
 
-	log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << "\tadultPopulation=" << nrAdults );
-
 	unsigned nrChildren = 0;
 	for ( AgentsList::iterator it = _agents.begin(); 
 		it != _agents.end(); it++ )
 		nrChildren += dynamic_cast<GujaratAgent*>((*it))->getNrChildren();
-
-	log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << "\tchildrenPopulation=" << nrChildren);
-	log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << "\tmaxCurrentResources=" << getDynamicRaster("resources").getCurrentMaxValue());
-	log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << "\tminCurrentResources=" << getDynamicRaster("resources").getCurrentMinValue());
-	log_DEBUG(logName.str(), MPI_Wtime() - _initialTime << "\tavgCurrentResources=" << getDynamicRaster("resources").getAvgValue() );
 
 	// these rasters are only updated at the beginning of seasons
 //	if ( !_climate.cellUpdateRequired() ) return;
