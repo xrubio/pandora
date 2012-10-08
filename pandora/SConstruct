@@ -78,10 +78,11 @@ if int(mareNostrum)==0:
 		envPython['CCFLAGS'] = Split('-g -Wall -DTIXML_USE_STL -DPANDORADEBUG')	
 		if int(extremeDebug)==1:
 			envPython['CCFLAGS'] += ['-DPANDORAEDEBUG']
-		if int(useMpi)==1:
-			envPython['CCFLAGS'] += ['-DPANDORAMPI']
 	else:
 		envPython['CCFLAGS'] = Split('-O3 -Wall -DTIXML_USE_STL')
+	
+	if int(useMpi)==1:
+		envPython['CCFLAGS'] += ['-DPANDORAMPI']
 	
 	srcPyFiles = [] 
 	for src in srcFiles:

@@ -23,6 +23,7 @@
 #ifndef __World_hxx__
 #define __World_hxx__
 
+#ifdef PANDORAMPI
 enum MpiMessageType
 {
 	eNumAgents = 1,
@@ -36,6 +37,9 @@ enum MpiMessageType
 	eNumModifiedAgents = 9,
 	eModifiedAgent = 10
 };
+#include <mpi.h>
+
+#endif
 
 #include <map>
 #include <vector>
@@ -45,7 +49,6 @@ enum MpiMessageType
 #include <Rectangle.hxx>
 #include <Point2D.hxx>
 #include <Simulation.hxx>
-#include <mpi.h>
 
 #include <algorithm>
 
@@ -53,6 +56,7 @@ namespace Engine
 {
 class Agent;
 
+#ifdef PANDORAMPI
 struct MpiOverlap
 {
 	std::string _rasterName;
@@ -60,6 +64,7 @@ struct MpiOverlap
 	Rectangle<int> _overlap;
 	MPI_Request _request;
 };
+#endif
 
 class World
 {
@@ -119,10 +124,13 @@ protected:
 	//! provides a random valid position inside boundaries
 	Point2D<int> getRandomPosition();
 
+#ifdef PANDORAMPI
 	std::list<MpiOverlap*> _sendRequests;
 	std::list<MpiOverlap*> _receiveRequests;
 	// this method checks whether all the requests in the pool created by MPI_Isend and MPI_Irecv are finished before continuing
 	void clearRequests( bool updateMaxValues );
+#endif
+
 private:
 	//! PENDENT amount of width around one boundary considering the side of the World object that owns _overlap
 	int _overlap;
@@ -130,6 +138,7 @@ private:
 	// if this variable is set to true, getNeighbours will look through the list of agents instead of searching by position. It is false by default
 	bool _searchAgents;
 	
+#ifdef PANDORAMPI
 	// method to send a list of agents to their respective future world
 	void sendAgents( AgentsList & agentsToSend );
 	// Method to send overlap zones in the section we have executed 
@@ -148,6 +157,8 @@ private:
 	// if entire overlap is true, the node will send its owned zone in overlap as well as adjacents overlapped zones
 	void receiveOverlapData( const int & sectionIndex, const bool & entireOverlap = true );
 	void receiveMaxOverlapData();
+#endif
+
 protected:
 	double _initialTime;
 	//! check correct overlap/size relation

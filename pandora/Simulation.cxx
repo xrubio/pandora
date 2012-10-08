@@ -41,10 +41,14 @@ Simulation::~Simulation()
 
 void Simulation::init()
 {
+#ifdef PANDORAMPI
 	MPI_Comm_size(MPI_COMM_WORLD, &_numTasks);
-	MPI_Comm_rank(MPI_COMM_WORLD,&_id);
+	MPI_Comm_rank(MPI_COMM_WORLD,&_id);	
 	std::cout << "simulation: " << _id << " of: " << _numTasks << " initialized" << std::endl;
-	
+#else
+	_id = 0;
+	_numTasks = 1;
+#endif	
 	_localRasterSize = _size/sqrt(_numTasks);
 	if(_localRasterSize%2!=0)
 	{
@@ -53,7 +57,6 @@ void Simulation::init()
 		oss << "Simulation::init - local raster size: " << _localRasterSize << " must be divisible by 2";
 		throw Exception(oss.str());
 	}
-	
 }
 	
 const int & Simulation::getId() const
