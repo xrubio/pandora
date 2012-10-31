@@ -250,7 +250,7 @@ void RasterLoader::fillGrassCellRaster( StaticRaster & raster, const std::string
 	if(world && G_window_cols()!=world->getSimulation().getSize())
 	{
 		std::stringstream oss;
-		oss << "StaticRaster::loadGrassCellRasterFile - Grass raster: " << rasterName << " with size: " << G_window_cols << " different from defined size: " << world->getSimulation().getSize() << std::endl;
+		oss << "StaticRaster::loadGrassCellRasterFile - Grass raster: " << rasterName << " with size: " << G_window_cols() << " different from defined size: " << world->getSimulation().getSize() << std::endl;
 		throw Engine::Exception(oss.str());
 		return;
 	}
