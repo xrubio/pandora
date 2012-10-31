@@ -23,7 +23,7 @@
 #ifndef __Serializer_hxx__
 #define __Serializer_hxx__
 
-#include <hdf5.h>
+//#include <hdf5.h>
 #include <string>
 #include <map>
 #include <vector>
@@ -49,10 +49,10 @@ class Serializer
 
 	std::string _resultsFile;
 
-	hid_t _agentsFileId;
-	hid_t _fileId;
+	//hid_t _agentsFileId;
+	//hid_t _fileId;
 	// this id is used to track the data set of the agent being serialized
-	hid_t _currentAgentDatasetId;
+	//hid_t _currentAgentDatasetId;
 
 	void serializeRaster( StaticRaster & raster, World & world, const std::string & datasetKey );
 

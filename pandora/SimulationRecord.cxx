@@ -25,8 +25,6 @@
 #include <GeneralState.hxx>
 #include <RasterLoader.hxx>
 
-#include <hdf5.h>
-
 #include <iostream>
 #include <sstream>
 #include <vector>

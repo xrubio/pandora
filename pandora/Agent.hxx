@@ -107,9 +107,6 @@ public:
 	friend std::ostream & operator<<( std::ostream & stream, Agent * agent );
 	friend std::ostream & operator<<( std::ostream & stream, Agent & agent );
 
-	// TODO fix? when an agent is modified we need to alert the original in case of being an overlap copy
-	//void interactionWithAgent(Agent * agent);
-	virtual void * fillPackage() = 0;
 	// this function returns true if the type of the agent is the one passed by reference
 	bool isType( const std::string & type ) const;
 	std::string getType() const;
@@ -124,8 +121,11 @@ public:
 	void executeActions();
 
 	// mpi related
+#ifdef PANDORAMPI
+	virtual void * fillPackage() = 0;
 	virtual void sendVectorAttributes( int target ) = 0;
 	virtual void receiveVectorAttributes(int origin) = 0;
+#endif
 
 	AttributesList::iterator beginStringAttributes(){ return _stringAttributes.begin(); }
 	AttributesList::iterator endStringAttributes(){ return _stringAttributes.end(); }

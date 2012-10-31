@@ -21,7 +21,9 @@
  */
 
 #include <Simulation.hxx>
+#ifdef PANDORAMPI
 #include <mpi.h>
+#endif
 #include <iostream>
 #include <Exceptions.hxx>
 #include <cmath>

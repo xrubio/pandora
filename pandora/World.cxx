@@ -23,7 +23,6 @@
 #include <World.hxx>
 #include <Agent.hxx>
 #include <Exceptions.hxx>
-#include <MpiFactory.hxx>
 
 #include <GeneralState.hxx>
 #include <Serializer.hxx>
@@ -35,6 +34,10 @@
 #include <sstream>
 #include <algorithm>
 #include <ctime>
+
+#ifdef PANDORAMPI
+#include <MpiFactory.hxx>
+#endif
 
 namespace Engine
 {
@@ -49,7 +52,7 @@ World::World( const Simulation & simulation, const int & overlap, const bool & a
     , _searchAgents(true)
     , _initialTime(0.0f)
 {
-	GeneralState::serializer().setResultsFile(fileName);
+//	GeneralState::serializer().setResultsFile(fileName);
 }
 
 World::~World()
@@ -81,10 +84,12 @@ void World::init( int argc, char *argv[] )
 	stablishPosition();
 	createRasters();
 	
-	GeneralState::serializer().init(_simulation, _staticRasters, _dynamicRasters, *this);
+//	GeneralState::serializer().init(_simulation, _staticRasters, _dynamicRasters, *this);
 	serializeStaticRasters();
 	createAgents();
+#ifdef PANDORAMPI
 	MpiFactory::instance()->registerTypes();
+#endif
 
 	std::stringstream logName;
 	logName << "simulation_" << _simulation.getId();
@@ -201,7 +206,272 @@ bool World::willBeRemoved( Agent * agent )
 	return false;
 }
 
+void World::addAgent( Agent * agent )
+{
+	agent->setWorld(this);
+	// we need to remove any previous instance of this agent in overlap
+
+	AgentsList::iterator it = getGhostAgent(agent->getId());
+	if(it!=_overlapAgents.end())
+	{
+		_overlapAgents.erase(it);
+	}
+	_agents.push_back(agent);	
+	
+	std::stringstream logName;
+	logName << "agents_" << getId() << "_" << agent->getId();
+	log_EDEBUG( logName.str(), "agent: " << agent << " added at time step: " << getCurrentTimeStep());
+}
+
+void World::stepSection( const int & sectionIndex )
+{
+	std::stringstream logName;
+	logName << "simulation_" << _simulation.getId();
+
+	log_DEBUG(logName.str(), getWallTime() << " beginning step: " << _step << " section: " << sectionIndex);
+
+	// first of all we will execute raster rules for the zone where stepSection is executed
+	stepRastersSection(sectionIndex, _sections[sectionIndex]);
+
+	//std::cout << _simulation.getId() << " executing section: " << sectionIndex << " in step: " << _step << " with zone: " << _sections[sectionIndex] << std::endl;
+	AgentsList::iterator it=_agents.begin();
+	std::vector<Agent*> agentsToExecute;
+	// we have to randomize the execution of agents in a given section index
+	while(it!=_agents.end())
+	{
+		Agent * agent = *it;
+		if(_sections[sectionIndex].isInside(agent->getPosition()) && !hasBeenExecuted(agent))
+		{
+			agentsToExecute.push_back(agent);
+		}
+		it++;
+	}
+	std::random_shuffle(agentsToExecute.begin(), agentsToExecute.end());
+	int numExecutedAgents = 0;
+	AgentsList agentsToSend;
+
+#ifdef PANDORAEDEBUG
+	// plan actions, disabled for debug
+	#pragma omp parallel for
+#endif
+	for(int i=0; i<agentsToExecute.size(); i++)
+	{
+		Agent * agent = agentsToExecute[i];
+		//Agent * agent = *it;
+		if(_sections[sectionIndex].isInside(agent->getPosition()) && !hasBeenExecuted(agent))
+		{
+			agent->logAgentState();
+			agent->updateKnowledge();
+			agent->selectActions();
+		}
+	}
+
+	// execute actions
+	for(int i=0; i<agentsToExecute.size(); i++)
+	{
+		Agent * agent = agentsToExecute.at(i);
+		if(_sections[sectionIndex].isInside(agent->getPosition()) && !hasBeenExecuted(agent))
+		{
+			log_DEBUG(logName.str(), getWallTime() << " agent: " << agent << " being executed at index: " << sectionIndex << " of task: "<< _simulation.getId() << " in step: " << _step );
+			agent->executeActions();
+			agent->updateState();
+			log_DEBUG(logName.str(), getWallTime() << " agent: " << agent << " has been executed at index: " << sectionIndex << " of task: "<< _simulation.getId() << " in step: " << _step );
+
 #ifdef PANDORAMPI
+			if(!_boundaries.isInside(agent->getPosition()) && !willBeRemoved(agent))
+			{
+				log_DEBUG(logName.str(), getWallTime() << " migrating agent: " << agent << " being executed at index: " << sectionIndex << " of task: "<< _simulation.getId() );
+				agentsToSend.push_back(agent);
+
+				// the agent is no longer property of this world
+				AgentsList::iterator itErase  = getOwnedAgent(agent->getId());
+				// it will be deleted
+				_agents.erase(itErase);
+				_overlapAgents.push_back(agent);
+				log_DEBUG(logName.str(), getWallTime() <<  "putting agent: " << agent << " to overlap");
+			}
+			else
+			{
+				log_DEBUG(logName.str(), getWallTime() << " finished agent: " << agent);
+			}
+#endif
+			_executedAgentsHash.insert(make_pair(agent->getId(), agent));
+			numExecutedAgents++;
+			log_DEBUG(logName.str(), getWallTime()  << " num executed agents: " << numExecutedAgents );
+		}
+	}
+#ifdef PANDORAMPI
+	log_DEBUG(logName.str(), getWallTime()  << " sending agents in section: " << sectionIndex << " and step: " << _step);
+	sendAgents(agentsToSend);
+#endif
+	log_DEBUG(logName.str(), getWallTime() << " has finished section: " << sectionIndex << " and step: " << _step);
+	
+	log_DEBUG(logName.str(), getWallTime() << " executed step: " << _step << " section: " << sectionIndex << " in zone: " << _sections[sectionIndex] << " with num executed agents: " << numExecutedAgents << " total agents: " << _agents.size() << " and overlap agents: " << _overlapAgents.size());
+}
+
+void World::serializeAgents()
+{
+	AgentsList::iterator it=_agents.begin();
+	int i = 0;
+	while(it!=_agents.end())
+	{
+		if((*it)->exists())
+		{
+//			GeneralState::serializer().serializeAgent((*it), _step, *this, i);
+			i++;
+		}
+		it++;
+	}
+	// serialize remaining agents
+//	GeneralState::serializer().finishAgentsSerialization(_step, *this);
+}
+
+#ifdef PANDORAMPI
+
+void World::sendAgents( AgentsList & agentsToSend )
+{
+	if(_neighbors.size()==0)
+	{
+		return;
+	}
+	//TODO: es poden enviar missatges de forma no sincronitzada ni predestinada?
+	std::stringstream logName;
+	logName << "MPI_agents_world_" << _simulation.getId();
+	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sendAgent: " << agentsToSend.size() << " agents");
+
+	// for each neighbor, we send the number of agents to send
+	for(MpiFactory::TypesMap::iterator itType=MpiFactory::instance()->beginTypes(); itType!=MpiFactory::instance()->endTypes(); itType++)
+	{
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sendAgent - checking mpi type: " << itType->first );
+		// add each agent to the list of the neighbour where it will be sent
+		std::vector< AgentsList > agentsToNeighbors;
+		agentsToNeighbors.resize(_neighbors.size());
+
+
+		for(AgentsList::iterator it=agentsToSend.begin(); it!=agentsToSend.end(); it++)
+		{
+			Agent * agent = (*it);
+			if(agent->isType(itType->first))
+			{
+				int newID = getIdFromPosition(agent->getPosition());
+				agentsToNeighbors[getNeighborIndex(newID)].push_back(agent);
+			}
+		}
+
+		MPI_Datatype * agentType = itType->second;
+		for(int i=0; i<_neighbors.size(); i++)
+		{	
+			int numAgents = agentsToNeighbors[i].size();
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sendAgent - sending num agents: " << numAgents << " to: " << _neighbors[i]);
+			int error = MPI_Send(&numAgents, 1, MPI_INTEGER, _neighbors[i], eNumAgents, MPI_COMM_WORLD);
+			if(error != MPI_SUCCESS)
+			{
+				std::stringstream oss;
+				oss << "World::sendAgents - " << _simulation.getId() << " error in MPI_Send : " << error;
+				throw Exception(oss.str());
+			}
+			AgentsList::iterator it= agentsToNeighbors[i].begin();
+			while(it!=agentsToNeighbors[i].end())
+			{
+				Agent * agent = *it;
+				void * package = agent->fillPackage();
+				log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sendAgent - sending agent: " << *it << " to: " << _neighbors[i] );
+				error = MPI_Send(package, 1, *agentType, _neighbors[i], eAgent, MPI_COMM_WORLD);
+				delete package;
+				if(error != MPI_SUCCESS)
+				{
+					std::stringstream oss;
+					oss << "World::sendAgents - " << _simulation.getId() << " error in MPI_Send : " << error;
+					throw Exception(oss.str());
+				}
+				agent->sendVectorAttributes(_neighbors[i]);
+				// it is not deleted, as it is sent to overlap list
+				it = agentsToNeighbors[i].erase(it);
+			}
+		}
+	}
+	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sendAgent -  end checking agents to send: " << agentsToSend.size());
+}
+
+void World::sendOverlapZones( const int & sectionIndex, const bool & entireOverlap )
+{
+	std::stringstream logName;
+	logName << "MPI_raster_world_" << _simulation.getId();
+	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " sendOverlapZones");
+	std::vector<int> neighborsToUpdate;
+	
+	for(int i=0; i<_neighbors.size(); i++)
+	{
+		if(needsToBeUpdated(_neighbors[i], sectionIndex))
+		{
+			neighborsToUpdate.push_back(_neighbors[i]);
+		}
+	}
+
+	for(RastersMap::iterator it=_dynamicRasters.begin(); it!=_dynamicRasters.end(); it++)
+	{
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " sending raster: " << it->first);
+		for(int i=0; i<neighborsToUpdate.size(); i++)
+		{
+			MpiOverlap * send = new MpiOverlap;
+			if(entireOverlap)
+			{
+				send->_overlap= getOverlap(neighborsToUpdate[i], sectionIndex);
+				log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " send entire overlap: " << send->_overlap << " to: " << neighborsToUpdate[i]);
+			}
+			else
+			{
+				send->_overlap = getInternalOverlap(neighborsToUpdate[i]);
+				log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " send partial overlap: " << send->_overlap << " to: " << neighborsToUpdate[i]);
+			}
+			const Rectangle<int> & overlapZone = send->_overlap;
+			send->_data.resize(overlapZone._size._x * overlapZone._size._y);
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " will send overlap to: " << neighborsToUpdate[i] << " with size: " << send->_data.size() << " and zone: " << overlapZone);
+			for(int n=0; n<send->_data.size(); n++)
+			{
+				Point2D<int> index(overlapZone._origin._x+n%overlapZone._size._x, overlapZone._origin._y+n/overlapZone._size._x);
+				send->_data.at(n) = getDynamicRaster(it->first).getValue(index);
+				log_EDEBUG(logName.str(), "\t" << getWallTime() << " step: " << _step << "/" << sectionIndex << " send index: " << index << " in global pos: " << index+_overlapBoundaries._origin << " value: " << send->_data.at(n));
+			}
+			MPI_Isend(&send->_data[0], send->_data.size(), MPI_INTEGER, neighborsToUpdate[i], eRasterData, MPI_COMM_WORLD, &send->_request);
+			_sendRequests.push_back(send);
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " raster: " << it->first << " data sent to: " << _neighbors[i]);
+		}
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " raster: " << it->first << " sent");
+	}
+	log_DEBUG(logName.str(), getWallTime() << " step: "  << "/" << sectionIndex << _step << " sendOverlapZones ended");
+}
+
+void World::sendMaxOverlapZones()
+{
+	std::stringstream logName;
+	logName << "MPI_raster_world_" << _simulation.getId();
+	log_DEBUG(logName.str(), getWallTime() << " step: "  << _step << " sendMaxOverlapZones");
+	for(RastersMap::iterator it=_dynamicRasters.begin(); it!=_dynamicRasters.end(); it++)
+	{
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sending max raster: " << it->first);
+		for(int i=0; i<_neighbors.size(); i++)
+		{
+			MpiOverlap * send = new MpiOverlap;
+			send->_overlap = getInternalOverlap(_neighbors[i]);
+			send->_data.resize(send->_overlap._size._x * send->_overlap._size._y);
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " will send max overlap of: " << it->first << " to: " << _neighbors[i] << " with size: " << send->_data.size() << " and zone: " << send->_overlap << " to " << _neighbors[i]);
+			const Rectangle<int> & overlapZone = send->_overlap;	
+			for(int n=0; n<send->_data.size(); n++)
+			{
+				Point2D<int> index(overlapZone._origin._x+n%overlapZone._size._x, overlapZone._origin._y+n/overlapZone._size._x);
+				send->_data.at(n) = getDynamicRaster(it->first).getMaxValueAt(index);
+				log_EDEBUG(logName.str(), "\t" << getWallTime() << " step: " << _step << " send index: " << index << " in global pos: " << index+_overlapBoundaries._origin << " max value: " << send->_data.at(n));
+			}
+			MPI_Isend(&send->_data[0], send->_data.size(), MPI_INTEGER, _neighbors[i], eRasterMaxData, MPI_COMM_WORLD, &send->_request);
+			_sendRequests.push_back(send);
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " raster: " << it->first << " max data sent to: " << _neighbors[i]);
+		}
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " raster: " << it->first << " max data sent");
+	}
+	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sendMaxOverlapZones ended");
+}
+
 void World::sendGhostAgents( const int & sectionIndex )
 {
 	std::stringstream logName;
@@ -392,150 +662,6 @@ void World::receiveGhostAgents( const int & sectionIndex )
 
 }
 
-void World::sendAgents( AgentsList & agentsToSend )
-{
-	if(_neighbors.size()==0)
-	{
-		return;
-	}
-	//TODO: es poden enviar missatges de forma no sincronitzada ni predestinada?
-	std::stringstream logName;
-	logName << "MPI_agents_world_" << _simulation.getId();
-	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sendAgent: " << agentsToSend.size() << " agents");
-
-	// for each neighbor, we send the number of agents to send
-	for(MpiFactory::TypesMap::iterator itType=MpiFactory::instance()->beginTypes(); itType!=MpiFactory::instance()->endTypes(); itType++)
-	{
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sendAgent - checking mpi type: " << itType->first );
-		// add each agent to the list of the neighbour where it will be sent
-		std::vector< AgentsList > agentsToNeighbors;
-		agentsToNeighbors.resize(_neighbors.size());
-
-
-		for(AgentsList::iterator it=agentsToSend.begin(); it!=agentsToSend.end(); it++)
-		{
-			Agent * agent = (*it);
-			if(agent->isType(itType->first))
-			{
-				int newID = getIdFromPosition(agent->getPosition());
-				agentsToNeighbors[getNeighborIndex(newID)].push_back(agent);
-			}
-		}
-
-		MPI_Datatype * agentType = itType->second;
-		for(int i=0; i<_neighbors.size(); i++)
-		{	
-			int numAgents = agentsToNeighbors[i].size();
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sendAgent - sending num agents: " << numAgents << " to: " << _neighbors[i]);
-			int error = MPI_Send(&numAgents, 1, MPI_INTEGER, _neighbors[i], eNumAgents, MPI_COMM_WORLD);
-			if(error != MPI_SUCCESS)
-			{
-				std::stringstream oss;
-				oss << "World::sendAgents - " << _simulation.getId() << " error in MPI_Send : " << error;
-				throw Exception(oss.str());
-			}
-			AgentsList::iterator it= agentsToNeighbors[i].begin();
-			while(it!=agentsToNeighbors[i].end())
-			{
-				Agent * agent = *it;
-				void * package = agent->fillPackage();
-				log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sendAgent - sending agent: " << *it << " to: " << _neighbors[i] );
-				error = MPI_Send(package, 1, *agentType, _neighbors[i], eAgent, MPI_COMM_WORLD);
-				delete package;
-				if(error != MPI_SUCCESS)
-				{
-					std::stringstream oss;
-					oss << "World::sendAgents - " << _simulation.getId() << " error in MPI_Send : " << error;
-					throw Exception(oss.str());
-				}
-				agent->sendVectorAttributes(_neighbors[i]);
-				// it is not deleted, as it is sent to overlap list
-				it = agentsToNeighbors[i].erase(it);
-			}
-		}
-	}
-	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sendAgent -  end checking agents to send: " << agentsToSend.size());
-}
-
-void World::sendOverlapZones( const int & sectionIndex, const bool & entireOverlap )
-{
-	std::stringstream logName;
-	logName << "MPI_raster_world_" << _simulation.getId();
-	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " sendOverlapZones");
-	std::vector<int> neighborsToUpdate;
-	
-	for(int i=0; i<_neighbors.size(); i++)
-	{
-		if(needsToBeUpdated(_neighbors[i], sectionIndex))
-		{
-			neighborsToUpdate.push_back(_neighbors[i]);
-		}
-	}
-
-	for(RastersMap::iterator it=_dynamicRasters.begin(); it!=_dynamicRasters.end(); it++)
-	{
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " sending raster: " << it->first);
-		for(int i=0; i<neighborsToUpdate.size(); i++)
-		{
-			MpiOverlap * send = new MpiOverlap;
-			if(entireOverlap)
-			{
-				send->_overlap= getOverlap(neighborsToUpdate[i], sectionIndex);
-				log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " send entire overlap: " << send->_overlap << " to: " << neighborsToUpdate[i]);
-			}
-			else
-			{
-				send->_overlap = getInternalOverlap(neighborsToUpdate[i]);
-				log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " send partial overlap: " << send->_overlap << " to: " << neighborsToUpdate[i]);
-			}
-			const Rectangle<int> & overlapZone = send->_overlap;
-			send->_data.resize(overlapZone._size._x * overlapZone._size._y);
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " will send overlap to: " << neighborsToUpdate[i] << " with size: " << send->_data.size() << " and zone: " << overlapZone);
-			for(int n=0; n<send->_data.size(); n++)
-			{
-				Point2D<int> index(overlapZone._origin._x+n%overlapZone._size._x, overlapZone._origin._y+n/overlapZone._size._x);
-				send->_data.at(n) = getDynamicRaster(it->first).getValue(index);
-				log_EDEBUG(logName.str(), "\t" << getWallTime() << " step: " << _step << "/" << sectionIndex << " send index: " << index << " in global pos: " << index+_overlapBoundaries._origin << " value: " << send->_data.at(n));
-			}
-			MPI_Isend(&send->_data[0], send->_data.size(), MPI_INTEGER, neighborsToUpdate[i], eRasterData, MPI_COMM_WORLD, &send->_request);
-			_sendRequests.push_back(send);
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " raster: " << it->first << " data sent to: " << _neighbors[i]);
-		}
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " raster: " << it->first << " sent");
-	}
-	log_DEBUG(logName.str(), getWallTime() << " step: "  << "/" << sectionIndex << _step << " sendOverlapZones ended");
-}
-
-void World::sendMaxOverlapZones()
-{
-	std::stringstream logName;
-	logName << "MPI_raster_world_" << _simulation.getId();
-	log_DEBUG(logName.str(), getWallTime() << " step: "  << _step << " sendMaxOverlapZones");
-	for(RastersMap::iterator it=_dynamicRasters.begin(); it!=_dynamicRasters.end(); it++)
-	{
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sending max raster: " << it->first);
-		for(int i=0; i<_neighbors.size(); i++)
-		{
-			MpiOverlap * send = new MpiOverlap;
-			send->_overlap = getInternalOverlap(_neighbors[i]);
-			send->_data.resize(send->_overlap._size._x * send->_overlap._size._y);
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " will send max overlap of: " << it->first << " to: " << _neighbors[i] << " with size: " << send->_data.size() << " and zone: " << send->_overlap << " to " << _neighbors[i]);
-			const Rectangle<int> & overlapZone = send->_overlap;	
-			for(int n=0; n<send->_data.size(); n++)
-			{
-				Point2D<int> index(overlapZone._origin._x+n%overlapZone._size._x, overlapZone._origin._y+n/overlapZone._size._x);
-				send->_data.at(n) = getDynamicRaster(it->first).getMaxValueAt(index);
-				log_EDEBUG(logName.str(), "\t" << getWallTime() << " step: " << _step << " send index: " << index << " in global pos: " << index+_overlapBoundaries._origin << " max value: " << send->_data.at(n));
-			}
-			MPI_Isend(&send->_data[0], send->_data.size(), MPI_INTEGER, _neighbors[i], eRasterMaxData, MPI_COMM_WORLD, &send->_request);
-			_sendRequests.push_back(send);
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " raster: " << it->first << " max data sent to: " << _neighbors[i]);
-		}
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " raster: " << it->first << " max data sent");
-	}
-	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sendMaxOverlapZones ended");
-}
-
 void World::receiveAgents( const int & sectionIndex )
 {
 	std::stringstream logName;
@@ -670,7 +796,7 @@ void World::clearRequests( bool updateMaxValues )
 			if(finished)
 			{
 				it = _sendRequests.erase(it);
-				log_DEBUG(logName.str(), getWallTime() - _initialTime<< " request finished, lacking: " << _sendRequests.size() << " requests");
+				log_DEBUG(logName.str(), getWallTime() << " request finished, lacking: " << _sendRequests.size() << " requests");
 				delete send;
 			}
 		}
@@ -688,10 +814,10 @@ void World::clearRequests( bool updateMaxValues )
 			if(finished)
 			{
 				it = _receiveRequests.erase(it);
-				log_DEBUG(logName.str(), getWallTime() - _initialTime<< " receive request finished, lacking: " << _receiveRequests.size() << " requests");
+				log_DEBUG(logName.str(), getWallTime() << " receive request finished, lacking: " << _receiveRequests.size() << " requests");
 
 				const Rectangle<int> & overlapZone = receive->_overlap;
-				log_DEBUG(logName.str(), getWallTime() - _initialTime<< " processing request for overlap: " << overlapZone << " raster: " << receive->_rasterName << " for max values");
+				log_DEBUG(logName.str(), getWallTime() << " processing request for overlap: " << overlapZone << " raster: " << receive->_rasterName << " for max values");
 				for(int i=0; i<receive->_data.size(); i++)
 				{
 					Point2D<int> index(overlapZone._origin._x+i%overlapZone._size._x, overlapZone._origin._y+i/overlapZone._size._x);
@@ -709,11 +835,11 @@ void World::clearRequests( bool updateMaxValues )
 
 				if(updateMaxValues)
 				{
-					log_DEBUG(logName.str(), getWallTime() - _initialTime<< " receive request finished for max values of raster: " <<  receive->_rasterName);
+					log_DEBUG(logName.str(), getWallTime() << " receive request finished for max values of raster: " <<  receive->_rasterName);
 				}
 				else
 				{
-					log_DEBUG(logName.str(), getWallTime() - _initialTime<< " receive request finished for current values of raster: " <<  receive->_rasterName);
+					log_DEBUG(logName.str(), getWallTime() << " receive request finished for current values of raster: " <<  receive->_rasterName);
 				}
 				delete receive;
 			}
@@ -723,125 +849,6 @@ void World::clearRequests( bool updateMaxValues )
 }
 
 #endif
-
-void World::addAgent( Agent * agent )
-{
-	agent->setWorld(this);
-	// we need to remove any previous instance of this agent in overlap
-
-	AgentsList::iterator it = getGhostAgent(agent->getId());
-	if(it!=_overlapAgents.end())
-	{
-		_overlapAgents.erase(it);
-	}
-	_agents.push_back(agent);	
-	
-	std::stringstream logName;
-	logName << "agents_" << getId() << "_" << agent->getId();
-	log_EDEBUG( logName.str(), "agent: " << agent << " added at time step: " << getCurrentTimeStep());
-}
-
-void World::stepSection( const int & sectionIndex )
-{
-	std::stringstream logName;
-	logName << "simulation_" << _simulation.getId();
-
-	log_DEBUG(logName.str(), getWallTime() << " beginning step: " << _step << " section: " << sectionIndex);
-
-	// first of all we will execute raster rules for the zone where stepSection is executed
-	stepRastersSection(sectionIndex, _sections[sectionIndex]);
-
-	//std::cout << _simulation.getId() << " executing section: " << sectionIndex << " in step: " << _step << " with zone: " << _sections[sectionIndex] << std::endl;
-	AgentsList::iterator it=_agents.begin();
-	std::vector<Agent*> agentsToExecute;
-	// we have to randomize the execution of agents in a given section index
-	while(it!=_agents.end())
-	{
-		Agent * agent = *it;
-		if(_sections[sectionIndex].isInside(agent->getPosition()) && !hasBeenExecuted(agent))
-		{
-			agentsToExecute.push_back(agent);
-		}
-		it++;
-	}
-	std::random_shuffle(agentsToExecute.begin(), agentsToExecute.end());
-	int numExecutedAgents = 0;
-	AgentsList agentsToSend;
-
-	// plan actions 
-	#pragma omp parallel for
-	for(int i=0; i<agentsToExecute.size(); i++)
-	{
-		Agent * agent = agentsToExecute[i];
-		//Agent * agent = *it;
-		if(_sections[sectionIndex].isInside(agent->getPosition()) && !hasBeenExecuted(agent))
-		{
-			agent->logAgentState();
-			agent->updateKnowledge();
-			agent->selectActions();
-		}
-	}
-
-	// execute actions
-	for(int i=0; i<agentsToExecute.size(); i++)
-	{
-		Agent * agent = agentsToExecute.at(i);
-		if(_sections[sectionIndex].isInside(agent->getPosition()) && !hasBeenExecuted(agent))
-		{
-			log_DEBUG(logName.str(), getWallTime() << " agent: " << agent << " being executed at index: " << sectionIndex << " of task: "<< _simulation.getId() << " in step: " << _step );
-			agent->executeActions();
-			agent->updateState();
-			log_DEBUG(logName.str(), getWallTime() << " agent: " << agent << " has been executed at index: " << sectionIndex << " of task: "<< _simulation.getId() << " in step: " << _step );
-
-#ifdef PANDORAMPI
-			if(!_boundaries.isInside(agent->getPosition()) && !willBeRemoved(agent))
-			{
-				log_DEBUG(logName.str(), getWallTime() << " migrating agent: " << agent << " being executed at index: " << sectionIndex << " of task: "<< _simulation.getId() );
-				agentsToSend.push_back(agent);
-
-				// the agent is no longer property of this world
-				AgentsList::iterator itErase  = getOwnedAgent(agent->getId());
-				// it will be deleted
-				_agents.erase(itErase);
-				_overlapAgents.push_back(agent);
-				log_DEBUG(logName.str(), getWallTime() <<  "putting agent: " << agent << " to overlap");
-			}
-			else
-			{
-				log_DEBUG(logName.str(), getWallTime() << " finished agent: " << agent);
-			}
-#endif
-			_executedAgentsHash.insert(make_pair(agent->getId(), agent));
-			numExecutedAgents++;
-			log_DEBUG(logName.str(), getWallTime()  << " num executed agents: " << numExecutedAgents );
-		}
-	}
-
-#ifdef PANDORAMPI
-	log_DEBUG(logName.str(), getWallTime()  << " sending agents in section: " << sectionIndex << " and step: " << _step);
-	sendAgents(agentsToSend);
-#endif	
-	log_DEBUG(logName.str(), getWallTime() << " has finished section: " << sectionIndex << " and step: " << _step);
-	log_DEBUG(logName.str(), getWallTime() << " executed step: " << _step << " section: " << sectionIndex << " in zone: " << _sections[sectionIndex] << " with num executed agents: " << numExecutedAgents << " total agents: " << _agents.size() << " and overlap agents: " << _overlapAgents.size());
-}
-
-void World::serializeAgents()
-{
-	AgentsList::iterator it=_agents.begin();
-	int i = 0;
-	while(it!=_agents.end())
-	{
-		if((*it)->exists())
-		{
-			GeneralState::serializer().serializeAgent((*it), _step, *this, i);
-			i++;
-		}
-		it++;
-	}
-	// serialize remaining agents
-	GeneralState::serializer().finishAgentsSerialization(_step, *this);
-}
-
 
 int World::getIdFromPosition( const Point2D<int> & position )
 {
@@ -889,7 +896,6 @@ void World::step()
 	// TODO the same with raster modification?
 	stepEnvironment();
 	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " has executed step environment");
-
 #ifdef PANDORAMPI
 	for(int sectionIndex=0; sectionIndex<4; sectionIndex++)
 	{
@@ -900,7 +906,6 @@ void World::step()
 	}
 	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " has executed update overlap");
 #endif
-
 	_executedAgentsHash.clear();
 
 	std::stringstream logNameMpi;
@@ -910,7 +915,6 @@ void World::step()
 	for(int sectionIndex=0; sectionIndex<4; sectionIndex++)
 	{
 		stepSection(sectionIndex);
-
 #ifdef PANDORAMPI
 		log_DEBUG(logNameMpi.str(), getWallTime() << " executing step: " << _step << " and section: " << sectionIndex << " has been executed");
 		receiveAgents(sectionIndex);
@@ -925,16 +929,14 @@ void World::step()
 		log_DEBUG(logNameMpi.str(), getWallTime() << " executing step: " << _step << " and section: " << sectionIndex << " sent overlap");
 		receiveOverlapData(sectionIndex);
 		log_DEBUG(logNameMpi.str(), getWallTime() << " executing step: " << _step << " and section: " << sectionIndex << " received overlap" );
-
 		//MPI_Barrier(MPI_COMM_WORLD);
 #endif
 	}
 
 	removeAgents();
-	log_INFO(logName.str(), getWallTime() - _initialTime<< " - world at pos: " << _worldPos << " finished step: " << _step);
-	log_DEBUG(logNameMpi.str(), getWallTime() - _initialTime<< " - world at pos: " << _worldPos << " finished step: " << _step);
+	log_INFO(logName.str(), getWallTime() << " - world at pos: " << _worldPos << " finished step: " << _step);
+	log_DEBUG(logNameMpi.str(), getWallTime() << " - world at pos: " << _worldPos << " finished step: " << _step);
 }
-
 
 void World::run()
 {
@@ -966,8 +968,7 @@ void World::run()
 		sendGhostAgents(sectionIndex);
 		receiveGhostAgents(sectionIndex);
 	}
-#endif	
-
+#endif
 	for(_step=0; _step<_simulation.getNumSteps(); _step++)
 	{
 		step();
@@ -977,7 +978,7 @@ void World::run()
 	serializeAgents();
 	
 	log_INFO(logName.str(), getWallTime() << " closing files");
-	GeneralState::serializer().finish();
+	//GeneralState::serializer().finish();
 #ifdef PANDORAMPI
 	MpiFactory::instance()->cleanTypes();
 	MPI_Finalize();
@@ -1069,7 +1070,7 @@ void World::serializeRasters()
 	{
 		if(rasterToSerialize(it->first))
 		{
-			GeneralState::serializer().serializeRaster(it->first, it->second, *this, _step);
+			//GeneralState::serializer().serializeRaster(it->first, it->second, *this, _step);
 		}
 	}
 }
@@ -1080,7 +1081,7 @@ void World::serializeStaticRasters()
 	{
 		if(rasterToSerialize(it->first))
 		{
-			GeneralState::serializer().serializeStaticRaster(it->first, it->second, *this);
+			//GeneralState::serializer().serializeStaticRaster(it->first, it->second, *this);
 		}
 	}
 }

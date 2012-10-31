@@ -31,7 +31,7 @@
 
 #include <vector>
 #include <gdal_priv.h>
-#include <hdf5.h>
+//#include <hdf5.h>
 
 extern "C" 
 {
@@ -110,11 +110,8 @@ void RasterLoader::fillGDALRaster( StaticRaster & raster, const std::string & fi
 		{
 			Point2D<int> index2(index - overlapBoundaries._origin);
 			log_EDEBUG(logName.str(), "index: " << index << " and index2: " << index2 << " accessing to: " << overlapBoundaries._size._x*index2._y+index2._x);
-			int value = (int)(pafScanline[overlapBoundaries._size._x*index2._y+index2._x]);
-			log_EDEBUG(logName.str(), "value: " << value);
-
 			raster._values[index2._x][index2._y] = (int)(pafScanline[overlapBoundaries._size._x*index2._y+index2._x]);
-			log_EDEBUG(logName.str(), "value in index2: " << index2 << " is: " << value);
+			log_EDEBUG(logName.str(), "value in index2: " << index2 << " is: " << (int)(pafScanline[overlapBoundaries._size._x*index2._y+index2._x]));
 		}
 	}
 
@@ -136,6 +133,7 @@ void RasterLoader::fillGDALRaster( StaticRaster & raster, const std::string & fi
 
 void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fileName, const std::string & rasterName, World * world )
 {
+	/*
 	std::stringstream logName;
 	if(world)
 	{
@@ -222,6 +220,7 @@ void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fi
 		dynamicRaster->updateCurrentMinMaxValues();
 	}
 	log_DEBUG(logName.str(), "file: " << fileName << " rasterName: " << rasterName << " loaded");
+	*/
 }
 
 void RasterLoader::fillGrassCellRaster( StaticRaster & raster, const std::string & rasterName, World * world )

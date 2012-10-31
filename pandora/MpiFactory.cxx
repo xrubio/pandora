@@ -20,6 +20,7 @@
  * 
  */
 
+#ifdef PANDORAMPI
 #include <MpiFactory.hxx>
 
 namespace Engine
@@ -65,3 +66,4 @@ MpiFactory::TypesMap::iterator MpiFactory::endTypes()
 
 } // namespace Engine
 
+#endif // PANDORAMPI
