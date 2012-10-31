@@ -40,16 +40,25 @@ public:
 
 	void serialize(){}
 
-	// MPI Script Generated code
-	AgroPastoralist( void * );
-	void * fillPackage();
-	void sendVectorAttributes( int target );
-	void receiveVectorAttributes( int target );
-
 	void	setMaxCropHomeDistance( int v ) { _maxCropHomeDistance = v; }
 	int	getMaxCropHomeDistance() const { return _maxCropHomeDistance; }
 	bool	isColdDrySeason();
 	CultivatedField& getCultivatedField() { return *_cultivatedField; }
+
+	////////////////////////////////////////////////
+	// This code has been automatically generated //
+	/////// Please do not modify it ////////////////
+	////////////////////////////////////////////////
+#ifdef PANDORAMPI
+	AgroPastoralist( void * );
+	void * fillPackage();
+	void sendVectorAttributes(int);
+	void receiveVectorAttributes(int);
+#endif // PANDORAMPI
+	////////////////////////////////////////////////
+	//////// End of generated code /////////////////
+	////////////////////////////////////////////////
+
 };
 
 } // namespace Gujarat

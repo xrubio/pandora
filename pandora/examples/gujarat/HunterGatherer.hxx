@@ -51,12 +51,20 @@ public:
 	
 	void serialize();
 	void registerAttributes();
-	
-	// MPI Script Generated code
+
+	////////////////////////////////////////////////
+	// This code has been automatically generated //
+	/////// Please do not modify it ////////////////
+	////////////////////////////////////////////////
+#ifdef PANDORAMPI
 	HunterGatherer( void * );
 	void * fillPackage();
-	void sendVectorAttributes( int target );
-	void receiveVectorAttributes( int target );
+	void sendVectorAttributes(int);
+	void receiveVectorAttributes(int);
+#endif // PANDORAMPI
+	////////////////////////////////////////////////
+	//////// End of generated code /////////////////
+	////////////////////////////////////////////////
 
 };
 

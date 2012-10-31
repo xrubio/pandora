@@ -1,9 +1,8 @@
 
-#include <GujaratConfig.hxx>
 #include <GujaratWorld.hxx>
+#include <GujaratConfig.hxx>
 #include <Simulation.hxx>
 #include <Exceptions.hxx>
-
 #include <iostream>
 #include <cstdlib>
 

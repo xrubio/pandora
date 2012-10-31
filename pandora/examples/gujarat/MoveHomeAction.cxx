@@ -176,7 +176,7 @@ void MoveHomeAction::executeMDP( const GujaratAgent& agent, const HunterGatherer
 	//std::cout << "MOVE HOME" << std::endl;
 	_forageAction->executeMDP(agent, s, sp);
 	sp.setLocation( _newHomeLoc );
-	std::cout << "executeMDP- time index: " << s.getTimeIndex() << " MoveHomeAction from loc->resources: " << s.getLocation() << " -> " << s.getOnHandResources() << " to: " << sp.getLocation() << " -> " << sp.getOnHandResources() << " days starving: " << s.getDaysStarving() << std::endl;
+	//std::cout << "executeMDP- time index: " << s.getTimeIndex() << " MoveHomeAction from loc->resources: " << s.getLocation() << " -> " << s.getOnHandResources() << " to: " << sp.getLocation() << " -> " << sp.getOnHandResources() << " days starving: " << s.getDaysStarving() << std::endl;
 }
 
 int MoveHomeAction::getTimeNeeded() const

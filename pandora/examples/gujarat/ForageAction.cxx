@@ -192,7 +192,7 @@ void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>
 	doWalk( agent, nearest, maxDist, sp.getResourcesRaster(), collected );
 
 	sp.addResources( agent.convertBiomassToCalories(collected));
-	std::cout << "executeMDP - time index: " << s.getTimeIndex() << " ForageAction with full pop: " << _useFullPopulation << " from area with max biomass: " << _forageArea->getBiomassAmount() << " loc->resources: " << s.getLocation() << " -> " << s.getOnHandResources() << " to: " << sp.getLocation() << " -> " << sp.getOnHandResources() << " days starving: " << s.getDaysStarving() << std::endl;
+	//std::cout << "executeMDP - time index: " << s.getTimeIndex() << " ForageAction with full pop: " << _useFullPopulation << " from area with max biomass: " << _forageArea->getBiomassAmount() << " loc->resources: " << s.getLocation() << " -> " << s.getOnHandResources() << " to: " << sp.getLocation() << " -> " << sp.getOnHandResources() << " days starving: " << s.getDaysStarving() << std::endl;
 }
 
 void ForageAction::setFullPopulation( bool useFullPopulation )

@@ -10,7 +10,7 @@ namespace Gujarat
 {
 
 GujaratConfig::GujaratConfig() 
-	: _size(0), _soilFile("soil file not loaded"), _demFile("dem file not loaded"), _distWaterFile("distance to water file not loaded"), _weightWaterFile("weight to water file not loaded"), _climateSeed(1), _hunterGathererController( "Rule-Based" ), _hgInitializer(0), _apInitializer(0), _controllerConfig(0)
+	: _size(0), _soilFile("soil file not loaded"), _demFile("dem file not loaded"), _distWaterFile("distance to water file not loaded"), _weightWaterFile("weight to water file not loaded"), _climateSeed(1), _hunterGathererController( "Rule-Based" ), _hgInitializer(0), _apInitializer(0), _controllerConfig(0), _numHG(0), _numAP(0)
 {
 }
   
