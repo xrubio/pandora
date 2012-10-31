@@ -136,6 +136,7 @@ def createFactoryMethods( listAgents, factoryFile, namespaces, listAttributesMap
 	print '\tcreating mpi factory: ' + factoryFile
 	# headers
 	f.write('\n')
+	f.write('#ifdef PANDORAMPI\n')	
 	f.write('#include <MpiFactory.hxx>\n')
 	f.write('#include <Exceptions.hxx>\n')
 	f.write('#include <sstream>\n')
@@ -158,6 +159,7 @@ def createFactoryMethods( listAgents, factoryFile, namespaces, listAttributesMap
 
 	# close header & namespace
 	f.write('} // namespace Engine\n')	
+	f.write('#endif // PANDORAMPI\n')
 	f.write('\n')	
 	f.close()
 	return None
@@ -167,6 +169,7 @@ def createMpiHeader( agentName, source, header, attributesMap ):
 	f = open('mpiCode/'+agentName+'_mpi.hxx', 'w')
 	# header
 	f.write('\n')
+	f.write('#ifdef PANDORAMPI\n')	
 	f.write('#ifndef __'+agentName+'_mpi_hxx\n')
 	f.write('#define __'+agentName+'_mpi_hxx\n')
 	f.write('\n')
@@ -191,6 +194,7 @@ def createMpiHeader( agentName, source, header, attributesMap ):
 	# close file
 	f.write('\n')
 	f.write('#endif // __'+agentName+'_mpi_hxx\n')
+	f.write('#endif // PANDORAMPI\n')
 	f.write('\n')
 	f.close()
 	return None
@@ -276,6 +280,7 @@ def createMpiCode( agentName, source, header, namespace, parent, attributesMap, 
 	f = open('mpiCode/'+agentName+'_mpi.cxx', 'w')
 	# header
 	f.write('\n')
+	f.write('#ifdef PANDORAMPI\n')	
 	f.write('#include "'+agentName+'_mpi.hxx"\n')
 	f.write('#include <'+agentName+'.hxx>\n')
 	f.write('#include <cstring>\n')
@@ -288,6 +293,7 @@ def createMpiCode( agentName, source, header, namespace, parent, attributesMap, 
 	writeConstructor( f, agentName, parent, attributesMap )
 	writeVectorAttributesPassing( f, agentName, vectorAttributesMap );
 	f.write('} // namespace '+namespace+'\n')
+	f.write('#endif // PANDORAMPI\n')
 	f.write('\n')
 	f.close()
 	return None
@@ -388,10 +394,12 @@ def checkHeader(agentName, headerName):
 			fTmp.write('\t// This code has been automatically generated //\n')
 			fTmp.write('\t/////// Please do not modify it ////////////////\n')
 			fTmp.write('\t////////////////////////////////////////////////\n')
+			fTmp.write('#ifdef PANDORAMPI\n')	
 			fTmp.write('\t'+agentName+'( void * );\n')
 			fTmp.write('\tvoid * fillPackage();\n')
 			fTmp.write('\tvoid sendVectorAttributes(int);\n')
 			fTmp.write('\tvoid receiveVectorAttributes(int);\n')
+			fTmp.write('#endif // PANDORAMPI\n')
 			fTmp.write('\t////////////////////////////////////////////////\n')
 			fTmp.write('\t//////// End of generated code /////////////////\n')
 			fTmp.write('\t////////////////////////////////////////////////\n')
