@@ -126,7 +126,8 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 	}	
 	std::random_shuffle( validActionSectors.begin(), validActionSectors.end() );
 	std::sort( validActionSectors.begin(), validActionSectors.end(), SectorBestFirstSortPtrVecPredicate() );
-	if ( _config.getNumberForageActions() >= validActionSectors.size() )
+	int forageActions = _config.getNumberForageActions();
+	if ( forageActions >= validActionSectors.size() )
 	{
 		for ( unsigned i = 0; i < validActionSectors.size(); i++ )
 		{
@@ -135,9 +136,9 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 	}
 	else
 	{
-		for ( unsigned i = 0; i < _config.getNumberForageActions(); i++ )
+		for ( unsigned i = 0; i < forageActions; i++ )
 			s.addAction( new ForageAction( validActionSectors[i], true ) );
-		for ( unsigned i = _config.getNumberForageActions(); i < validActionSectors.size(); i++ )
+		for ( unsigned i = forageActions; i < validActionSectors.size(); i++ )
 			delete validActionSectors[i];
 	}
 	//std::cout << "number of valid forage actions: " << s.numAvailableActions() << " for number of valid sectors: " << validActionSectors.size() << std::endl;
@@ -145,17 +146,17 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 	// Make Move Home
 	std::vector< MoveHomeAction* > possibleMoveHomeActions;
 	MoveHomeAction::generatePossibleActions( agentRef(), s.getLocation(), possibleMoveHomeActions );
-
-	if ( _config.getNumberMoveHomeActions() >=  possibleMoveHomeActions.size() )
+	int moveHomeActions =  _config.getNumberMoveHomeActions();
+	if (  moveHomeActions >=  possibleMoveHomeActions.size() )
 	{
 		for ( unsigned i = 0; i < possibleMoveHomeActions.size(); i++ )
 			s.addAction( possibleMoveHomeActions[i] );
 	}
 	else
 	{
-		for ( unsigned i = 0; i < _config.getNumberMoveHomeActions(); i++ )
+		for ( unsigned i = 0; i <  moveHomeActions; i++ )
 			s.addAction( possibleMoveHomeActions[i] );
-		for ( unsigned i = _config.getNumberMoveHomeActions(); i < possibleMoveHomeActions.size(); i++ )
+		for ( unsigned i =  moveHomeActions(); i < possibleMoveHomeActions.size(); i++ )
 			delete possibleMoveHomeActions[i];
 	}
 	assert( s.numAvailableActions() > 0 );
