@@ -35,7 +35,7 @@ mpich2
 scons
 
 You can install all of them with this command:
-$ sudo apt-get install libtinyxml-dev libdevil-dev freeglut3-dev libqwt-dev libqwt6 libqt4-dev grass grass-dev libgdal1-dev mpich2 scons libboost1.48-all-dev build-essential
+$ sudo apt-get install libtinyxml-dev libdevil-dev freeglut3-dev libqwt-dev libqwt6 libqt4-dev grass grass-dev libgdal1-dev mpich2 scons build-essential libboost-random-dev libboost-python-dev libboost-filesystem-dev libboost-system-dev
 
 - Compiling HDF5
 Ubuntu dependencies forces you to install the serial version of HDF5 as grass dependency. For this reason, we will need to download, compile and install hdf5.
@@ -43,14 +43,14 @@ Ubuntu dependencies forces you to install the serial version of HDF5 as grass de
 		$ cd ~/
 		$ mkdir hdf5
 		$ cd hdf5
-		$ wget "http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.9.tar.bz2"
+		$ wget "http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.10.tar.bz2"
 
 	* Unzip the file:
-		$ tar jxvf hdf5-1.8.9.tar.bz2
+		$ tar jxvf hdf5-1.8.10.tar.bz2
 
 	* configure the library:
-		$ cd hdf5-1.8.9
-		$ ./configure --enable-parallel --prefix=/usr/local/hdf5
+		$ cd hdf5-1.8.10
+		$ ./configure --enable-parallel --prefix=/usr/local/hdf5 --disable-shared --with-pic
 		(if you want more information type ./configure --help)
 
 	* compile and install:
