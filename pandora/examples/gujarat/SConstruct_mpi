@@ -1,20 +1,17 @@
 nameProgram = 'gujarat'
 
-agents = ['HunterGatherer','AgroPastoralist']
-namespaceAgents = ['Gujarat','Gujarat']
+#agents = ['HunterGatherer','AgroPastoralist']
+agents = ['HunterGatherer']
+#namespaceAgents = ['Gujarat','Gujarat']
+namespaceAgents = ['Gujarat']
 
-srcFiles = Split("""
-main.cxx GujaratWorld.cxx GujaratConfig.cxx 
-Climate.cxx GujaratAgent.cxx AgroPastoralist.cxx 
-HunterGatherer.cxx MDPAction.cxx MoveHomeAction.cxx 
-CultivatedField.cxx Sector.cxx ForageAction.cxx
-SettlementAreas.cxx HunterGathererMDPConfig.cxx 
-HunterGathererMDPState.cxx HunterGathererMDPModel.cxx DoNothingAction.cxx 
-AgentController.cxx HunterGathererProgrammedController.cxx HunterGathererDecisionTreeController.cxx 
-HunterGathererMDPController.cxx GujaratDemographics.cxx OriginalDemographics.cxx 
-CaloricRequirementsTable.cxx AgentInitializer.cxx
-FixedAgentInitializer.cxx EstablishPlotAction.cxx SowAction.cxx HarvestAction.cxx MaintainPlotAction.cxx APMoveHomeAction.cxx
-GujaratState.cxx""" )
+srcFiles = Split('main.cxx GujaratWorld.cxx GujaratConfig.cxx Climate.cxx GujaratAgent.cxx HunterGatherer.cxx MDPAction.cxx MoveHomeAction.cxx Sector.cxx ForageAction.cxx SettlementAreas.cxx HunterGathererMDPConfig.cxx HunterGathererMDPState.cxx HunterGathererMDPModel.cxx DoNothingAction.cxx AgentController.cxx HunterGathererProgrammedController.cxx HunterGathererDecisionTreeController.cxx HunterGathererMDPController.cxx GujaratDemographics.cxx OriginalDemographics.cxx CaloricRequirementsTable.cxx GujaratState.cxx')
+
+# APFiles = Split('APMoveHomeAction.cxx EstablishPlotAction.cxx SowAction.cxx HarvestAction.cxx MaintainPlotAction.cxx CultivatedField.cxx AgroPastoralist.cxx') 
+
+libFiles = Split('../../World.cxx ../../Agent.cxx ../../Simulation.cxx ../../LoggerBase.cxx ../../Raster.cxx ../../StaticRaster.cxx ../../Statistics.cxx ../../IncrementalRaster.cxx ../../Config.cxx ../../RasterLoader.cxx ../../GeneralState.cxx ../../Action.cxx ../../ShpLoader.cxx')
+
+srcFiles += libFiles
 
 
 import os, sys
@@ -37,12 +34,12 @@ generateMPICodeBuilder = Builder(action=generateMpi.execute)
 env.Append( BUILDERS = {'GenerateMPICode' : generateMPICodeBuilder})
 
 linkFlags = Split('-fopenmp')
-libs = Split('tinyxml pthread grass_gis grass_datetime')
+libs = Split('tinyxml gdal pthread grass_gis grass_datetime boost_filesystem boost_system')
 if int(release) == 0:
 	env['CCFLAGS'] = Split('-g -O0 -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG')
 	if int(extremeDebug)==1:
 		env['CCFLAGS'] += ['-DPANDORAEDEBUG']
-	libs += ['pandorad']
+#	libs += ['pandorad']
 else:
 	env['CCFLAGS'] = Split('-O3 -DTIXML_USE_STL -fopenmp')
 	libs += ['pandora']
@@ -64,8 +61,6 @@ if int(mareNostrum)==1:
 	libDirs += ['/gpfs/apps/BOOST/1_48_0/lib/']
 	libs += ['gpfs']
 	libs += ['xl']
-	libs += ['boost_filesystem']
-	libs += ['boost_system']
 else:
 	includeDirs += ['/usr/local/include','/usr/local/hdf5/include','/usr/lib/grass64/include/','/usr/include/gdal/']
 	libDirs = Split('../../ /usr/local/lib /usr/local/hdf5/lib/ /usr/lib/grass64/lib/')
