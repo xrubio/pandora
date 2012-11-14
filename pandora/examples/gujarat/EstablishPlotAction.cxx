@@ -49,8 +49,7 @@ void EstablishPlotAction::generatePossibleActions( GujaratAgent& agentRef, std::
 			if( world->getOverlapBoundaries().isInside(newPosition) 
 				&& world->checkPosition(newPosition))
 			{
-				if ( world->isInterdune( newPosition )
-					&& world->isWild( newPosition ) )
+				if ( world->getValue(eSoils, newPosition) == INTERDUNE && world->getValue(eResourceType, newPosition)==WILD )
 					actions.push_back(new EstablishPlotAction( newPosition ) );
 			}
 		}

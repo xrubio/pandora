@@ -59,6 +59,7 @@ class Agent;
 #ifdef PANDORAMPI
 struct MpiOverlap
 {
+	// TODO move from string to index
 	std::string _rasterName;
 	std::vector<int> _data;
 	Rectangle<int> _overlap;
@@ -69,8 +70,8 @@ struct MpiOverlap
 class World
 {
 public:
-	typedef std::map< std::string, StaticRaster > StaticRastersMap;
-	typedef std::map< std::string, Raster > RastersMap;
+	typedef std::map< std::string, int> RasterNameMap;
+
 	typedef std::list< Agent* > AgentsList;
 	typedef std::vector< Agent* > AgentsVector;
 protected:		
@@ -123,7 +124,7 @@ protected:
 
 	//! provides a random valid position inside boundaries
 	Point2D<int> getRandomPosition();
-
+	const std::string & getRasterName( const int & index ) const;
 #ifdef PANDORAMPI
 	std::list<MpiOverlap*> _sendRequests;
 	std::list<MpiOverlap*> _receiveRequests;
@@ -167,13 +168,15 @@ protected:
 	void stablishPosition();
 
 	// rasters that won't change values during the simulation
-	StaticRastersMap _staticRasters;
-	//! map of all the dynamic rasters used by the simulation
-	RastersMap _dynamicRasters;
-	std::list<std::string> _rastersToSerialize;
+	std::map<std::string, int> _rasterNames;
+	std::vector<StaticRaster * > _rasters;	
+	// true if the raster is dynamic
+	std::vector<bool> _dynamicRasters;
+	std::vector<bool> _serializeRasters;
 
 	//! stub method for grow resource to max of initialrasters, used by children of world at init time
 	void updateRasterToMaxValues( const std::string & key );
+	void updateRasterToMaxValues( const int & index );
 	
 	//! define original position of world, given overlap, size and id.
 	void stablishWorldPosition();
@@ -188,10 +191,6 @@ protected:
 	void setSearchAgents( const bool & searchAgents );
 	//! method interface for attribute _searchAgents. 
 	bool getSearchAgents();
-
-	//! return a raster from the entire set (dynamic and static)
-	StaticRaster & getRasterTmp( const std::string & key );
-	const StaticRaster & getRasterTmp( const std::string & key ) const;
 
 public:
 	//! constructor.
@@ -303,7 +302,7 @@ public:
 	//! dump the agents through a serializer.
 	void serializeAgents();
 	//! the override of this method allows to modify rasters between step executions
-	virtual void stepRaster( const std::string & key);
+	virtual void stepRaster( const int & index);
 	//! the override of this method allows to modify agents between step executions
 	virtual void stepAgents();
 
@@ -312,9 +311,9 @@ public:
 	const Raster& getConstDynamicRaster( const std::string& key ) const;
 
 	//! create a new static raster map with the stablished size and given key
-	void registerStaticRaster( const std::string & key, const bool & serialize );
+	void registerStaticRaster( const std::string & key, const int & index, const bool & serialize );
 	//! create a new raster map with the stablished size and given key
-	void registerDynamicRaster( const std::string & key, const bool & serialize );
+	void registerDynamicRaster( const std::string & key, const int & index, const bool & serialize );
 	//! checks if position parameter 'newPosition' is free to occupy by an agent, 'newPosition' is inside of the world and the maximum of agent cell-occupancy is not exceeded.
 	bool checkPosition( const Point2D<int> & newPosition );
 
@@ -323,12 +322,22 @@ public:
 
 	//! sets the value of raster "key" to value "value" in global position "position"
 	void setValue( const std::string & key, const Point2D<int> & position, int value );
+	//! sets the value of raster "index" to value "value" in global position "position"
+	void setValue( const int & index, const Point2D<int> & position, int value );
 	//! returns the value of raster "key" in global position "position"
 	int getValue( const std::string & key, const Point2D<int> & position ) const;
+	//! returns the value of raster "index" in global position "position"
+	int getValue( const int & index, const Point2D<int> & position ) const;
+
 	//! sets the maximum allowed value of raster "key" to value "value" in global position "position"
 	void setMaxValue( const std::string & key, const Point2D<int> & position, int value );
+	//! sets the maximum allowed value of raster "index" to value "value" in global position "position"
+	void setMaxValue( const int & index, const Point2D<int> & position, int value );
+
 	//! gets the maximum allowed value of raster "key" in global position "position"
 	int getMaxValueAt( const std::string & key, const Point2D<int> & position );
+	//! gets the maximum allowed value of raster "index" in global position "position"
+	int getMaxValueAt( const int & index, const Point2D<int> & position );
 
 	//! returns a Rectangle<int> expressing the boundaries of the world
 	const Rectangle<int> & getBoundaries() const;

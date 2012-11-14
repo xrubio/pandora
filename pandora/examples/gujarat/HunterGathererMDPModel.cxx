@@ -156,7 +156,7 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 	{
 		for ( unsigned i = 0; i <  moveHomeActions; i++ )
 			s.addAction( possibleMoveHomeActions[i] );
-		for ( unsigned i =  moveHomeActions(); i < possibleMoveHomeActions.size(); i++ )
+		for ( unsigned i =  moveHomeActions; i < possibleMoveHomeActions.size(); i++ )
 			delete possibleMoveHomeActions[i];
 	}
 	assert( s.numAvailableActions() > 0 );

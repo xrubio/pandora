@@ -64,6 +64,13 @@ World::~World()
 		it = _agents.erase(it);
 		delete agent;
 	}
+	for(int i=0; i<_rasters.size(); i++)
+	{
+		if(_rasters.at(i))
+		{
+			delete _rasters.at(i);
+		}
+	}
 }
 
 void World::initialize()
@@ -182,7 +189,13 @@ void World::stablishPosition()
 
 void World::updateRasterToMaxValues( const std::string & key )
 {
-	getDynamicRaster(key).updateRasterToMaxValues();
+	RasterNameMap::const_iterator it = _rasterNames.find(key);
+	updateRasterToMaxValues(it->second);
+}
+
+void World::updateRasterToMaxValues( const int & index )
+{
+	((Raster *)_rasters.at(index))->updateRasterToMaxValues();
 }
 
 bool World::hasBeenExecuted( Agent * agent )
@@ -408,9 +421,14 @@ void World::sendOverlapZones( const int & sectionIndex, const bool & entireOverl
 		}
 	}
 
-	for(RastersMap::iterator it=_dynamicRasters.begin(); it!=_dynamicRasters.end(); it++)
+	for(int d=0; d<_rasters.size(); d++)
 	{
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " sending raster: " << it->first);
+		if(!_dynamicRasters.at(d))
+		{
+			continue;
+		}
+
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " sending raster: " << d);
 		for(int i=0; i<neighborsToUpdate.size(); i++)
 		{
 			MpiOverlap * send = new MpiOverlap;
@@ -430,14 +448,14 @@ void World::sendOverlapZones( const int & sectionIndex, const bool & entireOverl
 			for(int n=0; n<send->_data.size(); n++)
 			{
 				Point2D<int> index(overlapZone._origin._x+n%overlapZone._size._x, overlapZone._origin._y+n/overlapZone._size._x);
-				send->_data.at(n) = getDynamicRaster(it->first).getValue(index);
+				send->_data.at(n) = getValue(d, index);
 				log_EDEBUG(logName.str(), "\t" << getWallTime() << " step: " << _step << "/" << sectionIndex << " send index: " << index << " in global pos: " << index+_overlapBoundaries._origin << " value: " << send->_data.at(n));
 			}
 			MPI_Isend(&send->_data[0], send->_data.size(), MPI_INTEGER, neighborsToUpdate[i], eRasterData, MPI_COMM_WORLD, &send->_request);
 			_sendRequests.push_back(send);
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " raster: " << it->first << " data sent to: " << _neighbors[i]);
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " raster: " << d << " data sent to: " << _neighbors[i]);
 		}
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " raster: " << it->first << " sent");
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " raster: " << d << " sent");
 	}
 	log_DEBUG(logName.str(), getWallTime() << " step: "  << "/" << sectionIndex << _step << " sendOverlapZones ended");
 }
@@ -447,27 +465,32 @@ void World::sendMaxOverlapZones()
 	std::stringstream logName;
 	logName << "MPI_raster_world_" << _simulation.getId();
 	log_DEBUG(logName.str(), getWallTime() << " step: "  << _step << " sendMaxOverlapZones");
-	for(RastersMap::iterator it=_dynamicRasters.begin(); it!=_dynamicRasters.end(); it++)
+	for(int d=0; d<_rasters.size(); d++)
 	{
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sending max raster: " << it->first);
+		if(!_dynamicRasters.at(d))
+		{
+			continue;
+		}
+
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sending max raster: " << d);
 		for(int i=0; i<_neighbors.size(); i++)
 		{
 			MpiOverlap * send = new MpiOverlap;
 			send->_overlap = getInternalOverlap(_neighbors[i]);
 			send->_data.resize(send->_overlap._size._x * send->_overlap._size._y);
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " will send max overlap of: " << it->first << " to: " << _neighbors[i] << " with size: " << send->_data.size() << " and zone: " << send->_overlap << " to " << _neighbors[i]);
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " will send max overlap of: " << d << " to: " << _neighbors[i] << " with size: " << send->_data.size() << " and zone: " << send->_overlap << " to " << _neighbors[i]);
 			const Rectangle<int> & overlapZone = send->_overlap;	
 			for(int n=0; n<send->_data.size(); n++)
 			{
 				Point2D<int> index(overlapZone._origin._x+n%overlapZone._size._x, overlapZone._origin._y+n/overlapZone._size._x);
-				send->_data.at(n) = getDynamicRaster(it->first).getMaxValueAt(index);
+				send->_data.at(n) = getMaxValueAt(d, index);
 				log_EDEBUG(logName.str(), "\t" << getWallTime() << " step: " << _step << " send index: " << index << " in global pos: " << index+_overlapBoundaries._origin << " max value: " << send->_data.at(n));
 			}
 			MPI_Isend(&send->_data[0], send->_data.size(), MPI_INTEGER, _neighbors[i], eRasterMaxData, MPI_COMM_WORLD, &send->_request);
 			_sendRequests.push_back(send);
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " raster: " << it->first << " max data sent to: " << _neighbors[i]);
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " raster: " << d << " max data sent to: " << _neighbors[i]);
 		}
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " raster: " << it->first << " max data sent");
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " raster: " << d << " max data sent");
 	}
 	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sendMaxOverlapZones ended");
 }
@@ -725,13 +748,19 @@ void World::receiveOverlapData( const int & sectionIndex, const bool & entireOve
 	}
 
 	// for each raster, we receive data from all the active neighbors
-	for(RastersMap::iterator it=_dynamicRasters.begin(); it!=_dynamicRasters.end(); it++)
+	for(int d=0; d<_rasters.size(); d++)
 	{
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " receiving raster: " << it->first);
+		if(!_dynamicRasters.at(d))
+		{
+			continue;
+		}
+		
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " receiving raster: " << d);
 		for(int i=0; i<neighborsToUpdate.size(); i++)
 		{
 			MpiOverlap* receive = new MpiOverlap;
-			receive->_rasterName = it->first;
+			// TODO move to index
+			receive->_rasterName = getRasterName(d);
 			if(entireOverlap)
 			{
 				receive->_overlap = getOverlap(neighborsToUpdate[i], sectionIndex);
@@ -748,7 +777,7 @@ void World::receiveOverlapData( const int & sectionIndex, const bool & entireOve
 			MPI_Irecv(&receive->_data[0], receive->_data.size(), MPI_INTEGER, neighborsToUpdate[i], eRasterData, MPI_COMM_WORLD, &receive->_request);
 			_receiveRequests.push_back(receive);
 		}
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " raster: " << it->first << " received");
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " raster: " << d << " received");
 	}
 	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " receiveOverlapData ended");
 }
@@ -759,13 +788,17 @@ void World::receiveMaxOverlapData()
 	logName << "MPI_raster_world_" << _simulation.getId();
 	log_DEBUG(logName.str(), getWallTime() << " step: "  << _step << " receiveMaxOverlapData");
 	// for each raster, we receive data from all the active neighbors
-	for(RastersMap::iterator it=_dynamicRasters.begin(); it!=_dynamicRasters.end(); it++)
+	for(int d=0; d<_rasters.size(); d++)
 	{
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " receiving max raster: " << it->first);
+		if(!_dynamicRasters.at(d))
+		{
+			continue;
+		}
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " receiving max raster: " << d);
 		for(int i=0; i<_neighbors.size(); i++)			
 		{
 			MpiOverlap* receive = new MpiOverlap;
-			receive->_rasterName = it->first;
+			receive->_rasterName = getRasterName(d);
 			receive->_overlap = getExternalOverlap(_neighbors[i]);
 			receive->_data.resize(receive->_overlap._size._x*receive->_overlap._size._y);
 
@@ -773,7 +806,7 @@ void World::receiveMaxOverlapData()
 			MPI_Irecv(&receive->_data[0], receive->_data.size(), MPI_INTEGER, _neighbors[i], eRasterMaxData, MPI_COMM_WORLD, &receive->_request);
 			_receiveRequests.push_back(receive);
 		}
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step  << " raster: " << it->first << " max data received");
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _step  << " raster: " << d << " max data received");
 	}
 	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " receiveMaxOverlapData ended");
 }
@@ -1066,32 +1099,38 @@ int World::getCurrentStep() const
 
 void World::serializeRasters()
 {
-	for(RastersMap::iterator it=_dynamicRasters.begin(); it!=_dynamicRasters.end(); it++)
+	for(int d=0; d<_rasters.size(); d++)
 	{
-		if(rasterToSerialize(it->first))
+		if(!_serializeRasters.at(d) || !_dynamicRasters.at(d))
 		{
-			//GeneralState::serializer().serializeRaster(it->first, it->second, *this, _step);
+			continue;
 		}
+		//GeneralState::serializer().serializeRaster(d, _rasters.at(d), *this, _step);
 	}
 }
 
 void World::serializeStaticRasters()
 {
-	for(StaticRastersMap::iterator it=_staticRasters.begin(); it!=_staticRasters.end(); it++)
+	for(int d=0; d<_rasters.size(); d++)
 	{
-		if(rasterToSerialize(it->first))
+		if(!_serializeRasters.at(d) || _dynamicRasters.at(d))
 		{
-			//GeneralState::serializer().serializeStaticRaster(it->first, it->second, *this);
+			continue;
 		}
+		//GeneralState::serializer().serializeStaticRaster(d, _rasters.at(d), *this);
 	}
 }
 
 void World::stepEnvironment()
 {
-	for(RastersMap::iterator it=_dynamicRasters.begin(); it!=_dynamicRasters.end(); it++)
+	for(int d=0; d<_rasters.size(); d++)
 	{
+		if(!_dynamicRasters.at(d))
+		{
+			continue;
+		}
 		// TODO initial pos and matrix size are needed?
-		stepRaster(it->first);
+		stepRaster(d);
 	}
 }
 
@@ -1099,34 +1138,54 @@ void World::stepRastersSection(  const int & indexSection, const Rectangle<int> 
 {
 }
 
-void World::stepRaster( const std::string & key)
+void World::stepRaster( const int & index  )
 {
-	getDynamicRaster(key).updateRasterIncrement();
+	((Raster*)_rasters.at(index))->updateRasterIncrement();
 }
 
 void World::stepAgents()
 {
 }
 
-void World::registerDynamicRaster( const std::string & key, const bool & serialize )
+void World::registerDynamicRaster( const std::string & key, const int & index, const bool & serialize )
 {
-	_dynamicRasters.insert( make_pair( key, Raster()));
-	getDynamicRaster(key).resize(_overlapBoundaries._size);
-	if(serialize)
+	if(_rasters.size()<=index)
 	{
-		_rastersToSerialize.push_back(key);
+		_rasters.resize(index+1);
+		_dynamicRasters.resize(index+1);
+		_serializeRasters.resize(index+1);
 	}
+	_rasterNames.insert(make_pair(key, index));
+	_dynamicRasters.at(index) = true;
+	if(_rasters.at(index))
+	{
+		delete _rasters.at(index);
+	}
+	_rasters.at(index) = new Raster();
+	_rasters.at(index)->resize(_overlapBoundaries._size);
+	_serializeRasters.at(index) = serialize;
 }
 
-void World::registerStaticRaster( const std::string & key, const bool & serialize )
+void World::registerStaticRaster( const std::string & key, const int & index, const bool & serialize )
 {
-	_staticRasters.insert( make_pair( key, StaticRaster()));
-	getStaticRaster(key).resize(_overlapBoundaries._size);
-	if(serialize)
+	if(_rasters.size()<=index)
 	{
-		_rastersToSerialize.push_back(key);
+		_rasters.resize(index+1);
+		_dynamicRasters.resize(index+1);
+		_serializeRasters.resize(index+1);
 	}
+	_rasterNames.insert(make_pair(key, index));
+	if(_rasters.at(index))
+	{
+		delete _rasters.at(index);
+	}
+	_rasters.at(index) = new StaticRaster();
+	_rasters.at(index)->resize(_overlapBoundaries._size);
+	
+	_dynamicRasters.at(index) = false;
+	_serializeRasters.at(index) = false;
 }
+
 bool World::checkPosition( const Point2D<int> & newPosition )
 {
 	// checking global boundaries: if environment is a border of the real world
@@ -1165,101 +1224,89 @@ Simulation & World::getSimulation()
 
 StaticRaster & World::getStaticRaster( const std::string & key )
 {
-	StaticRastersMap::iterator it = _staticRasters.find(key);
-	if(it==_staticRasters.end())
+	RasterNameMap::iterator it = _rasterNames.find(key);
+	if(it==_rasterNames.end())
 	{
 		// the key does not exists	
 		std::stringstream oss;
 		oss << "World::getStaticRaster - searching for unregistered raster: " << key;
 		throw Engine::Exception(oss.str());
 	}
-	return it->second;
+	return *(_rasters.at( it->second ));
 }
 
 Raster & World::getDynamicRaster( const std::string & key )
-{
-	RastersMap::iterator it = _dynamicRasters.find(key);
-	if(it==_dynamicRasters.end())		
+{	
+	RasterNameMap::iterator it = _rasterNames.find(key);
+	if(it==_rasterNames.end())
 	{
 		// the key does not exists	
 		std::stringstream oss;
 		oss << "World::getDynamicRaster - searching for unregistered raster: " << key;
-		throw Exception(oss.str());
+		throw Engine::Exception(oss.str());
 	}
-	return it->second;
+	return (Raster&)*(_rasters.at( it->second ));
 }
 
 const Raster & World::getConstDynamicRaster( const std::string & key ) const
 {
-	RastersMap::const_iterator it = _dynamicRasters.find(key);
-	if(it==_dynamicRasters.end())
+	RasterNameMap::const_iterator it = _rasterNames.find(key);
+	if(it==_rasterNames.end())
 	{
 		// the key does not exists	
 		std::stringstream oss;
 		oss << "World::getConstDynamicRaster - searching for unregistered raster: " << key;
-		throw Exception(oss.str());
+		throw Engine::Exception(oss.str());
 	}
-	return it->second;
-}
-
-StaticRaster & World::getRasterTmp( const std::string & key )
-{
-	RastersMap::iterator it = _dynamicRasters.find(key);
-	if(it!=_dynamicRasters.end())
-	{
-		return it->second;
-	}
-	StaticRastersMap::iterator itS = _staticRasters.find(key);
-	if(itS!=_staticRasters.end())
-	{
-		return itS->second;
-	}
-	// the key does not exists	
-	std::stringstream oss;
-	oss << "World::getRasterTmp - searching for unregistered raster: " << key;
-	throw Exception(oss.str());
-}
-
-const StaticRaster & World::getRasterTmp( const std::string & key ) const
-{
-	RastersMap::const_iterator it = _dynamicRasters.find(key);
-	if(it!=_dynamicRasters.end())		
-	{
-		return it->second;
-	}
-	StaticRastersMap::const_iterator itS = _staticRasters.find(key);
-	if(itS!=_staticRasters.end())
-	{
-		return itS->second;
-	}
-	// the key does not exists	
-	std::stringstream oss;
-	oss << "World::getRasterTmp- searching for unregistered raster: " << key;
-	throw Exception(oss.str());
+	return (const Raster &)*(_rasters.at( it->second ));
 }
 
 void World::setValue( const std::string & key, const Point2D<int> & position, int value )
 {
+	RasterNameMap::const_iterator it = _rasterNames.find(key);
+	setValue(it->second, position, value);
+}
+
+void World::setValue( const int & index, const Point2D<int> & position, int value )
+{
 	Point2D<int> localPosition(position - _overlapBoundaries._origin);
-	getDynamicRaster(key).setValue(localPosition, value);
+	((Raster*)_rasters.at(index))->setValue(localPosition, value);
 }
 
 int World::getValue( const std::string & key, const Point2D<int> & position ) const
 {
+	RasterNameMap::const_iterator it = _rasterNames.find(key);
+	return getValue(it->second, position);
+}
+
+int World::getValue( const int & index, const Point2D<int> & position ) const
+{
 	Point2D<int> localPosition(position - _overlapBoundaries._origin);
-	return getRasterTmp(key).getValue(localPosition);
+	return _rasters.at(index)->getValue(localPosition);
 }
 
 void World::setMaxValue( const std::string & key, const Point2D<int> & position, int value )
 {
+	RasterNameMap::const_iterator it = _rasterNames.find(key);
+	setMaxValue(it->second, position, value);
+}
+
+void World::setMaxValue( const int & index, const Point2D<int> & position, int value )
+{
 	Point2D<int> localPosition(position - _overlapBoundaries._origin);
-	getDynamicRaster(key).setMaxValue(localPosition, value);
+	((Raster*)_rasters.at(index))->setMaxValue(localPosition, value);
 }
 
 int World::getMaxValueAt( const std::string & key, const Point2D<int> & position )
 {
+	RasterNameMap::const_iterator it = _rasterNames.find(key);
+	return getMaxValueAt(it->second, position);
+}
+
+int World::getMaxValueAt( const int & index, const Point2D<int> & position )
+{
 	Point2D<int> localPosition(position - _overlapBoundaries._origin);	
-	return getDynamicRaster(key).getMaxValueAt(localPosition);
+	return ((Raster*)_rasters.at(index))->getMaxValueAt(localPosition);
 }
 
 const Rectangle<int> & World::getBoundaries() const
@@ -1882,16 +1929,6 @@ Point2D<int> World::getRandomPosition()
 	}
 }
 
-bool World::rasterToSerialize( const std::string & key )
-{
-	std::list<std::string>::iterator it = std::find(_rastersToSerialize.begin(), _rastersToSerialize.end(), key);
-	if(it!=_rastersToSerialize.end())
-	{
-		return true;
-	}
-	return false;
-}
-	
 double World::getWallTime() const
 {
 #ifdef PANDORAMPI
@@ -1899,6 +1936,20 @@ double World::getWallTime() const
 #else
 	return time(0) - _initialTime;
 #endif
+}
+
+const std::string & World::getRasterName( const int & index) const
+{
+	for(RasterNameMap::const_iterator it=_rasterNames.begin(); it!=_rasterNames.end(); it++)
+	{
+		if(it->second==index)
+		{
+			return it->first;
+		}
+	}
+	std::stringstream oss;
+	oss << "World::getRasterName - index: " << index << " doest no have a name";
+	throw Exception(oss.str());
 }
 
 } // namespace Engine

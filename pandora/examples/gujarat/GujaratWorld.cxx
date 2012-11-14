@@ -75,25 +75,25 @@ void GujaratWorld::createRasters()
 	std::stringstream logName;
 	logName << "simulation_" << _simulation.getId();
 	log_DEBUG(logName.str(), getWallTime() << " creating static rasters");
-	registerStaticRaster("soils", _config.isStorageRequired("soils"));
+	registerStaticRaster("soils", eSoils, _config.isStorageRequired("soils"));
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("soils"), _config._soilFile, this);	
 
-	registerStaticRaster("dem", _config.isStorageRequired("dem"));
+	registerStaticRaster("dem", eDem, _config.isStorageRequired("dem"));
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("dem"), _config._demFile, this);
 
-	registerStaticRaster("distWater", _config.isStorageRequired("distWater"));
+	registerStaticRaster("distWater", eDistWater, _config.isStorageRequired("distWater"));
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("distWater"), _config._distWaterFile, this);
 
 	if(_config._biomassDistribution.compare("linDecayFromWater")==0 || _config._biomassDistribution.compare("logDecayFromWater")==0)
 	{
-		registerStaticRaster("weightWater", _config.isStorageRequired("weightWater"));
+		registerStaticRaster("weightWater", eWeightWater, _config.isStorageRequired("weightWater"));
 		Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("weightWater"), _config._weightWaterFile, this);
 	}
 
 	//registerDynamicRaster("weightWater", true);
 	//getDynamicRaster("weightWater").setInitValues(0, std::numeric_limits<int>::max(), 0);
 	/*
-	registerStaticRaster("duneMap", _config.isStorageRequired("duneMap"));
+	registerStaticRaster("duneMap", eDuneMap, _config.isStorageRequired("duneMap"));
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("duneMap"), _config._duneMapFile, this);
 	*/
 
@@ -102,70 +102,33 @@ void GujaratWorld::createRasters()
 	registerDynamicRaster("moisture", _config.isStorageRequired("moisture"));
 	getDynamicRaster("moisture").setInitValues(0, std::numeric_limits<int>::max(), 0);
 	*/
-	registerDynamicRaster("resources", _config.isStorageRequired("resources"));
+	registerDynamicRaster("resources", eResources, _config.isStorageRequired("resources"));
 	getDynamicRaster("resources").setInitValues(0, std::numeric_limits<int>::max(), 0);
 	
-	//registerDynamicRaster("distWater", true);
-	//getDynamicRaster("distWater").setInitValues(0, std::numeric_limits<int>::max(), 0);
-
-	//std::stringstream logWater;
-	//logWater<< "distwater_" << getId();
-	//log_DEBUG( logName.str(), "timestep=" << getWorld()->getCurrentTimeStep());
-
-	/*
-	Engine::Point2D<int> index;
-	for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
-	{
-		std::cout << "row: " << index._x << std::endl;
-		for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)
-		{
-			int value = getValue("distWater", index);
-			if(value==0)
-			{
-				setValue("weightWater", index, 0);
-			}
-			else
-			{
-				float weight = 8061.0f/(float)value;
-				//std::cout << "weight with dist: " << value << " is: " << weight << std::endl;
-				setValue("weightWater", index, weight*100.0f);
-			}
-		}
-	}
-	*/
-
-
 	// we need to keep track of resource fractions
-	registerDynamicRaster("resourcesFraction", false);
+	registerDynamicRaster("resourcesFraction", eResourcesFraction, false);
 	getDynamicRaster("resourcesFraction").setInitValues(0, 100, 0);
 
 	/*
-	registerDynamicRaster("forageActivity", _config.isStorageRequired("forageActivity")); 
+	registerDynamicRaster("forageActivity", eForageActivity, _config.isStorageRequired("forageActivity")); 
 	getDynamicRaster("forageActivity").setInitValues(0, std::numeric_limits<int>::max(), 0);
-	registerDynamicRaster("homeActivity", _config.isStorageRequired("homeActivity"));
+	registerDynamicRaster("homeActivity", eHomeActivity, _config.isStorageRequired("homeActivity"));
 	getDynamicRaster("homeActivity").setInitValues(0, std::numeric_limits<int>::max(), 0);
-	registerDynamicRaster("farmingActivity", _config.isStorageRequired("farmingActivity"));
+	registerDynamicRaster("farmingActivity", eFarmingActivity, _config.isStorageRequired("farmingActivity"));
 	getDynamicRaster("farmingActivity").setInitValues(0, std::numeric_limits<int>::max(), 0);
 	*/
 
 	/*
-	registerDynamicRaster("resourceType", _config.isStorageRequired("resourceType")); // type of resources: wild, domesticated or fallow
+	registerDynamicRaster("resourceType", eResourceType, _config.isStorageRequired("resourceType")); // type of resources: wild, domesticated or fallow
 	getDynamicRaster("resourceType").setInitValues(0, SEASONALFALLOW, WILD);
-	registerDynamicRaster("consecutiveYears", _config.isStorageRequired("consecutiveYears")); // years passed using a given cell for a particular use
+	registerDynamicRaster("consecutiveYears", eConsecutiveYears, _config.isStorageRequired("consecutiveYears")); // years passed using a given cell for a particular use
 	getDynamicRaster("consecutiveYears").setInitValues(0, 3, 0);
-	registerDynamicRaster("sectors", _config.isStorageRequired("sectors"));
+	registerDynamicRaster("sectors", eSectors, _config.isStorageRequired("sectors"));
 	getDynamicRaster("sectors").setInitValues(0, _config._numSectors, 0);
-	*/
-
-	/*
-	registerDynamicRaster("tmpDunes", true); 
-	getDynamicRaster("tmpDunes").setInitValues(0, 100, 0);
 	*/
 
 	log_DEBUG(logName.str(), getWallTime() << " generating settlement areas");
 	_settlementAreas.generateAreas( *this, _config._lowResolution);
-	//log_DEBUG(logName.str(), getWallTime() << " updating moisture");
-	//updateMoisture();
 	log_DEBUG(logName.str(), getWallTime() << " create rasters done");
 }
 
@@ -227,99 +190,10 @@ void GujaratWorld::createAgents()
 	}
 }
 
-float GujaratWorld::moistureFunction( const Soils & soilType, const float & rain, const Seasons & season )
-{
-//proposal: posar un objecte soil a la cel.la
-//proposal: una subclass per cada tipus de soil i cadascuna implementa el comportament diferent: evaporacio, absorcio aigua,...
-//proposal: put moisture, soilType inside Soil object (one for each cell)    
-/* PENDENT
-    proposal: 
-    define a class array constant containing the alphas called moistureSoilAlpha[][]
-    float m[3][3]={{0.0,.25,.5},{.0,.5,1.0},{.0,.75,1.5}};
-    retrieve alpha with moistureSoilAlpha[soilType][season]
-    moistureFunction( sT, r, s, mR) = r - meanRain*moistureSoilAlpha[soilType][season];
-*/
-	float newMoisture; // newMoisture = r - alpha * R;
-	float alpha = 0.0;
-	switch (soilType)
-	{
-		case WATER:
-			switch (season)
-			{
-				case HOTWET:
-					alpha = 0.0; // dropable case, initialization could cover it.
-					break;
-				case COLDDRY:
-					alpha = 0.25; 
-					break;
-				case HOTDRY:
-					alpha = 0.5;
-			}	
-			break;
-
-		case INTERDUNE:
-			switch (season)
-			{
-				case HOTWET:
-					alpha = 0.0; // dropable case, initialization could cover it.
-					break;
-				case COLDDRY:
-					alpha = 0.5;
-					break;
-				case HOTDRY:
-					alpha = 1.0;
-			}
-			break;
-		
-		case DUNE:
-			switch (season)
-			{
-				case HOTWET:
-					alpha = 0.0; // dropable case, initialization could cover it.
-					break;
-				case COLDDRY:
-					alpha = 0.75;
-					break;
-				case HOTDRY:
-					alpha = 1.5;
-			}
-	}
-	//std::cout << "step: " << _step << " alpha: " << alpha << " with season: " << season << " and soil type: " << soilType << std::endl;
-	newMoisture = std::max(0.0f, rain - (alpha * _climate.getMeanAnnualRain()));
-	return newMoisture;
-}
-
-/*------------------------------*/
-
 void GujaratWorld::updateRainfall()
 {		
 	_climate.step();
 }
-
-/*
-void GujaratWorld::updateMoisture()
-{
-	float rain = _climate.getRain();
-	Seasons season = _climate.getSeason();
-
-	//std::cout << "in step: " << _step << " season: " << season << std::endl;
-	//foreach c in cells
-	//	c.moisture = moistureFunction( c.soilType, rain, s, m);
-
-	Engine::Point2D<int> index;
-	for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
-	{
-		for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)			
-		{
-			//int value    = getValue(key, index);
-			//int maxValue = getMaxValue(key, index);
-			Soils soilT = (Soils)getValue("soils", index);
-			float moisture = moistureFunction( soilT, rain, season );
-			setValue("moisture", index, moisture);
-		}
-	}
-}
-*/
 
 void GujaratWorld::updateSoilCondition()
 {
@@ -330,33 +204,33 @@ void GujaratWorld::updateSoilCondition()
 		{
 			for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)
 			{
-				setValue("resources", index, getValue("moisture", index));
-				if(getValue("resourceType", index)==WILD)
+				setValue(eResources, index, getValue("moisture", index));
+				if(getValue(eResourceType, index)==WILD)
 				{
 					continue;
 				}
 				
-				if(getValue("resourceType", index)==SEASONALFALLOW)
+				if(getValue(eResourceType, index)==SEASONALFALLOW)
 				{
-					setValue("resourceType", index, DOMESTICATED);
+					setValue(eResourceType, index, DOMESTICATED);
 				}
-				int consecutiveYears = getValue("consecutiveYears", index);
+				int consecutiveYears = getValue(eConsecutiveYears, index);
 				consecutiveYears++;				
 				if(consecutiveYears<3)
 				{
-					setValue("consecutiveYears", index, consecutiveYears);
+					setValue(eConsecutiveYears, index, consecutiveYears);
 				}
 				else
 				{
-					setValue("consecutiveYears", index, 0);
-					if(getValue("resourceType", index)==FALLOW)
+					setValue(eConsecutiveYears, index, 0);
+					if(getValue(eResourceType, index)==FALLOW)
 					{
-						setValue("resourceType", index, WILD);
+						setValue(eResourceType, index, WILD);
 
 					}
 					else
 					{
-						setValue("resourceType", index, FALLOW);
+						setValue(eResourceType, index, FALLOW);
 					}
 				}
 			}
@@ -368,9 +242,9 @@ void GujaratWorld::updateSoilCondition()
 		{
 			for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)
 			{
-				if(getValue("resourceType", index)==DOMESTICATED)
+				if(getValue(eResourceType, index)==DOMESTICATED)
 				{
-					setValue("resourceType", index, SEASONALFALLOW);
+					setValue(eResourceType, index, SEASONALFALLOW);
 				}
 			}
 		}
@@ -386,9 +260,9 @@ void GujaratWorld::updateResources()
 		{
 			// 3. Increment or Decrement cell biomass depending on yearly biomass
 			//    figures and current timestep
-			int currentValue = getValue("resources", index);
-			float currentFraction = (float)getValue("resourcesFraction", index)/100.0f;
-			Soils cellSoil = (Soils)getValue("soils", index);
+			int currentValue = getValue(eResources, index);
+			float currentFraction = (float)getValue(eResourcesFraction, index)/100.0f;
+			Soils cellSoil = (Soils)getValue(eSoils, index);
 			if(cellSoil!=WATER)
 			{
 				Seasons season = _climate.getSeason();
@@ -400,8 +274,8 @@ void GujaratWorld::updateResources()
 				float newValue = std::max(0.0f, currentValue+currentFraction+getBiomassVariation(wetSeason, cellSoil, index));
 				currentValue = newValue;
 				float fraction = 100.0f*(newValue  - currentValue);
-				setValue("resources", index, currentValue);
-				setValue("resourcesFraction", index, (int)fraction);
+				setValue(eResources, index, currentValue);
+				setValue(eResourcesFraction, index, (int)fraction);
 			}
 		}
 	}
@@ -501,7 +375,6 @@ void GujaratWorld::stepEnvironment()
 //	if ( !_climate.cellUpdateRequired() ) return;
 
 
-	//updateMoisture();
 	//updateSoilCondition();
 }
 
@@ -515,21 +388,6 @@ long int GujaratWorld::getNewKey()
 	return _agentKey++;
 }
 
-bool	GujaratWorld::isInterdune( Engine::Point2D<int> p )
-{
-	return getValue("soils", p) == INTERDUNE;
-}
-
-bool	GujaratWorld::isWild( Engine::Point2D<int> p )
-{
-	return getValue( "resourceType", p ) == WILD;
-}
-
-bool	GujaratWorld::isColdDrySeason()
-{
-	return getClimate().getSeason() == COLDDRY;
-}
-	
 float GujaratWorld::getBiomassVariation( bool wetSeason, Soils & cellSoil, const Engine::Point2D<int> & index ) const
 {
 	double variation = 0.0f;

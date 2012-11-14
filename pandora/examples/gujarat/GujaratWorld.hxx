@@ -12,6 +12,23 @@ namespace Gujarat
 class GujaratConfig;
 class SettlementAreas;
 
+enum Rasters
+{
+	eSoils,
+	eDem,
+	eDistWater,
+	eWeightWater,
+	eDuneMap,
+	eResources,
+	eResourcesFraction,
+	eForageActivity,
+	eHomeActivity,
+	eFarmingActivity,
+	eResourceType,
+	eConsecutiveYears,
+	eSectors,
+};
+
 // id's depends on GIS data
 enum Soils
 {
@@ -64,8 +81,6 @@ public:
 	GujaratWorld( Engine::Simulation & simulation, const GujaratConfig & config );
 	virtual ~GujaratWorld();
 	
-	// we need to redefine the step of the resource, as it will grow to max each step
-	float moistureFunction(const Soils & soilType, const float & rain, const Seasons & season );
 	void stepEnvironment();
 	//void stepGeneralUpdate( int step );
 	const Climate & getClimate() const;
@@ -74,10 +89,6 @@ public:
 	int  convertToCalories( int mass );
 	long int getNewKey();
 
-	bool	isInterdune( Engine::Point2D<int> p );
-	bool	isWild( Engine::Point2D<int> p );
-	bool	isColdDrySeason();
-	
 	SettlementAreas * getSettlementAreas() { return & _settlementAreas; }
 	const SettlementAreas* getSettlementAreas() const { return &_settlementAreas; }
 };

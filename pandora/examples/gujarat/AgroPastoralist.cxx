@@ -73,7 +73,7 @@ void AgroPastoralist::selectActions()
 	// MRJ: This is a HORRIBLE thing to do!!!
 	GujaratWorld* world = dynamic_cast<GujaratWorld*>( _world );
 
-	if( world->isColdDrySeason() && _cultivatedField->isDomesticated() && !_cultivatedField->isSown() )
+	if(world->getClimate().getSeason() == COLDDRY && _cultivatedField->isDomesticated() && !_cultivatedField->isSown() )
 	{
 		_actions.push_back(new SowAction());
 		return;
