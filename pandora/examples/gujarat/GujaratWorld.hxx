@@ -27,6 +27,7 @@ enum Rasters
 	eResourceType,
 	eConsecutiveYears,
 	eSectors,
+	eMoisture
 };
 
 // id's depends on GIS data

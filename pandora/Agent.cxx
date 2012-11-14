@@ -24,7 +24,11 @@
 
 #include <Exceptions.hxx>
 #include <World.hxx>
+
+#ifdef PANDORAMPI
 #include <Serializer.hxx>
+#endif
+
 #include <Action.hxx>
 #include <Logger.hxx>
 #include <GeneralState.hxx>

@@ -9,7 +9,6 @@
 #include <map>
 #include <vector>
 //#include <CaloricRequirementsTable.hxx>
-#include <AgentInitializer.hxx>
 
 namespace Gujarat
 {
@@ -75,8 +74,6 @@ class GujaratConfig : public Engine::Config
 
 	//CaloricRequirementsTable* _hgCaloryRequirements;
 	//CaloricRequirementsTable* _apCaloryRequirements;
-	AgentInitializer*	  _hgInitializer;
-	AgentInitializer*	  _apInitializer;
 
 	HunterGathererMDPConfig*	_controllerConfig;
 

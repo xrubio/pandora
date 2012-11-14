@@ -57,7 +57,7 @@ float SettlementAreas::computeAreaScore(const Engine::Rectangle<int> & newArea, 
 		for(index._y = newArea._origin._y; index._y < newArea._origin._y + newArea._size._y ; index._y++)
 		{	
 			numCells++;
-			if (w.getValue("soils",index) == INTERDUNE)
+			if (w.getValue(eSoils,index) == INTERDUNE)
 			{
 				numInterdune++;
 			}
@@ -145,7 +145,7 @@ void SettlementAreas::testDuneInside( const Engine::Rectangle<int> & newArea, Gu
 		for(insidePosition._y=newArea._origin._y; insidePosition._y<newArea._origin._y+newArea._size._y; insidePosition._y++)
 		{
 			// if only one point is dune, add new area
-			if(w.getValue("soils", insidePosition)==DUNE)
+			if(w.getValue(eSoils, insidePosition)==DUNE)
 			{
 				_areas.push_back(newArea);
 				_scoreAreas.push_back(computeAreaScore(newArea,w));

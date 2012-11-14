@@ -124,7 +124,6 @@ protected:
 
 	//! provides a random valid position inside boundaries
 	Point2D<int> getRandomPosition();
-	const std::string & getRasterName( const int & index ) const;
 #ifdef PANDORAMPI
 	std::list<MpiOverlap*> _sendRequests;
 	std::list<MpiOverlap*> _receiveRequests;
@@ -311,9 +310,9 @@ public:
 	const Raster& getConstDynamicRaster( const std::string& key ) const;
 
 	//! create a new static raster map with the stablished size and given key
-	void registerStaticRaster( const std::string & key, const int & index, const bool & serialize );
+	void registerStaticRaster( const std::string & key, const bool & serialize, int index = -1);
 	//! create a new raster map with the stablished size and given key
-	void registerDynamicRaster( const std::string & key, const int & index, const bool & serialize );
+	void registerDynamicRaster( const std::string & key, const bool & serialize, int index = -1);
 	//! checks if position parameter 'newPosition' is free to occupy by an agent, 'newPosition' is inside of the world and the maximum of agent cell-occupancy is not exceeded.
 	bool checkPosition( const Point2D<int> & newPosition );
 
@@ -321,11 +320,11 @@ public:
 	Simulation & getSimulation();
 
 	//! sets the value of raster "key" to value "value" in global position "position"
-	void setValue( const std::string & key, const Point2D<int> & position, int value );
+	void setValueStr( const std::string & key, const Point2D<int> & position, int value );
 	//! sets the value of raster "index" to value "value" in global position "position"
 	void setValue( const int & index, const Point2D<int> & position, int value );
 	//! returns the value of raster "key" in global position "position"
-	int getValue( const std::string & key, const Point2D<int> & position ) const;
+	int getValueStr( const std::string & key, const Point2D<int> & position ) const;
 	//! returns the value of raster "index" in global position "position"
 	int getValue( const int & index, const Point2D<int> & position ) const;
 
@@ -353,9 +352,11 @@ public:
 	//! returns the simulation id where that World is in (??? TODO verifica això)
 	int getId() const;
 
-	bool rasterToSerialize( const std::string & key );
 	//! returns the attribute _overlap
 	const int & getOverlap();
+	
+	// get a raster name from its index
+	const std::string & getRasterName( const int & index ) const;
 public:
 	//! Factory method design pattern for creating concrete agents and rasters. It is delegated to concrete Worlds. This method must be defined by children, it is the method where agents are created and addAgents must be called
 	virtual void createAgents() = 0;

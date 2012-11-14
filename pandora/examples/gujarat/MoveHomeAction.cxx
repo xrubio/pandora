@@ -113,7 +113,7 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent& agent,
 			{
 				log_DEBUG(logName.str(), "checking pos: " << index << " from origin: " << agentPos);
 
-				if ((world->getValue("soils",index) == DUNE) 
+				if ((world->getValue(eSoils,index) == DUNE) 
 					&& (ceil(agentPos.distance(index)) <= (double)agent.getHomeMobilityRange()))
 				{
 					countDunes++;

@@ -25,7 +25,11 @@
 #include <Exceptions.hxx>
 
 #include <GeneralState.hxx>
+
+#ifdef PANDORAMPI
 #include <Serializer.hxx>
+#endif
+
 #include <Logger.hxx>
 #include <Statistics.hxx>
 
@@ -90,9 +94,11 @@ void World::init( int argc, char *argv[] )
 	
 	stablishPosition();
 	createRasters();
-	
-//	GeneralState::serializer().init(_simulation, _staticRasters, _dynamicRasters, *this);
+
+#ifdef PANDORAMPI
+	GeneralState::serializer().init(_simulation, _dynamicRasters, _serializeRasters, *this);
 	serializeStaticRasters();
+#endif
 	createAgents();
 #ifdef PANDORAMPI
 	MpiFactory::instance()->registerTypes();
@@ -1105,7 +1111,9 @@ void World::serializeRasters()
 		{
 			continue;
 		}
-		//GeneralState::serializer().serializeRaster(d, _rasters.at(d), *this, _step);
+#ifdef PANDORAMPI
+		GeneralState::serializer().serializeRaster(d, (Raster&)(*_rasters.at(d)), *this, _step);
+#endif
 	}
 }
 
@@ -1117,7 +1125,9 @@ void World::serializeStaticRasters()
 		{
 			continue;
 		}
-		//GeneralState::serializer().serializeStaticRaster(d, _rasters.at(d), *this);
+#ifdef PANDORAMPI
+		GeneralState::serializer().serializeStaticRaster(d, *_rasters.at(d), *this);
+#endif
 	}
 }
 
@@ -1147,8 +1157,14 @@ void World::stepAgents()
 {
 }
 
-void World::registerDynamicRaster( const std::string & key, const int & index, const bool & serialize )
+void World::registerDynamicRaster( const std::string & key, const bool & serialize, int index )
 {
+	// if no index is provided, add one at the end
+	if(index==-1)
+	{
+		index = _rasters.size();
+	}
+		
 	if(_rasters.size()<=index)
 	{
 		_rasters.resize(index+1);
@@ -1166,8 +1182,14 @@ void World::registerDynamicRaster( const std::string & key, const int & index, c
 	_serializeRasters.at(index) = serialize;
 }
 
-void World::registerStaticRaster( const std::string & key, const int & index, const bool & serialize )
+void World::registerStaticRaster( const std::string & key, const bool & serialize, int index )
 {
+	// if no index is provided, add one at the end
+	if(index==-1)
+	{
+		index = _rasters.size();
+	}
+		
 	if(_rasters.size()<=index)
 	{
 		_rasters.resize(index+1);
@@ -1261,7 +1283,7 @@ const Raster & World::getConstDynamicRaster( const std::string & key ) const
 	return (const Raster &)*(_rasters.at( it->second ));
 }
 
-void World::setValue( const std::string & key, const Point2D<int> & position, int value )
+void World::setValueStr( const std::string & key, const Point2D<int> & position, int value )
 {
 	RasterNameMap::const_iterator it = _rasterNames.find(key);
 	setValue(it->second, position, value);
@@ -1273,7 +1295,7 @@ void World::setValue( const int & index, const Point2D<int> & position, int valu
 	((Raster*)_rasters.at(index))->setValue(localPosition, value);
 }
 
-int World::getValue( const std::string & key, const Point2D<int> & position ) const
+int World::getValueStr( const std::string & key, const Point2D<int> & position ) const
 {
 	RasterNameMap::const_iterator it = _rasterNames.find(key);
 	return getValue(it->second, position);

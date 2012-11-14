@@ -4,7 +4,7 @@
 #include <Raster.hxx>
 #include <Point2D.hxx>
 #include <HunterGatherer.hxx>
-#include <AgroPastoralist.hxx>
+//#include <AgroPastoralist.hxx>
 #include <Exceptions.hxx>
 #include <GujaratConfig.hxx>
 #include <OriginalDemographics.hxx>
@@ -75,18 +75,18 @@ void GujaratWorld::createRasters()
 	std::stringstream logName;
 	logName << "simulation_" << _simulation.getId();
 	log_DEBUG(logName.str(), getWallTime() << " creating static rasters");
-	registerStaticRaster("soils", eSoils, _config.isStorageRequired("soils"));
+	registerStaticRaster("soils", _config.isStorageRequired("soils"), eSoils);
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("soils"), _config._soilFile, this);	
 
-	registerStaticRaster("dem", eDem, _config.isStorageRequired("dem"));
+	registerStaticRaster("dem", _config.isStorageRequired("dem"), eDem);
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("dem"), _config._demFile, this);
 
-	registerStaticRaster("distWater", eDistWater, _config.isStorageRequired("distWater"));
+	registerStaticRaster("distWater", _config.isStorageRequired("distWater"), eDistWater);
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("distWater"), _config._distWaterFile, this);
 
 	if(_config._biomassDistribution.compare("linDecayFromWater")==0 || _config._biomassDistribution.compare("logDecayFromWater")==0)
 	{
-		registerStaticRaster("weightWater", eWeightWater, _config.isStorageRequired("weightWater"));
+		registerStaticRaster("weightWater", _config.isStorageRequired("weightWater"), eWeightWater);
 		Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("weightWater"), _config._weightWaterFile, this);
 	}
 
@@ -98,15 +98,17 @@ void GujaratWorld::createRasters()
 	*/
 
 	log_DEBUG(logName.str(), getWallTime() << " creating dynamic rasters");
+
 	/*
 	registerDynamicRaster("moisture", _config.isStorageRequired("moisture"));
 	getDynamicRaster("moisture").setInitValues(0, std::numeric_limits<int>::max(), 0);
 	*/
-	registerDynamicRaster("resources", eResources, _config.isStorageRequired("resources"));
+	
+	registerDynamicRaster("resources", _config.isStorageRequired("resources"), eResources);
 	getDynamicRaster("resources").setInitValues(0, std::numeric_limits<int>::max(), 0);
 	
 	// we need to keep track of resource fractions
-	registerDynamicRaster("resourcesFraction", eResourcesFraction, false);
+	registerDynamicRaster("resourcesFraction", false, eResourcesFraction);
 	getDynamicRaster("resourcesFraction").setInitValues(0, 100, 0);
 
 	/*
@@ -169,6 +171,7 @@ void GujaratWorld::createAgents()
 		}
 	}
 
+	/*
 	for(int i=0; i<_config._numAP; i++)
 	{ 
 		if((i%_simulation.getNumTasks())==_simulation.getId())
@@ -188,6 +191,7 @@ void GujaratWorld::createAgents()
 			std::cout << _simulation.getId() << " new AgroPastoralist: " << agent << std::endl;
 		}
 	}
+	*/
 }
 
 void GujaratWorld::updateRainfall()
@@ -204,7 +208,7 @@ void GujaratWorld::updateSoilCondition()
 		{
 			for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)
 			{
-				setValue(eResources, index, getValue("moisture", index));
+				setValue(eResources, index, getValue(eMoisture, index));
 				if(getValue(eResourceType, index)==WILD)
 				{
 					continue;
@@ -404,7 +408,7 @@ float GujaratWorld::getBiomassVariation( bool wetSeason, Soils & cellSoil, const
 	}
 	else if(_config._biomassDistribution.compare("linDecayFromWater")==0 || _config._biomassDistribution.compare("logDecayFromWater")==0)
 	{
-		variation = _config._waterDistConstant*getValue("weightWater", index);
+		variation = _config._waterDistConstant*getValue(eWeightWater, index);
 		//variation = 1600.0f*1600.0f*float(getValue("weightWater", index))/16423239174.0f;
 		if(wetSeason)
 		{

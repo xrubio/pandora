@@ -67,3 +67,4 @@ MpiFactory::TypesMap::iterator MpiFactory::endTypes()
 } // namespace Engine
 
 #endif // PANDORAMPI
+

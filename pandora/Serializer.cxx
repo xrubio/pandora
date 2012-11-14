@@ -43,7 +43,7 @@ Serializer::~Serializer()
 {
 }
 
-void Serializer::init( Simulation & simulation, StaticRastersMap & staticRasters, RastersMap & rasters, World & world )
+void Serializer::init( Simulation & simulation, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters, World & world )
 {
 	std::stringstream logName;
 	logName << "Serializer_" << world.getId();
@@ -62,6 +62,7 @@ void Serializer::init( Simulation & simulation, StaticRastersMap & staticRasters
 	log_DEBUG(logName.str(), " 2 num tasks: " << simulation.getNumTasks() << " num steps: " << simulation.getNumSteps());
 
 	// creating base file in a parallel environment
+
 	hid_t propertyListId = H5Pcreate(H5P_FILE_ACCESS);
 
 	log_DEBUG(logName.str(), " 3 num tasks: " << simulation.getNumTasks() << " num steps: " << simulation.getNumSteps());
@@ -104,30 +105,32 @@ void Serializer::init( Simulation & simulation, StaticRastersMap & staticRasters
 	// we store the name of the rasters
 	hid_t rasterNameFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	hid_t rasterNameDatasetId = H5Dcreate(_fileId, "rasters", H5T_NATIVE_INT, rasterNameFileSpace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-	for(RastersMap::iterator it=rasters.begin(); it!=rasters.end(); it++)
+	// dynamic raster, store every time step
+	for(int i=0; i<dynamicRasters.size(); i++)
 	{
-		if(world.rasterToSerialize(it->first))
+		if(!serializeRasters.at(i) || !dynamicRasters.at(i))
 		{
-			attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
-			const std::string & name(it->first);
-			attributeId = H5Acreate(rasterNameDatasetId, name.c_str(), H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
-			H5Sclose(attributeFileSpace);
-			H5Aclose(attributeId);
+			continue;
 		}
+		attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
+		attributeId = H5Acreate(rasterNameDatasetId, world.getRasterName(i).c_str(), H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
+		H5Sclose(attributeFileSpace);
+		H5Aclose(attributeId);
 	}
 	H5Dclose(rasterNameDatasetId);
 
+	// static raster, store just at the beginning of the simulation
 	rasterNameDatasetId = H5Dcreate(_fileId, "staticRasters", H5T_NATIVE_INT, rasterNameFileSpace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-	for(StaticRastersMap::iterator it=staticRasters.begin(); it!=staticRasters.end(); it++)
+	for(int i=0; i<dynamicRasters.size(); i++)
 	{
-		if(world.rasterToSerialize(it->first))
+		if(!serializeRasters.at(i) || dynamicRasters.at(i))
 		{
-			attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
-			const std::string & name(it->first);
-			attributeId = H5Acreate(rasterNameDatasetId, name.c_str(), H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
-			H5Sclose(attributeFileSpace);
-			H5Aclose(attributeId);
+			continue;
 		}
+		attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
+		attributeId = H5Acreate(rasterNameDatasetId, world.getRasterName(i).c_str(), H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
+		H5Sclose(attributeFileSpace);
+		H5Aclose(attributeId);
 	}
 	H5Dclose(rasterNameDatasetId);
 	H5Sclose(rasterNameFileSpace);
@@ -171,38 +174,42 @@ void Serializer::init( Simulation & simulation, StaticRastersMap & staticRasters
 	propertyListId = H5Pcreate(H5P_DATASET_CREATE);
 	H5Pset_chunk(propertyListId, 2, chunkDimensions);
 
-	// static rasters
-	for(StaticRastersMap::iterator it=staticRasters.begin(); it!=staticRasters.end(); it++)
+	// static rasters	
+	
+	for(int i=0; i<dynamicRasters.size(); i++)
 	{
-		if(world.rasterToSerialize(it->first))
+		if(!serializeRasters.at(i) || dynamicRasters.at(i))
 		{
-			// TODO 0 o H5P_DEFAULT??
-			hid_t rasterGroupId = H5Gcreate(_fileId, it->first.c_str(), 0, H5P_DEFAULT, H5P_DEFAULT);
-			hid_t fileSpace = H5Screate_simple(2, dimensions, NULL); 
-			hid_t datasetId = H5Dcreate(rasterGroupId, "values", H5T_NATIVE_INT, fileSpace, H5P_DEFAULT, propertyListId, H5P_DEFAULT);
-			H5Dclose(datasetId);
-			H5Sclose(fileSpace);
-			H5Gclose(rasterGroupId);
+			continue;
 		}
-	}	
+		// TODO 0 o H5P_DEFAULT??
+		hid_t rasterGroupId = H5Gcreate(_fileId, world.getRasterName(i).c_str(), 0, H5P_DEFAULT, H5P_DEFAULT);
+		hid_t fileSpace = H5Screate_simple(2, dimensions, NULL); 
+		hid_t datasetId = H5Dcreate(rasterGroupId, "values", H5T_NATIVE_INT, fileSpace, H5P_DEFAULT, propertyListId, H5P_DEFAULT);
+		H5Dclose(datasetId);
+		H5Sclose(fileSpace);
+		H5Gclose(rasterGroupId);
+	}
+
 	// dynamic rasters
-	for(RastersMap::iterator it=rasters.begin(); it!=rasters.end(); it++)
+	for(int i=0; i<dynamicRasters.size(); i++)
 	{
-		if(world.rasterToSerialize(it->first))
+		if(!serializeRasters.at(i) || !dynamicRasters.at(i))
 		{
-			// TODO 0 o H5P_DEFAULT??
-			hid_t rasterGroupId = H5Gcreate(_fileId, it->first.c_str(), 0, H5P_DEFAULT, H5P_DEFAULT);
-			for(int i=0; i<=simulation.getNumSteps(); i++)
-			{  
-				std::ostringstream oss;
-				oss << "step" << i;
-				hid_t stepFileSpace = H5Screate_simple(2, dimensions, NULL); 
-				hid_t stepDatasetId = H5Dcreate(rasterGroupId, oss.str().c_str(), H5T_NATIVE_INT, stepFileSpace, H5P_DEFAULT, propertyListId, H5P_DEFAULT);
-				H5Dclose(stepDatasetId);
-				H5Sclose(stepFileSpace);
-			}	
-			H5Gclose(rasterGroupId);
-		}
+			continue;
+		}	
+		// TODO 0 o H5P_DEFAULT??
+		hid_t rasterGroupId = H5Gcreate(_fileId, world.getRasterName(i).c_str(), 0, H5P_DEFAULT, H5P_DEFAULT);
+		for(int i=0; i<=simulation.getNumSteps(); i++)
+		{  
+			std::ostringstream oss;
+			oss << "step" << i;
+			hid_t stepFileSpace = H5Screate_simple(2, dimensions, NULL); 
+			hid_t stepDatasetId = H5Dcreate(rasterGroupId, oss.str().c_str(), H5T_NATIVE_INT, stepFileSpace, H5P_DEFAULT, propertyListId, H5P_DEFAULT);
+			H5Dclose(stepDatasetId);
+			H5Sclose(stepFileSpace);
+		}	
+		H5Gclose(rasterGroupId);
 	}
 	H5Pclose(propertyListId);
 }
@@ -443,17 +450,17 @@ void Serializer::serializeAttribute( const std::string & name, const int & value
 	H5Sclose(fileSpace);
 }
 
-void Serializer::serializeRaster( const std::string & key, Raster & raster, World & world, const int & step )
+void Serializer::serializeRaster( const int & index, Raster & raster, World & world, const int & step )
 {
 	std::ostringstream oss;
-	oss << "/" << key << "/step" << step;
+	oss << "/" << world.getRasterName(index) << "/step" << step;
 	serializeRaster(raster,world, oss.str());
 }
 
-void Serializer::serializeStaticRaster( const std::string & key, StaticRaster & raster, World & world )
+void Serializer::serializeStaticRaster( const int & index, StaticRaster & raster, World & world )
 {
 	std::ostringstream oss;
-	oss << "/" << key << "/values";
+	oss << "/" << world.getRasterName(index) << "/values";
 	serializeRaster(raster, world, oss.str());
 }
 

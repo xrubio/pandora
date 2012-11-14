@@ -23,7 +23,7 @@
 #ifndef __Serializer_hxx__
 #define __Serializer_hxx__
 
-//#include <hdf5.h>
+#include <hdf5.h>
 #include <string>
 #include <map>
 #include <vector>
@@ -49,10 +49,10 @@ class Serializer
 
 	std::string _resultsFile;
 
-	//hid_t _agentsFileId;
-	//hid_t _fileId;
+	hid_t _agentsFileId;
+	hid_t _fileId;
 	// this id is used to track the data set of the agent being serialized
-	//hid_t _currentAgentDatasetId;
+	hid_t _currentAgentDatasetId;
 
 	void serializeRaster( StaticRaster & raster, World & world, const std::string & datasetKey );
 
@@ -74,13 +74,13 @@ public:
 	Serializer();
 	virtual ~Serializer();
 
-	void init( Simulation & simulation, StaticRastersMap & staticRasters, RastersMap & rasters, World & world );
+	void init( Simulation & simulation, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters, World & world );
 	void finish();
 
 	void serializeAgent( Agent * agent, const int & step, World & world, int index);
 	void serializeAttribute( const std::string & name, const int & value );
-	void serializeRaster( const std::string & key, Raster & raster, World & world, const int & step );
-	void serializeStaticRaster( const std::string & key, StaticRaster & raster, World & world );
+	void serializeRaster( const int & index, Raster & raster, World & world, const int & step );
+	void serializeStaticRaster( const int & index, StaticRaster & raster, World & world );
 	void finishAgentsSerialization( int step, World & world);
 	
 	void addStringAttribute( const std::string & type, const std::string & key, const std::string & value );

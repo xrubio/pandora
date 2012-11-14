@@ -52,6 +52,7 @@ public:
 	void serialize();
 	void registerAttributes();
 
+
 	////////////////////////////////////////////////
 	// This code has been automatically generated //
 	/////// Please do not modify it ////////////////

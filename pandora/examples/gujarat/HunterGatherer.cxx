@@ -222,8 +222,8 @@ bool HunterGatherer::cellValid( Engine::Point2D<int>& loc )
 
 bool HunterGatherer::cellRelevant( Engine::Point2D<int>& loc )
 {
-	Soils soilType = (Soils) _world->getValue("soils", loc);
-	int resourceType = _world->getValue("resourceType", loc);
+	Soils soilType = (Soils) _world->getValue(eSoils, loc);
+	int resourceType = _world->getValue(eResourceType, loc);
 	return soilType == INTERDUNE && resourceType == WILD;
 }
 

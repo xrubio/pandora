@@ -26,11 +26,6 @@ public:
 
 	void setResources( int resources );
 	int getResources() const;
-
-	RandomAgent( void * );
-	void * fillPackage(); 
-	void sendVectorAttributes(int);
-	void receiveVectorAttributes(int);
 };
 
 } // namespace Examples

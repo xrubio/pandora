@@ -266,7 +266,7 @@ Engine::Point2D<int> GujaratAgent::getNearLocation( int range )
 		for(location._y=_position._y-range; location._y<=_position._y+range; location._y++)
 		{
 			if(	_world->getOverlapBoundaries().isInside(location) && 
-				_world->checkPosition(location) && _world->getValue("soils", location)==DUNE)
+				_world->checkPosition(location) && _world->getValue(eSoils, location)==DUNE)
 			{
 				possiblePositions.push_back(location);
 			}
@@ -346,7 +346,7 @@ void	GujaratAgent::initializePosition( )
 			for ( int y = area._origin._y; y < area._origin._y + area._size._y; y++ )
 			{
 				Engine::Point2D<int> p(x,y);
-				if ( getWorld()->getValue("soils", p ) == DUNE )
+				if ( getWorld()->getValue(eSoils, p ) == DUNE )
 				{
 					dunes.push_back( p );
 				}

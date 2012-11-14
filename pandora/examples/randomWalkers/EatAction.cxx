@@ -19,8 +19,8 @@ void EatAction::execute( Engine::Agent & agent )
 {
 	RandomAgent & simpleAgent = (RandomAgent&)agent;
 	Engine::World * world = agent.getWorld();
-	simpleAgent.setResources(simpleAgent.getResources()+world->getValue("resources", agent.getPosition()));
-	world->setValue("resources", agent.getPosition(), 0);
+	simpleAgent.setResources(simpleAgent.getResources()+world->getValueStr("resources", agent.getPosition()));
+	world->setValueStr("resources", agent.getPosition(), 0);
 	simpleAgent.setResources(simpleAgent.getResources()-1);
 }
 

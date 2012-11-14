@@ -5,7 +5,11 @@
 #include <LoggerBase.hxx>
 #include <Statistics.hxx>
 #include <RasterLoader.hxx>
-//#include <Serializer.hxx>
+
+#ifdef PANDORAMPI
+#include <Serializer.hxx>
+#endif
+
 #include <ShpLoader.hxx>
 
 namespace Engine
@@ -20,7 +24,11 @@ class GeneralState
 	Statistics _statistics;
 	RasterLoader _rasterLoader;
 	ShpLoader _shpLoader;
-//	Serializer _serializer;
+
+#ifdef PANDORAMPI
+	Serializer _serializer;
+#endif
+
 protected:
 	GeneralState();
 
@@ -48,12 +56,12 @@ public:
 		return instance()._shpLoader;
 	}
 
-	/*
+#ifdef PANDORAMPI
 	static Serializer & serializer()
 	{
 		return instance()._serializer;
 	}
-	*/
+#endif
 };
 
 } // namespace Engine
