@@ -31,7 +31,10 @@
 
 #include <vector>
 #include <gdal_priv.h>
-//#include <hdf5.h>
+
+#ifdef PANDORAMPI
+#include <hdf5.h>
+#endif
 
 extern "C" 
 {
@@ -133,7 +136,7 @@ void RasterLoader::fillGDALRaster( StaticRaster & raster, const std::string & fi
 
 void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fileName, const std::string & rasterName, World * world )
 {
-	/*
+#ifdef PANDORAMPI
 	std::stringstream logName;
 	if(world)
 	{
@@ -220,7 +223,7 @@ void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fi
 		dynamicRaster->updateCurrentMinMaxValues();
 	}
 	log_DEBUG(logName.str(), "file: " << fileName << " rasterName: " << rasterName << " loaded");
-	*/
+#endif
 }
 
 void RasterLoader::fillGrassCellRaster( StaticRaster & raster, const std::string & rasterName, World * world )

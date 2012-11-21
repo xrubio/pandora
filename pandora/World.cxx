@@ -56,7 +56,9 @@ World::World( const Simulation & simulation, const int & overlap, const bool & a
     , _searchAgents(true)
     , _initialTime(0.0f)
 {
-//	GeneralState::serializer().setResultsFile(fileName);
+#ifdef PANDORAMPI
+	GeneralState::serializer().setResultsFile(fileName);
+#endif
 }
 
 World::~World()
@@ -336,13 +338,17 @@ void World::serializeAgents()
 	{
 		if((*it)->exists())
 		{
-//			GeneralState::serializer().serializeAgent((*it), _step, *this, i);
+#ifdef PANDORAMPI
+			GeneralState::serializer().serializeAgent((*it), _step, *this, i);
+#endif
 			i++;
 		}
 		it++;
 	}
 	// serialize remaining agents
-//	GeneralState::serializer().finishAgentsSerialization(_step, *this);
+#ifdef PANDORAMPI
+	GeneralState::serializer().finishAgentsSerialization(_step, *this);
+#endif
 }
 
 #ifdef PANDORAMPI
@@ -1017,12 +1023,14 @@ void World::run()
 	serializeAgents();
 	
 	log_INFO(logName.str(), getWallTime() << " closing files");
-	//GeneralState::serializer().finish();
 #ifdef PANDORAMPI
+	GeneralState::serializer().finish();
 	MpiFactory::instance()->cleanTypes();
-	MPI_Finalize();
 #endif
 	log_INFO(logName.str(), getWallTime() << " simulation finished");
+#ifdef PANDORAMPI
+	MPI_Finalize();
+#endif
 }
 
 World::AgentsList::iterator World::getOwnedAgent( const std::string & id )
@@ -1205,7 +1213,7 @@ void World::registerStaticRaster( const std::string & key, const bool & serializ
 	_rasters.at(index)->resize(_overlapBoundaries._size);
 	
 	_dynamicRasters.at(index) = false;
-	_serializeRasters.at(index) = false;
+	_serializeRasters.at(index) = serialize;
 }
 
 bool World::checkPosition( const Point2D<int> & newPosition )

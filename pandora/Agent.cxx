@@ -88,12 +88,16 @@ const Point2D<int> & Agent::getPosition() const
 
 void Agent::serializeAttribute( const std::string & name, const int & value )
 {
-//	GeneralState::serializer().addIntAttribute(getType(), name,value);
+#ifdef PANDORAMPI
+	GeneralState::serializer().addIntAttribute(getType(), name,value);
+#endif
 }
 
 void Agent::serializeAttribute( const std::string & name, const std::string & value)
 {
-//	GeneralState::serializer().addStringAttribute(getType(), name,value);
+#ifdef PANDORAMPI
+	GeneralState::serializer().addStringAttribute(getType(), name,value);
+#endif
 }
 
 const std::string & Agent::getId() const

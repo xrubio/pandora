@@ -54,7 +54,7 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 		// numCells = numRows*numColumns
 		numCells *= numCells;
 		_waterDistConstant = (double)numCells/(double)sumWeights;
-		std::cout << "type: " << _biomassDistribution << " sum weight: " << sumWeights << " constant: " << _waterDistConstant << std::endl;
+		//std::cout << "type: " << _biomassDistribution << " sum weight: " << sumWeights << " constant: " << _waterDistConstant << std::endl;
 	}
 
 	element = root->FirstChildElement("rainHistoricalDistribution");
@@ -207,6 +207,7 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 		}
 	}
 
+	/*
 	std::cout << "[CONFIG]: Mass To Energy Rate: " << _massToEnergyRate << std::endl;
 	std::cout << "[CONFIG]: Energy To Calories Rate: " << _energyToCalRate << std::endl;
 	std::cout << "[CONFIG]: Dune Cell: Biomass: Mass: " << _duneBiomass << std::endl;
@@ -218,7 +219,7 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 	std::cout << "[CONFIG]: Hunter Gatherer Controller: " << _hunterGathererController << std::endl;
 	if ( _controllerConfig != NULL )
 		_controllerConfig->dump( std::cout ); 
-
+	*/
 }
  
 void GujaratConfig::parseHGMDPConfig( TiXmlElement* element )

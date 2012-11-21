@@ -1,7 +1,7 @@
 nameProgram = 'gujarat'
 
-agents = ['HunterGatherer','AgroPastoralist']
-namespaceAgents = ['Gujarat','Gujarat']
+agents = ['HunterGatherer']
+namespaceAgents = ['Gujarat']
 
 srcFiles = Split('main.cxx GujaratWorld.cxx GujaratConfig.cxx Climate.cxx GujaratAgent.cxx HunterGatherer.cxx MDPAction.cxx MoveHomeAction.cxx Sector.cxx ForageAction.cxx SettlementAreas.cxx HunterGathererMDPConfig.cxx HunterGathererMDPState.cxx HunterGathererMDPModel.cxx DoNothingAction.cxx AgentController.cxx HunterGathererProgrammedController.cxx HunterGathererDecisionTreeController.cxx HunterGathererMDPController.cxx GujaratDemographics.cxx OriginalDemographics.cxx CaloricRequirementsTable.cxx GujaratState.cxx')
 
@@ -57,8 +57,12 @@ if int(mareNostrum)==1:
 	libs += ['boost_filesystem']
 	libs += ['boost_system']
 else:
-	includeDirs += ['/usr/local/include','/usr/local/hdf5/include','/usr/lib/grass64/include/','/usr/include/gdal/']
-	libDirs = Split('../../ /usr/local/lib /usr/local/hdf5/lib/ /usr/lib/grass64/lib/')
+	includeDirs += ['/usr/lib/grass64/include/','/usr/include/gdal/']
+	libDirs = ['../../', '/usr/lib/grass64/lib/']
+
+	if int(useMpi)==1:
+		includeDirs += ['/usr/local/hdf5/include']
+		libDirs += ['usr/local/hdf5/lib/']
 	libs += ['mpl']
 
 # add the list of mpi code that must be generated & compiled
@@ -70,5 +74,5 @@ for agent in agents:
 		mpiAgentsSrc.append("mpiCode/"+agent+"_mpi.cxx")
 env['namespaces'] = namespaceAgents
 env.GenerateMPICode( target=mpiAgentsSrc, source=agentsSrc)
-env.Program(nameProgram, srcFiles+mpiAgentsSrc, CPPPATH=includeDirs, LIBS=libs, LIBPATH=libDirs, LINKFLAGS=linkFlags)
+env.Program(nameProgram, mpiAgentsSrc+srcFiles, CPPPATH=includeDirs, LIBS=libs, LIBPATH=libDirs, LINKFLAGS=linkFlags)
 
