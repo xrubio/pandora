@@ -16,10 +16,15 @@ void ShpAgent::updateState()
 {
 }
 
+void ShpAgent::registerAttributes()
+{
+	registerIntAttribute("intValue");
+	registerIntAttribute("floatValue");
+	registerStringAttribute("label");
+}
 void ShpAgent::serialize()
 {
-	// TODO string attributes?
-	//serializeAttribute("label", _label);
+	serializeAttribute("label", _label);
 	serializeAttribute("intValue", _intValue);
 	serializeAttribute("floatValue", _floatValue);
 }
