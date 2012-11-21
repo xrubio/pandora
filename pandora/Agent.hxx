@@ -119,9 +119,11 @@ public:
 	void executeActions();
 
 	// mpi related
+#ifdef PANDORAMPI
 	virtual void * fillPackage() = 0;
 	virtual void sendVectorAttributes( int target ) = 0;
 	virtual void receiveVectorAttributes(int origin) = 0;
+#endif
 
 	AttributesList::iterator beginStringAttributes(){ return _stringAttributes.begin(); }
 	AttributesList::iterator endStringAttributes(){ return _stringAttributes.end(); }

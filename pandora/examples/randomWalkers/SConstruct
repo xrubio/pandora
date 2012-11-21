@@ -1,6 +1,7 @@
 nameProgram = 'randomWalkers'
 
 agents = ['RandomAgent']
+world = 'RandomWorld'
 namespaceAgents = ['Examples']
 
 srcFiles = Split('main.cxx RandomAgent.cxx RandomWorld.cxx RandomWorldConfig.cxx MoveAction.cxx EatAction.cxx')
@@ -69,7 +70,9 @@ for agent in agents:
 	if agent != '':
 		agentsSrc.append(agent+".cxx")
 		mpiAgentsSrc.append("mpiCode/"+agent+"_mpi.cxx")
+
 env['namespaces'] = namespaceAgents
 env.GenerateMPICode( target=mpiAgentsSrc, source=agentsSrc)
-env.Program(nameProgram, mpiAgentsSrc+srcFiles, CPPPATH=includeDirs, LIBS=libs, LIBPATH=libDirs, LINKFLAGS=linkFlags)
+env.Depends(world+'.hxx',mpiAgentsSrc)
+env.Program(nameProgram, srcFiles+mpiAgentsSrc, CPPPATH=includeDirs, LIBS=libs, LIBPATH=libDirs, LINKFLAGS=linkFlags)
 
