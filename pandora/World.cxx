@@ -1252,17 +1252,15 @@ Simulation & World::getSimulation()
 	return _simulation;
 }
 
-StaticRaster & World::getStaticRaster( const std::string & key )
+StaticRaster & World::getStaticRaster( const int & index )
 {
-	RasterNameMap::iterator it = _rasterNames.find(key);
-	if(it==_rasterNames.end())
-	{
-		// the key does not exists	
-		std::stringstream oss;
-		oss << "World::getStaticRaster - searching for unregistered raster: " << key;
-		throw Engine::Exception(oss.str());
-	}
-	return *(_rasters.at( it->second ));
+	return *(_rasters.at(index));
+}
+
+StaticRaster & World::getStaticRasterStr( const std::string & key )
+{
+	RasterNameMap::const_iterator it = _rasterNames.find(key);
+	return getStaticRaster(it->second);
 }
 
 Raster & World::getDynamicRaster( const std::string & key )

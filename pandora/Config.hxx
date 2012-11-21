@@ -50,6 +50,8 @@ protected:
 	void retrieveAttributeOptional( TiXmlElement* elem, const std::string & attrName, long int& value );
 	void retrieveAttributeMandatory( TiXmlElement* elem, const std::string & attrName, float& value );
 	void retrieveAttributeOptional( TiXmlElement* elem, const std::string & attrName, float& value );
+	void retrieveAttributeMandatory( TiXmlElement* elem, const std::string & attrName, bool & value );
+	void retrieveAttributeOptional( TiXmlElement* elem, const std::string & attrName, bool & value );
 
 public:
 	Config();

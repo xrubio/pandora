@@ -133,6 +133,47 @@ void Config::retrieveAttributeOptional( TiXmlElement* elem, const std::string & 
 	value = *retrievedStr;
 }
 
+void Config::retrieveAttributeMandatory( TiXmlElement* elem, const std::string & attrName, bool& value )
+{
+	const std::string * retrievedStr = elem->Attribute( attrName );
+	if (!retrievedStr)
+	{
+		std::stringstream sstr;
+		sstr << "[CONFIG]: ERROR: Attribute " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
+		throw Engine::Exception(sstr.str());
+		return;
+	}
+	if(!retrievedStr->compare("yes") || !retrievedStr->compare("true"))
+	{
+		value = true;
+	}
+	else
+	{
+		value = false;
+	}
+}
+
+void Config::retrieveAttributeOptional( TiXmlElement* elem, const std::string & attrName, bool& value )
+{
+	const std::string * retrievedStr = elem->Attribute( attrName );
+	if(!retrievedStr)
+	{
+		std::stringstream sstr;
+		std::cerr << "[CONFIG]: WARNING: Attribute " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
+		value = "";
+		return;	
+	}
+	if(!retrievedStr->compare("yes") || !retrievedStr->compare("true"))
+	{
+		value = true;
+	}
+	else
+	{
+		value = false;
+	}
+}
+
+
 void Config::retrieveAttributeMandatory( TiXmlElement* elem, const std::string & attrName, int& value )
 {
 	const std::string * retrievedStr = elem->Attribute( attrName );

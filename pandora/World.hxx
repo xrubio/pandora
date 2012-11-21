@@ -184,7 +184,8 @@ protected:
 	//! applies next simulation step on the Section of the space identified by parameter 'sectionIndex'.
 	void stepSection( const int & sectionIndex );
 	//! returns static raster identified by parameter 'key'.
-	StaticRaster & getStaticRaster( const std::string & key );
+	StaticRaster & getStaticRaster( const int & index );
+	StaticRaster & getStaticRasterStr( const std::string & key );
 	
 	//! method interface for attribute _searchAgents. 
 	void setSearchAgents( const bool & searchAgents );

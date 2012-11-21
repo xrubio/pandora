@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<config>  
+	<!-- Global simulation parameters -->
+	<output  resultsFile="./data/neolithic.h5" logsDir="./logs"/>
+	<numSteps value="3"/>
+	<!-- GIS input data -->
+	<location size="220" resolution="50" demFile="resources/eurasia_dem.tiff" initPopulationFile="resources/init_population_ppnbc_eurasia.tiff"/>
+	<!--
+	<initPopulation fileName="resources/init_population_ppnbc_europe.tiff"/>
+	<initPopulation fileName="resources/init_population_jericho_europe.tiff"/>
+	-->
+	<!-- mountain barriers, minimum threshold in meters -->
+	<mountains active="false" threshold="1750"/>
+	<!-- sea travel, maximum distance in km -->
+	<seaTravel active="false" distance="200"/>
+	<!-- dispersion parameters -->
+	<dispersion saturationDensityConstant="1.28" reproductiveRate="2.2" persistence="0.38"/>
+</config>
+

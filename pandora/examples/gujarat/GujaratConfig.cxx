@@ -201,9 +201,7 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 		{
 			std::string name, valueStr;
 			retrieveAttributeMandatory( elem, "name", name );
-			retrieveAttributeMandatory( elem, "value", valueStr );
-			bool value = ( valueStr == "yes" ? true : false );
-			_storeRasters[name] = value;
+			retrieveAttributeMandatory( elem, "value", _storeRasters[name]);
 		}
 	}
 
