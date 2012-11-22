@@ -1,0 +1,57 @@
+nameProgram = 'statistics'
+
+srcFiles = Split('main.cxx ../../../MpiStubCode.cxx')
+
+import os, sys
+from subprocess import call
+
+release = ARGUMENTS.get('release', 1)
+mareNostrum = ARGUMENTS.get('mn', 0)
+localmpich = ARGUMENTS.get('localmpich',0)
+
+if int(localmpich) == 1 :
+	env = Environment(ENV=os.environ, CXX='/usr/local/bin/mpicxx')
+else :
+	env = Environment(ENV=os.environ, CXX='mpicxx')
+	
+if int(mareNostrum) == 1:
+	env['CXX'] = '/opt/osshpc/mpich-mx/64/bin/mpicxx'
+else:
+	if int(localmpich) == 1 :
+		env['CXX'] = '/usr/local/bin/mpicxx'
+	else :
+		env['CXX'] = 'mpicxx'
+
+linkFlags = Split('-fopenmp')
+libs = Split('tinyxml')
+if int(release) == 0:
+	env['CCFLAGS'] = Split('-g -O0 -Wall -DTIXML_USE_STL -DDEBUG -fopenmp')
+	libs += ['pandorad']
+else:
+	env['CCFLAGS'] = Split('-O3 -DTIXML_USE_STL -fopenmp')
+	libs += ['pandora']
+
+includeDirs = Split('./ ../../../')
+
+if int(mareNostrum)==1:
+	includeDirs += ['/gpfs/apps/HDF5/1.8.9/64/include']
+	includeDirs += ['/gpfs/apps/BOOST/1_48_0/include/']
+	includeDirs += ['/gpfs/apps/TINYXML/2.6.2/64/STL/include']
+	includeDirs += ['/gpfs/apps/GDAL/1.7.1/64/include']	
+	includeDirs += ['/gpfs/apps/GRASS/6.4.2/grass-6.4.2/include/']
+
+	libDirs = Split('../../../ /gpfs/apps/HDF5/1.8.9/64/lib /opt/ibmcmp/vacpp/10.1/lib64/ /gpfs/apps/GDAL/1.7.1/64/lib /gpfs/apps/TINYXML/2.6.2/64/STL/lib')
+	libDirs += ['/gpfs/apps/GRASS/6.4.2/grass-6.4.2/lib/']
+	libDirs += ['/gpfs/apps/BOOST/1_48_0/lib/']
+	libs += ['gpfs']
+	libs += ['xl']
+	libs += ['boost_filesystem']
+	libs += ['boost_system']
+else:
+	includeDirs += ['/usr/local/include','/usr/local/hdf5/include','/usr/lib/grass64/include/','/usr/include/gdal/']
+	libDirs = Split('../../../ /usr/local/lib /usr/local/hdf5/lib/ /usr/lib/grass64/lib/')
+	libs += ['mpl']
+
+env.Program(nameProgram, srcFiles, CPPPATH=includeDirs, LIBS=libs, LIBPATH=libDirs, LINKFLAGS=linkFlags)
+
+
