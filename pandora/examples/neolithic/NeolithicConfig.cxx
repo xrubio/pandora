@@ -28,6 +28,7 @@ void NeolithicConfig::extractParticularAttribs(TiXmlElement * root)
 	element = root->FirstChildElement("seaTravel");
 	retrieveAttributeMandatory(element, "active", _seaTravel);
 	retrieveAttributeMandatory(element, "distance", _seaTravelDistance);
+	_seaTravelDistance /= resolution;
 
 	element = root->FirstChildElement("dispersion");
 	float saturationDensityConstant = 0.0f;

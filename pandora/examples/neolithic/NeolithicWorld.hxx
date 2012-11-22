@@ -25,9 +25,7 @@ class NeolithicWorld : public Engine::World
 
 	const NeolithicConfig & _config;
 
-//	void loadFile( const std::string & fileName, const std::string & raster);
-
-	void stepRasters();
+	void stepEnvironment();
 
 	bool isMountain( const Engine::Point2D<int> & index );
 	bool isSea( const Engine::Point2D<int> & index );

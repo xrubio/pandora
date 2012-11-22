@@ -307,8 +307,9 @@ public:
 	virtual void stepAgents();
 
 	//! returns raster identified by parameter 'key'.
-	Raster & getDynamicRaster( const std::string & key );
-	const Raster& getConstDynamicRaster( const std::string& key ) const;
+	Raster & getDynamicRaster( const int & index );
+	Raster & getDynamicRasterStr( const std::string & key );
+	const Raster& getConstDynamicRaster( const int & index ) const;
 
 	//! create a new static raster map with the stablished size and given key
 	void registerStaticRaster( const std::string & key, const bool & serialize, int index = -1);

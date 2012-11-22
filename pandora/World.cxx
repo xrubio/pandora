@@ -869,12 +869,12 @@ void World::clearRequests( bool updateMaxValues )
 					if(updateMaxValues)
 					{
 						log_EDEBUG(logName.str(), "\t" << getWallTime() << " step: " << _step << " receive index: " << index << " max value: " << receive->_data.at(i));
-						getDynamicRaster(receive->_rasterName).setMaxValue(index, receive->_data.at(i));
+						getDynamicRasterStr(receive->_rasterName).setMaxValue(index, receive->_data.at(i));
 					}
 					else
 					{
 						log_EDEBUG(logName.str(), "\t" << getWallTime() << " step: " << _step << " receive index: " << index << " current value: " << receive->_data.at(i));
-						getDynamicRaster(receive->_rasterName).setValue(index, receive->_data.at(i));
+						getDynamicRasterStr(receive->_rasterName).setValue(index, receive->_data.at(i));
 					}
 				}
 
@@ -1263,30 +1263,20 @@ StaticRaster & World::getStaticRasterStr( const std::string & key )
 	return getStaticRaster(it->second);
 }
 
-Raster & World::getDynamicRaster( const std::string & key )
-{	
-	RasterNameMap::iterator it = _rasterNames.find(key);
-	if(it==_rasterNames.end())
-	{
-		// the key does not exists	
-		std::stringstream oss;
-		oss << "World::getDynamicRaster - searching for unregistered raster: " << key;
-		throw Engine::Exception(oss.str());
-	}
-	return (Raster&)*(_rasters.at( it->second ));
+Raster & World::getDynamicRaster( const int & index)
+{		
+	return (Raster &)*(_rasters.at(index));
 }
 
-const Raster & World::getConstDynamicRaster( const std::string & key ) const
-{
+Raster & World::getDynamicRasterStr( const std::string & key )
+{	
 	RasterNameMap::const_iterator it = _rasterNames.find(key);
-	if(it==_rasterNames.end())
-	{
-		// the key does not exists	
-		std::stringstream oss;
-		oss << "World::getConstDynamicRaster - searching for unregistered raster: " << key;
-		throw Engine::Exception(oss.str());
-	}
-	return (const Raster &)*(_rasters.at( it->second ));
+	return getDynamicRaster(it->second);
+}
+
+const Raster & World::getConstDynamicRaster( const int & index ) const
+{	
+	return (const Raster &)*(_rasters.at(index));
 }
 
 void World::setValueStr( const std::string & key, const Point2D<int> & position, int value )

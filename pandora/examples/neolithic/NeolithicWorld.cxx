@@ -20,68 +20,6 @@ NeolithicWorld::NeolithicWorld( Engine::Simulation & simulation, const Neolithic
 NeolithicWorld::~NeolithicWorld()
 {
 }
-/*
-void NeolithicWorld::loadFile( const std::string & fileName, const std::string & raster)
-{
-	// TODO encapsulate GDAL in a class	
-	GDALAllRegister();
-	GDALDataset * dataset = (GDALDataset *)GDALOpen(fileName.c_str(), GA_ReadOnly );
-	
-	if(!dataset)
-	{
-		std::stringstream oss;
-		oss << "NeolithicWorld::loadFile - file: " << fileName << " not found";
-		throw Engine::Exception(oss.str());
-	}
-
-	int size = dataset->GetRasterXSize();
-	if(size!=dataset->GetRasterYSize())
-	{
-		std::stringstream oss;
-		oss << "NeolithicWorld::loadFile - file: " << fileName << " does not contain an squared raster. width: " << size << " and height: " << dataset->GetRasterYSize();
-		throw Engine::Exception(oss.str());
-	}
-
-	if(size!=_simulation.getSize())
-	{
-		std::stringstream oss;
-		oss << "NeolithicWorld::loadFile - file: " << fileName << " with size: " << size << " different from defined size: " << _simulation.getSize() << std::endl;
-		throw Engine::Exception(oss.str());
-	}
-
-	GDALRasterBand * band = dataset->GetRasterBand(1);
-	double minMaxValues[2];
-	int hasMin, hasMax;
-	minMaxValues[0] = band->GetMinimum(&hasMin);
-	minMaxValues[1] = band->GetMaximum(&hasMax);
-	if(!(hasMin && hasMax))
-	{
-		GDALComputeRasterMinMax((GDALRasterBandH)band, TRUE, minMaxValues);
-	}
-
-	//std::cout << "max value: " << minMaxValues[1] << std::endl;
-	getRaster(raster).setInitValues(0,std::numeric_limits<int>::max());
-
-	float * pafScanline = (float *)CPLMalloc(sizeof(float)*(_localRasterSize*_localRasterSize));
-	int worldsPerRow = sqrt(_simulation.getNumTasks());
-	int column = _simulation.getId()/worldsPerRow;
-	int row = _simulation.getId()%worldsPerRow;		
-	band->RasterIO( GF_Read, row*_localRasterSize, column*_localRasterSize, _localRasterSize, _localRasterSize, pafScanline, _localRasterSize, _localRasterSize, GDT_Float32, 0, 0 );
-	
-	Engine::Point2D<int> index;
-	for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
-	{
-		for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)			
-		{
-			Engine::Point2D<int> index2(index - _boundaries._origin);
-			int value = (int)(pafScanline[_localRasterSize*index2._y+index2._x]);
-			setMaxValue(raster, index, value);
-			setValue(raster, index, value);
-		}
-	}
-	GDALClose(dataset);
-}
-*/
 
 void NeolithicWorld::createRasters()
 {
@@ -92,8 +30,11 @@ void NeolithicWorld::createRasters()
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eInitPopulation), _config._initPopulationFile, this);
 
 	registerDynamicRaster("population", true, ePopulation);
+	getDynamicRaster(ePopulation).setDefaultInitValues(0,std::numeric_limits<int>::max(), 0);
 	registerDynamicRaster("populationBase", true, ePopulationBase);
+	getDynamicRaster(ePopulationBase).setDefaultInitValues(0,std::numeric_limits<int>::max(), 0);
 	registerDynamicRaster("arrivalTime", true, eArrivalTime);
+	getDynamicRaster(eArrivalTime).setDefaultInitValues(0,std::numeric_limits<int>::max(), 0);
 	
 	Engine::Point2D<int> index;	
 	for(index._x=_overlapBoundaries._origin._x; index._x<_overlapBoundaries._origin._x+_overlapBoundaries._size._x; index._x++)		
@@ -116,14 +57,13 @@ void NeolithicWorld::createRasters()
 			}
 		}
 	}
-
 }
 
 void NeolithicWorld::createAgents()
 {
 }
 
-void NeolithicWorld::stepRasters()
+void NeolithicWorld::stepEnvironment()
 {
 	reproductionStep();
 	if(!_config._mountains && !_config._seaTravel)
@@ -156,12 +96,6 @@ void NeolithicWorld::reproductionStep()
 				actualPopulation *= _config._reproductiveRate;
 			}
 
-			/*
-			if(actualPopulation>0)
-			{
-				std::cout << index << " has grown from: " << oldPopulation << " to: " << actualPopulation << std::endl;
-			}
-			*/
 			setValue(ePopulationBase, index, actualPopulation);
 			setValue(ePopulation, index, 0);
 		}
