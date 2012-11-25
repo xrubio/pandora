@@ -44,7 +44,7 @@
 		walkingSpeedHour="3000"
 		forageTimeCost="0.5"
 		demographicsModel="original"
-		controllerType="DecisionTree" >
+		controllerType="MDP" >
 		<!-- * width = number of trials before selecting an action, the higher the
 		 	the number, the more informed is the action selection and more
 			computation time is required -->

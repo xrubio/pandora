@@ -87,7 +87,7 @@ void GujaratWorld::createRasters()
 	if(_config._biomassDistribution.compare("linDecayFromWater")==0 || _config._biomassDistribution.compare("logDecayFromWater")==0)
 	{
 		registerStaticRaster("weightWater", _config.isStorageRequired("weightWater"), eWeightWater);
-		Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("weightWater"), _config._weightWaterFile, this);
+		Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eWeightWater), _config._weightWaterFile, this);
 	}
 
 	//registerDynamicRaster("weightWater", true);
@@ -105,11 +105,11 @@ void GujaratWorld::createRasters()
 	*/
 	
 	registerDynamicRaster("resources", _config.isStorageRequired("resources"), eResources);
-	getDynamicRaster("resources").setInitValues(0, std::numeric_limits<int>::max(), 0);
+	getDynamicRaster(eResources).setInitValues(0, std::numeric_limits<int>::max(), 0);
 	
 	// we need to keep track of resource fractions
 	registerDynamicRaster("resourcesFraction", false, eResourcesFraction);
-	getDynamicRaster("resourcesFraction").setInitValues(0, 100, 0);
+	getDynamicRaster(eResourcesFraction).setInitValues(0, 100, 0);
 
 	/*
 	registerDynamicRaster("forageActivity", eForageActivity, _config.isStorageRequired("forageActivity")); 
@@ -363,7 +363,7 @@ void GujaratWorld::stepEnvironment()
 	}
 	// resources are updated each time step
 	updateResources();
-	getDynamicRaster("resources").updateCurrentMinMaxValues();
+	getDynamicRaster(eResources).updateCurrentMinMaxValues();
 
 	unsigned nrAdults = 0;
 	for ( AgentsList::iterator it = _agents.begin(); 

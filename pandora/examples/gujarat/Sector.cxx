@@ -3,6 +3,7 @@
 #include <World.hxx>
 #include <Exceptions.hxx>
 
+#include <GujaratWorld.hxx>
 #include <cassert>
 
 namespace Gujarat
@@ -77,10 +78,9 @@ void	Sector::updateFeatures( const Engine::Raster& r )
 	computeBiomassAmount( r ); 
 }
 
-void	Sector::updateFeatures()
+void Sector::updateFeatures()
 {
-	const Engine::Raster & raster = _world.getConstDynamicRaster("resources");
-	computeBiomassAmount(raster);
+	computeBiomassAmount(_world.getConstDynamicRaster(eResources));
 }
 /*
 std::string Sector::biomassClass() const

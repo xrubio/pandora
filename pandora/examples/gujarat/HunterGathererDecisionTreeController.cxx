@@ -34,7 +34,7 @@ Sector* HunterGathererDecisionTreeController::getMaxBiomassSector(  HunterGather
 	std::vector< Sector* > validActionSectors;
 	std::vector< Sector* > actionSectors;
 
-	agent.updateKnowledge( agent.getPosition(), agent.getWorld()->getDynamicRaster( "resources" ), actionSectors );
+	agent.updateKnowledge( agent.getPosition(), agent.getWorld()->getDynamicRaster(eResources), actionSectors );
 
 	// MRJ: Remove empty sectors if any
 	for ( unsigned i = 0; i < actionSectors.size(); i++ )

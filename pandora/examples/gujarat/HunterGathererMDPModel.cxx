@@ -1,6 +1,8 @@
+
 #include <HunterGathererMDPModel.hxx>
 #include <HunterGatherer.hxx>
 #include <HunterGathererMDPConfig.hxx>
+#include <GujaratWorld.hxx>
 #include <ForageAction.hxx>
 #include <MoveHomeAction.hxx>
 #include <DoNothingAction.hxx>
@@ -38,11 +40,7 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	_simAgent = dynamic_cast<HunterGatherer *>(&agent);
 
 	// Build initial state from current state in the simulation
-	_initial = new HunterGathererMDPState(	agentRef().getPosition(),
-						agentRef().getOnHandResources(),
-						agentRef().getWorld()->getDynamicRaster( "resources" ),
-						_config.getHorizon(),
-						agentRef().computeConsumedResources(1) );
+	_initial = new HunterGathererMDPState(	agentRef().getPosition(), agentRef().getOnHandResources(), agentRef().getWorld()->getDynamicRaster(eResources), _config.getHorizon(), agentRef().computeConsumedResources(1));
 	makeActionsForState( *_initial );
 	//std::cout << "Initial state: " << *_initial << std::endl;	
 }

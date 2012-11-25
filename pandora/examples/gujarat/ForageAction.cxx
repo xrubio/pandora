@@ -71,7 +71,7 @@ void ForageAction::execute( Engine::Agent & a )
 
 	// 3. execute walk
 	_biomassCollected = 0;
-	doWalk( (GujaratAgent&)a, nearest, maxDistAgentWalk, agent.getWorld()->getDynamicRaster("resources"), _biomassCollected );	
+	doWalk( (GujaratAgent&)a, nearest, maxDistAgentWalk, agent.getWorld()->getDynamicRaster(eResources), _biomassCollected );	
 
 	//std::cout << "biomass collected: " << _biomassCollected << " to calories: " << agent.convertBiomassToCalories(_biomassCollected) << std::endl;
 	_caloriesCollected = agent.convertBiomassToCalories( _biomassCollected );
