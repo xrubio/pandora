@@ -179,15 +179,15 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 			retrieveAttributeMandatory( elem, "type", elemType );
 			if ( !elemType.compare("dune" ) )
 			{
-				retrieveAttributeMandatory( elem, "mean", _duneBiomass );
-				retrieveAttributeMandatory( elem, "stddev", _duneBiomassStdDev );
+				retrieveAttributeMandatory( elem, "value", _duneBiomass );
 				retrieveAttributeMandatory( elem, "efficiency", _duneEfficiency );
+				retrieveAttributeMandatory( elem, "minimum", _duneMinimum);
 			}
 			else if ( !elemType.compare("interdune") )
 			{
-				retrieveAttributeMandatory( elem, "mean", _interduneBiomass );
-				retrieveAttributeMandatory( elem, "stddev", _interduneBiomassStdDev );
+				retrieveAttributeMandatory( elem, "value", _interduneBiomass );
 				retrieveAttributeMandatory( elem, "efficiency", _interduneEfficiency );
+				retrieveAttributeMandatory( elem, "minimum", _interduneMinimum);
 			}
 			else
 			{

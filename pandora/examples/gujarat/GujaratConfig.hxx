@@ -52,17 +52,23 @@ class GujaratConfig : public Engine::Config
 	
 
 	// MRJ: Agro Pastoralists attributes
-	int		_maxCropHomeDistance;
+	int	_maxCropHomeDistance;
 
-	int		_numSectors;
-	float		_massToEnergyRate;
-	float		_energyToCalRate;
-	float		_duneBiomass;
-	float		_duneBiomassStdDev;
-	float		_duneEfficiency;
-	float		_interduneBiomass;
-	float		_interduneBiomassStdDev;
-	float		_interduneEfficiency;
+	int	_numSectors;
+	float _massToEnergyRate;
+	float _energyToCalRate;
+	// quantity of biomass in one dune cell on a mean rain year
+	float _duneBiomass;
+	// percentage of dune biomass that can be used for H/G
+	float _duneEfficiency;
+	// minimum percentage of dune biomass at the end of the year
+	float _duneMinimum;
+	// quantity of biomass in one interdune cell on a mean rain year
+	float _interduneBiomass;
+	// percentage of interdune biomass that can be used for H/G
+	float _interduneEfficiency;
+	// minimum percentage of interdune biomass at the end of the year
+	float _interduneMinimum;
 
 	float _rainHistoricalDistribShape;
 	float _rainHistoricalDistribScale;
