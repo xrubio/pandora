@@ -35,15 +35,16 @@ int main(int argc, char *argv[])
 {
 	if(argc!=4)
 	{
-		throw Engine::Exception("USAGE: statisticsGujarat file.h5 agent.csv rasters.csv");
-		return 0;		
+		throw Engine::Exception("USAGE: analysis file.h5 agent.csv rasters.csv");
+		return 0;
 	}
 
 	try
 	{
-		Engine::SimulationRecord simRecord( 360, false);
-		simRecord.loadHDF5(argv[1], false, true);
+		Engine::SimulationRecord simRecord( 10, false);
+		simRecord.loadHDF5(argv[1], true, false);
 
+		/*
 		Analysis::AgentResults agentResults(simRecord, argv[2], "HunterGatherer");
 		agentResults.addAnalysis(new Analysis::AgentNum());
 		agentResults.addAnalysis(new Analysis::AgentMean("children"));
@@ -56,14 +57,12 @@ int main(int argc, char *argv[])
 //		agentResults.addAnalysis(new Analysis::AgentHDFtoSHP(argv[4], Engine::Point2D<int>(774000,2623000), 31.5f, "EPSG:24312"));
 
 		agentResults.apply();
-
-		/*
+*/
 		Analysis::RasterResults rasterResults(simRecord, argv[3], "resources");
 		rasterResults.addAnalysis(new Analysis::RasterMean());
 		rasterResults.addAnalysis(new Analysis::RasterSum());		
 
 		rasterResults.apply();
-		*/
 	}
 	catch( std::exception & exceptionThrown )
 	{

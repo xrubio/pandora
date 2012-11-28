@@ -330,6 +330,12 @@ void GujaratWorld::recomputeYearlyBiomass()
 	_dailyRainSeasonBiomassIncrease[WATER] = 0.0f;
 	_dailyDrySeasonBiomassDecrease[WATER] = 0.0f;
 	
+	_dailyRainSeasonBiomassIncrease[WATER] = _dailyRainSeasonBiomassIncrease[DUNE];
+	_dailyDrySeasonBiomassDecrease[WATER] = _dailyDrySeasonBiomassDecrease[DUNE];
+
+	_dailyRainSeasonBiomassIncrease[INTERDUNE] = _dailyRainSeasonBiomassIncrease[DUNE];
+	_dailyDrySeasonBiomassDecrease[INTERDUNE] = _dailyDrySeasonBiomassDecrease[DUNE];
+
 	/*
 	// TODO remove
 	Engine::Point2D<int> index;

@@ -1,4 +1,4 @@
-nameProgram = 'statisticsGujarat'
+nameProgram = 'analysis'
 
 srcFiles = Split('main.cxx ../../../MpiStubCode.cxx')
 

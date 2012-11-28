@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<config>
+	<!-- Global simulation parameters -->
+	<output resultsFile="./data/research.h5" logsDir="./logs"/>
+	<numSteps value="300"/>
+	<numInitialPapers value="100">
+	<size value="100"/>
+	<probabilityNewAuthor value="0.2"/>
+	<probabilityNewPaper value="0.5"/>
+	<originalityThreshold value="0.2"/>
+	<citationRatius value="10"/>
+	<researcherLife value="50"/>
+</config>
+
