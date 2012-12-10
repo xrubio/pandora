@@ -10,6 +10,7 @@ controllers = ['DecisionTree']
 #controllers = ['DecisionTree', 'MDP', 'Random']
 #biomassDistributions = ['standard', 'logDecayFromWater', 'linDecayFromWater']
 biomassDistributions = ['logDecayFromWater']
+minimumBiomassValues = ['0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1.0']
 
 xmlTemplate = 'templates/config_template_local.xml'
 
@@ -23,6 +24,7 @@ numExecutionKey = 'NUMEXEC'
 
 climateKey = 'CLIMATESEED'
 biomassDistributionKey = 'BIOMASS_DISTRIBUTION'
+minimumBiomassKey = 'BIOMASS_MINIMUM'
 
 
 def replaceKey( fileName, key, value ):
@@ -46,19 +48,21 @@ for numExecution in range(0,numExecutions):
 		for numHG in numHGs:
 			for controller in controllers:
 				for biomassDistribution in biomassDistributions:
-					print 'creating gujarat instance: ' + str(index) + ' for map: ' + mapSize + ' numHG: ' + numHG + ' with controller: ' + controller + ' biomass distribution: ' + biomassDistribution + ' and execution: ' + str(numExecution)
-					dirName = 'results_size'+mapSize+'_numHG'+numHG+'_controller_'+controller+'_biodist_'+biomassDistribution+'_ex'+str(numExecution)
-					os.system('mkdir '+dirName)
-					configName = dirName + '/config.xml'			
-					os.system('cp '+xmlTemplate+' '+configName)
-					replaceKey(configName, mapSizeKey, mapSize)
-					replaceKey(configName, biomassDistributionKey, biomassDistribution)
-					replaceKey(configName, numHGKey, numHG)
-					replaceKey(configName, controllerKey, controller)
-					replaceKey(configName, climateKey, randomValue)
-					replaceKey(configName, numExecutionKey, str(numExecution))
+					for minimumBiomass in minimumBiomassValues:
+						print 'creating gujarat instance: ' + str(index) + ' for map: ' + mapSize + ' numHG: ' + numHG + ' with controller: ' + controller + ' biomass distribution: ' + biomassDistribution + + ' minimum biomass: ' + minimumBiomass + ' and execution: ' + str(numExecution)
+						dirName = 'results_size'+mapSize+'_numHG'+numHG+'_controller_'+controller+'_biodist_'+biomassDistribution+'_ex'+str(numExecution)
+						os.system('mkdir '+dirName)
+						configName = dirName + '/config.xml'			
+						os.system('cp '+xmlTemplate+' '+configName)
+						replaceKey(configName, mapSizeKey, mapSize)
+						replaceKey(configName, biomassDistributionKey, biomassDistribution)
+						replaceKey(configName, numHGKey, numHG)
+						replaceKey(configName, controllerKey, controller)
+						replaceKey(configName, climateKey, randomValue)
+						replaceKey(configName, minimumBiomassKey, str(minimumBiomass))
+						replaceKey(configName, numExecutionKey, str(numExecution))
 
-					index += 1
+						index += 1
 
 print 'workbench done, submitting tasks'
 index = 0
