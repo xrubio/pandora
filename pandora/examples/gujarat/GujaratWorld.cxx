@@ -8,8 +8,6 @@
 #include <Exceptions.hxx>
 #include <GujaratConfig.hxx>
 #include <OriginalDemographics.hxx>
-#include <RamirezDemographics.hxx>
-#include <AlexisDemographics.hxx>
 
 #include <GeneralState.hxx>
 #include <Logger.hxx>
@@ -375,16 +373,6 @@ void GujaratWorld::stepEnvironment()
 	// resources are updated each time step
 	updateResources();
 	getDynamicRaster(eResources).updateCurrentMinMaxValues();
-
-	unsigned nrAdults = 0;
-	for ( AgentsList::iterator it = _agents.begin(); 
-		it != _agents.end(); it++ )
-		nrAdults += dynamic_cast<GujaratAgent*>((*it))->getNrAvailableAdults();	
-
-	unsigned nrChildren = 0;
-	for ( AgentsList::iterator it = _agents.begin(); 
-		it != _agents.end(); it++ )
-		nrChildren += dynamic_cast<GujaratAgent*>((*it))->getNrChildren();
 
 	// these rasters are only updated at the beginning of seasons
 //	if ( !_climate.cellUpdateRequired() ) return;

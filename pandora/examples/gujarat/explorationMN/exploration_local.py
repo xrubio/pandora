@@ -5,12 +5,13 @@ import fileinput, sys, os, random
 mapSizes = ['1600']
 
 numExecutions = 1
-numHGs = ['500']
+numHGs = ['400']
 controllers = ['DecisionTree']
 #controllers = ['DecisionTree', 'MDP', 'Random']
 #biomassDistributions = ['standard', 'logDecayFromWater', 'linDecayFromWater']
 biomassDistributions = ['logDecayFromWater']
-minimumBiomassValues = ['0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1.0']
+#minimumBiomassValues = ['0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1.0']
+minimumBiomassValues = ['0.1','0.5','1.0']
 
 xmlTemplate = 'templates/config_template_local.xml'
 
@@ -49,8 +50,8 @@ for numExecution in range(0,numExecutions):
 			for controller in controllers:
 				for biomassDistribution in biomassDistributions:
 					for minimumBiomass in minimumBiomassValues:
-						print 'creating gujarat instance: ' + str(index) + ' for map: ' + mapSize + ' numHG: ' + numHG + ' with controller: ' + controller + ' biomass distribution: ' + biomassDistribution + + ' minimum biomass: ' + minimumBiomass + ' and execution: ' + str(numExecution)
-						dirName = 'results_size'+mapSize+'_numHG'+numHG+'_controller_'+controller+'_biodist_'+biomassDistribution+'_ex'+str(numExecution)
+						print 'creating gujarat instance: ' + str(index) + ' for map: ' + mapSize + ' numHG: ' + numHG + ' with controller: ' + controller + ' biomass distribution: ' + biomassDistribution + ' minimum biomass: ' + str(minimumBiomass) + ' and execution: ' + str(numExecution)
+						dirName = 'results_size'+mapSize+'_numHG'+numHG+'_controller_'+controller+'_biodist_'+biomassDistribution+'_biomin_'+minimumBiomass+'_ex'+str(numExecution)
 						os.system('mkdir '+dirName)
 						configName = dirName + '/config.xml'			
 						os.system('cp '+xmlTemplate+' '+configName)
@@ -70,9 +71,10 @@ for mapSize in mapSizes:
 	for numHG in numHGs:
 		for controller in controllers:
 			for biomassDistribution in biomassDistributions:
-				for numExecution in range(0,numExecutions):
-					print 'submitting gujarat instance: ' + str(index) + ' for map: ' + mapSize + ' numHG: ' + numHG + ' with controller: ' + controller + ' and execution: ' + str(numExecution)
-					dirName = 'results_size'+mapSize+'_numHG'+numHG+'_controller_'+controller+'_biodist_'+biomassDistribution+'_ex'+str(numExecution)
-					os.system('../gujarat '+dirName+'/config.xml >'+dirName+'/gujarat.log 2>'+dirName+'/gujarat.err &')
-					index += 1
+				for minimumBiomass in minimumBiomassValues:
+					for numExecution in range(0,numExecutions):
+						print 'submitting gujarat instance: ' + str(index) + ' for map: ' + mapSize + ' numHG: ' + numHG + ' with controller: ' + controller + ' and execution: ' + str(numExecution)
+						dirName = 'results_size'+mapSize+'_numHG'+numHG+'_controller_'+controller+'_biodist_'+biomassDistribution+'_biomin_'+minimumBiomass+'_ex'+str(numExecution)
+						os.system('../gujarat '+dirName+'/config.xml >'+dirName+'/gujarat.log 2>'+dirName+'/gujarat.err')
+						index += 1
 
