@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 
 	try
 	{
-		Engine::SimulationRecord simRecord( 10, false);
+		Engine::SimulationRecord simRecord( 30, false);
 		simRecord.loadHDF5(argv[1], true, false);
 
 		/*

@@ -109,9 +109,9 @@ void GujaratWorld::createRasters()
 	registerDynamicRaster("resourcesFraction", false, eResourcesFraction);
 	getDynamicRaster(eResourcesFraction).setInitValues(0, 100, 0);
 
+	registerDynamicRaster("forageActivity", _config.isStorageRequired("forageActivity"), eForageActivity); 
+	getDynamicRaster(eForageActivity).setInitValues(0, std::numeric_limits<int>::max(), 0);
 	/*
-	registerDynamicRaster("forageActivity", eForageActivity, _config.isStorageRequired("forageActivity")); 
-	getDynamicRaster("forageActivity").setInitValues(0, std::numeric_limits<int>::max(), 0);
 	registerDynamicRaster("homeActivity", eHomeActivity, _config.isStorageRequired("homeActivity"));
 	getDynamicRaster("homeActivity").setInitValues(0, std::numeric_limits<int>::max(), 0);
 	registerDynamicRaster("farmingActivity", eFarmingActivity, _config.isStorageRequired("farmingActivity"));
@@ -327,32 +327,6 @@ void GujaratWorld::recomputeYearlyBiomass()
 
 	_dailyRainSeasonBiomassIncrease[WATER] = 0.0f;
 	_dailyDrySeasonBiomassDecrease[WATER] = 0.0f;
-	
-	_dailyRainSeasonBiomassIncrease[WATER] = _dailyRainSeasonBiomassIncrease[DUNE];
-	_dailyDrySeasonBiomassDecrease[WATER] = _dailyDrySeasonBiomassDecrease[DUNE];
-
-	_dailyRainSeasonBiomassIncrease[INTERDUNE] = _dailyRainSeasonBiomassIncrease[DUNE];
-	_dailyDrySeasonBiomassDecrease[INTERDUNE] = _dailyDrySeasonBiomassDecrease[DUNE];
-
-	/*
-	// TODO remove
-	Engine::Point2D<int> index;
-	for( index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++ )		
-	{
-		for( index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++ )
-		{
-			Soils cellSoil = (Soils)getValue("soils", index);
-			if(cellSoil==INTERDUNE)
-			{
-				setValue("resources", index, heightInterDune);
-			}
-			else if(cellSoil==DUNE)
-			{
-				setValue("resources", index, heightDune);
-			}
-		}
-	}
-	*/
 }
 
 void GujaratWorld::stepEnvironment()

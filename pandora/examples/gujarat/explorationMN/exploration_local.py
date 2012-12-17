@@ -5,13 +5,13 @@ import fileinput, sys, os, random
 mapSizes = ['1600']
 
 numExecutions = 1
-numHGs = ['400']
+numHGs = ['100']
 controllers = ['DecisionTree']
 #controllers = ['DecisionTree', 'MDP', 'Random']
 #biomassDistributions = ['standard', 'logDecayFromWater', 'linDecayFromWater']
-biomassDistributions = ['logDecayFromWater']
+biomassDistributions = ['linDecayFromWater']
 #minimumBiomassValues = ['0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1.0']
-minimumBiomassValues = ['0.1','0.5','1.0']
+minimumBiomassValues = ['0.1']
 
 xmlTemplate = 'templates/config_template_local.xml'
 

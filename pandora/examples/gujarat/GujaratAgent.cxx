@@ -96,7 +96,7 @@ void GujaratAgent::updateState()
 		// Decay factor, modeling spoilage
 		//_collectedResources *= getSurplusSpoilageFactor();
 	}
-	//std::cout << this << " starved: " << _starved << " with available time: " << getAvailableTime() << " collected: " << _collectedResources << " and needed: " << computeConsumedResources(1) << std::endl;
+	std::cout << this << " starved: " << _starved << " with available time: " << getAvailableTime() << " collected: " << _collectedResources << " and needed: " << computeConsumedResources(1) << std::endl;
 
 	/*
 	if ( (getWorld()->getCurrentTimeStep() % ((GujaratWorld*)_world)->getConfig()._daysPerSeason == 0) 

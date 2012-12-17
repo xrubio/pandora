@@ -144,8 +144,8 @@ void	ForageAction::doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0,
 		distHome = n0.distance(n);	
 		int amtCollected = agent.computeEffectiveBiomassForaged( bestScore );
 		//std::cout << "collected: " << amtCollected << " from: " << bestScore << " walkeddist: " << walkedDist << " distHome: " << distHome << " maxdist: " << maxDist << std::endl;
-		//int prevActivity = agent.getWorld()->getValue( "forageActivity", n );
-		//agent.getWorld()->setValue( "forageActivity", n, prevActivity + 1 );
+		int prevActivity = agent.getWorld()->getValue(eForageActivity, n );
+		agent.getWorld()->setValue(eForageActivity, n, prevActivity + 1 );
 		collected += amtCollected;
 
 		// 4. update cell resources & amount collected
