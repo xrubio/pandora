@@ -48,6 +48,7 @@ enum ResourceType
 
 class GujaratWorld : public Engine::World
 {
+
 	long int _agentKey;
 	Climate _climate;
 	const GujaratConfig & _config;
@@ -59,6 +60,8 @@ class GujaratWorld : public Engine::World
 	std::vector<float> _dailyDrySeasonBiomassDecrease;
 	// rectangular Areas surrounding Dunes
 	SettlementAreas    _settlementAreas;
+	// biomass of a cell at the end of the previous year
+	std::vector<float> _remainingBiomass;
 
 	//*********************************************
 	void createRasters();

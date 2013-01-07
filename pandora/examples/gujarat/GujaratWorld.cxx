@@ -13,6 +13,8 @@
 #include <Logger.hxx>
 #include <RasterLoader.hxx>
 #include <Statistics.hxx>
+#include <iomanip>
+
 
 #include <limits>
 
@@ -27,7 +29,8 @@ GujaratWorld::GujaratWorld( Engine::Simulation & simulation, const GujaratConfig
 	_yearlyBiomass.resize(4);
 	_dailyRainSeasonBiomassIncrease.resize(4);
 	_dailyDrySeasonBiomassDecrease.resize(4);
-
+	_remainingBiomass.resize(4);
+	_remainingBiomass[3] = _remainingBiomass[2] = _remainingBiomass[1] = 0.0f;
 }
 
 GujaratWorld::~GujaratWorld()
@@ -263,7 +266,7 @@ void GujaratWorld::updateResources()
 			// 3. Increment or Decrement cell biomass depending on yearly biomass
 			//    figures and current timestep
 			int currentValue = getValue(eResources, index);
-			float currentFraction = (float)getValue(eResourcesFraction, index)/100.0f;
+			float currentFraction = (float)getValue(eResourcesFraction, index)/100.0f;			
 			Soils cellSoil = (Soils)getValue(eSoils, index);
 			if(cellSoil!=WATER)
 			{
@@ -295,14 +298,12 @@ void GujaratWorld::recomputeYearlyBiomass()
 
 	// 2. For each soil type compute yearly biomass	
 
-	float currentDuneValue = _yearlyBiomass[DUNE]*_config._duneMinimum;
-	float currentInterDuneValue = _yearlyBiomass[INTERDUNE]*_config._interduneMinimum;
-
 	// data expressed in g/m2
 	_yearlyBiomass[WATER] = 0.0f;
 	_yearlyBiomass[DUNE] = areaOfCell*_config._duneBiomass * raininessFactor * _config._duneEfficiency;
 	_yearlyBiomass[INTERDUNE] = areaOfCell*_config._interduneBiomass * _config._interduneEfficiency * raininessFactor;
 	
+	//std::cout << std::setprecision(2) << std::fixed << "area of cell: " << areaOfCell << " interdune biomass: " << _config._interduneBiomass << " efficiency: " << _config._interduneEfficiency << " raininess factor: " << raininessFactor << " yearly biomass: " << _yearlyBiomass[INTERDUNE] << std::endl;
 	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " rain: " << _climate.getRain() << " with mean: " << _climate.getMeanAnnualRain());
 	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " yearly biomass of dune: " << _yearlyBiomass[DUNE] << " and interdune: " << _yearlyBiomass[INTERDUNE]);
 
@@ -311,22 +312,25 @@ void GujaratWorld::recomputeYearlyBiomass()
 	// dPS*h/2 + 2*dPS*h/2 = biomass, so h = biomass/1.5*dPS
 	// and A_2 = 2*A_1
 
-	double heightInterDune = (_yearlyBiomass[INTERDUNE]-currentInterDuneValue)/(_config._daysPerSeason*3/2);
-	_dailyRainSeasonBiomassIncrease[INTERDUNE] = heightInterDune/_config._daysPerSeason;
-	double heightInterDuneDecrease = _yearlyBiomass[INTERDUNE]*(1-_config._interduneMinimum)/(_config._daysPerSeason*3/2);
-	_dailyDrySeasonBiomassDecrease[INTERDUNE] = heightInterDuneDecrease/(2*_config._daysPerSeason);
+	double heightInterDune = (_yearlyBiomass[INTERDUNE] + 120.0f*_config._interduneMinimum-60.0*_remainingBiomass[INTERDUNE]) / (180+240*_config._interduneMinimum);
+	_dailyRainSeasonBiomassIncrease[INTERDUNE] = (heightInterDune-_remainingBiomass[INTERDUNE])/120.0f;
+	_remainingBiomass[INTERDUNE] = heightInterDune *_config._interduneMinimum;
+	_dailyDrySeasonBiomassDecrease[INTERDUNE] = heightInterDune*(1-_config._interduneMinimum)/240.0f;
+
 	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " biomass height interdune: " << heightInterDune << " increment: " << _dailyRainSeasonBiomassIncrease[INTERDUNE] << " and decrease: " << _dailyDrySeasonBiomassDecrease[INTERDUNE]);
 	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " calories height interdune: " << _config._massToEnergyRate*_config._energyToCalRate*heightInterDune << " increment: " << _config._massToEnergyRate*_config._energyToCalRate*_dailyRainSeasonBiomassIncrease[INTERDUNE] << " and decrease: " << _config._massToEnergyRate*_config._energyToCalRate*_dailyDrySeasonBiomassDecrease[INTERDUNE]);
 
-	double heightDune = (_yearlyBiomass[DUNE]-currentDuneValue)/(_config._daysPerSeason*3/2);
-	_dailyRainSeasonBiomassIncrease[DUNE] = heightDune/_config._daysPerSeason;
-	double heightDuneDecrease = _yearlyBiomass[DUNE]*(1-_config._duneMinimum)/(_config._daysPerSeason*3/2);
-	_dailyDrySeasonBiomassDecrease[DUNE] = heightDuneDecrease/(2*_config._daysPerSeason);
+	double heightDune = (_yearlyBiomass[DUNE] + 120.0f*_config._duneMinimum-60.0*_remainingBiomass[DUNE]) / (180+240*_config._duneMinimum);
+	_dailyRainSeasonBiomassIncrease[DUNE] = (heightDune-_remainingBiomass[DUNE])/120.0f;
+	_remainingBiomass[DUNE] = heightDune *_config._duneMinimum;
+	_dailyDrySeasonBiomassDecrease[DUNE] = heightDune*(1-_config._duneMinimum)/240.0f;
+
 	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " biomass height dune: " << heightDune << " increment: " << _dailyRainSeasonBiomassIncrease[DUNE] << " and decrease: " << _dailyDrySeasonBiomassDecrease[DUNE]);
 	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " calories height dune: " << _config._massToEnergyRate*_config._energyToCalRate*heightDune << " increment: " << _config._massToEnergyRate*_config._energyToCalRate*_dailyRainSeasonBiomassIncrease[DUNE] << " and decrease: " << _config._massToEnergyRate*_config._energyToCalRate*_dailyDrySeasonBiomassDecrease[DUNE]);
 
 	_dailyRainSeasonBiomassIncrease[WATER] = 0.0f;
 	_dailyDrySeasonBiomassDecrease[WATER] = 0.0f;
+	_remainingBiomass[WATER] = 0.0f;
 }
 
 void GujaratWorld::stepEnvironment()

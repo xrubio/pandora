@@ -41,7 +41,6 @@ void Climate::step()
 		float randomNumber = _uniformDistribution();
 		// TODO document weibull distribution
 		_currentRain = _config._rainHistoricalDistribScale*pow(-log(1.0-randomNumber),(1.0/_config._rainHistoricalDistribShape));
-		std::cout << "new current rain: " << _currentRain << std::endl;
 	}
 }
 
