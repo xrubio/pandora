@@ -58,10 +58,9 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 	}
 
 	element = root->FirstChildElement("rainHistoricalDistribution");
-	retrieveAttributeMandatory( element, "shape", _rainHistoricalDistribShape );
-	retrieveAttributeMandatory( element, "scale", _rainHistoricalDistribScale );
 	retrieveAttributeMandatory( element, "mean", _rainHistoricalDistribMean );
-
+	retrieveAttributeMandatory( element, "stdev", _rainHistoricalDistribStdev );	
+	
 	element = root->FirstChildElement("socialRange");
 	retrieveAttributeMandatory( element, "value", _socialRange );
 	
