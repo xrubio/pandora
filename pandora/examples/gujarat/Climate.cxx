@@ -1,5 +1,4 @@
 
-
 #include <Climate.hxx>
 #include <GujaratConfig.hxx>
 #include <GujaratWorld.hxx>
@@ -14,6 +13,11 @@ Climate::Climate( const GujaratConfig & config, const GujaratWorld& theWorld )
 	: _randomGenerator((long int)config._climateSeed), _currentSeason(HOTDRY),  
 	_currentRain(0.0f),
 	_uniformDistribution(_randomGenerator, boost::uniform_real <> (0,1)), 
+	_alphaRain ( 	(config._rainHistoricalDistribMean/config._rainHistoricalDistribStdev)
+	*(config._rainHistoricalDistribMean/config._rainHistoricalDistribStdev)  ),
+	_betaRain ( config._rainHistoricalDistribMean
+				/
+			(config._rainHistoricalDistribStdev*config._rainHistoricalDistribStdev) ),
 	_config(config), _theWorld( theWorld )
 {
 }
@@ -38,9 +42,13 @@ void Climate::step()
 
 	if(_currentSeason == HOTWET )
 	{
-		float randomNumber = _uniformDistribution();
-		// TODO document weibull distribution
-		_currentRain = _config._rainHistoricalDistribScale*pow(-log(1.0-randomNumber),(1.0/_config._rainHistoricalDistribShape));
+		// TODO document ODD : change weibull for gamma
+		
+		boost::gamma_distribution<> gd(_alphaRain);
+		boost::variate_generator<boost::mt19937&, boost::gamma_distribution<> >
+		var_gamma(_randomGenerator, gd);
+		
+		_currentRain = var_gamma()*1.0/_betaRain;
 	}
 }
 

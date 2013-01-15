@@ -288,6 +288,17 @@ void GujaratWorld::updateResources()
 
 void GujaratWorld::recomputeYearlyBiomass()
 {
+	// update all the map resources to the minimum of the year (in case it was diminished by agents)
+	Engine::Point2D<int> index;
+	for( index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++ )                
+	{
+		for( index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++ )
+		{
+			setValue(eResourcesFraction, index, 0);
+			setValue(eResources, index, _remainingBiomass[getValue(eSoils, index)]);
+		}
+	}
+
 	std::stringstream logName;
 	logName << "World_" << _simulation.getId();
 	// 1. Compute factor between actual rain and average rain		

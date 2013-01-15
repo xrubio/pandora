@@ -70,9 +70,9 @@ class GujaratConfig : public Engine::Config
 	// minimum percentage of interdune biomass at the end of the year
 	float _interduneMinimum;
 
-	float _rainHistoricalDistribShape;
-	float _rainHistoricalDistribScale;
 	float _rainHistoricalDistribMean;
+	float _rainHistoricalDistribStdev;
+	
 	float _surplusSpoilage;
 
 	std::string	_hunterGathererController;
