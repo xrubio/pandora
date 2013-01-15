@@ -31,7 +31,7 @@
 	</biomassDistribution>
 	<!-- Climatic model parameters -->
 	<climateSeed value="1"/>
-	<rainHistoricalDistribution shape="2.628" scale="5278.807" mean="4643.847826087"/>
+	<rainHistoricalDistribution mean="4643.848" stdev="1885.158"/>
 	<!-- Agents definition -->
 	<!-- overlap will be defined as homeRange + 1. It must be < 1/4 of world size -->
 	<!-- * Walking Speed Hour = # meters traversed per hour -->
