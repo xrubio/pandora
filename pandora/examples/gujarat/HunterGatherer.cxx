@@ -29,16 +29,16 @@ void HunterGatherer::registerAttributes()
 	log_DEBUG(logName.str(), "registering attributes for type: " << getType());
 
 	registerIntAttribute("MoveHome actions");
-	registerIntAttribute("Forage actions");
+//	registerIntAttribute("Forage actions");
 	registerIntAttribute("agent age");
-	registerIntAttribute("male alive");
-	registerIntAttribute("male age");
-	registerIntAttribute("female alive");
-	registerIntAttribute("female age");
+//	registerIntAttribute("male alive");
+//	registerIntAttribute("male age");
+//	registerIntAttribute("female alive");
+//	registerIntAttribute("female age");
 	registerIntAttribute("children");
 	registerIntAttribute("collected resources");
 	registerIntAttribute("starving %");
-	registerIntAttribute("starving days x 100");
+//	registerIntAttribute("starving days x 100");
 	log_DEBUG(logName.str(), "registering attributes for type: " << getType() << " finished");
 }
 
@@ -230,7 +230,7 @@ bool HunterGatherer::cellRelevant( Engine::Point2D<int>& loc )
 void HunterGatherer::serialize()
 {
 	serializeAttribute("agent age", _age);
-
+/*
 	if(_populationAges[0]!=-1)
 	{
 		serializeAttribute("male alive", 1);
@@ -252,7 +252,7 @@ void HunterGatherer::serialize()
 		serializeAttribute("female alive", 0);
 		serializeAttribute("female age", std::numeric_limits<int>::max());
 	}
-
+*/
 	int numChildren = 0;
 	for(unsigned i=2; i<_populationAges.size(); i++)
 	{
@@ -264,9 +264,9 @@ void HunterGatherer::serialize()
 	serializeAttribute("children", numChildren);
 	serializeAttribute("collected resources", _collectedResources);
 	serializeAttribute("starving %", getPercentageOfStarvingDays());
-	serializeAttribute("starving days x 100", _starved*100.0f);
+//	serializeAttribute("starving days x 100", _starved*100.0f);
 	serializeAttribute("MoveHome actions", _moveHomeActionsExecuted);
-	serializeAttribute("Forage actions", _forageActionsExecuted);
+//	serializeAttribute("Forage actions", _forageActionsExecuted);
 }
 
 } // namespace Gujarat

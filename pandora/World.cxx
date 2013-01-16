@@ -271,7 +271,7 @@ void World::stepSection( const int & sectionIndex )
 	int numExecutedAgents = 0;
 	AgentsList agentsToSend;
 
-#ifdef PANDORAEDEBUG
+#ifndef PANDORAEDEBUG
 	// plan actions, disabled for debug
 	#pragma omp parallel for
 #endif
