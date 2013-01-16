@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <config>  
 	<!-- Global simulation parameters -->
-	<output resultsFile="../data_biominBIOMASS_MINIMUM_exNUMEXEC/gujarat.h5" logsDir="../logs_biominBIOMASS_MINIMUM_exNUMEXEC"/>
+	<output resultsFile="/gpfs/projects/bsc21/WORK-RUBIO/data_biominBIOMASS_MINIMUM_exNUMEXEC/gujarat.h5" logsDir="/gpfs/projects/bsc21/WORK-RUBIO/logs_biominBIOMASS_MINIMUM_exNUMEXEC"/>
 	<numSteps value="18000"/>
 	<!-- g to KJ -->
 	<massToEnergyRate value="20" />
@@ -22,14 +22,14 @@
 	<cellBiomass type="dune" value="700" efficiency="0.13" minimum="BIOMASS_MINIMUM" />
 	<cellBiomass type="interdune" value="4000" efficiency="0.23" minimum="BIOMASS_MINIMUM" />
 	<!-- type of biomass distribution. Now can be standard, lin decay from water, or log decay from water -->
-	<biomassDistribution type="BIOMASS_DISTRIBUTION" distToWaterFile="../resources/1600/dist_water_1600.tiff" size="1600">
-		<logDecayFromWater weightFile="../resources/MAPSIZE/logWeight_water_1600.tiff" sumWeights="25091970"/>
-		<linDecayFromWater weightFile="../resources/MAPSIZE/linWeight_water_1600.tiff" sumWeights="16423239174"/>
+	<biomassDistribution type="linDecayFromWater" distToWaterFile="../../resources/1600/dist_water_1600.tiff" size="1600">
+		<logDecayFromWater weightFile="../../resources/1600/logWeight_water_1600.tiff" sumWeights="25091970"/>
+		<linDecayFromWater weightFile="../../resources/1600/linWeight_water_1600.tiff" sumWeights="16423239174"/>
 	</biomassDistribution>
 	<!-- GIS rasters -->
-	<soil fileName="../../resources/MAPSIZE/soils_MAPSIZE.tiff" size="MAPSIZE"/>
-	<dem fileName="../../resources/MAPSIZE/dem_MAPSIZE.tiff" size="MAPSIZE"/>
-	<duneMap fileName="../../resources/MAPSIZE/dunes_MAPSIZE_low.tiff" size="MAPSIZE"/>
+	<soil fileName="../../resources/1600/soils_1600.tiff" size="1600"/>
+	<dem fileName="../../resources/1600/dem_1600.tiff" size="1600"/>
+	<duneMap fileName="../../resources/1600/dunes_1600_low.tiff" size="1600"/>
 	<!-- Climatic model parameters -->
 	<climateSeed value="CLIMATESEED"/>
 	<rainHistoricalDistribution shape="2.628" scale="5278.807" mean="4643.847826087"/>
@@ -45,7 +45,7 @@
 		walkingSpeedHour="3000"
 		forageTimeCost="0.5"
 		demographicsModel="original"
-		controllerType="CTYPE" >
+		controllerType="DecisionTree" >
 		<!-- * width = number of trials before selecting an action, the higher the
 		 	the number, the more informed is the action selection and more
 			computation time is required -->

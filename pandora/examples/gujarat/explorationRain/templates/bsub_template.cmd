@@ -10,5 +10,5 @@
 export OMP_NUM_THREADS=4
 # You can choose the parallel environment through modules
 module load gnu openmpi
-mpirun -np 1 -npernode 4 ./gujarat
+mpirun -np 1 -npernode 4 ../../gujarat
 
