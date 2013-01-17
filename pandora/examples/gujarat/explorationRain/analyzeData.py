@@ -19,8 +19,8 @@ for numExecution in range(0,numExecutions):
 	for minimumBiomass in minimumBiomassValues:
 			print 'analyzing results for instance with: ' + str(index) + ' with min biomass: ' + minimumBiomass + ' and execution: ' + str(numExecution)
 			fileName = dirBase + 'data_biomin'+minimumBiomass+'_ex'+str(numExecution)+'/gujarat.h5'
-			outputAgents = outputDir+'/agents_biomin'+minimumBiomass+'_ex'+str(numExecution)
-			outputRasters = outputDir+'/rasters_biomin'+minimumBiomass+'_ex'+str(numExecution)
+			outputAgents = outputDir+'/agents_biomin'+minimumBiomass+'_ex'+str(numExecution)+'.csv'
+			outputRasters = outputDir+'/rasters_biomin'+minimumBiomass+'_ex'+str(numExecution)+'.csv'
 			outputLogDir = dirBase+'/logs_biomin'+minimumBiomass+'_ex'+str(numExecution)
 			os.system('../analysis/analysis '+fileName+' ' + outputAgents + ' ' + outputRasters)
 			os.system('mkdir '+logsDir+'/biomin_'+minimumBiomass+'_ex'+str(numExecution))
