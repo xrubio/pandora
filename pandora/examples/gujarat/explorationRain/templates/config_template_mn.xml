@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <config>  
 	<!-- Global simulation parameters -->
-	<output resultsFile="/gpfs/projects/bsc21/WORK-RUBIO/data_biominBIOMASS_MINIMUM_exNUMEXEC/gujarat.h5" logsDir="/gpfs/projects/bsc21/WORK-RUBIO/logs_biominBIOMASS_MINIMUM_exNUMEXEC"/>
+	<output resultsFile="/gpfs/projects/bsc21/WORK-RUBIO/data_biominBIOMASS_MINIMUM_meanMEAN_stddevSTDDEV_exNUMEXEC/gujarat.h5" logsDir="/gpfs/projects/bsc21/WORK-RUBIO/logs_biominBIOMASS_MINIMUM_meanMEAN_stddevSTDDEV_exNUMEXEC"/>
 	<numSteps value="18000"/>
 	<!-- g to KJ -->
 	<massToEnergyRate value="20" />
@@ -32,7 +32,7 @@
 	<duneMap fileName="../../resources/1600/dunes_1600_low.tiff" size="1600"/>
 	<!-- Climatic model parameters -->
 	<climateSeed value="CLIMATESEED"/>
-	<rainHistoricalDistribution shape="2.628" scale="5278.807" mean="4643.847826087"/>
+	<rainHistoricalDistribution mean="MEAN" stdev="STDDEV"/>
 	<!-- Agents definition -->
 	<!-- overlap will be defined as homeRange + 1. It must be < 1/4 of world size -->
 	<!-- * Walking Speed Hour = # meters traversed per hour -->
