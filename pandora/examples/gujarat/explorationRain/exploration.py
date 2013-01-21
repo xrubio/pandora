@@ -1,12 +1,12 @@
 #!/usr/bin/python
 import fileinput, sys, os, random
 
-numExecutions = 5
+numExecutions = 1
 
 #minimumBiomassValues = ['0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1.0']
-minimumBiomassValues = ['0.1', '0.2']
-meanValues = ['4643', '0']
-stdDevValues = ['1885', '32']
+minimumBiomassValues = ['0.1', '0.5']
+meanValues = ['4643', '3643']
+stdDevValues = ['1885', '2885']
 
 xmlTemplate = 'templates/config_template_mn.xml'
 runTemplate = 'templates/bsub_template.cmd'
@@ -58,10 +58,12 @@ for numExecution in range(0,numExecutions):
 
 print 'workbench done, submitting tasks'
 index = 0
-for minimumBiomass in minimumBiomassValues:
-	for numExecution in range(0,numExecutions):
-		print 'submitting gujarat instance: ' + str(index) + ' with min biomass: ' + minimumBiomass + ' mean: ' + mean + ' stddev: ' + stddev + ' and execution: ' + str(numExecution)
-		dirName = 'results_biomin'+minimumBiomass+'_mean'+mean+'_stddev'+stddev+'_ex'+str(numExecution)
-		os.system('bsub < '+dirName+'/bsub_gujarat.cmd')
-		index += 1
+for minimumBiomass in minimumBiomassValues:	
+	for mean in meanValues :
+		for stddev in stdDevValues:
+			for numExecution in range(0,numExecutions):
+				print 'submitting gujarat instance: ' + str(index) + ' with min biomass: ' + minimumBiomass + ' mean: ' + mean + ' stddev: ' + stddev + ' and execution: ' + str(numExecution)
+				dirName = 'results_biomin'+minimumBiomass+'_mean'+mean+'_stddev'+stddev+'_ex'+str(numExecution)
+				os.system('bsub < '+dirName+'/bsub_gujarat.cmd')
+				index += 1
 
