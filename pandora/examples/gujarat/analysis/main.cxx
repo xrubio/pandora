@@ -46,9 +46,9 @@ int main(int argc, char *argv[])
 
 		Analysis::AgentResults agentResults(simRecord, argv[2], "HunterGatherer");
 		agentResults.addAnalysis(new Analysis::AgentNum());
+		agentResults.addAnalysis(new Analysis::AgentMean("agent age"));
 		agentResults.addAnalysis(new Analysis::AgentMean("children"));
 		agentResults.addAnalysis(new Analysis::AgentSum("children"));
-		agentResults.addAnalysis(new Analysis::AgentMean("agent age"));
 		agentResults.addAnalysis(new Analysis::AgentMean("collected resources"));
 		agentResults.addAnalysis(new Analysis::AgentMean("starving %"));
 //		agentResults.addAnalysis(new Analysis::AgentMean("starving days x 100"));
