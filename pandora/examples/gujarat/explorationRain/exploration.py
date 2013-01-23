@@ -4,9 +4,10 @@ import fileinput, sys, os, random
 numExecutions = 1
 
 #minimumBiomassValues = ['0.1','0.2','0.3','0.4','0.5','0.6','0.7','0.8','0.9','1.0']
-minimumBiomassValues = ['0.1', '0.5']
-meanValues = ['4643', '3643']
-stdDevValues = ['1885', '2885']
+minimumBiomassValues = ['0.1']
+
+meanValues = ['0', '200', '400', '600', '800', '1000', '1200', '1400', '1600', '1800', '2000', '2200', '2400', '2600', '2800', '3000', '3200', '3400', '3600', '3800', '4000', '4200', '4400','4600','4800','5000','5200','5400','5600','5800','6000','6200','6400','6600','6800','7000']
+stdDevValues = ['1885']
 
 xmlTemplate = 'templates/config_template_mn.xml'
 runTemplate = 'templates/bsub_template.cmd'
@@ -26,7 +27,8 @@ def replaceKey( fileName, key, value ):
 		sys.stdout.write(line)
 	fileinput.close()
 
-os.system('rm -rf results_*')
+os.system('rm -rf mean/')
+os.system('mkdir mean')
 
 index = 0
 print 'creating test workbench'
@@ -40,7 +42,7 @@ for numExecution in range(0,numExecutions):
 		for mean in meanValues :
 			for stddev in stdDevValues:
 				print 'creating gujarat instance: ' + str(index) + ' for minimum biomass: ' + minimumBiomass + ' mean: ' + mean + ' stddev: ' + stddev + ' and execution: ' + str(numExecution)
-				dirName = 'results_biomin'+minimumBiomass+'_mean'+mean+'_stddev'+stddev+'_ex'+str(numExecution)
+				dirName = 'mean/results_biomin'+minimumBiomass+'_mean'+mean+'_stddev'+stddev+'_ex'+str(numExecution)
 				os.system('mkdir '+dirName)
 				configName = dirName + '/config.xml'			
 				os.system('cp '+xmlTemplate+' '+configName)
@@ -63,7 +65,7 @@ for minimumBiomass in minimumBiomassValues:
 		for stddev in stdDevValues:
 			for numExecution in range(0,numExecutions):
 				print 'submitting gujarat instance: ' + str(index) + ' with min biomass: ' + minimumBiomass + ' mean: ' + mean + ' stddev: ' + stddev + ' and execution: ' + str(numExecution)
-				dirName = 'results_biomin'+minimumBiomass+'_mean'+mean+'_stddev'+stddev+'_ex'+str(numExecution)
+				dirName = 'mean/results_biomin'+minimumBiomass+'_mean'+mean+'_stddev'+stddev+'_ex'+str(numExecution)
 				os.system('bsub < '+dirName+'/bsub_gujarat.cmd')
 				index += 1
 
