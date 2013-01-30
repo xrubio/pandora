@@ -460,7 +460,7 @@ void World::sendOverlapZones( const int & sectionIndex, const bool & entireOverl
 			for(int n=0; n<send->_data.size(); n++)
 			{
 				Point2D<int> index(overlapZone._origin._x+n%overlapZone._size._x, overlapZone._origin._y+n/overlapZone._size._x);
-				send->_data.at(n) = getValue(d, index);
+				send->_data.at(n) = getDynamicRaster(d).getValue(index);
 				log_EDEBUG(logName.str(), "\t" << getWallTime() << " step: " << _step << "/" << sectionIndex << " send index: " << index << " in global pos: " << index+_overlapBoundaries._origin << " value: " << send->_data.at(n));
 			}
 			MPI_Isend(&send->_data[0], send->_data.size(), MPI_INTEGER, neighborsToUpdate[i], eRasterData, MPI_COMM_WORLD, &send->_request);
@@ -491,11 +491,11 @@ void World::sendMaxOverlapZones()
 			send->_overlap = getInternalOverlap(_neighbors[i]);
 			send->_data.resize(send->_overlap._size._x * send->_overlap._size._y);
 			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " will send max overlap of: " << d << " to: " << _neighbors[i] << " with size: " << send->_data.size() << " and zone: " << send->_overlap << " to " << _neighbors[i]);
-			const Rectangle<int> & overlapZone = send->_overlap;	
+			const Rectangle<int> & overlapZone = send->_overlap;
 			for(int n=0; n<send->_data.size(); n++)
 			{
 				Point2D<int> index(overlapZone._origin._x+n%overlapZone._size._x, overlapZone._origin._y+n/overlapZone._size._x);
-				send->_data.at(n) = getMaxValueAt(d, index);
+				send->_data.at(n) = getDynamicRaster(d).getMaxValueAt(index);
 				log_EDEBUG(logName.str(), "\t" << getWallTime() << " step: " << _step << " send index: " << index << " in global pos: " << index+_overlapBoundaries._origin << " max value: " << send->_data.at(n));
 			}
 			MPI_Isend(&send->_data[0], send->_data.size(), MPI_INTEGER, _neighbors[i], eRasterMaxData, MPI_COMM_WORLD, &send->_request);
@@ -1323,7 +1323,10 @@ int World::getMaxValueAt( const std::string & key, const Point2D<int> & position
 
 int World::getMaxValueAt( const int & index, const Point2D<int> & position )
 {
+	std::stringstream logName;
+	logName << "max_value_" << _simulation.getId();
 	Point2D<int> localPosition(position - _overlapBoundaries._origin);	
+	log_DEBUG(logName.str(), getWallTime() << " accessing to pos: " << position << " real: " << localPosition << " with overlap: " << _overlapBoundaries << " for index: " << index);
 	return ((Raster*)_rasters.at(index))->getMaxValueAt(localPosition);
 }
 
