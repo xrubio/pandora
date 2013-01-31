@@ -258,16 +258,22 @@ void GujaratWorld::updateSoilCondition()
 
 void GujaratWorld::updateResources()
 {
+	std::stringstream logName;
+	logName << "updateResources_" << _simulation.getId();
+	log_DEBUG(logName.str(), getWallTime() << " initiating");
+
 	Engine::Point2D<int> index;
 	for( index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++ )		
 	{
 		for( index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++ )
 		{
+			//log_DEBUG(logName.str(), getWallTime() << " index: " << index << " with boundaries: " << _boundaries);
 			// 3. Increment or Decrement cell biomass depending on yearly biomass
 			//    figures and current timestep
 			int currentValue = getValue(eResources, index);
-			float currentFraction = (float)getValue(eResourcesFraction, index)/100.0f;			
+			float currentFraction = (float)getValue(eResourcesFraction, index)/100.0f;
 			Soils cellSoil = (Soils)getValue(eSoils, index);
+			//log_DEBUG(logName.str(), getWallTime() << " index: " << index << " current: " << currentValue << " fraction: " << currentFraction << " cell soil: " << cellSoil);
 			if(cellSoil!=WATER)
 			{
 				Seasons season = _climate.getSeason();
@@ -279,11 +285,13 @@ void GujaratWorld::updateResources()
 				float newValue = std::max(0.0f, currentValue+currentFraction+getBiomassVariation(wetSeason, cellSoil, index));
 				currentValue = newValue;
 				float fraction = 100.0f*(newValue  - currentValue);
+				//log_DEBUG(logName.str(), getWallTime() << " newValue: " << currentValue << " fraction: " << fraction);
 				setValue(eResources, index, currentValue);
 				setValue(eResourcesFraction, index, (int)fraction);
 			}
 		}
 	}
+	log_DEBUG(logName.str(), getWallTime() << " end of updateResources");
 }
 
 void GujaratWorld::recomputeYearlyBiomass()

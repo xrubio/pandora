@@ -463,6 +463,7 @@ void World::sendOverlapZones( const int & sectionIndex, const bool & entireOverl
 				send->_data.at(n) = getDynamicRaster(d).getValue(index);
 				log_EDEBUG(logName.str(), "\t" << getWallTime() << " step: " << _step << "/" << sectionIndex << " send index: " << index << " in global pos: " << index+_overlapBoundaries._origin << " value: " << send->_data.at(n));
 			}
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " raster: " << d << " will be sent");
 			MPI_Isend(&send->_data[0], send->_data.size(), MPI_INTEGER, neighborsToUpdate[i], eRasterData, MPI_COMM_WORLD, &send->_request);
 			_sendRequests.push_back(send);
 			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " raster: " << d << " data sent to: " << _neighbors[i]);

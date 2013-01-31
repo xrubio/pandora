@@ -186,6 +186,7 @@ void SettlementAreas::generateAreas(GujaratWorld &w, int lowResolution)
 			testDuneInside(newArea, w);
 		}
 	}
+	log_DEBUG(logName.str(), "generate areas done");
 }
 
 void SettlementAreas::intersectionFilter(Engine::Rectangle<int> & r, std::vector<int> & candidates) const

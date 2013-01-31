@@ -1,0 +1,17 @@
+
+This model simulates a military engagement of the gunpowder era (XVII-XIXth centuries), and the excavation of the generated battlefield.
+
+
+The structure is as follows:
+
+- battle -> Simulation of the engagement
+- removeBullets -> Algorithm removing material evidence from the battlefield, modelling the effect of post-depositional processes
+- excavation -> Simulation of the archaeological fieldworks, with agents collecting musket bullets under different survey conditions
+
+References:
+
+Rubio-Campillo, X., Cela, J.M. & Hernàndez, F.X. (2013) The development of new infantry tactics during the early eighteenth century: a computer simulation approach to modern military history. Journal of Simulation 1-13.
+
+Rubio-Campillo, X., Cela, J.M. & Hernàndez, F.X. (2012) Simulating archaeologists? Using agent-based modelling to improve battlefield excavations. Journal of Archaeological Science 347-356.
+
+Wittek, P. & Rubio-Campillo, X. (2012) Military Reconstructive Simulation in the Cloud to Aid Battlefield Excavations. 2012 IEEE 4th International Conference on Cloud Computing Technology and Science 869-874.
