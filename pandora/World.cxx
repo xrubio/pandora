@@ -435,11 +435,11 @@ void World::sendOverlapZones( const int & sectionIndex, const bool & entireOverl
 
 	for(int d=0; d<_rasters.size(); d++)
 	{
-		if(!_dynamicRasters.at(d))
+		if(!_rasters.at(d) || !_dynamicRasters.at(d))
 		{
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " index: " << d << " not sending");
 			continue;
 		}
-
 		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " sending raster: " << d);
 		for(int i=0; i<neighborsToUpdate.size(); i++)
 		{
@@ -480,7 +480,7 @@ void World::sendMaxOverlapZones()
 	log_DEBUG(logName.str(), getWallTime() << " step: "  << _step << " sendMaxOverlapZones");
 	for(int d=0; d<_rasters.size(); d++)
 	{
-		if(!_dynamicRasters.at(d))
+		if(!_rasters.at(d) || !_dynamicRasters.at(d))
 		{
 			continue;
 		}
@@ -762,8 +762,8 @@ void World::receiveOverlapData( const int & sectionIndex, const bool & entireOve
 
 	// for each raster, we receive data from all the active neighbors
 	for(int d=0; d<_rasters.size(); d++)
-	{
-		if(!_dynamicRasters.at(d))
+	{	
+		if(!_rasters.at(d) || !_dynamicRasters.at(d))
 		{
 			continue;
 		}
@@ -784,7 +784,7 @@ void World::receiveOverlapData( const int & sectionIndex, const bool & entireOve
 				receive->_overlap = getExternalOverlap(neighborsToUpdate[i]);
 				log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " receive external overlap: " << receive->_overlap << " from " << neighborsToUpdate[i]);
 			}
-
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " AAA will receive overlap from: " << neighborsToUpdate[i] << " with size: " << receive->_data.size() << " and zone: " << receive->_overlap );
 			receive->_data.resize(receive->_overlap._size._x*receive->_overlap._size._y);
 			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " will receive overlap from: " << neighborsToUpdate[i] << " with size: " << receive->_data.size() << " and zone: " << receive->_overlap );
 			MPI_Irecv(&receive->_data[0], receive->_data.size(), MPI_INTEGER, neighborsToUpdate[i], eRasterData, MPI_COMM_WORLD, &receive->_request);
@@ -803,7 +803,7 @@ void World::receiveMaxOverlapData()
 	// for each raster, we receive data from all the active neighbors
 	for(int d=0; d<_rasters.size(); d++)
 	{
-		if(!_dynamicRasters.at(d))
+		if(!_rasters.at(d) || !_dynamicRasters.at(d))
 		{
 			continue;
 		}
@@ -1116,7 +1116,7 @@ void World::serializeRasters()
 {
 	for(int d=0; d<_rasters.size(); d++)
 	{
-		if(!_serializeRasters.at(d) || !_dynamicRasters.at(d))
+		if(!_rasters.at(d) || !_serializeRasters.at(d) || !_dynamicRasters.at(d))
 		{
 			continue;
 		}
@@ -1130,7 +1130,7 @@ void World::serializeStaticRasters()
 {
 	for(int d=0; d<_rasters.size(); d++)
 	{
-		if(!_serializeRasters.at(d) || _dynamicRasters.at(d))
+		if(!_rasters.at(d) || !_serializeRasters.at(d) || _dynamicRasters.at(d))			
 		{
 			continue;
 		}
@@ -1144,7 +1144,7 @@ void World::stepEnvironment()
 {
 	for(int d=0; d<_rasters.size(); d++)
 	{
-		if(!_dynamicRasters.at(d))
+		if(!_rasters.at(d) || !_dynamicRasters.at(d))
 		{
 			continue;
 		}
@@ -1173,10 +1173,15 @@ void World::registerDynamicRaster( const std::string & key, const bool & seriali
 	{
 		index = _rasters.size();
 	}
-		
+	
 	if(_rasters.size()<=index)
 	{
+		int oldSize = _rasters.size();
 		_rasters.resize(index+1);
+		for(int i=oldSize; i<_rasters.size(); i++)
+		{
+			_rasters.at(i) = 0;
+		}
 		_dynamicRasters.resize(index+1);
 		_serializeRasters.resize(index+1);
 	}
@@ -1200,8 +1205,13 @@ void World::registerStaticRaster( const std::string & key, const bool & serializ
 	}
 		
 	if(_rasters.size()<=index)
-	{
+	{	
+		int oldSize = _rasters.size();
 		_rasters.resize(index+1);
+		for(int i=oldSize; i<_rasters.size(); i++)
+		{
+			_rasters.at(i) = 0;
+		}
 		_dynamicRasters.resize(index+1);
 		_serializeRasters.resize(index+1);
 	}
