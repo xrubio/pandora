@@ -19,7 +19,7 @@ class Analysis
 {
 protected:
 	std::string _name;
-	std::vector<float> _results;
+	std::vector<double> _results;
 	// if _writeResults is false _results will not be written in csv file
 	// it is used for analysis that produce other results (i.e. AgentHDFtoSHP parser)
 	bool _writeResults;
