@@ -17,7 +17,7 @@ namespace Analysis
 
 class RasterMean : public RasterAnalysis
 {
-	int _numCells;
+	long int _numCells;
 public:
 	RasterMean();
 	virtual ~RasterMean();

@@ -47,11 +47,11 @@ void RasterMean::postProcess()
 	{
 		if(_numCells>0)
 		{
-			_results[i] /= _numCells;
+			_results[i] = ((long int)_results.at(i))/_numCells;
 		}
 		else
 		{
-			_results[i] = 0.0f;
+			_results.at(i) = 0.0f;
 		}
 	}
 }
