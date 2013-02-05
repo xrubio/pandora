@@ -1,33 +1,18 @@
 
 #include "Soldier.hxx"
-
 #include "Bullet.hxx"
 
-#include "Exceptions.hxx"
-#include "Statistics.hxx"
-#include "World.hxx"
+#include <Exceptions.hxx>
+#include <World.hxx>
 #include <cstring>
+#include <Statistics.hxx>
+#include <GeneralState.hxx>
 
 namespace BattleSim
 {
 
-Soldier::Soldier( const std::string & id, const int & rank, const int & cohesionRating, const int & cohesionDistance, const int & accuracy ) : Agent(id), _isBlueSide(isType("blueSoldier")), _rank(rank), _stress(0), _threshold(1000), _fireDistance(160), _cohesionRating(cohesionRating), _cohesionDistance(cohesionDistance), _moving(true), _routing(false), _reloadingTime(45), _timeUntilLoaded(0), _accuracy(accuracy), _delayBeforeFirstFire(0)
+Soldier::Soldier( const std::string & id, const int & rank, const int & cohesionRating, const int & cohesionDistance, const int & accuracy, const int & reloadingTime ) : Agent(id), _isBlueSide(isType("blueSoldier")), _rank(rank), _stress(0), _threshold(1000), _fireDistance(160), _cohesionRating(cohesionRating), _cohesionDistance(cohesionDistance), _moving(true), _routing(false), _reloadingTime(reloadingTime), _timeUntilLoaded(0), _accuracy(accuracy), _delayBeforeFirstFire(0)
 {
-}
-
-Soldier::Soldier( const SoldierPackage & package ) : Agent(package._id)
-{
-	_position = package._position;
-	_isBlueSide = package._isBlueSide;
-	_stress = package._stress;
-	_cohesionRating = package._cohesionRating;
-	_cohesionDistance = package._cohesionDistance;
-	_rank = package._rank;
-	_moving = package._moving;
-	_routing = package._routing;
-	_reloadingTime = package._reloadingTime;
-	_timeUntilLoaded = package._timeUntilLoaded;
-	_accuracy = package._accuracy;
 }
 
 Soldier::~Soldier()
@@ -45,8 +30,13 @@ void Soldier::move()
 			// we check 5 meters after firing distance, in order to allow read lines to fire
 			for(front._y=_position._y+_fireDistance-10; front._y>_position._y; front._y--)
 			{
-				Agent * agent = _world->getAgent(front);
-				if(agent && agent->exists() && agent->isType("redSoldier"))
+				Engine::World::AgentsVector agents = _world->getAgent(front);
+				if(agents.size()==0)
+				{
+					continue;
+				}
+				Agent * agent = agents.at(0);
+				if(agent->exists() && agent->isType("redSoldier"))
 				{
 					_moving = false;
 					//std::cout << "unit: " << this << " in rank: " << _rank << " stops" << std::endl;
@@ -66,9 +56,14 @@ void Soldier::move()
 			Engine::Point2D<int> front(_position._x, 0);
 			// we check 5 meters after firing distance, in order to allow read lines to fire
 			for(front._y=_position._y-_fireDistance+10; front._y<_position._y; front._y++)
-			{
-				Agent * agent = _world->getAgent(front);
-				if(agent && agent->exists() && agent->isType("blueSoldier"))
+			{	
+				Engine::World::AgentsVector agents = _world->getAgent(front);
+				if(agents.size()==0)
+				{
+					continue;
+				}
+				Agent * agent = agents.at(0);
+				if(agent->exists() && agent->isType("blueSoldier"))
 				{
 					_moving = false;
 					//std::cout << "unit: " << this << " in rank: " << _rank << " stops" << std::endl;
@@ -86,7 +81,6 @@ void Soldier::move()
 	}
 	else
 	{
-		Agent * forward = 0;
 		Engine::Point2D<int> forwardPos(_position._x, _position._y);
 		int advance = 1;
 		if(!_isBlueSide)
@@ -97,9 +91,14 @@ void Soldier::move()
 		for(int i=1; i<11; i++)
 		{
 			Engine::Point2D<int> forwardPos(_position._x, _position._y+advance*i);
-			forward = _world->getAgent(forwardPos);
+			Engine::World::AgentsVector forwardAgents = _world->getAgent(forwardPos);
+			if(forwardAgents.size()==0)
+			{
+				continue;
+			}
+			Agent * forward = forwardAgents.at(0);
 			// if you found a soldier in front of you
-			if(forward && forward->isType(getType()))
+			if(forward->isType(getType()))
 			{
 				Soldier * forwardSoldier = (Soldier*)forward;
 				if(forwardSoldier->isMoving())
@@ -150,7 +149,7 @@ void Soldier::fire()
 	Bullet * firedBullet = new Bullet(oss.str(), _accuracy);
 	firedBullet->setPosition(bulletPosition);
 	_world->addAgent(firedBullet);
-	firedBullet->setMuzzleVelocity(_world->getStatistics().getNormalDistValue(50, 450));
+	firedBullet->setMuzzleVelocity(Engine::GeneralState::statistics().getNormalDistValue(50, 450));
 	
 	_timeUntilLoaded = _reloadingTime;
 }
@@ -166,9 +165,9 @@ void Soldier::updateStress()
 	}
 	float globalThreat = 0.0f;
 
-	Engine::World::AgentsList enemies = _world->getNeighbours(this, _fireDistance*1.5f, enemyType);
+	Engine::World::AgentsVector enemies = _world->getNeighbours(this, _fireDistance*1.5f, enemyType);
 	//std::cout << this << " number of enemies: " << enemies.size() << std::endl;
-	for(Engine::World::AgentsList::iterator it=enemies.begin(); it!=enemies.end(); it++)
+	for(Engine::World::AgentsVector::iterator it=enemies.begin(); it!=enemies.end(); it++)
 	{
 		Soldier * enemy = (Soldier*)(*it);
 		if(!enemy->isRouting())
@@ -193,10 +192,10 @@ void Soldier::updateStress()
 		*/
 	}
 	int globalCohesion = 0;	
-	Engine::World::AgentsList friends = _world->getNeighbours(this, _cohesionDistance, friendType);
+	Engine::World::AgentsVector friends = _world->getNeighbours(this, _cohesionDistance, friendType);
 	
 	//std::cout << this << " number of friends: " << friends.size() << " at cohesion distance: " << _cohesionDistance << std::endl;
-	for(Engine::World::AgentsList::iterator it=friends.begin(); it!=friends.end(); it++)
+	for(Engine::World::AgentsVector::iterator it=friends.begin(); it!=friends.end(); it++)
 	{
 		Soldier * friendly = (Soldier*)(*it);
 		Engine::Point2D<int> friendPosition = friendly->getPosition();
@@ -321,10 +320,23 @@ void Soldier::rout()
 		newPos._y = _position._y+1;
 	}
 	// there's another soldier rearguard, check against cohesion rating; if ok, it won't rout
-	Agent * agent = _world->getAgent(newPos);
-	if(agent && agent->isType(getType()))
+	Engine::World::AgentsVector agents = _world->getAgent(newPos);
+	if(agents.size()==0)
+	{		
+		if(_world->checkPosition(newPos))
+		{
+			_position = newPos;
+		}
+		else
+		{
+			remove();
+		}
+		return;
+	}
+	Engine::Agent * agent = agents.at(0);
+	if(agent->isType(getType()))
 	{
-		if(_world->getStatistics().getUniformDistValue(0, 100)<_cohesionRating)
+		if(Engine::GeneralState::statistics().getUniformDistValue(0, 100)<_cohesionRating)
 		{
 			_stress = _threshold*0.9f;
 			Soldier * soldier = (Soldier*)agent;
@@ -335,7 +347,7 @@ void Soldier::rout()
 		else
 		{
 			// if not, it will check a hole; if it is already occupied, it won't move; in the contrary, it will displace to the another position
-			if(_world->getStatistics().getUniformDistValue(0, 1)==0)
+			if(Engine::GeneralState::statistics().getUniformDistValue(0, 1)==0)
 			{
 				newPos._x--;
 			}
@@ -343,8 +355,8 @@ void Soldier::rout()
 			{
 				newPos._x++;
 			}
-			Agent * agent2 = _world->getAgent(newPos);
-			if(!agent2)
+			Engine::World::AgentsVector agents2 = _world->getAgent(newPos);
+			if(agents2.size()==0)
 			{
 				if(_world->checkPosition(newPos))
 				{
@@ -357,11 +369,15 @@ void Soldier::rout()
 			}
 			else
 			{
-				_stress = _threshold*0.9f;
-				Soldier * soldier = (Soldier*)agent2;
-				soldier->addStress(20);
-				_routing = false;
-				return;
+				Engine::Agent * agent2 = agents.at(0);
+				if(agent2->isType(getType()))
+				{
+					_stress = _threshold*0.9f;
+					Soldier * soldier = (Soldier*)agent2;
+					soldier->addStress(20);
+					_routing = false;
+					return;				
+				}
 			}
 		}
 	}
@@ -376,27 +392,13 @@ void Soldier::rout()
 			remove();
 		}
 	}
-	// we disperse the stress of seeing the routing unit to other soldiers near it.
-	// TODO no! it is done in updateStress of the other agents
-	/*
-	Engine::World::AgentsList affectedSoldier = _world->getNeighbours(this, 10, getType());
-	for(Engine::World::AgentsList::iterator it=affectedSoldier.begin(); it!=affectedSoldier.end(); it++)
-	{
-		Agent * agent = (*it);
-		if(agent->isType("blueSoldier") || agent->isType("redSoldier"))
-		{
-			Soldier * soldier = (Soldier*)(*it);
-			soldier->addStress((100-soldier->getCohesionRating())/2);
-		}
-	}
-	*/
 }
 
 void Soldier::casualty()
 {
 	// we disperse the stress of seeing a casualty unit to other soldiers near it.
-	Engine::World::AgentsList affectedSoldier = _world->getNeighbours(this, _cohesionDistance, getType());
-	for(Engine::World::AgentsList::iterator it=affectedSoldier.begin(); it!=affectedSoldier.end(); it++)
+	Engine::World::AgentsVector affectedSoldier = _world->getNeighbours(this, _cohesionDistance, getType());
+	for(Engine::World::AgentsVector::iterator it=affectedSoldier.begin(); it!=affectedSoldier.end(); it++)
 	{
 		Agent * agent = (*it);
 		if(agent->isType("blueSoldier") || agent->isType("redSoldier"))
@@ -408,7 +410,7 @@ void Soldier::casualty()
 	remove();
 }
 
-void Soldier::step()
+void Soldier::updateState()
 {
 	if(!_exists)
 	{
@@ -440,6 +442,7 @@ void Soldier::step()
 			}
 		}
 	}
+
 	updateStress();	
 	if(_stress>_threshold)
 	{
@@ -496,23 +499,6 @@ bool Soldier::isMoving()
 	return _moving;
 }
 
-void * Soldier::createPackage()
-{
-	SoldierPackage * package = new SoldierPackage;
-	memcpy(&package->_id, _id.c_str(), sizeof(char)*_id.size());
-	package->_id[_id.size()] = '\0';
-	package->_position = _position;
-	package->_rank = _rank;
-	package->_isBlueSide = _isBlueSide;
-	package->_stress= _stress;
-	package->_cohesionRating = _cohesionRating;
-	package->_cohesionDistance = _cohesionDistance;
-	package->_moving = _moving;
-	package->_accuracy = _accuracy;
-	
-	return package;
-}
-
 void Soldier::serialize()
 {
 	serializeAttribute("stress", _stress);
@@ -531,6 +517,17 @@ void Soldier::serialize()
 	}
 }
 
+void Soldier::registerAttributes()
+{
+	registerIntAttribute("stress");
+	registerIntAttribute("cohesion rating");
+	registerIntAttribute("cohesion distance");
+	registerIntAttribute("rank");
+	registerIntAttribute("timeUntilLoaded");
+	registerIntAttribute("routing");
+	registerIntAttribute("fired");
+}
+	
 void Soldier::setDelayBeforeFirstFire( const int & delayBeforeFirstFire )
 {
 	_delayBeforeFirstFire = delayBeforeFirstFire;

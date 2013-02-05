@@ -1,10 +1,13 @@
 
 #include "Bullet.hxx"
-
-#include "Exceptions.hxx"
 #include "Soldier.hxx"
-#include "World.hxx"
+#include "Battlefield.hxx"
+
+#include <Exceptions.hxx>
+#include <World.hxx>
 #include <cstring>
+#include <Statistics.hxx>
+#include <GeneralState.hxx>
 
 namespace BattleSim
 {
@@ -13,18 +16,11 @@ Bullet::Bullet( const std::string & id, const int & impactProbability ) : Agent(
 {
 }
 
-Bullet::Bullet( const BulletPackage & package ) : Agent(package._id)
-{
-	_position = package._position;
-	_isBlueSide = package._isBlueSide;
-	_impactProbability = package._impactProbability;
-}
-
 Bullet::~Bullet()
 {
 }
 
-void Bullet::step()
+void Bullet::updateState()
 {
 	int distance = _fallingTime*_velocity;
 	// resolution is 0.5 m.
@@ -36,7 +32,7 @@ void Bullet::step()
 		{
 			newPos._y++;
 			// bullets can move 1 meter to every side every time they displace
-			newPos._x += _world->getStatistics().getUniformDistValue(-1,1);
+			newPos._x += Engine::GeneralState::statistics().getUniformDistValue(-1,1);
 			if(!checkContinue(newPos))
 			{
 				return;
@@ -48,7 +44,7 @@ void Bullet::step()
 		for(int i=0; i<distance; i++)
 		{
 			newPos._y--;
-			newPos._x += _world->getStatistics().getUniformDistValue(-1,1);
+			newPos._x += Engine::GeneralState::statistics().getUniformDistValue(-1,1);
 			if(!checkContinue(newPos))
 			{
 				return;
@@ -56,17 +52,17 @@ void Bullet::step()
 		}
 	}
 	// no impacts, hitting the ground	
-	int numBullets = _world->getValue("virtualRecord", newPos);
-	_world->setMaxValue("virtualRecord", newPos, numBullets+1);
-	_world->setValue("virtualRecord", newPos, numBullets+1);
+	int numBullets = _world->getValue(eVirtualRecord, newPos);
+	_world->setMaxValue(eVirtualRecord, newPos, numBullets+1);
+	_world->setValue(eVirtualRecord, newPos, numBullets+1);
 	remove();
 }
 
 bool Bullet::checkContinue( const Engine::Point2D<int> & newPos )
 {
-	Agent * target = _world->getAgent(newPos);
+	Engine::World::AgentsVector targets = _world->getAgent(newPos);
 	// out of battlefield
-	if(!target || target->isType("blueBullet") || target->isType("redBullet"))
+	if(targets.size()==0 || targets.at(0)->isType("blueBullet") || targets.at(0)->isType("redBullet"))
 	{
 		if(!_world->checkPosition(newPos))
 		{
@@ -79,7 +75,7 @@ bool Bullet::checkContinue( const Engine::Point2D<int> & newPos )
 			return true;
 		}
 	}
-	Soldier * soldier = (Soldier*)target;
+	Soldier * soldier = (Soldier*)targets.at(0);
 	// pass through ranks
 	if(_isBlueSide && soldier->isType("blueSoldier"))
 	{
@@ -91,14 +87,14 @@ bool Bullet::checkContinue( const Engine::Point2D<int> & newPos )
 		//_position = newPos;
 		return true;
 	}
-
-	if(_world->getStatistics().getUniformDistValue(1, 100)<=_impactProbability)
+	
+	if(Engine::GeneralState::statistics().getUniformDistValue(1, 100)<=_impactProbability)
 	{
 		// impact
 		//std::cout << soldier << " has been impacted by bullet: " << this << " with type: " <<  target->getType() << std::endl;
-		int numImpacts = _world->getValue("impacts", newPos);
-		_world->setMaxValue("impacts", newPos, numImpacts+1);
-		_world->setValue("impacts", newPos, numImpacts+1);
+		int numImpacts = _world->getValue(eImpacts, newPos);
+		_world->setMaxValue(eImpacts, newPos, numImpacts+1);
+		_world->setValue(eImpacts, newPos, numImpacts+1);
 
 		soldier->setExists(false);
 		remove();
@@ -113,31 +109,24 @@ bool Bullet::checkContinue( const Engine::Point2D<int> & newPos )
 	return true;
 }
 
-void * Bullet::createPackage()
-{
-	BulletPackage * package = new BulletPackage;
-	memcpy(&package->_id, _id.c_str(), sizeof(char)*_id.size());
-	package->_id[_id.size()] = '\0';
-	package->_position = _position;
-	package->_isBlueSide = _isBlueSide;
-	package->_impactProbability = _impactProbability;
-	
-	return package;
-}
-
 void Bullet::serialize()
 {
 	serializeAttribute("isBlueSide", _isBlueSide);
 }
 
+void Bullet::registerAttributes()
+{
+	registerIntAttribute("isBlueSide");
+}
+
 void Bullet::setMuzzleVelocity( const int & standardVelocity )
 {
-	_velocity = _world->getStatistics().getNormalDistValue(standardVelocity-100, standardVelocity+100);
+	_velocity = Engine::GeneralState::statistics().getNormalDistValue(standardVelocity-100, standardVelocity+100);
 	// normal height
-	float height = _world->getStatistics().getNormalDistValue(1.3f,1.6f);	
+	float height = Engine::GeneralState::statistics().getNormalDistValue(1.3f,1.6f);	
 	_fallingTime = sqrt(2*height/9.8f);
 	// we remove some time, due to resistance
-	_fallingTime -= _world->getStatistics().getNormalDistValue(0.0f, 0.2f);
+	_fallingTime -= Engine::GeneralState::statistics().getNormalDistValue(0.0f, 0.2f);
 }
 
 } // namespace BattleSim
