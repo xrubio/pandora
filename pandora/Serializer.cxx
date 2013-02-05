@@ -43,7 +43,7 @@ Serializer::~Serializer()
 {
 }
 
-void Serializer::init( Simulation & simulation, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters, World & world )
+void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters, World & world )
 {
 	std::stringstream logName;
 	logName << "Serializer_" << world.getId();
@@ -106,9 +106,9 @@ void Serializer::init( Simulation & simulation, std::vector<bool> & dynamicRaste
 	hid_t rasterNameFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	hid_t rasterNameDatasetId = H5Dcreate(_fileId, "rasters", H5T_NATIVE_INT, rasterNameFileSpace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 	// dynamic raster, store every time step
-	for(int i=0; i<dynamicRasters.size(); i++)
+	for(int i=0; i<rasters.size(); i++)
 	{
-		if(!serializeRasters.at(i) || !dynamicRasters.at(i))
+		if(!rasters.at(i) || !serializeRasters.at(i) || !dynamicRasters.at(i))
 		{
 			continue;
 		}
@@ -121,9 +121,9 @@ void Serializer::init( Simulation & simulation, std::vector<bool> & dynamicRaste
 
 	// static raster, store just at the beginning of the simulation
 	rasterNameDatasetId = H5Dcreate(_fileId, "staticRasters", H5T_NATIVE_INT, rasterNameFileSpace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-	for(int i=0; i<dynamicRasters.size(); i++)
+	for(int i=0; i<rasters.size(); i++)
 	{
-		if(!serializeRasters.at(i) || dynamicRasters.at(i))
+		if(!rasters.at(i) || !serializeRasters.at(i) || dynamicRasters.at(i))
 		{
 			continue;
 		}
@@ -176,9 +176,9 @@ void Serializer::init( Simulation & simulation, std::vector<bool> & dynamicRaste
 
 	// static rasters	
 	
-	for(int i=0; i<dynamicRasters.size(); i++)
+	for(int i=0; i<rasters.size(); i++)
 	{
-		if(!serializeRasters.at(i) || dynamicRasters.at(i))
+		if(!rasters.at(i) || !serializeRasters.at(i) || dynamicRasters.at(i))
 		{
 			continue;
 		}
@@ -192,9 +192,9 @@ void Serializer::init( Simulation & simulation, std::vector<bool> & dynamicRaste
 	}
 
 	// dynamic rasters
-	for(int i=0; i<dynamicRasters.size(); i++)
+	for(int i=0; i<rasters.size(); i++)
 	{
-		if(!serializeRasters.at(i) || !dynamicRasters.at(i))
+		if(!rasters.at(i) || !serializeRasters.at(i) || !dynamicRasters.at(i))
 		{
 			continue;
 		}	

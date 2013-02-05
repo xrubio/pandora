@@ -74,7 +74,7 @@ public:
 	Serializer();
 	virtual ~Serializer();
 
-	void init( Simulation & simulation, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters, World & world );
+	void init( Simulation & simulation, std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters, World & world );
 	void finish();
 
 	void serializeAgent( Agent * agent, const int & step, World & world, int index);
