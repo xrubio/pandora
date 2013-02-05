@@ -975,13 +975,12 @@ void World::step()
 		log_DEBUG(logNameMpi.str(), getWallTime() << " executing step: " << _step << " and section: " << sectionIndex << " sent overlap");
 		receiveOverlapData(sectionIndex);
 		log_DEBUG(logNameMpi.str(), getWallTime() << " executing step: " << _step << " and section: " << sectionIndex << " received overlap" );
-		//MPI_Barrier(MPI_COMM_WORLD);
+		MPI_Barrier(MPI_COMM_WORLD);
 #endif
 	}
 
 	removeAgents();
 	log_INFO(logName.str(), getWallTime() << " - world at pos: " << _worldPos << " finished step: " << _step);
-	log_DEBUG(logNameMpi.str(), getWallTime() << " - world at pos: " << _worldPos << " finished step: " << _step);
 }
 
 void World::run()
