@@ -30,7 +30,7 @@ void AcademiaConfig::extractParticularAttribs(TiXmlElement * root)
 	retrieveAttributeMandatory( element, "value", _citationRadius);
 
 	element = root->FirstChildElement("researcherLife");
-	retrieveAttributeMandatory( element, "value", _researcherLife);
+	retrieveAttributeMandatory( element, "value", _researcherLife);	
 }
 	
 int AcademiaConfig::getSize() const

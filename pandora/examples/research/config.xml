@@ -2,13 +2,13 @@
 <config>
 	<!-- Global simulation parameters -->
 	<output resultsFile="./data/research.h5" logsDir="./logs"/>
-	<numSteps value="300"/>
-	<numInitialPapers value="100">
+	<numSteps value="50"/>
+	<numInitialPapers value="10"/>
 	<size value="100"/>
-	<probabilityNewAuthor value="0.2"/>
-	<probabilityNewPaper value="0.5"/>
+	<probabilityNewAuthor value="0.1"/>
+	<probabilityNewPaper value="0.3"/>
 	<originalityThreshold value="0.2"/>
-	<citationRatius value="10"/>
+	<citationRadius value="10"/>
 	<researcherLife value="50"/>
 </config>
 

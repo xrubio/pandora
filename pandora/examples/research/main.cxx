@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 		}		
 	
 		std::string fileName("config.xml");
-		if(argc!=1)
+		if(argc==2)
 		{
 			fileName = argv[1];
 		}
