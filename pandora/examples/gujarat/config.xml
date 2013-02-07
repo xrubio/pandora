@@ -2,7 +2,7 @@
 <config>  
 	<!-- Global simulation parameters -->
 	<output resultsFile="./data/gujarat.h5" logsDir="./logs"/>
-	<numSteps value="360"/>
+	<numSteps value="12" serializeResolution="3"/>
 	<!-- g to KJ -->
 	<massToEnergyRate value="20" />
 	<!-- 1 KCal = 4.184 KJ, Conversion Rate = 1/4.184 -->
@@ -78,7 +78,7 @@
 	<storeRaster name="distWater" value="no" />
 	<storeRaster name="weightWater" value="no" />
 	<storeRaster name="moisture" value="no" />
-	<storeRaster name="resources" value="no" />
+	<storeRaster name="resources" value="yes" />
 	<storeRaster name="forageActivity" value="no" />
 	<storeRaster name="homeActivity" value="no" />
 	<storeRaster name="farmingActivity" value="no" />
