@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <config>  
 	<!-- Global simulation parameters -->
-	<output resultsFile="/gpfs/projects/bsc21/WORK-RUBIO/gujarat_results/mean/data_biominBIOMASS_MINIMUM_meanMEAN_stddevSTDDEV_exNUMEXEC/gujarat.h5" logsDir="/gpfs/projects/bsc21/WORK-RUBIO/gujarat_results/mean/logs_biominBIOMASS_MINIMUM_meanMEAN_stddevSTDDEV_exNUMEXEC"/>
+	<output resultsFile="/gpfs/projects/bsc21/WORK-RUBIO/gujarat_results/stddev/data_biominBIOMASS_MINIMUM_meanMEAN_stddevSTDDEV_exNUMEXEC/gujarat.h5" logsDir="/gpfs/projects/bsc21/WORK-RUBIO/gujarat_results/stddev/logs_biominBIOMASS_MINIMUM_meanMEAN_stddevSTDDEV_exNUMEXEC"/>
 	<numSteps value="18000" serializeResolution="360"/>
 	<!-- g to KJ -->
 	<massToEnergyRate value="20" />

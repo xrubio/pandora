@@ -1,15 +1,14 @@
 #!/usr/bin/python
 import fileinput, sys, os, random
 
-numExecutions = 5
+numExecutions = 1
 
 minimumBiomassValues = ['0.1']
+meanValues = ['4913']
+stdDevValues = ['1','100','200','300','400','500','600','700','800','900','1000','1100','1200','1300','1400','1500','1600', '1700', '1800', '1900', '2000', '2100', '2200', '2300', '2400', '2500', '2600', '2700', '2800', '2900','3000']
 
-meanValues = ['1', '200', '400', '600', '800', '1000', '1200', '1400', '1600', '1800', '2000', '2200', '2400', '2600', '2800', '3000', '3200', '3400', '3600', '3800', '4000', '4200', '4400','4600','4800','5000','5200','5400','5600','5800','6000','6200','6400','6600','6800','7000']
-stdDevValues = ['1885']
-
-xmlTemplate = 'templates/config_template_mn_mean.xml'
-runTemplate = 'templates/bsub_template_mean.cmd'
+xmlTemplate = 'templates/config_template_mn_stddev.xml'
+runTemplate = 'templates/bsub_template_stddev.cmd'
 
 indexKey = 'INDEX'
 initialDirKey = 'INITIALDIR'
@@ -26,8 +25,8 @@ def replaceKey( fileName, key, value ):
 		sys.stdout.write(line)
 	fileinput.close()
 
-os.system('rm -rf mean/')
-os.system('mkdir mean')
+os.system('rm -rf stddev/')
+os.system('mkdir stddev')
 
 index = 0
 print 'creating test workbench'
@@ -41,7 +40,7 @@ for numExecution in range(0,numExecutions):
 		for mean in meanValues :
 			for stddev in stdDevValues:
 				print 'creating gujarat instance: ' + str(index) + ' for minimum biomass: ' + minimumBiomass + ' mean: ' + mean + ' stddev: ' + stddev + ' and execution: ' + str(numExecution)
-				dirName = 'mean/results_biomin'+minimumBiomass+'_mean'+mean+'_stddev'+stddev+'_ex'+str(numExecution)
+				dirName = 'stddev/results_biomin'+minimumBiomass+'_mean'+mean+'_stddev'+stddev+'_ex'+str(numExecution)
 				os.system('mkdir '+dirName)
 				configName = dirName + '/config.xml'			
 				os.system('cp '+xmlTemplate+' '+configName)
@@ -64,7 +63,7 @@ for minimumBiomass in minimumBiomassValues:
 		for stddev in stdDevValues:
 			for numExecution in range(0,numExecutions):
 				print 'submitting gujarat instance: ' + str(index) + ' with min biomass: ' + minimumBiomass + ' mean: ' + mean + ' stddev: ' + stddev + ' and execution: ' + str(numExecution)
-				dirName = 'mean/results_biomin'+minimumBiomass+'_mean'+mean+'_stddev'+stddev+'_ex'+str(numExecution)
+				dirName = 'stddev/results_biomin'+minimumBiomass+'_mean'+mean+'_stddev'+stddev+'_ex'+str(numExecution)
 				os.system('bsub < '+dirName+'/bsub_gujarat.cmd')
 				index += 1
 

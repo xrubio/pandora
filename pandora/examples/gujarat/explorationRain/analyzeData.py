@@ -2,7 +2,7 @@
 
 import os, sys
 
-outputDir = 'finalResults'
+outputDir = 'results_stddev'
 dirBase = '/gpfs/projects/bsc21/WORK-RUBIO/'
 resultsBase = '.'
 
