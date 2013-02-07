@@ -4,8 +4,17 @@ import fileinput, sys, os, random
 numExecutions = 1
 
 minimumBiomassValues = ['0.1']
-meanValues = ['4913']
-stdDevValues = ['1','100','200','300','400','500','600','700','800','900','1000','1100','1200','1300','1400','1500','1600', '1700', '1800', '1900', '2000', '2100', '2200', '2300', '2400', '2500', '2600', '2700', '2800', '2900','3000']
+
+# local mean
+meanValues = ['4791']
+
+# regional mean
+#meanValues = ['5584']
+
+# continental mean
+#meanValues = ['11140']
+
+stdDevValues = ['1','200','400','600','800','1000','1200','1400','1600','1800','2000','2200','2400','2600','2800','3000']
 
 xmlTemplate = 'templates/config_template_mn_stddev.xml'
 runTemplate = 'templates/bsub_template_stddev.cmd'

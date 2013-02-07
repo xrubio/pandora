@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <config>  
 	<!-- Global simulation parameters -->
-	<output resultsFile="/gpfs/projects/bsc21/WORK-RUBIO/gujarat_results/mean/data_biominBIOMASS_MINIMUM_meanMEAN_stddevSTDDEV_exNUMEXEC/gujarat.h5" logsDir="/gpfs/projects/bsc21/WORK-RUBIO/gujarat_results/mean/logs_biominBIOMASS_MINIMUM_meanMEAN_stddevSTDDEV_exNUMEXEC"/>
-	<numSteps value="18000"/>
+	<output resultsFile="/gpfs/projects/bsc21/WORK-RUBIO/gujarat_results/biomin/data_biominBIOMASS_MINIMUM_meanMEAN_stddevSTDDEV_exNUMEXEC/gujarat.h5" logsDir="/gpfs/projects/bsc21/WORK-RUBIO/gujarat_results/biomin/logs_biominBIOMASS_MINIMUM_meanMEAN_stddevSTDDEV_exNUMEXEC"/>
+	<numSteps value="18000" serializeResolution="360"/>
 	<!-- g to KJ -->
 	<massToEnergyRate value="20" />
 	<!-- 1 KCal = 4.184 KJ, Conversion Rate = 1/4.184 -->
