@@ -41,8 +41,8 @@ int main(int argc, char *argv[])
 
 	try
 	{
-		Engine::SimulationRecord simRecord( 2, false);
-		simRecord.loadHDF5(argv[1], true, true);
+		Engine::SimulationRecord simRecord( 1, false);
+		simRecord.loadHDF5(argv[1], false, true);
 
 		Analysis::AgentResults agentResults(simRecord, argv[2], "HunterGatherer");
 		agentResults.addAnalysis(new Analysis::AgentNum());
@@ -58,11 +58,13 @@ int main(int argc, char *argv[])
 
 		agentResults.apply();
 
+		/*
 		Analysis::RasterResults rasterResults(simRecord, argv[3], "resources");
 		rasterResults.addAnalysis(new Analysis::RasterMean());
 		rasterResults.addAnalysis(new Analysis::RasterSum());		
 
 		rasterResults.apply();
+		*/
 	}
 	catch( std::exception & exceptionThrown )
 	{
