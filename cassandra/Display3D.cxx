@@ -271,13 +271,13 @@ void Display3D::paintAgents()
 		for(Engine::SimulationRecord::AgentRecordsMap::const_iterator it= _simulationRecord->beginAgents(itType); it!=_simulationRecord->endAgents(itType); it++)
 		{
 			Engine::AgentRecord * agent = it->second;
-			bool exists = agent->getState(_viewedStep/_simulationRecord->getResolution(), "exists");
+			bool exists = agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "exists");
 
 			if(!exists)
 			{
 				continue;
 			}
-			Engine::Point3D<int> position(agent->getState(_viewedStep/_simulationRecord->getResolution(), "x"), agent->getState(_viewedStep/_simulationRecord->getResolution(), "y"), 0);
+			Engine::Point3D<int> position(agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "x"), agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "y"), 0);
 			position._z = -1+raster.getValue(Engine::Point2D<int>(position._x,position._y));
 					
 			glPushMatrix();

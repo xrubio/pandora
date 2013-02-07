@@ -52,31 +52,26 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 	// check if directory exists
 	unsigned int filePos = _resultsFile.find_last_of("/");
 	std::string path = _resultsFile.substr(0,filePos+1);
-	log_DEBUG(logName.str(), " num tasks: " << simulation.getNumTasks() << " num steps: " << simulation.getNumSteps());
 
 	// create dir where logs will be stored if it is not already created
 	if(!path.empty())
 	{
 		boost::filesystem::create_directory(path);
 	}
-	log_DEBUG(logName.str(), " 2 num tasks: " << simulation.getNumTasks() << " num steps: " << simulation.getNumSteps());
 
 	// creating base file in a parallel environment
 
 	hid_t propertyListId = H5Pcreate(H5P_FILE_ACCESS);
 
-	log_DEBUG(logName.str(), " 3 num tasks: " << simulation.getNumTasks() << " num steps: " << simulation.getNumSteps());
 	// workaround, it crashes in serial without this clause
 	if(simulation.getNumTasks()>1)		
 	{
 		H5Pset_fapl_mpio(propertyListId, MPI_COMM_WORLD, MPI_INFO_NULL);
 	}
 
-	log_DEBUG(logName.str(), " 4 num tasks: " << simulation.getNumTasks() << " num steps: " << simulation.getNumSteps());
 	_fileId = H5Fcreate(_resultsFile.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, propertyListId);
 	H5Pclose(propertyListId);
 
-	log_DEBUG(logName.str(), " 5 num tasks: " << simulation.getNumTasks() << " num steps: " << simulation.getNumSteps());
 	// adding a group with global generic data
 	hsize_t simpleDimension = 1;
 	hid_t globalFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
@@ -85,6 +80,12 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 	hid_t attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	hid_t attributeId = H5Acreate(globalDatasetId, "numSteps", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
 	H5Awrite(attributeId, H5T_NATIVE_INT, &simulation.getNumSteps());
+	H5Sclose(attributeFileSpace);
+	H5Aclose(attributeId);
+	
+	attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
+	attributeId = H5Acreate(globalDatasetId, "serializerResolution", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
+	H5Awrite(attributeId, H5T_NATIVE_INT, &simulation.getSerializerResolution());
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 
@@ -100,7 +101,7 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 
-	std::cout << " id: " << simulation.getId() << " size: " << simulation.getSize() << " num tasks: " << simulation.getNumTasks() << " and steps: " << simulation.getNumSteps() << std::endl;
+	log_INFO(logName.str(), world.getWallTime() << " id: " << simulation.getId() << " size: " << simulation.getSize() << " num tasks: " << simulation.getNumTasks() << " serializer resolution:" << simulation.getSerializerResolution() << " and steps: " << simulation.getNumSteps());
 
 	// we store the name of the rasters
 	hid_t rasterNameFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
@@ -202,6 +203,10 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 		hid_t rasterGroupId = H5Gcreate(_fileId, world.getRasterName(i).c_str(), 0, H5P_DEFAULT, H5P_DEFAULT);
 		for(int i=0; i<=simulation.getNumSteps(); i++)
 		{  
+			if(i%simulation.getSerializerResolution()!=0)
+			{
+				continue;
+			}
 			std::ostringstream oss;
 			oss << "step" << i;
 			hid_t stepFileSpace = H5Screate_simple(2, dimensions, NULL); 
@@ -245,6 +250,11 @@ void Serializer::registerType( Agent * agent, World & world  )
 	// create a dataset for each timestep
 	for(int i=0; i<=world.getSimulation().getNumSteps(); i++)
 	{
+		if(i%world.getSimulation().getSerializerResolution()!=0)
+		{
+			continue;
+		}
+
 		std::ostringstream oss;
 		oss<<"step"<<i;
 		hid_t stepGroup = H5Gcreate(agentTypeGroup, oss.str().c_str(),  0, H5P_DEFAULT, H5P_DEFAULT);

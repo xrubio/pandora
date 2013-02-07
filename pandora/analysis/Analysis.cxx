@@ -24,7 +24,7 @@ const std::string & Analysis::getName() const
 	return _name;
 }
 	
-float Analysis::getResult( int timeStep ) const
+long double Analysis::getResult( int timeStep ) const
 {
 	return _results.at(timeStep);
 }

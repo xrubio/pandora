@@ -89,7 +89,7 @@ void DataPlot::setSimulationRecord( Engine::SimulationRecord * simulationRecord 
 		return;
 	}
 
-	int realSize = _simulationRecord->getNumSteps()/_simulationRecord->getResolution();
+	int realSize = _simulationRecord->getNumSteps()/_simulationRecord->getFinalResolution();
 	_steps.resize(realSize);
 	// it doesn't count
 	realSize++;
@@ -97,7 +97,7 @@ void DataPlot::setSimulationRecord( Engine::SimulationRecord * simulationRecord 
 	_values.fill(1, realSize);
 	for(int i=0; i<_steps.size(); i++)
 	{
-		_steps[i] = i*_simulationRecord->getResolution();
+		_steps[i] = i*_simulationRecord->getFinalResolution();
 	}
 	//_valuePlot->setRawData(_steps.data(), _values.data(), _steps.size());
 	_valuePlot->setRawSamples(_steps.data(), _values.data(), _steps.size());
@@ -133,7 +133,7 @@ void DataPlot::stateSelected( const std::string & type, const std::string & stat
 	calculateValues(type, state);
 	updateMinMaxValue();
 	
-	setAxisScale(xBottom, 0, _steps.size()*_simulationRecord->getResolution());
+	setAxisScale(xBottom, 0, _steps.size()*_simulationRecord->getFinalResolution());
     setAxisScale(yLeft, _minValue, _maxValue);	
 
 	replot();

@@ -2,7 +2,7 @@
 #include <analysis/RasterMean.hxx>
 #include <Raster.hxx>
 #include <Exceptions.hxx>
-
+#include <iostream>
 namespace Analysis
 {
 
@@ -47,7 +47,7 @@ void RasterMean::postProcess()
 	{
 		if(_numCells>0)
 		{
-			_results[i] = ((long int)_results.at(i))/_numCells;
+			_results[i] = _results.at(i)/_numCells;
 		}
 		else
 		{

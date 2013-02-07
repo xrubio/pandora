@@ -144,11 +144,11 @@ void Display2D::paintEvent(QPaintEvent *event)
 			if(agentConfig->useIcon() && !agentConfig->getFileName2D().empty())
 			{	
 				Engine::AgentRecord * agent = it->second;
-				bool exists = agent->getState(_viewedStep/_simulationRecord->getResolution(), "exists");
+				bool exists = agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "exists");
 				if(exists)
 				{
-					int x = agent->getState(_viewedStep/_simulationRecord->getResolution(), "x");
-					int y = agent->getState(_viewedStep/_simulationRecord->getResolution(), "y");
+					int x = agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "x");
+					int y = agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "y");
 					int size = (float)_zoom*agentConfig->getSize();
 					int xPos = x*_zoom - size/2;						
 					int yPos = y*_zoom - size/2;
@@ -159,12 +159,12 @@ void Display2D::paintEvent(QPaintEvent *event)
 			{
 				QColor colorToUse(agentConfig->getColor());
 				Engine::AgentRecord * agent = it->second;
-				bool exists = agent->getState(_viewedStep/_simulationRecord->getResolution(), "exists");
+				bool exists = agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "exists");
 				if(exists)
 				{
 					QPen agentsPen;
-					int x = agent->getState(_viewedStep/_simulationRecord->getResolution(), "x");
-					int y = agent->getState(_viewedStep/_simulationRecord->getResolution(), "y");
+					int x = agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "x");
+					int y = agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "y");
 					QBrush brush(Qt::SolidPattern);
 					if(_state=="unknown")
 					{
@@ -180,7 +180,7 @@ void Display2D::paintEvent(QPaintEvent *event)
 						int value = 0;
 						try
 						{
-							value = agent->getState(_viewedStep/_simulationRecord->getResolution(), _state);
+							value = agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), _state);
 							int max = _simulationRecord->getMaxValueForState(_state);
 							int min = _simulationRecord->getMinValueForState(_state);
 							int diff = std::max(1,max - min);
@@ -323,10 +323,10 @@ std::string Display2D::getRasterToolTip( const Engine::Point2D<int> & position )
 std::string Display2D::getAgentToolTip( const Engine::Point2D<int> & position )
 {
 	std::stringstream toolTipString;
-	Engine::AgentRecord * agentRecord = _simulationRecord->getAgentAtPosition(_viewedStep/_simulationRecord->getResolution(), position);
+	Engine::AgentRecord * agentRecord = _simulationRecord->getAgentAtPosition(_viewedStep/_simulationRecord->getFinalResolution(), position);
 	if(agentRecord)
 	{
-		toolTipString << std::endl << agentRecord->getCompleteState(_viewedStep/_simulationRecord->getResolution());
+		toolTipString << std::endl << agentRecord->getCompleteState(_viewedStep/_simulationRecord->getFinalResolution());
 	}
 	return toolTipString.str();
 }

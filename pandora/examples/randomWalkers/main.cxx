@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 		Examples::RandomWorldConfig config;
 		config.deserialize(fileName);
 	
-		Engine::Simulation helloWorldSim(config.getSize(), config.getNumSteps());
+		Engine::Simulation helloWorldSim(config.getSize(), config.getNumSteps(), 10);
 		Examples::RandomWorld world( helloWorldSim, config);
 	
 		world.init(argc, argv);

@@ -108,7 +108,7 @@ void StepDataPlot::stepChanged(int step )
 	{
 		return;
 	}
-	_step = step/_simulationRecord->getResolution();
+	_step = step/_simulationRecord->getFinalResolution();
 	updateData();
 }
 

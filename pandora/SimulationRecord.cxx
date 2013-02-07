@@ -37,7 +37,7 @@ namespace Engine
 std::list<std::string> SimulationRecord::_agentTypes;
 std::list<std::string> SimulationRecord::_agentAttributes;
 
-SimulationRecord::SimulationRecord( int resolution, bool gui) : _name("unknown"), _numSteps(0), _loadingStep(0), _resolution(resolution), _gui(gui), _loadingPercentageDone(0.0f), _loadingState("no load")
+SimulationRecord::SimulationRecord( int loadedResolution, bool gui) : _name("unknown"), _numSteps(0), _loadingStep(0), _loadedResolution(loadedResolution), _serializedResolution(1), _gui(gui), _loadingPercentageDone(0.0f), _loadingState("no load")
 {	
 }
 
@@ -74,7 +74,13 @@ bool SimulationRecord::loadHDF5( const std::string & fileName, const bool & load
 	H5Aread(attributeId, H5T_NATIVE_INT, &_numSteps);
 	H5Aclose(attributeId);
 
-	int numStepsToLoad = 1+_numSteps/_resolution;
+	attributeId = H5Aopen_name(datasetId, "serializerResolution");
+	H5Aread(attributeId, H5T_NATIVE_INT, &_serializedResolution);
+	H5Aclose(attributeId);
+
+
+	int numStepsToLoad = 1+_numSteps/getFinalResolution();
+	std::cout << "num steps to load: " << numStepsToLoad << std::endl;
 	// we need this information in order to open agents records
 	attributeId = H5Aopen_name(datasetId, "numTasks");	
 	int numTasks= 0;
@@ -152,10 +158,10 @@ bool SimulationRecord::loadHDF5( const std::string & fileName, const bool & load
 				}
 				int maxValue = std::numeric_limits<int>::min();
 				int minValue = std::numeric_limits<int>::max();
-				for(int i=0; i<=_numSteps; i=i+_resolution)
+				for(int i=0; i<=_numSteps; i=i+getFinalResolution())
 				{
 					std::stringstream line;
-					line << "loading raster " << it->first << " - step: " << i << "/" << _numSteps;
+					line << "loading raster " << it->first << " - step: " << i << " : " << i/getFinalResolution() << "/" << _numSteps/getFinalResolution();
 					_loadingState = line.str();
 					if(!_gui)
 					{
@@ -173,7 +179,7 @@ bool SimulationRecord::loadHDF5( const std::string & fileName, const bool & load
 					int * dset_data = (int*)malloc(sizeof(int)*dims[0]*dims[1]);
 					
 					// squared	
-					Engine::Raster & raster = it->second[i/_resolution];
+					Engine::Raster & raster = it->second[i/getFinalResolution()];
 					raster.resize(Engine::Point2D<int>(dims[0], dims[1]));
 					// TODO max value!
 					raster.setInitValues(std::numeric_limits<int>::min(),std::numeric_limits<int>::max(), 0);
@@ -211,15 +217,17 @@ bool SimulationRecord::loadHDF5( const std::string & fileName, const bool & load
 					_loadingPercentageDone += increase;
 				}
 				// setting max value for the entire simulation
-				for(int i=0; i<=_numSteps; i=i+_resolution)
+				for(int i=0; i<=_numSteps; i=i+getFinalResolution())
 				{
-					Engine::Raster & raster = it->second[i/_resolution];
+					Engine::Raster & raster = it->second.at(i/getFinalResolution());
 					raster.setMaxValue(maxValue);
 					raster.setMinValue(minValue);
+				
 				}
 			}
 		}
 	}
+
 	H5Fclose(fileId);
 
 	_loadingPercentageDone = 50.0f;
@@ -278,12 +286,12 @@ hssize_t SimulationRecord::registerAgentIds( const hid_t & stepGroup, std::vecto
 		// new agent
 		if(it==agents.end())
 		{
-			agents.insert( make_pair( agentName, new AgentRecord(agentName, (_numSteps/_resolution)+1)));
+			agents.insert( make_pair( agentName, new AgentRecord(agentName, 1+_numSteps/getFinalResolution())));
 			it = agents.find(agentName);
 		}
 		AgentRecord * agentRecord = it->second;
 		// the agent exists in _loadingStep
-		agentRecord->addState( _loadingStep/_resolution, "exists", true);
+		agentRecord->addState( _loadingStep/getFinalResolution(), "exists", true);
 	}
 	// clean memory
 	H5Dvlen_reclaim (stringType, stringSpace, H5P_DEFAULT, stringIds);
@@ -341,7 +349,7 @@ void SimulationRecord::loadAttributes( const hid_t & stepGroup, hssize_t & numEl
 				std::string agentName = indexAgents.at(iAgent);
 				AgentRecordsMap::iterator it = agents.find(agentName);
 				AgentRecord * agentRecord = it->second;
-				agentRecord->addState( _loadingStep/_resolution, *itA, data.at(iAgent));
+				agentRecord->addState( _loadingStep/getFinalResolution(), *itA, data.at(iAgent));
 				updateMinMaxAttributeValues(*itA, data.at(iAgent));
 			}
 		}
@@ -388,10 +396,10 @@ void SimulationRecord::loadAgentsFiles( const std::string & path, int numStepsTo
 		for(std::list< std::string >::iterator typeAgent=_agentTypes.begin(); typeAgent!=_agentTypes.end(); typeAgent++)
 		{
 			AgentTypesMap::iterator typeIt = _types.find(*typeAgent);
-			for(_loadingStep=0; _loadingStep<=_numSteps; _loadingStep=_loadingStep+_resolution)
+			for(_loadingStep=0; _loadingStep<=_numSteps; _loadingStep=_loadingStep+getFinalResolution())
 			{
 				std::stringstream line;
-				line << "loading agents of type: " << *typeAgent << " in task: "<< i+1 << "/" << numTasks << " - step: " << _loadingStep << "/" << _numSteps;
+				line << "loading agents of type: " << *typeAgent << " in task: "<< i+1 << "/" << numTasks << " - step: " << _loadingStep/getFinalResolution() << "/" << _numSteps/getFinalResolution();
 				_loadingState = line.str();
 				if(!_gui)
 				{
@@ -469,11 +477,11 @@ Engine::StaticRaster & SimulationRecord::getRasterTmp( const std::string & key, 
 		return itS->second;
 	}
 	RasterHistory & resourceHistory = getRasterHistory(key);
-	int index = step/_resolution;
+	int index = step/getFinalResolution();
 	if(index<0 || index>=resourceHistory.size())
 	{
 		std::stringstream oss;
-		oss << "SimulationRecord::getRasterTmp - asking for key: " << key << " and step: " << step << "out of bounds, having: " << resourceHistory.size()*_resolution << " steps";
+		oss << "SimulationRecord::getRasterTmp - asking for key: " << key << " and step: " << step << "out of bounds, having: " << resourceHistory.size()*getFinalResolution()<< " steps";
 		throw Engine::Exception(oss.str());
 
 	}
@@ -483,11 +491,11 @@ Engine::StaticRaster & SimulationRecord::getRasterTmp( const std::string & key, 
 Engine::Raster & SimulationRecord::getDynamicRaster(  const std::string & key, const int & step )
 {
 	RasterHistory & resourceHistory = getRasterHistory(key);
-	int index = step/_resolution;
+	int index = step/getFinalResolution();
 	if(index<0 || index>=resourceHistory.size())
 	{
 		std::stringstream oss;
-		oss << "SimulationRecord::getDynamicRaster - asking for key: " << key << " and step: " << step << "out of bounds, having: " << resourceHistory.size()*_resolution << " steps";
+		oss << "SimulationRecord::getDynamicRaster - asking for key: " << key << " and step: " << step << "out of bounds, having: " << resourceHistory.size()*getFinalResolution()<< " steps";
 		throw Engine::Exception(oss.str());
 
 	}
@@ -517,9 +525,19 @@ int SimulationRecord::getNumSteps() const
 	return _numSteps;
 }
 
-int SimulationRecord::getResolution() const
+int SimulationRecord::getSerializedResolution() const
 {
-	return _resolution;
+	return _serializedResolution;
+}
+
+int SimulationRecord::getLoadedResolution() const
+{
+	return _loadedResolution;
+}
+
+int SimulationRecord::getFinalResolution() const
+{
+	return _serializedResolution*_loadedResolution;
 }
 
 bool SimulationRecord::hasAgentType( const std::string & type ) const
@@ -692,7 +710,7 @@ void SimulationRecord::registerAgent( hid_t loc_id, const char * name )
 	if(it==agents.end())
 	{
 		// +1 due to init state, new agent record with size of num steps +1
-		agents.insert( make_pair( agentName, new AgentRecord(agentName, (_numSteps/_resolution)+1)));
+		agents.insert( make_pair( agentName, new AgentRecord(agentName, 1+_numSteps/getFinalResolution())));
 		it = agents.find(agentName);
 	}
 
@@ -707,7 +725,7 @@ void SimulationRecord::registerAgent( hid_t loc_id, const char * name )
 
 	
 		AgentRecord * agentRecord = it->second;
-		agentRecord->addState( _loadingStep/_resolution, std::string(nameAttribute), value );
+		agentRecord->addState( _loadingStep/getFinalResolution(), std::string(nameAttribute), value );
 		H5Aclose(attributeId);
 
 		ValuesMap::iterator it = _minAttributeValues.find(nameAttribute);

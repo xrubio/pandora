@@ -19,7 +19,7 @@ class Analysis
 {
 protected:
 	std::string _name;
-	std::vector<double> _results;
+	std::vector<long double> _results;
 	// if _writeResults is false _results will not be written in csv file
 	// it is used for analysis that produce other results (i.e. AgentHDFtoSHP parser)
 	bool _writeResults;
@@ -31,7 +31,7 @@ public:
 	const std::string & getName() const;
 	virtual void preProcess(){};
 	virtual void postProcess(){};
-	float getResult( int timeStep ) const;
+	long double getResult( int timeStep ) const;
 	bool writeResults(){return _writeResults;}	
 };
 

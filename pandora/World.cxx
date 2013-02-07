@@ -332,6 +332,11 @@ void World::stepSection( const int & sectionIndex )
 
 void World::serializeAgents()
 {
+	if(_step%_simulation.getSerializerResolution()!=0)
+	{
+		return;
+	}
+
 	AgentsList::iterator it=_agents.begin();
 	int i = 0;
 	while(it!=_agents.end())
@@ -1113,6 +1118,11 @@ int World::getCurrentStep() const
 
 void World::serializeRasters()
 {
+	if(_step%_simulation.getSerializerResolution()!=0)
+	{
+		return;
+	}
+
 	for(int d=0; d<_rasters.size(); d++)
 	{
 		if(!_rasters.at(d) || !_serializeRasters.at(d) || !_dynamicRasters.at(d))

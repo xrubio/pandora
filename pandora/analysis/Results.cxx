@@ -60,7 +60,7 @@ void Results::apply() const
 		std::cout << " done" << std::endl;
 	}
 
-	for(int i=0; i<=_simRecord.getNumSteps()/_simRecord.getResolution(); i++)		
+	for(int i=0; i<=_simRecord.getNumSteps(); i=i+_simRecord.getFinalResolution())
 	{
 		std::stringstream newLine;
 		newLine << i << _separator;
@@ -68,7 +68,7 @@ void Results::apply() const
 		{
 			if((*itL)->writeResults())
 			{
-				newLine << std::setprecision(2) << std::fixed << (*itL)->getResult(i) << _separator;				
+				newLine << std::setprecision(2) << std::fixed << (*itL)->getResult(i/_simRecord.getFinalResolution()) << _separator;				
 			}
 		}
 		file << newLine.str() << std::endl;
@@ -78,7 +78,7 @@ void Results::apply() const
 
 void Results::addAnalysis( Analysis * analysis )
 {
-	analysis->setNumTimeSteps(1+(_simRecord.getNumSteps()/_simRecord.getResolution()));	
+	analysis->setNumTimeSteps(1+(_simRecord.getNumSteps()/_simRecord.getFinalResolution()));	
 	_analysisList.push_back(analysis);
 }
 

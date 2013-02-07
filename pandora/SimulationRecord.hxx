@@ -56,7 +56,11 @@ private:
 	int _numSteps;
 	// the step currently being loaded
 	int _loadingStep;
-	int _resolution;
+
+	// resolution of serializedData
+	int _serializedResolution;
+	// resolution of loaded data
+	int _loadedResolution;
 
 	// we need to know min and max values for each state in order to paint agents 
 	ValuesMap _minAttributeValues;
@@ -88,7 +92,7 @@ private:
 	// updates min/max values checking value for the attribute key
 	void updateMinMaxAttributeValues( const std::string & key, int value );
 public:
-	SimulationRecord( int resolution = 1, bool gui = true );
+	SimulationRecord( int loadedResolution = 1, bool gui = true );
 	virtual ~SimulationRecord();
 
 	// the real method, called from registerAgentStep
@@ -103,7 +107,10 @@ public:
 
 	const std::string & getName() const;
 	int getNumSteps() const;
-	int getResolution() const;	
+	int getSerializedResolution() const;	
+	int getLoadedResolution() const;	
+	// the final resolution is the result of multiplying serialized x loaded resolution
+	int getFinalResolution() const;
 	
 	AgentRecordsMap::const_iterator beginAgents( const std::string & type ) const;
 	AgentRecordsMap::const_iterator endAgents( const std::string & type) const;
