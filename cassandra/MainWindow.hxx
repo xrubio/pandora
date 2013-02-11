@@ -29,6 +29,9 @@
 #include <Configuration3D.hxx>
 #include <LoadSimulationThread.hxx>
 
+#include <QVTKWidget.h>
+
+
 class QMenu;
 class QAction;
 class QToolBar;
@@ -46,6 +49,8 @@ class AgentTypeSelection;
 class RasterSelection;
 class GenericStatistics;
 class Display3D;
+class Display3DVTK;
+class Display3DVL;
 class AgentConfiguration;
 class RasterConfiguration;
 
@@ -83,6 +88,8 @@ private:
 	QAction * _showAgentsAction;
 
 	QAction * _show3DAction;
+    QAction * _show3DActionVTK;
+    QAction * _show3DActionVL;
 	QAction * _options3DAction;
 
 	QSpinBox * _stepBox;
@@ -94,6 +101,8 @@ private:
 
 	Display2D * _display2D;
 	Display3D * _display3D;
+    Display3DVTK * _displayVTK;
+    Display3DVL * _displayVL;
 
 	AgentTypeSelection * _agentTypeSelection;
 	AgentTraitSelection * _agentTraitSelection;
@@ -137,6 +146,8 @@ private slots:
 	
 	void show3DWindow();
 	void show3DOptions();
+    void show3DWindowVTK();
+    void show3DWindowVL();
 
 	void agentConfigured( const std::string & , const AgentConfiguration &); 
 	void rasterConfigured( const std::string & , const RasterConfiguration &); 	

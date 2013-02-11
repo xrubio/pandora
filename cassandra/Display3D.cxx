@@ -38,7 +38,6 @@
 #include <ColorSelector.hxx>
 #include <StaticRaster.hxx>
 #include <ProjectConfiguration.hxx>
-
 #include <algorithm>
 
 namespace GUI
@@ -98,8 +97,38 @@ void Display3D::initializeGL()
 	glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, spot_cutoff);
 	glLightf(GL_LIGHT1, GL_SPOT_EXPONENT, spot_exponent);
 	//glEnable -> "encèn" (Recordatori: OpenGL es com una màquina d'estats)
-	//Iluminació disponible.
+        //Iluminació disponible
 	*/
+
+        //MOD
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);   //netejar vista
+
+
+        Engine::StaticRaster & DEMRaster = _simulationRecord->getRasterTmp(_config3D.getDEMRaster(), _viewedStep);
+
+        float puntMig = sqrt(DEMRaster.getSize()._x*DEMRaster.getSize()._x+DEMRaster.getSize()._y*DEMRaster.getSize()._y);
+
+        radi = (puntMig)/2.f; //mida escenari/2
+        VRP.x = DEMRaster.getSize()._x/2;
+        VRP.y = -DEMRaster.getSize()._y/2;
+        VRP.z = 0;
+        cout << "Radi = " << radi << endl;
+        dist = 3*radi;
+
+        //cout << "Angle cam = " << ((atan(height()/(2*((3*dist) - dist))))*180)/3.1415 << endl;
+        anglecam = ((asin(radi/dist)*180)/3.1415)*2;
+
+        //anglecam = (((atan(radi/dist)*180)/3.1415)*2);
+        cout << "Angle cam = " << anglecam << endl;
+        ra = (float)width()/(float)height();
+        angleX = 0;
+        angleY = 0;
+        angleZ = 0;
+        anterior = radi;
+        posterior = radi*3 + anterior;
+        focus();
+
+        //FI MOD
 
 	GLfloat materialSpecular[] = {1.0f, 1.0f, 1.0f, 1.0f};
 	GLfloat materialShininess[] = {50.0f};
@@ -127,6 +156,7 @@ void Display3D::initializeGL()
 	glPixelStorei(GL_UNPACK_ALIGNMENT,1);
 
 
+
 	/*
 	for(Models3DMap::iterator it=_models.begin(); it!=_models.end(); it++)
 	{
@@ -135,7 +165,7 @@ void Display3D::initializeGL()
 	}
 	*/
 	
-	_landscapeMaterial.registerTexture();
+        _landscapeMaterial.registerTexture();
 	//glEnable(GL_CULL_FACE);
 	/*
 	glEnable(GL_LIGHT0);
@@ -153,6 +183,24 @@ void Display3D::initializeGL()
 	*/
 }
 
+//MOD
+void Display3D::focus()
+{
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(anglecam, ra, anterior, posterior);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    glTranslatef(0,0,-dist);
+    glRotatef(-angleX,1,0,0);
+    glRotatef(-angleY,0,1,0);
+    glRotatef(-angleZ,0,0,1);
+    glTranslatef(-VRP.x,-VRP.y,-VRP.z);
+}
+//FI MOD
 void Display3D::paintLandscape()
 {
 	Engine::Point2D<int> index;
@@ -164,7 +212,7 @@ void Display3D::paintLandscape()
 	_landscapeMaterial.activate();
 	
 	// general plane covering the entire world
-	/*
+        /*
 	glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 0.0f);
 		glVertex3d(5000, 5000, 1);
@@ -178,16 +226,17 @@ void Display3D::paintLandscape()
 		glTexCoord2f(1.0f, 0.0f);
 		glVertex3d(5000, -5000, 1);
 	glEnd();
-	*/
-	const Engine::Point3D<float> scale(_config3D.getSize3D());
+        */
+        const Engine::Point3D<float> scale(_config3D.getSize3D());
+
 	
 //	glTranslatef(-_cellScale._x*_simulationRecord->getSize()/2, -_cellScale._y*_simulationRecord->getSize()/2, 0.0f);
 	RasterConfiguration * rasterConfig = ProjectConfiguration::instance()->getRasterConfig(_config3D.getColorRaster());
 	const ColorSelector & colorSelector(rasterConfig->getColorRamp());
 
-	for(index._x=0; index._x<DEMRaster.getSize()._x-1; index._x++)
+        for(index._x=0; index._x<DEMRaster.getSize()._x-1; index._x++)
 	{	
-		for(index._y=0; index._y<DEMRaster.getSize()._y-1; index._y++)
+                for(index._y=0; index._y<DEMRaster.getSize()._y-1; index._y++)
 		{		
 			Engine::Point3D<float> topLeft(index._x, index._y, 0.0f);
 			topLeft._z = DEMRaster.getValue(Engine::Point2D<int>(topLeft._x,topLeft._y));
@@ -219,7 +268,7 @@ void Display3D::paintLandscape()
 
 			setCellColor(colorSelector.getColor(topLeftColor));
 			glTexCoord2f(topLeft._x/_simulationRecord->getSize(), topLeft._y/_simulationRecord->getSize());
-			glVertex3f(scale._x*topLeft._x, -scale._y*topLeft._y, scale._z*topLeft._z);
+                        glVertex3f(scale._x*topLeft._x, -scale._y*topLeft._y, scale._z*topLeft._z);
 			
 			setCellColor(colorSelector.getColor(bottomLeftColor));
 			glTexCoord2f(bottomLeft._x/_simulationRecord->getSize(), bottomLeft._y/_simulationRecord->getSize());
@@ -246,18 +295,18 @@ void Display3D::setCellColor( const QColor & color )
 	float diffuseColor[3];
 	float specularColor[3];
 
-	ambientColor[0] = color.redF();
-	ambientColor[1] = color.greenF();
-	ambientColor[2] = color.blueF();
+        ambientColor[0] = color.redF();
+        ambientColor[1] = color.greenF();
+        ambientColor[2] = color.blueF();
 
-	diffuseColor[0] = color.redF();
-	diffuseColor[1] = color.greenF();
-	diffuseColor[2] = color.blueF();
-	
+        diffuseColor[0] = color.redF();
+        diffuseColor[1] = color.greenF();
+        diffuseColor[2] = color.blueF();
+
 	specularColor[0] = specularColor[1] = specularColor[2] = 1.0f;
-	glMaterialfv( GL_FRONT, GL_AMBIENT, ambientColor);	
+        glMaterialfv( GL_FRONT, GL_AMBIENT, ambientColor);
 	glMaterialfv( GL_FRONT, GL_DIFFUSE, diffuseColor);
-	glMaterialfv( GL_FRONT, GL_SPECULAR, specularColor);
+        glMaterialfv( GL_FRONT, GL_SPECULAR, specularColor);
 }
 
 void Display3D::paintAgents()
@@ -268,11 +317,10 @@ void Display3D::paintAgents()
 	for(Engine::SimulationRecord::AgentTypesMap::const_iterator itType = _simulationRecord->beginTypes(); itType!=_simulationRecord->endTypes(); itType++)
 	{
 		AgentConfiguration * agentConfig = ProjectConfiguration::instance()->getAgentConfig(itType->first);
-		for(Engine::SimulationRecord::AgentRecordsMap::const_iterator it= _simulationRecord->beginAgents(itType); it!=_simulationRecord->endAgents(itType); it++)
+                for(Engine::SimulationRecord::AgentRecordsMap::const_iterator it= _simulationRecord->beginAgents(itType); it!=_simulationRecord->endAgents(itType); it++)
 		{
 			Engine::AgentRecord * agent = it->second;
 			bool exists = agent->getState(_viewedStep/_simulationRecord->getResolution(), "exists");
-
 			if(!exists)
 			{
 				continue;
@@ -286,7 +334,7 @@ void Display3D::paintAgents()
 			//glRotatef(180.0f, 1.0f, 0.0f, 0.0f);
 			if(!agentConfig->getFileName3D().empty())
 			{
-				agentConfig->getModel().paint();
+                                agentConfig->getModel().paint();
 			}
 			glPopMatrix();
 		}
@@ -301,7 +349,7 @@ void Display3D::paintGL()
 		return;
 	}
 	
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glPushMatrix();
 
@@ -310,7 +358,7 @@ void Display3D::paintGL()
 //	gluLookAt(_position.x(), _position.y(), _zoom*1000.0f, _position.x(), _position.y(), 0.0f, 0.0f, 1.0f, 0.0f);
 //	gluLookAt(-_position.x(), _position.y(), _zoom*5000.0f, -_position.x(), _position.y(), 0.0f, 0.0f, 1.0f, 0.0f);
 //	gluLookAt(0, 0, 0, 0, 0, -_zoom*100.0, 0.0f, 1.0f, 0.0f);
-	gluLookAt(0, 0, 0, 0, 0, -1, 0.0f, 1.0f, 0.0f);
+        //gluLookAt(0, 0, 0, 0, 0, -1, 0.0f, 1.0f, 0.0f);
 
 //	glRotatef(180.0f, 1.0f, 0.0f, 0.0f);
 	/*
@@ -323,21 +371,26 @@ void Display3D::paintGL()
 	/*
 	glTranslatef(_position.x(), _position.y(), 0.0f);
 	*/
-	glTranslatef(0,0,-_zoom*100.0f);
+        /*glTranslatef(0,0,-_zoom*100.0f);
 
-	glRotatef(_rotation.x(), 0.0f, 1.0f, 0.0f);
-	glRotatef(_rotation.y(), 1.0f, 0.0f, 0.0f);
-	glRotatef(_rotationZ, 0.0f, 0.0f, 1.0f);
+        glRotatef(_rotation.x(), 1.0f, 0.0f, 0.0f);
+        glRotatef(_rotation.y(), 0.0f, 1.0f, 0.0f);
+        //glRotatef(_rotationZ, 0.0f, 0.0f, 1.0f);
 
-	glTranslatef(_position.x()-_cellScale._x*_simulationRecord->getSize()/2, -_position.y()+_cellScale._y*_simulationRecord->getSize()/2, 0.0f);
-//	glTranslatef(_position.x()-_cellScale._x*_simulationRecord->getSize()/2, -_position.y()+_cellScale._y*_simulationRecord->getSize()/2, -_zoom*100.0);
+       glTranslatef(_position.x()-_cellScale._x*_simulationRecord->getSize()/2, -_position.y()+_cellScale._y*_simulationRecord->getSize()/2, 0.0f);
+
+       //	glTranslatef(_position.x()-_cellScale._x*_simulationRecord->getSize()/2, -_position.y()+_cellScale._y*_simulationRecord->getSize()/2, -_zoom*100.0);
 
 
 	/*
 	glRotatef(_rotation.y(), 1.0f, 0.0f, 0.0f);
 	*/
+       //MOD
+        glViewport (0, 0, width(), height());
+        focus();
+        //FI MOD
 
-	paintLandscape();
+        paintLandscape();
 		
 	paintAgents();
 
@@ -360,46 +413,71 @@ void Display3D::resizeGL(int w, int h)
 
 void Display3D::wheelEvent( QWheelEvent * event )
 {
-	_zoom -= event->delta()/120;
-	updateGL();
+    anglecam -= event->delta()/100;
+    if(anglecam > 100) anglecam = 100;
+    else if(anglecam < 5) anglecam = 5;
+
+    //_zoom -= event->delta()/120;
+    updateGL();
+}
+
+void Display3D::mouseReleaseEvent( QMouseEvent *)
+{
+  DoingInteractive = NONE;
 }
 
 //Mètode que ens retorna la posició del cursor en un moment determinat.
 void Display3D::mousePressEvent(QMouseEvent *event)
 {
-	if(event->button() == Qt::LeftButton)
+    xClick = event->x();
+    yClick = event->y();
+
+
+        if (event->button()&Qt::LeftButton && event->modifiers()&Qt::ControlModifier)
+        {
+            DoingInteractive = ROTATE;
+        }
+        else if(event->button() == Qt::LeftButton)
 	{	
+                /*
 		if(event->modifiers() & Qt::ShiftModifier)
 		{
-			_lastTargetPos = event->globalPos() - _targetPosition;
+                        _lastTargetPos = event->globalPos() - _targetPosition;
 		}
 		else
 		{
 			_lastTargetPos = event->globalPos() - _targetPosition;
 			_lastPos = event->globalPos() - _position;
-		}
-		update();
+                }*/
+                DoingInteractive = MOV;
+                //update();
 		return;
 	}
-	else if(event->button() == Qt::MidButton)
+        else if (event->button()&Qt::RightButton)
+        {
+            DoingInteractive = PAN;
+        }
+        /*else if(event->button() == Qt::MidButton)
 	{
-		_lastPos = event->globalPos() - _rotation;	
-		update();
+                _lastPos = event->globalPos() - _rotation;
+                //update();
 		return;
 	}
 	else if(event->button() == Qt::RightButton)
 	{	
 		//_lastPos = event->globalPos() - _targetPosition;
 		_lastPos.setX(event->globalPos().x() - _rotationZ);
-		update();
+                //update();
 		return;
-	}
+        }*/
+
 }
 
 //Mètode per modificar el punt de vista des d'on mirem el raster a partir del mouse.
 void Display3D::mouseMoveEvent(QMouseEvent *event)
 {
-	if(event->buttons() & Qt::LeftButton)
+        /*
+        if(event->buttons() & Qt::LeftButton)
 	{
 		if(event->modifiers() & Qt::ShiftModifier)
 		{
@@ -407,10 +485,10 @@ void Display3D::mouseMoveEvent(QMouseEvent *event)
 		}
 		else
 		{
-			_position = event->globalPos() - _lastPos;
+                        _position = event->globalPos() - _lastPos;
 			_targetPosition = event->globalPos() - _lastTargetPos;
 		}
-		update();
+                update();
 		return;
 	}
 	if(event->buttons() & Qt::MidButton)
@@ -418,21 +496,62 @@ void Display3D::mouseMoveEvent(QMouseEvent *event)
 		_rotation = event->globalPos() - _lastPos;
 
 	
-		/*_rotation.setX(std::max(-85, _rotation.x()));
+                _rotation.setX(std::max(-85, _rotation.x()));
 		_rotation.setX(std::min(85, _rotation.x()));
 		_rotation.setY(std::max(-85, _rotation.y()));
 		_rotation.setY(std::min(85, _rotation.y()));
-		*/
-		update();
+
+                update();
 		return;
 	}
 	if(event->buttons() & Qt::RightButton)
 	{
 		_rotationZ = event->globalPos().x() - _lastPos.x();
-		update();
+                update();
 		return;
-	}
+        }*/
+    if (DoingInteractive == MOV)
+    {
+        angleX += yClick - event->y();
+        angleY += xClick - event->x();
+
+    }
+    if (DoingInteractive == ROTATE)
+    {
+        angleZ += yClick - event->y();
+        //angleY += xClick - event->x();
+
+    }
+    else if (DoingInteractive==PAN)
+    {
+      // Fem el pan
+        float mat[4][4];
+        glGetFloatv(GL_MODELVIEW_MATRIX, &mat[0][0]);
+
+        Point incX, incY;
+
+        incX.x = mat[0][0];
+        incX.y = mat[1][0];
+        incX.z = mat[2][0];
+
+        incY.x = mat[0][1];
+        incY.y = mat[1][1];
+        incY.z = mat[2][1];
+
+        incX = incX * (xClick - event->x())/20;
+        incY = incY * (event->y()-yClick)/20;
+
+        VRP += incX + incY;
+    }
+
+    xClick = event->x();
+    yClick = event->y();
+
+    focus();
+    update();
 }
+
+
 
 //Normalitzem l'angle per tenir un angle entre 0 i 2PI
 void Display3D::normalizeAngle(int & angle)

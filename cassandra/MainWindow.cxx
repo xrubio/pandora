@@ -29,6 +29,8 @@
 #include <GenericStatistics.hxx>
 #include <AgentConfigurator.hxx>
 #include <Display3D.hxx>
+#include <Display3DVTK.h>
+#include <Display3DVL.h>
 #include <AgentConfiguration.hxx>
 #include <RasterConfigurator.hxx>
 #include <Configurator3D.hxx>
@@ -53,10 +55,24 @@
 #include <QListWidgetItem>
 #include <QInputDialog>
 
+#include "vtkActor.h"
+#include "vtkCamera.h"
+#include "vtkCellArray.h"
+#include "vtkFloatArray.h"
+#include "vtkPointData.h"
+#include "vtkPoints.h"
+#include "vtkPolyData.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
+#include "vtkRenderer.h"
+
+
+
 namespace GUI
 {
 
-MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0), _agentTraitSelection(0), _rasterSelection(0), _genericStatistics(0), _viewedStep(0), _progressBar(0)//, _Raster3D(0)//, _windowRaster(true)*/
+MainWindow::MainWindow() : _display2D(0), _display3D(0), _displayVTK(0), _displayVL(0), _agentTypeSelection(0), _agentTraitSelection(0), _rasterSelection(0), _genericStatistics(0), _viewedStep(0), _progressBar(0)//, _Raster3D(0)//, _windowRaster(true)*/
 { 
 	QDockWidget * agentTypeSelectionDock = new QDockWidget(tr("Agent Types"), this);
 	agentTypeSelectionDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -85,11 +101,15 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	// resource display 2D
 	_display2D = new Display2D(this);
 	_display3D = new Display3D(0);
-	
+    _displayVTK = new Display3DVTK(0);
+    _displayVL = new Display3DVL(0);
+
 	_display2D->show();
 	_display3D->hide();
+    _displayVTK->hide();
+    _displayVL->hide();
 	
-	setCentralWidget(_display2D);
+    setCentralWidget(_display2D);
 //	setCentralWidget(_display3D);
 	
 	connect(this, SIGNAL(newViewedStep(int)), _display2D, SLOT(viewedStepChangedSlot(int)));
@@ -178,15 +198,26 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_showAgentsAction->setStatusTip(tr("Show Agents"));
 	connect(_showAgentsAction, SIGNAL(triggered()), _display2D, SLOT(showAgents()));
 	
-	_show3DAction = new QAction(QIcon(":/resources/icons/3dview.png"), tr("&Raster 3D"), this);
+    _show3DAction = new QAction(QIcon(":/resources/icons/3dview.png"), tr("&Raster 3D"), this);
 	_show3DAction->setShortcut(tr("Ctrl+3"));
 	_show3DAction->setStatusTip(tr("Show 3D raster"));
 	connect(_show3DAction, SIGNAL(triggered()), this, SLOT(show3DWindow()));
+
 	
 	_options3DAction = new QAction(QIcon(":/resources/icons/3doptions.png"), tr("&Edit 3D View"), this);
 	_options3DAction->setShortcut(tr("Ctrl+E"));
 	_options3DAction->setStatusTip(tr("Edit 3D View"));
 	connect(_options3DAction, SIGNAL(triggered()), this, SLOT(show3DOptions()));
+
+    _show3DActionVTK = new QAction(QIcon(":/resources/icons/3dview.png"), tr("&Raster 3D VTK"), this);
+    _show3DActionVTK->setShortcut(tr("Ctrl+3"));
+    _show3DActionVTK->setStatusTip(tr("Show 3D raster VTK"));
+    connect(_show3DActionVTK, SIGNAL(triggered()), this, SLOT(show3DWindowVTK()));
+
+    _show3DActionVL = new QAction(QIcon(":/resources/icons/3dview.png"), tr("&Raster 3D VL"), this);
+    _show3DActionVL->setShortcut(tr("Ctrl+3"));
+    _show3DActionVL->setStatusTip(tr("Show 3D raster VL"));
+    connect(_show3DActionVL, SIGNAL(triggered()), this, SLOT(show3DWindowVL()));
 	
 	// menus
 	_fileMenu = menuBar()->addMenu(tr("&File"));
@@ -213,6 +244,8 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_viewMenu->addSeparator();
 	_viewMenu->addAction(_show3DAction);
 	_viewMenu->addAction(_options3DAction);
+    _viewMenu->addAction(_show3DActionVTK);
+    _viewMenu->addAction(_show3DActionVL);
 	
 	// toolbars
 	_fileBar= addToolBar(tr("File"));
@@ -253,6 +286,8 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_viewBar->addSeparator();
 	_viewBar->addAction(_show3DAction);
 	_viewBar->addAction(_options3DAction);
+    _viewBar->addAction(_show3DActionVTK);
+    _viewBar->addAction(_show3DActionVL);
 	
 	// TODO un thread diferent?
 	_playTimer = new QTimer(this);
@@ -334,12 +369,13 @@ void MainWindow::adjustGUI()
 {
 	std::cout << "adjusting GUI" << std::endl;
 
-	_display2D->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
+    _display2D->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
 	_agentTypeSelection->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
 	_agentTraitSelection->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
 	_rasterSelection->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
 	_genericStatistics->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
 	_display3D->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
+    _displayVTK->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
 
 	if(!ProjectConfiguration::instance()->getSimulationRecord())
 	{	
@@ -486,20 +522,44 @@ void MainWindow::rasterConfigured( const std::string & type, const RasterConfigu
 
 void MainWindow::show3DWindow()
 {
-	if(_display3D->isVisible())
-	{
-		_display3D->hide();
-	}
-	else
-	{
-		_display3D->show();
-	}
+    if(_display3D->isVisible())
+    {
+        _display3D->hide();
+    }
+    else
+    {
+        _display3D->show();
+    }
 }
 
 void MainWindow::show3DOptions()
 {
 	Configurator3D * config = new Configurator3D(this);
 	connect(config, SIGNAL(configured3D(const Configuration3D &)), this, SLOT(configured3D(const Configuration3D &)));
+}
+
+void MainWindow::show3DWindowVTK()
+{
+    if(_displayVTK->isVisible())
+    {
+        _displayVTK->hide();
+    }
+    else
+    {
+        _displayVTK->paintLandscape();
+    }
+}
+
+void MainWindow::show3DWindowVL()
+{
+    if(_displayVL->isVisible())
+    {
+        _displayVL->hide();
+    }
+    else
+    {
+        _displayVL->show();
+    }
 }
 
 void MainWindow::configured3D( const Configuration3D & config3D )

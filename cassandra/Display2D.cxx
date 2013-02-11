@@ -294,6 +294,79 @@ void Display2D::mousePressEvent (QMouseEvent * event)
 	}
 }
 
+void Display2D::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if(!_simulationRecord)
+    {
+        return;
+    }
+    int radiX, radiY;
+    radiX = radiY = 3;
+    Engine::Point2D<int> position(event->pos().x()-_offset.x(), event->pos().y()-_offset.y());
+    // TODO program /= i *= in Engine::Point2D
+    position._x /= _zoom;
+    position._y /= _zoom;
+
+    std::cout << "position._x " << position._x << " position._y " << position._y << std::endl;
+
+    QListWidget *agentList = new QListWidget();
+    Engine::Point2D<int> positionAux(position._x, position._y);
+    Engine::AgentRecord * agentRecord;
+
+    for (int iX = 0; iX <= radiX; iX++) {
+        for (int iY = 0; iY <= radiY; iY++){
+            positionAux._x = position._x + iX;
+            positionAux._y = position._y + iY;
+            agentRecord = _simulationRecord->getAgentAtPosition(_viewedStep/_simulationRecord->getResolution(), positionAux);
+            if (agentRecord) {
+                std::string stateName = agentRecord->getId();
+                if (agentList->findItems(stateName.c_str(),Qt::MatchFixedString).isEmpty()) {
+                    agentList->addItem(stateName.c_str());
+                    std::string info = agentRecord->getCompleteState(_viewedStep/_simulationRecord->getResolution());
+                    agentList->addItem(info.c_str());
+                }
+
+            }
+            positionAux._x = position._x + iX;
+            positionAux._y = position._y - iY;
+            agentRecord = _simulationRecord->getAgentAtPosition(_viewedStep/_simulationRecord->getResolution(), positionAux);
+            if (agentRecord) {
+                std::string stateName = agentRecord->getId();
+                if (agentList->findItems(stateName.c_str(),Qt::MatchFixedString).isEmpty()) {
+                    agentList->addItem(stateName.c_str());
+                    std::string info = agentRecord->getCompleteState(_viewedStep/_simulationRecord->getResolution());
+                    agentList->addItem(info.c_str());
+                }
+            }
+            positionAux._x = position._x - iX;
+            positionAux._y = position._y + iY;
+            agentRecord = _simulationRecord->getAgentAtPosition(_viewedStep/_simulationRecord->getResolution(), positionAux);
+            if (agentRecord) {
+                std::string stateName = agentRecord->getId();
+                if (agentList->findItems(stateName.c_str(),Qt::MatchFixedString).isEmpty()) {
+                    agentList->addItem(stateName.c_str());
+                    std::string info = agentRecord->getCompleteState(_viewedStep/_simulationRecord->getResolution());
+                    agentList->addItem(info.c_str());
+                }
+            }
+            positionAux._x = position._x - iX;
+            positionAux._y = position._y - iY;
+            agentRecord = _simulationRecord->getAgentAtPosition(_viewedStep/_simulationRecord->getResolution(), positionAux);
+            if (agentRecord) {
+                std::string stateName = agentRecord->getId();
+                if (agentList->findItems(stateName.c_str(),Qt::MatchFixedString).isEmpty()) {
+                    agentList->addItem(stateName.c_str());
+                    std::string info = agentRecord->getCompleteState(_viewedStep/_simulationRecord->getResolution());
+                    agentList->addItem(info.c_str());
+                }
+            }
+        }
+    }
+    agentList->setAlternatingRowColors(true);
+    agentList->resize(400,400);
+    agentList->show();
+}
+
 void Display2D::mouseMoveEvent (QMouseEvent * event)
 {
 	if(!_simulationRecord)
@@ -315,7 +388,7 @@ std::string Display2D::getRasterToolTip( const Engine::Point2D<int> & position )
 	{
 		it--;
 		Engine::StaticRaster & raster = _simulationRecord->getRasterTmp(*it, _viewedStep);
-		toolTipString << *it << " in " << position << " : " << raster.getValue(position) << std::endl;
+        toolTipString << *it << " in " << position << " : " << raster.getValue(position) << std::endl;
 	}
 	return toolTipString.str();
 }
@@ -326,7 +399,7 @@ std::string Display2D::getAgentToolTip( const Engine::Point2D<int> & position )
 	Engine::AgentRecord * agentRecord = _simulationRecord->getAgentAtPosition(_viewedStep/_simulationRecord->getResolution(), position);
 	if(agentRecord)
 	{
-		toolTipString << std::endl << agentRecord->getCompleteState(_viewedStep/_simulationRecord->getResolution());
+        toolTipString << std::endl << agentRecord->getCompleteState(_viewedStep/_simulationRecord->getResolution());
 	}
 	return toolTipString.str();
 }
