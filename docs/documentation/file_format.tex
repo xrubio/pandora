@@ -1,0 +1,217 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{url}
+
+% Title Page
+\title{Pandora file format}
+\author{Xavier Rubio-Campillo}
+
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This document defines the format that Pandora uses to serialize a simulation.
+\end{abstract}
+
+\section{Introduction}
+
+Pandora uses HDF5\footnote{\url{http://www.hdfgroup.org/HDF5/}} to store the contents of a simulation, both in distributed environments (thus avoiding bottlenecks) and serial executions. This is an structured binary format designed for scientific applications.
+
+Each simulation developed with the library generated at least a \textbf{.h5} file, and one \textbf{.abm} file for every computer node used in the execution (they are numbered following the id of the node, i.e. \textit{agents-0.abm}, \textit{agents-1.abm}). The number of the \textbf{.h5} file and the directory where all the data is stored must be specified at execution time, usually inside the XML configuration.
+
+\section{Base \textbf{.h5} file}
+
+This file provides information about global parameters of the simulation, and the raster maps.
+
+\subsection{Global Parameters}
+
+This dataset comprises 4 different values:
+
+
+\begin{enumerate}
+  \item numSteps (integer)
+Total number of executed time steps.
+  \item numTasks (integer)
+Number of tasks used during the execution
+  \item serializerResolution (integer)
+How many time steps are executed before storing one.
+  \item{size}
+Total size of the environment
+\end{enumerate}
+
+As an example:
+\begin{verbatim}
+GROUP "/" {
+   DATASET "global" {
+      DATATYPE  H5T_STD_I32LE
+      DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
+      DATA {
+      (0): 0
+      }
+      ATTRIBUTE "numSteps" {
+         DATATYPE  H5T_STD_I32LE
+         DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
+         DATA {
+         (0): 18000
+         }
+      }
+      ATTRIBUTE "numTasks" {
+         DATATYPE  H5T_STD_I32LE
+         DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
+         DATA {
+         (0): 4
+         }
+      }
+      ATTRIBUTE "serializerResolution" {
+         DATATYPE  H5T_STD_I32LE
+         DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
+         DATA {
+         (0): 360
+         }
+      }
+      ATTRIBUTE "size" {
+         DATATYPE  H5T_STD_I32LE
+         DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
+         DATA {
+         (0): 1600
+         }
+      }
+   }
+\end{verbatim}
+
+\subsection{Rasters}
+The dataset contains all raster map information of the simulation. There are two types of rasters: Static Rasters and Dynamic Rasters. In the root element there exist a Dataset defining which of the Rasters that will be loaded are Static. It comprises a list of Attributes, whose identifiers are the Static Rasters (so, the ones that are not listed here are Dynamics):
+
+\begin{verbatim}
+    DATASET "staticRasters" {
+      DATATYPE  H5T_STD_I32LE
+      DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
+      DATA {
+      (0): 0
+      }
+      ATTRIBUTE "dem" {
+         DATATYPE  H5T_STD_I32LE
+         DATASPACE  SIMPLE { ( 1 ) / ( 1 ) }
+         DATA {
+         (0): 0
+         }
+      }
+   }
+\end{verbatim}
+
+
+\subsubsection{Static Rasters}
+
+Static Rasters are used by a Pandora simulation, but cannot be modified (i.e. GIS data like Digital Elevation Models, rivers and lakes, etc.).
+They form a Group (whose identifier is the name of the Static Raster) inside the root element \textit{/}. This Group has an integer DataSet called 'values' with the size specified by the global parameter \textit{size}. Inside the dataset the information is provided as a bidimensional matrix, like:
+\begin{verbatim}
+ 
+GROUP "/" {
+   GROUP "dem" {
+      DATASET "values" {
+         DATATYPE  H5T_STD_I32LE
+         DATASPACE  SIMPLE { ( 264, 264 ) / ( 264, 264 ) }
+         DATA {
+         (0,0): -32768, -32768, -32768, -32768, -32768, -32768, -32768,
+         (0,7): -32768, -32768, -32768, -32768, -32768, -32768, -32768,
+         (0,14): -32768, -32768, -32768, -32768, -32768, -32768, -32768,
+         (0,21): -32768, -32768, -32768, -32768, -32768, -32768, -32768,
+         (0,28): -32768, -32768, -32768, -32768, -32768, -32768, -32768,
+         (0,35): -32768, -32768, -32768, -32768, -32768, -32768, -32768,
+         (0,42): -32768, 1575, 1262, 1526, 1175, 1080, 828, 536, 574, 913,
+	  ..................
+	  ..................
+	  ..................
+	  ..................
+	  ..................
+	  ..................
+         (263,252): -32768, -32768, -32768, -32768, -32768, -32768, -32768,
+         (263,259): -32768, -32768, -32768, -32768, -32768
+         }
+      }
+   }
+\end{verbatim}
+
+\subsubsection{Dynamic Rasters}
+
+Dynamic Rasters are exactly like the static ones, that can be modified by the agents or the world every time step. They are defined as a Group inside the root element whose identifier is the name of the raster. Inside this Group there is a dataset for every time step from 0 to \textit{numSteps}, with identifiers following this value (i.e. \textit{step0}, \textit{step1}, \textit{step2}, ...). Every time step dataset contains a bidimensional matrix of the global size:
+
+\begin{verbatim}
+    GROUP "resources" {
+      DATASET "step0" {
+         DATATYPE  H5T_STD_I32LE
+         DATASPACE  SIMPLE { ( 264, 264 ) / ( 264, 264 ) }
+         DATA {
+         (0,0): 5, 1, 4, 1, 1, 3, 3, 2, 2, 5, 5, 3, 3, 4, 1, 0, 4, 4, 3, 4,
+         (0,20): 1, 4, 5, 4, 3, 3, 2, 4, 2, 3, 3, 3, 3, 3, 1, 2, 4, 4, 3, 0,
+         (0,40): 4, 4, 1, 2, 5, 0, 3, 4, 1, 0, 2, 3, 0, 4, 0, 5, 4, 1, 0, 1,
+         (0,60): 3, 1, 3, 4, 3, 2, 4, 4, 1, 5, 4, 3, 4, 2, 1, 3, 3, 3, 0, 0,
+         (0,80): 0, 1, 2, 3, 2, 1, 3, 3, 2, 3, 2, 2, 0, 2, 2, 2, 4, 1, 3, 3,
+         (0,100): 1, 5, 4, 2, 4, 2, 4, 1, 1, 2, 2, 4, 4, 4, 1, 3, 0, 2, 3, 4,
+	  ..................
+	  ..................
+	  ..................
+	  ..................
+	  ..................
+	  ..................
+         (263,229): 1, 4, 5, 0, 2, 2, 3, 4, 2, 4, 1, 3, 3, 5, 3, 4, 2, 2, 5,
+         (263,248): 5, 2, 3, 3, 4, 0, 2, 2, 4, 2, 3, 2, 5, 1, 5, 4
+         }
+      }
+      DATASET "step1" {
+	  ..................
+\end{verbatim}
+
+\section{Agents (.abm) files}
+
+Each task stores the agents that are inside their boundaries at a given time step (this is the reason why there is one file per task). Pandora generates a Group for each Agent type. Inside it there is a nested list of Groups, each one containing the information of a time step from 0 to \textit{numSteps}, with identifiers following this value (i.e. \textit{step0}, \textit{step1}, \textit{step2}, ...).
+Finally, the time step group has a Dataset for every attribute of the agent that was stored. At least the id (string), x and y positions (integer) are stored, plus any additional attributes defined in the method \textit{registerAttributes}. Each attribute Dataset is a unidimensional vector with size equal to the number of agents for this particular time step and task (so all attribute Datasets inside a time step group have the same size), like:
+
+\begin{verbatim}
+GROUP "/" {
+   GROUP "RandomAgent" {
+      GROUP "step0" {
+         DATASET "id" {
+            DATATYPE  H5T_STRING {
+               STRSIZE H5T_VARIABLE;
+               STRPAD H5T_STR_NULLTERM;
+               CSET H5T_CSET_ASCII;
+               CTYPE H5T_C_S1;
+            }
+            DATASPACE  SIMPLE { ( 2 ) / ( H5S_UNLIMITED ) }
+            DATA {
+            (0): "RandomAgent_0", "RandomAgent_1"
+            }
+         }
+         DATASET "resources" {
+            DATATYPE  H5T_STD_I32LE
+            DATASPACE  SIMPLE { ( 2 ) / ( H5S_UNLIMITED ) }
+            DATA {
+            (0): 5, 5
+            }
+         }
+         DATASET "x" {
+            DATATYPE  H5T_STD_I32LE
+            DATASPACE  SIMPLE { ( 2 ) / ( H5S_UNLIMITED ) }
+            DATA {
+            (0): 32, 16
+            }
+         }
+         DATASET "y" {
+            DATATYPE  H5T_STD_I32LE
+            DATASPACE  SIMPLE { ( 2 ) / ( H5S_UNLIMITED ) }
+            DATA {
+            (0): 191, 116
+            }
+         }
+      } 
+      GROUP "step1" {
+	..................
+\end{verbatim}
+
+\section{Final considerations}
+
+If you want to see some code capable of loading this data, take a look to the \textbf{SimulationRecord} class. This is the basic class to load a Pandora execution, and uses the HDF5 C library to read through the data of any simulated model. It is used by Cassandra (GUI application) as well as the set of tools inside directory \textit{Analysis}
+
+\end{document}
