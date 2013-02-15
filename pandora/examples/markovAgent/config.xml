@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<config>  
+	<!-- Global simulation parameters -->
+	<output resultsFile="./data/mdpAgents.h5" logsDir="./logs"/>
+	<numSteps value="1" serializeResolution="1"/>
+	<size value="32"/>
+	<numAgents value="1"/>
+</config>
+

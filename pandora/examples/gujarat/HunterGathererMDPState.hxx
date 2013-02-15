@@ -10,8 +10,6 @@
 namespace Gujarat
 {
 
-class HunterGathererMDPProblem;
-
 class HunterGathererMDPState
 {
 public:

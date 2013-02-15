@@ -1,14 +1,16 @@
 #!/usr/bin/python
 import fileinput, sys, os, random
+baseDir = '/home/bsc21/bsc21887/pandora/examples/gujarat/explorationRain'
+taskFile = 'mean.txt'
 
-numExecutions = 1
+numExecutions = 5
 
 minimumBiomassValues = ['0.1']
 
 # local large
-meanValues = ['1791', '2291', '2791', '3291', '3791', '4291', '4791', '5291', '5791', '6291', '6791', '7291','7791']
+#meanValues = ['1791', '2291', '2791', '3291', '3791', '4291', '4791', '5291', '5791','7791']
 # local small
-#meanValues = ['4682','4707','4732','4757','4782','4807','4832','4857','4882','4907','4932','4957','4982','5002','5032']
+meanValues = ['4682','4707','4732','4757','4782','4807','4832','4857','4882','4907','4932','4957','4982','5002','5032']
 # local stddev
 stdDevValues = ['1934']
 
@@ -27,7 +29,7 @@ stdDevValues = ['1934']
 #stdDevValues = ['1011']
 
 xmlTemplate = 'templates/config_template_mn_mean.xml'
-runTemplate = 'templates/bsub_template_mean.cmd'
+#runTemplate = 'templates/bsub_template_mean.cmd'
 
 indexKey = 'INDEX'
 initialDirKey = 'INITIALDIR'
@@ -69,20 +71,22 @@ for numExecution in range(0,numExecutions):
 				replaceKey(configName, numExecutionKey, str(numExecution))
 				replaceKey(configName, climateKey, randomValue)
 
-				runName = dirName+'/bsub_gujarat.cmd'
-				os.system('cp '+runTemplate+' '+runName)
-				replaceKey(runName, indexKey, str(index))
-				replaceKey(runName, initialDirKey, dirName)
+#runName = dirName+'/bsub_gujarat.cmd'
+#				os.system('cp '+runTemplate+' '+runName)
+#				replaceKey(runName, indexKey, str(index))
+#				replaceKey(runName, initialDirKey, dirName)
 				index += 1
 
-print 'workbench done, submitting tasks'
+print 'workbench done, writing task file'
+
 index = 0
+taskFile = open(taskFile, 'w')
 for minimumBiomass in minimumBiomassValues:	
 	for mean in meanValues :
 		for stddev in stdDevValues:
 			for numExecution in range(0,numExecutions):
-				print 'submitting gujarat instance: ' + str(index) + ' with min biomass: ' + minimumBiomass + ' mean: ' + mean + ' stddev: ' + stddev + ' and execution: ' + str(numExecution)
+				print 'writing gujarat instance: ' + str(index) + ' with min biomass: ' + minimumBiomass + ' mean: ' + mean + ' stddev: ' + stddev + ' and execution: ' + str(numExecution)
 				dirName = 'mean/results_biomin'+minimumBiomass+'_mean'+mean+'_stddev'+stddev+'_ex'+str(numExecution)
-				os.system('bsub < '+dirName+'/bsub_gujarat.cmd')
+				taskFile.write('cd '+baseDir+'/'+dirName+' && ../../../gujarat\n')
 				index += 1
-
+taskFile.close()
