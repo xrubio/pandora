@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<config>  
+	<output resultsFile="./data/results.h5" logsDir="./logs"/>
+	<numAgents value="10"/>
+	<numAnimalsMax value = "600" />
+	<numAnimalsMaxIni value = "500"/>
+	<numAnimalsMin value = "100" />
+	<numAnimalsMinIni value = "150"/>
+	<numSteps value="10" serializeResolution="1"/>
+	<numVillages value="8" />
+	<percentAgentsWithCellphone value="65"/>
+	<probabilityChildInheritsFromFather value = "90"/>
+	<size value="60"/>
+</config>
