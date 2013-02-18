@@ -3,6 +3,7 @@
 #include <GeneralState.hxx>
 #include <Statistics.hxx>
 #include <iostream>
+#include <stack>
 
 namespace Tutorial
 {
@@ -14,15 +15,58 @@ void MyAgent::initNumberOfAnimals() {
 void MyAgent::initHasCellphone() {
 	int percentAgentsWithCellphone = 65;
 	int r = Engine::GeneralState::statistics().getUniformDistValue(0, 100);
-	if (r < percentAgentsWithCellphone) _hasCellphone = true;
-	else _hasCellphone = false;
+	_hasCellphone = (r < percentAgentsWithCellphone);
 }
 
-void MyAgent::initMentalWorldRepresentation() { //if first == -1 then second == 0
+void MyAgent::updateCellMentalWorldRepresentation(int x, int y, int resourcesLevel, int time) {
+	_mentalWorldRepresentation[x][y].first = resourcesLevel;
+	_mentalWorldRepresentation[x][y].second = time;
+}
+
+std::vector<Engine::Point2D<int> > MyAgent::getUnknownNeighborCells(int x, int y) {
+	std::vector<Engine::Point2D<int> > neighborCells;
+	for (int i = y-1; i <= y+1; ++i) {
+		for (int j = x-1; j <= x+1; ++j) {
+			Engine::Point2D<int> newPosition;
+			newPosition._x = j;
+			newPosition._y = i;
+			if (_world->checkPosition(newPosition) and not (i == y and j == x) and _mentalWorldRepresentation[i][j].first != -1) {
+				neighborCells.push_back(newPosition);
+			}
+		}
+	}
+	return neighborCells;
+}
+
+void MyAgent::initMentalWorldRepresentation() { //TODO completar
+	//All cells are unknown
 	for (int i = 0; i < _config.getSize(); ++i) {
 		for (int j = 0; j < _config.getSize(); ++j) {
 			_mentalWorldRepresentation[i][j].first = -1;
-			_mentalWorldRepresentation[i][j].second = Engine::GeneralState::statistics().getUniformDistValue(0, 2);
+			_mentalWorldRepresentation[i][j].second = -1;
+		}
+	}
+	//Initialize some cells
+	for (int i = 0; i < _config.getMaxYearsCellInfo(); ++i) {
+		int cellsNeeded = _config.getPercentMapKnownAtBeginning()/_config.getMaxYearsCellInfo();
+		int cellsFilled = 0;
+		Engine::Point2D<int> position;
+		position._x = Engine::GeneralState::statistics().getUniformDistValue(0, _config.getSize()-1);
+		position._y = Engine::GeneralState::statistics().getUniformDistValue(0, _config.getSize()-1);
+		std::stack<Engine::Point2D<int> > positionsToExplore;
+		positionsToExplore.push(position);
+		while (cellsFilled < cellsNeeded and not positionsToExplore.empty()) {
+			position = positionsToExplore.top();
+			positionsToExplore.pop();
+			int actualResources = _world->getValueStr("resources", position);
+			int resourcesLevel;
+			if (actualResources <= _config.getResourcesLowLevel()) resourcesLevel = 0;
+			else if (actualResources >= _config.getResourcesHighLevel()) resourcesLevel = 2;
+			else resourcesLevel = 1;
+			updateCellMentalWorldRepresentation(position._x, position._y, resourcesLevel, i);
+			std::vector<Engine::Point2D<int> > neighborCells = getUnknownNeighborCells(position._x, position._y);
+			for (int j = 0; j < neighborCells.size(); ++j) positionsToExplore.push(neighborCells[j]);
+			++cellsFilled;
 		}
 	}
 }
@@ -37,10 +81,11 @@ void MyAgent::initCellphoneUsage() {
 }
 
 void MyAgent::initSocialNetwork() { //Siempre pone 2 en la relacion, tiene que ir en las dos direcciones!
-	std::vector<int> idsAgentsSameVillage = _village.getCitizens();
+	//usar nueva funcion createAffinity
+	std::vector<std::string> idsAgentsSameVillage = _village.getCitizens();
 	for (int i = 0; i < idsAgentsSameVillage.size(); ++i) {
 		//if no es el mismo y no esta añadido
-		std::pair<int, int> association;
+		std::pair<std::string, int> association;
 		association.first = idsAgentsSameVillage[i];
 		association.second = 2;
 		_socialNetwork.push_back(association);
@@ -59,16 +104,77 @@ void MyAgent::initReputation() {
 	_reputation = -1;
 }
 
-void MyAgent::initCallsMade() {
-	_callsMade = 0;
+void MyAgent::initMadeCalls() {
+	_madeCalls = 0;
 }
 
 void MyAgent::initCellsSharedPerCall() {
 	_avgCellsSharedPerCall = -1;
 }
 
+void MyAgent::initLastCalls() {
+	for (int i = 0; i < _socialNetwork.size(); ++i) {
+		_lastCalls.push_back(std::pair<std::string, int> (_socialNetwork[i].first, 0));
+	}
+}
+
 void MyAgent::setVillage(MyVillage &v) {
 	_village = v;
+}
+
+MyVillage MyAgent::getVillage() {
+	return _village;
+}
+
+void MyAgent::callMade(std::string id) {
+	for (int i = 0; i < _lastCalls.size(); ++i) {
+		if (_lastCalls[i].first == id) _lastCalls[i].second = 0;
+	}
+	MyAgent* receiver = (MyAgent*)_world->getAgent(id);
+	receiver->callMade(_id);
+}
+
+void MyAgent::updateLastCalls() {
+	for (int i = 0; i < _lastCalls.size(); ++i) {
+		++_lastCalls[i].second;
+	}
+}
+
+void MyAgent::createAffinity(std::string id, int affinityLevel) {
+	_socialNetwork.push_back(std::pair<std::string, int> (id, affinityLevel));
+	_lastCalls.push_back(std::pair<std::string, int> (id, 0));
+}
+
+void MyAgent::deleteAffinity(std::string id) { //TODO
+	bool found = false;
+	for (int i = 0; not found and i < _socialNetwork.size(); ++i) {
+		if (_socialNetwork[i].first == id) {
+			_socialNetwork.erase(_socialNetwork.begin(), _socialNetwork.begin() + i);
+			found = true;
+		}
+	}
+}
+
+void MyAgent::updateAffinities() { //TODO
+	for (int i = 0; i < _socialNetwork.size(); ++i) {
+		MyAgent* a = (MyAgent*)_world->getAgent(_socialNetwork[i].first);
+		if (_village.getId() == a->getVillage().getId()) {
+			/*if () _socialNetwork[i].second = 2;
+			else if () _socialNetwork[i].second = 1;
+			else {
+				deleteAffinity(_socialNetwork[i].first);//delete x2
+				a->deleteAffinity(_id);
+			}*/
+		}
+		else {
+			/*if () _socialNetwork[i].second = 1;
+			else if () _socialNetwork[i].second = 0;
+			else {
+				deleteAffinity(_socialNetwork[i].first);//delete x2
+				a->deleteAffinity(_id);
+			}*/
+		}
+	}
 }
 
 MyAgent::MyAgent(const std::string &id, const Examples::MyWorldConfig &config, MyWorld* w) : Agent(id), _gatheredResources(0) {
@@ -81,8 +187,9 @@ MyAgent::MyAgent(const std::string &id, const Examples::MyWorldConfig &config, M
 	initCellphoneUsage();
 	initSocialNetwork();
 	initReputation();
-	initCallsMade();
+	initMadeCalls();
 	initCellsSharedPerCall();
+	initLastCalls();
 }
 
 MyAgent::~MyAgent() {
@@ -102,17 +209,13 @@ void MyAgent::gatherResources() { //TODO depende de definicion del clima
 	_world->setValueStr("resources", _position, 0);
 }
 
-bool MyAgent::hasMinimumNumberOfAnimals() {
-	return _numberOfAnimals >= 100;
-}
-
 void MyAgent::updateMentalWorldRepresentation() {
-	for (int i = 0; i < 60; ++i) {
-		for (int j = 0; j < 60; ++j) {
+	for (int i = 0; i < _config.getSize(); ++i) {
+		for (int j = 0; j < _config.getSize(); ++j) {
 			if (_mentalWorldRepresentation[i][j].first != -1) ++_mentalWorldRepresentation[i][j].second;
-			if (_mentalWorldRepresentation[i][j].second >= 3) {
+			if (_mentalWorldRepresentation[i][j].second >= _config.getMaxYearsCellInfo()) {
 				_mentalWorldRepresentation[i][j].first = -1;
-				_mentalWorldRepresentation[i][j].second = 0;
+				_mentalWorldRepresentation[i][j].second = -1;
 			}
 		}
 	}
@@ -143,7 +246,7 @@ void MyAgent::updateReputation() {
 
 void MyAgent::updateAvgSharedCellsPerCall(int sharedCells) {
 	if (_avgCellsSharedPerCall == -1) _avgCellsSharedPerCall = sharedCells;
-	else _avgCellsSharedPerCall = (_avgCellsSharedPerCall*_callsMade + sharedCells)/(_callsMade + 1);
+	else _avgCellsSharedPerCall = (_avgCellsSharedPerCall*_madeCalls + sharedCells)/(_madeCalls + 1);
 }
 
 void MyAgent::fission() {
@@ -160,14 +263,28 @@ void MyAgent::fission() {
 		newAgent->updateMentalWorldRepresentationAccuracy();
 		newAgent->setCooperationTreat(_cooperationTreat);
 		newAgent->setCellphoneUsage(_cellphoneUsage);
-		//TODO copiar mentalworldrepresentation desde el padre
+		//TODO copiar mentalworldrepresentation desde el padre, añadir al padre a la red social del hijo
 	}
 
 	_numberOfAnimals -= _numberOfAnimals/2; //the parent has half of the animals than before the fission
 }
 
-void MyAgent::fussion() { //TODO
-	//_exists = 0;
+void MyAgent::deleteContactInSocialNetwork(std::string id) {
+	bool found = false;
+	for (int i = 0; not found and i < _socialNetwork.size(); ++i) {
+		if (_socialNetwork[i].first == id) {
+			_socialNetwork.erase(_socialNetwork.begin() + i);
+			found = true;
+		}
+	}
+}
+
+void MyAgent::stopBeingAShepherd() {
+	for (int i = 0; i < _socialNetwork.size(); ++i) {
+		MyAgent* contact = (MyAgent*)_world->getAgent(_socialNetwork[i].first);
+		contact->deleteContactInSocialNetwork(_id);
+	}
+	_exists = 0;
 }
 
 bool MyAgent::agentFissions() {
@@ -176,8 +293,8 @@ bool MyAgent::agentFissions() {
 	return r <= probability;
 }
 
-bool MyAgent::agentFussions() { //TODO
-	
+bool MyAgent::hasMinimumNumOfAnimals() {
+	return _numberOfAnimals <= _config.getNumAnimalsMin();
 }
 
 void MyAgent::move() {

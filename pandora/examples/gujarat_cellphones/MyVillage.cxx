@@ -14,7 +14,7 @@ int MyVillage::getId() {
 	return _id;
 }
 
-std::vector<int> MyVillage::getCitizens() {
+std::vector<std::string> MyVillage::getCitizens() {
 	return _citizens;
 }
 
@@ -26,9 +26,13 @@ void MyVillage::setLocation(const Engine::Point2D<int> &p) {
 	_location = p;
 }
 
-bool MyVillage::isCitizenOfVillage(int id) {
+bool MyVillage::isCitizenOfVillage(std::string id) {
 	for (int i = 0; i < _citizens.size(); ++i) {
 		if (_citizens[i] == id) return true;
 	}
 	return false;
+}
+
+void MyVillage::addCitizen(std::string id) {
+	_citizens.push_back(id);
 }

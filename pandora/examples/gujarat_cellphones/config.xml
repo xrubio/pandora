@@ -1,14 +1,22 @@
 <?xml version="1.0" ?>
 <config>  
 	<output resultsFile="./data/results.h5" logsDir="./logs"/>
-	<numAgents value="10"/>
-	<numAnimalsMax value = "600" />
-	<numAnimalsMaxIni value = "500"/>
-	<numAnimalsMin value = "100" />
-	<numAnimalsMinIni value = "150"/>
+	<diffVillageDaysNoCallsLow value="90"/>
+	<diffVillageDaysNoCallsMedium value="30"/>	
+	<maxYearsCellInfo value="3"/>
+	<numAgents value="1"/>
+	<numAnimalsMax value="600"/>
+	<numAnimalsMaxIni value="500"/>
+	<numAnimalsMin value="100"/>
+	<numAnimalsMinIni value="100"/>
 	<numSteps value="10" serializeResolution="1"/>
-	<numVillages value="8" />
+	<numVillages value="8"/>
 	<percentAgentsWithCellphone value="65"/>
-	<probabilityChildInheritsFromFather value = "90"/>
-	<size value="60"/>
+	<percentMapKnownAtBeginning value="5"/>
+	<probabilityChildInheritsFromFather value="90"/>
+	<resourcesHighLevel value="10"/>
+	<resourcesLowLevel value="5"/>
+	<sameVillageDaysNoCallsHigh value="30"/>
+	<sameVillageDaysNoCallsMedium value="90"/>
+	<size value="10"/>
 </config>

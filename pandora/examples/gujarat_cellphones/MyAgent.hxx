@@ -23,22 +23,25 @@ protected:
 	void initSocialNetwork();
 	void initWorld(MyWorld* w);
 	void initReputation();
-	void initCallsMade();
+	void initMadeCalls();
 	void initCellsSharedPerCall();
+	void initLastCalls();
 	void updateNumberOfAnimals();
 	void updateMentalWorldRepresentation();
 	void updateMentalWorldRepresentationAccuracy();
 	void resetNumberOfResourcesGathered();
 	void gatherResources();
 	void move();
-	bool hasMinimumNumberOfAnimals();
+	bool hasMinimumNumOfAnimals();
+	void stopBeingAShepherd();
 	void checkConditions();
 	void fission();
-	void fussion();
 	bool agentFissions();
-	bool agentFussions();
 	void updateReputation();
 	void updateAvgSharedCellsPerCall(int sharedCells);
+	void updateAffinities();
+
+	std::vector<Engine::Point2D<int> > getUnknownNeighborCells(int x, int y);
 	
 public:
 	MyAgent(const std::string &id, const Examples::MyWorldConfig &config, MyWorld* w);
@@ -55,13 +58,14 @@ public:
 	int _cooperationTreat;
 	int _cellphoneUsage;
 	MyVillage _village;
-	std::vector<std::pair<int,int> > _socialNetwork; //first is an id of an agent, second is the affinity
+	std::vector<std::pair<std::string,int> > _socialNetwork; //first is an id of an agent, second is the affinity
 	double _mentalWorldRepresentationAccuracy;
 	Examples::MyWorldConfig _config;
 	MyWorld* _world;
 	int _reputation;
-	int _callsMade;
+	int _madeCalls;
 	double _avgCellsSharedPerCall;
+	std::vector<std::pair<std::string, int> > _lastCalls; //first is and id of an agent, second is days since last call was made
 
 	void setVillage(MyVillage &v);
 	void initPosition();
@@ -71,6 +75,13 @@ public:
 	void setCooperationTreat(int cooperationTreat);
 	void setCellphoneUsage(int cellphoneUsage);
 	double getAvgCellsSharedPerCall();
+	void deleteContactInSocialNetwork(std::string id);
+	void updateCellMentalWorldRepresentation(int x, int y, int resourcesLevel, int time);
+	void callMade(std::string id);
+	void updateLastCalls();
+	void createAffinity(std::string id, int affinityLevel);
+	MyVillage getVillage();
+	void deleteAffinity(std::string id);
 
 	////////////////////////////////////////////////
 	// This code has been automatically generated //

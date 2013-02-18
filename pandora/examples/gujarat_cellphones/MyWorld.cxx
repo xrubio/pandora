@@ -63,6 +63,7 @@ std::string MyWorld::createAgent(int idVillage) {
 	oss << "MyAgent_" << _agentsCounter;
 	MyAgent* agent = new MyAgent(oss.str(), _config, this);
 	addAgent(agent);
+	_villages[idVillage].addCitizen(oss.str());
 	agent->setVillage(_villages[idVillage]);
 	agent->initPosition();
 	++_agentsCounter;
