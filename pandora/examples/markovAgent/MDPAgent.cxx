@@ -8,7 +8,7 @@
 namespace Examples
 {
 
-MDPAgent::MDPAgent( const std::string & id ) : Agent(id), _resources(4), _model(0), _uctBasePolicy(0)
+MDPAgent::MDPAgent( const std::string & id ) : Agent(id), _resources(0), _model(0), _uctBasePolicy(0)
 {
 	_model = new MDPAgentModel();
 	// horizon
@@ -19,26 +19,26 @@ MDPAgent::MDPAgent( const std::string & id ) : Agent(id), _resources(4), _model(
 MDPAgent::~MDPAgent()
 {
 	delete _model;
-	if(_uctBasePolicy)
-	{
-		delete _uctBasePolicy;
-	}
+	delete _uctBasePolicy;
 }
 
 void MDPAgent::selectActions()
 {
+	std::cout << this << " selecting actions for time step: " << _world->getCurrentStep() << std::endl;
 	_model->reset(*this);
-	UCT * uctPolicy = new UCT(*_uctBasePolicy, 10, 2, 10, false);
+	UCT * uctPolicy = new UCT(*_uctBasePolicy, 9, 1, 10, false);
 //	UCT * uctPolicy = new UCT(*_uctBasePolicy, _mdpWidth, _mdpHorizon, _mdpExplorationBonus, false);
 	Problem::action_t index = (*uctPolicy)(_model->init());
 	MoveAction * action = _model->init().getAvailableAction(index).copy();
+	std::cout << "action chosen with index: " << index << " is moving from: " << _position << " to: " << action->getNewPosition() << std::endl;
 	delete uctPolicy;
 	_actions.push_back(action);
+	std::cout << this << "end selecting actions for time step: " << _world->getCurrentStep() << std::endl;
 }
 
 void MDPAgent::updateState()
 {
-	_resources -= 2;
+//	_resources -= 2;
 	if(_resources<0)
 	{
 		remove();
