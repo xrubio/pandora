@@ -50,7 +50,7 @@ public:
 	virtual const int & getValue( Point2D<int> position ) const;
 
 	//! Returns size of the raster codifying the horizontal and vertical dimensions in a Point2D object. 
-	Point2D<int> getSize() const;
+	virtual Point2D<int> getSize() const;
 	//! Initializes the components of vector '_values' to defaultValue, and to maxValue the ones from vector _maxValue.
 	void setDefaultInitValues( int minValue, int maxValue, int defaultValue );	
 	//! Assigns the value "value" to the cell located by parameter "position". Does nothing if "position" is out of the area of the raster.
