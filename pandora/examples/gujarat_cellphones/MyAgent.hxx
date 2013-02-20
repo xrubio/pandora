@@ -40,11 +40,14 @@ protected:
 	void updateReputation();
 	void updateAvgSharedCellsPerCall(int sharedCells);
 	void updateAffinities();
+	int getLastCall(std::string id);
+	bool decideToMakeACall();
+	int getAffinity(std::string id);
 
 	std::vector<Engine::Point2D<int> > getUnknownNeighborCells(int x, int y);
 	
 public:
-	MyAgent(const std::string &id, const Examples::MyWorldConfig &config, MyWorld* w);
+	MyAgent(const std::string &id, const Examples::MyWorldConfig &config, MyWorld* w, bool initialAgent);
 	virtual ~MyAgent();
 
 	void updateState();
@@ -75,13 +78,13 @@ public:
 	void setCooperationTreat(int cooperationTreat);
 	void setCellphoneUsage(int cellphoneUsage);
 	double getAvgCellsSharedPerCall();
-	void deleteContactInSocialNetwork(std::string id);
 	void updateCellMentalWorldRepresentation(int x, int y, int resourcesLevel, int time);
 	void callMade(std::string id);
 	void updateLastCalls();
 	void createAffinity(std::string id, int affinityLevel);
 	MyVillage getVillage();
 	void deleteAffinity(std::string id);
+	std::string getId();
 
 	////////////////////////////////////////////////
 	// This code has been automatically generated //

@@ -17,8 +17,12 @@ class MyWorldConfig : public Engine::Config
 	int _numAnimalsMin;
 	int _numAnimalsMinIni;
 	int _numVillages;
+	int _percentKnownAgentsDifferentVillageMediumAffinity;
+	int _percentKnownAgentsSameVillageHighAffinity;
 	int _percentMapKnownAtBeginning;
 	int _probabilityChildInheritsFromFather;
+	int _probabilityKnowAgentDifferentVillageAtStart;
+	int _probabilityKnowAgentSameVillageAtStart;
 	int _resourcesHighLevel;
 	int _resourcesLowLevel;
 	int _sameVillageDaysNoCallsHigh;
@@ -31,7 +35,8 @@ public:
 
 	void extractParticularAttribs(TiXmlElement *pRoot);
 
-	int getSize() const;
+	int getDiffVillageDaysNoCallsLow() const;
+	int getDiffVillageDaysNoCallsMedium() const;
 	int getMaxYearsCellInfo() const;
 	int getNumAgents() const;
 	int getNumAnimalsMax() const;
@@ -39,12 +44,17 @@ public:
 	int getNumAnimalsMin() const;
 	int getNumAnimalsMinIni() const;
 	int getNumVillages() const;
+	int getPercentKnownAgentsDifferentVillageMediumAffinity() const;
+	int getPercentKnownAgentsSameVillageHighAffinity() const;
 	int getPercentMapKnownAtBeginning() const;
 	int getProbabilityChildInheritsFromFather() const;
+	int getProbabilityKnowAgentDifferentVillageAtStart() const;
+	int getProbabilityKnowAgentSameVillageAtStart() const;
 	int getResourcesHighLevel() const;
 	int getResourcesLowLevel() const;
 	int getSameVillageDaysNoCallsHigh() const;
 	int getSameVillageDaysNoCallsMedium() const;
+	int getSize() const;
 
 	friend class MyWorld;
 };

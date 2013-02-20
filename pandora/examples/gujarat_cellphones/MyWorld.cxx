@@ -19,17 +19,65 @@ void MyWorld::createRasters() {
 	createVillages();
 }
 
-double MyWorld::getMaximumAvgCellsSharedPerCall() { 
-	/*double max = -1;
+std::vector<std::string> MyWorld::getIdsExistingAgents() { //TODO FIX
+	std::vector<std::string> ids;
 	for (int i = 0; i < _agentsCounter; ++i) {
 		std::ostringstream oss;
 		oss << "MyAgent_" << i;
-		MyAgent a = getAgent(oss.str());
-		if (a.exists() and (max == -1 or a.getAvgCellsSharedPerCall() > max)) {
-			max = a.getAvgCellsSharedPerCall();
+		MyAgent* a = (MyAgent*)getAgent(oss.str());
+		if (a->exists()) ids.push_back(a->getId());
+	}
+	return ids;
+}
+
+double MyWorld::getMaximumAvgCellsSharedPerCall() { 
+	double max = -1;
+	std::vector<std::string> ids = getIdsExistingAgents();
+	for (int i = 0; i < ids.size(); ++i) {
+		MyAgent* a = (MyAgent*)getAgent(ids[i]);
+		if (max == -1 or a->getAvgCellsSharedPerCall() > max) {
+			max = a->getAvgCellsSharedPerCall();
 		}
 	}		
-	return max;*/
+	return max;
+}
+
+void MyWorld::initSocialNetwork() {
+	std::vector<std::string> agentsIds = getIdsExistingAgents(); 
+	for (int i = 0; i < agentsIds.size(); ++i) {
+		for (int j = i + 1; j < agentsIds.size(); ++j) {
+			MyAgent* a1 = (MyAgent*) getAgent(agentsIds[i]);
+			MyAgent* a2 = (MyAgent*) getAgent(agentsIds[j]);
+			if (a1->getVillage().getId() == a2->getVillage().getId()) {
+				int r = Engine::GeneralState::statistics().getUniformDistValue(1, 100);
+				if (r <= _config.getProbabilityKnowAgentSameVillageAtStart()) {
+					r = Engine::GeneralState::statistics().getUniformDistValue(1, 100);
+					if (r <= _config.getPercentKnownAgentsSameVillageHighAffinity()) {
+						a1->createAffinity(agentsIds[j], 2);
+						a2->createAffinity(agentsIds[i], 2);
+					}
+					else {
+						a1->createAffinity(agentsIds[j], 1);
+						a2->createAffinity(agentsIds[i], 1);
+					}
+				}
+			}
+			else {
+				int r = Engine::GeneralState::statistics().getUniformDistValue(1, 100);
+				if (r <= _config.getProbabilityKnowAgentDifferentVillageAtStart()) {
+					r = Engine::GeneralState::statistics().getUniformDistValue(1, 100);
+					if (r <= _config.getPercentKnownAgentsDifferentVillageMediumAffinity()) {
+						a1->createAffinity(agentsIds[j], 1);
+						a2->createAffinity(agentsIds[i], 1);
+					}
+					else {
+						a1->createAffinity(agentsIds[j], 0);
+						a2->createAffinity(agentsIds[i], 0);
+					}
+				}
+			}
+		}
+	}
 }
 
 void MyWorld::initVillage(int id, int x, int y) {
@@ -58,10 +106,10 @@ void MyWorld::createVillages() {
 	initVillage(7, 7*_config.getSize()/8, 7*_config.getSize()/8);
 }
 
-std::string MyWorld::createAgent(int idVillage) {
+std::string MyWorld::createAgent(int idVillage, bool initialAgent) {
 	std::ostringstream oss;
 	oss << "MyAgent_" << _agentsCounter;
-	MyAgent* agent = new MyAgent(oss.str(), _config, this);
+	MyAgent* agent = new MyAgent(oss.str(), _config, this, initialAgent);
 	addAgent(agent);
 	_villages[idVillage].addCitizen(oss.str());
 	agent->setVillage(_villages[idVillage]);
@@ -73,9 +121,10 @@ std::string MyWorld::createAgent(int idVillage) {
 void MyWorld::createAgents() {
 	for(int i = 0; i < _config.getNumAgents(); ++i) {
 		if((i%_simulation.getNumTasks())==_simulation.getId()) {
-			createAgent(Engine::GeneralState::statistics().getUniformDistValue(0,_config.getNumVillages()-1));
+			createAgent(Engine::GeneralState::statistics().getUniformDistValue(0,_config.getNumVillages()-1), true);
 		}
 	}
+	initSocialNetwork();
 }
 
 } // namespace Tutorial 

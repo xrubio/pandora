@@ -22,6 +22,7 @@ class MyWorld : public Engine::World
 	void createVillages();
 	void createAgents();
 	void initVillage(int id, int x, int y);
+	void initSocialNetwork();
 	MyVillage getVillage(int id);
 	int _agentsCounter;
 
@@ -29,8 +30,9 @@ public:
 	Examples::MyWorldConfig _config;
 	MyWorld(Engine::Simulation &simulation, Examples::MyWorldConfig &config);
 	virtual ~MyWorld();
-	std::string createAgent(int idVillage);
+	std::string createAgent(int idVillage, bool initialAgent);
 	double getMaximumAvgCellsSharedPerCall();
+	std::vector<std::string> getIdsExistingAgents();
 };
 
 } // namespace Tutorial 

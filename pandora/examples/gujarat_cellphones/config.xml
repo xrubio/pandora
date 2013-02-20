@@ -4,7 +4,7 @@
 	<diffVillageDaysNoCallsLow value="90"/>
 	<diffVillageDaysNoCallsMedium value="30"/>	
 	<maxYearsCellInfo value="3"/>
-	<numAgents value="1"/>
+	<numAgents value="10"/>
 	<numAnimalsMax value="600"/>
 	<numAnimalsMaxIni value="500"/>
 	<numAnimalsMin value="100"/>
@@ -12,8 +12,12 @@
 	<numSteps value="10" serializeResolution="1"/>
 	<numVillages value="8"/>
 	<percentAgentsWithCellphone value="65"/>
+	<percentKnownAgentsDifferentVillageMediumAffinity value = "30"/>
+	<percentKnownAgentsSameVillageHighAffinity value = "30"/>
 	<percentMapKnownAtBeginning value="5"/>
 	<probabilityChildInheritsFromFather value="90"/>
+	<probabilityKnowAgentDifferentVillageAtStart value="10"/>
+	<probabilityKnowAgentSameVillageAtStart value="50"/>
 	<resourcesHighLevel value="10"/>
 	<resourcesLowLevel value="5"/>
 	<sameVillageDaysNoCallsHigh value="30"/>
