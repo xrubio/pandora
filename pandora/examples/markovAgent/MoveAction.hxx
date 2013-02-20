@@ -19,13 +19,19 @@ class MDPAgentState;
 class MoveAction : public Engine::Action
 {
 	Engine::Point2D<int> _newPosition;
+	int _resourcesToCollect;
 public:
-	MoveAction( const Engine::Point2D<int> & newPosition );
+	MoveAction( const Engine::Point2D<int> & newPosition, int resourcesToCollect );
 	virtual ~MoveAction();
 
 	void executeMDP( const MDPAgent & agent, const MDPAgentState & state, MDPAgentState & stateNext ) const;
 	void execute( Engine::Agent & agent );
 	MoveAction * copy() const;
+
+	const Engine::Point2D<int> & getNewPosition() const;
+	int getResourcesToCollect() const;
+	
+	//friend std::ostream & operator<<( std::ostream & stream, MoveAction * action );
 };
 
 } // namespace Examples

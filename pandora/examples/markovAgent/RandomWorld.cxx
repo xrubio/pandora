@@ -11,7 +11,7 @@
 namespace Examples 
 {
 
-RandomWorld::RandomWorld( Engine::Simulation & simulation, const RandomWorldConfig & config ) : World(simulation, 1, false, config._resultsFile), _config(config)
+RandomWorld::RandomWorld( Engine::Simulation & simulation, const RandomWorldConfig & config ) : World(simulation, 1, true, config._resultsFile), _config(config)
 {
 }
 
@@ -22,7 +22,7 @@ RandomWorld::~RandomWorld()
 void RandomWorld::createRasters()
 {
 	registerDynamicRaster("resources", true);
-	getDynamicRasterStr("resources").setInitValues(0, 10, 0);
+	getDynamicRasterStr("resources").setInitValues(0, 100, 0);
 	
 	Engine::Point2D<int> index(0,0);
 	for(index._x=0; index._x<_overlapBoundaries._size._x; index._x++)
@@ -30,7 +30,7 @@ void RandomWorld::createRasters()
 		for(index._y=0; index._y<_overlapBoundaries._size._y; index._y++)
 		{
 			int value = Engine::GeneralState::statistics().getUniformDistValue(0,5);
-			getDynamicRasterStr("resources").setMaxValue(index, value);
+			//getDynamicRasterStr("resources").setMaxValue(index, 1+index._x);
 		}
 	}
 	updateRasterToMaxValues("resources");
@@ -47,6 +47,7 @@ void RandomWorld::createAgents()
 			MDPAgent * agent = new MDPAgent(oss.str());
 			addAgent(agent);
 			agent->setRandomPosition();
+			//agent->setPosition(Engine::Point2D<int>(0,0));
 		}
 	}
 }

@@ -26,11 +26,14 @@ MDPAgentModel::~MDPAgentModel()
 
 void MDPAgentModel::setup( const unsigned int & horizon )
 {
+	std::cout << "setup model at horizon: " << horizon << std::endl;
 	_horizon = horizon;
 }
 
 void MDPAgentModel::reset( MDPAgent & agent )
 {
+	std::cout << "reset size: " << agent.getWorld()->getDynamicRaster(eResources).getSize() << std::endl;
+	std::cout << "reset model for agent: " << agent << std::endl;
 	if(_initial)
 	{
 		delete _initial;
@@ -39,6 +42,7 @@ void MDPAgentModel::reset( MDPAgent & agent )
 	_agent= &agent;
 	_initial = new MDPAgentState(agent.getPosition(), agent.getResources(), agent.getWorld()->getDynamicRaster(eResources), _horizon, 2);
 	makeActionsForState(*_initial);
+	std::cout << "end reset model for agent: " << agent << std::endl;
 }
 
 action_t MDPAgentModel::number_actions( const MDPAgentState & state ) const
@@ -68,12 +72,32 @@ bool MDPAgentModel::applicable( const MDPAgentState & state, action_t action) co
 
 float MDPAgentModel::cost( const MDPAgentState & state, action_t action ) const
 {
-	// TODO
-	return 1.0;
+	float futureValue = state.getResources() + state.getAvailableAction(action).getResourcesToCollect();
+	float cost = std::numeric_limits<float>::max();
+	if(futureValue!=0.0f)
+	{
+		cost = 1.0f/futureValue;
+	}
+	std::cout << "future value: " << futureValue << " cost: " << cost << " for state: " << state << " and action: " << action << " move to pos: " << state.getAvailableAction(action).getNewPosition() << std::endl;
+	return cost;
+	/*
+	float cost = 0.0f;
+	if(state.getResources()<0)
+	{
+		cost = 1000.0f;
+	}
+	else
+	{
+		cost = state.getTimeStep()+1;
+	}
+	std::cout << "cost for state: " << state << " and action: " << action << " is: " << cost << std::endl;
+	return cost;
+	*/
 }
 
 void MDPAgentModel::next( const MDPAgentState & state, action_t index, OutcomeVector & outcomes ) const
 {
+//	std::cout << "creating next state" << std::endl;
 	MDPAgentState stateNext;
 	state.initializeSuccessor(stateNext);
 	const MoveAction & moveAction = state.getAvailableAction(index);
@@ -82,6 +106,7 @@ void MDPAgentModel::next( const MDPAgentState & state, action_t index, OutcomeVe
 	stateNext.computeHash();	
 	makeActionsForState(stateNext);
 	outcomes.push_back(std::make_pair(stateNext, 1.0));
+//	std::cout << "end creating next state" << std::endl;
 }
 
 void MDPAgentModel::applyFrameEffects( const MDPAgentState & state,  MDPAgentState & stateNext ) const
@@ -92,6 +117,7 @@ void MDPAgentModel::applyFrameEffects( const MDPAgentState & state,  MDPAgentSta
 
 void MDPAgentModel::makeActionsForState( MDPAgentState & state ) const
 {
+//	std::cout << "making actions for state : " << &state << " at pos: " << state << std::endl;
 	assert(state.getNumAvailableActions()==0);
 	//is it necessary?
 	//_agentSim->updateKnowledge(state.getPosition(), s.getResources());
@@ -102,12 +128,18 @@ void MDPAgentModel::makeActionsForState( MDPAgentState & state ) const
 			Engine::Point2D<int> newPosition(i,j);
 			if(!_agent->getWorld()->checkPosition(newPosition))
 			{
+//				std::cout << "from position: " << state.getPosition() << " discarding position: " << newPosition << std::endl;
 				continue;
 			}
-			state.addAction(new MoveAction(newPosition));
+//			std::cout << "from position: " << state.getPosition() << " creating new at: " << newPosition << std::endl;
+			MoveAction * newAction = new MoveAction(newPosition, state.getRasterResources().getValue(newPosition));
+//			std::cout << "creating new action: " << newAction << std::endl;
+			state.addAction(newAction);
 		}
 	}
+	state.randomizeActions();
 	assert(state.getNumAvailableActions()>0);
+//	std::cout << "end making actions for state: " << state << std::endl;
 }
 
 } // namespace Examples

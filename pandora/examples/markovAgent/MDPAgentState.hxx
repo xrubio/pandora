@@ -16,7 +16,7 @@ class MoveAction;
 class MDPAgentState
 {
 public:
-	MDPAgentState();
+	explicit MDPAgentState();
 	MDPAgentState(const Engine::Point2D<int> & position, int resources, const Engine::Raster& resourcesRaster, unsigned int horizon, int resourcesToEat);
 	MDPAgentState( const MDPAgentState & state );
 	virtual ~MDPAgentState();
@@ -24,12 +24,10 @@ public:
 	void initializeSuccessor( MDPAgentState & state ) const;
 	unsigned int hash() const;
 
-//	const MDPAgentState & operator=(const MDPAgentState & state );
+	const MDPAgentState & operator=(const MDPAgentState & state );
 	bool operator==( const MDPAgentState & state ) const;
-	/*
 	bool operator!=( const MDPAgentState& state ) const;
 	bool operator<( const MDPAgentState & state ) const;
-	*/
 	
 	void increaseTimeStep();
 	int getTimeStep() const;
@@ -43,7 +41,11 @@ public:
 	void computeHash();
 
 	int getResources() const;
+	void setResources( int value );
 	const Engine::IncrementalRaster & getRasterResources() const;
+	Engine::IncrementalRaster & getRasterResources();
+	// this method randomize the order of actions. It is useful in cases where two actions are equal, in ordere to avoid artifacts where the first one is always chosen
+	void randomizeActions();
 
 private:
 	int _timeStep;
@@ -55,6 +57,10 @@ private:
 	int _horizon;
 	int _resourcesToEat;
 	bool _isCopy;
+public:
+	friend std::ostream & operator<<( std::ostream & stream, MDPAgentState & state );
+	friend std::ostream & operator<<( std::ostream & stream, const MDPAgentState & state );
+
 };
 
 }
