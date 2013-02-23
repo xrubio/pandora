@@ -43,8 +43,11 @@ protected:
 	int getLastCall(std::string id);
 	bool decideToMakeACall();
 	int getAffinity(std::string id);
-
 	std::vector<Engine::Point2D<int> > getUnknownNeighborCells(int x, int y);
+	std::vector<std::vector<int> > getMatrixKnownNeighborCells();
+	int longestPathKnownCellsFromCell(int i, int j);
+	std::vector<Engine::Point2D<int> > getCellsToAskInConversation(const std::vector<std::vector<int> > &m, int numberOfCells);
+	int getAffinityWithAgent(std::string id);
 	
 public:
 	MyAgent(const std::string &id, const Examples::MyWorldConfig &config, MyWorld* w, bool initialAgent);
@@ -85,6 +88,12 @@ public:
 	MyVillage getVillage();
 	void deleteAffinity(std::string id);
 	std::string getId();
+	void exchangeInformationWithOtherAgent(std::string idAgentReceivesCall);
+	bool knowsCell(int i, int j);
+	int getValueCellMentalWorldRepresentation(int x, int y);
+	int getTimeCellMentalWorldRepresentation(int x, int y);
+	int numberOfCellsWillingToTell(std::string idReceivingAgent);
+	int getReputation();
 
 	////////////////////////////////////////////////
 	// This code has been automatically generated //

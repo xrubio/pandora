@@ -19,8 +19,11 @@ void MyAgent::initHasCellphone() {
 }
 
 void MyAgent::updateCellMentalWorldRepresentation(int x, int y, int resourcesLevel, int time) {
-	_mentalWorldRepresentation[x][y].first = resourcesLevel;
-	_mentalWorldRepresentation[x][y].second = time;
+	//update only if the previous information is older or if it does not exist
+	if (_mentalWorldRepresentation[x][y].first == -1 or _mentalWorldRepresentation[x][y].second > time) {
+		_mentalWorldRepresentation[x][y].first = resourcesLevel;
+		_mentalWorldRepresentation[x][y].second = time;
+	}
 }
 
 std::vector<Engine::Point2D<int> > MyAgent::getUnknownNeighborCells(int x, int y) {
@@ -374,10 +377,133 @@ double MyAgent::getAvgCellsSharedPerCall() {
 	return _avgCellsSharedPerCall;
 }
 
+std::vector<Engine::Point2D<int> > shuffleVector(const std::vector<Engine::Point2D<int> > &v) {
+	std::vector<Engine::Point2D<int> > shuffled(v.size());
+	std::vector<Engine::Point2D<int> > aux(v.size());
+	for (int i = 0; i < v.size(); ++i) aux[i] = v[i];
+	for (int i = 0; i < v.size(); ++i) {
+		int r =Engine::GeneralState::statistics().getUniformDistValue(0, aux.size()-1);
+		shuffled[i] = aux[r];
+		aux.erase(shuffled.begin() + r);
+	}
+	return shuffled;
+}
+
+std::vector<Engine::Point2D<int> > MyAgent::getCellsToAskInConversation(const std::vector<std::vector<int> > &m, int numberOfCells) {
+	std::vector<Engine::Point2D<int> > cellsToAsk;
+	int max = 0;
+	for (int i = 0; i < _config.getSize(); ++i) {
+		for (int j = 0; j < _config.getSize(); ++j) {
+			if (m[i][j] > max) max = m[i][j];
+		}
+	}
+	while (max > 0 and (cellsToAsk.size() < numberOfCells)) {
+		std::vector<Engine::Point2D<int> > aux;
+		for (int i = 0; i < _config.getSize(); ++i) {
+			for (int j = 0; j < _config.getSize(); ++j) {
+				if (m[i][j] == max) aux.push_back(Engine::Point2D<int> (i, j)); 
+			}
+		}
+		aux = shuffleVector(aux);
+		for (int i = 0; i < aux.size() and (cellsToAsk.size() < numberOfCells); ++i) {
+			cellsToAsk.push_back(aux[i]);
+		}
+		--max;
+	}
+	return cellsToAsk;
+}
+
+int MyAgent::longestPathKnownCellsFromCell(int i, int j) {
+	int longestPath = 0;
+	std::vector<std::vector<bool> > visited(_config.getSize(), std::vector<bool>(_config.getSize(), false));
+	visited[i][j] = true;
+	std::stack<Engine::Point2D<int> > s;
+	s.push(Engine::Point2D<int> (i, j));
+	while (not s.empty()) {
+		Engine::Point2D<int> p = s.top();
+		s.pop();
+		if (_mentalWorldRepresentation[p._x][p._y].first != -1) ++longestPath;	
+		for (int a = p._x - 1; a <= p._x + 1; ++a) {
+			for (int b = p._y - 1; b <= p._y + 1; ++b) {
+				if ((a >= 0 and a < _config.getSize()) and (b >= 0 and b < _config.getSize()) and (not (p._x == a and p._y == b)) and (_mentalWorldRepresentation[a][b].first != -1) and (not visited[a][b])){			
+					s.push(Engine::Point2D<int> (a, b));
+					visited[a][b] = true;
+				}
+			}
+		}
+	}
+	return longestPath;
+}
+
+std::vector<std::vector<int> > MyAgent::getMatrixKnownNeighborCells() {
+	std::vector<std::vector<int> > result(_config.getSize(), std::vector<int>(_config.getSize()));
+	for (int i = 0; i < _config.getSize(); ++i) {
+		for (int j = 0; j < _config.getSize(); ++j) {
+			if (_mentalWorldRepresentation[i][j].first != -1) result[i][j] = -1;
+			else result[i][j] = longestPathKnownCellsFromCell(i, j);
+		}
+	}	
+	return result;
+}
+
+bool MyAgent::knowsCell(int i, int j) {
+	return _mentalWorldRepresentation[i][j].first != -1;
+}
+
+int MyAgent::getValueCellMentalWorldRepresentation(int x, int y) {
+	return _mentalWorldRepresentation[x][y].first;
+}
+
+int MyAgent::getTimeCellMentalWorldRepresentation(int x, int y) {
+	return _mentalWorldRepresentation[x][y].second;
+}
+
+int MyAgent::getAffinityWithAgent(std::string id) {
+	for (int i = 0; i < _socialNetwork.size(); ++i) {
+		if (_socialNetwork[i].first == id) return _socialNetwork[i].second;
+	}
+}
+
+int MyAgent::getReputation() {
+	return _reputation;
+}
+
+int MyAgent::numberOfCellsWillingToTell(std::string idReceivingAgent) {
+	MyAgent* receivingAgent = (MyAgent*) _world->getAgent(idReceivingAgent);
+	int affinity = getAffinityWithAgent(idReceivingAgent);
+	int max = _config.getSize()*(_config.getMaxPercentMapSharedInACall()/(1000));
+	if (affinity == 2) return max*(0.8 + 0.2*(_cooperationTreat/100));
+	else if (affinity == 1) {
+		if (_reputation <= receivingAgent->getReputation()) return max*(0.5 + 0.2*(_cooperationTreat/100));
+		return max*0.5;
+	}
+	else {
+		if (_reputation <= receivingAgent->getReputation()) return max*(0.1 + 0.2*(_cooperationTreat/100));
+		return max*0.1;
+	}
+}
+
+void MyAgent::exchangeInformationWithOtherAgent(std::string idAgentReceivesCall) {
+	MyAgent *agentReceivingCall = (MyAgent*) _world->getAgent(idAgentReceivesCall);
+	std::vector<std::vector<int> > knownNeighborCells = getMatrixKnownNeighborCells();
+	int ncells = agentReceivingCall->numberOfCellsWillingToTell(idAgentReceivesCall);
+	std::vector<Engine::Point2D<int> > cellsToAsk = getCellsToAskInConversation(knownNeighborCells, ncells*3);
+	int infoCellsExchanged = 0;
+	for (int i = 0; i < cellsToAsk.size() and infoCellsExchanged <= ncells; ++i) {
+		if (agentReceivingCall->knowsCell(cellsToAsk[i]._x, cellsToAsk[i]._y)) {
+			int cellValue = agentReceivingCall->getValueCellMentalWorldRepresentation(cellsToAsk[i]._x, cellsToAsk[i]._y);
+			int cellTime = getTimeCellMentalWorldRepresentation(cellsToAsk[i]._x, cellsToAsk[i]._y);
+			updateCellMentalWorldRepresentation(cellsToAsk[i]._x, cellsToAsk[i]._y, cellValue, cellTime);
+			++infoCellsExchanged;
+		}
+	}
+	agentReceivingCall->exchangeInformationWithOtherAgent(_id);
+}
+
 void MyAgent::updateState() {
-	//checkConditions(); where to call this function from?
 	move();
 	gatherResources();
+	//checkConditions();
 }
 
 void MyAgent::serialize() { //TODO falta completar

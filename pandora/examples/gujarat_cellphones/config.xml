@@ -3,6 +3,7 @@
 	<output resultsFile="./data/results.h5" logsDir="./logs"/>
 	<diffVillageDaysNoCallsLow value="90"/>
 	<diffVillageDaysNoCallsMedium value="30"/>	
+	<maxPercentMapSharedInACall value="3"/> <!--This number needs to be divided by 10-->
 	<maxYearsCellInfo value="3"/>
 	<numAgents value="10"/>
 	<numAnimalsMax value="600"/>
@@ -22,5 +23,5 @@
 	<resourcesLowLevel value="5"/>
 	<sameVillageDaysNoCallsHigh value="30"/>
 	<sameVillageDaysNoCallsMedium value="90"/>
-	<size value="10"/>
+	<size value="60"/>
 </config>
