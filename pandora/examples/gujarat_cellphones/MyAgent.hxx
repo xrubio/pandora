@@ -6,6 +6,7 @@
 #include "MyWorldConfig.hxx"
 #include "MyVillage.hxx"
 #include <string>
+#include <map>
 #include <utility>
 
 namespace Tutorial
@@ -15,85 +16,89 @@ class MyAgent : public Engine::Agent
 {
 
 protected:
-	void initNumberOfAnimals();
-	void initHasCellphone();
-	void initMentalWorldRepresentation();
-	void initCooperationTreat();
+	bool agentFissions();
+	bool agentIsInHisVillage();
+	void checkConditions();
+	bool decideToMakeACall();
+	void fission();
+	void gatherResources();
+	int getAffinityWithAgent(std::string id);
+	std::vector<Engine::Point2D<int> > getCellsToAskInVillage(const std::vector<std::vector<int> > &m, int numberOfCells);
+	std::vector<Engine::Point2D<int> > getCellsToAskOutsideVillage(int numberOfCells);
+	int getLastCall(std::string id);
+	std::vector<std::vector<int> > getMatrixKnownNeighborCells();
+	std::vector<Engine::Point2D<int> > getUnknownNeighborCells(int x, int y);
+	bool hasMinimumNumOfAnimals();
 	void initCellphoneUsage();
+	void initCellsSharedPerCall();
+	void initCooperationTreat();
+	void initHasCellphone();
+	void initLastCalls();
+	void initMadeCalls();
+	void initMentalWorldRepresentation();
+	void initNumberOfAnimals();
+	void initReputation();
 	void initSocialNetwork();
 	void initWorld(MyWorld* w);
-	void initReputation();
-	void initMadeCalls();
-	void initCellsSharedPerCall();
-	void initLastCalls();
-	void updateNumberOfAnimals();
+	int longestPathKnownCellsFromCell(int i, int j);
+	void meetAgentsInSameCell();
+	void move();
+	void resetNumberOfResourcesGathered();
+	void stopBeingAShepherd();
+	void updateAffinities();
+	void updateAvgSharedCellsPerCall(int sharedCells);
 	void updateMentalWorldRepresentation();
 	void updateMentalWorldRepresentationAccuracy();
-	void resetNumberOfResourcesGathered();
-	void gatherResources();
-	void move();
-	bool hasMinimumNumOfAnimals();
-	void stopBeingAShepherd();
-	void checkConditions();
-	void fission();
-	bool agentFissions();
+	void updateNumberOfAnimals();
 	void updateReputation();
-	void updateAvgSharedCellsPerCall(int sharedCells);
-	void updateAffinities();
-	int getLastCall(std::string id);
-	bool decideToMakeACall();
-	int getAffinity(std::string id);
-	std::vector<Engine::Point2D<int> > getUnknownNeighborCells(int x, int y);
-	std::vector<std::vector<int> > getMatrixKnownNeighborCells();
-	int longestPathKnownCellsFromCell(int i, int j);
-	std::vector<Engine::Point2D<int> > getCellsToAskInConversation(const std::vector<std::vector<int> > &m, int numberOfCells);
-	int getAffinityWithAgent(std::string id);
 	
 public:
+	double _avgCellsSharedPerCall;
+	int _cellphoneUsage;
+	Examples::MyWorldConfig _config;
+	int _cooperationTreat;
+	int _gatheredResources;
+	bool _hasCellphone;
+	std::map<std::string, int> _lastCalls; //first is and id of an agent, second is days since last call was made
+	int _madeCalls;
+	std::pair<int, int> _mentalWorldRepresentation[60][60]; //first is info about the area, second is how old the info is
+	double _mentalWorldRepresentationAccuracy;
+	int _numberOfAnimals;
+	int _reputation;
+	std::vector<std::pair<std::string,int> > _socialNetwork; //first is an id of an agent, second is the affinity
+	MyVillage _village;
+	MyWorld* _world;
+
 	MyAgent(const std::string &id, const Examples::MyWorldConfig &config, MyWorld* w, bool initialAgent);
 	virtual ~MyAgent();
-
-	void updateState();
-	void serialize();
-	void registerAttributes();
-
-	int _gatheredResources;
-	int _numberOfAnimals;
-	bool _hasCellphone;
-	std::pair<int, int> _mentalWorldRepresentation[60][60]; //first is info about the area, second is how old the info is
-	int _cooperationTreat;
-	int _cellphoneUsage;
-	MyVillage _village;
-	std::vector<std::pair<std::string,int> > _socialNetwork; //first is an id of an agent, second is the affinity
-	double _mentalWorldRepresentationAccuracy;
-	Examples::MyWorldConfig _config;
-	MyWorld* _world;
-	int _reputation;
-	int _madeCalls;
-	double _avgCellsSharedPerCall;
-	std::vector<std::pair<std::string, int> > _lastCalls; //first is and id of an agent, second is days since last call was made
-
-	void setVillage(MyVillage &v);
-	void initPosition();
-	void setGatheredResources(int resources);
-	void setNumberOfAnimals(int animals);
-	void setHasCellphone(bool cellphone);
-	void setCooperationTreat(int cooperationTreat);
-	void setCellphoneUsage(int cellphoneUsage);
-	double getAvgCellsSharedPerCall();
-	void updateCellMentalWorldRepresentation(int x, int y, int resourcesLevel, int time);
 	void callMade(std::string id);
-	void updateLastCalls();
+	std::string chooseWhoToCall();
 	void createAffinity(std::string id, int affinityLevel);
-	MyVillage getVillage();
 	void deleteAffinity(std::string id);
-	std::string getId();
 	void exchangeInformationWithOtherAgent(std::string idAgentReceivesCall);
-	bool knowsCell(int i, int j);
-	int getValueCellMentalWorldRepresentation(int x, int y);
-	int getTimeCellMentalWorldRepresentation(int x, int y);
-	int numberOfCellsWillingToTell(std::string idReceivingAgent);
+	double getAvgCellsSharedPerCall();
 	int getReputation();
+	int getTimeCellMentalWorldRepresentation(int x, int y);
+	int getValueCellMentalWorldRepresentation(int x, int y);
+	std::string getId();
+	MyVillage getVillage();
+	bool hasAffinityWithAgent(std::string id);
+	bool hasCellphone();
+	void initPosition();
+	bool knowsCell(int i, int j);
+	int numberOfCellsWillingToTell(std::string idReceivingAgent);
+	void registerAttributes();
+	void returnToVillage();
+	void serialize();
+	void setCellphoneUsage(int cellphoneUsage);
+	void setCooperationTreat(int cooperationTreat);
+	void setGatheredResources(int resources);
+	void setHasCellphone(bool cellphone);
+	void setNumberOfAnimals(int animals);
+	void setVillage(MyVillage &v);
+	void updateCellMentalWorldRepresentation(int x, int y, int resourcesLevel, int time);
+	void updateLastCalls();
+	void updateState();
 
 	////////////////////////////////////////////////
 	// This code has been automatically generated //

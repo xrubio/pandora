@@ -8,8 +8,11 @@ namespace Examples
 
 class MyWorldConfig : public Engine::Config
 {	
+	int _daysDrySeason;
+	int _daysWetSeason;
 	int _diffVillageDaysNoCallsLow;
 	int _diffVillageDaysNoCallsMedium;
+	int _maxPercentMapSharedInACall;
 	int _maxYearsCellInfo;
 	int _numAgents;
 	int _numAnimalsMax;
@@ -20,9 +23,13 @@ class MyWorldConfig : public Engine::Config
 	int _percentKnownAgentsDifferentVillageMediumAffinity;
 	int _percentKnownAgentsSameVillageHighAffinity;
 	int _percentMapKnownAtBeginning;
+	int _probabilityCallHighAffinity;
+	int _probabilityCallLowAffinity;
+	int _probabilityCallMediumAffinity;
 	int _probabilityChildInheritsFromFather;
 	int _probabilityKnowAgentDifferentVillageAtStart;
 	int _probabilityKnowAgentSameVillageAtStart;
+	int _probabilityMeetAgentSameCell;
 	int _resourcesHighLevel;
 	int _resourcesLowLevel;
 	int _sameVillageDaysNoCallsHigh;
@@ -32,11 +39,12 @@ class MyWorldConfig : public Engine::Config
 public:
 	MyWorldConfig();
 	virtual ~MyWorldConfig();
-
 	void extractParticularAttribs(TiXmlElement *pRoot);
-
+	int getDaysDrySeason() const;
+	int getDaysWetSeason() const;
 	int getDiffVillageDaysNoCallsLow() const;
 	int getDiffVillageDaysNoCallsMedium() const;
+	int getMaxPercentMapSharedInACall() const;
 	int getMaxYearsCellInfo() const;
 	int getNumAgents() const;
 	int getNumAnimalsMax() const;
@@ -47,9 +55,13 @@ public:
 	int getPercentKnownAgentsDifferentVillageMediumAffinity() const;
 	int getPercentKnownAgentsSameVillageHighAffinity() const;
 	int getPercentMapKnownAtBeginning() const;
+	int getProbabilityCallHighAffinity() const;
+	int getProbabilityCallLowAffinity() const;
+	int getProbabilityCallMediumAffinity() const;
 	int getProbabilityChildInheritsFromFather() const;
 	int getProbabilityKnowAgentDifferentVillageAtStart() const;
 	int getProbabilityKnowAgentSameVillageAtStart() const;
+	int getProbabilityMeetAgentSameCell() const;
 	int getResourcesHighLevel() const;
 	int getResourcesLowLevel() const;
 	int getSameVillageDaysNoCallsHigh() const;

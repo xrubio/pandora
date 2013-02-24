@@ -6,21 +6,20 @@
 
 class MyVillage
 {	
-	int _id;
 	std::vector<std::string> _citizens;
+	int _id;
 	Engine::Point2D<int> _location;
 
 public:
 	MyVillage();
 	MyVillage(int id);
 	virtual ~MyVillage();
-
-	int getId();
+	void addCitizen(std::string id);
 	std::vector<std::string> getCitizens();
+	int getId();
 	Engine::Point2D<int> getLocation();
 	bool isCitizenOfVillage(std::string id);
 	void setLocation(const Engine::Point2D<int> &p);
-	void addCitizen(std::string id);
 };
 
 

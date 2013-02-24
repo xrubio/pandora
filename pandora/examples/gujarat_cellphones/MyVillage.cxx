@@ -10,20 +10,20 @@ MyVillage::MyVillage(int id) {
 MyVillage::~MyVillage() {
 }
 
-int MyVillage::getId() {
-	return _id;
+void MyVillage::addCitizen(std::string id) {
+	_citizens.push_back(id);
 }
 
 std::vector<std::string> MyVillage::getCitizens() {
 	return _citizens;
 }
 
-Engine::Point2D<int> MyVillage::getLocation() {
-	return _location;
+int MyVillage::getId() {
+	return _id;
 }
 
-void MyVillage::setLocation(const Engine::Point2D<int> &p) {
-	_location = p;
+Engine::Point2D<int> MyVillage::getLocation() {
+	return _location;
 }
 
 bool MyVillage::isCitizenOfVillage(std::string id) {
@@ -33,6 +33,6 @@ bool MyVillage::isCitizenOfVillage(std::string id) {
 	return false;
 }
 
-void MyVillage::addCitizen(std::string id) {
-	_citizens.push_back(id);
+void MyVillage::setLocation(const Engine::Point2D<int> &p) {
+	_location = p;
 }

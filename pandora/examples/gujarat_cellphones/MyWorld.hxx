@@ -16,23 +16,28 @@ namespace Tutorial
 
 class MyWorld : public Engine::World
 {
+	int _agentsCounter;
+	std::vector<std::string> _idsDeletedAgents;
 	std::vector<MyVillage> _villages;
 
+	void createAgents();
 	void createRasters();
 	void createVillages();
-	void createAgents();
-	void initVillage(int id, int x, int y);
-	void initSocialNetwork();
 	MyVillage getVillage(int id);
-	int _agentsCounter;
+	void initSocialNetwork();
+	void initVillage(int id, int x, int y);
 
 public:
 	Examples::MyWorldConfig _config;
+
 	MyWorld(Engine::Simulation &simulation, Examples::MyWorldConfig &config);
 	virtual ~MyWorld();
+	void addDeletedAgent(std::string id);
+	bool agentHasBeenDeleted(std::string id);
 	std::string createAgent(int idVillage, bool initialAgent);
-	double getMaximumAvgCellsSharedPerCall();
+	std::vector<std::string> getIdsAgentsInCell(int x, int y);
 	std::vector<std::string> getIdsExistingAgents();
+	double getMaximumAvgCellsSharedPerCall();
 };
 
 } // namespace Tutorial 
