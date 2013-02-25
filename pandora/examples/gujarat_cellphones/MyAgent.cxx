@@ -46,6 +46,12 @@ void MyAgent::callMade(std::string id) {
 
 void MyAgent::checkConditions() { //TODO falta completar
 	assert (_numberOfAnimals >= _config.getNumAnimalsMin() and _numberOfAnimals <= _config.getNumAnimalsMax());
+	assert (_cooperationTreat >= 0 and _cooperationTreat <= 100);
+	assert (_avgCellsSharedPerCall <= (_config.getMaxPercentMapSharedInACall()*_config.getSize()));
+	assert (_reputation <= 100);
+	if (not _hasCellphone) assert (_cellphoneUsage == 0);
+	else assert (_cellphoneUsage >= 1 and _cellphoneUsage <= 7);
+	//lastCalls
 }
 
 std::string MyAgent::chooseWhoToCall() {
@@ -124,22 +130,29 @@ void MyAgent::fission() {
 	//if the child inherits the characteristics of the father
 	if (r <= _config.getProbabilityChildInheritsFromFather()) {
 		newAgent->setHasCellphone(_hasCellphone);
-		newAgent->updateMentalWorldRepresentationAccuracy();
 		newAgent->setCooperationTreat(_cooperationTreat);
 		newAgent->setCellphoneUsage(_cellphoneUsage);
 		for (int i = 0; i < _socialNetwork.size(); ++i) {
-			if (not hasAffinityWithAgent(_socialNetwork[i].first)) {
-				newAgent->createAffinity(_socialNetwork[i].first, _socialNetwork[i].second);
+			MyAgent* a = (MyAgent*)_world->getAgent(_socialNetwork[i].first);
+			if (newAgent->hasAffinityWithAgent(_socialNetwork[i].first)) {
+				newAgent->deleteAffinity(_socialNetwork[i].first); //the affinity level needs to be the same
+				a->deleteAffinity(newAgent->getId());
 			}
+			newAgent->createAffinity(_socialNetwork[i].first, _socialNetwork[i].second);
+			a->createAffinity(newAgent->getId(), _socialNetwork[i].second);
 		}
-		if (not hasAffinityWithAgent(_id)) createAffinity(_id, 2);
+		newAgent->deleteAffinity(_id); //in case it was created randomly
+		newAgent->createAffinity(_id, 2);
 		for (int i = 0; i < _config.getSize(); ++i) {
 			for (int j = 0; j < _config.getSize(); ++j) {
 				newAgent->updateCellMentalWorldRepresentation(i, j, _mentalWorldRepresentation[i][j].first, _mentalWorldRepresentation[i][j].second);
 			}
 		}
+		newAgent->updateMentalWorldRepresentationAccuracy();
 	}
 
+	deleteAffinity(idNewAgent); //in case it was created randomly
+	createAffinity(idNewAgent, 2);
 	_numberOfAnimals -= _numberOfAnimals/2; //the parent has half of the animals than before the fission
 }
 
@@ -156,6 +169,10 @@ int MyAgent::getAffinityWithAgent(std::string id) {
 
 double MyAgent::getAvgCellsSharedPerCall() {
 	return _avgCellsSharedPerCall;
+}
+
+int MyAgent::getCellphoneUsage() {
+	return _cellphoneUsage;
 }
 
 std::vector<Engine::Point2D<int> > MyAgent::getCellsToAskInVillage(const std::vector<std::vector<int> > &m, int numberOfCells) {
@@ -196,12 +213,40 @@ std::vector<Engine::Point2D<int> > MyAgent::getCellsToAskOutsideVillage(int numb
 	return cellsToAsk;
 }
 
+int MyAgent::getCooperationTreat() {
+	return _cooperationTreat;
+}
+
+int MyAgent::getMadeCalls() {
+	return _madeCalls;
+}
+
+double MyAgent::getMentalWorldRepresentationAccuracy() {
+	return _mentalWorldRepresentationAccuracy;
+}
+
+int MyAgent::getNumberOfAnimals() {
+	return _numberOfAnimals;
+}
+
+int MyAgent::getGatheredResources() {
+	return _gatheredResources;
+}
+
+bool MyAgent::getHasCellphone() {
+	return _hasCellphone;
+}
+
 std::string MyAgent::getId() {
 	return _id;
 }
 
 int MyAgent::getLastCall(std::string id) {
 	return _lastCalls[id];
+}
+
+std::map<std::string, int>  MyAgent::getLastCalls() {
+	return _lastCalls;
 }
 
 std::vector<std::vector<int> > MyAgent::getMatrixKnownNeighborCells() {
@@ -219,23 +264,27 @@ int MyAgent::getReputation() {
 	return _reputation;
 }
 
+std::vector<std::pair<std::string,int> > MyAgent::getSocialNetwork() {
+	return _socialNetwork;
+}
+
 int MyAgent::getTimeCellMentalWorldRepresentation(int x, int y) {
 	return _mentalWorldRepresentation[x][y].second;
 }
 
 std::vector<Engine::Point2D<int> > MyAgent::getUnknownNeighborCells(int x, int y) {
 	std::vector<Engine::Point2D<int> > neighborCells;
-	for (int i = y - 1; i <= y + 1; ++i) {
-		for (int j = x - 1; j <= x + 1; ++j) {
+	for (int i = x - 1; i <= x + 1; ++i) {
+		for (int j = y - 1; j <= y + 1; ++j) {
 			Engine::Point2D<int> newPosition;
-			newPosition._x = j;
-			newPosition._y = i;
-			if (_world->checkPosition(newPosition) and (i != y or j != x) and _mentalWorldRepresentation[i][j].first != -1) {
+			newPosition._x = i;
+			newPosition._y = j;
+			if (_world->checkPosition(newPosition) and (i != y or j != x) and _mentalWorldRepresentation[i][j].first == -1) {
 				neighborCells.push_back(newPosition);
 			}
 		}
 	}
-	return neighborCells;
+	return shuffleVector(neighborCells);
 }
 
 int MyAgent::getValueCellMentalWorldRepresentation(int x, int y) {
@@ -300,7 +349,7 @@ void MyAgent::initMentalWorldRepresentation() {
 	}
 	//Initialize some cells
 	for (int i = 0; i < _config.getMaxYearsCellInfo(); ++i) {
-		int cellsNeeded = _config.getPercentMapKnownAtBeginning()/_config.getMaxYearsCellInfo();
+		int cellsNeeded = (_config.getPercentMapKnownAtBeginning()*_config.getSize()*_config.getSize())/(_config.getMaxYearsCellInfo()*100);
 		int cellsFilled = 0;
 		Engine::Point2D<int> position;
 		position._x = Engine::GeneralState::statistics().getUniformDistValue(0, _config.getSize()-1);
@@ -316,7 +365,7 @@ void MyAgent::initMentalWorldRepresentation() {
 			else if (actualResources >= _config.getResourcesHighLevel()) resourcesLevel = 2;
 			else resourcesLevel = 1;
 			updateCellMentalWorldRepresentation(position._x, position._y, resourcesLevel, i);
-			std::vector<Engine::Point2D<int> > neighborCells = getUnknownNeighborCells(position._x, position._y);
+			std::vector<Engine::Point2D<int> > neighborCells = getUnknownNeighborCells(position._x, position._y);		
 			for (int j = 0; j < neighborCells.size(); ++j) positionsToExplore.push(neighborCells[j]);
 			++cellsFilled;
 		}
@@ -405,14 +454,22 @@ int MyAgent::longestPathKnownCellsFromCell(int i, int j) {
 void MyAgent::meetAgentsInSameCell() {
 	std::vector<std::string> agentsIds = _world->getIdsAgentsInCell(_position._x, _position._y);
 	for (int i = 0; i < agentsIds.size(); ++i) {
-		int r = Engine::GeneralState::statistics().getUniformDistValue(0, 100);
-		if (r <= _config.getProbabilityMeetAgentSameCell()) {
-			MyAgent* a = (MyAgent*) _world->getAgent(agentsIds[i]);
-			if (_village.getId() == a->getVillage().getId()) createAffinity(a->getId(), 1);
-			else createAffinity(a->getId(), 0);
-			exchangeInformationWithOtherAgent(agentsIds[i]);
-			a->exchangeInformationWithOtherAgent(_id);
+		MyAgent* a = (MyAgent*) _world->getAgent(agentsIds[i]);
+		if (not hasAffinityWithAgent(agentsIds[i])) {
+			int r = Engine::GeneralState::statistics().getUniformDistValue(0, 100);
+			if (r <= _config.getProbabilityMeetAgentSameCell()) {
+				if (_village.getId() == a->getVillage().getId()) {
+					createAffinity(a->getId(), 1);
+					a->createAffinity(_id, 1);
+				}
+				else {
+					createAffinity(a->getId(), 0);
+					a->createAffinity(_id, 0);
+				}
+			}
 		}
+		exchangeInformationWithOtherAgent(agentsIds[i]);
+		a->exchangeInformationWithOtherAgent(_id);
 	}
 }
 
@@ -428,13 +485,17 @@ int MyAgent::numberOfCellsWillingToTell(std::string idReceivingAgent) {
 	MyAgent* receivingAgent = (MyAgent*) _world->getAgent(idReceivingAgent);
 	int affinity = getAffinityWithAgent(idReceivingAgent);
 	int max = _config.getSize()*(_config.getMaxPercentMapSharedInACall()/(1000));
-	if (affinity == 2) return max*(0.8 + 0.2*(_cooperationTreat/100));
+	if (affinity == 2) return max*(0.8 + 0.2*(receivingAgent->getCooperationTreat()/100));
 	else if (affinity == 1) {
-		if (_reputation <= receivingAgent->getReputation()) return max*(0.5 + 0.2*(_cooperationTreat/100));
+		if (_reputation <= receivingAgent->getReputation()) {
+			return max*(0.5 + 0.2*(receivingAgent->getCooperationTreat()/100));
+		}
 		return max*0.5;
 	}
 	else {
-		if (_reputation <= receivingAgent->getReputation()) return max*(0.1 + 0.2*(_cooperationTreat/100));
+		if (_reputation <= receivingAgent->getReputation()) {
+			return max*(0.1 + 0.2*(receivingAgent->getCooperationTreat()/100));
+		}
 		return max*0.1;
 	}
 }
@@ -502,6 +563,7 @@ std::vector<Engine::Point2D<int> > shuffleVector(const std::vector<Engine::Point
 }
 
 void MyAgent::stopBeingAShepherd() {
+	//delete the agent in the social network of the rest of agents
 	for (int i = 0; i < _socialNetwork.size(); ++i) {
 		MyAgent* contact = (MyAgent*)_world->getAgent(_socialNetwork[i].first);
 		contact->deleteAffinity(_id);
@@ -625,7 +687,7 @@ void MyAgent::updateState() {
 		if (dayOfYear == 0) {
 			if (not hasMinimumNumOfAnimals()) stopBeingAShepherd();
 		}
-		checkConditions();
+		if (_exists) checkConditions();
 	}
 }
 

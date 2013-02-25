@@ -35,6 +35,7 @@ public:
 	void addDeletedAgent(std::string id);
 	bool agentHasBeenDeleted(std::string id);
 	std::string createAgent(int idVillage, bool initialAgent);
+	int getAgentsCounter();
 	std::vector<std::string> getIdsAgentsInCell(int x, int y);
 	std::vector<std::string> getIdsExistingAgents();
 	double getMaximumAvgCellsSharedPerCall();

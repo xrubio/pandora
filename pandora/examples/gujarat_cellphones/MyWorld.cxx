@@ -62,6 +62,10 @@ void MyWorld::createVillages() {
 	initVillage(7, 7*_config.getSize()/8, 7*_config.getSize()/8);
 }
 
+int MyWorld::getAgentsCounter() {
+	return _agentsCounter;
+}
+
 std::vector<std::string> MyWorld::getIdsAgentsInCell(int x, int y) {
 	std::vector<std::string> idsAgents;
 	for (int i = 0; i < _agentsCounter; ++i) {
