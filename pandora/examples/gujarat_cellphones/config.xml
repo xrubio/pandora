@@ -1,12 +1,15 @@
 <?xml version="1.0" ?>
 <config>  
 	<output resultsFile="./data/results.h5" logsDir="./logs"/>
+	<cellphoneUsageMax value="7"/>
+	<cellphoneUsageMin value="1"/>
 	<daysDrySeason value="240"/>
 	<daysWetSeason value="120"/>
 	<diffVillageDaysNoCallsLow value="90"/>
 	<diffVillageDaysNoCallsMedium value="30"/>	
 	<maxPercentMapSharedInACall value="3"/> <!--This number needs to be divided by 10-->
 	<maxYearsCellInfo value="3"/>
+	<multiplierCellsToAsk value="3"/>
 	<numAgents value="10"/>
 	<numAnimalsMax value="600"/>
 	<numAnimalsMaxIni value="500"/>
@@ -22,7 +25,9 @@
 	<probabilityCallLowAffinity value="10"/>
 	<probabilityCallMediumAffinity value="35"/>
 	<probabilityChildInheritsFromFather value="90"/>
-	<probabilityKnowAgentDifferentVillageAtStart value="10"/>
+	<probabilityExchangeInfoHighAffinityInVillage value="90"/> <!--TODO needs to be validated -->
+	<probabilityExchangeInfoMediumAffinityInVillage value="50"/> <!--TODO needs to be validated -->
+	<probabilityKnowAgentDifferentVillageAtStart value="10"/> 
 	<probabilityKnowAgentSameVillageAtStart value="50"/>
 	<probabilityMeetAgentSameCell value="10"/>
 	<resourcesHighLevel value="10"/> <!-- TODO needs to be validated -->
