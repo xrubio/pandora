@@ -44,7 +44,7 @@ void RandomWorld::createAgents()
 		{
 			std::ostringstream oss;
 			oss << "MDPAgent_" << i;
-			MDPAgent * agent = new MDPAgent(oss.str());
+			MDPAgent * agent = new MDPAgent(oss.str(), _config._horizon, _config._width, _config._explorationBonus);
 			addAgent(agent);
 			agent->setRandomPosition();
 			//agent->setPosition(Engine::Point2D<int>(0,0));

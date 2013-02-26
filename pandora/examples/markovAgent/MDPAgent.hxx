@@ -23,9 +23,14 @@ class MDPAgent : public Engine::Agent
 	int _resources; // MpiBasicAttribute
 	MDPAgentModel * _model;
 	BasePolicy * _uctBasePolicy;
+
+	// mdp
+	int _horizon;
+	int _width;
+	int _explorationBonus;
 public:
 	// todo remove environment from here
-	MDPAgent( const std::string & id );
+	MDPAgent( const std::string & id, const int & horizon, const int & width, const int & explorationBonus);
 	virtual ~MDPAgent();
 	
 	void selectActions();

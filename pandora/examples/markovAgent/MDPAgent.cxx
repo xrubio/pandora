@@ -8,7 +8,7 @@
 namespace Examples
 {
 
-MDPAgent::MDPAgent( const std::string & id ) : Agent(id), _resources(0), _model(0), _uctBasePolicy(0)
+MDPAgent::MDPAgent( const std::string & id, const int & horizon, const int & width, const int & explorationBonus ) : Agent(id), _resources(0), _model(0), _uctBasePolicy(0), _horizon(horizon), _width(width), _explorationBonus(explorationBonus)
 {
 	_model = new MDPAgentModel();
 	// horizon
@@ -26,8 +26,7 @@ void MDPAgent::selectActions()
 {
 	std::cout << this << " selecting actions for time step: " << _world->getCurrentStep() << std::endl;
 	_model->reset(*this);
-	UCT * uctPolicy = new UCT(*_uctBasePolicy, 9, 1, 10, false);
-//	UCT * uctPolicy = new UCT(*_uctBasePolicy, _mdpWidth, _mdpHorizon, _mdpExplorationBonus, false);
+	UCT * uctPolicy = new UCT(*_uctBasePolicy, _horizon, _width, _explorationBonus, false);
 	Problem::action_t index = (*uctPolicy)(_model->init());
 	MoveAction * action = _model->init().getAvailableAction(index).copy();
 	std::cout << "action chosen with index: " << index << " is moving from: " << _position << " to: " << action->getNewPosition() << std::endl;
