@@ -12,6 +12,10 @@ MyWorldConfig::~MyWorldConfig() {
 void MyWorldConfig::extractParticularAttribs(TiXmlElement * root) {
 	TiXmlElement * element = root->FirstChildElement("numAgents");
 	retrieveAttributeMandatory( element, "value", _numAgents);
+	element = root->FirstChildElement("cellphoneUsageMax");
+	retrieveAttributeMandatory( element, "value", _cellphoneUsageMax);
+	element = root->FirstChildElement("cellphoneUsageMin");
+	retrieveAttributeMandatory( element, "value", _cellphoneUsageMin);
 	element = root->FirstChildElement("daysDrySeason");
 	retrieveAttributeMandatory( element, "value", _daysDrySeason);
 	element = root->FirstChildElement("daysWetSeason");
@@ -24,6 +28,8 @@ void MyWorldConfig::extractParticularAttribs(TiXmlElement * root) {
 	retrieveAttributeMandatory( element, "value", _maxPercentMapSharedInACall);
 	element = root->FirstChildElement("maxYearsCellInfo");
 	retrieveAttributeMandatory( element, "value", _maxYearsCellInfo);
+	element = root->FirstChildElement("multiplierCellsToAsk");
+	retrieveAttributeMandatory( element, "value", _multiplierCellsToAsk);
 	element = root->FirstChildElement("numAnimalsMax");
 	retrieveAttributeMandatory( element, "value", _numAnimalsMax);
 	element = root->FirstChildElement("numAnimalsMaxIni");
@@ -34,6 +40,8 @@ void MyWorldConfig::extractParticularAttribs(TiXmlElement * root) {
 	retrieveAttributeMandatory( element, "value", _numAnimalsMinIni);		
 	element = root->FirstChildElement("numVillages");
 	retrieveAttributeMandatory( element, "value", _numVillages);
+	element = root->FirstChildElement("percentAgentsWithCellphone");
+	retrieveAttributeMandatory( element, "value", _percentAgentsWithCellphone);
 	element = root->FirstChildElement("percentKnownAgentsDifferentVillageMediumAffinity");
 	retrieveAttributeMandatory( element, "value", _percentKnownAgentsDifferentVillageMediumAffinity);
 	element = root->FirstChildElement("percentKnownAgentsSameVillageHighAffinity");
@@ -48,6 +56,10 @@ void MyWorldConfig::extractParticularAttribs(TiXmlElement * root) {
 	retrieveAttributeMandatory( element, "value", _probabilityCallMediumAffinity);
 	element = root->FirstChildElement("probabilityChildInheritsFromFather");
 	retrieveAttributeMandatory( element, "value", _probabilityChildInheritsFromFather);
+	element = root->FirstChildElement("probabilityExchangeInfoHighAffinityInVillage");
+	retrieveAttributeMandatory( element, "value", _probabilityExchangeInfoHighAffinityInVillage);
+	element = root->FirstChildElement("probabilityExchangeInfoMediumAffinityInVillage");
+	retrieveAttributeMandatory( element, "value", _probabilityExchangeInfoMediumAffinityInVillage);
 	element = root->FirstChildElement("probabilityKnowAgentDifferentVillageAtStart");
 	retrieveAttributeMandatory( element, "value", _probabilityKnowAgentDifferentVillageAtStart);
 	element = root->FirstChildElement("probabilityKnowAgentSameVillageAtStart");
@@ -64,6 +76,14 @@ void MyWorldConfig::extractParticularAttribs(TiXmlElement * root) {
 	retrieveAttributeMandatory( element, "value", _sameVillageDaysNoCallsMedium);
 	element = root->FirstChildElement("size");
 	retrieveAttributeMandatory( element, "value", _size);
+}
+
+int MyWorldConfig::getCellphoneUsageMax() const {
+	return _cellphoneUsageMax;
+}
+
+int MyWorldConfig::getCellphoneUsageMin() const {
+	return _cellphoneUsageMin;
 }
 
 int MyWorldConfig::getDaysDrySeason() const {
@@ -88,6 +108,10 @@ int MyWorldConfig::getMaxPercentMapSharedInACall() const {
 
 int MyWorldConfig::getMaxYearsCellInfo() const {
 	return _maxYearsCellInfo;
+}
+
+int MyWorldConfig::getMultiplierCellsToAsk() const {
+	return _multiplierCellsToAsk;
 }
 
 int MyWorldConfig::getNumAgents() const {
@@ -118,6 +142,10 @@ int MyWorldConfig::getSize() const {
 	return _size;
 }
 
+int MyWorldConfig::getPercentAgentsWithCellphone() const {
+	return _percentAgentsWithCellphone;
+}
+
 int MyWorldConfig::getPercentKnownAgentsDifferentVillageMediumAffinity() const {
 	return _percentKnownAgentsDifferentVillageMediumAffinity;
 }
@@ -144,6 +172,14 @@ int MyWorldConfig::getProbabilityCallMediumAffinity() const {
 
 int MyWorldConfig::getProbabilityChildInheritsFromFather() const {
 	return _probabilityChildInheritsFromFather;
+}
+
+int MyWorldConfig::getProbabilityExchangeInfoHighAffinityInVillage() const {
+	return _probabilityExchangeInfoHighAffinityInVillage;
+}
+
+int MyWorldConfig::getProbabilityExchangeInfoMediumAffinityInVillage() const {
+	return _probabilityExchangeInfoMediumAffinityInVillage;
 }
 
 int MyWorldConfig::getProbabilityKnowAgentDifferentVillageAtStart() const {
