@@ -21,16 +21,19 @@ class MDPAgent : public Engine::Agent
 	typedef Online::Policy::UCT::uct_t< MDPAgentState > UCT;
 
 	int _resources; // MpiBasicAttribute
+	// resources to consume every step in order to avoid death by starvation
+	int _neededResources; // MpiBasicAttribute
 	MDPAgentModel * _model;
 	BasePolicy * _uctBasePolicy;
 
 	// mdp
-	int _horizon;
-	int _width;
-	int _explorationBonus;
+	int _horizon; // MpiBasicAttribute
+	int _width; // MpiBasicAttribute
+	int _explorationBonus; // MpiBasicAttribute
+
 public:
 	// todo remove environment from here
-	MDPAgent( const std::string & id, const int & horizon, const int & width, const int & explorationBonus);
+	MDPAgent( const std::string & id, const int & neededResources, const int & horizon, const int & width, const int & explorationBonus);
 	virtual ~MDPAgent();
 	
 	void selectActions();
@@ -40,6 +43,7 @@ public:
 
 	void setResources( int resources );
 	int getResources() const;
+	int getNeededResources() const;
 
 	////////////////////////////////////////////////
 	// This code has been automatically generated //

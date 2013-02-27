@@ -7,18 +7,17 @@ namespace Examples
 
 MDPAgentState::MDPAgentState() : _timeStep(0), _position(-1,-1), _resources(0), _horizon(0), _isCopy(false)
 {
-	std::cout << "OEOEEEEEEEEEEEEEOEEEEEEEE" << std::endl;
 }
 
 MDPAgentState::MDPAgentState(const Engine::Point2D<int> & position, int resources, const Engine::Raster & resourcesRaster, unsigned int horizon, int resourcesToEat) : _timeStep(0), _position(position), _resources(resources), _rasterResources(resourcesRaster), _horizon(horizon), _resourcesToEat(resourcesToEat), _isCopy(false)
 {
-	std::cout << "creating state by params: " << _rasterResources.getSize() << " original: " << resourcesRaster.getSize() << std::endl;
+//	std::cout << "creating state by params: " << _rasterResources.getSize() << " original: " << resourcesRaster.getSize() << std::endl;
 	computeHash();
 }
 
 MDPAgentState::MDPAgentState::MDPAgentState( const MDPAgentState & state ) : _timeStep(state._timeStep), _position(state._position), _resources(state._resources), _rasterResources(state._rasterResources), _hashKey(state._hashKey), _horizon(state._horizon), _resourcesToEat(state._resourcesToEat), _isCopy(true)
 {
-	std::cout << "creating state by copy with size: " << _rasterResources.getSize() << " from: " << state._rasterResources.getSize() << std::endl;
+//	std::cout << "creating state by copy with size: " << _rasterResources.getSize() << " from: " << state._rasterResources.getSize() << std::endl;
 	for (int i=0; i<state.getNumAvailableActions(); i++)
 	{
 		addAction(state.getAvailableAction(i).copy());
@@ -151,7 +150,7 @@ const MoveAction & MDPAgentState::getAvailableAction(Problem::action_t index) co
 
 void MDPAgentState::eat()
 {
-	//_resources -= _resourcesToEat;
+	_resources -= _resourcesToEat;
 }
 
 void MDPAgentState::computeHash()

@@ -7,6 +7,7 @@
 #include <Raster.hxx>
 #include <Point2D.hxx>
 #include <GeneralState.hxx>
+#include <Statistics.hxx>
 
 namespace Examples 
 {
@@ -29,8 +30,8 @@ void RandomWorld::createRasters()
 	{
 		for(index._y=0; index._y<_overlapBoundaries._size._y; index._y++)
 		{
-			int value = Engine::GeneralState::statistics().getUniformDistValue(0,5);
-			//getDynamicRasterStr("resources").setMaxValue(index, 1+index._x);
+			int value = Engine::GeneralState::statistics().getNormalDistValue(0,200);
+			getDynamicRasterStr("resources").setMaxValue(index, value);
 		}
 	}
 	updateRasterToMaxValues("resources");
@@ -44,10 +45,11 @@ void RandomWorld::createAgents()
 		{
 			std::ostringstream oss;
 			oss << "MDPAgent_" << i;
-			MDPAgent * agent = new MDPAgent(oss.str(), _config._horizon, _config._width, _config._explorationBonus);
+			int horizon = Engine::GeneralState::statistics().getUniformDistValue(2, _config._horizon);
+			int width = Engine::GeneralState::statistics().getUniformDistValue(1, _config._width);
+			MDPAgent * agent = new MDPAgent(oss.str(), _config._neededResources, horizon, width, _config._explorationBonus);
 			addAgent(agent);
 			agent->setRandomPosition();
-			//agent->setPosition(Engine::Point2D<int>(0,0));
 		}
 	}
 }

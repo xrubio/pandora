@@ -2,9 +2,10 @@
 <config>  
 	<!-- Global simulation parameters -->
 	<output resultsFile="./data/mdpAgents.h5" logsDir="./logs"/>
-	<numSteps value="50" serializeResolution="1"/>
+	<numSteps value="100" serializeResolution="1"/>
 	<size value="32"/>
-	<numAgents value="50"/>
-	<mdp horizon="10" width="100" explorationBonus="10"/>
+	<agents num="100" neededResources="30">
+		<mdp horizon="10" width="100" explorationBonus="10"/>
+	</agents>
 </config>
 

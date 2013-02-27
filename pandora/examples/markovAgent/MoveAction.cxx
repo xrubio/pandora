@@ -29,9 +29,10 @@ void MoveAction::executeMDP( const MDPAgent & agent, const MDPAgentState & state
 	stateNext.setPosition(_newPosition);
 	Engine::Point2D<int> localPos = agent.getPosition() - agent.getWorld()->getOverlapBoundaries()._origin;
 	stateNext.setResources(state.getResources()+state.getRasterResources().getValue(localPos));
-	std::cout << "executing from state: " << state << " to: " << stateNext << " getting value: " << state.getRasterResources().getValue(localPos) << " size of inc. raster: " << state.getRasterResources().getSize() << std::endl;
+//	std::cout << "executing from state: " << state << " to: " << stateNext << " getting value: " << state.getRasterResources().getValue(localPos) << " size of inc. raster: " << state.getRasterResources().getSize() << std::endl;
 
 	stateNext.getRasterResources().setValue(localPos, 0);
+	/*
 	for(int i=0; i<stateNext.getRasterResources().getSize()._x; i++)
 	{
 		for(int j=0; j<stateNext.getRasterResources().getSize()._y; j++)
@@ -39,6 +40,7 @@ void MoveAction::executeMDP( const MDPAgent & agent, const MDPAgentState & state
 			std::cout << "raster - " << i << "/" << j << " : " << stateNext.getRasterResources().getValue(Engine::Point2D<int>(i,j)) << std::endl;
 		}
 	}
+	*/
 }
 
 void MoveAction::execute( Engine::Agent & agent )

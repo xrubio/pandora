@@ -14,15 +14,17 @@ RandomWorldConfig::~RandomWorldConfig()
 
 void RandomWorldConfig::extractParticularAttribs(TiXmlElement * root)
 {
-	TiXmlElement * element = root->FirstChildElement("numAgents");
-	retrieveAttributeMandatory( element, "value", _numAgents);
-	element = root->FirstChildElement("size");
+	TiXmlElement * element = root->FirstChildElement("size");
 	retrieveAttributeMandatory( element, "value", _size);
 
-	element = root->FirstChildElement("mdp");
-	retrieveAttributeMandatory( element, "horizon", _horizon);
-	retrieveAttributeMandatory( element, "width", _width);
-	retrieveAttributeMandatory( element, "explorationBonus", _explorationBonus);
+	element = root->FirstChildElement("agents");
+	retrieveAttributeMandatory( element, "num", _numAgents);
+	retrieveAttributeMandatory( element, "neededResources", _neededResources);
+
+	TiXmlElement * mdp = element->FirstChildElement("mdp");
+	retrieveAttributeMandatory( mdp, "horizon", _horizon);
+	retrieveAttributeMandatory( mdp, "width", _width);
+	retrieveAttributeMandatory( mdp, "explorationBonus", _explorationBonus);
 
 }
 	

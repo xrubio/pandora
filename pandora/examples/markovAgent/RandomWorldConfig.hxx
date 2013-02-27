@@ -16,6 +16,8 @@ class RandomWorldConfig : public Engine::Config
 	int _horizon;
 	int _width;
 	int _explorationBonus;
+
+	int _neededResources;
 public:
 	RandomWorldConfig();
 	virtual ~RandomWorldConfig();
