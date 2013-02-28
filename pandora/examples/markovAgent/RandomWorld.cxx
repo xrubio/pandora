@@ -30,7 +30,7 @@ void RandomWorld::createRasters()
 	{
 		for(index._y=0; index._y<_overlapBoundaries._size._y; index._y++)
 		{
-			int value = Engine::GeneralState::statistics().getNormalDistValue(0,200);
+			int value = Engine::GeneralState::statistics().getNormalDistValue(0,100);
 			getDynamicRasterStr("resources").setMaxValue(index, value);
 		}
 	}
@@ -47,7 +47,8 @@ void RandomWorld::createAgents()
 			oss << "MDPAgent_" << i;
 			int horizon = Engine::GeneralState::statistics().getUniformDistValue(2, _config._horizon);
 			int width = Engine::GeneralState::statistics().getUniformDistValue(1, _config._width);
-			MDPAgent * agent = new MDPAgent(oss.str(), _config._neededResources, horizon, width, _config._explorationBonus);
+			MDPAgent * agent = new MDPAgent(oss.str(), _config._neededResources, _config._birthResources);
+			agent->configureMDP(horizon, width, _config._explorationBonus);
 			addAgent(agent);
 			agent->setRandomPosition();
 		}

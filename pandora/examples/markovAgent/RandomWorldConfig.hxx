@@ -17,7 +17,10 @@ class RandomWorldConfig : public Engine::Config
 	int _width;
 	int _explorationBonus;
 
+	// resources needed every time step
 	int _neededResources;
+	// resources needed to birth a child after consuming _neededResources
+	int _birthResources;
 public:
 	RandomWorldConfig();
 	virtual ~RandomWorldConfig();

@@ -23,6 +23,11 @@ class MDPAgent : public Engine::Agent
 	int _resources; // MpiBasicAttribute
 	// resources to consume every step in order to avoid death by starvation
 	int _neededResources; // MpiBasicAttribute
+	// if the agent has s surplus > _birthResources will generate a child at the end of time step
+	int _birthResources; // MpiBasicAttribute
+
+	// number of generated children
+	int _numChildren; // MpiBasicAttribute
 	MDPAgentModel * _model;
 	BasePolicy * _uctBasePolicy;
 
@@ -33,9 +38,10 @@ class MDPAgent : public Engine::Agent
 
 public:
 	// todo remove environment from here
-	MDPAgent( const std::string & id, const int & neededResources, const int & horizon, const int & width, const int & explorationBonus);
+	MDPAgent( const std::string & id, const int & neededResources, const int & birthResources );
 	virtual ~MDPAgent();
-	
+
+	void configureMDP( const int & horizon, const int & width, const int & explorationBonus );
 	void selectActions();
 	void updateState();
 	void registerAttributes();

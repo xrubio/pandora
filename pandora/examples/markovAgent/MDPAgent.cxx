@@ -8,10 +8,25 @@
 namespace Examples
 {
 
-MDPAgent::MDPAgent( const std::string & id, const int & neededResources, const int & horizon, const int & width, const int & explorationBonus ) : Agent(id), _resources(0), _neededResources(neededResources), _model(0), _uctBasePolicy(0), _horizon(horizon), _width(width), _explorationBonus(explorationBonus)
+MDPAgent::MDPAgent( const std::string & id, const int & neededResources, const int & birthResources ) : Agent(id), _resources(0), _neededResources(neededResources), _birthResources(birthResources), _numChildren(0), _model(0), _uctBasePolicy(0), _horizon(0), _width(0), _explorationBonus(0)
 {
+}
+
+void MDPAgent::configureMDP( const int & horizon, const int & width, const int & explorationBonus )
+{
+	_horizon = horizon;
+	_width = width;
+	_explorationBonus = explorationBonus;
+
+	if(_model)
+	{
+		delete _model;
+	}
+	if(_uctBasePolicy)
+	{
+		delete _uctBasePolicy;
+	}
 	_model = new MDPAgentModel();
-	// horizon
 	_model->setup(_horizon);
 	_uctBasePolicy = new BasePolicy(*_model);
 }
@@ -42,6 +57,18 @@ void MDPAgent::updateState()
 	{
 		remove();
 	}
+	if(_resources>_birthResources)
+	{
+		std::ostringstream oss;
+		oss << _id << "_child" << _numChildren;
+
+		MDPAgent * child = new MDPAgent(oss.str(), _neededResources, _birthResources);
+		child->configureMDP(_horizon, _width, _explorationBonus);
+		_world->addAgent(child);
+		child->setPosition(_position);
+		_resources -= _birthResources;
+		_numChildren++;
+	}
 }
 
 void MDPAgent::registerAttributes()
@@ -49,6 +76,7 @@ void MDPAgent::registerAttributes()
 	registerIntAttribute("resources");
 	registerIntAttribute("width");
 	registerIntAttribute("horizon");
+	registerIntAttribute("number of children");
 }
 
 void MDPAgent::serialize()
@@ -56,6 +84,7 @@ void MDPAgent::serialize()
 	serializeAttribute("resources", _resources);
 	serializeAttribute("width", _width);
 	serializeAttribute("horizon", _horizon);
+	serializeAttribute("number of children", _numChildren);
 }
 
 void MDPAgent::setResources( int resources )
