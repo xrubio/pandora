@@ -1,12 +1,26 @@
 <?xml version="1.0" ?>
 <config>  
 	<output resultsFile="./data/results.h5" logsDir="./logs"/>
+	<agentBirthResources value="0"/> <!--not used-->
+	<agentNeededResources value="0"/> <!--not used-->
+	<biomassDistribution value="linDecayFromWater"/>
 	<cellphoneUsageMax value="7"/>
 	<cellphoneUsageMin value="1"/>
+	<cellResolution value="8000"/>
+	<climateSeed value="1"/>
 	<daysDrySeason value="240"/>
+	<daysPerSeason value="120"/>
 	<daysWetSeason value="120"/>
 	<diffVillageDaysNoCallsLow value="90"/>
 	<diffVillageDaysNoCallsMedium value="30"/>	
+	<duneBiomass value="700"/>
+	<duneEfficiency value="0.13"/>
+	<duneMinimum value="0.2"/>
+	<explorationBonus value="10"/>
+	<horizon value="10"/>
+	<interduneBiomass value="4000"/>
+	<interduneEfficiency value="0.23"/>
+	<interduneMinimum value="0.2"/>
 	<maxPercentMapSharedInACall value="3"/> <!--This number needs to be divided by 10-->
 	<maxYearsCellInfo value="3"/>
 	<multiplierCellsToAsk value="3"/>
@@ -30,9 +44,15 @@
 	<probabilityKnowAgentDifferentVillageAtStart value="10"/> 
 	<probabilityKnowAgentSameVillageAtStart value="50"/>
 	<probabilityMeetAgentSameCell value="10"/>
-	<resourcesHighLevel value="10"/> <!-- TODO needs to be validated -->
-	<resourcesLowLevel value="5"/> <!-- TODO needs to be validated -->
+	<rainHistoricalDistribution mean="4643.848" stdev="1885.158"/>
+	<resourcesAgentCanGetPerDay value="200"/>
+	<resourcesHighLevel value="3000"/> <!-- TODO needs to be validated -->
+	<resourcesLowLevel value="1000"/> <!-- TODO needs to be validated -->
+	<resourcesNeededPerAnimal value="50"/> <!-- TODO needs to be validated -->
+	<resourcesNeededToGetANewAnimal value="200"/> <!-- TODO needs to be validated -->
 	<sameVillageDaysNoCallsHigh value="30"/>
 	<sameVillageDaysNoCallsMedium value="90"/>
 	<size value="60"/>
+	<sumWeights value="16423"/> <!-- TODO needs to be validated -->
+	<width value="100"/>
 </config>

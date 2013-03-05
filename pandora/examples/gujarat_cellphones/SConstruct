@@ -1,9 +1,9 @@
-nameProgram = 'PandoraTutorial'
+nameProgram = 'GujaratCellphones'
 
 agents = ['MyAgent']
-namespaceAgents = ['Tutorial']
+namespaceAgents = ['GujaratCellphones']
 
-srcFiles = ['main.cxx', 'MyWorld.cxx', 'MyAgent.cxx', 'MyWorldConfig.cxx', 'MyVillage.cxx']
+srcFiles = ['main.cxx', 'MyWorld.cxx', 'MyAgent.cxx', 'MyWorldConfig.cxx', 'MyVillage.cxx', 'Climate.cxx', 'MDPAgentState.cxx', 'MDPAgentModel.cxx', 'MoveAction.cxx']
 
 import os, sys
 from subprocess import call
@@ -41,7 +41,7 @@ else:
 if int(useMpi)==1:
 	env['CCFLAGS'] += ['-DPANDORAMPI']
 
-includeDirs = Split('./ ../../')
+includeDirs = Split('./ ../../ ../../../libs/libmdp')
 
 if int(mareNostrum)==1:	
 	includeDirs += ['/gpfs/apps/HDF5/1.8.9/64/include']

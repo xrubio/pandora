@@ -1,6 +1,6 @@
 #include <MyWorldConfig.hxx>
 
-namespace Examples
+namespace GujaratCellphones
 {
 
 MyWorldConfig::MyWorldConfig() {
@@ -12,18 +12,46 @@ MyWorldConfig::~MyWorldConfig() {
 void MyWorldConfig::extractParticularAttribs(TiXmlElement * root) {
 	TiXmlElement * element = root->FirstChildElement("numAgents");
 	retrieveAttributeMandatory( element, "value", _numAgents);
+	element = root->FirstChildElement("agentBirthResources");
+	retrieveAttributeMandatory( element, "value", _agentBirthResources);
+	element = root->FirstChildElement("agentNeededResources");
+	retrieveAttributeMandatory( element, "value", _agentNeededResources);
+	element = root->FirstChildElement("biomassDistribution");
+	retrieveAttributeMandatory( element, "value", _biomassDistribution);
 	element = root->FirstChildElement("cellphoneUsageMax");
 	retrieveAttributeMandatory( element, "value", _cellphoneUsageMax);
 	element = root->FirstChildElement("cellphoneUsageMin");
 	retrieveAttributeMandatory( element, "value", _cellphoneUsageMin);
+	element = root->FirstChildElement("cellResolution");
+	retrieveAttributeMandatory( element, "value", _cellResolution);
+	element = root->FirstChildElement("climateSeed");
+	retrieveAttributeMandatory( element, "value", _climateSeed);
 	element = root->FirstChildElement("daysDrySeason");
 	retrieveAttributeMandatory( element, "value", _daysDrySeason);
+	element = root->FirstChildElement("daysPerSeason");
+	retrieveAttributeMandatory( element, "value", _daysPerSeason);
 	element = root->FirstChildElement("daysWetSeason");
 	retrieveAttributeMandatory( element, "value", _daysWetSeason);
 	element = root->FirstChildElement("diffVillageDaysNoCallsLow");
 	retrieveAttributeMandatory( element, "value", _diffVillageDaysNoCallsLow);
 	element = root->FirstChildElement("diffVillageDaysNoCallsMedium");
 	retrieveAttributeMandatory( element, "value", _diffVillageDaysNoCallsMedium);
+	element = root->FirstChildElement("duneBiomass");
+	retrieveAttributeMandatory( element, "value", _duneBiomass);
+	element = root->FirstChildElement("duneEfficiency");
+	retrieveAttributeMandatory( element, "value", _duneEfficiency);
+	element = root->FirstChildElement("duneMinimum");
+	retrieveAttributeMandatory( element, "value", _duneMinimum);
+	element = root->FirstChildElement("explorationBonus");
+	retrieveAttributeMandatory( element, "value", _explorationBonus);
+	element = root->FirstChildElement("horizon");
+	retrieveAttributeMandatory( element, "value", _horizon);
+	element = root->FirstChildElement("interduneBiomass");
+	retrieveAttributeMandatory( element, "value", _interduneBiomass);
+	element = root->FirstChildElement("interduneEfficiency");
+	retrieveAttributeMandatory( element, "value", _interduneEfficiency);
+	element = root->FirstChildElement("interduneMinimum");
+	retrieveAttributeMandatory( element, "value", _interduneMinimum);
 	element = root->FirstChildElement("maxPercentMapSharedInACall");
 	retrieveAttributeMandatory( element, "value", _maxPercentMapSharedInACall);
 	element = root->FirstChildElement("maxYearsCellInfo");
@@ -40,6 +68,9 @@ void MyWorldConfig::extractParticularAttribs(TiXmlElement * root) {
 	retrieveAttributeMandatory( element, "value", _numAnimalsMinIni);		
 	element = root->FirstChildElement("numVillages");
 	retrieveAttributeMandatory( element, "value", _numVillages);
+	element = root->FirstChildElement("rainHistoricalDistribution");
+	retrieveAttributeMandatory(element, "mean", _rainHistoricalDistribMean);
+	retrieveAttributeMandatory(element, "stdev", _rainHistoricalDistribStdDev);	
 	element = root->FirstChildElement("percentAgentsWithCellphone");
 	retrieveAttributeMandatory( element, "value", _percentAgentsWithCellphone);
 	element = root->FirstChildElement("percentKnownAgentsDifferentVillageMediumAffinity");
@@ -66,16 +97,38 @@ void MyWorldConfig::extractParticularAttribs(TiXmlElement * root) {
 	retrieveAttributeMandatory( element, "value", _probabilityKnowAgentSameVillageAtStart);
 	element = root->FirstChildElement("probabilityMeetAgentSameCell");
 	retrieveAttributeMandatory( element, "value", _probabilityMeetAgentSameCell);
+	element = root->FirstChildElement("resourcesAgentCanGetPerDay");
+	retrieveAttributeMandatory( element, "value", _resourcesAgentCanGetPerDay);
 	element = root->FirstChildElement("resourcesHighLevel");
 	retrieveAttributeMandatory( element, "value", _resourcesHighLevel);
 	element = root->FirstChildElement("resourcesLowLevel");
 	retrieveAttributeMandatory( element, "value", _resourcesLowLevel);
+	element = root->FirstChildElement("resourcesNeededPerAnimal");
+	retrieveAttributeMandatory( element, "value", _resourcesNeededPerAnimal);
+	element = root->FirstChildElement("resourcesNeededToGetANewAnimal");
+	retrieveAttributeMandatory( element, "value", _resourcesNeededToGetANewAnimal);
 	element = root->FirstChildElement("sameVillageDaysNoCallsHigh");
 	retrieveAttributeMandatory( element, "value", _sameVillageDaysNoCallsHigh);
 	element = root->FirstChildElement("sameVillageDaysNoCallsMedium");
 	retrieveAttributeMandatory( element, "value", _sameVillageDaysNoCallsMedium);
 	element = root->FirstChildElement("size");
 	retrieveAttributeMandatory( element, "value", _size);
+	element = root->FirstChildElement("sumWeights");
+	retrieveAttributeMandatory( element, "value", _sumWeights);
+	element = root->FirstChildElement("width");
+	retrieveAttributeMandatory( element, "value", _width);
+}
+
+int MyWorldConfig::getAgentBirthResources() const {
+	return _agentBirthResources;
+}
+
+int MyWorldConfig::getAgentNeededResources() const {
+	return _agentNeededResources;
+}
+
+std::string MyWorldConfig::getBiomassDistribution() const {
+	return _biomassDistribution;
 }
 
 int MyWorldConfig::getCellphoneUsageMax() const {
@@ -86,12 +139,52 @@ int MyWorldConfig::getCellphoneUsageMin() const {
 	return _cellphoneUsageMin;
 }
 
+int MyWorldConfig::getCellResolution() const {
+	return _cellResolution;
+}
+
+int MyWorldConfig::getClimateSeed() const {
+	return _climateSeed;
+}
+
 int MyWorldConfig::getDaysDrySeason() const {
 	return _daysDrySeason;
 }
 
+int MyWorldConfig::getDaysPerSeason() const {
+	return _daysPerSeason;
+}
+
 int MyWorldConfig::getDaysWetSeason() const {
 	return _daysWetSeason;
+}
+
+int MyWorldConfig::getDuneBiomass() const {
+	return _duneBiomass;
+}
+
+float MyWorldConfig::getDuneEfficiency() const {
+	return _duneEfficiency;
+}
+
+int MyWorldConfig::getDuneMinimum() const {
+	return _duneMinimum;
+}
+
+int MyWorldConfig::getExplorationBonus() const {
+	return _explorationBonus;
+}
+
+int MyWorldConfig::getInterduneBiomass() const {
+	return _interduneBiomass;
+}
+
+float MyWorldConfig::getInterduneEfficiency() const {
+	return _interduneEfficiency;
+}
+
+int MyWorldConfig::getInterduneMinimum() const {
+	return _interduneMinimum;
 }
 
 int MyWorldConfig::getDiffVillageDaysNoCallsLow() const {
@@ -102,6 +195,10 @@ int MyWorldConfig::getDiffVillageDaysNoCallsMedium() const {
 	return _diffVillageDaysNoCallsMedium;
 }
 	
+int MyWorldConfig::getHorizon() const {
+	return _horizon;
+}
+
 int MyWorldConfig::getMaxPercentMapSharedInACall() const {
 	return _maxPercentMapSharedInACall;
 }
@@ -136,6 +233,14 @@ int MyWorldConfig::getNumAnimalsMinIni() const {
 
 int MyWorldConfig::getNumVillages() const {
 	return _numVillages;
+}
+
+float MyWorldConfig::getRainHistoricalDistribMean() const {
+	return _rainHistoricalDistribMean;
+}
+
+float MyWorldConfig::getRainHistoricalDistribStdDev() const {
+	return _rainHistoricalDistribStdDev;
 }
 
 int MyWorldConfig::getSize() const {
@@ -194,12 +299,24 @@ int MyWorldConfig::getProbabilityMeetAgentSameCell() const {
 	return _probabilityMeetAgentSameCell;
 }
 
+int MyWorldConfig::getResourcesAgentCanGetPerDay() const {
+	return _resourcesAgentCanGetPerDay;
+}
+
 int MyWorldConfig::getResourcesHighLevel() const {
 	return _resourcesHighLevel;
 }
 
 int MyWorldConfig::getResourcesLowLevel() const {
 	return _resourcesLowLevel;
+}
+
+int MyWorldConfig::getResourcesNeededPerAnimal() const {
+	return _resourcesNeededPerAnimal;
+}
+
+int MyWorldConfig::getResourcesNeededToGetANewAnimal() const {
+	return _resourcesNeededToGetANewAnimal;
 }
 
 int MyWorldConfig::getSameVillageDaysNoCallsHigh() const {
@@ -210,4 +327,12 @@ int MyWorldConfig::getSameVillageDaysNoCallsMedium() const {
 	return _sameVillageDaysNoCallsMedium;
 }
 
-} // namespace Examples
+int MyWorldConfig::getSumWeights() const {
+	return _sumWeights;
+}
+
+int MyWorldConfig::getWidth() const {
+	return _width;
+}
+
+} // namespace GujaratCellphones
