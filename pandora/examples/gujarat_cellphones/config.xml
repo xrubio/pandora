@@ -1,40 +1,40 @@
 <?xml version="1.0" ?>
-<config>  
+<config> 
+	<!-- simulation config -->
 	<output resultsFile="./data/results.h5" logsDir="./logs"/>
+	<numSteps value="480" serializeResolution="1"/>
+	<size value="60"/>
+
+	<!-- climate parameters -->
+	<climateSeed value="1"/>
+<!-- <rainHistoricalDistribution mean="4643.848" stdev="1885.158"/> -->
+	<rainHistoricalDistribution mean="4643.848" stdev="0.001"/>
+	<daysDrySeason value="240"/>
+
+	<!-- landscape parameters -->
+	<resourcesAgentCanGetPerDay value="200"/>
+	<resourcesHighLevel value="3000"/> <!-- TODO needs to be validated -->
+	<resourcesLowLevel value="1000"/> <!-- TODO needs to be validated -->
+	<resourcesNeededPerAnimal value="50"/> <!-- TODO needs to be validated -->
+	<resourcesNeededToGetANewAnimal value="200"/> <!-- TODO needs to be validated -->
+	
+	<!-- agent demographics -->
+	<numVillages value="0"/>
+	<numAgents value="0"/>
 	<agentBirthResources value="0"/> <!--not used-->
 	<agentNeededResources value="0"/> <!--not used-->
-	<biomassDistribution value="linDecayFromWater"/>
-	<cellphoneUsageMax value="7"/>
-	<cellphoneUsageMin value="1"/>
-	<cellResolution value="8000"/>
-	<climateSeed value="1"/>
-	<daysDrySeason value="240"/>
-	<daysPerSeason value="120"/>
-	<daysWetSeason value="120"/>
-	<diffVillageDaysNoCallsLow value="90"/>
-	<diffVillageDaysNoCallsMedium value="30"/>	
-	<duneBiomass value="700"/>
-	<duneEfficiency value="0.13"/>
-	<duneMinimum value="0.2"/>
-	<explorationBonus value="10"/>
-	<horizon value="10"/>
-	<interduneBiomass value="4000"/>
-	<interduneEfficiency value="0.23"/>
-	<interduneMinimum value="0.2"/>
-	<maxPercentMapSharedInACall value="3"/> <!--This number needs to be divided by 10-->
-	<maxYearsCellInfo value="3"/>
-	<multiplierCellsToAsk value="3"/>
-	<numAgents value="10"/>
+
+	<!-- animals -->
 	<numAnimalsMax value="600"/>
 	<numAnimalsMaxIni value="500"/>
 	<numAnimalsMin value="100"/>
 	<numAnimalsMinIni value="100"/>
-	<numSteps value="721" serializeResolution="1"/>
-	<numVillages value="8"/>
-	<percentAgentsWithCellphone value="65"/>
-	<percentKnownAgentsDifferentVillageMediumAffinity value = "30"/>
-	<percentKnownAgentsSameVillageHighAffinity value = "30"/>
-	<percentMapKnownAtBeginning value="5"/>
+
+	<!-- transmission params -->
+	<cellphoneUsageMax value="7"/>
+	<cellphoneUsageMin value="1"/>
+	<diffVillageDaysNoCallsLow value="90"/>
+	<diffVillageDaysNoCallsMedium value="30"/>
 	<probabilityCallHighAffinity value="50"/>
 	<probabilityCallLowAffinity value="10"/>
 	<probabilityCallMediumAffinity value="35"/>
@@ -44,15 +44,18 @@
 	<probabilityKnowAgentDifferentVillageAtStart value="10"/> 
 	<probabilityKnowAgentSameVillageAtStart value="50"/>
 	<probabilityMeetAgentSameCell value="10"/>
-	<rainHistoricalDistribution mean="4643.848" stdev="1885.158"/>
-	<resourcesAgentCanGetPerDay value="200"/>
-	<resourcesHighLevel value="3000"/> <!-- TODO needs to be validated -->
-	<resourcesLowLevel value="1000"/> <!-- TODO needs to be validated -->
-	<resourcesNeededPerAnimal value="50"/> <!-- TODO needs to be validated -->
-	<resourcesNeededToGetANewAnimal value="200"/> <!-- TODO needs to be validated -->
+	<percentAgentsWithCellphone value="65"/>
+	<percentKnownAgentsDifferentVillageMediumAffinity value = "30"/>
+	<percentKnownAgentsSameVillageHighAffinity value = "30"/>
+	<percentMapKnownAtBeginning value="5"/>
 	<sameVillageDaysNoCallsHigh value="30"/>
 	<sameVillageDaysNoCallsMedium value="90"/>
-	<size value="60"/>
-	<sumWeights value="16423"/> <!-- TODO needs to be validated -->
+	<maxPercentMapSharedInACall value="3"/> <!--This number needs to be divided by 10-->
+	<maxYearsCellInfo value="3"/>
+	<multiplierCellsToAsk value="3"/>
+
+	<!-- mdp -->
+	<explorationBonus value="10"/>
+	<horizon value="10"/>
 	<width value="100"/>
 </config>

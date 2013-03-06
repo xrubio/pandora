@@ -7,7 +7,6 @@
 #include "MDPAgentState.hxx"
 #include "MyWorldConfig.hxx"
 #include "MyVillage.hxx"
-#include "MyWorld.hxx"
 #include <string>
 #include <map>
 #include <utility>
@@ -16,6 +15,8 @@
 
 namespace GujaratCellphones
 {
+
+class MyWorld;
 
 class MyAgent : public Engine::Agent
 {

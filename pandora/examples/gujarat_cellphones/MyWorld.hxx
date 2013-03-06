@@ -6,7 +6,6 @@
 #include "MyVillage.hxx"
 #include "MyWorldConfig.hxx"
 #include "Climate.hxx"
-#include "MyAgent.hxx"
 
 namespace Engine
 {
@@ -17,45 +16,34 @@ namespace GujaratCellphones {
 
 enum Rasters
 {
-	eWeightWater,
+	// quality of soil, between 0 and 10 (being 5 the standard)
+	eSoilQuality,
 	eResources,
-	eResourcesFraction,
-	eSoils
-};
-
-enum Soils
-{
-	WATER = 1,
-	INTERDUNE = 2,
-	DUNE = 3
+	eResourcesFraction
 };
 
 class MyWorld : public Engine::World
 {
 	int _agentsCounter;
-	std::vector<std::vector<Soils> > _cellSoils;
 	Climate _climate;
-	std::vector<float> _dailyDrySeasonBiomassDecrease;
-	std::vector<float> _dailyRainSeasonBiomassIncrease;
 	std::vector<std::vector<int> > _distancesMatrix;
 	std::vector<std::string> _idsDeletedAgents;
-	std::vector<float> _remainingBiomass;
 	std::vector<MyVillage> _villages;
-	std::vector<float> _yearlyBiomass;
 
 	void createAgents();
 	void createRasters();
 	void createVillages();
 	void generateDistancesMatrix(int size);
-	float getBiomassVariation(bool wetSeason, Soils & cellSoil, const Engine::Point2D<int> & index) const;
 	MyVillage getVillage(int id);
-	void initCellSoils();
 	void initSocialNetwork();
 	void initVillage(int id, int x, int y);
 	void recomputeYearlyBiomass();
-	void updateRainfall();
 	void updateResources();
 
+	// maximum resources for soil quality (from 0 to 10)
+	std::vector<float> _maxResources;
+	// daily decrease for soil quality (from 0 to 10)
+	std::vector<float> _dailyDecrease;
 public:
 	MyWorldConfig _config;
 
@@ -71,6 +59,8 @@ public:
 	std::vector<std::string> getIdsExistingAgents();
 	double getMaximumAvgCellsSharedPerCall();
 	void stepEnvironment();
+
+	int getDaysDrySeason() const;
 };
 
 } // namespace Tutorial 

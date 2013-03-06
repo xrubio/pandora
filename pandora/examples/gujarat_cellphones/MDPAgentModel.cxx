@@ -122,7 +122,9 @@ void MDPAgentModel::makeActionsForState( MDPAgentState & state ) const
 	//is it necessary?
 	//_agentSim->updateKnowledge(state.getPosition(), s.getResources());
 	MyWorld* w = (MyWorld*) _agent->getWorld();
-	if (w->getClimate().getSeason() == HOTWET) {
+
+	if (w->getCurrentStep()%240==0) {
+	//if (w->getClimate().getSeason() == HOTWET) {
 		int valueInMentalWorldRepr = _agent->getValueCellMentalWorldRepresentation(state.getPosition()._x, state.getPosition()._y);
 		//if the info is unknown, average(1) is assumed
 		if (valueInMentalWorldRepr == -1) valueInMentalWorldRepr = 2; 
@@ -138,7 +140,10 @@ void MDPAgentModel::makeActionsForState( MDPAgentState & state ) const
 			for(int j=state.getPosition()._y-1; j<=state.getPosition()._y+1; j++)
 			{
 				Engine::Point2D<int> newPosition(i,j);
-				if(i >= 0 and i < _agent->_config.getSize() and j >= 0 and j < _agent->_config.getSize() and _agent->canGetHomeFromPosition(newPosition, _agent->_config.getDaysPerSeason()*3 - _agent->getWorld()->getCurrentStep()%(_agent->_config.getDaysPerSeason()*3) - 1)) {
+				int daysUntilWetSeason = w->getDaysDrySeason() - state.getTimeStep();
+
+				if(i >= 0 and i < _agent->_config.getSize() and j >= 0 and j < _agent->_config.getSize() and _agent->canGetHomeFromPosition(newPosition, daysUntilWetSeason))
+				{
 					//std::cout << "from position: " << state.getPosition() << " creating new at: " << newPosition << std::endl;
 					int valueInMentalWorldRepr = _agent->getValueCellMentalWorldRepresentation(newPosition._x, newPosition._y);
 					if (valueInMentalWorldRepr == -1) valueInMentalWorldRepr = 2;

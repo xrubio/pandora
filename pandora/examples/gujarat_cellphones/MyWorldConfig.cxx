@@ -16,42 +16,22 @@ void MyWorldConfig::extractParticularAttribs(TiXmlElement * root) {
 	retrieveAttributeMandatory( element, "value", _agentBirthResources);
 	element = root->FirstChildElement("agentNeededResources");
 	retrieveAttributeMandatory( element, "value", _agentNeededResources);
-	element = root->FirstChildElement("biomassDistribution");
-	retrieveAttributeMandatory( element, "value", _biomassDistribution);
 	element = root->FirstChildElement("cellphoneUsageMax");
 	retrieveAttributeMandatory( element, "value", _cellphoneUsageMax);
 	element = root->FirstChildElement("cellphoneUsageMin");
 	retrieveAttributeMandatory( element, "value", _cellphoneUsageMin);
-	element = root->FirstChildElement("cellResolution");
-	retrieveAttributeMandatory( element, "value", _cellResolution);
 	element = root->FirstChildElement("climateSeed");
 	retrieveAttributeMandatory( element, "value", _climateSeed);
 	element = root->FirstChildElement("daysDrySeason");
 	retrieveAttributeMandatory( element, "value", _daysDrySeason);
-	element = root->FirstChildElement("daysPerSeason");
-	retrieveAttributeMandatory( element, "value", _daysPerSeason);
-	element = root->FirstChildElement("daysWetSeason");
-	retrieveAttributeMandatory( element, "value", _daysWetSeason);
 	element = root->FirstChildElement("diffVillageDaysNoCallsLow");
 	retrieveAttributeMandatory( element, "value", _diffVillageDaysNoCallsLow);
 	element = root->FirstChildElement("diffVillageDaysNoCallsMedium");
 	retrieveAttributeMandatory( element, "value", _diffVillageDaysNoCallsMedium);
-	element = root->FirstChildElement("duneBiomass");
-	retrieveAttributeMandatory( element, "value", _duneBiomass);
-	element = root->FirstChildElement("duneEfficiency");
-	retrieveAttributeMandatory( element, "value", _duneEfficiency);
-	element = root->FirstChildElement("duneMinimum");
-	retrieveAttributeMandatory( element, "value", _duneMinimum);
 	element = root->FirstChildElement("explorationBonus");
 	retrieveAttributeMandatory( element, "value", _explorationBonus);
 	element = root->FirstChildElement("horizon");
 	retrieveAttributeMandatory( element, "value", _horizon);
-	element = root->FirstChildElement("interduneBiomass");
-	retrieveAttributeMandatory( element, "value", _interduneBiomass);
-	element = root->FirstChildElement("interduneEfficiency");
-	retrieveAttributeMandatory( element, "value", _interduneEfficiency);
-	element = root->FirstChildElement("interduneMinimum");
-	retrieveAttributeMandatory( element, "value", _interduneMinimum);
 	element = root->FirstChildElement("maxPercentMapSharedInACall");
 	retrieveAttributeMandatory( element, "value", _maxPercentMapSharedInACall);
 	element = root->FirstChildElement("maxYearsCellInfo");
@@ -113,8 +93,6 @@ void MyWorldConfig::extractParticularAttribs(TiXmlElement * root) {
 	retrieveAttributeMandatory( element, "value", _sameVillageDaysNoCallsMedium);
 	element = root->FirstChildElement("size");
 	retrieveAttributeMandatory( element, "value", _size);
-	element = root->FirstChildElement("sumWeights");
-	retrieveAttributeMandatory( element, "value", _sumWeights);
 	element = root->FirstChildElement("width");
 	retrieveAttributeMandatory( element, "value", _width);
 }
@@ -127,10 +105,6 @@ int MyWorldConfig::getAgentNeededResources() const {
 	return _agentNeededResources;
 }
 
-std::string MyWorldConfig::getBiomassDistribution() const {
-	return _biomassDistribution;
-}
-
 int MyWorldConfig::getCellphoneUsageMax() const {
 	return _cellphoneUsageMax;
 }
@@ -139,52 +113,12 @@ int MyWorldConfig::getCellphoneUsageMin() const {
 	return _cellphoneUsageMin;
 }
 
-int MyWorldConfig::getCellResolution() const {
-	return _cellResolution;
-}
-
-int MyWorldConfig::getClimateSeed() const {
-	return _climateSeed;
-}
-
 int MyWorldConfig::getDaysDrySeason() const {
 	return _daysDrySeason;
 }
 
-int MyWorldConfig::getDaysPerSeason() const {
-	return _daysPerSeason;
-}
-
-int MyWorldConfig::getDaysWetSeason() const {
-	return _daysWetSeason;
-}
-
-int MyWorldConfig::getDuneBiomass() const {
-	return _duneBiomass;
-}
-
-float MyWorldConfig::getDuneEfficiency() const {
-	return _duneEfficiency;
-}
-
-int MyWorldConfig::getDuneMinimum() const {
-	return _duneMinimum;
-}
-
 int MyWorldConfig::getExplorationBonus() const {
 	return _explorationBonus;
-}
-
-int MyWorldConfig::getInterduneBiomass() const {
-	return _interduneBiomass;
-}
-
-float MyWorldConfig::getInterduneEfficiency() const {
-	return _interduneEfficiency;
-}
-
-int MyWorldConfig::getInterduneMinimum() const {
-	return _interduneMinimum;
 }
 
 int MyWorldConfig::getDiffVillageDaysNoCallsLow() const {
@@ -233,14 +167,6 @@ int MyWorldConfig::getNumAnimalsMinIni() const {
 
 int MyWorldConfig::getNumVillages() const {
 	return _numVillages;
-}
-
-float MyWorldConfig::getRainHistoricalDistribMean() const {
-	return _rainHistoricalDistribMean;
-}
-
-float MyWorldConfig::getRainHistoricalDistribStdDev() const {
-	return _rainHistoricalDistribStdDev;
 }
 
 int MyWorldConfig::getSize() const {
@@ -327,12 +253,8 @@ int MyWorldConfig::getSameVillageDaysNoCallsMedium() const {
 	return _sameVillageDaysNoCallsMedium;
 }
 
-int MyWorldConfig::getSumWeights() const {
-	return _sumWeights;
-}
-
 int MyWorldConfig::getWidth() const {
 	return _width;
 }
-
+	
 } // namespace GujaratCellphones

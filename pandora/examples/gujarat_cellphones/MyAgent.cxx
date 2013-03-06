@@ -6,6 +6,7 @@
 #include <iostream>
 #include <map>
 #include <stack>
+#include "MyWorld.hxx"
 
 namespace GujaratCellphones
 {
@@ -724,38 +725,43 @@ void MyAgent::updateReputation() {
 	else _reputation = (_avgCellsSharedPerCall*100)/_world->getMaximumAvgCellsSharedPerCall();
 }
 
-void MyAgent::updateState() {
-	if (_exists) {
-		int dayOfYear = (_world->getCurrentStep())%(_config.getDaysDrySeason() + _config.getDaysWetSeason());
-		if (dayOfYear == 0 and _world->getCurrentStep() != 0) { //first day of wet season
-			updateYearsMentalWorldRepresentation();
-			updateNumberOfAnimals();
-			if (agentFissions()) fission();
-			resetNumberOfResourcesGathered();
+void MyAgent::updateState()
+{
+	//first day of wet season
+	if (_world->getCurrentStep()%_config.getDaysDrySeason()  == 0)
+	{
+		if(!hasMinimumNumOfAnimals())
+		{
+			stopBeingAShepherd();
 		}
-		else if (dayOfYear == _config.getDaysWetSeason() - 1) { //last day wet season
-			exchangeInfoWithPeopleInVillage();
-			resetSpokeInVillage();
+
+		checkConditions();
+		
+		exchangeInfoWithPeopleInVillage();
+		resetSpokeInVillage();
+		updateYearsMentalWorldRepresentation();
+		updateNumberOfAnimals();
+		if (agentFissions())
+		{
+			fission();
 		}
-		else if (dayOfYear >= _config.getDaysWetSeason()){ //dry season
-			meetAgentsInSameCell();
-		}
-		if (decideToMakeACall()) {
-			std::string whoToCall = chooseWhoToCall();
-			if (whoToCall != "") {
-				exchangeInformationWithOtherAgent(whoToCall);
-				MyAgent* receiver = (MyAgent*)_world->getAgent(whoToCall);
-				receiver->exchangeInformationWithOtherAgent(_id);
-			}
-		}
-		updateLastCalls();
-		updateReputation();
-		updateAffinities();
-		if (dayOfYear == 0) {
-			if (not hasMinimumNumOfAnimals()) stopBeingAShepherd();
-		}
-		if (_exists) checkConditions();
+		resetNumberOfResourcesGathered();
 	}
+	else
+	{
+		meetAgentsInSameCell();
+	}
+	if (decideToMakeACall()) {
+		std::string whoToCall = chooseWhoToCall();
+		if (whoToCall != "") {
+			exchangeInformationWithOtherAgent(whoToCall);
+			MyAgent* receiver = (MyAgent*)_world->getAgent(whoToCall);
+			receiver->exchangeInformationWithOtherAgent(_id);
+		}
+	}
+	updateLastCalls();
+	updateReputation();
+	updateAffinities();
 }
 
 void MyAgent::updateYearsMentalWorldRepresentation() {

@@ -1,18 +1,17 @@
 #include <MyWorld.hxx>
+#include "MyAgent.hxx"
 
 namespace GujaratCellphones
 {
 
-MyWorld::MyWorld(Engine::Simulation &simulation, MyWorldConfig &config) : World(simulation, 1, false, "./data/results.h5"), _climate(config, *this) {
+MyWorld::MyWorld(Engine::Simulation &simulation, MyWorldConfig &config) : World(simulation, 1, false, config._resultsFile), _climate(config)
+{
 	_agentsCounter = 0;
 	_config = config;
-	_dailyDrySeasonBiomassDecrease.resize(4);
-	_dailyRainSeasonBiomassIncrease.resize(4);
-	_remainingBiomass.resize(4);
-	_remainingBiomass[3] = _remainingBiomass[2] = _remainingBiomass[1] = 0.0f;
-	_yearlyBiomass.resize(4);
 	generateDistancesMatrix(config.getSize());
-	initCellSoils();
+
+	_dailyDecrease.resize(11);
+	_maxResources.resize(11);
 }
 
 MyWorld::~MyWorld() {
@@ -53,19 +52,30 @@ void MyWorld::createAgents() {
 	initSocialNetwork();
 }
 
-void MyWorld::createRasters() {
+void MyWorld::createRasters()
+{
 	registerDynamicRaster("resources", true, eResources);
 	getDynamicRaster(eResources).setInitValues(0, std::numeric_limits<int>::max(), 0);
-	registerStaticRaster("soils", true, eSoils);
-	//Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eSoils), "./resources/60/soils_60.tiff", this);
+
+	registerDynamicRaster("soil quality", true, eSoilQuality);
+	getDynamicRaster(eSoilQuality).setInitValues(0, 10, 5);
+
+	Engine::Point2D<int> index(0,0);
+	for(index._x=0; index._x<_overlapBoundaries._size._x; index._x++)
+	{
+		for(index._y=0; index._y<_overlapBoundaries._size._y; index._y++)
+		{
+			int value = Engine::GeneralState::statistics().getNormalDistValue(0,10);
+			getDynamicRaster(eSoilQuality).setMaxValue(index, value);
+		}
+	}
+	updateRasterToMaxValues(eSoilQuality);	
+	
 	// we need to keep track of resource fractions
 	registerDynamicRaster("resourcesFraction", false, eResourcesFraction);
-	getDynamicRaster(eResourcesFraction).setInitValues(0, std::numeric_limits<int>::max(), 0);
-	if(_config.getBiomassDistribution().compare("linDecayFromWater")==0 or _config.getBiomassDistribution().compare("logDecayFromWater")==0) {
-		registerStaticRaster("weightWater", false, eWeightWater);
-		Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eWeightWater), "./resources/60/linWeight_water_60.tiff", this);
-	}
-	createVillages();
+	getDynamicRaster(eResourcesFraction).setInitValues(0, 100, 0);
+
+
 }
 
 void MyWorld::createVillages() {
@@ -105,21 +115,6 @@ void MyWorld::generateDistancesMatrix(int size) {
 
 int MyWorld::getAgentsCounter() {
 	return _agentsCounter;
-}
-
-float MyWorld::getBiomassVariation(bool wetSeason, Soils & cellSoil, const Engine::Point2D<int> & index) const {
-	double variation = 0.0f;
-	if(_config.getBiomassDistribution().compare("standard")==0) {
-		if(wetSeason) variation = _dailyRainSeasonBiomassIncrease.at(cellSoil);
-		else variation = -_dailyDrySeasonBiomassDecrease.at(cellSoil);
-	}
-	else if(_config.getBiomassDistribution().compare("linDecayFromWater")==0 or _config.getBiomassDistribution().compare("logDecayFromWater")==0) {
-		variation = ((double)(_config.getSize()*_config.getSize())/((double)(_config.getSumWeights())))*getValue(eWeightWater, index);
-		variation /= 10000.0f; //TODO validar
-		if(wetSeason) variation *= (float)(_dailyRainSeasonBiomassIncrease.at(cellSoil)/10000.0f); //TODO validar	
-		else variation *= -1.0f*(float)(_dailyDrySeasonBiomassDecrease.at(cellSoil)/10000.0f); //TODO validar
-	}
-	return variation;
 }
 
 Climate MyWorld::getClimate() {
@@ -170,15 +165,6 @@ MyVillage MyWorld::getVillage(int id) {
 	}
 }
 
-void MyWorld::initCellSoils() {
-	_cellSoils = std::vector<std::vector<Soils> > (_config.getSize(), std::vector<Soils> (_config.getSize()));
-	for (int i = 0; i < _config.getSize(); ++i) {
-		for (int j = 0; j < _config.getSize(); ++j) {
-			_cellSoils[i][j] = (Soils)(Engine::GeneralState::statistics().getUniformDistValue(2, 3));
-		}
-	}
-}
-
 void MyWorld::initSocialNetwork() {
 	std::vector<std::string> agentsIds = getIdsExistingAgents(); 
 	for (int i = 0; i < agentsIds.size(); ++i) {
@@ -226,91 +212,69 @@ void MyWorld::initVillage(int id, int x, int y) {
 	_villages.push_back(v);
 }
 
-void MyWorld::recomputeYearlyBiomass() {
-	// update all the map resources to the minimum of the year (in case it was diminished by agents)
+void MyWorld::recomputeYearlyBiomass()
+{
+	float rainWeight = _climate.getRain()/_config._rainHistoricalDistribMean;
+	std::cout << " rain: " << _climate.getRain() << " mean: " << _config._rainHistoricalDistribMean << " weight: " << rainWeight << std::endl;
 	Engine::Point2D<int> index;
-	for(index._x = _boundaries._origin._x; index._x < _boundaries._origin._x + _boundaries._size._x; index._x++ )                
+
+	for(int i=0; i<_maxResources.size(); i++)
 	{
-		for( index._y = _boundaries._origin._y; index._y < _boundaries._origin._y + _boundaries._size._y; index._y++ )
+		float maxValue = i*rainWeight*10000.0f/5.0f;
+		_maxResources.at(i) = maxValue;
+		float decrease = maxValue*1.0f;
+		// days of dry season -1 because the first day it is not decreased
+		_dailyDecrease.at(i) = decrease/(_config._daysDrySeason-1);
+
+	}
+
+	for(index._x = _overlapBoundaries._origin._x; index._x < _overlapBoundaries._origin._x + _overlapBoundaries._size._x; index._x++ )                
+	{
+		for( index._y = _overlapBoundaries._origin._y; index._y < _overlapBoundaries._origin._y + _overlapBoundaries._size._y; index._y++ )
 		{
-			setValue(eResourcesFraction, index, 0);
-			setValue(eResources, index, _remainingBiomass[getValue(eSoils, index)]);
-			// 1. Compute factor between actual rain and average rain		
-			float raininessFactor = _climate.getRain() / _climate.getMeanAnnualRain();
-			double areaOfCell = _config.getCellResolution()*_config.getCellResolution(); 
-			// 2. For each soil type compute yearly biomass	
-			// data expressed in g/m2
-			_yearlyBiomass[WATER] = 0.0f;
-			_yearlyBiomass[DUNE] = areaOfCell*_config.getDuneBiomass() * raininessFactor * _config.getDuneEfficiency();
-			_yearlyBiomass[INTERDUNE] = areaOfCell*_config.getInterduneBiomass() * _config.getInterduneEfficiency() * raininessFactor;
-
-			// yearly biomass is the area of a triangle with max height at the end of wet season
-			// A_1 + A_2 = biomass, being A_1 = daysPerSeason*h/2 and A_2 = 2*daysPerSeason*h/2
-			// dPS*h/2 + 2*dPS*h/2 = biomass, so h = biomass/1.5*dPS
-			// and A_2 = 2*A_1
-
-			double heightInterDune = (_yearlyBiomass[INTERDUNE] + 120.0f*_config.getInterduneMinimum()-60.0*_remainingBiomass[INTERDUNE]) / (180+240*_config.getInterduneMinimum());
-
-			_dailyRainSeasonBiomassIncrease[INTERDUNE] = (heightInterDune-_remainingBiomass[INTERDUNE])/120.0f;
-			_remainingBiomass[INTERDUNE] = heightInterDune *_config.getInterduneMinimum();
-			_dailyDrySeasonBiomassDecrease[INTERDUNE] = heightInterDune*(1-_config.getInterduneMinimum())/240.0f;
-
-			double heightDune = (_yearlyBiomass[DUNE] + 120.0f*_config.getDuneMinimum()-60.0*_remainingBiomass[DUNE]) / (180+240*_config.getDuneMinimum());
-			_dailyRainSeasonBiomassIncrease[DUNE] = (heightDune-_remainingBiomass[DUNE])/120.0f;
-			_remainingBiomass[DUNE] = heightDune *_config.getDuneMinimum();
-			_dailyDrySeasonBiomassDecrease[DUNE] = heightDune*(1-_config.getDuneMinimum())/240.0f;
-
-			_dailyRainSeasonBiomassIncrease[WATER] = 0.0f;
-			_dailyDrySeasonBiomassDecrease[WATER] = 0.0f;
-			_remainingBiomass[WATER] = 0.0f;
+			setValue(eResources, index, _maxResources.at(getValue(eSoilQuality, index)));
 		}
 	}
 }
 
-void MyWorld::stepEnvironment() {
-	_climate.advanceSeason();
-	// if this is the first step of a wet season, rainfall and biomass are calculated for the entire year
-	if (_climate.rainSeasonStarted()) {
-		updateRainfall();
+void MyWorld::stepEnvironment()
+{
+	// first day of year -> step to include whole wet season
+	if(_step%_config._daysDrySeason==0)
+	{
+		_climate.computeRainValue();
 		recomputeYearlyBiomass();
 	}
-	// resources are updated each time step
-	updateResources();
-}
-
-void MyWorld::updateRainfall() {
-	_climate.step();
-}
-
-void MyWorld::updateResources() {
-	Engine::Point2D<int> index;
-	for( index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++ )		
+	else
 	{
-		for( index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++ )
+		updateResources();
+	}
+}
+
+void MyWorld::updateResources()
+{
+	Engine::Point2D<int> index;
+	for( index._x=_overlapBoundaries._origin._x; index._x<_overlapBoundaries._origin._x+_overlapBoundaries._size._x; index._x++ )		
+	{
+		for( index._y=_overlapBoundaries._origin._y; index._y<_overlapBoundaries._origin._y+_overlapBoundaries._size._y; index._y++ )
 		{
-			// 3. Increment or Decrement cell biomass depending on yearly biomass
-			//    figures and current timestep
 			int currentValue = getValue(eResources, index);
+			float decrease = _dailyDecrease.at(getValue(eSoilQuality, index));
+
 			float currentFraction = (float)getValue(eResourcesFraction, index)/100.0f;
-			//Soils cellSoil = (Soils)getValue(eSoils, index); //TODO cambiar esto
-			//Soils cellSoil = (Soils)(Engine::GeneralState::statistics().getUniformDistValue(1, 3));
-			Soils cellSoil = _cellSoils[index._x][index._y];
-			if(cellSoil!=WATER)
-			{
-				Seasons season = _climate.getSeason();
-				bool wetSeason = false;
-				if(season==HOTWET)
-				{
-					wetSeason = true;
-				}			
-				float newValue = std::max(0.0f, currentValue+currentFraction+getBiomassVariation(wetSeason, cellSoil, index));
-				currentValue = newValue;
-				float fraction = 100.0f*(newValue  - currentValue);
-				setValue(eResources, index, currentValue);
-				setValue(eResourcesFraction, index, (int)fraction);
-			}
+			float newValue = std::max(0.0f, currentValue+currentFraction-decrease);
+			currentValue = newValue;
+			float fraction = 100.0f*(newValue  - currentValue);
+
+			setValue(eResources, index, currentValue);
+			setValue(eResourcesFraction, index, (int)fraction);
 		}
 	}
+}
+
+int MyWorld::getDaysDrySeason() const
+{
+	return _config._daysDrySeason;
 }
 
 }
