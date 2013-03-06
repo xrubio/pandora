@@ -38,7 +38,7 @@ void MyAgent::addSpokeInVillage(std::string id) {
 
 bool MyAgent::agentFissions() {
 	double probability = ((_numberOfAnimals-_config.getNumAnimalsMin()*2)*100)/(_config.getNumAnimalsMax()-_config.getNumAnimalsMin()*2);
-	int r = Engine::GeneralState::statistics().getUniformDistValue(0,100);
+	int r = Engine::GeneralState::statistics().getUniformDistValue(1,100);
 	return r <= probability;
 }
 
@@ -66,7 +66,7 @@ void MyAgent::checkConditions() { //TODO falta completar
 
 std::string MyAgent::chooseWhoToCall() {
 	int affinityCallReceiver;
-	int r = Engine::GeneralState::statistics().getUniformDistValue(0,100);
+	int r = Engine::GeneralState::statistics().getUniformDistValue(1,100);
 	if (r <= _config.getProbabilityCallLowAffinity()) affinityCallReceiver = 0;
 	else if (r <= _config.getProbabilityCallMediumAffinity()) affinityCallReceiver = 1;
 	else affinityCallReceiver = 2;
@@ -102,7 +102,7 @@ void MyAgent::createAffinity(std::string id, int affinityLevel) {
 bool MyAgent::decideToMakeACall() {
 	if (not _hasCellphone) return false;
 	int probability = (_cellphoneUsage*100)/_config.getCellphoneUsageMax();
-	int r = Engine::GeneralState::statistics().getUniformDistValue(0,100);
+	int r = Engine::GeneralState::statistics().getUniformDistValue(1,100);
 	return r <= probability;
 }
 
@@ -150,7 +150,7 @@ void MyAgent::exchangeInfoWithPeopleInVillage() {
 			}
 			if (not haveAlreadySpoken) {
 				bool exchangeInformation = false;
-				int r = Engine::GeneralState::statistics().getUniformDistValue(0,100);
+				int r = Engine::GeneralState::statistics().getUniformDistValue(1,100);
 				if (_socialNetwork[i].second == 2) {
 					exchangeInformation = (r <= _config.getProbabilityExchangeInfoHighAffinityInVillage());
 				}
@@ -175,7 +175,7 @@ void MyAgent::fission() {
 	newAgent->setResources(0);
 	newAgent->setNumberOfAnimals(_numberOfAnimals/2);
 
-	int r = Engine::GeneralState::statistics().getUniformDistValue(0,100);
+	int r = Engine::GeneralState::statistics().getUniformDistValue(1,100);
 	//if the child inherits the characteristics of the father
 	if (r <= _config.getProbabilityChildInheritsFromFather()) {
 		newAgent->setHasCellphone(_hasCellphone);
@@ -377,7 +377,7 @@ void MyAgent::initCooperationTreat() {
 }
 
 void MyAgent::initHasCellphone() {
-	int r = Engine::GeneralState::statistics().getUniformDistValue(0, 100);
+	int r = Engine::GeneralState::statistics().getUniformDistValue(1, 100);
 	_hasCellphone = (r < _config.getPercentAgentsWithCellphone());
 }
 
@@ -510,7 +510,7 @@ void MyAgent::meetAgentsInSameCell() {
 		if (agentsIds[i] != _id) {
 			MyAgent* a = (MyAgent*) _world->getAgent(agentsIds[i]);
 			if (not hasAffinityWithAgent(agentsIds[i])) {
-				int r = Engine::GeneralState::statistics().getUniformDistValue(0, 100);
+				int r = Engine::GeneralState::statistics().getUniformDistValue(1, 100);
 				if (r <= _config.getProbabilityMeetAgentSameCell()) {
 					if (_village.getId() == a->getVillage().getId()) {
 						createAffinity(a->getId(), 1);
