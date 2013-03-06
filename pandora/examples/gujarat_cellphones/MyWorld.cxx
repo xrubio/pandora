@@ -28,25 +28,29 @@ bool MyWorld::agentHasBeenDeleted(std::string id) {
 	return false;
 }
 
-std::string MyWorld::createAgent(int idVillage, bool initialAgent) {
+MyAgent * MyWorld::createAgent(int idVillage, bool initialAgent)
+{
+	std::cout << "creating agent at village: " << idVillage << std::endl;
 	std::ostringstream oss;
 	oss << "MyAgent_" << _agentsCounter;
-	int horizon = Engine::GeneralState::statistics().getUniformDistValue(2, _config.getHorizon());
-	int width = Engine::GeneralState::statistics().getUniformDistValue(1, _config.getWidth());
 	MyAgent* agent = new MyAgent(oss.str(), _config, this, initialAgent, _config.getAgentNeededResources(), _config.getAgentBirthResources());
-	agent->configureMDP(horizon, width, _config.getExplorationBonus());
+	agent->configureMDP(_config.getHorizon(), _config.getWidth(), _config.getExplorationBonus());
 	addAgent(agent);
-	_villages[idVillage].addCitizen(oss.str());
-	agent->setVillage(_villages[idVillage]);
+	_villages.at(idVillage).addCitizen(oss.str());
+	agent->setVillage(_villages.at(idVillage));
 	agent->initPosition();
 	++_agentsCounter;
-	return oss.str();
+	return agent;
 }
 
-void MyWorld::createAgents() {
-	for(int i = 0; i < _config.getNumAgents(); ++i) {
-		if((i%_simulation.getNumTasks())==_simulation.getId()) {
-			createAgent(Engine::GeneralState::statistics().getUniformDistValue(0,_config.getNumVillages() - 1), true);
+void MyWorld::createAgents()
+{
+	createVillages();
+	for(int i = 0; i < _config.getNumAgents(); i++)
+	{
+		if((i%_simulation.getNumTasks())==_simulation.getId())
+		{
+			createAgent(Engine::GeneralState::statistics().getUniformDistValue(0,_config.getNumVillages()-1), true);
 		}
 	}
 	initSocialNetwork();
@@ -78,7 +82,8 @@ void MyWorld::createRasters()
 
 }
 
-void MyWorld::createVillages() {
+void MyWorld::createVillages()
+{
 	initVillage(0, _config.getSize()/8, _config.getSize()/8);
 	initVillage(1, 3*_config.getSize()/8, 3*_config.getSize()/8);
 	initVillage(2, _config.getSize()/8, 5*_config.getSize()/8);
@@ -115,10 +120,6 @@ void MyWorld::generateDistancesMatrix(int size) {
 
 int MyWorld::getAgentsCounter() {
 	return _agentsCounter;
-}
-
-Climate MyWorld::getClimate() {
-	return _climate;
 }
 
 int MyWorld::getDistance(int x1, int y1, int x2, int y2) {
@@ -240,7 +241,7 @@ void MyWorld::recomputeYearlyBiomass()
 void MyWorld::stepEnvironment()
 {
 	// first day of year -> step to include whole wet season
-	if(_step%_config._daysDrySeason==0)
+	if(isWetSeason())
 	{
 		_climate.computeRainValue();
 		recomputeYearlyBiomass();
@@ -272,9 +273,19 @@ void MyWorld::updateResources()
 	}
 }
 
-int MyWorld::getDaysDrySeason() const
+bool MyWorld::isWetSeason() const
 {
-	return _config._daysDrySeason;
+	if(_step%_config._daysDrySeason==0)
+	{
+		return true;
+	}
+	return false;
+}
+
+int MyWorld::daysUntilWetSeason() const
+{
+	int days = _step%_config._daysDrySeason;
+	return _config._daysDrySeason - days;
 }
 
 }

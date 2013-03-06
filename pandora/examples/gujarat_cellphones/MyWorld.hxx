@@ -22,6 +22,8 @@ enum Rasters
 	eResourcesFraction
 };
 
+class MyAgent;
+
 class MyWorld : public Engine::World
 {
 	int _agentsCounter;
@@ -51,16 +53,18 @@ public:
 	virtual ~MyWorld();
 	void addDeletedAgent(std::string id);
 	bool agentHasBeenDeleted(std::string id);
-	std::string createAgent(int idVillage, bool initialAgent);
+	MyAgent * createAgent(int idVillage, bool initialAgent);
 	int getAgentsCounter();
-	Climate getClimate();
 	int getDistance(int x1, int y1, int x2, int y2);
 	std::vector<std::string> getIdsAgentsInCell(int x, int y);
 	std::vector<std::string> getIdsExistingAgents();
 	double getMaximumAvgCellsSharedPerCall();
 	void stepEnvironment();
 
-	int getDaysDrySeason() const;
+	// the first step of a year simultes the entire wet season
+	bool isWetSeason() const;
+	// remaining days until next wet season
+	int daysUntilWetSeason() const;
 };
 
 } // namespace Tutorial 

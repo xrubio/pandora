@@ -140,9 +140,7 @@ void MDPAgentModel::makeActionsForState( MDPAgentState & state ) const
 			for(int j=state.getPosition()._y-1; j<=state.getPosition()._y+1; j++)
 			{
 				Engine::Point2D<int> newPosition(i,j);
-				int daysUntilWetSeason = w->getDaysDrySeason() - state.getTimeStep();
-
-				if(i >= 0 and i < _agent->_config.getSize() and j >= 0 and j < _agent->_config.getSize() and _agent->canGetHomeFromPosition(newPosition, daysUntilWetSeason))
+				if(i >= 0 and i < _agent->_config.getSize() and j >= 0 and j < _agent->_config.getSize() and _agent->canGetHomeFromPosition(newPosition, w->daysUntilWetSeason()))
 				{
 					//std::cout << "from position: " << state.getPosition() << " creating new at: " << newPosition << std::endl;
 					int valueInMentalWorldRepr = _agent->getValueCellMentalWorldRepresentation(newPosition._x, newPosition._y);

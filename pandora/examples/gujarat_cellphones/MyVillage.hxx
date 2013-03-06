@@ -1,8 +1,12 @@
+
 #ifndef __MyVillage_hxx__
 #define __MyVillage_hxx__
 
 #include <vector>
 #include <Point2D.hxx>
+
+namespace GujaratCellphones
+{
 
 class MyVillage
 {	
@@ -14,13 +18,15 @@ public:
 	MyVillage();
 	MyVillage(int id);
 	virtual ~MyVillage();
-	void addCitizen(std::string id);
+	void addCitizen(const std::string & id);
 	std::vector<std::string> getCitizens();
 	int getId();
 	Engine::Point2D<int> getLocation();
-	bool isCitizenOfVillage(std::string id);
+	bool isCitizenOfVillage(const std::string & id);
 	void setLocation(const Engine::Point2D<int> &p);
 };
 
+} // namespace GujaratCellphones
 
-#endif 
+#endif // __MyVillage_hxx__
+

@@ -19,8 +19,8 @@
 	<resourcesNeededToGetANewAnimal value="200"/> <!-- TODO needs to be validated -->
 	
 	<!-- agent demographics -->
-	<numVillages value="0"/>
-	<numAgents value="0"/>
+	<numVillages value="1"/>
+	<numAgents value="1"/>
 	<agentBirthResources value="0"/> <!--not used-->
 	<agentNeededResources value="0"/> <!--not used-->
 
@@ -56,6 +56,6 @@
 
 	<!-- mdp -->
 	<explorationBonus value="10"/>
-	<horizon value="10"/>
-	<width value="100"/>
+	<horizon value="240"/>
+	<width value="5000"/>
 </config>

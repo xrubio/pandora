@@ -169,10 +169,10 @@ void MyAgent::exchangeInfoWithPeopleInVillage() {
 	}
 }
 
-void MyAgent::fission() {
+void MyAgent::fission()
+{
 	//initialize child agent
-	std::string idNewAgent = _world->createAgent(_village.getId(), false);
-	MyAgent* newAgent = (MyAgent*)_world->getAgent(idNewAgent);
+	MyAgent* newAgent = _world->createAgent(_village.getId(), false);
 	newAgent->setResources(0);
 	newAgent->setNumberOfAnimals(_numberOfAnimals/2);
 
@@ -200,8 +200,8 @@ void MyAgent::fission() {
 		}
 	}
 
-	deleteAffinity(idNewAgent); //in case it was created randomly
-	createAffinity(idNewAgent, 2);
+	deleteAffinity(newAgent->getId()); //in case it was created randomly
+	createAffinity(newAgent->getId(), 2);
 	_numberOfAnimals -= _numberOfAnimals/2; //the parent has half of the animals than before the fission
 }
 
@@ -580,7 +580,13 @@ void MyAgent::resetSpokeInVillage() {
 	_spokeInVillage.clear();
 }
 
-void MyAgent::selectActions() {
+void MyAgent::selectActions()
+{
+	// only select path at the beginning of dry season
+	if(!_world->isWetSeason())
+	{
+		return;
+	}
 //	std::cout << this << " selecting actions for time step: " << _world->getCurrentStep() << std::endl;	
 	_model->reset(*this);
 	UCT * uctPolicy = new UCT(*_uctBasePolicy, _horizon, _width, _explorationBonus, false);
@@ -728,14 +734,14 @@ void MyAgent::updateReputation() {
 void MyAgent::updateState()
 {
 	//first day of wet season
-	if (_world->getCurrentStep()%_config.getDaysDrySeason()  == 0)
+	if(_world->isWetSeason())
 	{
 		if(!hasMinimumNumOfAnimals())
 		{
 			stopBeingAShepherd();
 		}
 
-		checkConditions();
+		//checkConditions();
 		
 		exchangeInfoWithPeopleInVillage();
 		resetSpokeInVillage();
@@ -751,9 +757,11 @@ void MyAgent::updateState()
 	{
 		meetAgentsInSameCell();
 	}
-	if (decideToMakeACall()) {
+	if(decideToMakeACall())
+	{
 		std::string whoToCall = chooseWhoToCall();
-		if (whoToCall != "") {
+		if (whoToCall != "")
+		{
 			exchangeInformationWithOtherAgent(whoToCall);
 			MyAgent* receiver = (MyAgent*)_world->getAgent(whoToCall);
 			receiver->exchangeInformationWithOtherAgent(_id);
