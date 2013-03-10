@@ -11,7 +11,7 @@
 	<rainHistoricalDistribution mean="4643.848" stdev="0.001"/>
 	<daysDrySeason value="240"/>
 	<!-- yearly resources in an average cell -->
-	<averageResources value="10000"/>
+	<averageResources value="1000"/>
 
 	<!-- agent demographics -->
 	<numVillages value="10"/>
