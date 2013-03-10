@@ -41,7 +41,7 @@ void MDPAgent::selectActions()
 {
 //	std::cout << this << " selecting actions for time step: " << _world->getCurrentStep() << std::endl;	
 	_model->reset(*this);
-	UCT * uctPolicy = new UCT(*_uctBasePolicy, _horizon, _width, _explorationBonus, false);
+	UCT * uctPolicy = new UCT(*_uctBasePolicy, _width, _horizon, _explorationBonus, false);
 	Problem::action_t index = (*uctPolicy)(_model->init());
 	MoveAction * action = _model->init().getAvailableAction(index).copy();
 //	std::cout << "action chosen with index: " << index << " is moving from: " << _position << " to: " << action->getNewPosition() << std::endl;
