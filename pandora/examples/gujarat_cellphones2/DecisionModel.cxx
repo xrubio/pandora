@@ -103,6 +103,25 @@ float DecisionModel::cost( const HerderState & state, action_t action ) const
 			//std::cout << " new cost: " << cost << " due to distance: " << secondDistance << " - " << firstDistance << " weight: " <<25-state.getTimeStep() << std::endl;
 		}
 	}
+
+	// knowledge penalisation if the zone is not explored (increased risk)
+	int knowledge = state.getKnowledgeMap().getValue(state.getAvailableAction(action).getNewPosition());
+	if(knowledge>=0 && knowledge<10)
+	{
+		std::cout << "added cost for risk: " << 1.0 - (float)(knowledge)/10.0f << " knowledge: " << knowledge << std::endl;
+		cost += 1.0 - (float)(knowledge)/10.0f;
+	}
+	// now known or really old
+	else
+	{
+		std::cout << "added cost for risk: " << 1.0 - (float)(knowledge)/10.0f << " knowledge: " << knowledge << std::endl;
+		cost += 1.0f;
+	}
+
+
+
+
+
 	//std::cout << " new cost: " << cost << std::endl;
 	return cost;
 }

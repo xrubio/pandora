@@ -43,6 +43,7 @@ public:
 	float getStarvationDays() const;
 //	const Engine::IncrementalRaster & getRasterResources() const;
 //	Engine::IncrementalRaster & getRasterResources();
+	const Engine::IncrementalRaster & getKnowledgeMap() const;
 	Engine::IncrementalRaster & getResourcesMap();
 	const Engine::IncrementalRaster & getResourcesMap() const;
 	// this method randomize the order of actions. It is useful in cases where two actions are equal, in ordere to avoid artifacts where the first one is always chosen

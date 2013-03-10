@@ -185,6 +185,12 @@ const Engine::IncrementalRaster & HerderState::getResourcesMap() const
 	return _resourcesMap;
 }
 
+const Engine::IncrementalRaster & HerderState::getKnowledgeMap() const
+{
+	return _knowledgeMap;
+}
+
+
 void HerderState::randomizeActions()
 {
 	std::random_shuffle(_availableActions.begin(), _availableActions.end());
