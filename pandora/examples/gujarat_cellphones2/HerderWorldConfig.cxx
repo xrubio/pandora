@@ -9,48 +9,58 @@ HerderWorldConfig::HerderWorldConfig() {
 HerderWorldConfig::~HerderWorldConfig() {
 }
 
-void HerderWorldConfig::extractParticularAttribs(TiXmlElement * root) {
-	TiXmlElement * element = root->FirstChildElement("numAgentsPerVillage");
-	retrieveAttributeMandatory( element, "value", _numAgentsPerVillage);
-	element = root->FirstChildElement("agentBirthResources");
-	retrieveAttributeMandatory( element, "value", _agentBirthResources);
-	element = root->FirstChildElement("agentNeededResources");
-	retrieveAttributeMandatory( element, "value", _agentNeededResources);
-	element = root->FirstChildElement("cellphoneUsageMax");
-	retrieveAttributeMandatory( element, "value", _cellphoneUsageMax);
-	element = root->FirstChildElement("cellphoneUsageMin");
-	retrieveAttributeMandatory( element, "value", _cellphoneUsageMin);
+void HerderWorldConfig::extractParticularAttribs(TiXmlElement * root)
+{
+	TiXmlElement * element = 0;
+	element = root->FirstChildElement("size");
+	retrieveAttributeMandatory( element, "value", _size);
+	
+	// climate
 	element = root->FirstChildElement("climateSeed");
 	retrieveAttributeMandatory( element, "value", _climateSeed);
 	element = root->FirstChildElement("daysDrySeason");
 	retrieveAttributeMandatory( element, "value", _daysDrySeason);
-	element = root->FirstChildElement("diffVillageDaysNoCallsLow");
-	retrieveAttributeMandatory( element, "value", _diffVillageDaysNoCallsLow);
-	element = root->FirstChildElement("diffVillageDaysNoCallsMedium");
-	retrieveAttributeMandatory( element, "value", _diffVillageDaysNoCallsMedium);
+	element = root->FirstChildElement("averageResources");
+	retrieveAttributeMandatory( element, "value", _averageResources);
+	element = root->FirstChildElement("rainHistoricalDistribution");
+	retrieveAttributeMandatory(element, "mean", _rainHistoricalDistribMean);
+	retrieveAttributeMandatory(element, "stdev", _rainHistoricalDistribStdDev);	
+
+
+	// demographics
+	element = root->FirstChildElement("numVillages");
+	retrieveAttributeMandatory( element, "value", _numVillages);
+	element = root->FirstChildElement("numAgentsPerVillage");
+	retrieveAttributeMandatory( element, "value", _numAgentsPerVillage);
+	element = root->FirstChildElement("animalsPerHerder");
+	retrieveAttributeMandatory( element, "value", _animalsPerHerder);
+	element = root->FirstChildElement("resourcesNeededPerAnimal");
+	retrieveAttributeMandatory( element, "value", _resourcesNeededPerAnimal);
+
+	// mdp
 	element = root->FirstChildElement("explorationBonus");
 	retrieveAttributeMandatory( element, "value", _explorationBonus);
 	element = root->FirstChildElement("horizon");
 	retrieveAttributeMandatory( element, "value", _horizon);
+	element = root->FirstChildElement("width");
+	retrieveAttributeMandatory( element, "value", _width);
+	
+	// interactions
+	/*
+	element = root->FirstChildElement("cellphoneUsageMax");
+	retrieveAttributeMandatory( element, "value", _cellphoneUsageMax);
+	element = root->FirstChildElement("cellphoneUsageMin");
+	retrieveAttributeMandatory( element, "value", _cellphoneUsageMin);
+	element = root->FirstChildElement("diffVillageDaysNoCallsLow");
+	retrieveAttributeMandatory( element, "value", _diffVillageDaysNoCallsLow);
+	element = root->FirstChildElement("diffVillageDaysNoCallsMedium");
+	retrieveAttributeMandatory( element, "value", _diffVillageDaysNoCallsMedium);
 	element = root->FirstChildElement("maxPercentMapSharedInACall");
 	retrieveAttributeMandatory( element, "value", _maxPercentMapSharedInACall);
 	element = root->FirstChildElement("maxYearsCellInfo");
 	retrieveAttributeMandatory( element, "value", _maxYearsCellInfo);
 	element = root->FirstChildElement("multiplierCellsToAsk");
 	retrieveAttributeMandatory( element, "value", _multiplierCellsToAsk);
-	element = root->FirstChildElement("numAnimalsMax");
-	retrieveAttributeMandatory( element, "value", _numAnimalsMax);
-	element = root->FirstChildElement("numAnimalsMaxIni");
-	retrieveAttributeMandatory( element, "value", _numAnimalsMaxIni);
-	element = root->FirstChildElement("numAnimalsMin");
-	retrieveAttributeMandatory( element, "value", _numAnimalsMin);
-	element = root->FirstChildElement("numAnimalsMinIni");
-	retrieveAttributeMandatory( element, "value", _numAnimalsMinIni);		
-	element = root->FirstChildElement("numVillages");
-	retrieveAttributeMandatory( element, "value", _numVillages);
-	element = root->FirstChildElement("rainHistoricalDistribution");
-	retrieveAttributeMandatory(element, "mean", _rainHistoricalDistribMean);
-	retrieveAttributeMandatory(element, "stdev", _rainHistoricalDistribStdDev);	
 	element = root->FirstChildElement("percentAgentsWithCellphone");
 	retrieveAttributeMandatory( element, "value", _percentAgentsWithCellphone);
 	element = root->FirstChildElement("percentKnownAgentsDifferentVillageMediumAffinity");
@@ -78,27 +88,19 @@ void HerderWorldConfig::extractParticularAttribs(TiXmlElement * root) {
 	element = root->FirstChildElement("probabilityMeetAgentSameCell");
 	retrieveAttributeMandatory( element, "value", _probabilityMeetAgentSameCell);
 	element = root->FirstChildElement("resourcesAgentCanGetPerDay");
-	retrieveAttributeMandatory( element, "value", _resourcesAgentCanGetPerDay);
-	element = root->FirstChildElement("resourcesHighLevel");
-	retrieveAttributeMandatory( element, "value", _resourcesHighLevel);
-	element = root->FirstChildElement("resourcesLowLevel");
-	retrieveAttributeMandatory( element, "value", _resourcesLowLevel);
-	element = root->FirstChildElement("animalsPerHerder");
-	retrieveAttributeMandatory( element, "value", _animalsPerHerder);
-	element = root->FirstChildElement("resourcesNeededPerAnimal");
-	retrieveAttributeMandatory( element, "value", _resourcesNeededPerAnimal);
-	element = root->FirstChildElement("resourcesNeededToGetANewAnimal");
-	retrieveAttributeMandatory( element, "value", _resourcesNeededToGetANewAnimal);
 	element = root->FirstChildElement("sameVillageDaysNoCallsHigh");
 	retrieveAttributeMandatory( element, "value", _sameVillageDaysNoCallsHigh);
 	element = root->FirstChildElement("sameVillageDaysNoCallsMedium");
 	retrieveAttributeMandatory( element, "value", _sameVillageDaysNoCallsMedium);
-	element = root->FirstChildElement("size");
-	retrieveAttributeMandatory( element, "value", _size);
-	element = root->FirstChildElement("width");
-	retrieveAttributeMandatory( element, "value", _width);
+	*/
 }
 
+int HerderWorldConfig::getSize() const
+{
+	return _size;
+}
+
+/*
 int HerderWorldConfig::getAgentBirthResources() const {
 	return _agentBirthResources;
 }
@@ -167,9 +169,6 @@ int HerderWorldConfig::getNumVillages() const {
 	return _numVillages;
 }
 
-int HerderWorldConfig::getSize() const {
-	return _size;
-}
 
 int HerderWorldConfig::getPercentAgentsWithCellphone() const {
 	return _percentAgentsWithCellphone;
@@ -254,5 +253,6 @@ int HerderWorldConfig::getSameVillageDaysNoCallsMedium() const {
 int HerderWorldConfig::getWidth() const {
 	return _width;
 }
+*/
 	
 } // namespace GujaratCellphones

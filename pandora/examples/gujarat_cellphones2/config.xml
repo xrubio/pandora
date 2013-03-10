@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<config> 
+	<!-- simulation config -->
+	<output resultsFile="./data/results.h5" logsDir="./logs"/>
+	<numSteps value="2401" serializeResolution="1"/>
+	<size value="60"/>
+
+	<!-- climate parameters -->
+	<climateSeed value="1"/>
+<!-- <rainHistoricalDistribution mean="4643.848" stdev="1885.158"/> -->
+	<rainHistoricalDistribution mean="4643.848" stdev="0.001"/>
+	<daysDrySeason value="240"/>
+	<!-- yearly resources in an average cell -->
+	<averageResources value="10000"/>
+
+	<!-- agent demographics -->
+	<numVillages value="10"/>
+	<numAgentsPerVillage value="10"/>
+	<animalsPerHerder value="50"/> <!-- TODO needs to be validated -->
+	<resourcesNeededPerAnimal value="1"/> <!-- TODO needs to be validated -->
+
+	<!-- transmission params -->
+	<cellphoneUsageMax value="7"/>
+	<cellphoneUsageMin value="1"/>
+	<diffVillageDaysNoCallsLow value="90"/>
+	<diffVillageDaysNoCallsMedium value="30"/>
+	<probabilityCallHighAffinity value="50"/>
+	<probabilityCallLowAffinity value="10"/>
+	<probabilityCallMediumAffinity value="35"/>
+	<probabilityChildInheritsFromFather value="90"/>
+	<probabilityExchangeInfoHighAffinityInVillage value="90"/> <!--TODO needs to be validated -->
+	<probabilityExchangeInfoMediumAffinityInVillage value="50"/> <!--TODO needs to be validated -->
+	<probabilityKnowAgentDifferentVillageAtStart value="10"/> 
+	<probabilityKnowAgentSameVillageAtStart value="50"/>
+	<probabilityMeetAgentSameCell value="10"/>
+	<percentAgentsWithCellphone value="65"/>
+	<percentKnownAgentsDifferentVillageMediumAffinity value = "30"/>
+	<percentKnownAgentsSameVillageHighAffinity value = "30"/>
+	<percentMapKnownAtBeginning value="5"/>
+	<sameVillageDaysNoCallsHigh value="30"/>
+	<sameVillageDaysNoCallsMedium value="90"/>
+	<maxPercentMapSharedInACall value="3"/> <!--This number needs to be divided by 10-->
+	<maxYearsCellInfo value="3"/>
+	<multiplierCellsToAsk value="3"/>
+
+	<!-- mdp -->
+	<explorationBonus value="0"/>
+	<horizon value="20"/>
+	<width value="200"/>
+</config>

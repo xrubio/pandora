@@ -67,7 +67,7 @@ void HerderWorld::createAgents()
 			ossH << "Herder_vil" << i << "_" << j;
 			Herder * newHerder = new Herder(ossH.str(), _config._animalsPerHerder, _config._resourcesNeededPerAnimal);
 			addAgent(newHerder);
-			newHerder->configureMDP(_config.getHorizon(), _config.getWidth(), _config.getExplorationBonus());
+			newHerder->configureMDP(_config._horizon, _config._width, _config._explorationBonus);
 			newVillage->addHerder(newHerder);
 			newHerder->createKnowledge();
 		}
@@ -267,7 +267,7 @@ void HerderWorld::recomputeYearlyBiomass()
 
 	for(int i=0; i<_maxResources.size(); i++)
 	{
-		float maxValue = i*rainWeight*1000.0f/5.0f;
+		float maxValue = (i*rainWeight*_config._averageResources)/5.0f;
 		_maxResources.at(i) = maxValue;
 		float decrease = maxValue*1.0f;
 		// days of dry season -1 because the first day it is not decreased

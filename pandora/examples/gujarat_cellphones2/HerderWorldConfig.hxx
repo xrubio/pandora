@@ -13,6 +13,7 @@ class HerderWorldConfig : public Engine::Config
 	float _rainHistoricalDistribMean;
 	float _rainHistoricalDistribStdDev;
 	int _daysDrySeason;
+	int _averageResources;
 
 	// landscape
 	int _size;
@@ -28,23 +29,16 @@ class HerderWorldConfig : public Engine::Config
 	int _animalsPerHerder;
 	int _resourcesNeededPerAnimal;
 
-	int _agentNeededResources;
-	int _agentBirthResources;
+
+	// interaction
+	/*
 	int _cellphoneUsageMax;
 	int _cellphoneUsageMin;
 	int _diffVillageDaysNoCallsLow;
 	int _diffVillageDaysNoCallsMedium;
-
-
 	int _maxPercentMapSharedInACall;
 	int _maxYearsCellInfo;
 	int _multiplierCellsToAsk;
-	
-
-	int _numAnimalsMax;
-	int _numAnimalsMaxIni;
-	int _numAnimalsMin;
-	int _numAnimalsMinIni;
 	int _percentAgentsWithCellphone;
 	int _percentKnownAgentsDifferentVillageMediumAffinity;
 	int _percentKnownAgentsSameVillageHighAffinity;
@@ -58,18 +52,19 @@ class HerderWorldConfig : public Engine::Config
 	int _probabilityKnowAgentDifferentVillageAtStart;
 	int _probabilityKnowAgentSameVillageAtStart;
 	int _probabilityMeetAgentSameCell;
-
 	int _resourcesAgentCanGetPerDay;
 	int _resourcesHighLevel;
 	int _resourcesLowLevel;
 	int _resourcesNeededToGetANewAnimal;
 	int _sameVillageDaysNoCallsHigh;
 	int _sameVillageDaysNoCallsMedium;
+	*/
 
 public:
 	HerderWorldConfig();
 	virtual ~HerderWorldConfig();
 	void extractParticularAttribs(TiXmlElement *pRoot);
+	/*
 	int getAgentBirthResources() const;
 	int getAgentNeededResources() const;
 	int getCellphoneUsageMax() const;
@@ -108,11 +103,13 @@ public:
 	int getResourcesNeededToGetANewAnimal() const;
 	int getSameVillageDaysNoCallsHigh() const;
 	int getSameVillageDaysNoCallsMedium() const;
-	int getSize() const;
 	int getWidth() const;
 
 	int getDaysDrySeason() const;
+	*/
 
+	int getSize() const;
+	
 	friend class HerderWorld;
 	friend class Climate;
 };
