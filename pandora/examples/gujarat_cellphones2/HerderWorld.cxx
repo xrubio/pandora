@@ -116,9 +116,11 @@ void HerderWorld::createRasters()
 	// we need to keep track of resource fractions
 	registerDynamicRaster("resourcesFraction", false, eResourcesFraction);
 	getDynamicRaster(eResourcesFraction).setInitValues(0, 100, 0);
-	
+
+	/*
 	registerDynamicRaster("knowledge", true);
 	registerDynamicRaster("resourcesMap", true);
+	*/
 
 	registerDynamicRaster("gathered", true);
 	getDynamicRasterStr("gathered").setInitValues(0, std::numeric_limits<int>::max(), 0);

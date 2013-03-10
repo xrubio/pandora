@@ -218,11 +218,11 @@ void Herder::createKnowledge()
 	oss2 << _id << "_resources";
 	_resourcesMap = oss2.str();
 
-	_knowledgeMap = "knowledge";
-	_resourcesMap = "resourcesMap";
+//	_knowledgeMap = "knowledge";
+//	_resourcesMap = "resourcesMap";
 
-//	_world->registerDynamicRaster(_knowledgeMap, false);
-//	_world->registerDynamicRaster(_resourcesMap, false);
+	_world->registerDynamicRaster(_knowledgeMap, false);
+	_world->registerDynamicRaster(_resourcesMap, false);
 	_world->getDynamicRasterStr(_knowledgeMap).setInitValues(0, std::numeric_limits<int>::max(), 0);
 	_world->getDynamicRasterStr(_resourcesMap).setInitValues(0, 0, 0);
 	_world->getDynamicRasterStr(_resourcesMap).setMaxValue(std::numeric_limits<int>::max());
