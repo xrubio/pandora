@@ -3,23 +3,41 @@
 	<!-- simulation config -->
 	<output resultsFile="./data/results.h5" logsDir="./logs"/>
 	<numSteps value="2401" serializeResolution="1"/>
+	<environment>
+		<landscape size value="60" averageResources="1000"/>
+		<climate value="1" meanRain="4643.848" stddev="1885.18"/>
+	</environment>
+	<population>
+		<villages num="10" agentsPerVillage="10"/>
+		<animals numPerHerder="50" resourcesPerDay="1"/>		
+	</population>
+	<!--
+	<knowledgeTransmission>
+		<inVillage>
+		</inVillage>
+
+		<cellphones activated="false" maxUsage="7" minUsage="1">
+		</cellphones>
+	</knowledgeTransmission>
+	-->
+</config>
+
+<!--
+<config> 
+	<output resultsFile="./data/results.h5" logsDir="./logs"/>
+	<numSteps value="2401" serializeResolution="1"/>
 	<size value="60"/>
 
-	<!-- climate parameters -->
 	<climateSeed value="1"/>
-<!-- <rainHistoricalDistribution mean="4643.848" stdev="1885.158"/> -->
-	<rainHistoricalDistribution mean="4643.848" stdev="0.001"/>
+ <rainHistoricalDistribution mean="4643.848" stdev="1885.158"/>
 	<daysDrySeason value="240"/>
-	<!-- yearly resources in an average cell -->
 	<averageResources value="1000"/>
 
-	<!-- agent demographics -->
 	<numVillages value="10"/>
 	<numAgentsPerVillage value="10"/>
-	<animalsPerHerder value="50"/> <!-- TODO needs to be validated -->
-	<resourcesNeededPerAnimal value="1"/> <!-- TODO needs to be validated -->
+	<animalsPerHerder value="50"/>
+	<resourcesNeededPerAnimal value="1"/>
 
-	<!-- transmission params -->
 	<cellphoneUsageMax value="7"/>
 	<cellphoneUsageMin value="1"/>
 	<diffVillageDaysNoCallsLow value="90"/>
@@ -28,8 +46,8 @@
 	<probabilityCallLowAffinity value="10"/>
 	<probabilityCallMediumAffinity value="35"/>
 	<probabilityChildInheritsFromFather value="90"/>
-	<probabilityExchangeInfoHighAffinityInVillage value="90"/> <!--TODO needs to be validated -->
-	<probabilityExchangeInfoMediumAffinityInVillage value="50"/> <!--TODO needs to be validated -->
+	<probabilityExchangeInfoHighAffinityInVillage value="90"/>
+	<probabilityExchangeInfoMediumAffinityInVillage value="50"/>
 	<probabilityKnowAgentDifferentVillageAtStart value="10"/> 
 	<probabilityKnowAgentSameVillageAtStart value="50"/>
 	<probabilityMeetAgentSameCell value="10"/>
@@ -39,12 +57,12 @@
 	<percentMapKnownAtBeginning value="5"/>
 	<sameVillageDaysNoCallsHigh value="30"/>
 	<sameVillageDaysNoCallsMedium value="90"/>
-	<maxPercentMapSharedInACall value="3"/> <!--This number needs to be divided by 10-->
+	<maxPercentMapSharedInACall value="3"/>
 	<maxYearsCellInfo value="3"/>
 	<multiplierCellsToAsk value="3"/>
 
-	<!-- mdp -->
 	<explorationBonus value="0"/>
 	<horizon value="20"/>
 	<width value="200"/>
 </config>
+-->
