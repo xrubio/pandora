@@ -66,13 +66,14 @@ void RasterSelection::setSimulationRecord( Engine::SimulationRecord * simulation
 
 void RasterSelection::updateRasters()
 {
+	_rasterList.clear();
 	std::list<std::string> items;
 	for(int i=0; i<count(); i++)
 	{
 		std::string newItem(item(i)->text().toStdString());
-		items.push_back(newItem);
+		_rasterList.push_back(newItem);
 	}
-	emit rastersRearranged(items);
+	emit rastersRearranged(_rasterList);
 }
 
 void RasterSelection::dropEvent( QDropEvent * event )
@@ -81,6 +82,10 @@ void RasterSelection::dropEvent( QDropEvent * event )
 	updateRasters();
 }
 
+const std::list<std::string> & RasterSelection::getRasterList() const
+{
+	return _rasterList;
+}
 
 } // namespace GUI
 

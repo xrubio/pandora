@@ -44,7 +44,7 @@ class RasterSelection : public QListWidget
 	Q_OBJECT
 
 	Engine::SimulationRecord * _simulationRecord;
-	std::list<std::string> _states;
+	std::list<std::string> _rasterList;
 	void dropEvent( QDropEvent * event);
 	void updateRasters();
 public:
@@ -52,6 +52,7 @@ public:
 	RasterSelection(QWidget * parent = 0);
 	virtual ~RasterSelection();
 	void setSimulationRecord( Engine::SimulationRecord * simulationRecord );
+	const std::list<std::string> & getRasterList() const;
 
 signals:
 	void rastersRearranged(std::list<std::string> items);
