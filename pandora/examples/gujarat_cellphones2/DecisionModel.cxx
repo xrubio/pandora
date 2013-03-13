@@ -109,7 +109,7 @@ float DecisionModel::cost( const HerderState & state, action_t action ) const
 	if(knowledge>=0 && knowledge<10)
 	{
 		//std::cout << "added cost for risk: " << 1.0 - (float)(knowledge)/10.0f << " knowledge: " << knowledge << std::endl;
-		cost += 1.0 - (float)(knowledge)/10.0f;
+		cost += (float)(knowledge)/10.0f;
 	}
 	// now known or really old
 	else

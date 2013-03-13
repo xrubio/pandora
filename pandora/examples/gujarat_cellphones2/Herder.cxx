@@ -95,7 +95,7 @@ void Herder::updateKnowledge()
 			{
 				knowledge.setValue(index, -1);
 				resources.setMaxValue(index, std::numeric_limits<int>::max());
-				//resources.setMaxValue(index, averageValue);
+				resources.setMaxValue(index, averageValue);
 				resources.setValue(index, averageValue);
 			}
 		}
@@ -121,7 +121,7 @@ void Herder::updateKnowledge()
 		}
 	}
 	// current resource values must be updated to max value
-	//resources.updateRasterToMaxValues();
+	resources.updateRasterToMaxValues();
 }
 
 void Herder::talkToOtherShepherds( int numberOfShepherds )
@@ -177,6 +177,9 @@ void Herder::exchangeInformationWithOtherShepherd( const std::string & idShepher
 		for(index._y=0; index._y<_world->getOverlapBoundaries()._size._y; index._y++)
 		{
 			//std::cout << index._x << " " << index._y << std::endl;
+			int cellMaxValue = std::max(resourcesAgentCalls.getMaxValueAt(index), resourcesAgentReceivesCall.getMaxValueAt(index));
+			resourcesAgentCalls.setMaxValue(index, cellMaxValue);
+			resourcesAgentReceivesCall.setMaxValue(index, cellMaxValue);
 			if (knowledgeAgentCalls.getValue(index) == knowledgeAgentReceivesCall.getValue(index))
 			{
 				int avg = (resourcesAgentCalls.getValue(index) + resourcesAgentReceivesCall.getValue(index))/2;

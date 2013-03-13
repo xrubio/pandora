@@ -57,7 +57,7 @@ void MoveAction::execute( Engine::Agent & agent )
 	if(herder.getWorld()->getDynamicRasterStr(herder.getKnowledgeMap()).getValue(_newPosition)!=0)
 	{
 		herder.getWorld()->getDynamicRasterStr(herder.getKnowledgeMap()).setValue(_newPosition, 0);
-		//herder.getWorld()->getDynamicRasterStr(herder.getResourcesMap()).setMaxValue(_newPosition, previousValue);
+		herder.getWorld()->getDynamicRasterStr(herder.getResourcesMap()).setMaxValue(_newPosition, previousValue);
 	}
 	herder.getWorld()->getDynamicRasterStr(herder.getResourcesMap()).setValue(_newPosition, previousValue - collected);
 	// knowledge is updated to 0 years
