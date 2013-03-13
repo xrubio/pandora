@@ -2,51 +2,22 @@
 <config> 
 	<!-- simulation config -->
 	<output resultsFile="/gpfs/projects/bsc21/WORK-RUBIO/gujarat_cellphone_results/resourcesNeededPerAnimal/data_resourcesNeededPerAnimalRESOURCES_NEEDED_PER_ANIMAL_exNUMEXEC/gujarat_cellphones.h5" logsDir="/gpfs/projects/bsc21/WORK-RUBIO/gujarat_cellphones_results/resourcesNeededPerAnimal/logs_resourcesNeededPerAnimalRESOURCES_NEEDED_PER_ANIMAL_exNUMEXEC"/>
+<?xml version="1.0" ?>
+<config> 
 	<numSteps value="24001" serializeResolution="1"/>
-	<size value="60"/>
-
-	<!-- climate parameters -->
-	<climateSeed value="1"/>
-	<!-- <rainHistoricalDistribution mean="4643.848" stdev="1885.158"/> -->
-	<rainHistoricalDistribution mean="4643.848" stdev="0.001"/>
-	<daysDrySeason value="240"/>
-	<!-- yearly resources in an average cell -->
-	<averageResources value="10000"/>
-
-	<!-- agent demographics -->
-	<numVillages value="8"/>
-	<numAgentsPerVillage value="40"/>
-	<animalsPerHerder value="50"/> 
-	<animalsPerHerderMax value="600"/>
-	<animalsPerHerderMin value="0"/>
-	<resourcesNeededPerAnimal value="RESOURCES_NEEDED_PER_ANIMAL"/> 
-
-	<!-- transmission params -->
-	<cellphoneUsageMax value="7"/>
-	<cellphoneUsageMin value="1"/>
-	<diffVillageDaysNoCallsLow value="90"/>
-	<diffVillageDaysNoCallsMedium value="30"/>
-	<probabilityCallHighAffinity value="50"/>
-	<probabilityCallLowAffinity value="10"/>
-	<probabilityCallMediumAffinity value="35"/>
-	<probabilityChildInheritsFromFather value="90"/>
-	<probabilityExchangeInfoHighAffinityInVillage value="90"/> 
-	<probabilityExchangeInfoMediumAffinityInVillage value="50"/> 
-	<probabilityKnowAgentDifferentVillageAtStart value="10"/> 
-	<probabilityKnowAgentSameVillageAtStart value="50"/>
-	<probabilityMeetAgentSameCell value="10"/>
-	<percentAgentsWithCellphone value="0"/>
-	<percentKnownAgentsDifferentVillageMediumAffinity value = "30"/>
-	<percentKnownAgentsSameVillageHighAffinity value = "30"/>
-	<percentMapKnownAtBeginning value="5"/>
-	<sameVillageDaysNoCallsHigh value="30"/>
-	<sameVillageDaysNoCallsMedium value="90"/>
-	<maxPercentMapSharedInACall value="3"/> <!--This number needs to be divided by 10-->
-	<maxYearsCellInfo value="3"/>
-	<multiplierCellsToAsk value="3"/>
-
-	<!-- mdp -->
-	<explorationBonus value="0"/>
-	<horizon value="20"/>
-	<width value="200"/>
+	<environment>
+		<landscape size="60" averageResources="1000"/>
+		<climate seed="1" daysDrySeason="240" meanRain="4643.848" stddev="1885.18"/>
+	</environment>
+	<population>
+		<villages num="10" agentsPerVillage="10"/>
+		<animals numPerHerder="50" resourcesPerDay="RESOURCES_NEEDED_PER_ANIMAL"/>		
+	</population>
+	<mdp horizon="20" width="200" explorationBonus="0"/>
+	<knowledgeTransmission>
+		<inVillage conversationsWetSeason="5"/>
+		<outsideVillage callsPerDayDrySeason="1"/>
+		<communications active="1"/>
+		<cellphones active="1"/>
+	</knowledgeTransmission>
 </config>
