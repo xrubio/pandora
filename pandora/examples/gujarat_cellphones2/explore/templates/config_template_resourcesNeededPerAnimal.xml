@@ -2,8 +2,6 @@
 <config> 
 	<!-- simulation config -->
 	<output resultsFile="/gpfs/projects/bsc21/WORK-RUBIO/gujarat_cellphone_results/resourcesNeededPerAnimal/data_resourcesNeededPerAnimalRESOURCES_NEEDED_PER_ANIMAL_exNUMEXEC/gujarat_cellphones.h5" logsDir="/gpfs/projects/bsc21/WORK-RUBIO/gujarat_cellphones_results/resourcesNeededPerAnimal/logs_resourcesNeededPerAnimalRESOURCES_NEEDED_PER_ANIMAL_exNUMEXEC"/>
-<?xml version="1.0" ?>
-<config> 
 	<numSteps value="24001" serializeResolution="1"/>
 	<environment>
 		<landscape size="60" averageResources="1000"/>
