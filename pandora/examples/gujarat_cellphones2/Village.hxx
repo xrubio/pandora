@@ -1,4 +1,3 @@
-
 #ifndef __Village_hxx__
 #define __Village_hxx__
 
@@ -13,20 +12,22 @@ class Herder;
 class Village : public Engine::Agent
 {	
 	std::list<Herder*> _herders;
+	//probability of exchanging information when two agents talk to each other
+	int _shareKnowledge; 
+
 public:
 	Village(const std::string & id);
 	virtual ~Village();
+	void updateState();
+
+	void setShareKnowledge( int shareKnowledge );
+	int getShareKnowledge();
 	void addHerder(Herder * herder);
 	void removeHerder(Herder * herder);
-	void updateState();
+	Herder* getRandomHerder( const std::string & id ); 
+
 	void registerAttributes();
 	void serialize();
-
-//	std::vector<std::string> getHerders();
-//	int getId();
-//	Engine::Point2D<int> getLocation();
-//	bool isCitizenOfVillage(const std::string & id);
-//	void setLocation(const Engine::Point2D<int> &p);
 
 	////////////////////////////////////////////////
 	// This code has been automatically generated //

@@ -168,13 +168,6 @@ void HerderState::setResources( int resources )
 	_resources = resources;
 }
 
-/*
-const Engine::IncrementalRaster & HerderState::getRasterResources() const
-{
-	return _rasterResources;
-}
-*/
-
 Engine::IncrementalRaster & HerderState::getResourcesMap()
 {
 	return _resourcesMap;

@@ -118,10 +118,6 @@ float DecisionModel::cost( const HerderState & state, action_t action ) const
 		cost += 1.0f;
 	}
 
-
-
-
-
 	//std::cout << " new cost: " << cost << std::endl;
 	return cost;
 }

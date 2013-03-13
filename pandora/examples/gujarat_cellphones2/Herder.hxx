@@ -1,16 +1,14 @@
-
 #ifndef __Herder_hxx__
 #define __Herder_hxx__
 
 #include <Agent.hxx>
 #include <Action.hxx>
-
+#include <HerderWorld.hxx>
 #include "DecisionModel.hxx"
 #include "HerderState.hxx"
-
+#include "HerderWorldConfig.hxx"
 #include <engine/policy.h>
 #include <engine/uct.h>
-#include <string>
 
 namespace GujaratCellphones
 {
@@ -22,50 +20,60 @@ class Herder : public Engine::Agent
 	typedef Online::Policy::random_t< HerderState> BasePolicy;
 	typedef Online::Policy::UCT::uct_t< HerderState > UCT;
 
-	int _resources; // MpiBasicAttribute
-	float _starvationDays; // MpiBasicAttribute
-	// number of animals
-	int _herdSize; // MpiBasicAttribute
-	// daily resources needed by every animal
-	int _resourcesPerAnimal; // MpiBasicAttribute
-
 	DecisionModel * _model;
 	BasePolicy * _uctBasePolicy;
+
+	//BasicAttributes
+	int _resources; 
+	float _starvationDays;
+	int _herdSize; //number of animals
+	int _resourcesPerAnimal; // daily resources needed by each animal
+	Village * _village;
+	HerderWorldConfig _config;
+	HerderWorld * _world;
 
 	// mdp
 	int _horizon; // MpiBasicAttribute
 	int _width; // MpiBasicAttribute
 	int _explorationBonus; // MpiBasicAttribute
 
-	Village * _village;
+	//mental map
+	std::string _knowledgeMap; //quality of knowledge (years of the information)
+	std::string _resourcesMap; //value of resources
 
-	// mental map, quality of knowledge (years of the information)
-	std::string _knowledgeMap;
-	// mental map, value of resources
-	std::string _resourcesMap;
+
 public:
-	// todo remove environment from here
-	Herder( const std::string & id, int herdSize, int resourcesPerAnimal);
+	Herder( const std::string & id, int herdSize, int resourcesPerAnimal, const HerderWorldConfig config, HerderWorld* w, Village* v );
 	virtual ~Herder();
 
-	void configureMDP( const int & horizon, const int & width, const int & explorationBonus );
-	void selectActions();
-	void updateState();
-	void registerAttributes();
-	void serialize();
-
+	//sets and gets
 	void setResources( int resources );
 	int getResources() const;
-	// resources to consume every step in order to avoid death by starvation
 	int getNeededResources() const;
+	void setVillage( Village * village );
 	const Village & getVillage() const;
-	void setVillage(Village * village);
 	int getHerdSize() const;
+	const std::string & getKnowledgeMap() const;
+	const std::string & getResourcesMap() const;
+
+	//mental map
 	void createKnowledge();
 	void updateKnowledge();
 
-	const std::string & getKnowledgeMap() const;
-	const std::string & getResourcesMap() const;
+	//interactions
+	void talkToOtherShepherds( int numberOfShepherds );
+	//void printRaster(Engine::Raster & raster);
+	void exchangeInformationWithOtherShepherd( const std::string & idShepherdReceivesCall );
+
+	//mdp
+	void configureMDP( const int & horizon, const int & width, const int & explorationBonus );
+	void selectActions();
+	void updateState();
+
+	//register information
+	void registerAttributes();
+	void serialize();
+
 
 	////////////////////////////////////////////////
 	// This code has been automatically generated //

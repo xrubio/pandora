@@ -28,7 +28,6 @@ void MoveAction::executeMDP( const Herder & agent, const HerderState & state, He
 {
 	stateNext.setPosition(_newPosition);
 	Engine::Point2D<int> localPos = agent.getPosition() - agent.getWorld()->getOverlapBoundaries()._origin;
-
 	int collected = std::min(agent.getNeededResources(), state.getResourcesMap().getValue(localPos));
 	stateNext.setResources(collected);
 //	std::cout << "executing from state: " << state << " to: " << stateNext << " getting value: " << state.getRasterResources().getValue(localPos) << " size of inc. raster: " << state.getRasterResources().getSize() << std::endl;
@@ -58,7 +57,7 @@ void MoveAction::execute( Engine::Agent & agent )
 	if(herder.getWorld()->getDynamicRasterStr(herder.getKnowledgeMap()).getValue(_newPosition)!=0)
 	{
 		herder.getWorld()->getDynamicRasterStr(herder.getKnowledgeMap()).setValue(_newPosition, 0);
-		herder.getWorld()->getDynamicRasterStr(herder.getResourcesMap()).setMaxValue(_newPosition, previousValue);
+		//herder.getWorld()->getDynamicRasterStr(herder.getResourcesMap()).setMaxValue(_newPosition, previousValue);
 	}
 	herder.getWorld()->getDynamicRasterStr(herder.getResourcesMap()).setValue(_newPosition, previousValue - collected);
 	// knowledge is updated to 0 years

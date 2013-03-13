@@ -1,4 +1,3 @@
-
 #include "Village.hxx"
 #include "Herder.hxx"
 
@@ -11,6 +10,20 @@ Village::Village(const std::string & id) : Agent(id)
 
 Village::~Village()
 {
+}
+
+void Village::updateState()
+{
+}
+
+void Village::setShareKnowledge( int shareKnowledge ) 
+{
+	_shareKnowledge = shareKnowledge;
+}
+
+int Village::getShareKnowledge()
+{
+	return _shareKnowledge;
 }
 
 void Village::addHerder(Herder * herder)
@@ -35,14 +48,31 @@ void Village::removeHerder(Herder * herder)
 	}
 }
 
-void Village::updateState()
+Herder* Village::getRandomHerder( const std::string & id) 
 {
+	int r = Engine::GeneralState::statistics().getUniformDistValue(0, _herders.size() - 2);
+	int counter = 0;
+	for(std::list<Herder*>::iterator it=_herders.begin(); it!=_herders.end(); it++)
+	{
+		if ((*it)->getId() != id) 
+		{
+			if (counter == r) 
+			{
+				return (*it);
+			}
+			else 
+			{
+				++counter;
+			}
+		}
+	}
 }
 
 void Village::registerAttributes()
 {
 	registerIntAttribute("herders");
 	registerIntAttribute("total animals");
+	registerIntAttribute("share knowledge");
 }
 
 void Village::serialize()
@@ -54,38 +84,8 @@ void Village::serialize()
 		totalAnimals += (*it)->getHerdSize();
 	}
 	serializeAttribute("total animals", totalAnimals);
+	serializeAttribute("share knowledge", _shareKnowledge);
 }
 
-
-/*
-std::vector<std::string> Village::getCitizens() {
-	return _citizens;
-}
-
-int Village::getId() {
-	return _id;
-}
-
-Engine::Point2D<int> Village::getLocation() {
-	return _location;
-}
-
-bool Village::isCitizenOfVillage(const std::string & id)
-{
-	for (int i = 0; i < _citizens.size(); ++i)
-	{
-		if (_citizens.at(i).compare(id)==0)
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-void Village::setLocation(const Engine::Point2D<int> & location )
-{
-	_location = location;
-}
-*/
 }
 
