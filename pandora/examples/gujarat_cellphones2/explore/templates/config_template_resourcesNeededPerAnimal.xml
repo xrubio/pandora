@@ -17,7 +17,7 @@
 	<knowledgeTransmission>
 		<inVillage conversationsWetSeason="5"/>
 		<outsideVillage callsPerDayDrySeason="1"/>
-		<communications active="1"/>
-		<cellphones active="1"/>
+		<communications active="0"/>
+		<cellphones active="0"/>
 	</knowledgeTransmission>
 </config>
