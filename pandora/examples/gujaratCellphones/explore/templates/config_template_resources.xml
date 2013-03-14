@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<config> 
+	<!-- simulation config -->
+        <output resultsFile="/gpfs/projects/bsc21/WORK-RUBIO/gujaratCellphone/resources/data_resourcesRESOURCES_exNUMEXEC/phones.h5" logsDir="/gpfs/projects/bsc21/WORK-RUBIO/gujaratCellphone/resources/logs_resourcesRESOURCES_exNUMEXEC"/>
+	<numSteps value="24001" serializeResolution="240"/>
+	<environment>
+		<landscape size="60" averageResources="1000"/>
+		<climate seed="1" daysDrySeason="240" meanRain="4643.848" stddev="1885.18"/>
+	</environment>
+	<population>
+		<villages num="10" agentsPerVillage="10"/>
+		<animals numPerHerder="50" resourcesPerDay="RESOURCES"/>		
+	</population>
+	<mdp horizon="10" width="200" explorationBonus="0"/>
+	<knowledgeTransmission>
+		<inVillage conversationsWetSeason="5"/>
+		<outsideVillage callsPerDayDrySeason="1"/>
+		<communications active="0"/>
+		<cellphones active="0"/>
+	</knowledgeTransmission>
+</config>
