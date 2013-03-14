@@ -8,6 +8,7 @@ resourcesValues = ['1','2','3','4', '5', '6', '7', '8', '9', '10']
 
 xmlTemplate = 'templates/config_template_resources.xml'
 
+climateKey = 'CLIMATESEED'
 numExecutionKey = 'NUMEXEC'
 resourcesKey = 'RESOURCES'
 
@@ -25,12 +26,15 @@ index = 0
 print 'creating test workbench'
 
 for numExecution in range(0,numExecutions):
+	# each n.execution has the same seed in all parameter space
+	randomValue = str(random.randint(0,10000000))
 	for resources in resourcesValues:
 		print 'creating gujarat_cellphones instance: ' + str(index) + ' for resources needed per animal: ' + resources + ' and execution: ' + str(numExecution)
 		dirName = 'resources/gujaratCellphones_resources'+resources+'_ex'+str(numExecution)
 		os.system('mkdir '+dirName)
 		configName = dirName + '/config.xml'			
 		os.system('cp '+xmlTemplate+' '+configName)
+		replaceKey(configName, climateKey, randomValue)
 		replaceKey(configName, resourcesKey, resources)
 		replaceKey(configName, numExecutionKey, str(numExecution))
 		index += 1
