@@ -1,0 +1,44 @@
+#!/usr/bin/python
+
+import os, sys
+
+#numExecutions = 10
+numExecutions = 1
+#resourcesValues = ['1','2','3','4', '5', '6', '7', '8', '9', '10']
+resourcesValues = ['1']
+
+# dir where analysis will be stored
+outputDir = 'compiledResultsResourcesPerAnimal'
+resultsDir = outputDir+'/resources/'
+logsDir = outputDir+'/logs/'
+csvDir = outputDir+'/csv/'
+
+# directory where raw results are located
+rawDir = '/home/bsc21/bsc21887/pandora/examples/gujarat_cellphones2/explore/results/resources/'
+
+os.system('rm -rf '+outputDir)
+os.makedirs(outputDir)
+os.makedirs(resultsDir)
+os.makedirs(logsDir)
+os.makedirs(csvDir)
+
+index = 0
+for numExecution in range(0,numExecutions):
+	for resources in resourcesValues:	
+		print 'analyzing results for instance: ' + str(index) + ' with resources per animal: ' + resources + ' and execution: ' + str(numExecution)
+#suffix = 'resources'+resources+'_ex'+str(numExecution)
+		suffix = 'resourcesNeededPerAnimal'+resources+'_ex'+str(numExecution)
+		rawResultsDir = rawDir+'/data_'+suffix
+		
+		# analysis
+		fileToAnalyze = rawResultsDir+'/gujarat_cellphones.h5'
+		csv = csvDir+'/agents_'+suffix+'.csv'		
+		os.system('../analysis/analysis '+fileToAnalyze+' '+csv)
+		
+		# copy results
+		os.system('cp '+rawResultsDir+' '+resultsDir)
+
+		# copy logs
+		rawLogDir = rawDir+'/logs_'+suffix
+		os.system('cp '+rawLogDir+' '+logsDir)
+

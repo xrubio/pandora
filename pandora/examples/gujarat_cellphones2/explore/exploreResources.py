@@ -27,7 +27,7 @@ print 'creating test workbench'
 for numExecution in range(0,numExecutions):
 	for resources in resourcesValues:
 		print 'creating gujarat_cellphones instance: ' + str(index) + ' for resources needed per animal: ' + resources + ' and execution: ' + str(numExecution)
-		dirName = 'resources/results_resources'+resources+'_ex'+str(numExecution)
+		dirName = 'resources/gujaratCellphones_resources'+resources+'_ex'+str(numExecution)
 		os.system('mkdir '+dirName)
 		configName = dirName + '/config.xml'			
 		os.system('cp '+xmlTemplate+' '+configName)
@@ -42,7 +42,7 @@ taskFile = open(taskFile, 'w')
 for resources in resourcesValues:
 	for numExecution in range(0,numExecutions):
 		print 'writing gujarat_cellphones instance: ' + str(index) + ' with resources needed per animal: ' + resources + ' and execution: ' + str(numExecution)
-		dirName = 'resources/results_resources'+resources+'_ex'+str(numExecution)
+		dirName = 'resources/gujaratCellphones_resources'+resources+'_ex'+str(numExecution)
 		taskFile.write('cd '+baseDir+'/'+dirName+' && ../../../gujaratCellphones\n')
 		index += 1
 taskFile.close()

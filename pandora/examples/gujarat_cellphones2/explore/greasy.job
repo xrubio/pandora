@@ -1,7 +1,7 @@
 #!/bin/bash
-#BSUB -J cellphones
-#BSUB -oo cellphones.out
-#BSUB -eo cellphones.err
+#BSUB -J gujaratCellphones 
+#BSUB -oo gujaratCellphones
+#BSUB -eo gujaratCellphones
 
 ##################################################
 # Fill here with a number of cpus according to   #
@@ -24,7 +24,7 @@
 # the list of tasks.                             #
 ##################################################
 
-FILE=resourcesNeededPerAnimal.txt
+FILE=resources
 
 ##################################################
 # Here goes the path to the place where the logs #
