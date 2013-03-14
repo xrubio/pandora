@@ -10,14 +10,14 @@
 # master if using the mpi engine.                #
 ##################################################
 
-#BSUB -n 401
+#BSUB -n 112
 #BSUB -R"span[ptile=16]"
 
 ##################################################
 # and set an appropiate wall_clock_limit         #
 ##################################################
 
-#BSUB -W 01:00
+#BSUB -W 14:00
 
 ##################################################
 # Here goes the path to the file where you have  #
