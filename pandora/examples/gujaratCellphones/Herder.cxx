@@ -288,7 +288,7 @@ void Herder::updateState()
 				_herdSize = std::max(0, _herdSize-1);
 			}
 		}
-		std::cout << this << " starvation: " << _starvationDays << " check: " << (int)(1000.0f*_starvationDays/(float)_config._daysDrySeason) << " old herd size: " << oldHerdSize << " new: " << _herdSize << std::endl;
+		//std::cout << this << " starvation: " << _starvationDays << " check: " << (int)(1000.0f*_starvationDays/(float)_config._daysDrySeason) << " old herd size: " << oldHerdSize << " new: " << _herdSize << std::endl;
 		_starvationDays = 0.0f;
 		// no animals, remove agent
 		if(_herdSize==0)
@@ -325,7 +325,7 @@ void Herder::updateState()
 	{
 		_starvationDays += float(getNeededResources()-_resources)/float(getNeededResources());
 	}
-	std::cout << " needed: " << getNeededResources() << " resources: " << _resources << " starvation acc: " << _starvationDays << std::endl;
+	//std::cout << " needed: " << getNeededResources() << " resources: " << _resources << " starvation acc: " << _starvationDays << std::endl;
 	_resources = 0;
 }
 
