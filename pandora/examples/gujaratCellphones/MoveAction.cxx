@@ -62,6 +62,8 @@ void MoveAction::execute( Engine::Agent & agent )
 	herder.getWorld()->getDynamicRasterStr(herder.getResourcesMap()).setValue(_newPosition, previousValue - collected);
 	// knowledge is updated to 0 years
 	herder.getWorld()->getDynamicRasterStr("gathered").setValue(_newPosition, herder.getWorld()->getDynamicRasterStr("gathered").getValue(_newPosition)+1);
+
+	//std::cout << "herder: " << herder << " has collected: " << collected << " from: " << previousValue << " with needed: " << herder.getNeededResources() << std::endl;
 }
 
 const Engine::Point2D<int> & MoveAction::getNewPosition() const

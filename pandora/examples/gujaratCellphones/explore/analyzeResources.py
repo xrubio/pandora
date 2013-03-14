@@ -31,7 +31,7 @@ for numExecution in range(0,numExecutions):
 		rawResultsDir = rawDir+'/data_'+suffix
 		
 		# analysis
-		fileToAnalyze = rawResultsDir+'/gujarat_cellphones.h5'
+		fileToAnalyze = rawResultsDir+'/phones.h5'
 		csv = csvDir+'/agents_'+suffix+'.csv'		
 		os.system('../analysis/analysis '+fileToAnalyze+' '+csv)
 		

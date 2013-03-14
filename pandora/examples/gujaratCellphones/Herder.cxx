@@ -86,7 +86,7 @@ void Herder::updateKnowledge()
 		int maxValue =  _world->getDynamicRaster(eResources).getCurrentMaxValue();
 		// tentative value = 1/3
 		int averageValue = maxValue/3;
-		std::cout << "min: " << minValue << " max: " << maxValue << " average: " << averageValue << std::endl;
+		//std::cout << "min: " << minValue << " max: " << maxValue << " average: " << averageValue << std::endl;
 
 		Engine::Point2D<int> index(0,0);
 		for(index._x=0; index._x<_world->getOverlapBoundaries()._size._x; index._x++)
@@ -277,18 +277,18 @@ void Herder::updateState()
 	}
 	if(world.daysUntilWetSeason()==0)
 	{
-		std::cout << "dry season, herder: " << this << std::endl;
+		//std::cout << "dry season, herder: " << this << std::endl;
 		// animals death by starvation
 		int oldHerdSize = _herdSize;
 		for(int i=0; i<oldHerdSize; i++)
 		{
 			int die = Engine::GeneralState::statistics().getUniformDistValue(0,1000);
-			if(die<10*_starvationDays)
+			if(die<int((1000.0f*_starvationDays)/(float)_config._daysDrySeason))
 			{
 				_herdSize = std::max(0, _herdSize-1);
 			}
 		}
-		std::cout << this << " starvation: " << _starvationDays << " old herd size: " << oldHerdSize << " new: " << _herdSize << std::endl;
+		std::cout << this << " starvation: " << _starvationDays << " check: " << (int)(1000.0f*_starvationDays/(float)_config._daysDrySeason) << " old herd size: " << oldHerdSize << " new: " << _herdSize << std::endl;
 		_starvationDays = 0.0f;
 		// no animals, remove agent
 		if(_herdSize==0)
@@ -307,7 +307,7 @@ void Herder::updateState()
 			}
 		}
 		setPosition(_village->getPosition());
-		std::cout << this << " reproduction: old herd size: " << oldHerdSize << " new: " << _herdSize << std::endl;
+		//std::cout << this << " reproduction: old herd size: " << oldHerdSize << " new: " << _herdSize << std::endl;
 
 		if (_config._communications == 1) 
 		{
@@ -320,10 +320,12 @@ void Herder::updateState()
 	{
 		talkToOtherShepherds(_config._callsPerDayDrySeason);
 	}
+
 	if(_resources<getNeededResources())
 	{
 		_starvationDays += float(getNeededResources()-_resources)/float(getNeededResources());
 	}
+	std::cout << " needed: " << getNeededResources() << " resources: " << _resources << " starvation acc: " << _starvationDays << std::endl;
 	_resources = 0;
 }
 
@@ -336,7 +338,7 @@ void Herder::registerAttributes()
 
 void Herder::serialize()
 {
-	serializeAttribute("starvation x100", _starvationDays*100.0f);
+	serializeAttribute("starvation x100", (int)(_starvationDays*100.0f));
 	serializeAttribute("herd size", _herdSize);
 	serializeAttribute("needed resources", getNeededResources());
 }
