@@ -293,7 +293,7 @@ template<typename T> class uct_t : public improvement_t<T> {
                 bonus = add_bonus ? par * sqrtf(2 * log_ns / data.counts_.at(1+a)) : 0;
                 value = data.values_.at(1+a) + bonus;
 
-		std::cout << "Applicable Action: " << a << " Q(a,s)=" << value << " N(a,s)=" << data.counts_.at(1+a) << std::endl;
+//		std::cout << "Applicable Action: " << a << " Q(a,s)=" << value << " N(a,s)=" << data.counts_.at(1+a) << std::endl;
 
                 // update best action so far
                 if( value <= best_value ) {
@@ -307,7 +307,7 @@ template<typename T> class uct_t : public improvement_t<T> {
                 }
             }
         }
-	std::cout << "Best Action: " << best_actions.size() << " Cost: " << best_value << " Count: " << best_count <<  std::endl;
+//	std::cout << "Best Action: " << best_actions.size() << " Cost: " << best_value << " Count: " << best_count <<  std::endl;
         assert(!best_actions.empty());
         return best_actions[Random::uniform(best_actions.size())];
     }
