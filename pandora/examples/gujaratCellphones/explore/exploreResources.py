@@ -29,7 +29,7 @@ for numExecution in range(0,numExecutions):
 	# each n.execution has the same seed in all parameter space
 	randomValue = str(random.randint(0,10000000))
 	for resources in resourcesValues:
-		print 'creating gujarat_cellphones instance: ' + str(index) + ' for resources needed per animal: ' + resources + ' and execution: ' + str(numExecution)
+		print 'creating gujaratCellphones instance: ' + str(index) + ' for resources needed per animal: ' + resources + ' and execution: ' + str(numExecution)
 		dirName = 'resources/gujaratCellphones_resources'+resources+'_ex'+str(numExecution)
 		os.system('mkdir '+dirName)
 		configName = dirName + '/config.xml'			
@@ -45,7 +45,7 @@ index = 0
 taskFile = open(taskFile, 'w')
 for resources in resourcesValues:
 	for numExecution in range(0,numExecutions):
-		print 'writing gujarat_cellphones instance: ' + str(index) + ' with resources needed per animal: ' + resources + ' and execution: ' + str(numExecution)
+		print 'writing gujaratCellphones instance: ' + str(index) + ' with resources needed per animal: ' + resources + ' and execution: ' + str(numExecution)
 		dirName = 'resources/gujaratCellphones_resources'+resources+'_ex'+str(numExecution)
 		taskFile.write('cd '+baseDir+'/'+dirName+' && ../../../gujaratCellphones\n')
 		index += 1

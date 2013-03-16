@@ -11,7 +11,7 @@
 		<villages num="10" agentsPerVillage="10"/>
 		<animals numPerHerder="50" resourcesPerDay="RESOURCES"/>		
 	</population>
-	<mdp horizon="10" width="200" explorationBonus="0"/>
+	<mdp horizon="10" width="100" explorationBonus="0"/>
 	<knowledgeTransmission>
 		<inVillage conversationsWetSeason="5"/>
 		<outsideVillage callsPerDayDrySeason="1"/>

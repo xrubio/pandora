@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
 		GujaratCellphones::HerderWorldConfig config;
 		config.deserialize(fileName);
 
-		Engine::Simulation myWorldSim(config.getSize(),config.getNumSteps());
+		Engine::Simulation myWorldSim(config.getSize(),config.getNumSteps(), config.getSerializeResolution());
 		GujaratCellphones::HerderWorld world(myWorldSim, config);
 
 		world.init(argc, argv);
