@@ -2,7 +2,7 @@
 
 import os, sys
 
-numExecutions = 1
+numExecutions = 10
 resourcesValues = ['1','2','3','4', '5', '6', '7', '8', '9', '10']
 
 # dir where analysis will be stored
@@ -21,8 +21,8 @@ os.makedirs(logsDir)
 os.makedirs(csvDir)
 
 index = 0
-for numExecution in range(0,numExecutions):
-	for resources in resourcesValues:	
+for resources in resourcesValues:	
+	for numExecution in range(0,numExecutions):
 		print 'analyzing results for instance: ' + str(index) + ' with resources per animal: ' + resources + ' and execution: ' + str(numExecution)
 #suffix = 'resources'+resources+'_ex'+str(numExecution)
 		suffix = 'resources'+resources+'_ex'+str(numExecution)
@@ -34,9 +34,9 @@ for numExecution in range(0,numExecutions):
 		os.system('../analysis/analysis '+fileToAnalyze+' '+csv)
 		
 		# copy results
-		os.system('cp '+rawResultsDir+' '+resultsDir)
+		os.system('cp -ar '+rawResultsDir+' '+resultsDir)
 
 		# copy logs
 		rawLogDir = rawDir+'/logs_'+suffix
-		os.system('cp -ar '+rawLogDir+' '+logsDir)
+ 		os.system('cp -ar '+rawLogDir+' '+logsDir)
 
