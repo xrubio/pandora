@@ -149,7 +149,7 @@ void Config::retrieveAttributeMandatory( TiXmlElement* elem, const std::string &
 		throw Engine::Exception(sstr.str());
 		return;
 	}
-	if(!retrievedStr->compare("yes") || !retrievedStr->compare("true"))
+	if(!retrievedStr->compare("yes") || !retrievedStr->compare("true") || !retrievedStr->compare("1"))
 	{
 		value = true;
 	}

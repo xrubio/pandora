@@ -13,9 +13,7 @@
 	</population>
 	<mdp horizon="10" width="100" explorationBonus="0"/>
 	<knowledgeTransmission>
-		<inVillage conversationsWetSeason="5"/>
-		<outsideVillage callsPerDayDrySeason="1"/>
-		<communications active="0"/>
-		<cellphones active="0"/>
+		<inVillage active="no" fixedValue="-1"/>
+		<outVillage active="no" fixedValue="1"/>
 	</knowledgeTransmission>
 </config>

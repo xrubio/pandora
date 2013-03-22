@@ -1,11 +1,12 @@
 <?xml version="1.0" ?>
 <config> 
 	<!-- simulation config -->
-	<output resultsFile="//gpfs/projects/bsc21/WORK-RUBIO/gujaratCellphone/rainStddev/data_rainStddevRAIN_STDDEV_exNUMEXEC/phones.h5" logsDir="/gpfs/projects/bsc21/WORK-RUBIO/gujaratCellphone/rainStddev/logs_rainStddevRAIN_STDDEV_exNUMEXEC"/> 
+        <output resultsFile="/gpfs/projects/bsc21/WORK-RUBIO/gujaratCellphones/knowledge/data_exNUMEXEC/phones.h5" logsDir="/gpfs/projects/bsc21/WORK-RUBIO/gujaratCellphones/knowledge/logs_exNUMEXEC"/>
+	<output resultsFile="./data/phones.h5" logsDir="./logs"/>
 	<numSteps value="24001" serializeResolution="240"/>
 	<environment>
 		<landscape size="60" averageResources="1000"/>
-		<climate seed="CLIMATESEED" daysDrySeason="240" meanRain="4643.848" stddev="RAIN_STDDEV"/>
+		<climate seed="CLIMATESEED" daysDrySeason="240" meanRain="4643.848" stddev="1885.18"/>
 	</environment>
 	<population>
 		<villages num="10" agentsPerVillage="10"/>
@@ -13,7 +14,7 @@
 	</population>
 	<mdp horizon="10" width="100" explorationBonus="0"/>
 	<knowledgeTransmission>
-		<inVillage active="no" fixedValue="-1"/>
+		<inVillage active="yes" fixedValue="-1"/>
 		<outVillage active="no" fixedValue="1"/>
 	</knowledgeTransmission>
 </config>

@@ -1,7 +1,7 @@
 #!/bin/bash
-#BSUB -J phonesResources 
-#BSUB -oo phonesResources
-#BSUB -eo phonesResources
+#BSUB -J resources 
+#BSUB -oo resources
+#BSUB -eo resources
 
 ##################################################
 # Fill here with a number of cpus according to   #

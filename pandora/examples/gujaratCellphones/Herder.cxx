@@ -1,12 +1,20 @@
+
 #include "Herder.hxx"
+
 #include <Statistics.hxx>
+
 #include "MoveAction.hxx"
+#include "HerderWorld.hxx"
+#include "HerderWorldConfig.hxx"
+#include "DecisionModel.hxx"
 
 namespace GujaratCellphones
 {
 
-Herder::Herder( const std::string & id, int herdSize, int resourcesPerAnimal, const HerderWorldConfig config, HerderWorld* w, Village* v) : Agent(id), _resources(0), _starvationDays(0), _herdSize(herdSize), _resourcesPerAnimal(resourcesPerAnimal), _model(0), _uctBasePolicy(0), _horizon(0), _width(0), _explorationBonus(0), _config(config), _world(w), _village(v)
+Herder::Herder( const std::string & id, int herdSize, int resourcesPerAnimal, Village & village) : Agent(id), _resources(0), _starvationDays(0), _herdSize(herdSize), _resourcesPerAnimal(resourcesPerAnimal), _model(0), _uctBasePolicy(0), _horizon(0), _width(0), _explorationBonus(0), _village(&village)
 {
+	_village->addHerder(this);
+	setPosition(_village->getPosition());
 }
 
 Herder::~Herder()
@@ -30,17 +38,6 @@ int Herder::getNeededResources() const
 	return _herdSize*_resourcesPerAnimal;
 }
 
-void Herder::setVillage(Village * village)
-{
-	_village = village;
-	_position = village->getPosition();
-}
-
-const Village & Herder::getVillage() const
-{
-	return *_village;
-}
-	
 int Herder::getHerdSize() const
 {
 	return _herdSize;
@@ -56,6 +53,11 @@ const std::string & Herder::getResourcesMap() const
 	return _resourcesMap;
 }
 
+const Village & Herder::getVillage() const
+{
+	return *_village;
+}
+
 void Herder::createKnowledge()
 {	
 	std::ostringstream oss;
@@ -67,9 +69,8 @@ void Herder::createKnowledge()
 
 	_world->registerDynamicRaster(_knowledgeMap, false);
 	_world->registerDynamicRaster(_resourcesMap, false);
-	_world->getDynamicRasterStr(_knowledgeMap).setInitValues(0, std::numeric_limits<int>::max(), 0);
-	_world->getDynamicRasterStr(_resourcesMap).setInitValues(0, 0, 0);
-	_world->getDynamicRasterStr(_resourcesMap).setMaxValue(std::numeric_limits<int>::max());
+	_world->getDynamicRasterStr(_knowledgeMap).setInitValues(-1, std::numeric_limits<int>::max(), -1);
+	_world->getDynamicRasterStr(_resourcesMap).setInitValues(0, std::numeric_limits<int>::max(), 0);
 }
 
 void Herder::updateKnowledge()
@@ -101,12 +102,6 @@ void Herder::updateKnowledge()
 		}
 		return;
 	}
-	HerderWorld & world = (HerderWorld &)*_world;
-	if(world.daysUntilWetSeason()!=0)
-	{
-		return;
-	}
-
 	// info is one year old
 	Engine::Point2D<int> index(0,0);
 	for(index._x=0; index._x<_world->getOverlapBoundaries()._size._x; index._x++)
@@ -124,16 +119,26 @@ void Herder::updateKnowledge()
 	resources.updateRasterToMaxValues();
 }
 
-void Herder::talkToOtherShepherds( int numberOfShepherds )
+void Herder::inVillageKnowledgeTransmission() const
 {
-	for (int i = 0; i < numberOfShepherds; ++i)
+	knowledgeTransmission(_village->getInVillageTransmission());
+}
+
+void Herder::outVillageKnowledgeTransmission() const
+{
+	knowledgeTransmission(_village->getOutVillageTransmission());
+}
+
+void Herder::knowledgeTransmission( int frequency ) const
+{
+	std::cout << "checking knowledge for: " << this << " with frequency: " << frequency << std::endl;
+	for(std::list<Herder*>::const_iterator it=_village->beginHerders(); it!=_village->endHerders(); it++)
 	{
-		int r = Engine::GeneralState::statistics().getUniformDistValue(1, 100);
-		if (r <= _village->getShareKnowledge()) 
+		int value = Engine::GeneralState::statistics().getUniformDistValue(0, 100);
+		if(value<frequency) 
 		{
-			Herder* receiver = _village->getRandomHerder(_id); 
-			assert(_id != receiver->getId());
-			exchangeInformationWithOtherShepherd(receiver->getId());
+			std::cout << "sharing knowledge between: " << this << " and: " << *it << " frequency: " << frequency  << " at village with transmission: " << _village->getInVillageTransmission() << "/" << _village->getOutVillageTransmission() << std::endl;
+			shareKnowledge(**it);
 		}
 	}
 }
@@ -151,77 +156,60 @@ void Herder::talkToOtherShepherds( int numberOfShepherds )
 	std::cout << std::endl;
 }*/
 
-void Herder::exchangeInformationWithOtherShepherd( const std::string & idShepherdReceivesCall )
+void Herder::copyValue( const Herder & origin, const Herder & target, const Engine::Point2D<int> & index ) const
 {
-	Herder *agentReceivesCall = (Herder*) _world->getAgent(idShepherdReceivesCall);
-	Engine::Raster & knowledgeAgentCalls = _world->getDynamicRasterStr(_knowledgeMap);
-	Engine::Raster & resourcesAgentCalls = _world->getDynamicRasterStr(_resourcesMap);
-	Engine::Raster & knowledgeAgentReceivesCall = _world->getDynamicRasterStr(agentReceivesCall->getKnowledgeMap());
-	Engine::Raster & resourcesAgentReceivesCall = _world->getDynamicRasterStr(agentReceivesCall->getResourcesMap());
+	Engine::Raster & knowledgeOrigin = _world->getDynamicRasterStr(origin.getKnowledgeMap());
+	Engine::Raster & resourcesOrigin = _world->getDynamicRasterStr(origin.getResourcesMap());
 
-	/*std::cout << "Before talking" << std::endl;
-	std::cout << "id agent calls " << _id << std::endl;
-	std::cout << "id agent receives call " << agentReceivesCall->getId() << std::endl;
-	std::cout << "knowledge map agent calls" << std::endl;
- 	printRaster(knowledgeAgentCalls);
-	std::cout << "resources map agent calls" << std::endl;
-	printRaster(resourcesAgentCalls);
-	std::cout << "knowledge map agent receives call" << std::endl;
-	printRaster(knowledgeAgentReceivesCall);
-	std::cout << "resources map agent receives call" << std::endl;
-	printRaster(resourcesAgentReceivesCall);*/
+	Engine::Raster & knowledgeTarget = _world->getDynamicRasterStr(target.getKnowledgeMap());
+	Engine::Raster & resourcesTarget = _world->getDynamicRasterStr(target.getResourcesMap());
 
+	knowledgeTarget.setValue(index, knowledgeOrigin.getValue(index));
+	resourcesTarget.setMaxValue(index, resourcesOrigin.getMaxValueAt(index));
+	resourcesTarget.setValue(index, resourcesOrigin.getValue(index));
+}
+
+void Herder::shareCell( const Herder & herderA, const Herder & herderB, const Engine::Point2D<int> & index ) const
+{
+	Engine::Raster & knowledgeA = _world->getDynamicRasterStr(herderA.getKnowledgeMap());
+	Engine::Raster & resourcesA = _world->getDynamicRasterStr(herderA.getResourcesMap());
+
+	Engine::Raster & knowledgeB = _world->getDynamicRasterStr(herderB.getKnowledgeMap());
+	Engine::Raster & resourcesB = _world->getDynamicRasterStr(herderB.getResourcesMap());
+
+	if(knowledgeA.getValue(index)>knowledgeB.getValue(index))
+	{
+		copyValue(herderB, herderA, index);
+		return;
+	}
+	if(knowledgeA.getValue(index)<knowledgeB.getValue(index))
+	{
+		copyValue(herderA, herderB, index);
+		return;
+	}
+	if(knowledgeA.getValue(index)==knowledgeB.getValue(index))
+	{
+		if(Engine::GeneralState::statistics().getUniformDistValue(0,1)==0)
+		{
+			copyValue(herderA, herderB, index);
+		}
+		else
+		{
+			copyValue(herderB, herderA, index);
+		}
+	}
+}
+
+void Herder::shareKnowledge(Herder & herder) const
+{
 	Engine::Point2D<int> index(0,0);
 	for(index._x=0; index._x<_world->getOverlapBoundaries()._size._x; index._x++)
 	{
 		for(index._y=0; index._y<_world->getOverlapBoundaries()._size._y; index._y++)
 		{
-			//std::cout << index._x << " " << index._y << std::endl;
-			int cellMaxValue = std::max(resourcesAgentCalls.getMaxValueAt(index), resourcesAgentReceivesCall.getMaxValueAt(index));
-			resourcesAgentCalls.setMaxValue(index, cellMaxValue);
-			resourcesAgentReceivesCall.setMaxValue(index, cellMaxValue);
-			if (knowledgeAgentCalls.getValue(index) == knowledgeAgentReceivesCall.getValue(index))
-			{
-				int avg = (resourcesAgentCalls.getValue(index) + resourcesAgentReceivesCall.getValue(index))/2;
-				resourcesAgentCalls.setValue(index, avg);
-				resourcesAgentReceivesCall.setValue(index, avg);
-			}
-			else if (knowledgeAgentCalls.getValue(index) == -1)
-			{
-				knowledgeAgentCalls.setValue(index, knowledgeAgentReceivesCall.getValue(index));
-				resourcesAgentCalls.setValue(index, resourcesAgentReceivesCall.getValue(index));
-			}
-			else if (knowledgeAgentReceivesCall.getValue(index) == -1)
-			{
-				knowledgeAgentReceivesCall.setValue(index, knowledgeAgentCalls.getValue(index));
-				resourcesAgentReceivesCall.setValue(index, resourcesAgentCalls.getValue(index));
-			}
-
-			else if (knowledgeAgentCalls.getValue(index) > knowledgeAgentReceivesCall.getValue(index))
-			{
-				knowledgeAgentCalls.setValue(index, knowledgeAgentReceivesCall.getValue(index));
-				resourcesAgentCalls.setValue(index, resourcesAgentReceivesCall.getValue(index));
-			}			
-			else
-			{
-				knowledgeAgentReceivesCall.setValue(index, knowledgeAgentCalls.getValue(index));
-				resourcesAgentReceivesCall.setValue(index, resourcesAgentCalls.getValue(index));
-			}
-
+			shareCell(*this, herder, index );
 		}
 	}
-
-	/*std::cout << "After talking" << std::endl;
-	std::cout << "id agent calls " << _id << std::endl;
-	std::cout << "id agent receives call " << agentReceivesCall->getId() << std::endl;
-	std::cout << "knowledge map agent calls" << std::endl;
- 	printRaster(knowledgeAgentCalls);
-	std::cout << "resources map agent calls" << std::endl;
-	printRaster(resourcesAgentCalls);
-	std::cout << "knowledge map agent receives call" << std::endl;
-	printRaster(knowledgeAgentReceivesCall);
-	std::cout << "resources map agent receives call" << std::endl;
-	printRaster(resourcesAgentReceivesCall);*/
 }
 
 void Herder::configureMDP( const int & horizon, const int & width, const int & explorationBonus )
@@ -271,6 +259,7 @@ void Herder::selectActions()
 void Herder::updateState()
 {
 	HerderWorld & world = (HerderWorld &)*_world;
+	const HerderWorldConfig & config = world.getConfig();
 	if(world.getCurrentStep()==0)
 	{
 		return;
@@ -283,12 +272,12 @@ void Herder::updateState()
 		for(int i=0; i<oldHerdSize; i++)
 		{
 			int die = Engine::GeneralState::statistics().getUniformDistValue(0,1000);
-			if(die<int((1000.0f*_starvationDays)/(float)_config._daysDrySeason))
+			if(die<int((1000.0f*_starvationDays)/(float)config._daysDrySeason))
 			{
 				_herdSize = std::max(0, _herdSize-1);
 			}
 		}
-		//std::cout << this << " starvation: " << _starvationDays << " check: " << (int)(1000.0f*_starvationDays/(float)_config._daysDrySeason) << " old herd size: " << oldHerdSize << " new: " << _herdSize << std::endl;
+		//std::cout << this << " starvation: " << _starvationDays << " check: " << (int)(1000.0f*_starvationDays/(float)config._daysDrySeason) << " old herd size: " << oldHerdSize << " new: " << _herdSize << std::endl;
 		_starvationDays = 0.0f;
 		// no animals, remove agent
 		if(_herdSize==0)
@@ -306,19 +295,20 @@ void Herder::updateState()
 				_herdSize++;
 			}
 		}
-		setPosition(_village->getPosition());
+		setPosition(_village->getPosition());		
 		//std::cout << this << " reproduction: old herd size: " << oldHerdSize << " new: " << _herdSize << std::endl;
 
-		if (_config._communications == 1) 
+		if(config._inVillageTransmission)
 		{
-			talkToOtherShepherds(_config._conversationsWetSeason);
+			inVillageKnowledgeTransmission();
 		}
-
 		return;
 	}
-	if (_config._communications == 1 and _config._cellphones == 1) 
+	
+	
+	if(config._outVillageTransmission)
 	{
-		talkToOtherShepherds(_config._callsPerDayDrySeason);
+		outVillageKnowledgeTransmission();
 	}
 
 	if(_resources<getNeededResources())
@@ -334,6 +324,7 @@ void Herder::registerAttributes()
 	registerIntAttribute("starvation x100");
 	registerIntAttribute("herd size");
 	registerIntAttribute("needed resources");
+	registerIntAttribute("village");
 }
 
 void Herder::serialize()
@@ -341,6 +332,7 @@ void Herder::serialize()
 	serializeAttribute("starvation x100", (int)(_starvationDays*100.0f));
 	serializeAttribute("herd size", _herdSize);
 	serializeAttribute("needed resources", getNeededResources());
+	serializeAttribute("village", _village->getIndex());
 }
 
 } // namespace GujaratCellphones

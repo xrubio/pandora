@@ -28,10 +28,11 @@ class HerderWorldConfig : public Engine::Config
 	int _explorationBonus;
 
 	//knowledge transmission
-	int _conversationsWetSeason;
-	int _callsPerDayDrySeason;
-	int _communications;
-	int _cellphones;
+	bool _inVillageTransmission;
+	// if values are -1 the herders of each village will share a common random uniform value
+	int _inVillageTransmissionValue;
+	bool _outVillageTransmission;
+	int _outVillageTransmissionValue;
 	
 public:
 	HerderWorldConfig();

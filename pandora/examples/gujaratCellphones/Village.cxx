@@ -4,7 +4,8 @@
 namespace GujaratCellphones
 {
 
-Village::Village(const std::string & id) : Agent(id)
+Village::Village(const std::string & id, int index) : Agent(id), _inVillageTransmission(0), _outVillageTransmission(0), _index(index)
+													  
 {
 }
 
@@ -16,20 +17,35 @@ void Village::updateState()
 {
 }
 
-void Village::setShareKnowledge( int shareKnowledge ) 
+int Village::getIndex() const
 {
-	_shareKnowledge = shareKnowledge;
+	return _index;
 }
 
-int Village::getShareKnowledge()
+void Village::setInVillageTransmission( int inVillageTransmission) 
 {
-	return _shareKnowledge;
+	_inVillageTransmission = inVillageTransmission;
 }
+
+int Village::getInVillageTransmission() const
+{
+	return _inVillageTransmission;
+}
+
+void Village::setOutVillageTransmission( int outVillageTransmission) 
+{
+	_outVillageTransmission = outVillageTransmission;
+}
+
+int Village::getOutVillageTransmission() const
+{
+	return _outVillageTransmission;
+}
+
 
 void Village::addHerder(Herder * herder)
 {
 	_herders.push_back(herder);
-	herder->setVillage(this);
 }
 
 void Village::removeHerder(Herder * herder)
@@ -48,31 +64,23 @@ void Village::removeHerder(Herder * herder)
 	}
 }
 
-Herder* Village::getRandomHerder( const std::string & id) 
+std::list<Herder*>::iterator Village::beginHerders()
 {
-	int r = Engine::GeneralState::statistics().getUniformDistValue(0, _herders.size() - 2);
-	int counter = 0;
-	for(std::list<Herder*>::iterator it=_herders.begin(); it!=_herders.end(); it++)
-	{
-		if ((*it)->getId() != id) 
-		{
-			if (counter == r) 
-			{
-				return (*it);
-			}
-			else 
-			{
-				++counter;
-			}
-		}
-	}
+	return _herders.begin();
+}
+
+std::list<Herder*>::iterator Village::endHerders()
+{
+	return _herders.end();
 }
 
 void Village::registerAttributes()
 {
 	registerIntAttribute("herders");
 	registerIntAttribute("total animals");
-	registerIntAttribute("share knowledge");
+	registerIntAttribute("in village transmission");
+	registerIntAttribute("out village transmission");
+	registerIntAttribute("known 3-year cells");
 }
 
 void Village::serialize()
@@ -83,8 +91,30 @@ void Village::serialize()
 	{
 		totalAnimals += (*it)->getHerdSize();
 	}
-	serializeAttribute("total animals", totalAnimals);
-	serializeAttribute("share knowledge", _shareKnowledge);
+	serializeAttribute("total animals", totalAnimals); 
+	serializeAttribute("in village transmission", _inVillageTransmission);
+	serializeAttribute("out village transmission", _outVillageTransmission);
+
+	int knownCells = 0;
+	for(std::list<Herder*>::iterator it=_herders.begin(); it!=_herders.end(); it++)
+	{
+		Herder & herder = **it;
+		Engine::Raster knowledge = _world->getDynamicRasterStr(herder.getKnowledgeMap());
+
+		Engine::Point2D<int> index(0,0);
+		for(index._x=0; index._x<_world->getOverlapBoundaries()._size._x; index._x++)
+		{
+			for(index._y=0; index._y<_world->getOverlapBoundaries()._size._y; index._y++)
+			{
+				int value = knowledge.getValue(index);
+				if(value>-1 && value<3)
+				{
+					knownCells++;
+				}
+			}
+		}
+	}
+	serializeAttribute("known 3-year cells", knownCells);
 }
 
 }

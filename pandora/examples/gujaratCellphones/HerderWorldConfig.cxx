@@ -45,14 +45,12 @@ void HerderWorldConfig::extractParticularAttribs(TiXmlElement * root)
 	//knowledge transmission
 	element = root->FirstChildElement("knowledgeTransmission");
 	child = element->FirstChildElement("inVillage");	
-	retrieveAttributeMandatory(child, "conversationsWetSeason", _conversationsWetSeason);
-	child = element->FirstChildElement("outsideVillage");	
-	retrieveAttributeMandatory(child, "callsPerDayDrySeason", _callsPerDayDrySeason);
-	child = element->FirstChildElement("communications");	
-	retrieveAttributeMandatory(child, "active", _communications);
-	child = element->FirstChildElement("cellphones");	
-	retrieveAttributeMandatory(child, "active", _cellphones);
-
+	retrieveAttributeMandatory(child, "active", _inVillageTransmission);
+	retrieveAttributeMandatory(child, "fixedValue", _inVillageTransmissionValue);
+	
+	child = element->FirstChildElement("outVillage");	
+	retrieveAttributeMandatory(child, "active", _outVillageTransmission);
+	retrieveAttributeMandatory(child, "fixedValue", _outVillageTransmissionValue);
 }
 
 int HerderWorldConfig::getSize() const

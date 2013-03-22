@@ -1,7 +1,7 @@
 #ifndef __Village_hxx__
 #define __Village_hxx__
 
-#include <vector>
+#include <list>
 #include <Point2D.hxx>
 #include <Agent.hxx>
 
@@ -13,21 +13,31 @@ class Village : public Engine::Agent
 {	
 	std::list<Herder*> _herders;
 	//probability of exchanging information when two agents talk to each other
-	int _shareKnowledge; 
+	int _inVillageTransmission; // MpiBasicAttribute 
+	int _outVillageTransmission;  // MpiBasicAttribute 
+	int _index; // MpiBasicAttribute
 
 public:
-	Village(const std::string & id);
+	Village(const std::string & id, int inedx);
 	virtual ~Village();
 	void updateState();
 
-	void setShareKnowledge( int shareKnowledge );
-	int getShareKnowledge();
+	void setInVillageTransmission( int inVillageTransmission);
+	int getInVillageTransmission() const;
+	
+	void setOutVillageTransmission( int outVillageTransmission);
+	int getOutVillageTransmission() const;
+
 	void addHerder(Herder * herder);
 	void removeHerder(Herder * herder);
-	Herder* getRandomHerder( const std::string & id ); 
+
+	std::list<Herder*>::iterator beginHerders();
+	std::list<Herder*>::iterator endHerders();
 
 	void registerAttributes();
 	void serialize();
+
+	int getIndex() const;
 
 	////////////////////////////////////////////////
 	// This code has been automatically generated //

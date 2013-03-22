@@ -48,6 +48,7 @@ public:
 	virtual ~HerderWorld();
 	void stepEnvironment();
 	int daysUntilWetSeason() const; // remaining days until next wet season
+	const HerderWorldConfig & getConfig() const;
 };
 
 } // namespace Tutorial 

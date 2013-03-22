@@ -22,19 +22,52 @@ void HerderWorld::createAgents()
 		Engine::Point2D<int> villageLocation = Engine::Point2D<int>(Engine::GeneralState::statistics().getUniformDistValue(0, _config._size-1),Engine::GeneralState::statistics().getUniformDistValue(0, _config._size-1));
 		std::ostringstream oss;
 		oss << "Village_" << i;
-		Village * newVillage = new Village(oss.str());
+		Village * newVillage = new Village(oss.str(), i);
 		newVillage->setPosition(villageLocation);
-		newVillage->setShareKnowledge(Engine::GeneralState::statistics().getUniformDistValue(1, 100));
+
+		// in village transmission
+		if(_config._inVillageTransmission)
+		{
+			if(_config._inVillageTransmissionValue==-1)
+			{
+				newVillage->setInVillageTransmission(Engine::GeneralState::statistics().getUniformDistValue(0, 100));
+			}
+			else
+			{
+				newVillage->setInVillageTransmission(_config._inVillageTransmissionValue);
+			}
+		}
+		else
+		{
+			newVillage->setInVillageTransmission(0);
+		}
+		
+		// mobile transmission
+		if(_config._outVillageTransmission)
+		{
+			if(_config._outVillageTransmissionValue==-1)
+			{
+				newVillage->setOutVillageTransmission(Engine::GeneralState::statistics().getUniformDistValue(0, 100));
+			}
+			else
+			{
+				newVillage->setOutVillageTransmission(_config._outVillageTransmissionValue);
+			}
+		}
+		else
+		{
+			newVillage->setOutVillageTransmission(0);
+		}
 		addAgent(newVillage);
 
 		for(int j=0; j< _config._numAgentsPerVillage; j++)
 		{
 			std::ostringstream ossH;
-			ossH << "Herder_vil" << i << "_" << j;
-			Herder * newHerder = new Herder(ossH.str(), _config._animalsPerHerder, _config._resourcesNeededPerAnimal, _config, this, newVillage);
+			ossH << "Herder_"<<j<<"_vil" << i;
+			Herder * newHerder = new Herder(ossH.str(), _config._animalsPerHerder, _config._resourcesNeededPerAnimal, *newVillage);
+			newHerder->configureMDP(_config._horizon, _config._width, _config._explorationBonus);			
+
 			addAgent(newHerder);
-			newHerder->configureMDP(_config._horizon, _config._width, _config._explorationBonus);
-			newVillage->addHerder(newHerder);
 			newHerder->createKnowledge();
 		}
 	}
@@ -62,11 +95,6 @@ void HerderWorld::createRasters()
 	// we need to keep track of resource fractions
 	registerDynamicRaster("resourcesFraction", false, eResourcesFraction);
 	getDynamicRaster(eResourcesFraction).setInitValues(0, 100, 0);
-
-	/*
-	registerDynamicRaster("knowledge", true);
-	registerDynamicRaster("resourcesMap", true);
-	*/
 
 	registerDynamicRaster("gathered", true);
 	getDynamicRasterStr("gathered").setInitValues(0, std::numeric_limits<int>::max(), 0);
@@ -149,6 +177,11 @@ int HerderWorld::daysUntilWetSeason() const
 	}
 	int days = _step%_config._daysDrySeason;
 	return _config._daysDrySeason - days;
+}
+	
+const HerderWorldConfig & HerderWorld::getConfig() const
+{
+	return _config;
 }
 
 }
