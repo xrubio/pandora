@@ -131,13 +131,13 @@ void Herder::outVillageKnowledgeTransmission() const
 
 void Herder::knowledgeTransmission( int frequency ) const
 {
-	std::cout << "checking knowledge for: " << this << " with frequency: " << frequency << std::endl;
+	//std::cout << "checking knowledge for: " << this << " with frequency: " << frequency << std::endl;
 	for(std::list<Herder*>::const_iterator it=_village->beginHerders(); it!=_village->endHerders(); it++)
 	{
 		int value = Engine::GeneralState::statistics().getUniformDistValue(0, 100);
 		if(value<frequency) 
 		{
-			std::cout << "sharing knowledge between: " << this << " and: " << *it << " frequency: " << frequency  << " at village with transmission: " << _village->getInVillageTransmission() << "/" << _village->getOutVillageTransmission() << std::endl;
+			//std::cout << "sharing knowledge between: " << this << " and: " << **it << " frequency: " << frequency  << " at village with transmission: " << _village->getInVillageTransmission() << "/" << _village->getOutVillageTransmission() << std::endl;
 			shareKnowledge(**it);
 		}
 	}
