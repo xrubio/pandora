@@ -102,6 +102,11 @@ void Herder::updateKnowledge()
 		}
 		return;
 	}
+	HerderWorld & world = (HerderWorld &)*_world;
+	if(world.daysUntilWetSeason()!=0)
+	{
+		return;
+	}
 	// info is one year old
 	Engine::Point2D<int> index(0,0);
 	for(index._x=0; index._x<_world->getOverlapBoundaries()._size._x; index._x++)

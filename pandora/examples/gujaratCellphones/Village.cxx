@@ -96,11 +96,13 @@ void Village::serialize()
 	serializeAttribute("out village transmission", _outVillageTransmission);
 
 	int knownCells = 0;
+	//std::cout << "init village: " << *this << std::endl;
 	for(std::list<Herder*>::iterator it=_herders.begin(); it!=_herders.end(); it++)
 	{
 		Herder & herder = **it;
 		Engine::Raster knowledge = _world->getDynamicRasterStr(herder.getKnowledgeMap());
 
+		int herderKnownCells = 0;
 		Engine::Point2D<int> index(0,0);
 		for(index._x=0; index._x<_world->getOverlapBoundaries()._size._x; index._x++)
 		{
@@ -109,11 +111,15 @@ void Village::serialize()
 				int value = knowledge.getValue(index);
 				if(value>-1 && value<3)
 				{
-					knownCells++;
+					//std::cout << "\t\tindex : " << index << " value: " << value << std::endl;
+					herderKnownCells++;
 				}
 			}
 		}
+		//std::cout << "\therder: " << herder << " with raster: " << herder.getKnowledgeMap() << " knows: " << herderKnownCells << std::endl;
+		knownCells += herderKnownCells;
 	}
+	//std::cout << "end village: " << *this << " known cells: " << knownCells << std::endl;
 	serializeAttribute("known 3-year cells", knownCells);
 }
 
