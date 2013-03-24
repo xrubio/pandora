@@ -31,7 +31,7 @@ for resources in resourcesValues:
 		# analysis
 		fileToAnalyze = rawResultsDir+'/phones.h5'
 		csv = csvDir+'/agents_'+suffix+'.csv'		
-		os.system('../analysis/analysis '+fileToAnalyze+' '+csv)
+		os.system('../analysisHerder/analysis/ '+fileToAnalyze+' '+csv)
 		
 		# copy results
 		os.system('cp -ar '+rawResultsDir+' '+resultsDir)

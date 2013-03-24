@@ -60,7 +60,7 @@ bool AgentFinalResults::attributeToStore( const std::string & key )
 }
 
 void AgentFinalResults::computeAgent( const Engine::AgentRecord & agentRecord )
-{	
+{
 	if(agentRecord.getState(_numStep, "exists")==0)
 	{
 		return;

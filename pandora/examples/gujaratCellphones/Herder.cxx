@@ -95,7 +95,6 @@ void Herder::updateKnowledge()
 			for(index._y=0; index._y<_world->getOverlapBoundaries()._size._y; index._y++)
 			{
 				knowledge.setValue(index, -1);
-				resources.setMaxValue(index, std::numeric_limits<int>::max());
 				resources.setMaxValue(index, averageValue);
 				resources.setValue(index, averageValue);
 			}
@@ -142,7 +141,6 @@ void Herder::knowledgeTransmission( int frequency ) const
 		int value = Engine::GeneralState::statistics().getUniformDistValue(0, 100);
 		if(value<frequency) 
 		{
-			//std::cout << "sharing knowledge between: " << this << " and: " << **it << " frequency: " << frequency  << " at village with transmission: " << _village->getInVillageTransmission() << "/" << _village->getOutVillageTransmission() << std::endl;
 			shareKnowledge(**it);
 		}
 	}

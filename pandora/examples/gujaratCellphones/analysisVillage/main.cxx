@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 		//agentResults.addAnalysis(new Analysis::AgentMean("herd size"));
 		//agentResults.addAnalysis(new Analysis::AgentMean("needed resources"));
 
-		Analysis::AgentFinalResults * final = new Analysis::AgentFinalResults(argv[2], simRecord.getNumSteps()-1, ";");
+		Analysis::AgentFinalResults * final = new Analysis::AgentFinalResults(argv[2], simRecord.getNumSteps()/simRecord.getSerializedResolution(), ";");
 		final->addAttribute("in village transmission");
 		final->addAttribute("herders");
 		final->addAttribute("total animals");

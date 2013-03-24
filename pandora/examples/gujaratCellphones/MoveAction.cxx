@@ -51,7 +51,8 @@ void MoveAction::execute( Engine::Agent & agent )
 	int previousValue = herder.getWorld()->getValue(eResources,_newPosition);
 	int collected = std::min(herder.getNeededResources(), agent.getWorld()->getValue(eResources,_newPosition));
 	herder.setResources(collected);
-	herder.getWorld()->setValue(eResources, _newPosition, previousValue - collected);
+	int modifiedValue = previousValue - collected;
+	herder.getWorld()->setValue(eResources, _newPosition, modifiedValue);
 
 	// we set the maximum value of the mental map of the agent to the value before gathering in case it is the first time this year
 	if(herder.getWorld()->getDynamicRasterStr(herder.getKnowledgeMap()).getValue(_newPosition)!=0)
@@ -59,9 +60,13 @@ void MoveAction::execute( Engine::Agent & agent )
 		herder.getWorld()->getDynamicRasterStr(herder.getKnowledgeMap()).setValue(_newPosition, 0);
 		herder.getWorld()->getDynamicRasterStr(herder.getResourcesMap()).setMaxValue(_newPosition, previousValue);
 	}
-	herder.getWorld()->getDynamicRasterStr(herder.getResourcesMap()).setValue(_newPosition, previousValue - collected);
+	if(herder.getWorld()->getDynamicRasterStr(herder.getResourcesMap()).getMaxValueAt(_newPosition)<modifiedValue)
+	{
+		herder.getWorld()->getDynamicRasterStr(herder.getResourcesMap()).setMaxValue(_newPosition, modifiedValue);
+	}
+	herder.getWorld()->getDynamicRasterStr(herder.getResourcesMap()).setValue(_newPosition, modifiedValue);
 	// knowledge is updated to 0 years
-	herder.getWorld()->getDynamicRasterStr("gathered").setValue(_newPosition, herder.getWorld()->getDynamicRasterStr("gathered").getValue(_newPosition)+1);
+	//herder.getWorld()->getDynamicRasterStr("gathered").setValue(_newPosition, herder.getWorld()->getDynamicRasterStr("gathered").getValue(_newPosition)+1);
 
 	//std::cout << "herder: " << herder << " has collected: " << collected << " from: " << previousValue << " with needed: " << herder.getNeededResources() << std::endl;
 }

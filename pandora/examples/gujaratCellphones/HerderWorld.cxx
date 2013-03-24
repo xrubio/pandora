@@ -96,8 +96,10 @@ void HerderWorld::createRasters()
 	registerDynamicRaster("resourcesFraction", false, eResourcesFraction);
 	getDynamicRaster(eResourcesFraction).setInitValues(0, 100, 0);
 
+	/*
 	registerDynamicRaster("gathered", true);
 	getDynamicRasterStr("gathered").setInitValues(0, std::numeric_limits<int>::max(), 0);
+	*/
 }
 
 void HerderWorld::recomputeYearlyBiomass()
