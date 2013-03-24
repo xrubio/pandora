@@ -41,7 +41,7 @@ index = 0
 taskFile = open(taskFile, 'w')
 for numExecution in range(0,numExecutions):
 	print 'writing gujaratCellphones instance: ' + str(index) + ' execution: ' + str(numExecution)
-	dirName = 'resources/gujaratCellphones_ex'+str(numExecution)
+	dirName = 'knowledge/gujaratCellphones_ex'+str(numExecution)
 	taskFile.write('cd '+baseDir+'/'+dirName+' && ../../../gujaratCellphones\n')
 	index += 1
 taskFile.close()

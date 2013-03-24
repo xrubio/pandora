@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <config> 
 	<!-- simulation config -->
-        <output resultsFile="/gpfs/projects/bsc21/WORK-RUBIO/gujaratCellphones/knowledge/data_exNUMEXEC/phones.h5" logsDir="/gpfs/projects/bsc21/WORK-RUBIO/gujaratCellphones/knowledge/logs_exNUMEXEC"/>
+        <output resultsFile="/gpfs/projects/bsc21/WORK-RUBIO/gujaratCellphone/knowledge/data_exNUMEXEC/phones.h5" logsDir="/gpfs/projects/bsc21/WORK-RUBIO/gujaratCellphone/knowledge/logs_exNUMEXEC"/>
 	<output resultsFile="./data/phones.h5" logsDir="./logs"/>
 	<numSteps value="24001" serializeResolution="240"/>
 	<environment>

@@ -26,14 +26,14 @@
 #include <analysis/AgentMean.hxx>
 #include <analysis/AgentSum.hxx>
 #include <analysis/AgentNum.hxx>
-#include <analysis/AgentHDFtoSHP.hxx>
+#include <analysis/AgentFinalResults.hxx>
 #include <iostream>
 
 int main(int argc, char *argv[])
 {
 	if(argc!=3)
 	{
-		throw Engine::Exception("USAGE: analysis file.h5 agent.csv");
+		throw Engine::Exception("USAGE: analysis file.h5 results.csv");
 		return 0;
 	}
 
@@ -42,11 +42,17 @@ int main(int argc, char *argv[])
 		Engine::SimulationRecord simRecord( 1, false);
 		simRecord.loadHDF5(argv[1], false, true);
 
-		Analysis::AgentResults agentResults(simRecord, argv[2], "Herder");
-		agentResults.addAnalysis(new Analysis::AgentNum());
+		Analysis::AgentResults agentResults(simRecord, "tmp.csv", "Village");
+		//agentResults.addAnalysis(new Analysis::AgentNum());
 		//agentResults.addAnalysis(new Analysis::AgentMean("starvation x100"));
-		agentResults.addAnalysis(new Analysis::AgentMean("herd size"));
+		//agentResults.addAnalysis(new Analysis::AgentMean("herd size"));
 		//agentResults.addAnalysis(new Analysis::AgentMean("needed resources"));
+
+		Analysis::AgentFinalResults * final = new Analysis::AgentFinalResults(argv[2], simRecord.getNumSteps()-1, ";");
+		final->addAttribute("in village transmission");
+		final->addAttribute("herders");
+		final->addAttribute("total animals");
+		agentResults.addAnalysis(final);
 
 		agentResults.apply();
 	}
