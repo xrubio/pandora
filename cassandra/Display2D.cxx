@@ -315,7 +315,7 @@ std::string Display2D::getRasterToolTip( const Engine::Point2D<int> & position )
 	{
 		it--;
 		Engine::StaticRaster & raster = _simulationRecord->getRasterTmp(*it, _viewedStep);
-		toolTipString << *it << " in " << position << " : " << raster.getValue(position) << std::endl;
+		toolTipString << "\t" <<  *it << " : " << raster.getValue(position) << std::endl;
 	}
 	return toolTipString.str();
 }
@@ -323,9 +323,11 @@ std::string Display2D::getRasterToolTip( const Engine::Point2D<int> & position )
 std::string Display2D::getAgentToolTip( const Engine::Point2D<int> & position )
 {
 	std::stringstream toolTipString;
-	Engine::AgentRecord * agentRecord = _simulationRecord->getAgentAtPosition(_viewedStep/_simulationRecord->getFinalResolution(), position);
-	if(agentRecord)
+	Engine::SimulationRecord::AgentRecordsVector agents = _simulationRecord->getAgentsAtPosition(_viewedStep/_simulationRecord->getFinalResolution(), position);
+
+	for(int i=0; i<agents.size(); i++)
 	{
+		Engine::AgentRecord * agentRecord = agents.at(i);
 		toolTipString << std::endl << agentRecord->getCompleteState(_viewedStep/_simulationRecord->getFinalResolution());
 	}
 	return toolTipString.str();
@@ -344,7 +346,7 @@ bool Display2D::event(QEvent *event)
 
 		std::string finalToolTip("");
 		std::stringstream posToolTip;
-		posToolTip << "position: " << position << " zoom: " << _zoom;
+		posToolTip << "raster maps at position: " << position << std::endl;;
 		finalToolTip += posToolTip.str();
 	
 		if(!_simulationRecord || position._x<0 || position._y<0 || position._x>=_simulationRecord->getSize() || position._y>=_simulationRecord->getSize())

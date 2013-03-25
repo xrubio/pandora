@@ -38,6 +38,7 @@ public:
 	void serialize();
 
 	int getIndex() const;
+	void fission( Herder & original );
 
 	////////////////////////////////////////////////
 	// This code has been automatically generated //

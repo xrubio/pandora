@@ -74,11 +74,15 @@ int AgentRecord::getState( int numStep, const std::string & key ) const
 std::string AgentRecord::getCompleteState( int numStep ) const
 {
 	std::stringstream completeState;
-	completeState << "id: " << _id << std::endl;
-	completeState << "Agent values:";
+	completeState << "id: " << _id << " pos: " << getState(numStep, "x") << "/" << getState(numStep, "y") << std::endl;
 	for(StatesMap::const_iterator it=_states.begin(); it!=_states.end(); it++)
 	{
-		completeState << std::endl << it->first << ": " << it->second[numStep];
+		const std::string & key = it->first;
+		if(key.compare("exists")==0 || key.compare("x")==0 || key.compare("y")==0)
+		{
+			continue;
+		}
+		completeState << "\t" << it->first << ": " << it->second[numStep] << std::endl;
 	}
 	return completeState.str();
 }

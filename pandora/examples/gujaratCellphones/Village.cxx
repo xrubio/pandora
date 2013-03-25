@@ -1,5 +1,7 @@
 #include "Village.hxx"
 #include "Herder.hxx"
+#include "HerderWorld.hxx"
+#include "HerderWorldConfig.hxx"
 
 namespace GujaratCellphones
 {
@@ -121,6 +123,24 @@ void Village::serialize()
 	}
 	//std::cout << "end village: " << *this << " known cells: " << knownCells << std::endl;
 	serializeAttribute("known 3-year cells", knownCells);
+}
+
+void Village::fission( Herder & original )
+{
+	HerderWorld & world = (HerderWorld &)*_world;
+	const HerderWorldConfig & config = world.getConfig();
+
+	std::ostringstream ossH;
+	ossH << "Herder_"<<_herders.size()<<"_vil" << _index;
+	int numAnimals = original.getHerdSize()/2;
+	
+	Herder * newHerder = new Herder(ossH.str(), numAnimals, config._resourcesNeededPerAnimal, *this);
+	newHerder->configureMDP(config._horizon, config._width, config._explorationBonus);
+
+	world.addAgent(newHerder);
+	newHerder->createKnowledge();
+	newHerder->shareKnowledge(original);
+	original.setHerdSize(original.getHerdSize()-numAnimals);
 }
 
 }

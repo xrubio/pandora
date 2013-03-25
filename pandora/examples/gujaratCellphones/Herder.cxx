@@ -43,6 +43,11 @@ int Herder::getHerdSize() const
 	return _herdSize;
 }
 
+void Herder::setHerdSize( int herdSize )
+{
+	_herdSize = herdSize;
+}
+
 const std::string & Herder::getKnowledgeMap() const
 {
 	return _knowledgeMap;
@@ -182,11 +187,25 @@ void Herder::shareCell( const Herder & herderA, const Herder & herderB, const En
 
 	if(knowledgeA.getValue(index)>knowledgeB.getValue(index))
 	{
+		// agent B did not visit the cell
+		if(knowledgeB.getValue(index)==-1)
+		{
+			copyValue(herderA, herderB, index);
+			return;
+		}
+		// agent B has more recent information
 		copyValue(herderB, herderA, index);
 		return;
 	}
 	if(knowledgeA.getValue(index)<knowledgeB.getValue(index))
 	{
+		// agent A did not visit the cell
+		if(knowledgeA.getValue(index)==-1)
+		{
+			copyValue(herderB, herderA, index);
+			return;
+		}
+		// agent A has more recent information
 		copyValue(herderA, herderB, index);
 		return;
 	}
@@ -289,6 +308,12 @@ void Herder::updateState()
 			remove();
 			return;
 		}
+		// fission
+		if(_herdSize>config._animalsPerHerder)
+		{
+			_village->fission(*this);
+		}
+
 		// animals reproduction, 20%
 		oldHerdSize = _herdSize;
 		for(int i=0; i<oldHerdSize; i++)

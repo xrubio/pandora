@@ -42,7 +42,6 @@ class Herder : public Engine::Agent
 	void knowledgeTransmission( int frequency ) const;
 	void copyValue( const Herder & origin, const Herder & target, const Engine::Point2D<int> & index ) const;
 	void shareCell( const Herder & herderA, const Herder & herderB, const Engine::Point2D<int> & index ) const;
-	void shareKnowledge( Herder & herder ) const;
 		
 public:
 	Herder( const std::string & id, int herdSize, int resourcesPerAnimal, Village & village );
@@ -53,6 +52,7 @@ public:
 	int getResources() const;
 	int getNeededResources() const;
 	int getHerdSize() const;
+	void setHerdSize( int herdSize );
 	const std::string & getKnowledgeMap() const;
 	const std::string & getResourcesMap() const;
 	const Village & getVillage() const;
@@ -60,6 +60,7 @@ public:
 	//mental map
 	void createKnowledge();
 	void updateKnowledge();
+	void shareKnowledge( Herder & herder ) const;
 
 	//void printRaster(Engine::Raster & raster);
 

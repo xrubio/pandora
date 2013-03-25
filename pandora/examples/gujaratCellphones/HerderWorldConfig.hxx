@@ -43,6 +43,7 @@ public:
 	friend class HerderWorld;
 	friend class Climate;
 	friend class Herder;
+	friend class Village;
 };
 
 } // namespace GujaratCellphones

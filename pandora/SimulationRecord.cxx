@@ -614,8 +614,9 @@ SimulationRecord::StaticRasterMap::const_iterator SimulationRecord::endStaticRas
 	return _staticRasters.end();
 }
 		
-AgentRecord * SimulationRecord::getAgentAtPosition( int step, const Engine::Point2D<int> & position ) const	
+SimulationRecord::AgentRecordsVector SimulationRecord::getAgentsAtPosition( int step, const Engine::Point2D<int> & position ) const	
 {
+	AgentRecordsVector results;
 	for(AgentTypesMap::const_iterator itType=_types.begin(); itType!=_types.end(); itType++)
 	{
 		for(AgentRecordsMap::const_iterator it=beginAgents(itType); it!=endAgents(itType); it++)
@@ -625,11 +626,11 @@ AgentRecord * SimulationRecord::getAgentAtPosition( int step, const Engine::Poin
 			int y = agentRecord->getState(step, "y");
 			if(x==position._x && y==position._y)
 			{
-				return agentRecord;
+				results.push_back(agentRecord);
 			}
 		}
 	}
-	return 0;
+	return  results;
 }
 
 double SimulationRecord::getMean( const std::string & type, const std::string & state, int step )

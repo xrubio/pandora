@@ -42,11 +42,12 @@ class SimulationRecord
 public:
 	// TODO programar funció d'equivalencia a agent record i convertir en llista
 	typedef std::map<std::string, AgentRecord * > AgentRecordsMap;
-	typedef std::map<std::string, int > ValuesMap;
+	typedef std::map<std::string, int > ValuesMap;	
 	typedef std::vector<Engine::Raster> RasterHistory;
 	typedef std::map<std::string, RasterHistory> RasterMap;
 	typedef std::map<std::string, Engine::StaticRaster> StaticRasterMap;
 	typedef std::map<std::string, AgentRecordsMap > AgentTypesMap;
+	typedef std::vector<AgentRecord *> AgentRecordsVector;
 private:
 
 	std::string _name;
@@ -57,10 +58,10 @@ private:
 	// the step currently being loaded
 	int _loadingStep;
 
-	// resolution of serializedData
-	int _serializedResolution;
 	// resolution of loaded data
 	int _loadedResolution;
+	// resolution of serializedData
+	int _serializedResolution;
 
 	// we need to know min and max values for each state in order to paint agents 
 	ValuesMap _minAttributeValues;
@@ -128,7 +129,7 @@ public:
 	StaticRasterMap::const_iterator beginStaticRasters() const;
 	StaticRasterMap::const_iterator endStaticRasters() const;
 
-	AgentRecord * getAgentAtPosition( int step, const Engine::Point2D<int> & position ) const;
+	AgentRecordsVector getAgentsAtPosition( int step, const Engine::Point2D<int> & position ) const;
 	
 	// TODO make a different class
 	double getMean( const std::string & type, const std::string & state, int step );
