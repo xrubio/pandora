@@ -2,7 +2,7 @@
 <config> 
 	<!-- simulation config -->
 	<output resultsFile="./data/phones.h5" logsDir="./logs"/>
-	<numSteps value="2401" serializeResolution="1"/>
+	<numSteps value="10" serializeResolution="1"/>
 	<environment>
 		<landscape size="60" averageResources="1000"/>
 		<climate seed="1" daysDrySeason="240" meanRain="4643.848" stddev="1885.18"/>
