@@ -24,6 +24,7 @@
 
 #include <analysis/Results.hxx>
 #include <analysis/AgentMean.hxx>
+#include <analysis/AgentStdDev.hxx>
 #include <analysis/AgentSum.hxx>
 #include <analysis/AgentNum.hxx>
 #include <iostream>
@@ -45,6 +46,7 @@ int main(int argc, char *argv[])
 		agentResults.addAnalysis(new Analysis::AgentNum());
 		//agentResults.addAnalysis(new Analysis::AgentMean("starvation x100"));
 		agentResults.addAnalysis(new Analysis::AgentMean("herd size"));
+		agentResults.addAnalysis(new Analysis::AgentStdDev("herd size"));
 		//agentResults.addAnalysis(new Analysis::AgentMean("needed resources"));
 
 		agentResults.apply();
