@@ -31,8 +31,6 @@ class HerderWorld : public Engine::World
 	Climate _climate;
 	// maximum resources for soil quality (from 0 to 10)
 	std::vector<float> _maxResources;
-	// daily decrease for soil quality (from 0 to 10)
-	std::vector<float> _dailyDecrease;
 
 	void createAgents();
 	void createRasters();

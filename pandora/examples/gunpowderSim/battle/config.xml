@@ -6,6 +6,6 @@
 	<battlefield size="500" initialDistance="320"/>
 	<!-- tactics as follows: 1: volley; 2: ranks; 3: platoon; 4: catalan system -->
 	<blueSide numSoldiers="288" ranks="3" cohesionRating="50" cohesionDistance="20" accuracy="10" tactic="2" reloadingTime="48"/>
-	<redSide numSoldiers="288" ranks="3" cohesionRating="50" cohesionDistance="20" accuracy="10" tactic="3" reloadingTime="48"/>
+	<redSide numSoldiers="288" ranks="3" cohesionRating="60" cohesionDistance="20" accuracy="10" tactic="3" reloadingTime="48"/>
 </config>
 

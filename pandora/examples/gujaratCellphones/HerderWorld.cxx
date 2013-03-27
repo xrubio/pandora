@@ -7,7 +7,6 @@ namespace GujaratCellphones
 HerderWorld::HerderWorld(Engine::Simulation &simulation, HerderWorldConfig &config) : World(simulation, 1, true, config._resultsFile), _climate(config)
 {
 	_config = config;
-	_dailyDecrease.resize(11);
 	_maxResources.resize(11);
 }
 
@@ -79,14 +78,15 @@ void HerderWorld::createRasters()
 	getDynamicRaster(eResources).setInitValues(0, std::numeric_limits<int>::max(), 0);
 
 	registerDynamicRaster("soil quality", true, eSoilQuality);
-	getDynamicRaster(eSoilQuality).setInitValues(0, 10, 5);
+	getDynamicRaster(eSoilQuality).setInitValues(0, 10, 0);
 
 	Engine::Point2D<int> index(0,0);
 	for(index._x=0; index._x<_overlapBoundaries._size._x; index._x++)
 	{
 		for(index._y=0; index._y<_overlapBoundaries._size._y; index._y++)
 		{
-			int value = Engine::GeneralState::statistics().getNormalDistValue(0,10);
+			int value = index._y*10/_overlapBoundaries._size._y;
+			//int value = Engine::GeneralState::statistics().getNormalDistValue(0,10);
 			getDynamicRaster(eSoilQuality).setMaxValue(index, value);
 		}
 	}
@@ -112,9 +112,6 @@ void HerderWorld::recomputeYearlyBiomass()
 	{
 		float maxValue = (i*rainWeight*_config._averageResources)/5.0f;
 		_maxResources.at(i) = maxValue;
-		float decrease = maxValue*1.0f;
-		// days of dry season -1 because the first day it is not decreased
-		_dailyDecrease.at(i) = decrease/(_config._daysDrySeason-1);
 
 	}
 
@@ -123,27 +120,6 @@ void HerderWorld::recomputeYearlyBiomass()
 		for( index._y = _overlapBoundaries._origin._y; index._y < _overlapBoundaries._origin._y + _overlapBoundaries._size._y; index._y++ )
 		{
 			setValue(eResources, index, _maxResources.at(getValue(eSoilQuality, index)));
-		}
-	}
-}
-
-void HerderWorld::updateResources()
-{
-	Engine::Point2D<int> index;
-	for( index._x=_overlapBoundaries._origin._x; index._x<_overlapBoundaries._origin._x+_overlapBoundaries._size._x; index._x++ )		
-	{
-		for( index._y=_overlapBoundaries._origin._y; index._y<_overlapBoundaries._origin._y+_overlapBoundaries._size._y; index._y++ )
-		{
-			int currentValue = getValue(eResources, index);
-			float decrease = _dailyDecrease.at(getValue(eSoilQuality, index));
-
-			float currentFraction = (float)getValue(eResourcesFraction, index)/100.0f;
-			float newValue = std::max(0.0f, currentValue+currentFraction-decrease);
-			currentValue = newValue;
-			float fraction = 100.0f*(newValue  - currentValue);
-
-			setValue(eResources, index, currentValue);
-			setValue(eResourcesFraction, index, (int)fraction);
 		}
 	}
 }

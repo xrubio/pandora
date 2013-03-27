@@ -1284,13 +1284,25 @@ StaticRaster & World::getStaticRasterStr( const std::string & key )
 }
 
 Raster & World::getDynamicRaster( const int & index)
-{		
+{
+	if(index>=_rasters.size())
+	{
+		std::stringstream oss;
+		oss << "World::getDynamicRaster - index: " << index << " out of bound with size: " << _rasters.size();
+		throw Exception(oss.str());
+	}
 	return (Raster &)*(_rasters.at(index));
 }
 
 Raster & World::getDynamicRasterStr( const std::string & key )
 {	
 	RasterNameMap::const_iterator it = _rasterNames.find(key);
+	if(it==_rasterNames.end())
+	{
+		std::stringstream oss;
+		oss << "World::getDynamicRasterStr - raster: " << key << " not registered";
+		throw Exception(oss.str());
+	}
 	return getDynamicRaster(it->second);
 }
 
