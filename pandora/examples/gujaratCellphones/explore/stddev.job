@@ -47,6 +47,7 @@ FILE=rainStddev.txt
 ##################################################
 
 export GREASY_NWORKERS=90
+export GREASY_TASKS_PER_NODE=4
 # export GREASY_NODELIST=node1,node2,node3
 
 ##################################################

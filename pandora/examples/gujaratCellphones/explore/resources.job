@@ -47,6 +47,7 @@ FILE=resources.txt
 ##################################################
 
 export GREASY_NWORKERS=100
+export GREASY_TASKS_PER_NODE=4
 # export GREASY_NODELIST=node1,node2,node3
 
 ##################################################
