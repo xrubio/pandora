@@ -44,7 +44,14 @@ void AgentStdDev::postProcess()
 		{
 			sum += _values[i][j];
 		}
-		averages[i] = sum/_values[i].size();
+		if(_values[i].size()!=0)
+		{
+			averages[i] = sum/_values[i].size();
+		}
+		else
+		{
+			averages[i] = 0;
+		}
 	}
 	// diff calculations
 	for(int i=0; i<_results.size(); i++)
@@ -56,7 +63,14 @@ void AgentStdDev::postProcess()
 			float value = _values[i][j];
 			diff += (average-value)*(average-value);
 		}
-		_results[i] = sqrt(diff/_values[i].size());
+		if(_values[i].size()!=0)
+		{
+			_results[i] = sqrt(diff/_values[i].size());
+		}
+		else
+		{
+			_results[i] = 0;
+		}
 	}
 }
 
