@@ -2,16 +2,16 @@
 <config> 
 	<!-- simulation config -->
 	<output resultsFile="./data/phones.h5" logsDir="./logs"/>
-	<numSteps value="1201" serializeResolution="240"/>
+	<numSteps value="2401" serializeResolution="1"/>	
 	<environment>
 		<landscape size="60" averageResources="1000"/>
-		<climate seed="1" daysDrySeason="240" meanRain="4643.848" stddev="1885.18"/>
+		<climate seed="1" daysDrySeason="240" meanRain="4643.848" stddev="0.0001"/>
 	</environment>
 	<population>
-		<villages num="10" agentsPerVillage="10"/>
-		<animals numPerHerder="50" resourcesPerDay="1"/>		
+		<villages num="2" agentsPerVillage="2"/>
+		<animals numPerHerder="50" resourcesPerDay="5"/>
 	</population>
-	<mdp horizon="10" width="100" explorationBonus="0"/>
+	<mdp horizon="10" width="200" explorationBonus="0"/>
 	<knowledgeTransmission>
 		<!-- if fixed value = -1 a random value will be defined for each village -->
 		<inVillage active="yes" fixedValue="0"/>
