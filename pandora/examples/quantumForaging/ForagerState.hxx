@@ -7,11 +7,10 @@
 #include <Point2D.hxx>
 #include <HashTable.hxx>
 #include <engine/problem.h>
+#include "BaseAction.hxx"
 
 namespace QuantumExperiment
 {
-
-class MoveAction;
 
 class ForagerState
 {
@@ -32,13 +31,14 @@ public:
 	const Engine::Point2D<int> & getPosition() const;
 	void setPosition( const Engine::Point2D<int> & position );
 
-	void addAction( MoveAction * action );
-	const MoveAction & getAvailableAction(Problem::action_t index) const;
+	void addAction( BaseAction * action );
+	const BaseAction & getAvailableAction(Problem::action_t index) const;
 
 	void consume();
 	void computeHash();
 
 	void setForagedResources( int foragedResources );
+	int getForagedResources() const;
 	int getNeededResources() const;
 	const Engine::IncrementalRaster & getKnowledgeMap() const;
 	Engine::IncrementalRaster & getResourcesMap();
@@ -58,7 +58,7 @@ private:
 	Engine::IncrementalRaster _resourcesMap;
 
 	Engine::HashKey	* _hashKey;
-	std::vector<MoveAction*> _availableActions;
+	std::vector<BaseAction *> _availableActions;
 	int _neededResources;
 	bool _isCopy;
 public:

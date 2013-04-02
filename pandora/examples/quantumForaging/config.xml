@@ -2,10 +2,10 @@
 <config> 
 	<!-- simulation config -->
 	<output resultsFile="./data/quantum.h5" logsDir="./logs"/>
-	<numSteps value="500" serializeResolution="1"/>
+	<numSteps value="10" serializeResolution="1"/>
 	<environment size="30"/>
 	<agents num="1" neededResources="1">
-		<mdp horizon="10" width="20" explorationBonus="0"/>
+		<mdp horizon="10" width="100" explorationBonus="0"/>
 	</agents>
 </config>
 

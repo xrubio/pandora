@@ -4,7 +4,7 @@ agents = ['Forager']
 world = 'QuantumWorld'
 namespaceAgents = ['QuantumExperiment']
 
-srcFiles = ['main.cxx', 'Forager.cxx', 'QuantumWorld.cxx','QuantumWorldConfig.cxx', 'ForagerState.cxx', 'DecisionModel.cxx', 'MoveAction.cxx']
+srcFiles = ['main.cxx', 'Forager.cxx', 'QuantumWorld.cxx','QuantumWorldConfig.cxx', 'ForagerState.cxx', 'DecisionModel.cxx', 'MoveAction.cxx', 'ForageAction.cxx']
 
 import os, sys
 from subprocess import call

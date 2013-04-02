@@ -39,7 +39,8 @@ void QuantumWorld::createRasters()
 		for(index._y=0; index._y<_overlapBoundaries._size._y; index._y++)
 		{
 			//int value = Engine::GeneralState::statistics().getUniformDistValue(0,10);
-			int value = index._x;
+			//int value = index._x;
+			int value = 1;
 			getDynamicRaster(eResources).setMaxValue(index, value);
 		}
 	}

@@ -1,6 +1,7 @@
 
 #include "ForagerState.hxx"
 #include "MoveAction.hxx"
+#include "ForageAction.hxx"
 
 namespace QuantumExperiment
 {
@@ -90,12 +91,12 @@ int ForagerState::getNumAvailableActions() const
 	return _availableActions.size();
 }
 
-void ForagerState::addAction( MoveAction * action )
+void ForagerState::addAction( BaseAction * action )
 {
 	_availableActions.push_back(action);
 }
 
-const MoveAction & ForagerState::getAvailableAction(Problem::action_t index) const
+const BaseAction & ForagerState::getAvailableAction(Problem::action_t index) const
 {
 	return *_availableActions.at(index);
 }
@@ -195,6 +196,11 @@ void ForagerState::clearActions()
 void ForagerState::setForagedResources( int foragedResources )
 {
 	_foragedResources = foragedResources;
+}
+	
+int ForagerState::getForagedResources() const
+{
+	return _foragedResources;
 }
 
 } // namespace QuantumExperiment

@@ -116,14 +116,12 @@ void Forager::selectActions()
 	//std::cout << "mdp config, width: " << _width << " horizon: " << std::min(_horizon, world.daysUntilWetSeason()) << " bonus: " << _explorationBonus << std::endl;
 	UCT * uctPolicy = new UCT(*_uctBasePolicy, _width, _horizon, _explorationBonus, false);
 	Problem::action_t index = (*uctPolicy)(_model->init());
-	MoveAction * action = _model->init().getAvailableAction(index).copy();
-
+	BaseAction * action = _model->init().getAvailableAction(index).copy();
 	for(int i=0; i<_model->init().getNumAvailableActions(); i++)
 	{
-		std::cout << "possible action: " << i << " moving from: " << _model->init().getPosition()  << " to: " << _model->init().getAvailableAction(i).getNewPosition() << " would have cost: "<< _model->cost( _model->init(), i) << std::endl;
+		std::cout << "possible action for agent: " << this << " index: " << i << " is: " << _model->init().getAvailableAction(i).describe() << " would have cost: "<< _model->cost( _model->init(), i) << std::endl;
 	}
-	std::cout << "action chosen for step: " << _world->getCurrentStep() << " with index: " << index << " is moving from: " << _position << " to: " << action->getNewPosition() << std::endl;
-	
+	std::cout << "action chosen for agent: " << this << " at step: " << _world->getCurrentStep() << " with index: " << index << " is: " << action->describe() << std::endl;	
 	delete uctPolicy;
 	_actions.push_back(action);
 	std::cout << this << " end selecting actions for time step: " << _world->getCurrentStep() << std::endl;

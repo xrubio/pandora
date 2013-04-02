@@ -2,7 +2,10 @@
 #include "DecisionModel.hxx"
 #include "Forager.hxx"
 #include "ForagerState.hxx"
+
+#include "BaseAction.hxx"
 #include "MoveAction.hxx"
+#include "ForageAction.hxx"
 
 #include <Exceptions.hxx>
 
@@ -66,29 +69,27 @@ bool DecisionModel::applicable( const ForagerState & state, action_t action) con
 
 float DecisionModel::cost( const ForagerState & state, action_t action ) const
 {
+	std::cout << "cost for state: " << state << " and action: " << action << std::endl;
 	float cost = 0.0f;
-	float foragedResources = std::min(state.getNeededResources(), state.getResourcesMap().getValue(state.getAvailableAction(action).getNewPosition()));
-
+	float foragedResources = state.getForagedResources();
 	float neededResources = _agent.getNeededResources();
 	if(foragedResources<neededResources)
 	{
-		cost += (neededResources-foragedResources)/neededResources;
+		cost += 1.0f - foragedResources/neededResources;
 	}
-	std::cout << "action: " << action << " from state: " << state << " moving to: " << state.getAvailableAction(action).getNewPosition() << " is getting: " << foragedResources << " resources needed: " << neededResources << " base cost: " << cost << std::endl;
+	//std::cout << "action: " << action << " from state: " << state << " moving to: " << state.getAvailableAction(action).getPosition() << " is getting: " << foragedResources << " resources needed: " << neededResources << " base cost: " << cost << std::endl;
 	return cost;
 }
 
 void DecisionModel::next( const ForagerState & state, action_t index, OutcomeVector & outcomes ) const
 {
-//	std::cout << "creating next state" << std::endl;
 	ForagerState stateNext(state);
-	const MoveAction & moveAction = state.getAvailableAction(index);
-	moveAction.executeMDP( _agent, state, stateNext );
+	const BaseAction & action = state.getAvailableAction(index);
+	action.executeMDP( _agent, state, stateNext );
 	applyFrameEffects(state, stateNext);
 	stateNext.computeHash();	
 	makeActionsForState(stateNext);
 	outcomes.push_back(std::make_pair(stateNext, 1.0));
-//	std::cout << "end creating next state" << std::endl;
 }
 
 void DecisionModel::applyFrameEffects( const ForagerState & state,  ForagerState & stateNext ) const
@@ -101,6 +102,7 @@ void DecisionModel::makeActionsForState( ForagerState & state ) const
 {
 	state.clearActions();
 	assert(state.getNumAvailableActions()==0);
+	// 8 possible movements
 	for(int i=state.getPosition()._x-1; i<=state.getPosition()._x+1; i++)
 	{
 		for(int j=state.getPosition()._y-1; j<=state.getPosition()._y+1; j++)
@@ -110,12 +112,20 @@ void DecisionModel::makeActionsForState( ForagerState & state ) const
 			{
 				continue;
 			}
+			if(state.getPosition()==newPosition)
+			{
+				continue;
+			}
+
 			//std::cout << "from position: " << state.getPosition() << " creating new at: " << newPosition << std::endl;
 			MoveAction * newAction = new MoveAction(newPosition);
 			//std::cout << "creating new action: " << newAction << std::endl;
 			state.addAction(newAction);
 		}
 	}
+	// the last possible action is to remain in cell and forage
+	ForageAction * forageAction = new ForageAction(state.getPosition());
+	state.addAction(forageAction);
 	state.randomizeActions();
 	assert(state.getNumAvailableActions()>0);
 }
