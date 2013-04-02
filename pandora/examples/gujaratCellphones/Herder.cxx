@@ -112,18 +112,19 @@ void Herder::updateKnowledge()
 		return;
 	}
 	// info is one year old
-	Engine::Point2D<int> index(0,0);
-	for(index._x=0; index._x<_world->getOverlapBoundaries()._size._x; index._x++)
-	{
-		for(index._y=0; index._y<_world->getOverlapBoundaries()._size._y; index._y++)
+		Engine::Point2D<int> index(0,0);
+//		Engine::Raster & knowledge = _world->getDynamicRasterStr(_knowledgeMap);
+		for(index._x=0; index._x<_world->getOverlapBoundaries()._size._x; index._x++)
 		{
-			// if it has been explored
-			if(knowledge.getValue(index)!=-1)
+			for(index._y=0; index._y<_world->getOverlapBoundaries()._size._y; index._y++)
 			{
-				knowledge.setValue(index, knowledge.getValue(index)+1);
+				// if it has been explored
+				if(knowledge.getValue(index)!=-1)
+				{
+					knowledge.setValue(index, knowledge.getValue(index)+1);
+				}
 			}
 		}
-	}
 	// current resource values must be updated to max value
 	resources.updateRasterToMaxValues();
 }
@@ -194,7 +195,7 @@ void Herder::shareCell( const Herder & herderA, const Herder & herderB, const En
 			return;
 		}
 		// agent B has more recent information
-		copyValue(herderB, herderA, index);
+		//copyValue(herderB, herderA, index);
 		return;
 	}
 	if(knowledgeA.getValue(index)<knowledgeB.getValue(index))
@@ -202,13 +203,15 @@ void Herder::shareCell( const Herder & herderA, const Herder & herderB, const En
 		// agent A did not visit the cell
 		if(knowledgeA.getValue(index)==-1)
 		{
-			copyValue(herderB, herderA, index);
+			//copyValue(herderB, herderA, index);
 			return;
 		}
 		// agent A has more recent information
 		copyValue(herderA, herderB, index);
 		return;
 	}
+
+	/*
 	if(knowledgeA.getValue(index)==knowledgeB.getValue(index))
 	{
 		if(Engine::GeneralState::statistics().getUniformDistValue(0,1)==0)
@@ -220,6 +223,7 @@ void Herder::shareCell( const Herder & herderA, const Herder & herderB, const En
 			copyValue(herderB, herderA, index);
 		}
 	}
+	*/
 }
 
 void Herder::shareKnowledge(Herder & herder) const
@@ -291,15 +295,21 @@ void Herder::updateState()
 		//std::cout << "dry season, herder: " << this << std::endl;
 		// animals death by starvation
 		int oldHerdSize = _herdSize;
+		int newHerdSize = (int)(float)(_herdSize) * (1.0f-(_starvationDays/(float)config._daysDrySeason));
+
+		// 10% reproduction
+		_herdSize = (int)((float)newHerdSize*1.1f);
+		/*
 		for(int i=0; i<oldHerdSize; i++)
 		{
-			int die = Engine::GeneralState::statistics().getUniformDistValue(0,1000);
-			if(die<int((1000.0f*_starvationDays)/(float)config._daysDrySeason))
+			int die = Engine::GeneralState::statistics().getUniformDistValue(0,100);
+			if(die<int((100.0f*_starvationDays)/(float)config._daysDrySeason))
 			{
 				_herdSize = std::max(0, _herdSize-1);
 			}
 		}
-		//std::cout << this << " starvation: " << _starvationDays << " check: " << (int)(1000.0f*_starvationDays/(float)config._daysDrySeason) << " old herd size: " << oldHerdSize << " new: " << _herdSize << std::endl;
+		*/
+		std::cout << this << " starvation: " << _starvationDays << " percentage removed: " <<  100.0f*_starvationDays/(float)config._daysDrySeason << " old herd size: " << oldHerdSize << " to: " << newHerdSize << " final: " << _herdSize << std::endl;
 		_starvationDays = 0.0f;
 		// no animals, remove agent
 		if(_herdSize==0)
@@ -313,23 +323,30 @@ void Herder::updateState()
 		{
 			_village->fission(*this);
 		}
-
-		// animals reproduction, 20%
-		oldHerdSize = _herdSize;
-		for(int i=0; i<oldHerdSize; i++)
-		{
-			if(Engine::GeneralState::statistics().getUniformDistValue(0,4)==0)
-			{
-				_herdSize++;
-			}
-		}
 		setPosition(_village->getPosition());		
-		//std::cout << this << " reproduction: old herd size: " << oldHerdSize << " new: " << _herdSize << std::endl;
 
 		if(config._inVillageTransmission)
 		{
 			inVillageKnowledgeTransmission();
 		}
+		
+		/*
+		// info is one year old
+		Engine::Point2D<int> index(0,0);
+		Engine::Raster & knowledge = _world->getDynamicRasterStr(_knowledgeMap);
+		for(index._x=0; index._x<_world->getOverlapBoundaries()._size._x; index._x++)
+		{
+			for(index._y=0; index._y<_world->getOverlapBoundaries()._size._y; index._y++)
+			{
+				// if it has been explored
+				if(knowledge.getValue(index)!=-1)
+				{
+					knowledge.setValue(index, knowledge.getValue(index)+1);
+					std::cout << "setting knowledge value: " << knowledge.getValue(index) << std::endl;
+				}
+			}
+		}
+		*/
 		return;
 	}
 	

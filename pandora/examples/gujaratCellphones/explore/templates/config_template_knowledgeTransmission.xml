@@ -6,15 +6,15 @@
 	<numSteps value="24001" serializeResolution="240"/>
 	<environment>
 		<landscape size="60" averageResources="1000"/>
-		<climate seed="CLIMATESEED" daysDrySeason="240" meanRain="4643.848" stddev="1885.18"/>
+		<climate seed="CLIMATESEED" daysDrySeason="240" meanRain="4643.848" stddev="0.0001"/>
 	</environment>
 	<population>
-		<villages num="10" agentsPerVillage="10"/>
+		<villages num="2" agentsPerVillage="10"/>
 		<animals numPerHerder="50" resourcesPerDay="1"/>		
 	</population>
-	<mdp horizon="10" width="100" explorationBonus="0"/>
+	<mdp horizon="30" width="100" explorationBonus="0"/>
 	<knowledgeTransmission>
-		<inVillage active="yes" fixedValue="-1"/>
+		<inVillage active="yes" fixedValue="100"/>
 		<outVillage active="no" fixedValue="1"/>
 	</knowledgeTransmission>
 </config>

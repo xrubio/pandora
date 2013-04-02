@@ -3,8 +3,8 @@ import fileinput, sys, os, random
 baseDir = '/home/bsc21/bsc21887/pandora/examples/gujaratCellphones/explore'
 taskFile = 'generalKnowledgeTransmission.txt'
 
-numExecutions = 10
-knowledgeValues =  ['0','10','20','30','40','50','60','70','80','90','100']
+numExecutions = 20
+knowledgeValues =  ['0'] #'20','30','40','50','60','70','80','90','100']
 
 xmlTemplate = 'templates/config_template_generalKnowledgeTransmission.xml'
 

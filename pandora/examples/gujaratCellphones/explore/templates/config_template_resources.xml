@@ -8,10 +8,10 @@
 		<climate seed="CLIMATESEED" daysDrySeason="240" meanRain="4643.848" stddev="1885.18"/>
 	</environment>
 	<population>
-		<villages num="10" agentsPerVillage="10"/>
+		<villages num="1" agentsPerVillage="10"/>
 		<animals numPerHerder="50" resourcesPerDay="RESOURCES"/>		
 	</population>
-	<mdp horizon="10" width="100" explorationBonus="0"/>
+	<mdp horizon="10" width="200" explorationBonus="0"/>
 	<knowledgeTransmission>
 		<inVillage active="no" fixedValue="-1"/>
 		<outVillage active="no" fixedValue="1"/>

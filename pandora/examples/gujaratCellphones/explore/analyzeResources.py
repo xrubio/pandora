@@ -3,7 +3,7 @@
 import os, sys
 
 numExecutions = 10
-resourcesValues = ['1','2','3','4', '5', '6', '7', '8', '9', '10']
+resourcesValues = ['1','2','3','4'] #, '5', '6', '7', '8', '9', '10']
 
 # dir where analysis will be stored
 outputDir = 'compiledResultsResources'
@@ -31,7 +31,7 @@ for resources in resourcesValues:
 		# analysis
 		fileToAnalyze = rawResultsDir+'/phones.h5'
 		csv = csvDir+'/agents_'+suffix+'.csv'		
-		os.system('../analysisHerder/analysis/ '+fileToAnalyze+' '+csv)
+		os.system('../analysisHerder/analysis '+fileToAnalyze+' '+csv)
 		
 		# copy results
 		os.system('cp -ar '+rawResultsDir+' '+resultsDir)

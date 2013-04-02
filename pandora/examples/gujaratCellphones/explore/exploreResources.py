@@ -4,7 +4,8 @@ baseDir = '/home/bsc21/bsc21887/pandora/examples/gujaratCellphones/explore'
 taskFile = 'resources.txt'
 
 numExecutions = 10
-resourcesValues = ['1','2','3','4', '5', '6', '7', '8', '9', '10']
+#resourcesValues = ['1','2','3','4', '5', '6', '7', '8', '9', '10']
+resourcesValues = ['5', '6', '7', '8', '9', '10']
 
 xmlTemplate = 'templates/config_template_resources.xml'
 

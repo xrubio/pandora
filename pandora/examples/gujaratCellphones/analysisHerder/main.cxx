@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 
 		Analysis::AgentResults agentResults(simRecord, argv[2], "Herder");
 		agentResults.addAnalysis(new Analysis::AgentNum());
-		//agentResults.addAnalysis(new Analysis::AgentMean("starvation x100"));
+		agentResults.addAnalysis(new Analysis::AgentMean("starvation x100"));
 		agentResults.addAnalysis(new Analysis::AgentMean("herd size"));
 		agentResults.addAnalysis(new Analysis::AgentStdDev("herd size"));
 		//agentResults.addAnalysis(new Analysis::AgentMean("needed resources"));

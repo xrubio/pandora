@@ -3,7 +3,7 @@ import fileinput, sys, os, random
 baseDir = '/home/bsc21/bsc21887/pandora/examples/gujaratCellphones/explore'
 taskFile = 'knowledgeTransmission.txt'
 
-numExecutions = 100
+numExecutions = 10
 
 xmlTemplate = 'templates/config_template_knowledgeTransmission.xml'
 

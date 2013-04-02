@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
 		final->addAttribute("in village transmission");
 		final->addAttribute("herders");
 		final->addAttribute("total animals");
+		final->addAttribute("known 3-year cells");
 		agentResults.addAnalysis(final);
 
 		agentResults.apply();

@@ -105,17 +105,22 @@ float DecisionModel::cost( const HerderState & state, action_t action ) const
 		}
 	}
 
+	/*
 	// knowledge penalisation if the zone is not explored (increased risk)
 	int knowledge = state.getKnowledgeMap().getValue(state.getAvailableAction(action).getNewPosition());
-	if(knowledge>=0 && knowledge<10)
+	if(knowledge>=2 && knowledge <10)
 	{
 		cost += (float)(knowledge)/(10.0f*2.0f);
+	}
+	else if(knowledge>=0 && knowledge <2)
+	{
 	}
 	// now known or really old
 	else
 	{
-		cost += 1.0f/2.0f;
+		cost += Engine::GeneralState::statistics().getUniformDistValue(0.0f,1.0f);
 	}
+	*/
 //	std::cout << "added cost for risk: " << cost << " knowledge: " << knowledge << std::endl;
 //	std::cout << " new cost: " << cost << std::endl;
 	return cost;

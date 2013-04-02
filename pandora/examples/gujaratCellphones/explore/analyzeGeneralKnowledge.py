@@ -2,7 +2,10 @@
 
 import os, sys
 
-numExecutions = 10
+#numExecutions = 10
+#knowledgeValues =  ['0','10','20','30','40','50','60','70','80','90','100']
+
+numExecutions = 20
 knowledgeValues =  ['0','10','20','30','40','50','60','70','80','90','100']
 
 # dir where analysis will be stored

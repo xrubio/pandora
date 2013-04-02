@@ -2,7 +2,8 @@
 
 import os, sys
 
-numExecutions = 1
+#numExecutions = 100
+numExecutions = 4
 
 # dir where analysis will be stored
 outputDir = 'compiledResultsKnowledge'
@@ -20,6 +21,7 @@ os.makedirs(logsDir)
 os.makedirs(csvDir)
 
 index = 0
+#for numExecution in range(0,numExecutions):
 for numExecution in range(0,numExecutions):
 	print 'analyzing results for instance: ' + str(index) + ' and execution: ' + str(numExecution)
 	suffix = 'ex'+str(numExecution)

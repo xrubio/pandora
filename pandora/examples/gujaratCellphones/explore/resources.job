@@ -1,7 +1,7 @@
 #!/bin/bash
 #BSUB -J resources 
-#BSUB -oo resources
-#BSUB -eo resources
+#BSUB -oo resources.log
+#BSUB -eo resources.err
 
 ##################################################
 # Fill here with a number of cpus according to   #
@@ -10,14 +10,14 @@
 # master if using the mpi engine.                #
 ##################################################
 
-#BSUB -n 416
+#BSUB -n 160
 #BSUB -R"span[ptile=16]"
 
 ##################################################
 # and set an appropiate wall_clock_limit         #
 ##################################################
 
-#BSUB -W 10:00
+#BSUB -W 06:00
 
 ##################################################
 # Here goes the path to the file where you have  #
@@ -46,8 +46,8 @@ FILE=resources.txt
 # comma-separated hostlist as well.              #
 ##################################################
 
-export GREASY_NWORKERS=100
-export GREASY_TASKS_PER_NODE=4
+export GREASY_NWORKERS=40
+#export GREASY_TASKS_PER_NODE=4
 # export GREASY_NODELIST=node1,node2,node3
 
 ##################################################
