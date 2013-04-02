@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<config> 
+	<!-- simulation config -->
+	<output resultsFile="./data/quantum.h5" logsDir="./logs"/>
+	<numSteps value="10" serializeResolution="1"/>
+	<environment size="30"/>
+	<agents num="1" neededResources="1">
+		<mdp horizon="1" width="10" explorationBonus="0"/>
+	</agents>
+</config>
+
