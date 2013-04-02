@@ -83,6 +83,7 @@ void Forager::updateKnowledge()
 			for(index._y=0; index._y<_world->getOverlapBoundaries()._size._y; index._y++)
 			{
 				resources.setMaxValue(index, averageValue);
+				//resources.setMaxValue(index, _world->getDynamicRaster(eResources).getValue(index));
 			}
 		}
 		resources.updateRasterToMaxValues();
