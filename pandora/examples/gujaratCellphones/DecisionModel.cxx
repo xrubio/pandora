@@ -85,7 +85,7 @@ float DecisionModel::cost( const HerderState & state, action_t action ) const
 		return 0.0f;
 	}
 	float cost = 0.0f;
-	float resourcesToCollect = state.getAvailableAction(action).getResourcesToCollect();
+	float resourcesToCollect = state.getResourcesMap().getValue(state.getAvailableAction(action).getNewPosition());
 	float neededResources = state.getResourcesToEat();
 	if(resourcesToCollect<neededResources)
 	{
@@ -162,7 +162,7 @@ void DecisionModel::makeActionsForState( HerderState & state ) const
 				continue;
 			}
 	//		std::cout << "from position: " << state.getPosition() << " creating new at: " << newPosition << std::endl;
-			MoveAction * newAction = new MoveAction(newPosition, state.getResourcesMap().getValue(newPosition));
+			MoveAction * newAction = new MoveAction(newPosition);
 	//		std::cout << "creating new action: " << newAction << std::endl;
 			state.addAction(newAction);
 		}

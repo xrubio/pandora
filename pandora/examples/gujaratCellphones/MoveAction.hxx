@@ -19,9 +19,8 @@ class HerderState;
 class MoveAction : public Engine::Action
 {
 	Engine::Point2D<int> _newPosition;
-	int _resourcesToCollect;
 public:
-	MoveAction( const Engine::Point2D<int> & newPosition, int resourcesToCollect );
+	MoveAction( const Engine::Point2D<int> & newPosition);
 	virtual ~MoveAction();
 
 	void executeMDP( const Herder & agent, const HerderState & state, HerderState & stateNext ) const;
@@ -29,7 +28,6 @@ public:
 	MoveAction * copy() const;
 
 	const Engine::Point2D<int> & getNewPosition() const;
-	int getResourcesToCollect() const;
 	
 	//friend std::ostream & operator<<( std::ostream & stream, MoveAction * action );
 };

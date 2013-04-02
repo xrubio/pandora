@@ -100,7 +100,7 @@ const MoveAction & HerderState::getAvailableAction(Problem::action_t index) cons
 
 void HerderState::eat()
 {
-	_starvationDays += float(_resources)/float(_resourcesToEat);
+	_starvationDays += (1.0f - float(_resources)/float(_resourcesToEat));
 	_resources = 0;
 }
 

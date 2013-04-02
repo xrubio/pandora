@@ -358,7 +358,7 @@ void Herder::updateState()
 
 	if(_resources<getNeededResources())
 	{
-		_starvationDays += float(getNeededResources()-_resources)/float(getNeededResources());
+		_starvationDays += 1.0f - float(_resources)/float(getNeededResources());
 	}
 	//std::cout << " needed: " << getNeededResources() << " resources: " << _resources << " starvation acc: " << _starvationDays << std::endl;
 	_resources = 0;

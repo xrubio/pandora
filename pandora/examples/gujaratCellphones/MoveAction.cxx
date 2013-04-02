@@ -10,7 +10,7 @@
 namespace GujaratCellphones
 {
 
-MoveAction::MoveAction( const Engine::Point2D<int> & newPosition, int resourcesToCollect ) : _newPosition(newPosition), _resourcesToCollect(resourcesToCollect)
+MoveAction::MoveAction( const Engine::Point2D<int> & newPosition) : _newPosition(newPosition)
 {
 }
 
@@ -20,7 +20,7 @@ MoveAction::~MoveAction()
 
 MoveAction * MoveAction::copy() const
 {
-	MoveAction * newAction = new MoveAction(_newPosition, _resourcesToCollect);
+	MoveAction * newAction = new MoveAction(_newPosition);
 	return newAction;
 }
 
@@ -93,10 +93,6 @@ const Engine::Point2D<int> & MoveAction::getNewPosition() const
 	return _newPosition;
 }
 
-int MoveAction::getResourcesToCollect() const
-{
-	return _resourcesToCollect;
-}
 
 /*
 std::ostream & operator<<( std::ostream & stream, MoveAction * action )
