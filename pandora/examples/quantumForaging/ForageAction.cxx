@@ -47,10 +47,11 @@ void ForageAction::execute( Engine::Agent & agent )
 	forager.getWorld()->setValue(eResources, _position, rest);
 
 	// we set the maximum value of the mental map of the agent to the value before gathering in case it is the first time this year
-	int qualityKnowledge = forager.getWorld()->getDynamicRasterStr(forager.getKnowledgeMap()).getValue(_position);
-	if(qualityKnowledge<100)
+	Engine::Raster & knowledge = forager.getWorld()->getDynamicRasterStr(forager.getKnowledgeMap());
+	int qualityKnowledge = knowledge.getValue(_position);
+	if(qualityKnowledge<knowledge.getMaxValueAt(_position))
 	{
-		forager.getWorld()->getDynamicRasterStr(forager.getKnowledgeMap()).setValue(_position, qualityKnowledge+1);
+		knowledge.setValue(_position, qualityKnowledge+1);
 	}
 
 	// how to model an improvement?

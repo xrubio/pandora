@@ -16,7 +16,8 @@ namespace QuantumExperiment
 enum Rasters
 {
 	// quality of soil, between 0 and 10
-	eResources
+	eResources,
+	eKnowledge
 };
 
 class QuantumWorld: public Engine::World

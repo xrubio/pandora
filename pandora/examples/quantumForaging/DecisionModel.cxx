@@ -69,16 +69,47 @@ bool DecisionModel::applicable( const ForagerState & state, action_t action) con
 
 float DecisionModel::cost( const ForagerState & state, action_t action ) const
 {
-	std::cout << "cost for state: " << state << " and action: " << action << std::endl;
-	float cost = 0.0f;
+	float starvationCost = 0.0f;
 	float foragedResources = state.getForagedResources();
 	float neededResources = _agent.getNeededResources();
 	if(foragedResources<neededResources)
 	{
-		cost += 1.0f - foragedResources/neededResources;
+		starvationCost += 1.0f - foragedResources/neededResources;
 	}
+
+	std::cout << "starvation cost for state: " << state << " is: " << starvationCost << std::endl;
+
+	Engine::Raster & knowledge = _agent.getWorld()->getDynamicRasterStr(_agent.getKnowledgeMap());
+	float qualityKnowledgeInPos = float(knowledge.getValue(state.getPosition()))/float(knowledge.getMaxValueAt(state.getPosition()));
+
+	// adjacent cells
+	Engine::Point2D<int> index(0,0);
+	float qualityKnowledgeInAdjacentCells = 0.0f;
+	int numNeighbors = 0.0f;
+	for(int i=state.getPosition()._x-1; i<=state.getPosition()._x+1; i++)
+	{
+		for(int j=state.getPosition()._y-1; j<=state.getPosition()._y+1; j++)
+		{
+			Engine::Point2D<int> neighbor(i,j);
+			if(!_agent.getWorld()->checkPosition(neighbor))
+			{
+				continue;
+			}
+			if(state.getPosition()==neighbor)
+			{
+				continue;
+			}
+			numNeighbors++;
+			float value = float(knowledge.getValue(neighbor))/float(knowledge.getMaxValueAt(neighbor));
+			qualityKnowledgeInAdjacentCells += value;
+		}
+	}
+	qualityKnowledgeInAdjacentCells /= numNeighbors;
+
+	std::cout << "cost for state: " << state << " and action: " << action << " is starvation: " << starvationCost << " in knowledge: " << qualityKnowledgeInPos << " adjacent: " << qualityKnowledgeInAdjacentCells << std::endl;
 	//std::cout << "action: " << action << " from state: " << state << " moving to: " << state.getAvailableAction(action).getPosition() << " is getting: " << foragedResources << " resources needed: " << neededResources << " base cost: " << cost << std::endl;
-	return cost;
+	float knowledgeCost = 0.0f;
+	return starvationCost+knowledgeCost;
 }
 
 void DecisionModel::next( const ForagerState & state, action_t index, OutcomeVector & outcomes ) const

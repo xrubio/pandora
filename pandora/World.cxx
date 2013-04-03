@@ -96,12 +96,11 @@ void World::init( int argc, char *argv[] )
 	
 	stablishPosition();
 	createRasters();
-
+	createAgents();
 #ifdef PANDORAMPI
 	GeneralState::serializer().init(_simulation, _rasters, _dynamicRasters, _serializeRasters, *this);
 	serializeStaticRasters();
 #endif
-	createAgents();
 #ifdef PANDORAMPI
 	MpiFactory::instance()->registerTypes();
 #endif
