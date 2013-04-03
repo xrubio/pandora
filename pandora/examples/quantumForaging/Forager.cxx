@@ -139,12 +139,16 @@ void Forager::registerAttributes()
 {
 	registerIntAttribute("starvation x100");
 	registerIntAttribute("needed resources");
+	registerIntAttribute("width");
+	registerIntAttribute("horizon");
 }
 
 void Forager::serialize()
 {
 	serializeAttribute("starvation x100", (int)(_starvation*100.0f));
 	serializeAttribute("needed resources", getNeededResources());
+	serializeAttribute("width", _width); 
+	serializeAttribute("horizon", _horizon);
 }
 
 int Forager::getHorizon() const
