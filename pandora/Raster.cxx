@@ -71,7 +71,7 @@ void Raster::updateRasterToMaxValues()
 	std::copy(_maxValues.begin(), _maxValues.end(), _values.begin());
 }
 
-int Raster::getMaxValueAt( Point2D<int> position )
+int Raster::getMaxValueAt( Point2D<int> position ) const
 {
 	if(position._x<0 || position._x>=_maxValues.size())
 	{

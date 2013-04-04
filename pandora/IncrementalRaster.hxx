@@ -41,8 +41,9 @@ public:
 
 	virtual void		resize(  const Point2D<int> & size );
 
-	virtual void 		setValue( Point2D<int> pos, int value );
-	virtual const int& 	getValue( Point2D<int> pos ) const;
+	void 		setValue( Point2D<int> pos, int value );
+	const int& 	getValue( Point2D<int> pos ) const;
+	int getMaxValueAt( Point2D<int> position ) const;
 
 	int			getCurrentMinValue() const { return _currentMinValue; }
 	int			getCurrentMaxValue() const { return _currentMaxValue; }
