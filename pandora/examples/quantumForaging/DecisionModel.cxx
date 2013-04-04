@@ -101,7 +101,7 @@ float DecisionModel::cost( const ForagerState & state, action_t action ) const
 			}
 			numNeighbors++;
 			float value = float(knowledge.getValue(neighbor))/float(knowledge.getMaxValueAt(neighbor));
-			std::cout << "\tknowledge value for neighbor: " << neighbor << " is: " << value << std::endl;
+			std::cout << "\tknowledge value for neighbor: " << neighbor << " is: " << value << " having base balue: " << knowledge.getValue(neighbor) << " and max: " << knowledge.getMaxValueAt(neighbor) << std::endl;
 			qualityKnowledgeInAdjacentCells += value;
 		}
 	}

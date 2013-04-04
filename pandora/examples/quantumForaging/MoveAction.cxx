@@ -26,7 +26,6 @@ BaseAction * MoveAction::copy() const
 
 void MoveAction::executeMDP( const Forager & forager, const ForagerState & state, ForagerState & stateNext ) const
 {
-	std::cout << "foo" << std::endl;
 	stateNext.setPosition(_position);
 
 	Engine::Point2D<int> localPos = _position - forager.getWorld()->getOverlapBoundaries()._origin;
@@ -39,7 +38,6 @@ void MoveAction::executeMDP( const Forager & forager, const ForagerState & state
 
 void MoveAction::execute( Engine::Agent & agent )
 {
-	std::cout << "foo2" << std::endl;
 	Forager & forager = (Forager&)agent;
 	forager.setPosition(_position);	
 	
