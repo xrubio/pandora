@@ -26,17 +26,25 @@ BaseAction * ForageAction::copy() const
 
 void ForageAction::executeMDP( const Forager & forager, const ForagerState & state, ForagerState & stateNext ) const
 {
+	std::cout << "bar" << std::endl;
 	Engine::Point2D<int> localPos = _position - forager.getWorld()->getOverlapBoundaries()._origin;
 	int previousValue = forager.getWorld()->getValue(eResources,_position);
 	int foragedResources = std::min(forager.getNeededResources(), previousValue);
 	stateNext.setForagedResources(foragedResources);
 
 //	std::cout << "executing from state: " << state << " to: " << stateNext << " getting value: " << state.getRasterResources().getValue(localPos) << " size of inc. raster: " << state.getRasterResources().getSize() << std::endl;
-	stateNext.getResourcesMap().setValue(localPos, previousValue-foragedResources);
+	stateNext.getResourcesMap().setValue(localPos, previousValue-foragedResources);	
+	
+	int oldKnowledge = state.getKnowledgeMap().getValue(localPos);
+	if(oldKnowledge<state.getKnowledgeMap().getMaxValueAt(localPos))
+	{
+		stateNext.getKnowledgeMap().setValue(localPos, 1);
+	}
 }
 
 void ForageAction::execute( Engine::Agent & agent )
 {
+	std::cout << "bar2" << std::endl;
 	Forager & forager = (Forager&)agent;
 
 	int previousValue = forager.getWorld()->getValue(eResources,_position);

@@ -26,13 +26,29 @@ BaseAction * MoveAction::copy() const
 
 void MoveAction::executeMDP( const Forager & forager, const ForagerState & state, ForagerState & stateNext ) const
 {
+	std::cout << "foo" << std::endl;
 	stateNext.setPosition(_position);
+
+	Engine::Point2D<int> localPos = _position - forager.getWorld()->getOverlapBoundaries()._origin;
+	int oldKnowledge = state.getKnowledgeMap().getValue(localPos);
+	if(oldKnowledge<state.getKnowledgeMap().getMaxValueAt(localPos))
+	{
+		stateNext.getKnowledgeMap().setValue(localPos, 1);
+	}
 }
 
 void MoveAction::execute( Engine::Agent & agent )
 {
+	std::cout << "foo2" << std::endl;
 	Forager & forager = (Forager&)agent;
-	forager.setPosition(_position);
+	forager.setPosition(_position);	
+	
+	Engine::Raster & knowledge = forager.getWorld()->getDynamicRasterStr(forager.getKnowledgeMap());
+	int qualityKnowledge = knowledge.getValue(_position);
+	if(qualityKnowledge<knowledge.getMaxValueAt(_position))
+	{
+		knowledge.setValue(_position, qualityKnowledge+1);
+	}
 }
 
 std::string MoveAction::describe() const

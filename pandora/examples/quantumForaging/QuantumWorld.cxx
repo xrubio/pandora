@@ -20,12 +20,12 @@ void QuantumWorld::createAgents()
 		std::ostringstream oss;
 		oss << "Forager_"<<i;
 		Forager * forager = new Forager(oss.str(), _config._neededResources);
-		int horizon = Engine::GeneralState::statistics().getUniformDistValue(1,_config._horizon);
+		//int horizon = Engine::GeneralState::statistics().getUniformDistValue(1,_config._horizon);
 		//int width = Engine::GeneralState::statistics().getUniformDistValue(2,_config._width);
-		forager->configureMDP(horizon, _config._width, _config._explorationBonus);	
+		forager->configureMDP(_config._horizon, _config._width, _config._explorationBonus);	
 		addAgent(forager);
-		forager->setRandomPosition();
-		//forager->setPosition(Engine::Point2D<int>(0,0));
+		//forager->setRandomPosition();
+		forager->setPosition(Engine::Point2D<int>(0,0));
 		forager->createKnowledge();
 	}
 }
@@ -40,8 +40,8 @@ void QuantumWorld::createRasters()
 	{
 		for(index._y=0; index._y<_overlapBoundaries._size._y; index._y++)
 		{
-			int value = Engine::GeneralState::statistics().getUniformDistValue(0,10);
-			//int value = index._x;
+			//int value = Engine::GeneralState::statistics().getUniformDistValue(0,10);
+			int value = index._x;
 			getDynamicRaster(eResources).setMaxValue(index, value);
 		}
 	}

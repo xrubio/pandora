@@ -113,7 +113,6 @@ void Forager::selectActions()
 {
 	QuantumWorld & world = (QuantumWorld &)*_world;
 	_model->reset();
-	//std::cout << "mdp config, width: " << _width << " horizon: " << std::min(_horizon, world.daysUntilWetSeason()) << " bonus: " << _explorationBonus << std::endl;
 	UCT * uctPolicy = new UCT(*_uctBasePolicy, _width, _horizon, _explorationBonus, false);
 	Problem::action_t index = (*uctPolicy)(_model->init());
 	BaseAction * action = _model->init().getAvailableAction(index).copy();

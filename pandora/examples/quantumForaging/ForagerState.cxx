@@ -168,6 +168,10 @@ const Engine::IncrementalRaster & ForagerState::getKnowledgeMap() const
 	return _knowledgeMap;
 }
 
+Engine::IncrementalRaster & ForagerState::getKnowledgeMap()
+{
+	return _knowledgeMap;
+}
 
 void ForagerState::randomizeActions()
 {

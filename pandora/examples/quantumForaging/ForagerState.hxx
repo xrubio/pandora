@@ -40,6 +40,7 @@ public:
 	void setForagedResources( int foragedResources );
 	int getForagedResources() const;
 	int getNeededResources() const;
+	Engine::IncrementalRaster & getKnowledgeMap();
 	const Engine::IncrementalRaster & getKnowledgeMap() const;
 	Engine::IncrementalRaster & getResourcesMap();
 	const Engine::IncrementalRaster & getResourcesMap() const;
