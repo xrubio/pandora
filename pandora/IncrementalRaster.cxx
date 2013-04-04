@@ -30,15 +30,13 @@ IncrementalRaster::IncrementalRaster()
 {
 }
 
-IncrementalRaster::IncrementalRaster( const Raster& baseRaster )
-	: _baseRaster( &baseRaster )
+IncrementalRaster::IncrementalRaster( const Raster& baseRaster ) : _baseRaster( &baseRaster )
 {
 	_currentMinValue = _baseRaster->getCurrentMinValue();
 	_currentMaxValue = _baseRaster->getCurrentMaxValue();
 }
 
-IncrementalRaster::IncrementalRaster( const IncrementalRaster& other ) 
-	: _changes( other._changes ), _baseRaster( other._baseRaster )
+IncrementalRaster::IncrementalRaster( const IncrementalRaster& other ) : _changes( other._changes ), _baseRaster( other._baseRaster )
 {
 	_currentMinValue = other._currentMinValue;
 	_currentMaxValue = other._currentMaxValue;
@@ -48,16 +46,16 @@ IncrementalRaster::~IncrementalRaster()
 {
 }
 
-void 	IncrementalRaster::resize( const Point2D<int>& size )
+void IncrementalRaster::resize( const Point2D<int>& size )
 {
 }
 
-void	IncrementalRaster::setValue( Point2D<int> pos, int value )
+void IncrementalRaster::setValue( Point2D<int> pos, int value )
 {
 	_changes[pos] = value;
 }
 
-const int&	IncrementalRaster::getValue( Point2D<int> pos ) const
+const int & IncrementalRaster::getValue( Point2D<int> pos ) const
 {
 	ChangeTable::const_iterator it = _changes.find( pos );
 	if ( it == _changes.end() )
@@ -82,7 +80,7 @@ void	IncrementalRaster::updateCurrentMinMaxValues()
 }
 */
 
-bool	IncrementalRaster::operator==( const IncrementalRaster& other ) const
+bool IncrementalRaster::operator==( const IncrementalRaster& other ) const
 {
 	for ( ChangeIterator i = firstChange(); 
 		i != endOfChanges(); i++ )
