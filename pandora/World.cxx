@@ -95,8 +95,8 @@ void World::init( int argc, char *argv[] )
 	_initialTime = getWallTime();
 	
 	stablishPosition();
-	createRasters();
 	createAgents();
+	createRasters();
 #ifdef PANDORAMPI
 	GeneralState::serializer().init(_simulation, _rasters, _dynamicRasters, _serializeRasters, *this);
 	serializeStaticRasters();
