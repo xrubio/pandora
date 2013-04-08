@@ -21,6 +21,8 @@ void QuantumWorldConfig::extractParticularAttribs(TiXmlElement * root)
 	element = root->FirstChildElement("agents");
 	retrieveAttributeMandatory(element, "num", _numAgents);
 	retrieveAttributeMandatory(element, "neededResources", _neededResources);
+	retrieveAttributeMandatory(element, "perfectInformation", _perfectInformation);
+	retrieveAttributeMandatory(element, "riskAversion", _riskAversion);
 
 	//mdp
 	TiXmlElement * child = element->FirstChildElement("mdp");

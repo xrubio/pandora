@@ -13,6 +13,10 @@ class QuantumWorldConfig : public Engine::Config
 	// agents
 	int _numAgents;
 	int _neededResources;
+	// if true, the agents will know at the beginning of the simulation the real resource map
+	bool _perfectInformation;
+	// aversion to risk, from 0.0 to 1.0f
+	float _riskAversion;
 
 	//mdp
 	int _horizon;

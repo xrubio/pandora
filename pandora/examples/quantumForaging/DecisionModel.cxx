@@ -73,38 +73,22 @@ float DecisionModel::cost( const ForagerState & state, action_t action ) const
 	float starvationCost = state.getAvailableAction(action).getStarvationCost();
 
 	const Engine::Raster & knowledge = state.getKnowledgeMap();
-	float qualityKnowledgeInPos = float(knowledge.getValue(state.getPosition()))/float(knowledge.getMaxValueAt(state.getPosition()));
 
-	// adjacent cells
-	Engine::Point2D<int> index(0,0);
-	float qualityKnowledgeInAdjacentCells = 0.0f;
-	int numNeighbors = 0.0f;
-	std::cout << "agent: " << _agent << " at state: " << state << " has quality of position: " << qualityKnowledgeInPos << std::endl;
-	for(int i=state.getPosition()._x-1; i<=state.getPosition()._x+1; i++)
+	float localKnowledgeIncrease = 0.0f;
+	if(state.getAvailableAction(action).getPosition()==state.getPosition() && knowledge.getValue(state.getPosition())<knowledge.getMaxValueAt(state.getPosition()))
 	{
-		for(int j=state.getPosition()._y-1; j<=state.getPosition()._y+1; j++)
-		{
-			Engine::Point2D<int> neighbor(i,j);
-			if(!_agent.getWorld()->checkPosition(neighbor))
-			{
-				continue;
-			}
-			if(state.getPosition()==neighbor)
-			{
-				continue;
-			}
-			numNeighbors++;
-			float value = float(knowledge.getValue(neighbor))/float(knowledge.getMaxValueAt(neighbor));
-			std::cout << "\tknowledge value for neighbor: " << neighbor << " is: " << value << " having base balue: " << knowledge.getValue(neighbor) << " and max: " << knowledge.getMaxValueAt(neighbor) << std::endl;
-			qualityKnowledgeInAdjacentCells += value;
-		}
+		localKnowledgeIncrease += 1.0f;	 
 	}
-	std::cout << "agent: " << _agent << " has quality of neighbors: " << qualityKnowledgeInAdjacentCells << " num neighbors: " << numNeighbors << " final value: " << 	qualityKnowledgeInAdjacentCells / numNeighbors << std::endl;
-	qualityKnowledgeInAdjacentCells /= numNeighbors;
 
-	//std::cout << "cost for state: " << state << " and action: " << action << " is starvation: " << starvationCost << " in knowledge: " << qualityKnowledgeInPos << " adjacent: " << qualityKnowledgeInAdjacentCells << std::endl;
-	//std::cout << "action: " << action << " from state: " << state << " moving to: " << state.getAvailableAction(action).getPosition() << " is getting: " << foragedResources << " resources needed: " << neededResources << " base cost: " << cost << std::endl;
-	float knowledgeCost = 0.0f;
+	float neighborKnowledgeIncrease = 0.0f;
+	if(state.getAvailableAction(action).getPosition()!=state.getPosition() && knowledge.getValue(state.getAvailableAction(action).getPosition())<knowledge.getMaxValueAt(state.getAvailableAction(action).getPosition()))
+	{
+		neighborKnowledgeIncrease += 1.0f;
+	}
+	
+	float knowledgeCost = (1.0f-localKnowledgeIncrease)*_agent.getAmbiguityAversion() + (1.0f-neighborKnowledgeIncrease)*_agent.getRiskAversion();
+	std::cout << "knowledge costs: " << knowledgeCost << " with ambiguity: " << localKnowledgeIncrease*_agent.getAmbiguityAversion() << " with aversion: " << _agent.getAmbiguityAversion() << " risk: " << neighborKnowledgeIncrease*_agent.getRiskAversion() << " with aversion: " << _agent.getRiskAversion() << std::endl;
+	std::cout << "final cost: " << starvationCost+knowledgeCost << " starv.: " << starvationCost << " knowledge: " << knowledgeCost << std::endl;
 	return starvationCost+knowledgeCost;
 }
 

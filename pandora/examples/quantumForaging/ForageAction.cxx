@@ -19,7 +19,7 @@ ForageAction::ForageAction( const Engine::Point2D<int> & position, const Engine:
 {	
 	int previousValue = resourcesMap.getValue(position);
 	int foragedResources = std::min(neededResources, previousValue);
-	_fractionForaged = 1.0f - (float)foragedResources/(float)neededResources; 
+	_fractionForaged = (float)foragedResources/(float)neededResources; 
 }
 
 ForageAction::~ForageAction()
@@ -85,7 +85,7 @@ std::string ForageAction::describe() const
 
 float ForageAction::getStarvationCost() const
 {
-	return _fractionForaged;
+	return 1.0f - _fractionForaged;
 }
 
 } // namespace QuantumExperiment

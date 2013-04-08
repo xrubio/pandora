@@ -11,14 +11,20 @@
 namespace QuantumExperiment
 {
 
-Forager::Forager( const std::string & id, int neededResources) : Agent(id), _currentResources(0), _neededResources(neededResources), _model(0), _uctBasePolicy(0), _horizon(0), _width(0), _explorationBonus(0)
+Forager::Forager( const std::string & id, int neededResources, bool perfectInformation, float riskAversion ) : Agent(id), _currentResources(0), _neededResources(neededResources), _perfectInformation(perfectInformation), _starvation(0), _model(0), _uctBasePolicy(0), _horizon(0), _width(0), _explorationBonus(0), _riskAversion(riskAversion), _ambiguityAversion(1.0f-riskAversion), _moveActions(0)
 {
 }
 
 Forager::~Forager()
 {
-	delete _model;
-	delete _uctBasePolicy;
+	if(_model)
+	{
+		delete _model;
+	}
+	if(_uctBasePolicy)
+	{
+		delete _uctBasePolicy;
+	}
 }
 
 void Forager::setCurrentResources( int currentResources )
@@ -82,8 +88,14 @@ void Forager::updateKnowledge()
 		{
 			for(index._y=0; index._y<_world->getOverlapBoundaries()._size._y; index._y++)
 			{
-				resources.setMaxValue(index, averageValue);
-				//resources.setMaxValue(index, _world->getDynamicRaster(eResources).getValue(index));
+				if(_perfectInformation)
+				{
+					resources.setMaxValue(index, _world->getDynamicRaster(eResources).getValue(index));
+				}
+				else
+				{
+					resources.setMaxValue(index, averageValue);
+				}
 			}
 		}
 		resources.updateRasterToMaxValues();
@@ -123,6 +135,11 @@ void Forager::selectActions()
 	std::cout << "action chosen for agent: " << this << " at step: " << _world->getCurrentStep() << " with index: " << index << " is: " << action->describe() << std::endl;	
 	delete uctPolicy;
 	_actions.push_back(action);
+
+	if(action->getPosition()!=_position)
+	{
+		_moveActions++;
+	}
 	std::cout << this << " end selecting actions for time step: " << _world->getCurrentStep() << std::endl;
 }
 
@@ -140,6 +157,7 @@ void Forager::registerAttributes()
 	registerIntAttribute("needed resources");
 	registerIntAttribute("width");
 	registerIntAttribute("horizon");
+	registerIntAttribute("move actions");
 }
 
 void Forager::serialize()
@@ -148,11 +166,22 @@ void Forager::serialize()
 	serializeAttribute("needed resources", getNeededResources());
 	serializeAttribute("width", _width); 
 	serializeAttribute("horizon", _horizon);
+	serializeAttribute("move actions", _moveActions);
 }
 
 int Forager::getHorizon() const
 {
 	return _horizon;
+}
+
+float Forager::getRiskAversion() const
+{
+	return _riskAversion;
+}
+
+float Forager::getAmbiguityAversion() const
+{
+	return _ambiguityAversion;
 }
 
 } // namespace QuantumExperiment

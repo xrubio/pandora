@@ -2,10 +2,11 @@
 <config> 
 	<!-- simulation config -->
 	<output resultsFile="./data/quantum.h5" logsDir="./logs"/>
-	<numSteps value="1" serializeResolution="1"/>
+	<numSteps value="100" serializeResolution="1"/>
 	<environment size="10"/>
-	<agents num="1" neededResources="1">
-		<mdp horizon="3" width="20" explorationBonus="0"/>
+	<!-- if risk aversion = -1, random value will be chosen -->
+	<agents num="1" neededResources="1" perfectInformation="false" riskAversion="-1">
+		<mdp horizon="5" width="200" explorationBonus="0"/>
 	</agents>
 </config>
 

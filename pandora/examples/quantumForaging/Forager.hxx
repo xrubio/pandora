@@ -16,14 +16,14 @@ class Forager : public Engine::Agent
 	typedef Online::Policy::random_t< ForagerState> BasePolicy;
 	typedef Online::Policy::UCT::uct_t< ForagerState > UCT;
 
-	DecisionModel * _model;
-	BasePolicy * _uctBasePolicy;
-
 	int _currentResources; // MpiBasicAttribute
 	int _neededResources; // MpiBasicAttribute
+	bool _perfectInformation; // MpiBasicAttribute
 	// fitness, in terms of % of time steps where the agent didn't get needed resources
 	float _starvation; // MpiBasicAttribute
 
+	DecisionModel * _model;
+	BasePolicy * _uctBasePolicy;
 	// mdp
 	int _horizon; // MpiBasicAttribute
 	int _width; // MpiBasicAttribute
@@ -32,9 +32,14 @@ class Forager : public Engine::Agent
 	//mental map
 	std::string _knowledgeMap; //quality of knowledge, from 0% (no idea) to 100% (perfect idea)
 	std::string _resourcesMap; //value of resources
+
+	// decision making process
+	float _riskAversion; // MpiBasicAttribute
+	float _ambiguityAversion; // MpiBasicAttribute
+	int _moveActions; // MpiBasicAttribute
 		
 public:
-	Forager( const std::string & id, int neededResources );
+	Forager( const std::string & id, int neededResources, bool perfectInformation, float riskAversion );
 	virtual ~Forager();
 
 	//sets and gets
@@ -57,6 +62,9 @@ public:
 	//register information
 	void registerAttributes();
 	void serialize();
+
+	float getRiskAversion() const;
+	float getAmbiguityAversion() const;
 
 	////////////////////////////////////////////////
 	// This code has been automatically generated //
