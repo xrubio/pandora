@@ -34,7 +34,8 @@ BaseAction * ForageAction::copy() const
 
 void ForageAction::executeMDP( const Forager & forager, const ForagerState & state, ForagerState & stateNext ) const
 {
-	Engine::Point2D<int> localPos = _position - forager.getWorld()->getOverlapBoundaries()._origin;	
+	Engine::Point2D<int> localPos = _position - forager.getWorld()->getOverlapBoundaries()._origin;
+
 	int previousValue = state.getResourcesMap().getValue(localPos);
 	int foragedResources = std::min(forager.getNeededResources(), previousValue);
 	stateNext.setForagedResources(foragedResources);
@@ -60,7 +61,7 @@ void ForageAction::execute( Engine::Agent & agent )
 	int rest = previousValue - collected;
 	forager.getWorld()->setValue(eResources, _position, rest);
 
-	// we set the maximum value of the mental map of the agent to the value before gathering in case it is the first time this year
+	// decrease the uncertainty of values
 	Engine::Raster & knowledge = forager.getWorld()->getDynamicRasterStr(forager.getKnowledgeMap());
 	int qualityKnowledge = knowledge.getValue(_position);
 	if(qualityKnowledge<knowledge.getMaxValueAt(_position))
@@ -68,7 +69,12 @@ void ForageAction::execute( Engine::Agent & agent )
 		knowledge.setValue(_position, qualityKnowledge+1);
 	}
 
-	// how to model an improvement?
+	// finally, we test uncertainty in order to know if the agent gets the real value
+	int value = Engine::GeneralState::statistics().getUniformDistValue(0,knowledge.getMaxValueAt(_position));
+	if(value<knowledge.getValue(_position))
+	{
+		return;
+	}
 	if(forager.getWorld()->getDynamicRasterStr(forager.getResourcesMap()).getMaxValueAt(_position)<rest)
 	{
 		forager.getWorld()->getDynamicRasterStr(forager.getResourcesMap()).setMaxValue(_position, rest);
