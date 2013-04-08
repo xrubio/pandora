@@ -23,6 +23,7 @@ public:
 	virtual void executeMDP( const Forager & agent, const ForagerState & state, ForagerState & stateNext ) const = 0;
 	virtual BaseAction * copy() const = 0;
 	int getResources() const { return _resources; }
+	virtual float getStarvationCost() const = 0;
 	const Engine::Point2D<int> & getPosition() const { return _position; }
 };
 

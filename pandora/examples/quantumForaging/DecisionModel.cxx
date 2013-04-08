@@ -70,13 +70,7 @@ bool DecisionModel::applicable( const ForagerState & state, action_t action) con
 float DecisionModel::cost( const ForagerState & state, action_t action ) const
 {
 	// TODO cost of action!
-	float starvationCost = 0.0f;
-	float foragedResources = state.getForagedResources();
-	float neededResources = _agent.getNeededResources();
-	if(foragedResources<neededResources)
-	{
-		starvationCost += 1.0f - foragedResources/neededResources;
-	}
+	float starvationCost = state.getAvailableAction(action).getStarvationCost();
 
 	const Engine::Raster & knowledge = state.getKnowledgeMap();
 	float qualityKnowledgeInPos = float(knowledge.getValue(state.getPosition()))/float(knowledge.getMaxValueAt(state.getPosition()));
@@ -157,7 +151,7 @@ void DecisionModel::makeActionsForState( ForagerState & state ) const
 		}
 	}
 	// the last possible action is to remain in cell and forage
-	ForageAction * forageAction = new ForageAction(state.getPosition());
+	ForageAction * forageAction = new ForageAction(state.getPosition(), state.getResourcesMap(), state.getNeededResources());
 	state.addAction(forageAction);
 	state.randomizeActions();
 	assert(state.getNumAvailableActions()>0);

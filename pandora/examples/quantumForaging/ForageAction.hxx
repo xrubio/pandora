@@ -6,6 +6,11 @@
 #include <string>
 #include <Point2D.hxx>
 
+namespace Engine
+{
+	class Raster;
+}
+
 namespace QuantumExperiment
 {
 class Forager;
@@ -13,13 +18,16 @@ class ForagerState;
 
 class ForageAction : public BaseAction
 {
+	float _fractionForaged;
 public:
-	ForageAction( const Engine::Point2D<int> & position);
+	ForageAction( const Engine::Point2D<int> & position, float fractionForaged);
+	ForageAction( const Engine::Point2D<int> & position, const Engine::Raster & resourcesMap, int neededResources);
 	virtual ~ForageAction();
 
 	void executeMDP( const Forager & agent, const ForagerState & state, ForagerState & stateNext ) const;
 	void execute( Engine::Agent & agent );
 	BaseAction * copy() const;
+	float getStarvationCost() const;
 	std::string describe() const;
 };
 

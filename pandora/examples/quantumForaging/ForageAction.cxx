@@ -5,13 +5,21 @@
 #include "Forager.hxx"
 #include "ForagerState.hxx"
 #include "QuantumWorld.hxx"
+#include <Raster.hxx>
 #include <GeneralState.hxx>
 
 namespace QuantumExperiment
 {
 
-ForageAction::ForageAction( const Engine::Point2D<int> & position ) : BaseAction(position)
+ForageAction::ForageAction( const Engine::Point2D<int> & position, float fractionForaged ) : BaseAction(position), _fractionForaged(fractionForaged)
 {
+}
+
+ForageAction::ForageAction( const Engine::Point2D<int> & position, const Engine::Raster & resourcesMap, int neededResources) : BaseAction(position)
+{	
+	int previousValue = resourcesMap.getValue(position);
+	int foragedResources = std::min(neededResources, previousValue);
+	_fractionForaged = 1.0f - (float)foragedResources/(float)neededResources; 
 }
 
 ForageAction::~ForageAction()
@@ -20,14 +28,14 @@ ForageAction::~ForageAction()
 
 BaseAction * ForageAction::copy() const
 {
-	ForageAction * newAction = new ForageAction(_position);
+	ForageAction * newAction = new ForageAction(_position, _fractionForaged);
 	return newAction;
 }
 
 void ForageAction::executeMDP( const Forager & forager, const ForagerState & state, ForagerState & stateNext ) const
 {
-	Engine::Point2D<int> localPos = _position - forager.getWorld()->getOverlapBoundaries()._origin;
-	int previousValue = forager.getWorld()->getValue(eResources,_position);
+	Engine::Point2D<int> localPos = _position - forager.getWorld()->getOverlapBoundaries()._origin;	
+	int previousValue = state.getResourcesMap().getValue(localPos);
 	int foragedResources = std::min(forager.getNeededResources(), previousValue);
 	stateNext.setForagedResources(foragedResources);
 
@@ -37,7 +45,7 @@ void ForageAction::executeMDP( const Forager & forager, const ForagerState & sta
 	int oldKnowledge = state.getKnowledgeMap().getValue(localPos);
 	if(oldKnowledge<state.getKnowledgeMap().getMaxValueAt(localPos))
 	{
-		stateNext.getKnowledgeMap().setValue(localPos, 1);
+		stateNext.getKnowledgeMap().setValue(localPos, oldKnowledge+1);
 	}
 }
 
@@ -71,8 +79,13 @@ void ForageAction::execute( Engine::Agent & agent )
 std::string ForageAction::describe() const
 {
 	std::ostringstream oss;
-	oss << "Forage Action at: " << _position << ", resources: " << _resources;
+	oss << "Forage Action at: " << _position << ", fraction foraged: " << _fractionForaged;
 	return oss.str();
+}
+
+float ForageAction::getStarvationCost() const
+{
+	return _fractionForaged;
 }
 
 } // namespace QuantumExperiment

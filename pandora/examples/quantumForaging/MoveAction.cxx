@@ -52,8 +52,13 @@ void MoveAction::execute( Engine::Agent & agent )
 std::string MoveAction::describe() const
 {
 	std::ostringstream oss;
-	oss << "Move Action to: " << _position << ", resources: " << _resources;
+	oss << "Move Action to: " << _position;
 	return oss.str();
+}
+
+float MoveAction::getStarvationCost() const
+{
+	return 1.0f;
 }
 
 } // namespace QuantumExperiment

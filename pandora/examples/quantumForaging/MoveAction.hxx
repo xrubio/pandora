@@ -20,6 +20,7 @@ public:
 	void executeMDP( const Forager & agent, const ForagerState & state, ForagerState & stateNext ) const;
 	void execute( Engine::Agent & agent );
 	BaseAction * copy() const;
+	float getStarvationCost() const;
 
 	std::string describe() const;
 };
