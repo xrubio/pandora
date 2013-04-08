@@ -51,7 +51,6 @@ bool DecisionModel::terminal( const ForagerState & state ) const
 {
 	if(state.getTimeStep()>_agent.getHorizon())
 	{
-		std::cout << "state: " << state << " is terminal due to exceed horizon: " << _agent.getHorizon() << std::endl;
 		return true;
 	}
 	return false;
@@ -69,7 +68,6 @@ bool DecisionModel::applicable( const ForagerState & state, action_t action) con
 
 float DecisionModel::cost( const ForagerState & state, action_t action ) const
 {
-	// TODO cost of action!
 	float starvationCost = state.getAvailableAction(action).getStarvationCost();
 
 	const Engine::Raster & knowledge = state.getKnowledgeMap();
@@ -87,8 +85,8 @@ float DecisionModel::cost( const ForagerState & state, action_t action ) const
 	}
 	
 	float knowledgeCost = (1.0f-localKnowledgeIncrease)*_agent.getAmbiguityAversion() + (1.0f-neighborKnowledgeIncrease)*_agent.getRiskAversion();
-	std::cout << "knowledge costs: " << knowledgeCost << " with ambiguity: " << localKnowledgeIncrease*_agent.getAmbiguityAversion() << " with aversion: " << _agent.getAmbiguityAversion() << " risk: " << neighborKnowledgeIncrease*_agent.getRiskAversion() << " with aversion: " << _agent.getRiskAversion() << std::endl;
-	std::cout << "final cost: " << starvationCost+knowledgeCost << " starv.: " << starvationCost << " knowledge: " << knowledgeCost << std::endl;
+//	std::cout << "knowledge costs: " << knowledgeCost << " with ambiguity: " << localKnowledgeIncrease*_agent.getAmbiguityAversion() << " with aversion: " << _agent.getAmbiguityAversion() << " risk: " << neighborKnowledgeIncrease*_agent.getRiskAversion() << " with aversion: " << _agent.getRiskAversion() << std::endl;
+//	std::cout << "final cost: " << starvationCost+knowledgeCost << " starv.: " << starvationCost << " knowledge: " << knowledgeCost << std::endl;
 	return starvationCost+knowledgeCost;
 }
 

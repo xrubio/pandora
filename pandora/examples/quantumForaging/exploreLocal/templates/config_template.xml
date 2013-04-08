@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<config> 
+	<!-- simulation config -->
+	<output resultsFile="data/quantum.h5" logsDir="logs/"/>
+	<numSteps value="100" serializeResolution="1"/>
+	<environment size="10"/>
+	<!-- if risk aversion = -1, random value will be chosen -->
+	<agents num="1" neededResources="1" perfectInformation="false" riskAversion="RISK">
+		<mdp horizon="HORIZON" width="WIDTH" explorationBonus="0"/>
+	</agents>
+</config>
+
