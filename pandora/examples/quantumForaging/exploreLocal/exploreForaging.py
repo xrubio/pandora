@@ -5,8 +5,8 @@ baseDir = '.'
 numExecutions = 10
 
 riskValues = ['0.0', '0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8', '0.9', '1.0']
-horizonValues = ['5']
-widthValues = ['200']
+horizonValues = ['1','3','5','7','9','11']
+widthValues = ['300']
 
 
 xmlTemplate = 'templates/config_template.xml'

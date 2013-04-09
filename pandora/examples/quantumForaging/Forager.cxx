@@ -160,6 +160,7 @@ void Forager::registerAttributes()
 	registerIntAttribute("width");
 	registerIntAttribute("horizon");
 	registerIntAttribute("move actions");
+	registerIntAttribute("risk aversion x100");
 }
 
 void Forager::serialize()
@@ -169,6 +170,7 @@ void Forager::serialize()
 	serializeAttribute("width", _width); 
 	serializeAttribute("horizon", _horizon);
 	serializeAttribute("move actions", _moveActions);
+	serializeAttribute("risk aversion x100", (int)(_riskAversion*100.0f));
 }
 
 int Forager::getHorizon() const
