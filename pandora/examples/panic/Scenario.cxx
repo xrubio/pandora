@@ -22,12 +22,13 @@ void Scenario::createAgents()
 		oss << "PanicAgent_"<<i;
 		PanicAgent * agent = new PanicAgent(oss.str());
 		addAgent(agent);
-	
+
 		agent->setRandomPosition();
 		while(getDynamicRaster(eObstacles).getValue(agent->getPosition())==1)
 		{
 			agent->setRandomPosition();
 		}
+		//agent->setPosition(Engine::Point2D<int>(76,423));
 		computeShortestExit(*agent);
 	}
 }
@@ -44,6 +45,7 @@ void Scenario::computeShortestExit(PanicAgent & agent )
 		{
 			possibleExits.clear();
 			possibleExits.push_back(*it);
+			minDistance = distance;
 		}
 		else if(distance==minDistance)
 		{
