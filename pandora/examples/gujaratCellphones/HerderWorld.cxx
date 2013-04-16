@@ -18,7 +18,8 @@ void HerderWorld::createAgents()
 {
 	for(int i=0; i<_config._numVillages; i++)
 	{
-		Engine::Point2D<int> villageLocation(Engine::GeneralState::statistics().getUniformDistValue(0, _config._size-1),Engine::GeneralState::statistics().getUniformDistValue(0, _config._size-1));
+		//Engine::Point2D<int> villageLocation(Engine::GeneralState::statistics().getUniformDistValue(0, _config._size-1),Engine::GeneralState::statistics().getUniformDistValue(0, _config._size-1));
+		Engine::Point2D<int> villageLocation(30,20);
 		std::ostringstream oss;
 		oss << "Village_" << i;
 		Village * newVillage = new Village(oss.str(), i);
@@ -85,7 +86,12 @@ void HerderWorld::createRasters()
 	{
 		for(index._y=0; index._y<_overlapBoundaries._size._y; index._y++)
 		{
-			int value = index._y*10/_overlapBoundaries._size._y;
+			int value = 0;
+			if(index._x>50)
+			{
+				value = 10;
+			}
+			//int value = index._y*10/_overlapBoundaries._size._y;
 			//int value = Engine::GeneralState::statistics().getNormalDistValue(0,10);
 			getDynamicRaster(eSoilQuality).setMaxValue(index, value);
 		}
@@ -96,10 +102,10 @@ void HerderWorld::createRasters()
 	registerDynamicRaster("resourcesFraction", false, eResourcesFraction);
 	getDynamicRaster(eResourcesFraction).setInitValues(0, 100, 0);
 
-	/*
 	registerDynamicRaster("Herder_0_vil0_resources", true);
 	registerDynamicRaster("Herder_1_vil0_resources", true);
 	registerDynamicRaster("Herder_2_vil0_resources", true);
+	/*
 	registerDynamicRaster("Herder_3_vil0_resources", true);
 	registerDynamicRaster("Herder_4_vil0_resources", true);
 	*/
@@ -114,11 +120,10 @@ void HerderWorld::createRasters()
 	registerDynamicRaster("Herder_12_vil0_resources", true);
 
 	*/
-	/*
-
 	registerDynamicRaster("Herder_0_vil0_knowledge", true);
 	registerDynamicRaster("Herder_1_vil0_knowledge", true);
 	registerDynamicRaster("Herder_2_vil0_knowledge", true);
+	/*
 	registerDynamicRaster("Herder_3_vil0_knowledge", true);
 	registerDynamicRaster("Herder_4_vil0_knowledge", true);
 	*/

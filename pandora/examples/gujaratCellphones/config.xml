@@ -2,13 +2,13 @@
 <config> 
 	<!-- simulation config -->
 	<output resultsFile="./data/phones.h5" logsDir="./logs"/>
-	<numSteps value="2401" serializeResolution="1"/>
+	<numSteps value="720" serializeResolution="1"/>
 	<environment>
 		<landscape size="60" averageResources="1000"/>
 		<climate seed="1" daysDrySeason="240" meanRain="4643.848" stddev="0.0001"/>
 	</environment>
 	<population>
-		<villages num="1" agentsPerVillage="10"/>
+		<villages num="1" agentsPerVillage="3"/>
 		<animals numPerHerder="50" resourcesPerDay="5"/>
 	</population>
 	<mdp horizon="10" width="200" explorationBonus="0"/>

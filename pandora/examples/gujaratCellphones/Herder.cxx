@@ -72,8 +72,8 @@ void Herder::createKnowledge()
 	oss2 << _id << "_resources";
 	_resourcesMap = oss2.str();
 
-	_world->registerDynamicRaster(_knowledgeMap, false);
-	_world->registerDynamicRaster(_resourcesMap, false);
+	//_world->registerDynamicRaster(_knowledgeMap, false);
+	//_world->registerDynamicRaster(_resourcesMap, false);
 	_world->getDynamicRasterStr(_knowledgeMap).setInitValues(-1, std::numeric_limits<int>::max(), -1);
 	_world->getDynamicRasterStr(_resourcesMap).setInitValues(0, std::numeric_limits<int>::max(), 0);
 }
@@ -321,7 +321,7 @@ void Herder::updateState()
 		// fission
 		if(_herdSize>config._animalsPerHerder)
 		{
-			_village->fission(*this);
+			//_village->fission(*this);
 		}
 		setPosition(_village->getPosition());		
 
