@@ -22,14 +22,13 @@ void Scenario::createAgents()
 		oss << "PanicAgent_"<<i;
 		PanicAgent * agent = new PanicAgent(oss.str());
 		addAgent(agent);
-		
+	
 		agent->setRandomPosition();
 		while(getDynamicRaster(eObstacles).getValue(agent->getPosition())==1)
 		{
 			agent->setRandomPosition();
 		}
-		
-		//agent->setPosition(Engine::Point2D<int>(1,1));
+		//agent->setPosition(Engine::Point2D<int>(99,99));
 	}
 }
 

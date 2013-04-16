@@ -40,24 +40,36 @@ float PanicAgent::getDistToNearestObstacle( const int & direction )
 		Engine::Point2D<int> newIntPos = Engine::Point2D<int>(std::floor(newPos._x), std::floor(newPos._y));
 		// out of position
 		if(!_world->checkPosition(newIntPos))
-		{
-			return newIntPos.distance(_position);
+		{	
+			if(newIntPos!=_position)
+			{
+				return newIntPos.distance(_position);
+			}
 		}
 		
 		if(_world->getDynamicRaster(eExits).getValue(newIntPos)==1)
-		{
-			return newIntPos.distance(_position);
+		{	
+			if(newIntPos!=_position)
+			{
+				return newIntPos.distance(_position);
+			}
 		}
 
 		// obstacle found
 		if(_world->getDynamicRaster(eObstacles).getValue(newIntPos)==1)
-		{
-			return newIntPos.distance(_position);
+		{	
+			if(newIntPos!=_position)
+			{
+				return newIntPos.distance(_position);
+			}
 		}
 		// there is a person there	
 		if(_world->getAgent(Engine::Point2D<int>(std::floor(newPos._x), std::floor(newPos._y))).size()!=0)
 		{
-			return newIntPos.distance(_position);
+			if(newIntPos!=_position)
+			{
+				return newIntPos.distance(_position);
+			}
 		}
 	}
 }
@@ -88,7 +100,7 @@ void PanicAgent::updateState()
 		{
 			direction += 360;
 		}
-		float radians = float(direction)*2*M_PI/360.0f;
+		float radians = float(direction)*M_PI/180.0f;
 
 		float distToObstacle = getDistToNearestObstacle(direction);
 
@@ -105,8 +117,14 @@ void PanicAgent::updateState()
 			desiredDegrees+= 360.0f;
 		}
 		//std::cout << "pos: " << _position << " to 0,0 rads: " << desiredRadians<< " degrees: " << desiredDegrees<< std::endl;
-		std::cout << "pos: " << _position << " basic dir: " << _direction << " fov: " << fov << " direction to test: " << direction << " dist to obstacle: " << distToObstacle << std::endl;
-		float value = rangeOfSight*rangeOfSight + distToObstacle*distToObstacle - 2*rangeOfSight*distToObstacle*std::cos(desiredRadians-radians);
+		//std::cout << "pos: " << _position << " basic dir: " << _direction << " fov: " << fov << " direction to test: " << direction << " dist to obstacle: " << distToObstacle << std::endl;
+
+		float diffRadiansCos = std::cos(desiredRadians)*std::cos(radians) + std::sin(desiredRadians)*std::sin(radians);
+		float diffRadians = std::acos(diffRadiansCos);
+		float diffDegrees = diffRadians*180.0f/M_PI;
+
+		float value = rangeOfSight*rangeOfSight + distToObstacle*distToObstacle - 2*rangeOfSight*distToObstacle*std::cos(diffRadians);
+		//std::cout << "degreea: " << desiredDegrees << " degreeb: " << direction << " diff: " << diffDegrees << " rada: " << desiredRadians << " radb: " << radians << " diffRadians: " << diffRadians << " value: " << value << std::endl;
 		if(value<minValue)
 		{
 			minValue = value;
@@ -121,11 +139,11 @@ void PanicAgent::updateState()
 	Engine::Point2D<int> newIntPos = Engine::Point2D<int>(std::floor(newPos._x), std::floor(newPos._y));
 	_rest._x = newPos._x - newIntPos._x;
 	_rest._y = newPos._y - newIntPos._y;
-	//std::cout << "rest: " << _rest << " new pos: " << newPos << " new int pos: " << newIntPos << std::endl;
+	std::cout << "rest: " << _rest << " new pos: " << newPos << " new int pos: " << newIntPos << std::endl;
 
 	if(_world->checkPosition(newIntPos) && _world->getDynamicRaster(eObstacles).getValue(newIntPos)==0)
 	{
-		if(_world->getDynamicRaster(eExits).getValue(_position)!=0 || _world->getAgent(newIntPos).size()==0)
+		if(_world->getDynamicRaster(eExits).getValue(newIntPos)!=0 || _world->getAgent(newIntPos).size()==0)
 		{
 			_position = newIntPos;
 		}
