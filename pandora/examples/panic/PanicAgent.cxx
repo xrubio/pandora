@@ -104,8 +104,7 @@ void PanicAgent::updateState()
 
 		float distToObstacle = getDistToNearestObstacle(direction);
 
-		Engine::Point2D<int> directExit(0,0);
-		Engine::Point2D<float> directDirectionVector(_position._x-directExit._x, _position._y-directExit._y);
+		Engine::Point2D<float> directDirectionVector(_position._x-_exit._x, _position._y-_exit._y);
 		float desiredRadians = std::atan2(-directDirectionVector._x, directDirectionVector._y);
 		float desiredDegrees = desiredRadians*180.0f/M_PI;
 		if(desiredDegrees>360.0f)
@@ -163,6 +162,11 @@ void PanicAgent::registerAttributes()
 void PanicAgent::serialize()
 {
 	serializeAttribute("direction", _direction);
+}
+	
+void PanicAgent::setExit( const Engine::Point2D<int> & exit )
+{
+	_exit = exit;
 }
 
 } // namespace Panic

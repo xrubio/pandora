@@ -4,7 +4,7 @@
 	<output resultsFile="./data/panic.h5" logsDir="./logs"/>
 	<!-- each step is 0.5 secs -->
 	<numSteps value="300" serializeResolution="1"/>
-	<environment size="100"/>
+	<environment size="708" fileName="resources/buildings.tiff"/>
 	<!-- if risk aversion = -1, random value will be chosen -->
 	<agents num="100"/>	
 </config>

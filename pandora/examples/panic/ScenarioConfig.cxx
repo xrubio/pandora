@@ -3,7 +3,7 @@
 namespace Panic
 {
 
-ScenarioConfig::ScenarioConfig()
+ScenarioConfig::ScenarioConfig() : _obstacleFile("not loaded")
 {
 }
 
@@ -16,6 +16,7 @@ void ScenarioConfig::extractParticularAttribs(TiXmlElement * root)
 	//environment
 	TiXmlElement * element = root->FirstChildElement("environment");
 	retrieveAttributeMandatory(element, "size", _size);
+	retrieveAttributeMandatory(element, "fileName", _obstacleFile);
 	
 	// agents
 	element = root->FirstChildElement("agents");

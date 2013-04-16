@@ -28,15 +28,41 @@ void Scenario::createAgents()
 		{
 			agent->setRandomPosition();
 		}
-		//agent->setPosition(Engine::Point2D<int>(99,99));
+		computeShortestExit(*agent);
 	}
+}
+
+void Scenario::computeShortestExit(PanicAgent & agent )
+{
+	std::vector< Engine::Point2D<int> > possibleExits;
+	float minDistance = std::numeric_limits<float>::max();
+
+	for(ExitsList::const_iterator it=_exits.begin(); it!=_exits.end(); it++)
+	{
+		float distance = agent.getPosition().distance(*it);
+		if(distance<minDistance)
+		{
+			possibleExits.clear();
+			possibleExits.push_back(*it);
+		}
+		else if(distance==minDistance)
+		{
+			possibleExits.push_back(*it);
+		}
+	}
+	std::random_shuffle(possibleExits.begin(), possibleExits.end());
+	agent.setExit(possibleExits.at(0));
+	std::cout << "agent: " << agent << " will go to: " << possibleExits.at(0) << std::endl;
 }
 
 void Scenario::createRasters()
 {	
-	registerDynamicRaster("obstacles", false, eObstacles);
-	getDynamicRaster(eObstacles).setInitValues(0, 0, 0);
-	getDynamicRaster(eObstacles).setMaxValue(1);
+	registerStaticRaster("obstacles", true, eObstacles);
+	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eObstacles), _config._obstacleFile, this);	
+
+	registerDynamicRaster("exits", true, eExits);
+	getDynamicRaster(eExits).setInitValues(0, 0, 0);
+	getDynamicRaster(eExits).setMaxValue(1);
 
 	Engine::Point2D<int> index(0,0);
 	int maxValue = _overlapBoundaries._size._x;
@@ -44,27 +70,39 @@ void Scenario::createRasters()
 	{
 		for(index._y=0; index._y<_overlapBoundaries._size._y; index._y++)
 		{
+			if(getStaticRaster(eObstacles).getValue(index)!=0)
+			{
+				continue;
+			}
+
 			if(index._x==0 || index._y==0)
 			{
-				getDynamicRaster(eObstacles).setMaxValue(index, 1);
+				getDynamicRaster(eExits).setMaxValue(index, 1);
 			}
 			if(index._x==_overlapBoundaries._size._x-1 || index._y==_overlapBoundaries._size._y-1)
 			{
-				getDynamicRaster(eObstacles).setMaxValue(index, 1);
+				getDynamicRaster(eExits).setMaxValue(index, 1);
 			}
 		}
 	}
-
-	// 1 exit at point 0,0
-	registerDynamicRaster("exits", false, eExits);
-	getDynamicRaster(eExits).setInitValues(0, 0, 0);
-	getDynamicRaster(eExits).setMaxValue(1);
-
-	getDynamicRaster(eExits).setMaxValue(Engine::Point2D<int>(0,0),1);
-	getDynamicRaster(eObstacles).setMaxValue(Engine::Point2D<int>(0,0),0);
-
-	updateRasterToMaxValues(eObstacles);
 	updateRasterToMaxValues(eExits);
+	fillExitList();
+}
+
+void Scenario::fillExitList()
+{
+	Engine::Point2D<int> index;
+	for(index._x=0; index._x<_overlapBoundaries._size._x; index._x++)
+	{
+		for(index._y=0; index._y<_overlapBoundaries._size._y; index._y++)
+		{
+			if(getDynamicRaster(eExits).getValue(index)==0)
+			{
+				continue;
+			}
+			_exits.push_back(index);
+		}
+	}
 }
 
 } // namespace Panic

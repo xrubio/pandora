@@ -9,6 +9,7 @@ namespace Panic
 class ScenarioConfig : public Engine::Config
 {
 	int _size;
+	std::string _obstacleFile;
 
 	// agents
 	int _numAgents;

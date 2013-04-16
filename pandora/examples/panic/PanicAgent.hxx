@@ -14,6 +14,7 @@ class PanicAgent : public Engine::Agent
 {
 	int _direction;
 	bool _exited;
+	Engine::Point2D<int> _exit;
 	Engine::Point2D<float> _rest;
 
 	Engine::Point2D<float> getNextPos( const int & direction, const Engine::Point2D<float> & position );
@@ -22,6 +23,7 @@ public:
 	// todo remove environment from here
 	PanicAgent( const std::string & id );
 	virtual ~PanicAgent();
+	void setExit( const Engine::Point2D<int> & exit );
 	
 	void updateState();
 	void registerAttributes();

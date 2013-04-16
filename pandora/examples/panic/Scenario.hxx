@@ -12,6 +12,7 @@ namespace Engine
 
 namespace Panic 
 {
+class PanicAgent;
 
 enum Rasters
 {
@@ -23,11 +24,15 @@ enum Rasters
 
 class Scenario: public Engine::World
 {
+	typedef std::list<Engine::Point2D<int> > ExitsList;
+	ExitsList _exits;
 	ScenarioConfig _config;
 
 	void createAgents();
 	void createRasters();
 
+	void fillExitList();
+	void computeShortestExit(PanicAgent & agent );
 public:
 	Scenario( Engine::Simulation &simulation, ScenarioConfig &config );
 	virtual ~Scenario();
