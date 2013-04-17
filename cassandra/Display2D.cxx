@@ -89,14 +89,23 @@ void Display2D::paintEvent(QPaintEvent *event)
 				{
 					it--;
 					RasterConfiguration * rasterConfig = ProjectConfiguration::instance()->getRasterConfig(*it);
-					Engine::StaticRaster & raster(_simulationRecord->getRasterTmp(*it, _viewedStep));				
+					Engine::StaticRaster & raster(_simulationRecord->getRasterTmp(*it, _viewedStep));
 					int value = raster.getValue(Engine::Point2D<int>(i,j));
-					if(rasterConfig->isTransparentEnabled() && value==rasterConfig->getTransparentValue())
+
+					if(raster.hasColorTable())
 					{
-						continue;
+						Engine::ColorEntry color = raster.getColorEntry(value);
+						pen.setColor(QColor(color._r, color._g, color._b, color._alpha));
 					}
-					ColorSelector & colorSelector = rasterConfig->getColorRamp();
-					pen.setColor(colorSelector.getColor(value));
+					else
+					{
+						if(rasterConfig->isTransparentEnabled() && value==rasterConfig->getTransparentValue())
+						{
+							continue;
+						}
+						ColorSelector & colorSelector = rasterConfig->getColorRamp();
+						pen.setColor(colorSelector.getColor(value));
+					}
 					
 					//pen.setWidth(_zoom);
 					//if(maxValue>0)
