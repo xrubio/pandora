@@ -65,13 +65,13 @@ float PanicAgent::getDistToNearestObstacle( const int & direction )
 			}
 		}
 		// there is a person there	
-		if(_world->getAgent(Engine::Point2D<int>(std::floor(newPos._x), std::floor(newPos._y))).size()!=0)
-		{
-			if(newIntPos!=_position)
-			{
-				return newIntPos.distance(_position);
-			}
-		}
+//		if(_world->getAgent(Engine::Point2D<int>(std::floor(newPos._x), std::floor(newPos._y))).size()!=0)
+//		{
+//			if(newIntPos!=_position)
+//			{
+//				return newIntPos.distance(_position);
+//			}
+//		}
 	}
 }
 
@@ -145,10 +145,10 @@ void PanicAgent::selectActions()
 
 	if(_world->checkPosition(newIntPos) && _world->getDynamicRaster(eObstacles).getValue(newIntPos)==0)
 	{
-		if(_world->getDynamicRaster(eExits).getValue(newIntPos)!=0 || _world->getAgent(newIntPos).size()==0)
-		{
+	//	if(_world->getDynamicRaster(eExits).getValue(newIntPos)!=0) // || _world->getAgent(newIntPos).size()==0)
+	//	{
 			_actions.push_back(new MoveAction(newIntPos));
-		}
+	//	}
 	}
 }
 
