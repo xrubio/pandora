@@ -138,7 +138,79 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 
 	H5Dclose(globalDatasetId);
 	H5Sclose(globalFileSpace);
+
+	// color tables
+	hid_t colorTableGroupId = H5Gcreate(_fileId, "colorTables", 0, H5P_DEFAULT, H5P_DEFAULT);
+	for(int i=0; i<rasters.size(); i++)
+	{
+		if(!rasters.at(i) || !serializeRasters.at(i))
+		{
+			continue;
+		}
+		hsize_t numEntries[2];
+		numEntries[0] = rasters.at(i)->getNumColorEntries();
+		numEntries[1] = 4; 
+		hid_t fileSpace = H5Screate_simple(2, numEntries, NULL); 
+		
+		hid_t rasterDatasetId = H5Dcreate(colorTableGroupId, world.getRasterName(i).c_str(), H5T_NATIVE_INT, fileSpace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+		// if not color table continue
+		if(numEntries[0] == 0)
+		{
+			H5Dclose(rasterDatasetId);
+			continue;
+		}
+
+		hsize_t	offset[2];
+    	offset[0] = 0;
+	    offset[1] = 0;
+		
+		hsize_t	stride[2];
+		stride[0] = 1;
+		stride[1] = 1;
 	
+		hsize_t count[2];
+		count[0] = 1;
+		count[1] = 1;
+
+		H5Sselect_hyperslab(fileSpace, H5S_SELECT_SET, offset, stride, count, numEntries);
+		int * data = (int *) malloc(sizeof(int)*numEntries[0]*numEntries[1]);
+
+		for(int z=0; z<numEntries[0]; z++)
+		{
+			// red
+			int index = z*numEntries[1];
+			int value = (int)(rasters.at(i)->getColorEntry(z)._r);
+			data[index] = value;
+
+			// green
+			index++;
+			value = (int)(rasters.at(i)->getColorEntry(z)._g);
+			data[index] = value;
+			
+			// blue
+			index++;
+			value = (int)(rasters.at(i)->getColorEntry(z)._b);
+			data[index] = value;
+
+			// alpha
+			index++;
+			value = (int)(rasters.at(i)->getColorEntry(z)._alpha);
+			data[index] = value;
+		}
+	    // Create property list for collective dataset write.
+		hid_t propertyListId = H5Pcreate(H5P_DATASET_XFER);
+		H5Pset_dxpl_mpio(propertyListId, H5FD_MPIO_INDEPENDENT);
+	    hid_t memorySpace = H5Screate_simple(2, numEntries, NULL);
+		H5Dwrite(rasterDatasetId, H5T_NATIVE_INT, memorySpace, fileSpace, propertyListId, data);
+
+		free(data);
+		H5Pclose(propertyListId);
+	    H5Sclose(memorySpace);	
+		H5Sclose(fileSpace);
+		H5Dclose(rasterDatasetId);
+	}
+	H5Gclose(colorTableGroupId);
+
 	// creating a file with the agents of each computer node
 	std::ostringstream oss;
 	if(!path.empty())

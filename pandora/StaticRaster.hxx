@@ -31,6 +31,14 @@ namespace Engine
 class World;
 class RasterLoader;
 
+struct ColorEntry
+{
+	short _r;
+	short _g;
+	short _b;
+	short _alpha;
+};
+
 //! this class is used to load a static raster map. Values can't be modified, and it won't be serialized each time step (only one time)
 class StaticRaster
 {
@@ -39,6 +47,9 @@ protected:
 
 	int _minValue;
 	int _maxValue;
+
+	bool _hasColorTable;
+	std::vector< ColorEntry > _colorTable;
 public:
 	StaticRaster();
 	virtual ~StaticRaster();
@@ -62,6 +73,12 @@ public:
 
 	float getAvgValue() const;
 	void updateMinMaxValues();
+
+	void setColorTable( bool hasColorTable, int size);
+	void addColorEntry( int index, short r, short g, short b, short alpha );
+	int getNumColorEntries();
+	bool hasColorTable();
+	ColorEntry getColorEntry(int index );
 	
 	friend class RasterLoader;
 }; 

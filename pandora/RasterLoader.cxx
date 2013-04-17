@@ -73,13 +73,13 @@ void RasterLoader::fillGDALRaster( StaticRaster & raster, const std::string & fi
 	if(size!=dataset->GetRasterYSize())
 	{
 		std::stringstream oss;
-		oss << "StaticRaster::loadFile - file: " << fileName << " does not contain an squared raster. width: " << size << " and height: " << dataset->GetRasterYSize();
+		oss << "RasterLoader::fillGDALRaster - file: " << fileName << " does not contain an squared raster. width: " << size << " and height: " << dataset->GetRasterYSize();
 		throw Engine::Exception(oss.str());
 	}
 	if(size!=simulation.getSize())
 	{
 		std::stringstream oss;
-		oss << "StaticRaster::loadFile - file: " << fileName << " with size: " << size << " different from defined size: " << simulation.getSize() << std::endl;
+		oss << "RasterLoader::fillGDALRaster - file: " << fileName << " with size: " << size << " different from defined size: " << simulation.getSize() << std::endl;
 		throw Engine::Exception(oss.str());
 	}
 	log_DEBUG(logName.str(), "size of raster: " << size);
@@ -128,6 +128,22 @@ void RasterLoader::fillGDALRaster( StaticRaster & raster, const std::string & fi
 	{
 		std::copy(dynamicRaster->_values.begin(), dynamicRaster->_values.end(), dynamicRaster->_maxValues.begin());
 		dynamicRaster->updateCurrentMinMaxValues();
+	}
+
+	// load color table if possible
+	GDALColorTable * colorTable = band->GetColorTable();
+	if(colorTable)
+	{
+		raster.setColorTable(true, colorTable->GetColorEntryCount());
+		for(int i=0; i<colorTable->GetColorEntryCount(); i++)
+		{ 	
+			GDALColorEntry newEntry;
+			if(colorTable->GetColorEntryAsRGB(i, &newEntry))
+			{
+				raster.addColorEntry(i, newEntry.c1, newEntry.c2, newEntry.c3, newEntry.c4);
+				//std::cout << "entry: " <<i << " color: " << newEntry.c1 << "/" << newEntry.c2 << "/" << newEntry.c3 << " alpha: " << newEntry.c4 << std::endl;
+			}
+		}
 	}
 	log_DEBUG(logName.str(), "finished, closing");	
 	GDALClose(dataset);
@@ -212,6 +228,34 @@ void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fi
 		}
 	}
 	free(dset_data);
+
+	std::ostringstream oss2;
+	oss2 << "/colorTables/" << rasterName;
+	hid_t colorTableId = H5Dopen(fileId, oss2.str().c_str(), H5P_DEFAULT);
+	hid_t colorTableSpaceId = H5Dget_space(colorTableId);
+	hsize_t colorTableDims[2];
+	H5Sget_simple_extent_dims(colorTableSpaceId, colorTableDims, NULL);
+
+	//std::cout << "raster: " << rasterName << " has color table of size: " << colorTableDims[0] << "/" << colorTableDims[1] << std::endl;
+	// color table
+	if(colorTableDims[0]!=0)
+	{
+		raster.setColorTable(true, colorTableDims[0]);
+		int * colors = (int*)malloc(sizeof(int)*colorTableDims[0]*colorTableDims[1]);
+		H5Dread(colorTableId, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, colors);
+		for(int i=0; i<colorTableDims[0]; i++)
+		{
+			int index = colorTableDims[1]*i;
+			raster.addColorEntry(i, short(colors[index]), short(colors[index+1]), short(colors[index+2]), short(colors[index+3]));
+			//std::cout << "entry: " << i << " colors: " << short(colors[index]) << "/" << short(colors[index+1]) << "/" << short(colors[index+2]) << " alpha: " << short(colors[index+3]) << std::endl;
+		}
+		free(colors);
+	}
+
+	H5Sclose(colorTableSpaceId);
+	H5Dclose(colorTableId);
+
+
 	H5Fclose(fileId);
 	raster.updateMinMaxValues();
 	

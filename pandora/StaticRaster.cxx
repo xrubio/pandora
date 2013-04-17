@@ -28,7 +28,7 @@
 namespace Engine
 {
 
-StaticRaster::StaticRaster() : _minValue(std::numeric_limits<int>::max()), _maxValue(std::numeric_limits<int>::min())
+StaticRaster::StaticRaster() : _minValue(std::numeric_limits<int>::max()), _maxValue(std::numeric_limits<int>::min()), _hasColorTable(false)
 {
 }
 
@@ -158,6 +158,67 @@ void StaticRaster::updateMinMaxValues()
 			_maxValue = std::max(_maxValue, _values[i][j]);
 		}
 	}
+}
+
+void StaticRaster::setColorTable( bool hasColorTable, int size )
+{
+	_hasColorTable = hasColorTable;
+	if(_colorTable.size()!=0)
+	{
+		_colorTable.clear();
+	}
+	_colorTable.resize(size);
+}
+
+void StaticRaster::addColorEntry( int index, short r, short g, short b, short alpha )
+{
+	if(!_hasColorTable)
+	{	
+		std::stringstream oss;
+		oss << "StaticRaster::addColorEntry - adding color entry without color table";
+		throw Exception(oss.str());
+		return;
+	}
+	if(index>=_colorTable.size())
+	{
+		std::stringstream oss;
+		oss << "StaticRaster::addColorEntry - index: " << index << " out of bounds with size: " << _colorTable.size();
+		throw Exception(oss.str());
+		return;
+	}
+	ColorEntry entry;
+	entry._r = r;
+	entry._g = g;
+	entry._b = b;
+	entry._alpha = alpha;
+	_colorTable.at(index) = entry;
+}
+	
+int StaticRaster::getNumColorEntries()
+{
+	return _colorTable.size();
+}
+
+ColorEntry StaticRaster::getColorEntry(int index )
+{
+	if(!_hasColorTable)
+	{	
+		std::stringstream oss;
+		oss << "StaticRaster::getColorEntry - getting color entry without color table";
+		throw Exception(oss.str());
+	}
+	if(index>=_colorTable.size())
+	{
+		std::stringstream oss;
+		oss << "StaticRaster::getColorEntry - index: " << index << " out of bounds with size: " << _colorTable.size();
+		throw Exception(oss.str());
+	}
+	return _colorTable.at(index);
+}
+
+bool StaticRaster::hasColorTable()
+{
+	return _hasColorTable;
 }
 
 } // namespace Engine
