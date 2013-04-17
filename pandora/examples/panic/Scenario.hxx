@@ -16,6 +16,8 @@ class PanicAgent;
 
 enum Rasters
 {
+	eOrto,
+	eTopo,
 	// obstacle, 1 if true, 0 if false
 	eObstacles,
 	// exits, 1 if true, 0 if false

@@ -3,9 +3,9 @@
 	<!-- simulation config -->
 	<output resultsFile="./data/panic.h5" logsDir="./logs"/>
 	<!-- each step is 0.5 secs -->
-	<numSteps value="1000" serializeResolution="1"/>	
+	<numSteps value="10" serializeResolution="1"/>	
 	<environment size="708" fileName="resources/buildings.tiff"/>
 	<!-- if risk aversion = -1, random value will be chosen -->
-	<agents num="1000"/>
+	<agents num="10"/>
 </config>
 
