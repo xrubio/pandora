@@ -7,6 +7,7 @@
 #include <cmath>
 
 #include "Scenario.hxx"
+#include "MoveAction.hxx"
 
 namespace Panic
 {
@@ -74,7 +75,9 @@ float PanicAgent::getDistToNearestObstacle( const int & direction )
 	}
 }
 
-void PanicAgent::updateState()
+
+
+void PanicAgent::selectActions()
 {
 	if(_exited)
 	{
@@ -144,10 +147,13 @@ void PanicAgent::updateState()
 	{
 		if(_world->getDynamicRaster(eExits).getValue(newIntPos)!=0 || _world->getAgent(newIntPos).size()==0)
 		{
-			_position = newIntPos;
+			_actions.push_back(new MoveAction(newIntPos));
 		}
 	}
-	
+}
+
+void PanicAgent::updateState()
+{
 	if(_world->getDynamicRaster(eExits).getValue(_position)==1)
 	{
 		_exited = true;

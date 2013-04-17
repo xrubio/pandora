@@ -4,7 +4,7 @@ agents = ['PanicAgent']
 world = 'Scenario'
 namespaceAgents = ['Panic']
 
-srcFiles = ['main.cxx', 'PanicAgent.cxx', 'Scenario.cxx','ScenarioConfig.cxx']
+srcFiles = ['main.cxx', 'PanicAgent.cxx', 'Scenario.cxx','ScenarioConfig.cxx', 'MoveAction.cxx']
 
 import os, sys
 from subprocess import call

@@ -25,6 +25,7 @@ public:
 	virtual ~PanicAgent();
 	void setExit( const Engine::Point2D<int> & exit );
 	
+	void selectActions();
 	void updateState();
 	void registerAttributes();
 	void serialize();
