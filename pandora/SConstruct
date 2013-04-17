@@ -13,7 +13,7 @@ else:
 
 env.VariantDir('build', '.')
 
-libs = Split('pthread gdal hdf5 z tinyxml grass_gis boost_filesystem boost_system')
+libs = Split('pthread gdal hdf5 z tinyxml grass_gis boost_filesystem boost_system gomp')
 #if int(useMpi) == 1:
 #	libs += ['mpich']
 
