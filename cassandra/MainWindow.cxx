@@ -36,6 +36,7 @@
 #include <ProjectConfiguration.hxx>
 #include <SimulationRecord.hxx>
 #include <LoadingProgressBar.hxx>
+#include <Settings.hxx>
 
 #include <iostream>
 
@@ -52,6 +53,9 @@
 #include <QDockWidget>
 #include <QListWidgetItem>
 #include <QInputDialog>
+
+
+
 
 namespace GUI
 {
@@ -85,15 +89,15 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	// resource display 2D
 	_display2D = new Display2D(this);
 	_display3D = new Display3D(0);
-	
+
 	_display2D->show();
 	_display3D->hide();
 	
-	setCentralWidget(_display2D);
+    setCentralWidget(_display2D);
 //	setCentralWidget(_display3D);
 	
 	connect(this, SIGNAL(newViewedStep(int)), _display2D, SLOT(viewedStepChangedSlot(int)));
-	connect(this, SIGNAL(newViewedStep(int)), _display3D, SLOT(viewedStepChangedSlot(int)));
+    connect(this, SIGNAL(newViewedStep(int)), _display3D, SLOT(viewedStepChangedSlot(int)));
 	connect(this, SIGNAL(newViewedStep(int)), _genericStatistics, SLOT(viewedStepChangedSlot(int)));
 	connect(_display2D, SIGNAL(calculateStatistics(const std::string &, const std::string &)), _genericStatistics, SLOT(calculateStatistics(const std::string &, const std::string &)));
 	connect(_agentTypeSelection, SIGNAL(itemActivated(QListWidgetItem *)), _display2D, SLOT(typeSelected(QListWidgetItem *)));
@@ -103,7 +107,11 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	connect(_rasterSelection, SIGNAL(rastersRearranged(std::list<std::string>)), _display2D, SLOT(rastersRearranged(std::list<std::string>)));
 	connect(_rasterSelection, SIGNAL(rastersRearranged(std::list<std::string>)), _display3D, SLOT(rastersRearranged(std::list<std::string>)));
 	connect(_rasterSelection, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(openRasterConfigurator(QListWidgetItem *)));
-	
+
+//    connect(this, SIGNAL(newViewedStep(int)), displayAgent, SLOT(viewedStepChangedSlot(int)));
+  //  connect(_rasterSelection, SIGNAL(rastersRearranged(std::list<std::string>)), displayAgent, SLOT(rastersRearranged(std::list<std::string>)));
+
+
 	// file menu 
 	_newProjectAction = new QAction(QIcon(":/resources/icons/project_new.png"), tr("&New Project"), this);
 	_newProjectAction->setShortcut(tr("Ctrl+N"));
@@ -178,15 +186,21 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_showAgentsAction->setStatusTip(tr("Show Agents"));
 	connect(_showAgentsAction, SIGNAL(triggered()), _display2D, SLOT(showAgents()));
 	
-	_show3DAction = new QAction(QIcon(":/resources/icons/3dview.png"), tr("&Raster 3D"), this);
+    _show3DAction = new QAction(QIcon(":/resources/icons/3dview.png"), tr("&Raster 3D"), this);
 	_show3DAction->setShortcut(tr("Ctrl+3"));
 	_show3DAction->setStatusTip(tr("Show 3D raster"));
 	connect(_show3DAction, SIGNAL(triggered()), this, SLOT(show3DWindow()));
+
 	
 	_options3DAction = new QAction(QIcon(":/resources/icons/3doptions.png"), tr("&Edit 3D View"), this);
 	_options3DAction->setShortcut(tr("Ctrl+E"));
 	_options3DAction->setStatusTip(tr("Edit 3D View"));
 	connect(_options3DAction, SIGNAL(triggered()), this, SLOT(show3DOptions()));
+
+    _settings = new QAction(tr("&Settings"),this);
+    _settings->setShortcut(tr("Ctrl+O"));
+    _settings->setStatusTip(tr("Settings"));
+    connect(_settings, SIGNAL(triggered()), this, SLOT(showSettings()));
 	
 	// menus
 	_fileMenu = menuBar()->addMenu(tr("&File"));
@@ -213,6 +227,9 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_viewMenu->addSeparator();
 	_viewMenu->addAction(_show3DAction);
 	_viewMenu->addAction(_options3DAction);
+
+    _settingsBar = menuBar()->addMenu(tr("&Settings"));
+    _settingsBar->addAction(_settings);
 	
 	// toolbars
 	_fileBar= addToolBar(tr("File"));
@@ -287,7 +304,7 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 
 MainWindow::~MainWindow()
 {
-	if(_display3D!=0)
+    if(_display3D!=0)
 	{
 		delete _display3D;
 	}
@@ -334,12 +351,12 @@ void MainWindow::adjustGUI()
 {
 	std::cout << "adjusting GUI" << std::endl;
 
-	_display2D->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
+    _display2D->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
 	_agentTypeSelection->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
 	_agentTraitSelection->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
 	_rasterSelection->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
-	_genericStatistics->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
-	_display3D->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
+    _genericStatistics->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
+    _display3D->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
 
 	if(!ProjectConfiguration::instance()->getSimulationRecord())
 	{	
@@ -486,14 +503,27 @@ void MainWindow::rasterConfigured( const std::string & type, const RasterConfigu
 
 void MainWindow::show3DWindow()
 {
-	if(_display3D->isVisible())
-	{
-		_display3D->hide();
-	}
-	else
-	{
-		_display3D->show();
-	}
+    if(_display3D->isVisible())
+    {
+        _display3D->hide();
+    }
+    else
+    {
+        _display3D->show();
+    }
+}
+
+void MainWindow::showSettings()
+{
+    Settings * set = new Settings(this,_display3D->LOD);
+    set->show();
+    connect(set, SIGNAL(LODmodif(int)), this, SLOT(updateLOD(int)));
+}
+
+void MainWindow::updateLOD(int lod)
+{
+    _display3D->LOD = lod;
+    _display3D->update();
 }
 
 void MainWindow::show3DOptions()
@@ -501,6 +531,7 @@ void MainWindow::show3DOptions()
 	Configurator3D * config = new Configurator3D(this);
 	connect(config, SIGNAL(configured3D(const Configuration3D &)), this, SLOT(configured3D(const Configuration3D &)));
 }
+
 
 void MainWindow::configured3D( const Configuration3D & config3D )
 {
@@ -571,5 +602,34 @@ void MainWindow::loadSimulationFinished( bool correct )
 	}
 }
 
+void MainWindow::show3Dagent(QTreeWidgetItem * item, int i)
+{
+    if (item->child(0) != 0);
+    else
+    {
+        cout << item->parent()->text(0).toStdString() << endl;
+        //QDockWidget * displayAgentDock = new QDockWidget(tr(item->parent()->text(0).toStdString().c_str()), this);
+        //displayAgentDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+        //_displayAgent = new DisplayAgent(displayAgent);
+
+        Display3D * displayAgent = new Display3D(0);
+        connect(this, SIGNAL(newViewedStep(int)), displayAgent, SLOT(viewedStepChangedSlot(int)));
+        connect(_rasterSelection, SIGNAL(rastersRearranged(std::list<std::string>)), displayAgent, SLOT(rastersRearranged(std::list<std::string>)));
+        displayAgent->setWindowTitle(item->parent()->text(0));
+
+        //displayAgentDock->setWidget(displayAgent);
+        //addDockWidget(Qt::RightDockWidgetArea, displayAgentDock);
+
+        displayAgent->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
+        displayAgent->rastersRearranged(_rasterSelection->getRasterList());
+        displayAgent->agentFocus = true;
+        displayAgent->idAgentFocus = item->parent()->text(0).toStdString();
+        displayAgent->show();
+
+
+    }
+}
+
 } // namespace GUI
+
 

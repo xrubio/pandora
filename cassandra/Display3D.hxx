@@ -28,6 +28,8 @@
 
 #include <QGLWidget>
 #include <Point3D.hxx>
+#include "QuadTree.hxx"
+
 
 class QListWidgetItem;
 
@@ -58,6 +60,12 @@ public:
 	QSize minimumSizeHint() const;
 	QSize sizeHint() const;
 	void setSimulationRecord( Engine::SimulationRecord * simulationRecord );
+
+    bool agentFocus;
+    string idAgentFocus;
+    float frustum[6][4];
+
+    int LOD;
 // 	
 //Declarem els SLOTS públics que seràn les funcions que rebràn un 
 //paràmetre que serà l'angle amb el que rotarem el nostre ràster
@@ -76,11 +84,24 @@ protected:
 	void mousePressEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseWheelEvent(QMouseEvent *event);
+        void mouseReleaseEvent (QMouseEvent *e);
 	void paintLandscape();
 	void paintAgents();
 
+    void ExtractFrustum();
+
 	void registerModel( const std::string & key, AgentConfiguration & agentConfig, const RastersConfigurationMap & rastersConfig );
 	void setCellColor( const QColor & color );
+
+        void focus();
+
+        double dist, anterior, posterior, radi, angleX, angleY, angleZ, anglecam, ra;
+		Engine::Point3D<float> _vrp; //Punt on mira l'observador
+        typedef  enum {NONE, ROTATE, ZOOM, PAN, MOV} InteractiveAction;
+        InteractiveAction DoingInteractive;
+        int   xClick, yClick;
+
+
 private:
 	void normalizeAngle(int &angle);
 	Engine::SimulationRecord * _simulationRecord;
@@ -105,6 +126,9 @@ private:
 	std::list<std::string> _orderedRasters;
 
 	const Configuration3D & _config3D;
+
+    Quadtree *quadLandscape;
+
 };
 
 }
