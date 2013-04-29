@@ -37,6 +37,9 @@
 #include <ColorSelector.hxx>
 #include <algorithm>
 
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
+
 namespace GUI
 {
 
@@ -46,7 +49,10 @@ Display2D::Display2D( QWidget * parent) : QWidget(parent), _simulationRecord(0),
 	setAutoFillBackground(true);
 	QPalette p(palette());
 	p.setColor(QPalette::Background, Qt::lightGray);
-	setPalette(p);
+    setPalette(p);
+    agentList = new QTreeWidget();
+
+    connect(agentList, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), parent, SLOT(show3Dagent(QTreeWidgetItem*,int)));
 }
 
 Display2D::~Display2D()
@@ -89,8 +95,13 @@ void Display2D::paintEvent(QPaintEvent *event)
 				{
 					it--;
 					RasterConfiguration * rasterConfig = ProjectConfiguration::instance()->getRasterConfig(*it);
-					Engine::StaticRaster & raster(_simulationRecord->getRasterTmp(*it, _viewedStep));
+					Engine::StaticRaster & raster(_simulationRecord->getRasterTmp(*it, _viewedStep));				
 					int value = raster.getValue(Engine::Point2D<int>(i,j));
+			
+					if(rasterConfig->isTransparentEnabled() && value==rasterConfig->getTransparentValue())
+					{
+						continue;
+					}
 
 					if(raster.hasColorTable())
 					{
@@ -99,35 +110,11 @@ void Display2D::paintEvent(QPaintEvent *event)
 					}
 					else
 					{
-						if(rasterConfig->isTransparentEnabled() && value==rasterConfig->getTransparentValue())
-						{
-							continue;
-						}
 						ColorSelector & colorSelector = rasterConfig->getColorRamp();
 						pen.setColor(colorSelector.getColor(value));
 					}
-					
-					//pen.setWidth(_zoom);
-					//if(maxValue>0)
-					//{
-					//	int colorValue = 255*value/maxValue;
-					//	pen.setColor(QColor(0,colorValue, 0));
-					//}
-					//else
-					//{
-					//	pen.setBrush(QColor(200,200,200));
-					//}
 					painter.setPen(pen);
-					// horizontal
-					//painter.drawLine(i*_zoom, j*_zoom, (i+1)*_zoom, j*_zoom);
-					//painter.drawLine(i*_zoom, (j+1)*_zoom, (i+1)*_zoom, (j+1)*_zoom);
-					// vertical
-					//painter.drawLine(i*_zoom, j*_zoom, i*_zoom, (j+1)*_zoom);
-					//painter.drawLine((i+1)*_zoom, j*_zoom, (i+1)*_zoom, (j+1)*_zoom);
 					painter.drawPoint(i*_zoom+_zoom/2,j*_zoom+_zoom/2);
-					//QPolygon foo(QRect(i*_zoom, j*_zoom, _zoom, _zoom));
-					//painter.drawPolygon(foo);
-					//painter.drawRect(i*_zoom,j*_zoom, _zoom, _zoom);
 					break;
 				}
 			}
@@ -303,6 +290,114 @@ void Display2D::mousePressEvent (QMouseEvent * event)
 	}
 }
 
+void Display2D::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if(!_simulationRecord)
+    {
+        return;
+    }
+    int radiX, radiY;
+    radiX = radiY = 3;
+    Engine::Point2D<int> position(event->pos().x()-_offset.x(), event->pos().y()-_offset.y());
+    // TODO program /= i *= in Engine::Point2D
+    position._x /= _zoom;
+    position._y /= _zoom;
+
+    std::cout << "position._x " << position._x << " position._y " << position._y << std::endl;
+
+    agentList->close();
+    agentList->clear();
+    //agentList = new QListWidget();
+    Engine::Point2D<int> positionAux(position._x, position._y);
+    for (int iX = 0; iX <= radiX; iX++)
+	{
+        for (int iY = 0; iY <= radiY; iY++)
+		{
+            positionAux._x = position._x + iX;
+            positionAux._y = position._y + iY;
+			Engine::SimulationRecord::AgentRecordsVector agents = _simulationRecord->getAgentsAtPosition(_viewedStep/_simulationRecord->getFinalResolution(), positionAux);
+
+			for(int i=0; i<agents.size(); i++)
+			{
+				Engine::AgentRecord * agentRecord = agents.at(i);
+                std::string stateName = agentRecord->getId();
+
+                if (agentList->findItems(stateName.c_str(),Qt::MatchFixedString).isEmpty())
+				{
+                    std::string info = agentRecord->getCompleteState(_viewedStep/_simulationRecord->getFinalResolution());
+                    QTreeWidgetItem *item = new QTreeWidgetItem();
+                    QTreeWidgetItem *item2 = new QTreeWidgetItem();
+                    item->setText(0,QString(stateName.c_str()));
+                    item2->setText(0,QString(info.c_str()));
+                    item->addChild(item2);
+                    agentList->addTopLevelItem(item);
+                }
+
+            }
+            positionAux._x = position._x + iX;
+            positionAux._y = position._y - iY;
+			
+			agents = _simulationRecord->getAgentsAtPosition(_viewedStep/_simulationRecord->getFinalResolution(), positionAux);
+			for(int i=0; i<agents.size(); i++)
+			{
+				Engine::AgentRecord * agentRecord = agents.at(i);
+                std::string stateName = agentRecord->getId();
+                if (agentList->findItems(stateName.c_str(),Qt::MatchFixedString).isEmpty())
+				{
+                    std::string info = agentRecord->getCompleteState(_viewedStep/_simulationRecord->getFinalResolution());
+                    QTreeWidgetItem *item = new QTreeWidgetItem();
+                    QTreeWidgetItem *item2 = new QTreeWidgetItem();
+                    item->setText(0,QString(stateName.c_str()));
+                    item2->setText(0,QString(info.c_str()));
+                    item->addChild(item2);
+                    agentList->addTopLevelItem(item);
+                }
+            }
+            positionAux._x = position._x - iX;
+            positionAux._y = position._y + iY;	
+			
+			agents = _simulationRecord->getAgentsAtPosition(_viewedStep/_simulationRecord->getFinalResolution(), positionAux);
+			for(int i=0; i<agents.size(); i++)
+			{
+				Engine::AgentRecord * agentRecord = agents.at(i);
+                std::string stateName = agentRecord->getId();
+                if (agentList->findItems(stateName.c_str(),Qt::MatchFixedString).isEmpty())
+				{
+                    std::string info = agentRecord->getCompleteState(_viewedStep/_simulationRecord->getFinalResolution());
+                    QTreeWidgetItem *item = new QTreeWidgetItem();
+                    QTreeWidgetItem *item2 = new QTreeWidgetItem();
+                    item->setText(0,QString(stateName.c_str()));
+                    item2->setText(0,QString(info.c_str()));
+                    item->addChild(item2);
+                    agentList->addTopLevelItem(item);
+                }
+            }
+            positionAux._x = position._x - iX;
+            positionAux._y = position._y - iY;	
+			
+			agents = _simulationRecord->getAgentsAtPosition(_viewedStep/_simulationRecord->getFinalResolution(), positionAux);
+			for(int i=0; i<agents.size(); i++)
+			{
+				Engine::AgentRecord * agentRecord = agents.at(i);
+                std::string stateName = agentRecord->getId();
+                if (agentList->findItems(stateName.c_str(),Qt::MatchFixedString).isEmpty())
+				{
+                    std::string info = agentRecord->getCompleteState(_viewedStep/_simulationRecord->getFinalResolution());
+                    QTreeWidgetItem *item = new QTreeWidgetItem();
+                    QTreeWidgetItem *item2 = new QTreeWidgetItem();
+                    item->setText(0,QString(stateName.c_str()));
+                    item2->setText(0,QString(info.c_str()));
+                    item->addChild(item2);
+                    agentList->addTopLevelItem(item);
+                }
+            }
+        }
+    }
+    agentList->setAlternatingRowColors(true);
+    agentList->resize(400,400);
+    agentList->show();
+}
+
 void Display2D::mouseMoveEvent (QMouseEvent * event)
 {
 	if(!_simulationRecord)
@@ -317,20 +412,20 @@ void Display2D::mouseMoveEvent (QMouseEvent * event)
 }
 
 std::string Display2D::getRasterToolTip( const Engine::Point2D<int> & position )
-{	
-	std::stringstream toolTipString;
-	std::list<std::string>::iterator it =_orderedRasters.end();
-	while(it!=_orderedRasters.begin())
-	{
-		it--;
-		Engine::StaticRaster & raster = _simulationRecord->getRasterTmp(*it, _viewedStep);
-		toolTipString << "\t" <<  *it << " : " << raster.getValue(position) << std::endl;
-	}
-	return toolTipString.str();
+{
+    std::stringstream toolTipString;
+    std::list<std::string>::iterator it =_orderedRasters.end();
+    while(it!=_orderedRasters.begin())
+    {
+        it--;
+        Engine::StaticRaster & raster = _simulationRecord->getRasterTmp(*it, _viewedStep);
+        toolTipString << *it << " in " << position << " : " << raster.getValue(position) << std::endl;
+    }
+    return toolTipString.str();
 }
 
 std::string Display2D::getAgentToolTip( const Engine::Point2D<int> & position )
-{
+{	
 	std::stringstream toolTipString;
 	Engine::SimulationRecord::AgentRecordsVector agents = _simulationRecord->getAgentsAtPosition(_viewedStep/_simulationRecord->getFinalResolution(), position);
 
@@ -355,7 +450,7 @@ bool Display2D::event(QEvent *event)
 
 		std::string finalToolTip("");
 		std::stringstream posToolTip;
-		posToolTip << "raster maps at position: " << position << std::endl;;
+		posToolTip << "position: " << position << " zoom: " << _zoom;
 		finalToolTip += posToolTip.str();
 	
 		if(!_simulationRecord || position._x<0 || position._y<0 || position._x>=_simulationRecord->getSize() || position._y>=_simulationRecord->getSize())

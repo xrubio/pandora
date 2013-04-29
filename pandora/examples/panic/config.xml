@@ -6,6 +6,6 @@
 	<numSteps value="10" serializeResolution="1"/>	
 	<environment size="708" fileName="resources/buildings.tiff"/>
 	<!-- if risk aversion = -1, random value will be chosen -->
-	<agents num="100"/>
+	<agents num="5000"/>
 </config>
 

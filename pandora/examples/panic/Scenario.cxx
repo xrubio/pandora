@@ -68,7 +68,7 @@ void Scenario::createRasters()
 	registerStaticRaster("obstacles", true, eObstacles);
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eObstacles), _config._obstacleFile, this);	
 
-	registerDynamicRaster("exits", true, eExits);
+	registerDynamicRaster("exits", false, eExits);
 	getDynamicRaster(eExits).setInitValues(0, 0, 0);
 	getDynamicRaster(eExits).setMaxValue(1);
 

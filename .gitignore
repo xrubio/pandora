@@ -6,3 +6,8 @@ pandora/build_py/
 *.swp
 *.so
 *.pyc
+*.csv
+*.abm
+*.h5
+*moc_**
+*mpiCode*

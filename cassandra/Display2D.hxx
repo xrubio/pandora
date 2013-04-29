@@ -28,7 +28,10 @@
 #include <QWidget>
 #include <QWheelEvent>
 #include <vector>
+#include <QListWidget>
 #include <string>
+
+#include <QTreeWidget>
 
 class QListWidgetItem;
 
@@ -76,13 +79,15 @@ public:
 	void setSimulationRecord( Engine::SimulationRecord * simulationRecord );
 	QSize minimumSizeHint() const;
 	QSize sizeHint() const;
+    QTreeWidget *agentList;
 
 protected:  
 	bool event(QEvent *event);
 	void paintEvent(QPaintEvent * event);
 	void wheelEvent(QWheelEvent * event);
 	void mousePressEvent(QMouseEvent * event);	
-	void mouseMoveEvent(QMouseEvent * event);	
+    void mouseMoveEvent(QMouseEvent * event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
 public slots:
 	void viewedStepChangedSlot( int newViewedStep );
 	void zoomIn();

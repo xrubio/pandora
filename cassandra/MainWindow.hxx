@@ -28,6 +28,8 @@
 #include <Point3D.hxx>
 #include <Configuration3D.hxx>
 #include <LoadSimulationThread.hxx>
+#include <QTreeWidgetItem>
+
 
 class QMenu;
 class QAction;
@@ -60,10 +62,13 @@ private:
 	QMenu * _fileMenu;
 	QMenu * _simulationMenu;
 	QMenu * _viewMenu;
+    QMenu * _settingsBar;
 
 	QToolBar * _fileBar;
 	QToolBar * _simulationBar;
-	QToolBar * _viewBar;
+    QToolBar * _viewBar;
+
+    QAction * _settings;
 
 	QAction * _newProjectAction;
 	QAction * _loadProjectAction;
@@ -93,7 +98,7 @@ private:
 	QTimer * _loadSimulationTimer;
 
 	Display2D * _display2D;
-	Display3D * _display3D;
+    Display3D * _display3D;
 
 	AgentTypeSelection * _agentTypeSelection;
 	AgentTraitSelection * _agentTraitSelection;
@@ -112,7 +117,7 @@ private:
 	LoadSimulationThread _loadSimulationThread;
 public:
 	MainWindow();
-	virtual ~MainWindow();
+    virtual ~MainWindow();
 
 private slots:
 
@@ -143,6 +148,12 @@ private slots:
 	void configured3D( const Configuration3D &);
 
 	void loadSimulationFinished( bool correct);
+
+    void show3Dagent(QTreeWidgetItem * item, int i);
+    void showSettings();
+
+    void updateLOD(int lod);
+
 signals:
 	void stepChangeToStepBox(int stepChangeToStepBox);
 	void newViewedStep(int newViewedStep);
