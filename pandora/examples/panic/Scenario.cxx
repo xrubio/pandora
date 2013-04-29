@@ -62,6 +62,9 @@ void Scenario::createRasters()
 	registerStaticRaster("orto5", true, eOrto);
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eOrto), "resources/orto5m.tiff", this);	
 
+	registerStaticRaster("mtc5", true, eTopo);
+	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eTopo), "resources/mtc5.tiff", this);	
+
 	registerStaticRaster("obstacles", true, eObstacles);
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eObstacles), _config._obstacleFile, this);	
 
