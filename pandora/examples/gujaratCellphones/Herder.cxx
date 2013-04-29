@@ -321,7 +321,7 @@ void Herder::updateState()
 		// fission
 		if(_herdSize>config._animalsPerHerder)
 		{
-			//_village->fission(*this);
+			_village->fission(*this);
 		}
 		setPosition(_village->getPosition());		
 

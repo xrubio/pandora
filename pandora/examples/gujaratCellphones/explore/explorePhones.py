@@ -4,7 +4,7 @@ baseDir = '/home/bsc21/bsc21887/pandora/examples/gujaratCellphones/explore'
 taskFile = 'phones.txt'
 
 numExecutions = 40
-knowledgeValues =  ['1','2','3']
+knowledgeValues =  ['10','20','30']
 
 xmlTemplate = 'templates/config_template_phones.xml'
 

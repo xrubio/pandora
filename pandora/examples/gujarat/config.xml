@@ -72,7 +72,7 @@
 
 	<!-- Raster storage options -->
 	<storeRaster name="soils" value="yes" />
-	<storeRaster name="dem" value="no" />
+	<storeRaster name="dem" value="yes" />
 	<storeRaster name="moisture" value="no" />
 	<storeRaster name="resources" value="no" />
 	<storeRaster name="forageActivity" value="no" />
