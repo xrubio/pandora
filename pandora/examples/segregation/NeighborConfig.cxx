@@ -36,8 +36,6 @@ void NeighborConfig::extractParticularAttribs(TiXmlElement * root)
 	
 	element = root->FirstChildElement("maxMovingDistance");
 	_maxMovingDistance = atof(element->Attribute("value"));
-
-	std::cout << *this << std::endl;
 }
 	
 const int & NeighborConfig::getSize()

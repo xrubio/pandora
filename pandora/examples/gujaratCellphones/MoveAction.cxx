@@ -55,35 +55,35 @@ void MoveAction::execute( Engine::Agent & agent )
 	herder.getWorld()->setValue(eResources, _newPosition, modifiedValue);
 
 	// we set the maximum value of the mental map of the agent to the value before gathering in case it is the first time this year
-	if(herder.getWorld()->getDynamicRasterStr(herder.getKnowledgeMap()).getValue(_newPosition)!=0)
+	if(herder.getWorld()->getDynamicRaster(herder.getKnowledgeMap()).getValue(_newPosition)!=0)
 	{
-		herder.getWorld()->getDynamicRasterStr(herder.getKnowledgeMap()).setValue(_newPosition, 0);
-		herder.getWorld()->getDynamicRasterStr(herder.getResourcesMap()).setMaxValue(_newPosition, previousValue);
+		herder.getWorld()->getDynamicRaster(herder.getKnowledgeMap()).setValue(_newPosition, 0);
+		herder.getWorld()->getDynamicRaster(herder.getResourcesMap()).setMaxValue(_newPosition, previousValue);
 	}
 	// if the agent already visited the cell this year we will set the max value to an average value between both samples
 	else 
 	{	
-		if(herder.getWorld()->getDynamicRasterStr(herder.getResourcesMap()).getMaxValueAt(_newPosition)<modifiedValue)
+		if(herder.getWorld()->getDynamicRaster(herder.getResourcesMap()).getMaxValueAt(_newPosition)<modifiedValue)
 		{
-			herder.getWorld()->getDynamicRasterStr(herder.getResourcesMap()).setMaxValue(_newPosition, modifiedValue);
+			herder.getWorld()->getDynamicRaster(herder.getResourcesMap()).setMaxValue(_newPosition, modifiedValue);
 		}
 		else
 		{
-			int previousMaxValue = herder.getWorld()->getDynamicRasterStr(herder.getResourcesMap()).getMaxValueAt(_newPosition);
+			int previousMaxValue = herder.getWorld()->getDynamicRaster(herder.getResourcesMap()).getMaxValueAt(_newPosition);
 			int newMaxValue = previousValue;
-			herder.getWorld()->getDynamicRasterStr(herder.getResourcesMap()).setMaxValue(_newPosition, (previousMaxValue+newMaxValue)/2);
+			herder.getWorld()->getDynamicRaster(herder.getResourcesMap()).setMaxValue(_newPosition, (previousMaxValue+newMaxValue)/2);
 		}
 	}
 
 	/*
-	if(herder.getWorld()->getDynamicRasterStr(herder.getResourcesMap()).getMaxValueAt(_newPosition)<modifiedValue)
+	if(herder.getWorld()->getDynamicRaster(herder.getResourcesMap()).getMaxValueAt(_newPosition)<modifiedValue)
 	{
-		herder.getWorld()->getDynamicRasterStr(herder.getResourcesMap()).setMaxValue(_newPosition, modifiedValue);
+		herder.getWorld()->getDynamicRaster(herder.getResourcesMap()).setMaxValue(_newPosition, modifiedValue);
 	}
 	*/
-	herder.getWorld()->getDynamicRasterStr(herder.getResourcesMap()).setValue(_newPosition, modifiedValue);
+	herder.getWorld()->getDynamicRaster(herder.getResourcesMap()).setValue(_newPosition, modifiedValue);
 	// knowledge is updated to 0 years
-	//herder.getWorld()->getDynamicRasterStr("gathered").setValue(_newPosition, herder.getWorld()->getDynamicRasterStr("gathered").getValue(_newPosition)+1);
+	//herder.getWorld()->getDynamicRaster("gathered").setValue(_newPosition, herder.getWorld()->getDynamicRaster("gathered").getValue(_newPosition)+1);
 
 	//std::cout << "herder: " << herder << " has collected: " << collected << " from: " << previousValue << " with needed: " << herder.getNeededResources() << std::endl;
 }

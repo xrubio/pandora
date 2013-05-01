@@ -202,6 +202,19 @@ public:
 	{
 		World::stepEnvironment();
 	}
+
+	// needed to avoid expliciting default params
+	void registerDynamicRasterSimple( const std::string & key, const bool & serialize )
+	{
+		Engine::World::registerDynamicRaster(key, serialize, -1);			
+	}
+	
+	// needed to avoid expliciting default params
+	void registerStaticRasterSimple( const std::string & key, const bool & serialize )
+	{
+		Engine::World::registerStaticRaster(key, serialize, -1);			
+	}
+
 };
 
 class AgentAnalysisWrap : public Analysis::AgentAnalysis, public boost::python::wrapper<Analysis::AgentAnalysis>
@@ -249,6 +262,12 @@ void passAnalysisOwnership( Analysis::Results & results, std::auto_ptr<Analysis:
 	analysisPtr.release();
 }
 
+// overloaded methods
+Engine::Raster & (Engine::World::*getDynamicRaster)(const std::string&) = &Engine::World::getDynamicRaster;
+Engine::StaticRaster & (Engine::World::*getStaticRaster)(const std::string&) = &Engine::World::getStaticRaster;
+int (Engine::World::*getValue)(const std::string&, const Engine::Point2D<int> &) const = &Engine::World::getValue;
+void (Engine::World::*setValue)(const std::string&, const Engine::Point2D<int> &, int) = &Engine::World::setValue;
+
 BOOST_PYTHON_MODULE(libpyPandora)
 {
 	boost::python::class_< Point2DInt >("Point2DIntStub", boost::python::init<const int & , const int & >() )
@@ -279,12 +298,14 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("stepEnvironment", &Engine::World::stepEnvironment, &WorldWrap::default_StepEnvironment)
 		.def("initialize", &Engine::World::initialize)
 		.def("checkPosition", &Engine::World::checkPosition)
-		.def("registerDynamicRaster", &Engine::World::registerDynamicRaster)
-		.def("getDynamicRaster", &Engine::World::getDynamicRaster, boost::python::return_value_policy<boost::python::reference_existing_object>())
+		.def("registerDynamicRaster", &WorldWrap::registerDynamicRasterSimple)	
+		.def("registerStaticRaster", &WorldWrap::registerStaticRasterSimple)	
+		.def("getDynamicRaster", getDynamicRaster, boost::python::return_value_policy<boost::python::reference_existing_object>())
+		.def("getStaticRaster", getStaticRaster, boost::python::return_value_policy<boost::python::reference_existing_object>())
 		.def("run", &Engine::World::run)
 		.def("addAgentStub", &WorldWrap::addAgent)
-		.def("setValue", &Engine::World::setValue)
-		.def("getValue", &Engine::World::getValue)
+		.def("setValue", setValue)
+		.def("getValue", getValue)
 		.add_property("currentStep", &Engine::World::getCurrentStep)
 	;
 	

@@ -80,7 +80,7 @@ void	Sector::updateFeatures( const Engine::Raster& r )
 
 void Sector::updateFeatures()
 {
-	computeBiomassAmount(_world.getConstDynamicRaster(eResources));
+	computeBiomassAmount(_world.getDynamicRaster(eResources));
 }
 /*
 std::string Sector::biomassClass() const

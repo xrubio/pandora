@@ -33,7 +33,7 @@ void DecisionModel::reset()
 		delete _initial;
 		_initial = 0;
 	}
-	_initial = new ForagerState(_agent.getPosition(), _agent.getNeededResources(), _agent.getWorld()->getDynamicRasterStr(_agent.getKnowledgeMap()), _agent.getWorld()->getDynamicRasterStr(_agent.getResourcesMap()), 0);
+	_initial = new ForagerState(_agent.getPosition(), _agent.getNeededResources(), _agent.getWorld()->getDynamicRaster(_agent.getKnowledgeMap()), _agent.getWorld()->getDynamicRaster(_agent.getResourcesMap()), 0);
 	makeActionsForState(*_initial);
 }
 

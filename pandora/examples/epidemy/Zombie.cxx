@@ -4,6 +4,7 @@
 #include <DoNothingAction.hxx>
 #include <GeneralState.hxx>
 #include <Statistics.hxx>
+#include <Logger.hxx>
 
 namespace Examples
 {

@@ -2,7 +2,7 @@
 #ifndef __NeighborConfig_hxx__
 #define __NeighborConfig_hxx__
 
-#include "Config.hxx"
+#include <Config.hxx>
 #include <tinyxml.h>
 #include <string>
 #include <sstream>
@@ -11,7 +11,7 @@ namespace Segregation
 {
     class NeighborHood;
 
-class NeighborConfig : public Config
+class NeighborConfig : public Engine::Config
 { 
 	int _size;
 	float _friendlyPercentage;
@@ -25,10 +25,6 @@ public:
 	virtual ~NeighborConfig();
     
 	void extractParticularAttribs(TiXmlElement *pRoot);
-	friend std::ostream & operator<<( std::ostream & stream, const NeighborConfig & config )
-	{
-		return stream << "Config(" << "path:" << config._path << "," << "size:" << config._size << "," << "steps:" << config._numSteps << " friendly percentage: " << config._friendlyPercentage<< " population density: " << config._populationDensity << " dime percentage: " << config._dimePercentage << " and neighbor distance: " << config._neighborDistance << ")";
-	}  
 	friend class Neighborhood;
 	const int & getSize();
 };

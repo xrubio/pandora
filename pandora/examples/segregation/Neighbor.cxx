@@ -13,17 +13,17 @@ Neighbor::~Neighbor()
 
 void Neighbor::updateKnowledge()
 {
-	Engine::World::AgentsList neighborsList = getWorld()->getNeighbours( this, _neighborDistance );
-	float neighbors = neighborsList.size();
-	float friendlyNeighbors = 0.0f;
-	for(Engine::World::AgentsList::iterator it=neighborsList.begin(); it!=neighborsList.end(); it++)
+	Engine::World::AgentsVector neighbors = getWorld()->getNeighbours( this, _neighborDistance );
+	int numNeighbors = neighbors.size();
+	int friendlyNeighbors = 0;
+	for(Engine::World::AgentsVector::iterator it=neighbors.begin(); it!=neighbors.end(); it++)
 	{
 		if((*it)->isType(getType()))
 		{
 			friendlyNeighbors++;
 		}
 	}
-	if(neighbors==0 || friendlyNeighbors/neighbors<=_friendlyPercentage)
+	if(numNeighbors==0 || (float)friendlyNeighbors/(float)numNeighbors<=_friendlyPercentage)
 	{
 		_needsToMove = false;
 		return;

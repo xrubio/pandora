@@ -23,7 +23,7 @@ RandomWorld::~RandomWorld()
 void RandomWorld::createRasters()
 {
 	registerDynamicRaster("resources", true);
-	getDynamicRasterStr("resources").setInitValues(0, 100, 0);
+	getDynamicRaster("resources").setInitValues(0, 100, 0);
 	
 	Engine::Point2D<int> index(0,0);
 	for(index._x=0; index._x<_overlapBoundaries._size._x; index._x++)
@@ -31,7 +31,7 @@ void RandomWorld::createRasters()
 		for(index._y=0; index._y<_overlapBoundaries._size._y; index._y++)
 		{
 			int value = Engine::GeneralState::statistics().getNormalDistValue(0,100);
-			getDynamicRasterStr("resources").setMaxValue(index, value);
+			getDynamicRaster("resources").setMaxValue(index, value);
 		}
 	}
 	updateRasterToMaxValues("resources");

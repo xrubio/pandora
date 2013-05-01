@@ -12,10 +12,10 @@ namespace Segregation
 
 class Neighbor : public Engine::Agent
 {
-	float _friendlyPercentage;
-	bool _needsToMove;
-	float _neighborDistance;
-	float _maxMovingDistance;
+	float _friendlyPercentage; // MpiBasicAttribute	
+	bool _needsToMove; // MpiBasicAttribute	
+	float _neighborDistance; // MpiBasicAttribute	
+	float _maxMovingDistance; // MpiBasicAttribute	
 
 	void updateKnowledge();
 	void moveHome();

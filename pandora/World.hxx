@@ -183,10 +183,7 @@ protected:
 	void step();
 	//! applies next simulation step on the Section of the space identified by parameter 'sectionIndex'.
 	void stepSection( const int & sectionIndex );
-	//! returns static raster identified by parameter 'key'.
-	StaticRaster & getStaticRaster( const int & index );
-	StaticRaster & getStaticRasterStr( const std::string & key );
-	
+		
 	//! method interface for attribute _searchAgents. 
 	void setSearchAgents( const bool & searchAgents );
 	//! method interface for attribute _searchAgents. 
@@ -308,8 +305,12 @@ public:
 
 	//! returns raster identified by parameter 'key'.
 	Raster & getDynamicRaster( const int & index );
-	Raster & getDynamicRasterStr( const std::string & key );
-	const Raster& getConstDynamicRaster( const int & index ) const;
+	Raster & getDynamicRaster( const std::string & key );
+	const Raster & getDynamicRaster( const int & index ) const;
+
+	//! returns static raster identified by parameter 'key'.
+	StaticRaster & getStaticRaster( const int & index );
+	StaticRaster & getStaticRaster( const std::string & key );
 
 	//! create a new static raster map with the stablished size and given key
 	void registerStaticRaster( const std::string & key, const bool & serialize, int index = -1);
@@ -322,11 +323,11 @@ public:
 	Simulation & getSimulation();
 
 	//! sets the value of raster "key" to value "value" in global position "position"
-	void setValueStr( const std::string & key, const Point2D<int> & position, int value );
+	void setValue( const std::string & key, const Point2D<int> & position, int value );
 	//! sets the value of raster "index" to value "value" in global position "position"
 	void setValue( const int & index, const Point2D<int> & position, int value );
 	//! returns the value of raster "key" in global position "position"
-	int getValueStr( const std::string & key, const Point2D<int> & position ) const;
+	int getValue( const std::string & key, const Point2D<int> & position ) const;
 	//! returns the value of raster "index" in global position "position"
 	int getValue( const int & index, const Point2D<int> & position ) const;
 

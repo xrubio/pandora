@@ -8,6 +8,7 @@
 #include <Raster.hxx>
 #include <Point2D.hxx>
 #include <GeneralState.hxx>
+#include <Logger.hxx>
 
 namespace Examples 
 {
@@ -43,7 +44,7 @@ void Earth::createAgents()
 {
 	std::stringstream logName;
 	logName << "simulation_" << _simulation.getId();
-	log_INFO(logName.str(), MPI_Wtime() - _initialTime << " creating agents");
+	log_INFO(logName.str(), getWallTime() << " creating agents");
 
 	Engine::Point2D<int> index;
 	int totalHumans = 0;
@@ -65,12 +66,12 @@ void Earth::createAgents()
 					scaledHumans++;
 				}
 				totalHumans += scaledHumans;
-				log_INFO(logName.str(), MPI_Wtime() - _initialTime << " created: " << scaledHumans << " humans at pos: " << index);
+				log_INFO(logName.str(), getWallTime() << " created: " << scaledHumans << " humans at pos: " << index);
 				setValue("humans", index, scaledHumans);
 			}
 		}
 	}
-	log_INFO(logName.str(), MPI_Wtime() - _initialTime << " " << totalHumans << " humans created");
+	log_INFO(logName.str(), getWallTime() << " " << totalHumans << " humans created");
 
 	for(int i=0; i<_config._numCases; i++)
 	{
@@ -83,7 +84,7 @@ void Earth::createAgents()
 	}
 	setValue("newCases", _config._firstCase, _config._numCases);
 	setValue("zombies", _config._firstCase, _config._numCases);
-	log_INFO(logName.str(), MPI_Wtime() - _initialTime << " " << _config._numCases << " zombies created at infection focus: " << _config._firstCase);
+	log_INFO(logName.str(), getWallTime() << " " << _config._numCases << " zombies created at infection focus: " << _config._firstCase);
 }
 
 float Earth::getZombieVirulence() const
@@ -132,7 +133,7 @@ void Earth::stepEnvironment()
 			totalZombies++;
 		}
 	}
-	log_INFO(logName.str(), "step: " << _step << " num humans: " << totalHumans << " num zombies: " << totalZombies);
+	log_INFO(logName.str(), getWallTime() << " step: " << _step << " num humans: " << totalHumans << " num zombies: " << totalZombies);
 }
 	
 } // namespace Examples

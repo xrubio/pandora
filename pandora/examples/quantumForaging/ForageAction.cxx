@@ -62,7 +62,7 @@ void ForageAction::execute( Engine::Agent & agent )
 	forager.getWorld()->setValue(eResources, _position, rest);
 
 	// decrease the uncertainty of values
-	Engine::Raster & knowledge = forager.getWorld()->getDynamicRasterStr(forager.getKnowledgeMap());
+	Engine::Raster & knowledge = forager.getWorld()->getDynamicRaster(forager.getKnowledgeMap());
 	int qualityKnowledge = knowledge.getValue(_position);
 	if(qualityKnowledge<knowledge.getMaxValueAt(_position))
 	{
@@ -75,11 +75,11 @@ void ForageAction::execute( Engine::Agent & agent )
 	{
 		return;
 	}
-	if(forager.getWorld()->getDynamicRasterStr(forager.getResourcesMap()).getMaxValueAt(_position)<rest)
+	if(forager.getWorld()->getDynamicRaster(forager.getResourcesMap()).getMaxValueAt(_position)<rest)
 	{
-		forager.getWorld()->getDynamicRasterStr(forager.getResourcesMap()).setMaxValue(_position, rest);
+		forager.getWorld()->getDynamicRaster(forager.getResourcesMap()).setMaxValue(_position, rest);
 	}
-	forager.getWorld()->getDynamicRasterStr(forager.getResourcesMap()).setValue(_position, rest);
+	forager.getWorld()->getDynamicRaster(forager.getResourcesMap()).setValue(_position, rest);
 }
 	
 std::string ForageAction::describe() const

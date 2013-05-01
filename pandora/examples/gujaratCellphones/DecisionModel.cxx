@@ -36,7 +36,7 @@ void DecisionModel::reset( Herder & agent, int daysUntilWetSeason, int horizon)
 		_initial = 0;
 	}
 	_agent= &agent;
-	_initial = new HerderState(agent.getPosition(), agent.getVillage().getPosition(), agent.getResources(), agent.getWorld()->getDynamicRasterStr(agent.getKnowledgeMap()), agent.getWorld()->getDynamicRasterStr(agent.getResourcesMap()), agent.getNeededResources(), _daysUntilWetSeason);
+	_initial = new HerderState(agent.getPosition(), agent.getVillage().getPosition(), agent.getResources(), agent.getWorld()->getDynamicRaster(agent.getKnowledgeMap()), agent.getWorld()->getDynamicRaster(agent.getResourcesMap()), agent.getNeededResources(), _daysUntilWetSeason);
 	makeActionsForState(*_initial);
 //	std::cout << "end reset model for agent: " << agent << std::endl;
 }

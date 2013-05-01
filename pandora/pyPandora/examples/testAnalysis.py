@@ -57,11 +57,11 @@ agentResults.addAnalysis(AgentMean('value'))
 agentResults.addAnalysis(AgentSum('value'))
 agentResults.addAnalysis(AgentHDFtoSHP('shp/agents.shp', -1))
 
-agentResults.compute()
+agentResults.apply()
 
 rasterResults = RasterResults(record, 'resources.csv', 'test', ';')
 rasterResults.addAnalysis(RasterMean())
 rasterResults.addAnalysis(RasterSum())
 
-rasterResults.compute()
+rasterResults.apply()
 

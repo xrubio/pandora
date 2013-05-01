@@ -41,7 +41,7 @@ void MoveAction::execute( Engine::Agent & agent )
 	Forager & forager = (Forager&)agent;
 	forager.setPosition(_position);	
 	
-	Engine::Raster & knowledge = forager.getWorld()->getDynamicRasterStr(forager.getKnowledgeMap());
+	Engine::Raster & knowledge = forager.getWorld()->getDynamicRaster(forager.getKnowledgeMap());
 	int qualityKnowledge = knowledge.getValue(_position);
 	if(qualityKnowledge<knowledge.getMaxValueAt(_position))
 	{

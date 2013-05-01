@@ -63,14 +63,14 @@ void Forager::createKnowledge()
 
 	_world->registerDynamicRaster(_knowledgeMap, true);
 	_world->registerDynamicRaster(_resourcesMap, true);
-	_world->getDynamicRasterStr(_knowledgeMap).setInitValues(0, 10, 0);
-	_world->getDynamicRasterStr(_resourcesMap).setInitValues(0, std::numeric_limits<int>::max(), 0);
+	_world->getDynamicRaster(_knowledgeMap).setInitValues(0, 10, 0);
+	_world->getDynamicRaster(_resourcesMap).setInitValues(0, std::numeric_limits<int>::max(), 0);
 }
 
 void Forager::updateKnowledge()
 {
-	Engine::Raster & knowledge = _world->getDynamicRasterStr(_knowledgeMap);
-	Engine::Raster & resources = _world->getDynamicRasterStr(_resourcesMap);
+	Engine::Raster & knowledge = _world->getDynamicRaster(_knowledgeMap);
+	Engine::Raster & resources = _world->getDynamicRaster(_resourcesMap);
 
 	// first step, init environment
 	if(_world->getCurrentStep()==0)

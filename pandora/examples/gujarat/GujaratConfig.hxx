@@ -18,34 +18,34 @@ class HunterGathererMDPConfig;
 
 class GujaratConfig : public Engine::Config
 { 
-	int 		_size;		
-	std::string 	_soilFile;
-	std::string 	_demFile;
-	std::string 	_distWaterFile;
-	std::string 	_weightWaterFile;
+	int _size;		
+	std::string _soilFile;
+	std::string _demFile;
+	std::string _distWaterFile;
+	std::string _weightWaterFile;
 	// constant equal to Numcells/sum of weights to water
 	double _waterDistConstant;
-	int		_climateSeed;
+	int	_climateSeed;
 	// Agent home range expressed in # of underlying GIS
 	// data grid (~30m)
-	int		_homeRange;
+	int	_homeRange;
 	// Agents social range expressed in # GIS data grid tiles
-	int		_socialRange;
+	int	_socialRange;
 	// # days corresponding to a climate model season	
-	int		_daysPerSeason;
-	int		_daysPerYear;
+	int	_daysPerSeason;
+	int	_daysPerYear;
 	// # meters corresponding to the side of a cell
 	float _cellResolution;
 	// # real cells for each one in a map on low resolution
 	int _lowResolution;
 	// MRJ: Hunter Gatherers attributes
-	int		_surplusForReproductionThreshold;
-	int		_surplusWanted;	
+	int	_surplusForReproductionThreshold;
+	int	_surplusWanted;	
 	//float   _hgFoodNeedsForReproduction;
 	//float   _hgSpoilageFoodFactor;	
-	int		_adulthoodAge;
-	float	_walkingSpeedHour;
-	float	_forageTimeCost;
+	int	_adulthoodAge;
+	float _walkingSpeedHour;
+	float _forageTimeCost;
 	// available forage time for each age until adulthood
 	std::vector<float> _availableForageTime;
 	std::vector<int> _caloricRequirements;
@@ -81,15 +81,15 @@ class GujaratConfig : public Engine::Config
 	//CaloricRequirementsTable* _hgCaloryRequirements;
 	//CaloricRequirementsTable* _apCaloryRequirements;
 
-	HunterGathererMDPConfig*	_controllerConfig;
+	HunterGathererMDPConfig * _controllerConfig;
 
 	int _numHG;
 	int _numAP;
 	std::map< std::string, bool > _storeRasters;
 	std::string _biomassDistribution;
 
-	void 	parseSoilInfo(TiXmlElement * element);
-	void	parseHGMDPConfig( TiXmlElement* element );
+	void parseSoilInfo(TiXmlElement * element);
+	void parseHGMDPConfig( TiXmlElement* element );
 	
 public:
 	GujaratConfig();  

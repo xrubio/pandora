@@ -74,14 +74,14 @@ void Herder::createKnowledge()
 
 	//_world->registerDynamicRaster(_knowledgeMap, false);
 	//_world->registerDynamicRaster(_resourcesMap, false);
-	_world->getDynamicRasterStr(_knowledgeMap).setInitValues(-1, std::numeric_limits<int>::max(), -1);
-	_world->getDynamicRasterStr(_resourcesMap).setInitValues(0, std::numeric_limits<int>::max(), 0);
+	_world->getDynamicRaster(_knowledgeMap).setInitValues(-1, std::numeric_limits<int>::max(), -1);
+	_world->getDynamicRaster(_resourcesMap).setInitValues(0, std::numeric_limits<int>::max(), 0);
 }
 
 void Herder::updateKnowledge()
 {
-	Engine::Raster & knowledge = _world->getDynamicRasterStr(_knowledgeMap);
-	Engine::Raster & resources = _world->getDynamicRasterStr(_resourcesMap);
+	Engine::Raster & knowledge = _world->getDynamicRaster(_knowledgeMap);
+	Engine::Raster & resources = _world->getDynamicRaster(_resourcesMap);
 
 	// first step, init environment
 	if(_world->getCurrentStep()==0)
@@ -113,7 +113,7 @@ void Herder::updateKnowledge()
 	}
 	// info is one year old
 		Engine::Point2D<int> index(0,0);
-//		Engine::Raster & knowledge = _world->getDynamicRasterStr(_knowledgeMap);
+//		Engine::Raster & knowledge = _world->getDynamicRaster(_knowledgeMap);
 		for(index._x=0; index._x<_world->getOverlapBoundaries()._size._x; index._x++)
 		{
 			for(index._y=0; index._y<_world->getOverlapBoundaries()._size._y; index._y++)
@@ -167,11 +167,11 @@ void Herder::knowledgeTransmission( int frequency ) const
 
 void Herder::copyValue( const Herder & origin, const Herder & target, const Engine::Point2D<int> & index ) const
 {
-	Engine::Raster & knowledgeOrigin = _world->getDynamicRasterStr(origin.getKnowledgeMap());
-	Engine::Raster & resourcesOrigin = _world->getDynamicRasterStr(origin.getResourcesMap());
+	Engine::Raster & knowledgeOrigin = _world->getDynamicRaster(origin.getKnowledgeMap());
+	Engine::Raster & resourcesOrigin = _world->getDynamicRaster(origin.getResourcesMap());
 
-	Engine::Raster & knowledgeTarget = _world->getDynamicRasterStr(target.getKnowledgeMap());
-	Engine::Raster & resourcesTarget = _world->getDynamicRasterStr(target.getResourcesMap());
+	Engine::Raster & knowledgeTarget = _world->getDynamicRaster(target.getKnowledgeMap());
+	Engine::Raster & resourcesTarget = _world->getDynamicRaster(target.getResourcesMap());
 
 	knowledgeTarget.setValue(index, knowledgeOrigin.getValue(index));
 	resourcesTarget.setMaxValue(index, resourcesOrigin.getMaxValueAt(index));
@@ -180,11 +180,11 @@ void Herder::copyValue( const Herder & origin, const Herder & target, const Engi
 
 void Herder::shareCell( const Herder & herderA, const Herder & herderB, const Engine::Point2D<int> & index ) const
 {
-	Engine::Raster & knowledgeA = _world->getDynamicRasterStr(herderA.getKnowledgeMap());
-	Engine::Raster & resourcesA = _world->getDynamicRasterStr(herderA.getResourcesMap());
+	Engine::Raster & knowledgeA = _world->getDynamicRaster(herderA.getKnowledgeMap());
+	Engine::Raster & resourcesA = _world->getDynamicRaster(herderA.getResourcesMap());
 
-	Engine::Raster & knowledgeB = _world->getDynamicRasterStr(herderB.getKnowledgeMap());
-	Engine::Raster & resourcesB = _world->getDynamicRasterStr(herderB.getResourcesMap());
+	Engine::Raster & knowledgeB = _world->getDynamicRaster(herderB.getKnowledgeMap());
+	Engine::Raster & resourcesB = _world->getDynamicRaster(herderB.getResourcesMap());
 
 	if(knowledgeA.getValue(index)>knowledgeB.getValue(index))
 	{
@@ -333,7 +333,7 @@ void Herder::updateState()
 		/*
 		// info is one year old
 		Engine::Point2D<int> index(0,0);
-		Engine::Raster & knowledge = _world->getDynamicRasterStr(_knowledgeMap);
+		Engine::Raster & knowledge = _world->getDynamicRaster(_knowledgeMap);
 		for(index._x=0; index._x<_world->getOverlapBoundaries()._size._x; index._x++)
 		{
 			for(index._y=0; index._y<_world->getOverlapBoundaries()._size._y; index._y++)
