@@ -152,8 +152,10 @@ class Oasis(World):
 	def createRasters(self):
 		self.registerDynamicRaster("farmers", 1)
 		self.registerDynamicRaster("herders", 1)
+		self.registerDynamicRaster("conflicts", 1)
 		self.getDynamicRaster("farmers").setInitValues(0, 1, 0)
 		self.getDynamicRaster("herders").setInitValues(0, 1, 0)
+		self.getDynamicRaster("conflicts").setInitValues(0, self._config._numSteps, 0)
 
 	def createAgents(self):
 		print 'creating farmers: '+str(self._config._initFarmers)+' and herders: '+str(self._config._initHerders)
@@ -161,6 +163,7 @@ class Oasis(World):
 			newAgent = Farmer('Farmer_'+str(i))
 			self.addAgent(newAgent)
 			newAgent._naturalGrowth = self._config._farmersGrowthRate
+			newAgent._strength = self._config._farmersStrength
 			newAgent.position = Point2DInt(i%self._config._size,i/self._config._size)
 			self.setValue('farmers', newAgent.position, 1) 
 
@@ -168,6 +171,7 @@ class Oasis(World):
 			newAgent = Herder('Herder_'+str(i))
 			self.addAgent(newAgent)
 			newAgent._naturalGrowth = self._config._herdersGrowthRate
+			newAgent._strength = self._config._farmersStrength*self._config._herdersRelativeStrength
 			newAgent.position = Point2DInt(self._config._size-1-i%self._config._size,self._config._size-1-i/self._config._size)
 			self.setValue('herders', newAgent.position, 1) 
 	
@@ -178,30 +182,38 @@ class Oasis(World):
 		return
 	
 	def resolveConflicts( self, position ):
-		indexOfOpportunity = self._numFields / self._config._size*self._config._size
 		# just one of each per cell
-		self.getAgent(position, 'Herder')
+		herder = self.getAgent(self.getAgentIds(position, 'Herder')[0])
+		farmer = self.getAgent(self.getAgentIds(position, 'Farmer')[0])
+		print 'conflict between herder: '+ herder.id + ' and farmer: ' + farmer.id + ' at pos: ' + str(position._x) + '/' + str(position._y)
+		self.setValue('conflicts', position, self.getValue('conflicts', position)+1)
 
-#herder = self.getAgent(position, 'Herder').at(0)
-#		farmer = self.getAgent(position, 'Farmer').at(0)
+		indexOfOpportunity = self._numFields / (self._config._size*self._config._size)
 		ratioOfStrengths = herder._strength/(herder._strength+farmer._strength)
 		incentiveForMigration = 1 - ratioOfStrengths*indexOfOpportunity
+		print '\tratio of strength: '+str(ratioOfStrengths) + ' incentive migration: ' + str(incentiveForMigration) + ' index of opportunity: ' + str(indexOfOpportunity) + ' num fields: ' + str(self._numFields) + ' size: ' + str(self._config._size)
 		if incentiveForMigration>herder._aggressiveness:
+			print '\therder migrated, removing agent: '+herder.id
 			self.removeAgent(herder)
 			self.setValue('herders', position, 0)
 			self._herdersOut += 1
+			return
 
 		# invasion attempt
 		self._aggressions += 1
 		randomValue = random.random()
 		if herder._aggressiveness > randomValue:
+			print '\t herder invasion success with random: '+str(randomValue) + ' and aggressiveness: ' + str(herder._aggressiveness) + ' farmer removed: ' + farmer.id
 			self.removeAgent(farmer)
 			self.setValue('farmers', position, 0)
 			_invasions += 1
+			return
 		else:
+			print '\t herder invasion failed with random: '+str(randomValue) + ' and aggressiveness: ' + str(herder._aggressiveness) + ' herder removed: ' + herder.id
 			self.removeAgent(herder)
 			self.setValue('herders', position, 0)
-
+			return
+	
 	def updateNumFields(self):
 		self._numFields = 0
 		for i in range(0,self._config._size):
