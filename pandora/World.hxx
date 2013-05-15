@@ -215,7 +215,7 @@ public:
 	void run();
 	
 	//! add an agent to the world, and remove it from overlap agents if exist
-	void addAgent( Agent * agent );
+	void addAgent( Agent * agent, bool executedAgent = true );
 	
 	void removeAgents();
 	void removeAgent(Agent * agent);

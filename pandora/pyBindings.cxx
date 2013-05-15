@@ -22,6 +22,7 @@
 
 #include <boost/python.hpp>
 #include <boost/python/object.hpp>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <Point2D.hxx>
 #include <StaticRaster.hxx>
 #include <Raster.hxx>
@@ -214,6 +215,24 @@ public:
 	{
 		Engine::World::registerStaticRaster(key, serialize, -1);			
 	}
+	
+	void addAgentSimple( Engine::Agent * agent )
+	{
+		Engine::World::addAgent(agent, true);
+	}
+
+	std::vector<std::string> getAgentIds(  const Engine::Point2D<int> & position, const std::string & type="all" )
+	{
+		std::vector<std::string> agentIds;
+		Engine::World::AgentsVector agents = getAgent(position, type);
+		agentIds.resize(agents.size());
+		for(int i=0; i<agents.size(); i++)
+		{
+			agentIds.at(i) = agents.at(i)->getId();
+		}
+		return agentIds;
+	}
+
 
 };
 
@@ -265,8 +284,11 @@ void passAnalysisOwnership( Analysis::Results & results, std::auto_ptr<Analysis:
 // overloaded methods
 Engine::Raster & (Engine::World::*getDynamicRaster)(const std::string&) = &Engine::World::getDynamicRaster;
 Engine::StaticRaster & (Engine::World::*getStaticRaster)(const std::string&) = &Engine::World::getStaticRaster;
+
 int (Engine::World::*getValue)(const std::string&, const Engine::Point2D<int> &) const = &Engine::World::getValue;
 void (Engine::World::*setValue)(const std::string&, const Engine::Point2D<int> &, int) = &Engine::World::setValue;
+
+Engine::Agent * (Engine::World::*getAgent)(const std::string &) = &Engine::World::getAgent;
 
 BOOST_PYTHON_MODULE(libpyPandora)
 {
@@ -291,23 +313,6 @@ BOOST_PYTHON_MODULE(libpyPandora)
 
 	boost::python::class_< Engine::Simulation >("SimulationStub", boost::python::init< const int &, const int & >() )
 	;
-
-	boost::python::class_< WorldWrap, boost::noncopyable >("WorldStub", boost::python::init< const Engine::Simulation & , const int &, const bool &, const std::string & >() )
-		.def("createRasters", boost::python::pure_virtual(&Engine::World::createRasters))
-		.def("createAgents", boost::python::pure_virtual(&Engine::World::createAgents))
-		.def("stepEnvironment", &Engine::World::stepEnvironment, &WorldWrap::default_StepEnvironment)
-		.def("initialize", &Engine::World::initialize)
-		.def("checkPosition", &Engine::World::checkPosition)
-		.def("registerDynamicRaster", &WorldWrap::registerDynamicRasterSimple)	
-		.def("registerStaticRaster", &WorldWrap::registerStaticRasterSimple)	
-		.def("getDynamicRaster", getDynamicRaster, boost::python::return_value_policy<boost::python::reference_existing_object>())
-		.def("getStaticRaster", getStaticRaster, boost::python::return_value_policy<boost::python::reference_existing_object>())
-		.def("run", &Engine::World::run)
-		.def("addAgentStub", &WorldWrap::addAgent)
-		.def("setValue", setValue)
-		.def("getValue", getValue)
-		.add_property("currentStep", &Engine::World::getCurrentStep)
-	;
 	
 	boost::python::class_< AgentWrap, std::auto_ptr<AgentWrap>, boost::noncopyable >("AgentStub", boost::python::init< const std::string & > () )
 		.def("updateState", &Engine::Agent::updateState, &AgentWrap::default_UpdateState)
@@ -321,6 +326,29 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.add_property("position", boost::python::make_function(&Engine::Agent::getPosition, boost::python::return_value_policy<boost::python::reference_existing_object>()), &Engine::Agent::setPosition )
 	;
 	
+	boost::python::class_< std::vector<std::string> >("StringVector").def(boost::python::vector_indexing_suite< std::vector<std::string> >());
+	boost::python::class_< std::vector<int> >("IntVector").def(boost::python::vector_indexing_suite< std::vector<int> >());
+	
+	boost::python::class_< WorldWrap, boost::noncopyable >("WorldStub", boost::python::init< const Engine::Simulation & , const int &, const bool &, const std::string & >() )
+		.def("createRasters", boost::python::pure_virtual(&Engine::World::createRasters))
+		.def("createAgents", boost::python::pure_virtual(&Engine::World::createAgents))
+		.def("stepEnvironment", &Engine::World::stepEnvironment, &WorldWrap::default_StepEnvironment)
+		.def("initialize", &Engine::World::initialize)
+		.def("checkPosition", &Engine::World::checkPosition)
+		.def("registerDynamicRaster", &WorldWrap::registerDynamicRasterSimple)	
+		.def("registerStaticRaster", &WorldWrap::registerStaticRasterSimple)	
+		.def("getDynamicRaster", getDynamicRaster, boost::python::return_value_policy<boost::python::reference_existing_object>())
+		.def("getStaticRaster", getStaticRaster, boost::python::return_value_policy<boost::python::reference_existing_object>())
+		.def("run", &Engine::World::run)
+		.def("addAgentStub", &WorldWrap::addAgentSimple)
+		.def("removeAgent", &Engine::World::removeAgent)
+		.def("setValue", setValue)
+		.def("getValue", getValue)
+		.def("getAgentIds", &WorldWrap::getAgentIds)
+		.def("getAgent", getAgent, boost::python::return_value_policy<boost::python::reference_existing_object>())
+		.add_property("currentStep", &Engine::World::getCurrentStep)
+	;
+
 	boost::python::class_< Engine::SimulationRecord>("SimulationRecordStub")
 		.def("loadHDF5", &Engine::SimulationRecord::loadHDF5)
 	;

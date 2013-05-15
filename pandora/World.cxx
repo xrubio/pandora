@@ -226,7 +226,7 @@ bool World::willBeRemoved( Agent * agent )
 	return false;
 }
 
-void World::addAgent( Agent * agent )
+void World::addAgent( Agent * agent, bool executedAgent )
 {
 	agent->setWorld(this);
 	// we need to remove any previous instance of this agent in overlap
@@ -236,7 +236,11 @@ void World::addAgent( Agent * agent )
 	{
 		_overlapAgents.erase(it);
 	}
-	_agents.push_back(agent);	
+	_agents.push_back(agent);
+	if(executedAgent)
+	{
+		_executedAgentsHash.insert(make_pair(agent->getId(), agent));
+	}
 	
 	std::stringstream logName;
 	logName << "agents_" << getId() << "_" << agent->getId();
@@ -656,7 +660,7 @@ void World::receiveGhostAgents( const int & sectionIndex )
 				{
 					log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " has received update of own agent: " << *it << " in step: " << _step );
 					_agents.erase(it);
-					addAgent(agent);
+					addAgent(agent, false);
 					worldOwnsAgent = true;
 				}
 				if(!worldOwnsAgent)
@@ -740,8 +744,7 @@ void World::receiveAgents( const int & sectionIndex )
 				log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " receiveAgents - received agent: " << agent << " number: " << j << " from: " << _neighbors[i]);
 				delete package;
 				agent->receiveVectorAttributes(_neighbors[i]);
-				_executedAgentsHash.insert(make_pair(agent->getId(), agent));
-				addAgent(agent);
+				addAgent(agent, true);
 			}
 		}
 	}
