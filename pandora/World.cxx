@@ -95,8 +95,8 @@ void World::init( int argc, char *argv[] )
 	_initialTime = getWallTime();
 	
 	stablishPosition();
-	createAgents();
 	createRasters();
+	createAgents();
 #ifdef PANDORAMPI
 	GeneralState::serializer().init(_simulation, _rasters, _dynamicRasters, _serializeRasters, *this);
 	serializeStaticRasters();
@@ -1174,7 +1174,7 @@ void World::stepAgents()
 {
 }
 
-void World::registerDynamicRaster( const std::string & key, const bool & serialize, int index )
+void World::registerDynamicRaster( const std::string & key, const bool & serialize, int index,  Engine::Point2D<int> size )
 {
 	// if no index is provided, add one at the end
 	if(index==-1)
@@ -1200,18 +1200,22 @@ void World::registerDynamicRaster( const std::string & key, const bool & seriali
 		delete _rasters.at(index);
 	}
 	_rasters.at(index) = new Raster();
-	_rasters.at(index)->resize(_overlapBoundaries._size);
+	if (size._x == -1 && size._y == -1) 
+	{ 
+		size = _overlapBoundaries._size;
+	}
+	_rasters.at(index)->resize(size);
 	_serializeRasters.at(index) = serialize;
 }
 
-void World::registerStaticRaster( const std::string & key, const bool & serialize, int index )
+void World::registerStaticRaster( const std::string & key, const bool & serialize, int index, Engine::Point2D<int> size )
 {
 	// if no index is provided, add one at the end
 	if(index==-1)
 	{
 		index = _rasters.size();
 	}
-		
+	
 	if(_rasters.size()<=index)
 	{	
 		int oldSize = _rasters.size();
@@ -1229,11 +1233,16 @@ void World::registerStaticRaster( const std::string & key, const bool & serializ
 		delete _rasters.at(index);
 	}
 	_rasters.at(index) = new StaticRaster();
-	_rasters.at(index)->resize(_overlapBoundaries._size);
+	if (size._x == -1 && size._y == -1) 
+	{ 
+		size = _overlapBoundaries._size;
+	}
+	_rasters.at(index)->resize(size);
 	
 	_dynamicRasters.at(index) = false;
 	_serializeRasters.at(index) = serialize;
 }
+
 
 bool World::checkPosition( const Point2D<int> & newPosition )
 {

@@ -2,7 +2,7 @@
 <config>  
 	<!-- Global simulation parameters -->
 	<output resultsFile="data/gujarat.h5" logsDir="logs"/>
-	<numSteps value="18000" serializeResolution="360"/>
+	<numSteps value="360" serializeResolution="1"/>
 	<!-- g to KJ -->
 	<massToEnergyRate value="20" />
 	<!-- 1 KCal = 4.184 KJ, Conversion Rate = 1/4.184 -->
@@ -31,21 +31,25 @@
 	<dem fileName="resources/1600/dem_1600.tiff" size="1600"/>
 	<duneMap fileName="resources/1600/dunes_1600_low.tiff" size="1600"/>
 	<!-- Climatic model parameters -->
-	<climateSeed value="713938"/>
-	<rainHistoricalDistribution mean="11521" stdev="1011"/>
+	<climateSeed value="1"/>
+	<rainHistoricalDistribution mean="4643.848" stdev="1885.158"/>
 	<!-- Agents definition -->
 	<!-- overlap will be defined as homeRange + 1. It must be < 1/4 of world size -->
 	<!-- * Walking Speed Hour = # meters traversed per hour -->
 	<!-- * Available Forage Time = # hours a day the forage action takes -->
 	<!-- * forageTimeCost = how much time (in hours) does it cost the agent to exploit a tile resources -->
 	<hunterGatherers
-		num="100" homeRange="299"
+		num="10" homeRange="299"
 		adulthoodAge="15"
 		numSectors="8"
+		lowResolution="160"
 		walkingSpeedHour="3000"
 		forageTimeCost="0.5"
 		demographicsModel="original"
-		controllerType="DecisionTree" >
+		hunterGathererInformationCaducityTime="7"
+		controllerType="MDP" 
+		mindType="omniscient">
+		<!-- mindType:{omniscient,partial}-->
 		<!-- * width = number of trials before selecting an action, the higher the
 		 	the number, the more informed is the action selection and more
 			computation time is required -->
@@ -82,5 +86,21 @@
 	<storeRaster name="consecutiveYears" value="no" />
 	<storeRaster name="sectors" value="no" />
 	<storeRaster name="duneMap" value="no" />
+ <!-- LowRes Raster storage options -->
+        <storeRaster name="eLRResources" value="no" />
+        <storeRaster name="eLRResourcesFraction" value="no" />
+        <storeRaster name="eLRForageActivity" value="no" />
+        <storeRaster name="eLRHomeActivity" value="no" />
+        <storeRaster name="eLRFarmingActivity" value="no" />
+        <storeRaster name="eLRMoisture" value="no" />
+        <storeRaster name="eLRWeightWater" value="no" />
+        <storeRaster name="LRCounterSoilDUNE" value="no" />
+        <storeRaster name="LRCounterSoilINTERDUNE" value="no" />
+        <storeRaster name="LRCounterSoilWATER" value="no" />
+	<storeRaster name="eSectorUtility" value="no" />
+	<storeRaster name="paintLRResources" value="no" />
+
+<storeRaster name="eForageArea" value="no" />
+
 </config>
 

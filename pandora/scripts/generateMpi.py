@@ -334,7 +334,14 @@ def addStringAttribute( line, attributesMap ):
 	return None
 
 def getAttributesFromClass( className, attributesMap, vectorAttributesMap):
+	print "CLASSNAME **************" + className + " final str\n"
+	#className = className.replace("", ";")
+	foo = className.replace(";", "")
+	#className = foo
+	print "FOO **************" + foo + " final str\n"
+	print "CLASSNAME **************" + className + " final str\n"
 	headerName = className+'.hxx'
+	
 	print '\t\tlooking for attributes of class: ' +  className + ' in header: '+ headerName + '...'
 	f = open(headerName, 'r')
 	keyBasic = 'MpiBasicAttribute'	

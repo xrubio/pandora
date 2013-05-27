@@ -148,6 +148,14 @@ public:
 		double valueY = _y-point._y;
 		return sqrt(valueX*valueX + valueY*valueY);
 	}
+	
+	//! Distance between points without square root.
+	double distanceSQ( const Point2D<Type> & point) const
+	{
+		double valueX = _x-point._x;
+		double valueY = _y-point._y;
+		return std::abs(valueX*valueX + valueY*valueY);
+	}
 };
 
 } // namespace Engine
