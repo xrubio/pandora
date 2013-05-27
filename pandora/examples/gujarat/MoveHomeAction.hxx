@@ -25,12 +25,14 @@ class MoveHomeAction : public MDPAction
 	// forage with half adult population is executed at the same time than MoveHome
 	ForageAction * _forageAction;     
 public:
-	MoveHomeAction( const Engine::Point2D<int>& p, Sector * sectorToForage, bool ownsSectorPointer = false );
+	MoveHomeAction( const Engine::Point2D<int>& p, Sector * HRSectorToForage, Sector * LRSectorToForage, bool ownsSectorPointer = false );
+	
 	// constructor copying forage action
 	MoveHomeAction( const Engine::Point2D<int>& p, ForageAction * forageAction );
 	virtual ~MoveHomeAction();
 	// TODO templatitzar classe per agent
 	void execute( Engine::Agent & agent );
+	
 	virtual void executeMDP( const GujaratAgent& agent, const HunterGathererMDPState& s, HunterGathererMDPState& sp ) const;
 
 	int getTimeNeeded() const;
@@ -41,6 +43,11 @@ public:
 	MDPAction* copy() const;
 	std::string describe() const;
 	int getPotentialBiomass() const;
+	
+	Sector * getVisitedSector();
+	/*Sector * getVisitedSector(GujaratAgent & ag) 
+	 * { return ag.getSectorOfLRCell(_newHomeLoc); }
+	 * */
 };
 	
 } // namespace Gujarat

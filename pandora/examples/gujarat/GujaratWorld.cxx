@@ -4,17 +4,19 @@
 #include <Raster.hxx>
 #include <Point2D.hxx>
 #include <HunterGatherer.hxx>
+
 //#include <AgroPastoralist.hxx>
 #include <Exceptions.hxx>
 #include <GujaratConfig.hxx>
 #include <OriginalDemographics.hxx>
 
 #include <GeneralState.hxx>
+
 #include <Logger.hxx>
 #include <RasterLoader.hxx>
 #include <Statistics.hxx>
 #include <iomanip>
-
+#include <algorithm>
 
 #include <limits>
 
@@ -76,9 +78,10 @@ void GujaratWorld::createRasters()
 	std::stringstream logName;
 	logName << "simulation_" << _simulation.getId();
 	log_DEBUG(logName.str(), getWallTime() << " creating static rasters");
+	
 	registerStaticRaster("soils", _config.isStorageRequired("soils"), eSoils);
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eSoils), _config._soilFile, this);	
-
+			
 	registerStaticRaster("dem", _config.isStorageRequired("dem"), eDem);
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eDem), _config._demFile, this);
 
@@ -106,7 +109,7 @@ void GujaratWorld::createRasters()
 	*/
 	
 	registerDynamicRaster("resources", _config.isStorageRequired("resources"), eResources);
-	getDynamicRaster(eResources).setInitValues(0, std::numeric_limits<int>::max(), 0);
+	getDynamicRaster(eResources).setInitValues(0, std::numeric_limits<int>::max(), 0);	
 	
 	// we need to keep track of resource fractions
 	registerDynamicRaster("resourcesFraction", false, eResourcesFraction);
@@ -114,6 +117,8 @@ void GujaratWorld::createRasters()
 
 	registerDynamicRaster("forageActivity", _config.isStorageRequired("forageActivity"), eForageActivity); 
 	getDynamicRaster(eForageActivity).setInitValues(0, std::numeric_limits<int>::max(), 0);
+	
+	
 	/*
 	registerDynamicRaster("homeActivity", eHomeActivity, _config.isStorageRequired("homeActivity"));
 	getDynamicRaster("homeActivity").setInitValues(0, std::numeric_limits<int>::max(), 0);
@@ -133,17 +138,316 @@ void GujaratWorld::createRasters()
 	log_DEBUG(logName.str(), getWallTime() << " generating settlement areas");
 	_settlementAreas.generateAreas( *this, _config._lowResolution);
 	log_DEBUG(logName.str(), getWallTime() << " create rasters done");
+	
+	assert(_settlementAreas.getAreas().size() > 0);
+	
+std::cout << "init LR" << std::endl;	
+	
+	// Low Ressolution Rasters
+	int LowResRasterSideSize = getLowResMapsSideSize();
+	Engine::Point2D<int> lowResSize2D( LowResRasterSideSize, LowResRasterSideSize);
+	
+	registerDynamicRaster("eLRResources", _config.isStorageRequired("eLRResources")
+			, eLRResources, lowResSize2D);
+	getDynamicRaster(eLRResources).setInitValues(0, std::numeric_limits<int>::max(), 0);
+	fillLRRaster(eLRResources, 0);
+	
+	registerDynamicRaster("eLRResourcesFraction", _config.isStorageRequired("eLRResourcesFraction")
+			, eLRResourcesFraction, lowResSize2D);
+	getDynamicRaster(eLRResourcesFraction).setInitValues(0, std::numeric_limits<int>::max(), 0);
+	fillLRRaster(eLRResourcesFraction, 0);
+	
+	registerDynamicRaster("eLRForageActivity", _config.isStorageRequired("eLRForageActivity")
+			, eLRForageActivity, lowResSize2D);
+	getDynamicRaster(eLRForageActivity).setInitValues(0, std::numeric_limits<int>::max(), 0);
+	
+	registerDynamicRaster("eLRHomeActivity", _config.isStorageRequired("eLRHomeActivity")
+			, eLRHomeActivity, lowResSize2D);
+	getDynamicRaster(eLRHomeActivity).setInitValues(0, std::numeric_limits<int>::max(), 0);
+	
+	registerDynamicRaster("eLRFarmingActivity", _config.isStorageRequired("eLRFarmingActivity")
+			, eLRFarmingActivity, lowResSize2D);
+	getDynamicRaster(eLRFarmingActivity).setInitValues(0, std::numeric_limits<int>::max(), 0);
+	
+	registerDynamicRaster("eLRPopulation", _config.isStorageRequired("eLRPopulation")
+			, eLRPopulation, lowResSize2D);
+	getDynamicRaster(eLRPopulation).setInitValues(0, std::numeric_limits<int>::max(), 0);
+	fillLRRaster(eLRPopulation, 0);
+	
+	
+	/*registerDynamicRaster("eLRMoisture", _config.isStorageRequired("eLRMoisture")
+			, eLRMoisture, Engine::Point2D<int>(LowResRasterSideSize,LowResRasterSideSize));
+	getDynamicRaster(eLRMoisture).setInitValues(0, std::numeric_limits<int>::max(), 0);
+	*/
+	// Low Ressolution Soil Counters
+	
+std::cout << "init LR dune" << std::endl;		
+
+std::cout << "max "<< _config._lowResolution*_config._lowResolution << std::endl;		
+
+	registerStaticRaster("LRCounterSoilDUNE", false, LRCounterSoilDUNE, lowResSize2D );
+	getStaticRaster(LRCounterSoilDUNE).setDefaultInitValues(0, _config._lowResolution*_config._lowResolution, 0);	
+	fillLowResCounterRaster(LRCounterSoilDUNE,eSoils,DUNE);
+	
+std::cout << "init LR interdune" << std::endl;		
+	
+	registerStaticRaster("LRCounterSoilINTERDUNE", false, LRCounterSoilINTERDUNE, lowResSize2D);
+	getStaticRaster(LRCounterSoilINTERDUNE).setDefaultInitValues(0, _config._lowResolution*_config._lowResolution, 0);
+	fillLowResCounterRaster(LRCounterSoilINTERDUNE,eSoils,INTERDUNE);
+	
+std::cout << "init LR water" << std::endl;		
+	
+
+	if(_config._biomassDistribution.compare("linDecayFromWater")==0 || _config._biomassDistribution.compare("logDecayFromWater")==0)
+	{
+	
+		registerStaticRaster("LRCounterSoilWATER", false, LRCounterSoilWATER, lowResSize2D);
+		getStaticRaster(LRCounterSoilWATER).setDefaultInitValues(0, _config._lowResolution*_config._lowResolution, 0);
+		fillLowResCounterRaster(LRCounterSoilWATER,eSoils,WATER);
+
+		std::cout << "init LR weightwater" << std::endl;		
+	
+		registerStaticRaster("eLRWeightWater", false, eLRWeightWater, lowResSize2D);
+		getStaticRaster(eLRWeightWater).setDefaultInitValues(0, std::numeric_limits<int>::max(), 0);
+		fillLowResMeanRaster(eLRWeightWater,eWeightWater);
+	}
+std::cout << "end init LR" << std::endl;	
+
+
 }
+
+
+void GujaratWorld::fillLRRaster(enum Rasters idLRRaster, int val)
+{
+	Engine::Point2D<int> index;
+	
+	for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
+	{	
+		for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)		
+		{			
+			Engine::Point2D<int> mapCell; 
+			worldCell2LowResCell(index, mapCell);
+			setInitValueLR(idLRRaster,mapCell,val);
+			//getDynamicRaster(idLRRaster).setValue(mapCell,val);
+			//setValueLR(idLRRaster,mapCell,val);
+		}
+	}
+}
+
+
+void GujaratWorld::fillHRRasterWithLRRaster(enum Rasters idLRSource, enum Rasters idHRTarget)
+{
+	Engine::Point2D<int> index;
+	
+	for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
+	{	
+		for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)		
+		{			
+			Engine::Point2D<int> mapCell; 
+			worldCell2LowResCell(index, mapCell);
+			//*?
+			//setValue(idHRTarget,index,getValueLR(idLRSource,mapCell));
+			//setValue(idHRTarget,index,100);
+			//getDynamicRaster(idHRTarget).setValue(index, getValueLR(idLRSource,mapCell));
+			//getDynamicRaster(idHRTarget).setInitValue(index, getValueLR(idLRSource,mapCell));
+			//getDynamicRaster(idHRTarget).setInitValue(index, 5);
+			getDynamicRaster(idHRTarget).setValue(index, getValueLR(idLRSource,mapCell));
+		}
+	}
+}
+
+
+void GujaratWorld::fillIniRaster(enum Rasters idRaster, int val)
+{
+	Engine::Point2D<int> index;
+	
+	for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
+	{	
+		for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)		
+		{			
+			//*? getDynamicRaster(idRaster).setValue(index, val);
+			//getDynamicRaster(idRaster).setInitValue(index, val);
+			//setInitValue(idRaster, index, val);
+			setValue(idRaster, index, val);
+		}
+	}
+	
+}
+
+
+
+void GujaratWorld::fillRaster(enum Rasters idRaster, int val)
+{
+	Engine::Point2D<int> index;
+	
+	for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
+	{	
+		for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)		
+		{			
+			//*? 
+			//getDynamicRaster(idRaster).setValue(index, val);
+			setValue(idRaster, index, val);
+			//setInitValue(idRaster, index, val);
+		}
+	}
+	
+}
+
+
+void GujaratWorld::fillLowResCounterRaster(enum Rasters idRasterCounter, enum Rasters idRasterSource,int target)
+{
+	Engine::Point2D<int> index;
+	
+	for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
+	{	
+		for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)		
+		{
+			int val = getValue(idRasterSource,index);
+			Engine::Point2D<int> mapCell; 
+			worldCell2LowResCell(index, mapCell);
+			int count = getValueLR(idRasterCounter,mapCell);
+			if(val==target)
+			{
+				setInitValueLR(idRasterCounter,mapCell,count+1);
+				//getDynamicRaster(idRasterCounter).setValue(mapCell,count+1);
+				//setValueLR(idRasterCounter,mapCell,count+1);
+			}
+			
+		}
+	}
+}
+
+void GujaratWorld::LowResRasterCountsHighResRaster(enum Rasters idRasterCounter, enum Rasters idRasterSource)
+{
+	Engine::Point2D<int> index;
+	
+	for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
+	{	
+		for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)		
+		{
+			Engine::Point2D<int> mapCell; 
+			worldCell2LowResCell(index, mapCell);
+			int count = getValueLR(idRasterCounter,mapCell);
+			int val   = getValue(idRasterSource,index);			
+			//*?
+			//setValueLR(idRasterCounter,mapCell,count+val);
+			setInitValueLR(idRasterCounter,mapCell,count+val);
+			//getDynamicRaster(idRasterCounter).setValue(mapCell,count+val);
+		}
+	}
+}
+
+
+void GujaratWorld::fillLowResMeanRaster(enum Rasters idRasterCounter, enum Rasters idRasterSource)
+{
+	Engine::Point2D<int> index;
+	for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
+	{	
+		for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)		
+		{
+			int val = getValue(idRasterSource,index);
+			Engine::Point2D<int> mapCell; 
+			worldCell2LowResCell( index, mapCell);
+			int count = getValueLR(idRasterCounter,mapCell);
+			setInitValueLR(idRasterCounter,mapCell,count+val);
+			//getDynamicRaster(idRasterCounter).setValue(mapCell,count+val);
+			//setValueLR(idRasterCounter,mapCell,count+val);
+		}
+	}
+	
+	for(	index._x=_boundaries._origin._x/_config._lowResolution; 
+			index._x<(_boundaries._origin._x+_boundaries._size._x)/_config._lowResolution; 
+			index._x++)		
+	{	
+		for( index._y=_boundaries._origin._y/_config._lowResolution; 
+			 index._y<(_boundaries._origin._y+_boundaries._size._y)/_config._lowResolution; 
+			 index._y++)		
+		{				
+//			std::cout << "get value at " << index << std::endl;
+			int count = getValueLR(idRasterCounter,index);
+			setInitValueLR(idRasterCounter
+						,index						,count/(_config._lowResolution*_config._lowResolution));
+			/*setValueLR(idRasterCounter
+						,index						,count/(_config._lowResolution*_config._lowResolution));*/
+			//getDynamicRaster(idRasterCounter).setValue(index,count/(_config._lowResolution*_config._lowResolution));
+		}
+	}
+}
+
+int GujaratWorld::getValueGW( const Engine::Raster & r, const Engine::Point2D<int> & position ) const
+{
+	Engine::Point2D<int> localPosition(position - _overlapBoundaries._origin);
+	return r.getValue(localPosition);
+}
+
+
+
+int GujaratWorld::getValueLR( const int & index, const Engine::Point2D<int> & position ) const
+{
+	Engine::Point2D<int> originLR;
+	worldCell2LowResCell( _overlapBoundaries._origin, originLR );
+	Engine::Point2D<int> localPosition(position - originLR);
+	return _rasters.at(index)->getValue(localPosition);
+}
+
+
+int GujaratWorld::getValueLR( const Engine::Raster & r, const Engine::Point2D<int> & position ) const
+{
+	Engine::Point2D<int> originLR;
+	worldCell2LowResCell( _overlapBoundaries._origin, originLR );
+	Engine::Point2D<int> localPosition(position - originLR);
+	return r.getValue(localPosition);
+}
+
+
+void GujaratWorld::setValueLR( const int & index, const Engine::Point2D<int> & position, int value )
+{
+	//*?
+	//setInitValueLR( index, position, value );
+	//return;
+	
+	
+	Engine::Point2D<int> originLR;
+	worldCell2LowResCell( _overlapBoundaries._origin, originLR );
+	Engine::Point2D<int> localPosition(position - originLR);
+	((Engine::Raster*)_rasters.at(index))->setValue(localPosition, value);
+}
+
+void GujaratWorld::setValueLR( Engine::Raster & r, const Engine::Point2D<int> & position, int value )
+{
+	Engine::Point2D<int> originLR;
+	worldCell2LowResCell( _overlapBoundaries._origin, originLR );
+	Engine::Point2D<int> localPosition(position - originLR);
+	r.setValue(localPosition, value);
+}
+
+void GujaratWorld::setInitValueLR( const int & index, const Engine::Point2D<int> & position, int value )
+{
+	Engine::Point2D<int> originLR;
+	worldCell2LowResCell( _overlapBoundaries._origin, originLR );
+	Engine::Point2D<int> localPosition(position - originLR);
+	((Engine::Raster*)_rasters.at(index))->setInitValue(localPosition, value);
+}
+
+void GujaratWorld::setInitValueLR( Engine::Raster & r, const Engine::Point2D<int> & position, int value )
+{
+	Engine::Point2D<int> originLR;
+	worldCell2LowResCell( _overlapBoundaries._origin, originLR );
+	Engine::Point2D<int> localPosition(position - originLR);
+	r.setInitValue(localPosition, value);
+}
+
 
 void GujaratWorld::createAgents()
 {
+
 	std::stringstream logName;
 	logName << "simulation_" << _simulation.getId();
 	log_DEBUG(logName.str(), getWallTime() << " creating agents");
 	for(int i=0; i<_config._numHG; i++)
 	{ 
 		if((i%_simulation.getNumTasks())==_simulation.getId())
-		{			
+		{
 			log_DEBUG(logName.str(), getWallTime() << " new HG with index: " << i);
 			std::ostringstream oss;
  			oss << "HunterGatherer_" << i;
@@ -156,10 +460,11 @@ void GujaratWorld::createAgents()
 			agent->setSocialRange( _config._socialRange );
 			agent->setHomeMobilityRange( _config._homeRange );
 			agent->setHomeRange( _config._homeRange );
+			agent->setLowResHomeRange( _config._lowResHomeRange );
 			//agent->setSurplusForReproductionThreshold( _config._surplusForReproductionThreshold );
 			//agent->setSurplusWanted( _config._surplusWanted );
 			//agent->setSurplusSpoilageFactor( _config._surplusSpoilage );
-			
+
 			//agent->setFoodNeedsForReproduction(_config._hgFoodNeedsForReproduction);			
 			agent->setWalkingSpeedHour( _config._walkingSpeedHour / _config._cellResolution );
 			agent->setForageTimeCost( _config._forageTimeCost );
@@ -168,11 +473,17 @@ void GujaratWorld::createAgents()
 			agent->setNumSectors( _config._numSectors );
 
 			agent->initializePosition();
+
 			log_DEBUG(logName.str(), getWallTime() << " new HG: " << agent);
+
+			Engine::Point2D<int> LRpos;
+			worldCell2LowResCell(agent->getPosition(),LRpos);
+			setValueLR(eLRPopulation,LRpos,1+getValueLR(eLRPopulation,LRpos));
+
 		}
 	}
 
-	/*
+	/*	
 	for(int i=0; i<_config._numAP; i++)
 	{ 
 		if((i%_simulation.getNumTasks())==_simulation.getId())
@@ -193,7 +504,51 @@ void GujaratWorld::createAgents()
 		}
 	}
 	*/
+
+
+	
 }
+
+
+Engine::Point2D<int> GujaratWorld::getHRFreeCell(const Engine::Point2D<int> LRpos, Engine::Point2D<int> & HRpos)
+{
+	
+	// posa un bucle recorrent la LR cell, comença a un punt random i recorres modularment la LRcell
+	
+	int C = getConfig()._lowResolution;
+	
+	Engine::Point2D<int> cornerLeftUp;
+	Engine::Point2D<int> cornerRightDown;
+	// 4 corners that bound the world cells belonging to the low res cell
+	cornerLeftUp._x = LRpos._x*C;
+	cornerLeftUp._y = LRpos._y*C;
+	cornerRightDown._x = LRpos._x*C + C-1;
+	cornerRightDown._y = LRpos._y*C + C-1;
+	HRpos._x =  Engine::GeneralState::statistics().getUniformDistValue(cornerLeftUp._x,cornerRightDown._x);
+	HRpos._y = 
+	Engine::GeneralState::statistics().getUniformDistValue(cornerLeftUp._y,cornerRightDown._y);
+	//TODO checkPosition expensive??? cost : #agents
+	while( getValue(eSoils,HRpos) != DUNE || ! Engine::World::checkPosition(HRpos))
+	{
+		HRpos._y++;
+		if(HRpos._y > cornerRightDown._y)
+		{
+			HRpos._y = cornerLeftUp._y;
+			HRpos._x++;
+			if( HRpos._x > cornerRightDown._x)
+			{
+				HRpos._x = cornerLeftUp._x;
+			}
+		}
+	// Ensured by MoveHomeAction : there are DUNEs, and there are not too
+	// much agents occupying cells. The loop will end finding a free cell.
+	}
+	// Ensured by MoveHomeAction : HRpos is a DUNE, and there are no agents occupying cells.
+	
+}
+
+
+
 
 void GujaratWorld::updateRainfall()
 {		
@@ -202,6 +557,7 @@ void GujaratWorld::updateRainfall()
 
 void GujaratWorld::updateSoilCondition()
 {
+	
 	Engine::Point2D<int> index;
 	if(_climate.getSeason()==HOTWET)
 	{
@@ -210,6 +566,7 @@ void GujaratWorld::updateSoilCondition()
 			for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)
 			{
 				setValue(eResources, index, getValue(eMoisture, index));
+								
 				if(getValue(eResourceType, index)==WILD)
 				{
 					continue;
@@ -262,6 +619,14 @@ void GujaratWorld::updateResources()
 	logName << "updateResources_" << _simulation.getId();
 	log_DEBUG(logName.str(), getWallTime() << " initiating");
 
+	//unsigned long sumRes = 0;
+	
+	Seasons season = _climate.getSeason();
+	bool wetSeason = false;
+	if(season==HOTWET)
+	{
+		wetSeason = true;
+	}			
 	Engine::Point2D<int> index;
 	for( index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++ )		
 	{
@@ -276,26 +641,26 @@ void GujaratWorld::updateResources()
 			//log_DEBUG(logName.str(), getWallTime() << " index: " << index << " current: " << currentValue << " fraction: " << currentFraction << " cell soil: " << cellSoil);
 			if(cellSoil!=WATER)
 			{
-				Seasons season = _climate.getSeason();
-				bool wetSeason = false;
-				if(season==HOTWET)
-				{
-					wetSeason = true;
-				}			
 				float newValue = std::max(0.0f, currentValue+currentFraction+getBiomassVariation(wetSeason, cellSoil, index));
 				currentValue = newValue;
 				float fraction = 100.0f*(newValue  - currentValue);
 				//log_DEBUG(logName.str(), getWallTime() << " newValue: " << currentValue << " fraction: " << fraction);
+				
 				setValue(eResources, index, currentValue);
 				setValue(eResourcesFraction, index, (int)fraction);
+				
+				//sumRes += currentValue;
 			}
 		}
 	}
 	log_DEBUG(logName.str(), getWallTime() << " end of updateResources");
+	
+	//std::cout << "sumres: " << sumRes << std::endl;
 }
 
 void GujaratWorld::recomputeYearlyBiomass()
 {
+	
 	// update all the map resources to the minimum of the year (in case it was diminished by agents)
 	Engine::Point2D<int> index;
 	for( index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++ )                
@@ -350,7 +715,31 @@ void GujaratWorld::recomputeYearlyBiomass()
 	_dailyRainSeasonBiomassIncrease[WATER] = 0.0f;
 	_dailyDrySeasonBiomassDecrease[WATER] = 0.0f;
 	_remainingBiomass[WATER] = 0.0f;
+	
+	//std::cout << "rem: " << _remainingBiomass[DUNE] << " " << _remainingBiomass[INTERDUNE] << " " << _remainingBiomass[WATER] << std::endl;
+	/*
+	std::cout << "increase: " << _dailyRainSeasonBiomassIncrease[DUNE] << " " 
+				<< _dailyRainSeasonBiomassIncrease[INTERDUNE] << " " 
+				<< _dailyRainSeasonBiomassIncrease[WATER] << std::endl;
+	
+	std::cout << "decrease: " << _dailyDrySeasonBiomassDecrease[DUNE] << " " 
+				<< _dailyDrySeasonBiomassDecrease[INTERDUNE] << " " 
+				<< _dailyDrySeasonBiomassDecrease[WATER] << std::endl;
+	*/
 }
+
+
+void GujaratWorld::updateResourcesLowResMap()
+{
+	fillLRRaster(eLRResources,0);
+	// eResources --> eLRResources
+	LowResRasterCountsHighResRaster(eLRResources, eResources);
+	// eLRResources --> paintLRResources
+	//fillHRRasterWithLRRaster(eLRResources, paintLRResources);
+	// Dont you add the Fraction Raster of resources?? 
+	// LR rasters are used in decision-making, maybe such precission is unneeded.
+}
+
 
 void GujaratWorld::stepEnvironment()
 {
@@ -364,17 +753,17 @@ void GujaratWorld::stepEnvironment()
 	if ( _climate.rainSeasonStarted() )
 	{
 		log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " num agents: " << _agents.size());
+		
 		updateRainfall();
 		recomputeYearlyBiomass();
 	}
 	// resources are updated each time step
 	updateResources();
+	//TODO look where Min Max Values are used to remove "update'em" if needed
 	getDynamicRaster(eResources).updateCurrentMinMaxValues();
-
-	// these rasters are only updated at the beginning of seasons
-//	if ( !_climate.cellUpdateRequired() ) return;
-
-
+	updateResourcesLowResMap();
+	getDynamicRaster(eLRResources).updateCurrentMinMaxValues();	
+	
 	//updateSoilCondition();
 }
 
@@ -424,8 +813,78 @@ float GujaratWorld::getBiomassVariation( bool wetSeason, Soils & cellSoil, const
 		throw Engine::Exception(oss.str());
 
 	}
+	
+	//std::cout << "variation: " << variation << std::endl;
+	
 	return variation;
 }
+
+
+	
+void GujaratWorld::worldCell2LowResCell( const Engine::Point2D<int> pos, Engine::Point2D<int> & result ) const
+{
+	result._x = pos._x / _config._lowResolution;
+	result._y = pos._y / _config._lowResolution;
+}
+	
+void GujaratWorld::LowRes2HighResCellCorner(Engine::Point2D<int> pos, Engine::Point2D<int> &result ) const	
+{
+	result._x = pos._x * _config._lowResolution;
+	result._y = pos._y * _config._lowResolution;
+}	
+	
+	
+int GujaratWorld::getLowResMapsSideSize() 
+{ 
+	return _overlapBoundaries._size._x / _config._lowResolution; 
+}
+	
+
+//*?
+//*********************************************************
+
+void GujaratWorld::updateeSectorUtility(const std::vector< Engine::Point2D<int> > & cells, int val)
+{
+	register int C = getConfig()._lowResolution;
+	
+	for(int i = 0; i < cells.size(); i++)
+	{
+		Engine::Point2D<int> LRxycell = cells[i];
+		Engine::Point2D<int> paintCell;
+		for(paintCell._x = LRxycell._x*C; paintCell._x < LRxycell._x*C + C; paintCell._x++)	
+			for(paintCell._y = LRxycell._y*C; paintCell._y < LRxycell._y*C + C; paintCell._y++)	
+				getDynamicRaster(eSectorUtility).setValue(paintCell, val);
+				
+			
+	}
+	
+}
+
+void GujaratWorld::assignResourceFromSectorsToHR(const std::vector< Engine::Point2D<int> > & cells, int HRValToForce)
+{
+	register int C = getConfig()._lowResolution;
+	
+	// HR assignation
+	for(int i = 0; i < cells.size(); i++)
+	{
+		Engine::Point2D<int> LRxycell = cells[i];
+		Engine::Point2D<int> paintCell;
+		for(paintCell._x = LRxycell._x*C; paintCell._x < LRxycell._x*C + C; paintCell._x++)	
+			for(paintCell._y = LRxycell._y*C; paintCell._y < LRxycell._y*C + C; paintCell._y++)	
+				getDynamicRaster(eResources).setValue(paintCell, HRValToForce);
+	}
+	
+	// LR assignation
+	HRValToForce = HRValToForce * C * C;
+	for(int i = 0; i < cells.size(); i++)
+	{		
+		getDynamicRaster(eLRResources).setValue(cells[i], HRValToForce);
+	}
+		
+}
+
+	
+	
 
 } // namespace Gujarat
 

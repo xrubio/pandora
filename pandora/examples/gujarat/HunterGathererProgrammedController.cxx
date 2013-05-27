@@ -31,15 +31,15 @@ void HunterGathererProgrammedController::selectActions( GujaratAgent & agent, st
 
 	// action pack : move Home, hunting, gathering
 	int dice = Engine::GeneralState::statistics().getUniformDistValue(1,10);
-	if ( dice > 8 ) // p=0.2 agent chooses to move its home
+	if ( dice < 3 ) // p=0.2 agent chooses to move its home
 	{
 		do
 		{
-			dice = Engine::GeneralState::statistics().getUniformDistValue( 0, agentConcrete.getSectors().size()-1 );
+			dice = Engine::GeneralState::statistics().getUniformDistValue( 0, agentConcrete.getLRSectors().size()-1 );
 		}
-		while ( agentConcrete.getSectors().at(dice)->isEmpty() );
+		while ( agentConcrete.getLRSectors().at(dice)->isEmpty() );
 
-		actions.push_back(new ForageAction( agentConcrete.getSectors().at(dice), false));
+		actions.push_back(new ForageAction( agentConcrete.getHRSectors().at(dice), agentConcrete.getHRSectors().at(dice), false));
 	}
 	else
 	{

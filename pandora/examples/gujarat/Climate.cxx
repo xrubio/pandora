@@ -41,9 +41,7 @@ void Climate::step()
 		return;
 
 	if(_currentSeason == HOTWET )
-	{
-		// TODO document ODD : change weibull for gamma
-		
+	{		
 		boost::gamma_distribution<> gd(_alphaRain);
 		boost::variate_generator<boost::mt19937&, boost::gamma_distribution<> >
 		var_gamma(_randomGenerator, gd);

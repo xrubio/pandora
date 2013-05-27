@@ -7,6 +7,7 @@ namespace Gujarat
 {
 
 class HunterGatherer;
+class GujaratAgent;
 class Sector;
 
 class HunterGathererDecisionTreeController : public AgentController
@@ -21,7 +22,7 @@ public:
 	MDPAction*         shouldForage(  HunterGatherer & agent  );
 	MDPAction*         shouldMoveHome(  HunterGatherer & agent  );
 	
-	Sector*         getMaxBiomassSector( HunterGatherer & agent );
+	int         getMaxBiomassSector( HunterGatherer & agent );
 //	unsigned        getDoNothingDaysCovered() const { return _DoNothingDaysCovered; } 
 
 private:

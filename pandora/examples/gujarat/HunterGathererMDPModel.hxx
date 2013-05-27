@@ -5,6 +5,7 @@
 #include <HunterGathererMDPConfig.hxx>
 #include <engine/problem.h>
 #include <vector>
+#include <map>
 
 namespace Gujarat
 {
@@ -49,7 +50,7 @@ public:
 
 	// Interface inherited from Problem::problem_t<T>
 	virtual Problem::action_t 		number_actions( const HunterGathererMDPState &s ) const;
-    	virtual const HunterGathererMDPState& 	init() const;
+	virtual const HunterGathererMDPState& 	init() const;
 	virtual bool 				terminal( const HunterGathererMDPState &s ) const;
 	virtual bool 				dead_end( const HunterGathererMDPState &s ) const { return false; }
 	virtual bool 				applicable( const HunterGathererMDPState &s, Problem::action_t a ) const;

@@ -9,12 +9,14 @@
 
 namespace Engine
 {
-	class World;
+	class World;	
 }
 
 namespace Gujarat
 {
 
+	class GujaratWorld;
+	
 enum	BiomassAmountClass
 {
 	BIOMASS_AMOUNT_LOW = 0,
@@ -24,7 +26,8 @@ enum	BiomassAmountClass
 
 class Sector
 {
-	const Engine::World & _world;
+	//const Engine::World & _world; needed change due to use of LR methods for raster access.
+	const GujaratWorld & _world;
 	std::vector< Engine::Point2D<int> >	_cells;
 	int					_biomassAmount;
 //	BiomassAmountClass			_biomassAmountClass;
@@ -32,16 +35,20 @@ class Sector
 private:
 
 	void	computeBiomassAmount( const Engine::Raster& r );
+	void	computeBiomassAmountLR( const Engine::Raster& r );
 
 public:
-	Sector( const Engine::World & world );
+	//Sector( const Engine::World & world );
+	Sector( const GujaratWorld & world );
 //	Sector( const Sector& other );
 	virtual ~Sector();
 
 	bool		isEmpty() const { return _cells.empty(); }
 	unsigned	numCells() const { return _cells.size(); }
 
-	const 	std::vector< Engine::Point2D<int> >&	cells() const { return _cells; }
+	const 	std::vector< Engine::Point2D<int> > & cells() const { return _cells; }
+	std::vector< Engine::Point2D<int> > & cellsNoConst() { return _cells; }
+
 
 	void	addCell( Engine::Point2D<int>& p )
 	{
@@ -72,10 +79,11 @@ public:
 
 	void	updateFeatures();
 	void	updateFeatures( const Engine::Raster& r );
+	void	updateFeaturesLR( const Engine::Raster& r );
 
 	//void	showFeatures( std::ostream& );
 	//std::string	biomassClass() const;
-	const Engine::World & getWorld() const;
+	const GujaratWorld & getWorld() const;
 };
 
 class SectorBestFirstSortPtrVecPredicate

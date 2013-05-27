@@ -259,6 +259,8 @@ void GujaratState::setHGController( const std::string & type, const HunterGather
 	throw Engine::Exception(oss.str());
 }
 
+
+
 AgentController & GujaratState::controller()
 {
 	int numThread = omp_get_thread_num();
@@ -271,19 +273,32 @@ AgentController & GujaratState::controller()
 	}
 	return *(instance()._hgControllers.at(numThread));
 }
-
+/*
 int GujaratState::sectorsMask( int i, int j)
 {
-	if(instance()._sectorsMask.size()==0)
+	if(instance()._HRsectorsMask.size()==0)
 	{
 		std::stringstream oss;
 		oss << "GujaratState::sectorsMask() - asking for sectors mask without being initialized";
 		throw Engine::Exception(oss.str());
 	}
-	return instance()._sectorsMask.at(i).at(j);
+	return instance()._HRsectorsMask.at(i).at(j);
+}
+*/
+int GujaratState::sectorsMask( int i, int j, const SectorsMask & sm)
+{
+	if(sm.size()==0)
+	{
+		std::stringstream oss;
+		oss << "GujaratState::sectorsMask() - asking for sectors mask without being initialized";
+		throw Engine::Exception(oss.str());
+	}
+	return sm.at(i).at(j);
 }
 
-void GujaratState::initializeSectorsMask( int numSectors, int homeRange )
+
+
+void GujaratState::initializeSectorsMask( int numSectors, int homeRange, SectorsMask & sm )
 {
 	std::vector< std::vector< Engine::Point2D<int> > > sectors;
 	
@@ -294,10 +309,10 @@ void GujaratState::initializeSectorsMask( int numSectors, int homeRange )
 
 	sectors.resize( numSectors );
 	// center position + home Range in any direction
-	instance()._sectorsMask.resize( 1+2*homeRange );
+	sm.resize( 1+2*homeRange );
 	for ( unsigned k = 0; k < 1+2*homeRange; k++ )
 	{
-		instance()._sectorsMask.at(k).resize( 1+2*homeRange );
+		sm.at(k).resize( 1+2*homeRange );
 	}
 
 	b._x = 0;
@@ -312,6 +327,7 @@ void GujaratState::initializeSectorsMask( int numSectors, int homeRange )
 		b = c;
 	}
 
+	sm.at(0).at(0) = -1;
 	for ( int x=-homeRange; x<=homeRange; x++ )
 	{
 		for ( int y=-homeRange; y<=homeRange; y++ )
@@ -321,19 +337,25 @@ void GujaratState::initializeSectorsMask( int numSectors, int homeRange )
 				continue;
 			}
 			Engine::Point2D<int> p( x, y );
-			instance()._sectorsMask.at(x+homeRange).at(y+homeRange) = -1;	
+			sm.at(x+homeRange).at(y+homeRange) = -1;	
 			for ( unsigned k = 0; k < numSectors; k++ )
 			{
 				if ( Engine::insideTriangle( p, sectors.at(k).at(0), sectors.at(k).at(1) ) )
 				{
-					instance()._sectorsMask.at(x+homeRange).at(y+homeRange) = k;
+					sm.at(x+homeRange).at(y+homeRange) = k;
 					break;
 				}
 			}
+		//*?	
+		//std::cout << sm[x+homeRange][y+homeRange] << std::endl;
 		}
+	//*?	
+	//std::cout << std::endl;
 	}
 
 }
+
+
 
 } // namespace Gujarat 
 

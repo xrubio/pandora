@@ -28,48 +28,43 @@ HunterGathererDecisionTreeController::~HunterGathererDecisionTreeController()
 }
 
 
-Sector* HunterGathererDecisionTreeController::getMaxBiomassSector(  HunterGatherer & agent  )
+int HunterGathererDecisionTreeController::getMaxBiomassSector(  HunterGatherer & agent  )
 {
 	// Make Forage actions
-	std::vector< Sector* > validActionSectors;
-	std::vector< Sector* > actionSectors;
-
-	agent.updateKnowledge( agent.getPosition(), agent.getWorld()->getDynamicRaster(eResources), actionSectors );
-
-	// MRJ: Remove empty sectors if any
-	for ( unsigned i = 0; i < actionSectors.size(); i++ )
-	{
-		if ( actionSectors[i]->isEmpty() )
-		{
-			delete actionSectors[i];
-			continue;
-		}
-		validActionSectors.push_back( actionSectors[i] );
-	}	
+	std::vector< int > validActionSectorsIdx;
+	//agent.updateKnowledge( agent.getPosition(), agent.getWorld()->getDynamicRaster(eResources), actionSectors );
 	
-	if(validActionSectors.empty())
+	//agent.updateKnowledge();	
+	assert(!agent.getLRSectors().empty());
+	if(agent.getLRSectors().empty())
 	{
-		return 0;
+		agent.updateKnowledge();
+		//return -1;
 	}
-
-	// Find Sector with Maximum Biomass to Forage 
-	int maxBiomass = 0;
-	unsigned maxBiomassIdx = 0;
-	for ( unsigned i = 0; i < validActionSectors.size(); i++ )
+	
+	// MRJ: Remove empty sectors if any
+	int maxBiomass    = -1;
+	for ( int i = 0; i < agent.getLRSectors().size(); i++ )
 	{
-		if( validActionSectors[i]->getBiomassAmount() > maxBiomass )
+		if( !(agent.getLRSectors()[i]->isEmpty()) )
 		{
-			maxBiomass = validActionSectors[i]->getBiomassAmount();
-			maxBiomassIdx = i;
+			if( agent.getLRSectors()[i]->getBiomassAmount() > maxBiomass )
+			{
+				maxBiomass = agent.getLRSectors()[i]->getBiomassAmount();
+				validActionSectorsIdx.clear();
+			}
+			else if(agent.getLRSectors()[i]->getBiomassAmount() < maxBiomass )
+			{
+				continue;
+			}
+			validActionSectorsIdx.push_back( i );
 		}
-	}
-
-	for ( unsigned i = 0; i < validActionSectors.size(); i++ )
-		if( i != maxBiomassIdx)
-			delete validActionSectors[i];
-
-	return validActionSectors.at(maxBiomassIdx);
-
+	}	
+	assert(maxBiomass != -1);
+	//std::random_shuffle(validActionSectorsIdx.begin(), validActionSectorsIdx.end());
+	int result = validActionSectorsIdx[Engine::GeneralState::statistics().getUniformDistValue(0,validActionSectorsIdx.size()-1)];
+	validActionSectorsIdx.clear();
+	return result;
 }
 
 /*
@@ -88,54 +83,70 @@ MDPAction* HunterGathererDecisionTreeController::shouldDoNothing( HunterGatherer
 */
 MDPAction* HunterGathererDecisionTreeController::shouldForage( HunterGatherer & agent )
 {	
-	Sector* maxSector = getMaxBiomassSector(agent);	
-
-	if(!maxSector) 
+	//Sector * maxSector = getMaxBiomassSector(agent);
+	int maxSectorIdx = getMaxBiomassSector(agent);
+	if(maxSectorIdx < 0) 
 	{
 		return 0;
 	}
 
-	int biomass = maxSector->getBiomassAmount();
+	int biomass = agent.getLRSectors()[maxSectorIdx]->getBiomassAmount();
 
 	// thinking that the agent will forage at most 9 cells
-	int numCells = maxSector->numCells();
+	int numCells = agent.getHRSectors()[maxSectorIdx]->numCells();
 
 	float maxNumCells = agent.getNrAvailableAdults()*agent.getAvailableTime()/agent.getForageTimeCost();
 	float percentageOfCells = maxNumCells/numCells;
-//	std::cout << agent << " required needs: " << agent.computeConsumedResources(1) << " max biomass: " << biomass << " potential calories: " << agent.convertBiomassToCalories(biomass) << " adults: " << agent.getNrAvailableAdults() << " max num cells: " << maxNumCells << " of: " << numCells  << " percentage: " << percentageOfCells << " estimation: " <<  0.5*percentageOfCells*(agent.convertBiomassToCalories(biomass)) << std::endl;	
 
-	// we check if, collecting 50% of real biomass, needs will be arrived
+	std::cout 	<< "avail time:" 		<< agent.getAvailableTime()
+				<< ",forage time cost:"	<< agent.getForageTimeCost()
+				<< ",maxNumCells:" 		<< maxNumCells 
+				<< std::endl;
+	
+	/*
+	std::cout << agent << " required needs: " << agent.computeConsumedResources(1) << " max biomass: " << biomass << " potential calories: " << agent.convertBiomassToCalories(biomass) << " adults: " << agent.getNrAvailableAdults() << " max num cells: " << maxNumCells << " of: " << numCells  << " percentage: " << percentageOfCells << " estimation: " <<  0.5*percentageOfCells*(agent.convertBiomassToCalories(biomass)) << std::endl;	
+	*/
+	// we check if, collecting 50% of real biomass, needs will be arrived.
+	// ISSUE : the condition say : everybody eats or I do not go out to forage
+	// You should go and forage something, at least for the couple.
 	if( 0.5*percentageOfCells*(agent.convertBiomassToCalories(biomass)) >= agent.computeConsumedResources(1) )
 	{
-		return new ForageAction(maxSector, true);
+		return new ForageAction(agent.getHRSectors()[maxSectorIdx],agent.getLRSectors()[maxSectorIdx], true);
 	}
 	//std::cout << "maxSector: " << maxSector << std::endl;
-	delete maxSector;
+	//delete maxSector;
 	return 0;
 }
 
 MDPAction* HunterGathererDecisionTreeController::shouldMoveHome( HunterGatherer & agent )
 {	
 	std::vector< MoveHomeAction* > possibleActions;
-	MoveHomeAction::generatePossibleActions( agent, possibleActions );
-
+	
+	agent.updateKnowledge();
+	
 	// look for an action that collects most calories before moving
-	Sector * bestSector = getMaxBiomassSector(agent);
+	//Sector * bestSector = getMaxBiomassSector(agent);
+	int bestSectorIdx = getMaxBiomassSector(agent);
+	if(bestSectorIdx < 0) 
+	{
+		return 0;
+	}
+	MoveHomeAction::generatePossibleActions( agent, possibleActions );
+	
 	// generatePossibleAction generates potential MoveHome actions ordered by the score of potential SettlementAreas
 	// thus, the first possible action with the best potential biomass is the optimal move
 	MDPAction * chosenAction = 0; 
+	// LEAK arranged
+	//std::random_shuffle(possibleActions.begin(), possibleActions.end());
+	
+	int idx = Engine::GeneralState::statistics().getUniformDistValue(0,possibleActions.size()-1);
+	chosenAction = possibleActions.at(idx);
+	possibleActions[idx] = 0;
 	for(int i=0; i<possibleActions.size(); i++)
 	{
-		if(!chosenAction && (possibleActions.at(i)->getPotentialBiomass()==bestSector->getBiomassAmount()))
-		{
-			chosenAction = possibleActions.at(i);
-		}
-		else
-		{
-			delete possibleActions.at(i);
-		}
-	}
-	delete bestSector;
+		delete possibleActions.at(i);
+	}		
+	possibleActions.clear();
 	return chosenAction;
 }
 

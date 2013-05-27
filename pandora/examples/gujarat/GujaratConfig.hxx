@@ -10,6 +10,7 @@
 #include <vector>
 //#include <CaloricRequirementsTable.hxx>
 
+
 namespace Gujarat
 {
 
@@ -18,7 +19,7 @@ class HunterGathererMDPConfig;
 
 class GujaratConfig : public Engine::Config
 { 
-	int 		_size;		
+	int 			_size;		
 	std::string 	_soilFile;
 	std::string 	_demFile;
 	std::string 	_distWaterFile;
@@ -29,6 +30,8 @@ class GujaratConfig : public Engine::Config
 	// Agent home range expressed in # of underlying GIS
 	// data grid (~30m)
 	int		_homeRange;
+	// Home range expressed in low ressolution cells according to the parameter _cellsPerLowResCellSide
+	int 		_lowResHomeRange;
 	// Agents social range expressed in # GIS data grid tiles
 	int		_socialRange;
 	// # days corresponding to a climate model season	
@@ -50,7 +53,9 @@ class GujaratConfig : public Engine::Config
 	std::vector<float> _availableForageTime;
 	std::vector<int> _caloricRequirements;
 	
-
+	// Amount of steps information expires
+	int _hunterGathererInformationCaducityTime;
+	
 	// MRJ: Agro Pastoralists attributes
 	int	_maxCropHomeDistance;
 
@@ -78,6 +83,9 @@ class GujaratConfig : public Engine::Config
 	std::string	_hunterGathererController;
 	std::string	_demographicsModel;
 
+	std::string	_hunterGathererMind;
+	
+	
 	//CaloricRequirementsTable* _hgCaloryRequirements;
 	//CaloricRequirementsTable* _apCaloryRequirements;
 
@@ -108,9 +116,15 @@ public:
 		return it->second;
 	}
 	
+	
+	friend class HunterGatherer;
+	friend class HunterGathererPartialMap;
+	friend class HunterGathererSharer;
 	friend class GujaratAgent;
 	friend class GujaratWorld;
 	friend class Climate;
+	friend class HGMind;
+	friend class HGPartialMindMap;
 };
 
 } // namespace Gujarat

@@ -55,7 +55,7 @@ void	OriginalDemographics::checkMortality( GujaratAgent& agent )
 	agent.checkDeath( 0, 3, 10 );
 	int childNaturalDeath = popSize - agent.getPopulationSize();
 	popSize = agent.getPopulationSize();
-
+	
 	std::cout << "agent: " << agent << " starved: " << agent.getStarved() << " days - percentage: " << agent.getPercentageOfStarvingDays() << " original pop: " << originalPopulation << " current pop: " << popSize << " death by starvation: " << deathByStarvation << " adults natural death: " << adultsNaturalDeath << " children natural death: " << childNaturalDeath << std::endl;
 	
 	// Old age death check

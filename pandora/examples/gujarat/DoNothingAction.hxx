@@ -30,6 +30,9 @@ public:
 	virtual std::string describe() const;
 protected:
 	
+	
+	Sector * getVisitedSector() { return 0; };
+	
 };
 
 }

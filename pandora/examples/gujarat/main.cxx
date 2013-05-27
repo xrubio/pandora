@@ -5,9 +5,10 @@
 #include <Exceptions.hxx>
 #include <iostream>
 #include <cstdlib>
-
+//#include <mcheck.h>
 int main(int argc, char *argv[])
 {
+//mtrace();
 	try
 	{
 		if(argc>2)

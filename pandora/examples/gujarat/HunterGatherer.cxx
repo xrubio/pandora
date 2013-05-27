@@ -10,15 +10,29 @@
 
 #include <GujaratState.hxx>
 #include <GeneralState.hxx>
+#include <HGMindFactory.hxx>
 #include <Logger.hxx>
+
+#include <GujaratConfig.hxx>
+
+#include <HGMindFactory.hxx>
+
+#include <MDPAction.hxx>
 
 namespace Gujarat
 {
 
 HunterGatherer::HunterGatherer( const std::string & id ) 
 	: GujaratAgent(id)/*, _surplusForReproductionThreshold(2), _surplusWanted(1)*/, _homeRange(50),
-	_numSectors( -1 )
+	_numSectors( -1 ),
+	_myHGMind(*(HGMindFactory::getHGMind(*(GujaratWorld*)_world)))
 {
+	//_myHGMind = *(HGMindFactory::getHGMind(*(GujaratWorld*)_world));
+	/*
+	static Gujarat::HGMind* Gujarat::HGMindFactory::getHGMind(Gujarat::HGMindFactory::GujaratWorld&)
+	./HGMindFactory.hxx:29:17: note:   no known conversion for argument 1 from ‘Gujarat::GujaratWorld’ to ‘Gujarat::HGMindFactory::GujaratWorld&’
+	*/
+	
 }
 
 void HunterGatherer::registerAttributes()
@@ -44,113 +58,63 @@ void HunterGatherer::registerAttributes()
 
 HunterGatherer::~HunterGatherer()
 {
-	for ( unsigned k = 0; k < _sectors.size(); k++ )
-	{
-		delete _sectors[k];
-	}
+	_myHGMind.clearSectorKnowledge();	
 }
 
-void HunterGatherer::updateKnowledge( const Engine::Point2D<int>& agentPos, const Engine::Raster& dataRaster, std::vector<Sector*>& sectors ) const
-{
-	for ( unsigned k = 0; k < _numSectors; k++ )
-	{
-		sectors.push_back( new Sector(*getWorld()) );
-	}
+//************************************************************************
+// REFACTORED updateKnowledge & updateKnowledge(par1,par2...)const
+//************************************************************************
+// some slight changes in the methods allows to disable omniscience i
+// perform update knowledge after exploring a sector
 
-	for ( int x=-_homeRange; x<=_homeRange; x++ )
-	{
-		for ( int y=-_homeRange; y<=_homeRange; y++ )
-		{
-			int indexSector = GujaratState::sectorsMask(x+_homeRange,y+_homeRange);
-			if ( indexSector == - 1 )
-			{
-				continue;
-			}
-
-			Engine::Point2D<int> p;
-			p._x = agentPos._x + x;
-			p._y = agentPos._y + y;
-			if ( !_world->getOverlapBoundaries().isInside(p) )
-			{
-				continue;
-			}
-			sectors[indexSector]->addCell( p );
-		}
-	}
-
-	for ( unsigned k = 0; k < _numSectors; k++ )
-	{
-		sectors[k]->updateFeatures(dataRaster);
-	}
-}
-
+									   
 void HunterGatherer::updateKnowledge()
-{
-	// H/G can't preserve resources
-	//std::cout << "collected from last time: " << _collectedResources << " surplus: " << _collectedResources - computeConsumedResources(1);
-	//_collectedResources -= computeConsumedResources(1);
-	//_collectedResources *= getSurplusSpoilageFactor();
-
-	//std::cout << " spoiled: " << _collectedResources << " needed resources: " << computeConsumedResources(1) <<  std::endl;
-	_collectedResources = 0;
+{	
+	_collectedResources = 0;	
+	
 	std::stringstream logName;
 	logName << "agents_" << _world->getId() << "_" << getId();
-
-	log_DEBUG(logName.str(), "update knowledge");
-	// sectors not initialized
-	log_DEBUG(logName.str(), "new sectors");
-	if(_sectors.size()==0)
-	{
-		_sectors.resize(_numSectors);
-		for ( unsigned k = 0; k < _numSectors; k++ )
-		{
-			_sectors[k] = new Sector( getWorldRef());
-		}
-	}
-	else
-	{
-		for ( unsigned k = 0; k < _numSectors; k++ )
-		{
-			//std::cout << this << "clearing sector: " << k << std::endl;
-			_sectors[k]->clearCells();
-			//std::cout << "DONE!" <<  std::endl;
-		}
-	}
 	
-	log_DEBUG(logName.str(), "create sectors with home range: " << _homeRange);
-	for ( int x=-_homeRange; x<=_homeRange; x++ )
-	{
-		for ( int y=-_homeRange; y<=_homeRange; y++ )
-		{
-			int indexSector = GujaratState::sectorsMask(x+_homeRange,y+_homeRange);
-			if ( indexSector == - 1 )
-			{
-				continue;
-			}
+	_myHGMind.updateKnowledge(_position);
 
-			Engine::Point2D<int> p;
-			p._x = _position._x + x;
-			p._y = _position._y + y;
-			// TODO overlapboundaries
-			if ( !_world->getBoundaries().isInside(p) )
-			{
-				continue;
-			}
-			_sectors[indexSector]->addCell( p );
-			//getWorld()->setValue( "sectors", p, 1 );
-		}
-	}
-	log_DEBUG(logName.str(), "update features");
-
-	for ( unsigned k = 0; k < _numSectors; k++ )
-	{
-		//std::cout << "Sector #" << (k+1) << " features:" << std::endl;
-		_sectors[k]->updateFeatures();
-		//_sectors[k]->showFeatures( std::cout );
-	}
-	log_DEBUG(logName.str(), "end update knowledge");
 }
 
+
+void	HunterGatherer::updateKnowledge( 	const Engine::Point2D<int>& agentPos, const Engine::Raster& dataRaster, std::vector< Sector* >& HRSectors, std::vector< Sector* >& LRSectors  ) const
+{	
+	_myHGMind.updateKnowledge(agentPos, dataRaster, HRSectors, LRSectors);
+}
+
+
+void HunterGatherer::executeActions()
+{	
+	std::list<Engine::Action *>::iterator it = _actions.begin();
+	while(it!=_actions.end())
+	{
+		//Engine::Action * nextAction = _actions[i];
+		MDPAction * nextAction = (MDPAction*)*it;
+		// world info retrieved due to execute an action
+		_myHGMind.updateDueToExecuteAction(((MDPAction*)nextAction)->getVisitedSector());
+		it++;
+	}
+	// Ensure that no action alters the internal knowledge retrieved
+	// by knowledgeDueToExecuteAction
+	// MoveHomeAction : 
+	//		erases sectors : HR, LR
+	//		does not touch timestamps
+	//		does not touch private rasters
+	// ForageAction :
+	//		touches nothing
+	
+	GujaratAgent::executeActions();
+	
+}
+
+void HunterGatherer::clearSectorKnowledge() 
+	{ 
+		_myHGMind.clearSectorKnowledge();
+	}	
+	
 void HunterGatherer::selectActions()
 {
 	std::list<MDPAction*> actions;
@@ -168,12 +132,18 @@ GujaratAgent * HunterGatherer::createNewAgent()
 	GujaratWorld * world = (GujaratWorld*)_world;
 	std::ostringstream oss;
 	oss << "HunterGatherer_" << world->getId() << "-" << world->getNewKey();
-	
+
+	//*? 
+	// NO CHILDREN
+	return 0;
+	/*
 	HunterGatherer * agent = new HunterGatherer(oss.str());
 
 	agent->setSocialRange( _socialRange );
 	agent->setHomeMobilityRange( _homeMobilityRange );
 	agent->setHomeRange( _homeRange );
+	agent->setLowResHomeRange( _lowResHomeRange );
+	
 	//agent->setSurplusForReproductionThreshold( _surplusForReproductionThreshold );
 	//agent->setSurplusWanted( _surplusWanted );
 	//agent->setSurplusSpoilageFactor( _surplusSpoilageFactor );
@@ -183,12 +153,13 @@ GujaratAgent * HunterGatherer::createNewAgent()
 	agent->setForageTimeCost( _forageTimeCost );
 	//agent->setAvailableForageTime( _availableForageTime );
 	agent->setMassToCaloriesRate( _massToCaloriesRate );
-	agent->setNumSectors( _sectors.size() );
+	agent->setNumSectors( ((GujaratConfig)((GujaratWorld*)_world)->getConfig())._numSectors );
 	
 	// initially the agent will be a couple
 	agent->_populationAges.resize(2);
 
 	return agent;
+	*/
 }
 
 /*
@@ -198,6 +169,12 @@ bool HunterGatherer::needsResources()
 }
 */
 
+Engine::Raster & HunterGatherer::getLRResourcesRaster() 
+{ 
+	//return _world->getDynamicRaster(eLRResources); 	
+	return _myHGMind.getLRResourcesRaster();
+}
+
 bool HunterGatherer::cellValid( Engine::Point2D<int>& loc )
 {
 	if ( !_world->getOverlapBoundaries().isInside(loc) )
@@ -206,6 +183,7 @@ bool HunterGatherer::cellValid( Engine::Point2D<int>& loc )
 	std::vector<Agent * > agents = _world->getAgent(loc);
 	if(agents.size()==0)
 	{
+		agents.clear();
 		return true;
 	}
 
@@ -214,9 +192,11 @@ bool HunterGatherer::cellValid( Engine::Point2D<int>& loc )
 		Agent * agent = agents.at(i);
 		if(agent->exists() && agent!=this)
 		{
+			agents.clear();
 			return false;
 		}
 	}
+	agents.clear();
 	return true;
 }
 

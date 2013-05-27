@@ -9,7 +9,7 @@
 namespace Gujarat
 {
 
-Sector::Sector( const Engine::World & world ) 
+Sector::Sector( const GujaratWorld & world ) 
 	: _world(world), _biomassAmount(0)
 {
 }
@@ -26,6 +26,7 @@ Sector::Sector( const Sector& other )
 
 Sector::~Sector()
 {
+		_cells.clear();
 }
 
 Engine::Point2D<int>	Sector::getNearestTo( Engine::Point2D<int> p ) const
@@ -55,6 +56,8 @@ void	Sector::computeBiomassAmount( const Engine::Raster& r )
 	// TODO refactor
 	for ( unsigned i = 0; i < _cells.size(); i++ )
 	{
+		//*?
+		//std::cout << "INCREASE UTILITY " << r.getValue( _cells[i]-_world.getOverlapBoundaries()._origin ) << std::endl;
 		_biomassAmount += r.getValue( _cells[i]-_world.getOverlapBoundaries()._origin );
 	}
 /*	
@@ -73,7 +76,36 @@ void	Sector::computeBiomassAmount( const Engine::Raster& r )
 	*/
 }
 
-void	Sector::updateFeatures( const Engine::Raster& r )
+
+void Sector::computeBiomassAmountLR( const Engine::Raster& r )
+{
+	_biomassAmount = 0;
+//	int maxBiomassAmount = r.getCurrentMaxValue();
+
+	
+	// TODO refactor
+	for ( unsigned i = 0; i < _cells.size(); i++ )
+	{
+		//*?
+		//std::cout << "INCREASE UTILITY " << r.getValue( _cells[i]-_world.getOverlapBoundaries()._origin ) << std::endl;
+		
+		//std::cout << "[" << std::endl;
+		_biomassAmount += r.getValue( _cells[i] );
+		
+		//std::cout << "INCREASE UTILITY2 " << _world.getValueLR(r,_cells[i]) << std::endl;
+		
+		//_world.getValueLR(r,_cells[i]);
+		//std::cout << "]" << std::endl;
+		//r.getValue( _cells[i]-_world.getOverlapBoundaries()._origin );
+	}
+}
+
+void Sector::updateFeaturesLR( const Engine::Raster& r )
+{
+	computeBiomassAmountLR( r ); 
+}
+
+void Sector::updateFeatures( const Engine::Raster& r )
 {
 	computeBiomassAmount( r ); 
 }
@@ -137,10 +169,12 @@ void	Sector::getAdjacent( Engine::Point2D<int> p, std::vector<Engine::Point2D<in
 	}	
 }
 	
-const Engine::World & Sector::getWorld() const
+const GujaratWorld & Sector::getWorld() const
 {
 	return _world;
 }
+
+
 
 } // namespace Gujarat
 

@@ -27,7 +27,23 @@ enum Rasters
 	eResourceType,
 	eConsecutiveYears,
 	eSectors,
-	eMoisture
+	eMoisture,
+	// LOW RESSOLUTION
+	eLRResources,
+	eLRResourcesFraction,
+	eLRForageActivity,
+	eLRHomeActivity,
+	eLRFarmingActivity,
+	eLRMoisture,
+	eLRWeightWater,
+	eLRPopulation,
+	LRCounterSoilDUNE,
+	LRCounterSoilINTERDUNE,
+	LRCounterSoilWATER,
+	
+	
+	eSectorUtility,
+	paintLRResources
 };
 
 // id's depends on GIS data
@@ -76,9 +92,10 @@ class GujaratWorld : public Engine::World
 	//void updateMoisture();
 	void updateSoilCondition();
 	void updateResources();
-
+	void updateResourcesLowResMap();
 	void recomputeYearlyBiomass();
-
+	void recomputeLowResYearlyBiomass();
+	
 	//Engine::Point2D<int> findNearestWater( const Engine::Point2D<int> & point );
 	float getBiomassVariation( bool wetSeason, Soils & cellSoil, const Engine::Point2D<int> & index ) const;
 public:
@@ -95,6 +112,78 @@ public:
 
 	SettlementAreas * getSettlementAreas() { return & _settlementAreas; }
 	const SettlementAreas* getSettlementAreas() const { return &_settlementAreas; }
+	
+	
+	void worldCell2LowResCell( Engine::Point2D<int> pos, Engine::Point2D<int> & result ) const;
+	void LowRes2HighResCellCorner(Engine::Point2D<int> pos, Engine::Point2D<int> &result ) const;
+	
+	int getLowResMapsSideSize();
+	
+	void fillLRRaster(enum Rasters idLRRaster, int val);
+	void fillRaster(enum Rasters iRaster, int val);
+	
+	void fillLowResCounterRaster(enum Rasters idRasterCounter, enum Rasters idRasterSource,int soiltype);
+	void LowResRasterCountsHighResRaster(enum Rasters idRasterCounter, enum Rasters idRasterSource);
+	void fillLowResMeanRaster(enum Rasters idRasterCounter, enum Rasters idRasterSource);
+	
+	//! returns the value of raster r in global position "position"
+	int getValueGW( const Engine::Raster & r, const Engine::Point2D<int> & position ) const;
+	
+	//! returns the value of raster "index" in global position "position"
+	int getValueLR( const int & index, const Engine::Point2D<int> & position ) const;
+	//! sets the value of raster "index" to value "value" in global position "position"
+	void setValueLR( const int & index, const Engine::Point2D<int> & position, int value );
+	//! sets the init value of raster "index" to value "value" in global position "position"
+	void setInitValueLR( const int & index, const Engine::Point2D<int> & position, int value );
+	
+	//! returns the value of raster "r" in global position "position"
+	int getValueLR( const Engine::Raster & r, const Engine::Point2D<int> & position ) const;
+	//! sets the value of raster "r" to value "value" in global position "position"
+	void setValueLR( Engine::Raster & r, const Engine::Point2D<int> & position, int value );
+	//! sets the init value of raster "r" to value "value" in global position "position"
+	void setInitValueLR( Engine::Raster & r, const Engine::Point2D<int> & position, int value );
+	
+	void ExpandLR2HRRaster(const int LRSource, const int HRTarget)
+	{
+		Engine::Point2D<int> index;
+		
+		for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
+		{	
+			for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)		
+			{				
+				Engine::Point2D<int> mapCell; 
+				worldCell2LowResCell(index, mapCell);
+				int v = getValueLR(LRSource,mapCell);
+				setValue(HRTarget,index,v);
+			}
+		}
+	}
+	
+	Engine::Point2D<int> getHRFreeCell(const Engine::Point2D<int> LRpos, Engine::Point2D<int> & HRpos);
+	
+	
+//*****************************************************************
+//*****************************************************************
+//*****************************************************************
+	Engine::Point2D<int> _firstHome;
+	
+	void fillWithValue(Engine::Raster & r, int val);
+	
+	void fillWithValue(enum Rasters r, int val);
+		
+	void initDebugRasters();
+	
+	void updateeSectorUtility(const std::vector< Engine::Point2D<int> > & cells, int val);
+		
+	void assignResourceFromSectorsToHR(const std::vector< Engine::Point2D<int> > & cells,int HRValToForce);
+	
+	
+	void fillHRRasterWithLRRaster(enum Rasters idLRSource, enum Rasters idHRTarget);
+	
+	void fillIniRaster(enum Rasters idRaster, int val);
+	
+//****************************************
+	
 };
 
 } // namespace Gujarat

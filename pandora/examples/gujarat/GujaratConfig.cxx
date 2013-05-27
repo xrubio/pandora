@@ -4,6 +4,7 @@
 #include <HunterGathererMDPConfig.hxx>
 
 #include <GujaratState.hxx>
+#include <HGMindFactory.hxx>
 
 namespace Gujarat
 {
@@ -61,6 +62,62 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 	retrieveAttributeMandatory( element, "mean", _rainHistoricalDistribMean );
 	retrieveAttributeMandatory( element, "stdev", _rainHistoricalDistribStdev );	
 	
+	
+	element = root->FirstChildElement("daysPerSeason");
+	retrieveAttributeMandatory( element, "value", _daysPerSeason );
+	element = root->FirstChildElement("daysPerYear");
+	retrieveAttributeMandatory( element, "value", _daysPerYear );
+	
+	element = root->FirstChildElement("cellResolution");
+	retrieveAttributeMandatory( element, "value", _cellResolution );
+	
+	element = root->FirstChildElement("lowResolution");
+	retrieveAttributeMandatory( element, "value", _lowResolution);
+	
+	element = root->FirstChildElement("massToEnergyRate" );
+	retrieveAttributeMandatory( element, "value", _massToEnergyRate );
+	element = root->FirstChildElement("energyToCaloriesRate" );
+	retrieveAttributeMandatory( element, "value", _energyToCalRate );
+	
+	TiXmlNode* n = NULL;
+	while ( ( n = root->IterateChildren( n ) ) )
+	{
+		if ( n->Type() != TiXmlNode::TINYXML_ELEMENT ) continue;
+		TiXmlElement* elem = n->ToElement();
+		if ( !elem->ValueStr().compare("cellBiomass") )
+		{
+			std::string elemType;
+			retrieveAttributeMandatory( elem, "type", elemType );
+			if ( !elemType.compare("dune" ) )
+			{
+				retrieveAttributeMandatory( elem, "value", _duneBiomass );
+				retrieveAttributeMandatory( elem, "efficiency", _duneEfficiency );
+				retrieveAttributeMandatory( elem, "minimum", _duneMinimum);
+			}
+			else if ( !elemType.compare("interdune") )
+			{
+				retrieveAttributeMandatory( elem, "value", _interduneBiomass );
+				retrieveAttributeMandatory( elem, "efficiency", _interduneEfficiency );
+				retrieveAttributeMandatory( elem, "minimum", _interduneMinimum);
+			}
+			else
+			{
+				std::stringstream sstr;
+				sstr << "ERROR: Loading simulation config document" << std::endl;
+				sstr << "Unknown cellBiomass type " << elemType << " found!!!" << std::endl;
+				throw Engine::Exception( sstr.str() ); 
+			}
+		}
+		else if ( !elem->ValueStr().compare( "storeRaster" ) ) 
+		{
+			std::string name, valueStr;
+			retrieveAttributeMandatory( elem, "name", name );
+			retrieveAttributeMandatory( elem, "value", _storeRasters[name]);
+		}
+	}
+	
+	
+	
 	element = root->FirstChildElement("socialRange");
 	retrieveAttributeMandatory( element, "value", _socialRange );
 	
@@ -76,8 +133,32 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 	retrieveAttributeMandatory( element, "adulthoodAge", _adulthoodAge );	
 	
 	retrieveAttributeMandatory( element, "numSectors", _numSectors );
-	GujaratState::initializeSectorsMask(_numSectors, _homeRange);
-
+	
+	retrieveAttributeMandatory( element, "hunterGathererInformationCaducityTime", _hunterGathererInformationCaducityTime );
+	
+	// Generate a sector mask of lowrescells for the lowresmap the would overlap the original sector mask.
+	// The difference of areas between both sectors must be minimized. 
+	int r_down    = _homeRange / _lowResolution;
+	int r_up      = 1 + r_down;
+	int loss_down = abs(_homeRange*_homeRange 
+						- 
+						r_down*r_down*_lowResolution*_lowResolution); 
+	int loss_up   = abs(_homeRange*_homeRange 
+						- 
+						r_up*r_up*_lowResolution*_lowResolution); 
+	
+	if (loss_down > loss_up)
+	{
+		_lowResHomeRange = r_up;
+	}
+	else
+	{
+		_lowResHomeRange = r_down;
+	}
+	
+	GujaratState::initializeSectorsMask(_numSectors, _homeRange, GujaratState::getHRSectorsMask());
+	GujaratState::initializeSectorsMask(_numSectors, _lowResHomeRange, GujaratState::getLRSectorsMask());
+	
 	retrieveAttributeMandatory( element, "walkingSpeedHour", _walkingSpeedHour );
 	retrieveAttributeMandatory( element, "forageTimeCost", _forageTimeCost );
 //	retrieveAttributeMandatory( element, "availableForageTime", _availableForageTime );
@@ -88,6 +169,9 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 	parseHGMDPConfig( element->FirstChildElement("controllerConfig") );
 	GujaratState::setHGController( _hunterGathererController, *_controllerConfig);
 
+	retrieveAttributeMandatory( element, "mindType", _hunterGathererMind );
+	HGMindFactory::setHGMind( _hunterGathererMind);
+	
 	float minValue = 0;
 	float adultValue = 0;
 	int minAge = 0;
@@ -150,59 +234,6 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 	
 //	retrieveAttributeMandatory( element, "num", _numAP );
 //	retrieveAttributeMandatory( element, "maxCropHomeDistance", _maxCropHomeDistance );
-
-	element = root->FirstChildElement("daysPerSeason");
-	retrieveAttributeMandatory( element, "value", _daysPerSeason );
-	element = root->FirstChildElement("daysPerYear");
-	retrieveAttributeMandatory( element, "value", _daysPerYear );
-	
-	element = root->FirstChildElement("cellResolution");
-	retrieveAttributeMandatory( element, "value", _cellResolution );
-
-	element = root->FirstChildElement("lowResolution");
-	retrieveAttributeMandatory( element, "value", _lowResolution);
-
-	element = root->FirstChildElement("massToEnergyRate" );
-	retrieveAttributeMandatory( element, "value", _massToEnergyRate );
-	element = root->FirstChildElement("energyToCaloriesRate" );
-	retrieveAttributeMandatory( element, "value", _energyToCalRate );
-	
-	TiXmlNode* n = NULL;
-	while ( ( n = root->IterateChildren( n ) ) )
-	{
-		if ( n->Type() != TiXmlNode::TINYXML_ELEMENT ) continue;
-		TiXmlElement* elem = n->ToElement();
-		if ( !elem->ValueStr().compare("cellBiomass") )
-		{
-			std::string elemType;
-			retrieveAttributeMandatory( elem, "type", elemType );
-			if ( !elemType.compare("dune" ) )
-			{
-				retrieveAttributeMandatory( elem, "value", _duneBiomass );
-				retrieveAttributeMandatory( elem, "efficiency", _duneEfficiency );
-				retrieveAttributeMandatory( elem, "minimum", _duneMinimum);
-			}
-			else if ( !elemType.compare("interdune") )
-			{
-				retrieveAttributeMandatory( elem, "value", _interduneBiomass );
-				retrieveAttributeMandatory( elem, "efficiency", _interduneEfficiency );
-				retrieveAttributeMandatory( elem, "minimum", _interduneMinimum);
-			}
-			else
-			{
-				std::stringstream sstr;
-				sstr << "ERROR: Loading simulation config document" << std::endl;
-				sstr << "Unknown cellBiomass type " << elemType << " found!!!" << std::endl;
-				throw Engine::Exception( sstr.str() ); 
-			}
-		}
-		else if ( !elem->ValueStr().compare( "storeRaster" ) ) 
-		{
-			std::string name, valueStr;
-			retrieveAttributeMandatory( elem, "name", name );
-			retrieveAttributeMandatory( elem, "value", _storeRasters[name]);
-		}
-	}
 
 	/*
 	std::cout << "[CONFIG]: Mass To Energy Rate: " << _massToEnergyRate << std::endl;

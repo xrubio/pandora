@@ -10,6 +10,7 @@ namespace Gujarat
 {
 class 	GujaratAgent;
 class 	HunterGathererMDPState;
+class	Sector;
 
 class MDPAction : public Engine::Action
 {
@@ -20,6 +21,8 @@ public:
 	virtual void executeMDP( const GujaratAgent& agent, const HunterGathererMDPState& s, HunterGathererMDPState& sp ) const;
 	virtual int getTimeNeeded() const = 0;
 	virtual MDPAction*	copy() const { return NULL; }
+	
+	virtual Sector * getVisitedSector() = 0;
 	
 	friend class GujaratAgent;
 };
