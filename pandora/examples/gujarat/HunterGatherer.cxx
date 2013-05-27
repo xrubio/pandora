@@ -23,16 +23,20 @@ namespace Gujarat
 {
 
 HunterGatherer::HunterGatherer( const std::string & id ) 
-	: GujaratAgent(id)/*, _surplusForReproductionThreshold(2), _surplusWanted(1)*/, _homeRange(50),
-	_numSectors( -1 ),
-	_myHGMind(*(HGMindFactory::getHGMind(*(GujaratWorld*)_world)))
+	: GujaratAgent(id)/*, _surplusForReproductionThreshold(2), _surplusWanted(1)*/ ,_homeRange(50)
+	,_numSectors( -1 )
+	//_myHGMind(HGMindFactory::getInstance().getHGMind(*(GujaratWorld*)_world))
 {
 	//_myHGMind = *(HGMindFactory::getHGMind(*(GujaratWorld*)_world));
 	/*
 	static Gujarat::HGMind* Gujarat::HGMindFactory::getHGMind(Gujarat::HGMindFactory::GujaratWorld&)
 	./HGMindFactory.hxx:29:17: note:   no known conversion for argument 1 from ‘Gujarat::GujaratWorld’ to ‘Gujarat::HGMindFactory::GujaratWorld&’
 	*/
-	
+}
+
+void HunterGatherer::createMind()
+{
+	_myHGMind = (HGMindFactory::getInstance().getHGMind(*(GujaratWorld*)_world));
 }
 
 void HunterGatherer::registerAttributes()
@@ -58,7 +62,8 @@ void HunterGatherer::registerAttributes()
 
 HunterGatherer::~HunterGatherer()
 {
-	_myHGMind.clearSectorKnowledge();	
+	_myHGMind->clearSectorKnowledge();	
+	delete _myHGMind;
 }
 
 //************************************************************************
@@ -75,14 +80,14 @@ void HunterGatherer::updateKnowledge()
 	std::stringstream logName;
 	logName << "agents_" << _world->getId() << "_" << getId();
 	
-	_myHGMind.updateKnowledge(_position);
+	_myHGMind->updateKnowledge(_position);
 
 }
 
 
 void	HunterGatherer::updateKnowledge( 	const Engine::Point2D<int>& agentPos, const Engine::Raster& dataRaster, std::vector< Sector* >& HRSectors, std::vector< Sector* >& LRSectors  ) const
 {	
-	_myHGMind.updateKnowledge(agentPos, dataRaster, HRSectors, LRSectors);
+	_myHGMind->updateKnowledge(agentPos, dataRaster, HRSectors, LRSectors);
 }
 
 
@@ -94,7 +99,7 @@ void HunterGatherer::executeActions()
 		//Engine::Action * nextAction = _actions[i];
 		MDPAction * nextAction = (MDPAction*)*it;
 		// world info retrieved due to execute an action
-		_myHGMind.updateDueToExecuteAction(((MDPAction*)nextAction)->getVisitedSector());
+		_myHGMind->updateDueToExecuteAction(((MDPAction*)nextAction)->getVisitedSector());
 		it++;
 	}
 	// Ensure that no action alters the internal knowledge retrieved
@@ -112,7 +117,7 @@ void HunterGatherer::executeActions()
 
 void HunterGatherer::clearSectorKnowledge() 
 	{ 
-		_myHGMind.clearSectorKnowledge();
+		_myHGMind->clearSectorKnowledge();
 	}	
 	
 void HunterGatherer::selectActions()
@@ -139,6 +144,7 @@ GujaratAgent * HunterGatherer::createNewAgent()
 	/*
 	HunterGatherer * agent = new HunterGatherer(oss.str());
 
+	agent->_world = _world;
 	agent->setSocialRange( _socialRange );
 	agent->setHomeMobilityRange( _homeMobilityRange );
 	agent->setHomeRange( _homeRange );
@@ -154,6 +160,8 @@ GujaratAgent * HunterGatherer::createNewAgent()
 	//agent->setAvailableForageTime( _availableForageTime );
 	agent->setMassToCaloriesRate( _massToCaloriesRate );
 	agent->setNumSectors( ((GujaratConfig)((GujaratWorld*)_world)->getConfig())._numSectors );
+	
+	agent->createMind();
 	
 	// initially the agent will be a couple
 	agent->_populationAges.resize(2);
@@ -172,7 +180,7 @@ bool HunterGatherer::needsResources()
 Engine::Raster & HunterGatherer::getLRResourcesRaster() 
 { 
 	//return _world->getDynamicRaster(eLRResources); 	
-	return _myHGMind.getLRResourcesRaster();
+	return _myHGMind->getLRResourcesRaster();
 }
 
 bool HunterGatherer::cellValid( Engine::Point2D<int>& loc )

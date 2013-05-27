@@ -7,4 +7,9 @@ HGOmniMindMap::HGOmniMindMap(GujaratWorld & w):
 { }
 
 
+HGOmniMindMap::~HGOmniMindMap()
+{
+	//~HGMind::HGMind();
+}
+
 }

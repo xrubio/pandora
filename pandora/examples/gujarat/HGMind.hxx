@@ -30,6 +30,7 @@ namespace Gujarat
 		
 	public:
 		HGMind(GujaratWorld & w);
+		~HGMind();
 		//HGMind(int x);
 		
 		//int read();

@@ -170,7 +170,7 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 	GujaratState::setHGController( _hunterGathererController, *_controllerConfig);
 
 	retrieveAttributeMandatory( element, "mindType", _hunterGathererMind );
-	HGMindFactory::setHGMind( _hunterGathererMind);
+	HGMindFactory::getInstance().setHGMind(_hunterGathererMind);
 	
 	float minValue = 0;
 	float adultValue = 0;

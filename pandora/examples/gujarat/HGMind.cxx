@@ -37,6 +37,11 @@ HGMind::HGMind(GujaratWorld & w):
 	_LRResourceRaster(w.getDynamicRaster(eLRResources))
 {}
 
+HGMind::~HGMind()
+{
+	clearSectorKnowledge();
+}
+
 void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos,
 										std::vector< Sector* >& HRSectors) const
 {

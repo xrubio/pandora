@@ -10,6 +10,7 @@
 #include <HGPartialMindMap.hxx>
 #include <GujaratWorld.hxx>
 
+
 namespace Gujarat{
 
 class HGMindFactory
@@ -18,15 +19,31 @@ class HGMindFactory
 	
 	typedef HGMind* (HGMindFactory::*GETMINDMETHOD) (GujaratWorld & w);
 	
-	static GETMINDMETHOD _getHGMind;
+	//static 
+	GETMINDMETHOD _getHGMind;
+	
+	static HGMindFactory * _instance;
+	
 public:	
-	static void setHGMind(const std::string & type);
+	/*static void setHGMind(const std::string & type);
 	
 	static HGMind *getHGOmniMindMap(GujaratWorld & w);
 	
 	static HGMind *getHGPartialMind(GujaratWorld & w);
 	
 	static HGMind *getHGMind(GujaratWorld & w);
+	*/
+	HGMindFactory();
+	
+	void setHGMind(const std::string & type);
+	
+	HGMind * getHGOmniMindMap(GujaratWorld & w);
+	
+	HGMind * getHGPartialMindMap(GujaratWorld & w);
+	
+	HGMind * getHGMind(GujaratWorld & w);
+	
+	static HGMindFactory & getInstance();
 	
 };
 

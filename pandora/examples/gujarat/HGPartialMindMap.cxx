@@ -20,6 +20,11 @@ HGPartialMindMap::HGPartialMindMap(GujaratWorld & w):
 	initTimeStampRaster();
 }
 
+HGPartialMindMap::~HGPartialMindMap()
+{
+	//~HGMind::HGMind();
+}
+
 void HGPartialMindMap::setGuessHeuristicResourceRaster()
 {
 	int minValue =  _world.getDynamicRaster(eResources).getCurrentMinValue();

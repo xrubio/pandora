@@ -1,9 +1,18 @@
 
 
 #include <HGMindFactory.hxx>
+#include <Exceptions.hxx>
 
 namespace Gujarat{
 
+HGMindFactory * HGMindFactory::_instance = 0;
+	
+HGMindFactory::HGMindFactory()
+{
+	// default
+	_getHGMind = &HGMindFactory::getHGOmniMindMap;
+}
+	
 void HGMindFactory::setHGMind(const std::string & type)
 {
 		if (type.compare("omniscient")==0)
@@ -27,7 +36,7 @@ HGMind * HGMindFactory::getHGOmniMindMap(GujaratWorld & w)
 	return new HGOmniMindMap(w);
 }
 	
-HGMind * HGMindFactory::getHGPartialMind(GujaratWorld & w)
+HGMind * HGMindFactory::getHGPartialMindMap(GujaratWorld & w)
 { 
 	return new HGPartialMindMap(w);	
 }
@@ -38,6 +47,17 @@ HGMind * HGMindFactory::getHGMind(GujaratWorld & w)
 }
 	
 
+HGMindFactory & HGMindFactory::getInstance()
+	{
+		if(!_instance)
+		{
+			_instance = new HGMindFactory;
+		}
+		return *_instance;
+	}
+	
+	
+	
 
 }
 

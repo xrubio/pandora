@@ -17,6 +17,7 @@ namespace Gujarat
 		
 	public:
 		HGPartialMindMap(GujaratWorld & w);
+		~HGPartialMindMap();
 		
 		void setGuessHeuristicResourceRaster();
 		

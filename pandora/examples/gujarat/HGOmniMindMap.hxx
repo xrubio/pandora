@@ -14,6 +14,7 @@ namespace Gujarat
 	{
 	public:
 		HGOmniMindMap(GujaratWorld & w);
+		~HGOmniMindMap();
 		
 		inline void updateDueToExecuteAction(Sector*) {}
 		

@@ -19,7 +19,7 @@ protected:
 	int 					_homeRange; // MpiBasicAttribute
 	int 					_numSectors; // MpiBasicAttribute
 	int						_lowResHomeRange; // MpiBasicAttribute
-	HGMind & _myHGMind; // MpiBasicAttribute
+	HGMind * _myHGMind; 
 	//void updateKnowledge();
 
 	// this method checks whether P1 and P2 are in the same side of the line that goes from B to C
@@ -38,7 +38,9 @@ public:
 	HunterGatherer( const std::string & id );
 	virtual ~HunterGatherer();
 
-	void setPosition(Engine::Point2D<int> p) { 	GujaratAgent::setPosition(p); _myHGMind.clearSectorKnowledge(); }
+	void createMind();
+	
+	void setPosition(Engine::Point2D<int> p) { 	GujaratAgent::setPosition(p); _myHGMind->clearSectorKnowledge(); }
 	
 	void setHomeRange( int v ) { _homeRange = v; }
 	int  getHomeRange() const { return _homeRange; }
@@ -48,10 +50,10 @@ public:
 	int getLowResHomeRange() const { return _lowResHomeRange; }
 	
 	const std::vector<Sector *> & getHRSectors() const 
-	{ return _myHGMind.getHRSectors(); }
+	{ return _myHGMind->getHRSectors(); }
 	//{ return _HRSectors; }
 	const std::vector<Sector *> & getLRSectors() const 
-	{ return _myHGMind.getLRSectors(); }
+	{ return _myHGMind->getLRSectors(); }
 	//{ return _LRSectors; }
 	
 	Sector * getHRSectors(int i) { return getHRSectors()[i]; }

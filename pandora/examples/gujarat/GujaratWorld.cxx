@@ -454,6 +454,8 @@ void GujaratWorld::createAgents()
 			HunterGatherer * agent = new HunterGatherer(oss.str());
 			addAgent(agent);
 			//_config._hgInitializer->initialize(agent);
+			agent->createMind();
+			
 			
 			agent->createInitialPopulation(_config._adulthoodAge);
 
