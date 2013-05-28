@@ -8,11 +8,12 @@
 
 #include "Scenario.hxx"
 #include "MoveAction.hxx"
+#include "ScenarioConfig.hxx"
 
 namespace Panic
 {
 
-PanicAgent::PanicAgent( const std::string & id ) : Agent(id), _direction(0), _exited(false), _rest(0.0f, 0.0f)
+PanicAgent::PanicAgent( const std::string & id, ScenarioConfig & config ) : Agent(id), _direction(0), _exited(false), _panicked(false), _config(&config), _compressionThreshold(config._compressionThreshold), _rest(0.0f, 0.0f)
 {
 	_direction = Engine::GeneralState::statistics().getUniformDistValue(0,359);
 }
@@ -48,7 +49,7 @@ float PanicAgent::getDistToNearestObstacle( const int & direction )
 			}
 		}
 		
-		if(_world->getDynamicRaster(eExits).getValue(newIntPos)==1)
+		if(_world->getValue(eExits, newIntPos)==1)
 		{	
 			if(newIntPos!=_position)
 			{
@@ -57,21 +58,22 @@ float PanicAgent::getDistToNearestObstacle( const int & direction )
 		}
 
 		// obstacle found
-		if(_world->getDynamicRaster(eObstacles).getValue(newIntPos)==1)
+		if(_world->getValue(eObstacles, newIntPos)==1)
 		{	
 			if(newIntPos!=_position)
 			{
 				return newIntPos.distance(_position);
 			}
 		}
-		// there is a person there	
-//		if(_world->getAgent(Engine::Point2D<int>(std::floor(newPos._x), std::floor(newPos._y))).size()!=0)
-//		{
-//			if(newIntPos!=_position)
-//			{
-//				return newIntPos.distance(_position);
-//			}
-//		}
+		
+		// too many people (>4 persons)
+		if(_world->getValue(eNumAgents, newIntPos)>4)
+		{	
+			if(newIntPos!=_position)
+			{
+				return newIntPos.distance(_position);
+			}
+		}
 	}
 }
 
@@ -79,14 +81,14 @@ float PanicAgent::getDistToNearestObstacle( const int & direction )
 
 void PanicAgent::selectActions()
 {
-	if(_exited)
+	if(_exited || !_panicked)
 	{
 		return;
 	}
 
-	float rangeOfSight = 900.0f;
+	float rangeOfSight = 200.0f;
 	// fov in degrees
-	int fov = 360;
+	int fov = 90;
 	int increaseDirection = 5;
 
 	float minValue = std::numeric_limits<float>::max();
@@ -147,27 +149,48 @@ void PanicAgent::selectActions()
 	{
 	//	if(_world->getDynamicRaster(eExits).getValue(newIntPos)!=0) // || _world->getAgent(newIntPos).size()==0)
 	//	{
-			_actions.push_back(new MoveAction(newIntPos));
+			_actions.push_back(new MoveAction(newIntPos, _config->_agentCompressionWeight, _config->_wallCompressionWeight, _config->_contagion));
 	//	}
 	}
 }
 
 void PanicAgent::updateState()
 {
-	if(_world->getDynamicRaster(eExits).getValue(_position)==1)
+	if(_exited)
+	{
+		return;
+	}
+
+	if(_world->getValue(eExits, _position)==1)
 	{
 		_exited = true;
 	}
+
+	if(_world->getValue(eCompression, _position)>_compressionThreshold)
+	{
+		_world->setValue(eDeaths, _position, _world->getValue(eDeaths, _position)+1);		
+		_world->setValue(eNumAgents, _position, _world->getValue(eNumAgents, _position)+1);		
+		_world->setValue(eCompression, _position, std::max(0, _world->getValue(eCompression, _position)-_compressionThreshold));
+		_world->removeAgent(this);
+	}
+
+	if(!_panicked && _world->getValue(ePanic, _position)==1)
+	{
+		_panicked = true;
+	}
+
 }
 
 void PanicAgent::registerAttributes()
 {
 	registerIntAttribute("direction");
+	registerIntAttribute("panicked");
 }
 
 void PanicAgent::serialize()
 {
 	serializeAttribute("direction", _direction);
+	serializeAttribute("panicked", _panicked);
 }
 	
 void PanicAgent::setExit( const Engine::Point2D<int> & exit )

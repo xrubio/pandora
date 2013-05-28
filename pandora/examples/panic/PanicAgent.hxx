@@ -9,19 +9,24 @@
 
 namespace Panic
 {
+class ScenarioConfig;
 
 class PanicAgent : public Engine::Agent
 {
 	int _direction;
 	bool _exited;
+	bool _panicked;
+	ScenarioConfig * _config;
+	int _compressionThreshold;
 	Engine::Point2D<int> _exit;
 	Engine::Point2D<float> _rest;
 
 	Engine::Point2D<float> getNextPos( const int & direction, const Engine::Point2D<float> & position );
 	float getDistToNearestObstacle( const int & direction );
+	
 public:
 	// todo remove environment from here
-	PanicAgent( const std::string & id );
+	PanicAgent( const std::string & id, ScenarioConfig & config);
 	virtual ~PanicAgent();
 	void setExit( const Engine::Point2D<int> & exit );
 	

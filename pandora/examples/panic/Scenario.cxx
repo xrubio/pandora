@@ -20,41 +20,57 @@ void Scenario::createAgents()
 	{
 		std::ostringstream oss;
 		oss << "PanicAgent_"<<i;
-		PanicAgent * agent = new PanicAgent(oss.str());
+		PanicAgent * agent = new PanicAgent(oss.str(), _config);
 		addAgent(agent);
 
 		agent->setRandomPosition();
-		while(getDynamicRaster(eObstacles).getValue(agent->getPosition())==1)
+		// avoid agent in obstacle and initial dense crowd
+		while((getValue(eObstacles, agent->getPosition())==1) || (getValue(eNumAgents, agent->getPosition())>1))
 		{
 			agent->setRandomPosition();
 		}
 		//agent->setPosition(Engine::Point2D<int>(76,423));
 		computeShortestExit(*agent);
+		setValue(eNumAgents, agent->getPosition(), getValue(eNumAgents, agent->getPosition())+1);
 	}
 }
 
 void Scenario::computeShortestExit(PanicAgent & agent )
 {
 	std::vector< Engine::Point2D<int> > possibleExits;
-	float minDistance = std::numeric_limits<float>::max();
-
-	for(ExitsList::const_iterator it=_exits.begin(); it!=_exits.end(); it++)
+	int randomValue = Engine::GeneralState::statistics().getUniformDistValue(0,9);
+	// probability 20% of not knowing the exit
+	if(randomValue<2)
 	{
-		float distance = agent.getPosition().distance(*it);
-		if(distance<minDistance)
+		int randomExitIndex = Engine::GeneralState::statistics().getUniformDistValue(0, _exits.size()-1);
+		ExitsList::const_iterator it=_exits.begin();
+		for(int i=0; i<randomExitIndex; i++)
 		{
-			possibleExits.clear();
-			possibleExits.push_back(*it);
-			minDistance = distance;
+			it++;
 		}
-		else if(distance==minDistance)
+		possibleExits.push_back(*it);
+	}
+	else
+	{
+		float minDistance = std::numeric_limits<float>::max();
+		for(ExitsList::const_iterator it=_exits.begin(); it!=_exits.end(); it++)
 		{
-			possibleExits.push_back(*it);
+			float distance = agent.getPosition().distance(*it);
+			if(distance<minDistance)
+			{
+				possibleExits.clear();
+				possibleExits.push_back(*it);
+				minDistance = distance;
+			}
+			else if(distance==minDistance)
+			{
+				possibleExits.push_back(*it);
+			}
 		}
 	}
 	std::random_shuffle(possibleExits.begin(), possibleExits.end());
 	agent.setExit(possibleExits.at(0));
-	std::cout << "agent: " << agent << " will go to: " << possibleExits.at(0) << std::endl;
+//	std::cout << "agent: " << agent << " will go to: " << possibleExits.at(0) << std::endl;
 }
 
 void Scenario::createRasters()
@@ -65,13 +81,30 @@ void Scenario::createRasters()
 	registerStaticRaster("mtc5", true, eTopo);
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eTopo), "resources/mtc5.tiff", this);	
 
-	registerStaticRaster("obstacles", true, eObstacles);
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eObstacles), _config._obstacleFile, this);	
+	registerDynamicRaster("obstacles", true, eObstacles);
+	Engine::GeneralState::rasterLoader().fillGDALRaster(getDynamicRaster(eObstacles), _config._obstacleFile, this);	
+	getDynamicRaster(eObstacles).setMaxValue(1);
 
 	registerDynamicRaster("exits", false, eExits);
 	getDynamicRaster(eExits).setInitValues(0, 0, 0);
 	getDynamicRaster(eExits).setMaxValue(1);
+	
+	registerDynamicRaster("numAgents", true, eNumAgents);
+	getDynamicRaster(eNumAgents).setInitValues(0, std::numeric_limits<int>::max(), 0);
+	
+	registerDynamicRaster("walls", true, eWalls);
+	getDynamicRaster(eWalls).setInitValues(0, 8, 0);
 
+	registerDynamicRaster("compression", true, eCompression);
+	getDynamicRaster(eCompression).setInitValues(0, std::numeric_limits<int>::max(), 0);
+
+	registerDynamicRaster("deaths", true, eDeaths);
+	getDynamicRaster(eDeaths).setInitValues(0, std::numeric_limits<int>::max(), 0);
+
+	registerDynamicRaster("panic", true, ePanic);
+	getDynamicRaster(ePanic).setInitValues(0, 1, 0);
+
+	// compute exit cells
 	Engine::Point2D<int> index(0,0);
 	int maxValue = _overlapBoundaries._size._x;
 	for(index._x=0; index._x<_overlapBoundaries._size._x; index._x++)
@@ -95,6 +128,55 @@ void Scenario::createRasters()
 	}
 	updateRasterToMaxValues(eExits);
 	fillExitList();
+
+	// compute number of adjacent walls
+	for(index._x=0; index._x<_overlapBoundaries._size._x; index._x++)
+	{
+		for(index._y=0; index._y<_overlapBoundaries._size._y; index._y++)
+		{
+			if(getValue(eObstacles, index)==1)
+			{
+				continue;
+			}
+			Engine::Point2D<int> neighbor(0,0);
+			int adjacentWalls = 0;	
+			for(neighbor._x=index._x-1; neighbor._x<=index._x+1; neighbor._x++)
+			{
+				for(neighbor._y=index._y-1; neighbor._y<=index._y+1; neighbor._y++)
+				{
+					if(neighbor._x==index._x && neighbor._y==index._y)
+					{
+						continue;
+					}
+					if(!checkPosition(neighbor))
+					{
+						continue;
+					}
+					if(getValue(eObstacles, neighbor)==1)
+					{
+						adjacentWalls++;
+					}
+				}
+			}
+			setValue(eWalls, index, adjacentWalls);
+		}
+	}
+
+	// initial panic conditions
+	for(index._x=0; index._x<_overlapBoundaries._size._x; index._x++)
+	{
+		for(index._y=0; index._y<_overlapBoundaries._size._y; index._y++)
+		{
+			if(getValue(eObstacles, index)==1)
+			{
+				continue;
+			}
+			if(index.distance(_config._initPanic)<_config._initPanicRadius)
+			{
+				setValue(ePanic, index, 1);
+			}
+		}
+	}
 }
 
 void Scenario::fillExitList()
@@ -109,6 +191,29 @@ void Scenario::fillExitList()
 				continue;
 			}
 			_exits.push_back(index);
+		}
+	}
+}
+
+void Scenario::stepEnvironment()
+{
+	// update body compression
+	Engine::Point2D<int> index;
+	for(index._x=0; index._x<_overlapBoundaries._size._x; index._x++)
+	{
+		for(index._y=0; index._y<_overlapBoundaries._size._y; index._y++)
+		{
+			if(getValue(eObstacles, index)==1)
+			{
+				continue;
+			}
+		
+			// 4 deaths = not passable
+			if(getValue(eDeaths, index)>4)
+			{
+				setMaxValue(eObstacles, index, 1);
+				setValue(eObstacles, index, 1);
+			}
 		}
 	}
 }
