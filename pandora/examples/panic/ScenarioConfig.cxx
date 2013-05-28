@@ -3,7 +3,7 @@
 namespace Panic
 {
 
-ScenarioConfig::ScenarioConfig() : _obstacleFile("not loaded")
+ScenarioConfig::ScenarioConfig() : _obstacleFile("not loaded"), _initAgentsDistributionFile("not loaded")
 {
 }
 
@@ -16,13 +16,35 @@ void ScenarioConfig::extractParticularAttribs(TiXmlElement * root)
 	//environment
 	TiXmlElement * element = root->FirstChildElement("environment");
 	retrieveAttributeMandatory(element, "size", _size);
-	retrieveAttributeMandatory(element, "fileName", _obstacleFile);
 
-	TiXmlElement * element2 = element->FirstChildElement("initPanic");
+	TiXmlElement * elementRasters = element->FirstChildElement("rasters");
+
+	TiXmlElement * element2 = elementRasters->FirstChildElement("obstacles");
+	retrieveAttributeMandatory(element2, "file", _obstacleFile);
+
+	element2 = elementRasters->FirstChildElement("support");
+	while(element2)
+	{
+		std::string name;
+		std::string file;
+		retrieveAttributeMandatory(element2, "name", name);
+		retrieveAttributeMandatory(element2, "file", file);
+		_supportMaps.insert(make_pair(name, file));
+		element2 = element2->NextSiblingElement("support");
+	}
+
+	element2 = element->FirstChildElement("initPanic");
 	retrieveAttributeMandatory(element2, "x", _initPanic._x);
 	retrieveAttributeMandatory(element2, "y", _initPanic._y);
 	retrieveAttributeMandatory(element2, "initRadius", _initPanicRadius);
 	retrieveAttributeMandatory(element2, "contagion", _contagion);
+
+	element2 = element->FirstChildElement("initAgentsDistribution");
+	retrieveAttributeMandatory(element2, "type", _initAgentsDistributionType);
+	if(_initAgentsDistributionType.compare("raster")==0)
+	{
+		retrieveAttributeMandatory(element2, "file", _initAgentsDistributionFile);
+	}
 
 	// agents
 	element = root->FirstChildElement("agents");

@@ -14,6 +14,26 @@ Scenario::~Scenario()
 {
 }
 
+bool Scenario::maxCapacity( const Engine::Point2D<int> & position )
+{
+	// if random no problem
+	if(_config._initAgentsDistributionType.compare("random")==0)
+	{
+		return false;
+	}
+	if(getValue("initAgentsDistribution", position)<=getValue(eNumAgents, position))
+	{
+		return true;
+	}
+
+	int randomValue = Engine::GeneralState::statistics().getUniformDistValue(0,getStaticRaster("initAgentsDistribution").getMaxValue());
+	if(randomValue<=getValue("initAgentsDistribution", position))
+	{
+		return false;
+	}
+	return true;
+}
+
 void Scenario::createAgents()
 {
 	for(int i=0; i<_config._numAgents; i++)
@@ -23,9 +43,9 @@ void Scenario::createAgents()
 		PanicAgent * agent = new PanicAgent(oss.str(), _config);
 		addAgent(agent);
 
-		agent->setRandomPosition();
 		// avoid agent in obstacle and initial dense crowd
-		while((getValue(eObstacles, agent->getPosition())==1) || (getValue(eNumAgents, agent->getPosition())>1))
+		agent->setRandomPosition();
+		while((getValue(eObstacles, agent->getPosition())==1) || maxCapacity(agent->getPosition()))
 		{
 			agent->setRandomPosition();
 		}
@@ -75,11 +95,13 @@ void Scenario::computeShortestExit(PanicAgent & agent )
 
 void Scenario::createRasters()
 {
-	registerStaticRaster("orto5", true, eOrto);
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eOrto), "resources/orto5m.tiff", this);	
-
-	registerStaticRaster("mtc5", true, eTopo);
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eTopo), "resources/mtc5.tiff", this);	
+	for(ScenarioConfig::SupportRastersMap::iterator it=_config._supportMaps.begin(); it!=_config._supportMaps.end(); it++)
+	{
+		std::string name = it->first;
+		std::string fileName = it->second;
+		registerStaticRaster(name, true);
+		Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(name), fileName, this);
+	}
 
 	registerDynamicRaster("obstacles", true, eObstacles);
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getDynamicRaster(eObstacles), _config._obstacleFile, this);	
@@ -103,6 +125,13 @@ void Scenario::createRasters()
 
 	registerDynamicRaster("panic", true, ePanic);
 	getDynamicRaster(ePanic).setInitValues(0, 1, 0);
+	
+	if(_config._initAgentsDistributionType.compare("raster")==0)
+	{
+		registerStaticRaster("initAgentsDistribution", false);
+		Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("initAgentsDistribution"), _config._initAgentsDistributionFile, this);
+	}
+
 
 	// compute exit cells
 	Engine::Point2D<int> index(0,0);
@@ -207,13 +236,15 @@ void Scenario::stepEnvironment()
 			{
 				continue;
 			}
-		
+	
+			/*
 			// 4 deaths = not passable
 			if(getValue(eDeaths, index)>4)
 			{
 				setMaxValue(eObstacles, index, 1);
 				setValue(eObstacles, index, 1);
 			}
+			*/
 		}
 	}
 }

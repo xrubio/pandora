@@ -3,10 +3,37 @@
 	<!-- simulation config -->
 	<output resultsFile="./data/panic.h5" logsDir="./logs"/>
 	<!-- each step is 0.5 secs -->
-	<numSteps value="300" serializeResolution="1"/>	
-	<environment size="708" fileName="resources/buildings.tiff">
+	<numSteps value="200" serializeResolution="1"/>	
+	<!-- catedral -->
+	<!--
+	<environment size="708">
+		<rasters>
+			<obstacles file="resources/catedral/buildings.tiff"/>
+			<support name="orto5" file="resources/catedral/orto5m.tiff"/>
+			<support name="mtc5" file="resources/catedral/mtc5m.tiff"/>
+		</rasters>
 		<initPanic x="443" y="322" initRadius="50" contagion="10"/>
+		<initAgentsDistribution type="random"/>
 	</environment>
+	-->	
+	<!-- concert 1 exit -->
+	<environment size="100">
+		<rasters>
+			<obstacles file="resources/1exit/walls1Exit.tiff"/>
+		</rasters>
+		<initPanic x="50" y="50" initRadius="10" contagion="10"/>
+		<initAgentsDistribution type="raster" file="resources/1exit/initAgents.tiff"/>
+	</environment>
+	<!-- concert 4 exits -->
+	<!--
+	<environment size="100">
+		<rasters>
+			<obstacles file="resources/4exits/walls4Exits.tiff"/>
+		</rasters>
+		<initPanic x="50" y="50" initRadius="10" contagion="10"/>
+	</environment>
+	-->
+
 	<!-- if risk aversion = -1, random value will be chosen -->
 	<agents num="5000"/>
 	<compression agentWeight="5" wallWeight="1" threshold="25"/>

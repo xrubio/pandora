@@ -16,8 +16,6 @@ class PanicAgent;
 
 enum Rasters
 {
-	eOrto,
-	eTopo,
 	// obstacle, 1 if true, 0 if false
 	eObstacles,
 	// exits, 1 if true, 0 if false
@@ -44,6 +42,7 @@ class Scenario: public Engine::World
 	void fillExitList();
 	void computeShortestExit(PanicAgent & agent );
 	void stepEnvironment();
+	bool maxCapacity( const Engine::Point2D<int> & position );
 public:
 	Scenario( Engine::Simulation &simulation, ScenarioConfig &config );
 	virtual ~Scenario();

@@ -67,7 +67,7 @@ float PanicAgent::getDistToNearestObstacle( const int & direction )
 		}
 		
 		// too many people (>4 persons)
-		if(_world->getValue(eNumAgents, newIntPos)>4)
+		if(_world->getValue(eNumAgents, newIntPos)>1)
 		{	
 			if(newIntPos!=_position)
 			{
@@ -169,7 +169,7 @@ void PanicAgent::updateState()
 	if(_world->getValue(eCompression, _position)>_compressionThreshold)
 	{
 		_world->setValue(eDeaths, _position, _world->getValue(eDeaths, _position)+1);		
-		_world->setValue(eNumAgents, _position, _world->getValue(eNumAgents, _position)+1);		
+		_world->setValue(eNumAgents, _position, _world->getValue(eNumAgents, _position)-1);		
 		_world->setValue(eCompression, _position, std::max(0, _world->getValue(eCompression, _position)-_compressionThreshold));
 		_world->removeAgent(this);
 	}
