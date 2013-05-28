@@ -112,7 +112,7 @@ void HunterGatherer::executeActions()
 	//		touches nothing
 	
 	GujaratAgent::executeActions();
-	
+	doInformationSharing();
 }
 
 void HunterGatherer::clearSectorKnowledge() 
@@ -256,6 +256,80 @@ void HunterGatherer::serialize()
 	serializeAttribute("MoveHome actions", _moveHomeActionsExecuted);
 //	serializeAttribute("Forage actions", _forageActionsExecuted);
 }
+
+
+//********************** SHARE INFORMATION METHODS
+void HunterGatherer::doInformationSharing()
+{	
+	Engine::World::AgentsVector neighbours = _world->getNeighbours(this, _socialRange, getType());
+	for(Engine::World::AgentsVector::iterator it=neighbours.begin(); it!=neighbours.end(); it++)
+	{
+		HunterGatherer * a = (HunterGatherer*)(*it);
+		if(getId() > a->getId())
+		{
+			shareInformation(a);
+			//Issue: If I would decide to share depending on utility of sector, 
+			// after each sharing my sectors should have their utility
+			// updated.
+		}
+	}
+	
+}
+
+
+void HunterGatherer::shareInformation( HunterGatherer * a)
+{
+	
+	// select one random sector s
+	int s = Engine::GeneralState::statistics().getUniformDistValue(0,_myHGMind->getLRSectors().size()-1);
+	
+	a->putInformation(_myHGMind->getLRSectors()[s]
+					,_myHGMind->getLRResourcesRaster()
+					,_myHGMind->getLRTimeStamps());
+	
+	a->shareInformation(this);
+}
+
+
+void HunterGatherer::putInformation(Sector *s, const Engine::Raster & r, const Engine::Raster & t)
+{
+	const 	std::vector< Engine::Point2D<int> > & cells = s->cells();
+	
+	Engine::Raster & myLRTimeRaster = _myHGMind->getLRTimeStamps();
+	Engine::Raster & myLRResRaster = _myHGMind->getLRResourcesRaster();
+	
+	for(int i = 0; i < cells.size(); i++)
+	{	
+		/*
+		int ts_i = ((GujaratWorld*)_world)->getValueLR(t,cells[i]);
+		//check timestamp!!! do not take information older than yours
+		if (ts_i > ((GujaratWorld*)_world)->getValueLR(_myLRTimeRaster,cells[i]))
+		{
+			int u  = ((GujaratWorld*)_world)->getValueLR(r,cells[i]);
+			((GujaratWorld*)_world)->setValueLR(_myLRResRaster,cells[i],u);
+			((GujaratWorld*)_world)->setValueLR(_myLRTimeRaster,cells[i],ts_i);
+		}
+		*/
+		int ts_i = t.getValue(cells[i]);
+		//check timestamp!!! do not take information older than yours
+		if (ts_i > myLRTimeRaster.getValue(cells[i]) 
+			&& 
+			ts_i - myLRTimeRaster.getValue(cells[i]) > 3 )
+		{
+			int u  = r.getValue(cells[i]);
+			myLRResRaster.setInitValue(cells[i],u);
+			myLRTimeRaster.setInitValue(cells[i],ts_i);
+		}
+	}
+	
+}
+
+//*************************************************************
+
+
+
+
+
 
 } // namespace Gujarat
 

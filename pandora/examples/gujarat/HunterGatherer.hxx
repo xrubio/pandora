@@ -87,6 +87,13 @@ public:
 	void serialize();
 	void registerAttributes();
 
+	//*********** INFORMATION SHARING
+	void doInformationSharing();
+	void shareInformation( HunterGatherer * a);
+	void putInformation(Sector *s, const Engine::Raster & r, const Engine::Raster & t);
+	//********************************
+	
+	
 	
 	////////////////////////////////////////////////
 	// This code has been automatically generated //

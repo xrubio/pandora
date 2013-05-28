@@ -13,7 +13,7 @@ namespace Gujarat
 	
 	class HGPartialMindMap : public HGMind
 	{
-		Engine::Raster _LRTimeStamps;
+		//Engine::Raster _LRTimeStamps;
 		
 	public:
 		HGPartialMindMap(GujaratWorld & w);
@@ -38,6 +38,7 @@ namespace Gujarat
 		//						, Engine::Point2D<int> LRHomeLocationNEW);
 									
 		void updateDueToExecuteAction(Sector *s);
+		
 		
 	};
 }

@@ -27,6 +27,7 @@ namespace Gujarat
 		std::vector<Sector *> _LRSectors;
 		
 		Engine::Raster & _LRResourceRaster;
+		Engine::Raster _LRTimeStamps;
 		
 	public:
 		HGMind(GujaratWorld & w);
@@ -48,7 +49,9 @@ namespace Gujarat
 		
 		const std::vector<Sector *> & getHRSectors()const{return _HRSectors;}
 		const std::vector<Sector *> & getLRSectors()const{return _LRSectors;}
-								
+		
+		Engine::Raster & getLRTimeStamps() { return _LRTimeStamps; }
+		
 		void updateKnowledge(Engine::Point2D<int> position);
 		
 		void	updateKnowledge( const Engine::Point2D<int>& agentPos

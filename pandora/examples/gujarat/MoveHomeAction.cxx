@@ -188,6 +188,7 @@ void MoveHomeAction::execute( Engine::Agent & agent )
 	// TODO
 	// here? or at HunterGatherer::executeActions()?
 	//gujaratAgent.clearSectorKnowledge(LRposOld,LRpos);
+	gujaratAgent.clearSectorKnowledge();
 	
 	/*
 	std::cout << "MSG> MOVE: "

@@ -9,13 +9,16 @@ namespace Gujarat{
 HGPartialMindMap::HGPartialMindMap(GujaratWorld & w):
 	HGMind(w)
 { 
-	_LRResourceRaster = *(new Engine::Raster());
-	
 	int LowResRasterSideSize     = w.getLowResMapsSideSize();
 	Engine::Point2D<int> lowResSize2D( LowResRasterSideSize, LowResRasterSideSize);
 	
+	
+	_LRResourceRaster = *(new Engine::Raster());
+	_LRResourceRaster.setInitValues(0, std::numeric_limits<int>::max(), 0);
 	_LRResourceRaster.resize( lowResSize2D );
 	setGuessHeuristicResourceRaster();
+	
+	_LRTimeStamps.setInitValues(0, std::numeric_limits<int>::max(), 0);
 	_LRTimeStamps.resize( lowResSize2D );
 	initTimeStampRaster();
 }
@@ -29,7 +32,9 @@ void HGPartialMindMap::setGuessHeuristicResourceRaster()
 {
 	int minValue =  _world.getDynamicRaster(eResources).getCurrentMinValue();
 	int maxValue =  _world.getDynamicRaster(eResources).getCurrentMaxValue();
-	int averageValueHR = (maxValue+minValue)/2;
+	int averageValueHR = 1000;
+	//*?
+	//(maxValue+minValue)/2;
 	
 	for(int i = 0; i < _LRResourceRaster.getSize()._x;i++)
 	{
@@ -37,11 +42,29 @@ void HGPartialMindMap::setGuessHeuristicResourceRaster()
 		{	
 			Engine::Point2D<int> p(i,j);
 			int n = _world.getValueLR(LRCounterSoilINTERDUNE,p);
-			_LRResourceRaster.setValue(p,n*averageValueHR);
+			int val = n*averageValueHR;
+			_LRResourceRaster.setInitValue(p,n*averageValueHR);
 		}
 	}
+	
 }
 
+void HGPartialMindMap::initTimeStampRaster()
+{
+	// called on creation of the agent
+	// called in MoveHomeAction, before calling  HGPartialMindMap::updateKnowledgeFromFirstHandVisit
+	int t = _world.getCurrentTimeStep();
+	
+	//_world.fillLRRaster(_LRTimeStamps,t);
+	for(int i = 0; i < _LRTimeStamps.getSize()._x;i++)
+	{
+		for(int j = 0; j < _LRTimeStamps.getSize()._y;j++)
+		{
+			Engine::Point2D<int> p(i,j);			
+			_LRTimeStamps.setInitValue(p,t);
+		}
+	}	
+}
 
 void HGPartialMindMap::knowledgeExpirationDateProcess()
 {
@@ -63,32 +86,20 @@ void HGPartialMindMap::knowledgeExpirationDateProcess()
 				>= 
 				((GujaratConfig) _world.getConfig())._hunterGathererInformationCaducityTime )
 			{
-				int n = _world.getValueLR(LRCounterSoilINTERDUNE,cells[i]);
-				_LRResourceRaster.setValue(cells[i],n*averageValueHR);
-				_LRTimeStamps.setValue(cells[i],_world.getCurrentTimeStep());
+				int n = 0;
+				//*?
+				//_world.getValueLR(LRCounterSoilINTERDUNE,cells[i]);
+				_LRResourceRaster.setInitValue(cells[i],n*averageValueHR);
+				_LRTimeStamps.setInitValue(cells[i],_world.getCurrentTimeStep());
 			}
 			else
 			{
-				_LRTimeStamps.setValue(cells[i],ts+1);
+				_LRTimeStamps.setInitValue(cells[i],ts+1);
 			}
 		}
 	}
 }	
 
-void HGPartialMindMap::initTimeStampRaster()
-{
-	// called on creation of the agent
-	// called in MoveHomeAction, before calling  HGPartialMindMap::updateKnowledgeFromFirstHandVisit
-	int t = _world.getCurrentTimeStep();
-	for(int i = 0; i < _LRTimeStamps.getSize()._x;i++)
-	{
-		for(int j = 0; j < _LRTimeStamps.getSize()._y;j++)
-		{
-			_LRTimeStamps.setValue(Engine::Point2D<int>(i,j),t);
-		}
-	}
-	
-}
 void HGPartialMindMap::updateKnowledge(Engine::Point2D<int> position)
 {	
 	knowledgeExpirationDateProcess();
@@ -109,13 +120,12 @@ void HGPartialMindMap::updateDueToExecuteAction(Sector *s)
 	//		sector
 	if (s != 0)
 	{
-		
 		const std::vector< Engine::Point2D<int> > & cells = s->cells();	
 		for(int i=0; i < cells.size(); i++)
 		{
-			_LRTimeStamps.setValue(cells[i],_world.getCurrentTimeStep());
+			_LRTimeStamps.setInitValue(cells[i],_world.getCurrentTimeStep());
 			int res = _world.getValueLR(eLRResources,cells[i]);
-			_LRResourceRaster.setValue(cells[i],res);
+			_LRResourceRaster.setInitValue(cells[i],res);
 		}
 	}
 }
