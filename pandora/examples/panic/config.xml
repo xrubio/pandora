@@ -3,9 +3,12 @@
 	<!-- simulation config -->
 	<output resultsFile="./data/panic.h5" logsDir="./logs"/>
 	<!-- each step is 0.5 secs -->
-	<numSteps value="10" serializeResolution="1"/>	
-	<environment size="708" fileName="resources/buildings.tiff"/>
+	<numSteps value="300" serializeResolution="1"/>	
+	<environment size="708" fileName="resources/buildings.tiff">
+		<initPanic x="443" y="322" initRadius="50" contagion="10"/>
+	</environment>
 	<!-- if risk aversion = -1, random value will be chosen -->
 	<agents num="5000"/>
+	<compression agentWeight="5" wallWeight="1" threshold="25"/>
 </config>
 
