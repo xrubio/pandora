@@ -21,6 +21,7 @@ class ScenarioConfig : public Engine::Config
 	float _agentCompressionWeight;
 	float _wallCompressionWeight;
 	float _compressionThreshold;
+	int _bodiesToObstacle;
 
 	// place where panic begins
 	Engine::Point2D<int> _initPanic;

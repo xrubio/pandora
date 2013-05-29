@@ -55,6 +55,7 @@ void ScenarioConfig::extractParticularAttribs(TiXmlElement * root)
 	retrieveAttributeMandatory(element, "agentWeight", _agentCompressionWeight);
 	retrieveAttributeMandatory(element, "wallWeight", _wallCompressionWeight);
 	retrieveAttributeMandatory(element, "threshold", _compressionThreshold);
+	retrieveAttributeMandatory(element, "obstacle", _bodiesToObstacle);
 }
 
 int ScenarioConfig::getSize() const

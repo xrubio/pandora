@@ -239,10 +239,16 @@ void Scenario::stepEnvironment()
 	
 			/*
 			// 4 deaths = not passable
-			if(getValue(eDeaths, index)>4)
+			if(getValue(eDeaths, index)>_config._bodiesToObstacle)
 			{
 				setMaxValue(eObstacles, index, 1);
 				setValue(eObstacles, index, 1);
+				// all agents are moved to neighbors
+				Engine::AgentsVector agents = getAgent(index);
+				for(int i=0; i<agents.size(); i++)
+				{
+
+				}
 			}
 			*/
 		}

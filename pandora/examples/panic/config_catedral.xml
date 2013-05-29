@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<config> 
+	<!-- simulation config -->
+	<output resultsFile="./data/panic.h5" logsDir="./logs"/>
+	<!-- each step is 0.5 secs -->
+	<numSteps value="10" serializeResolution="1"/>	
+	<!-- catedral -->
+	<environment size="708">
+		<rasters>
+			<obstacles file="resources/catedral/buildings.tiff"/>
+			<support name="orto5" file="resources/catedral/orto5m.tiff"/>
+			<support name="mtc5" file="resources/catedral/mtc5m.tiff"/>
+		</rasters>
+		<initPanic x="443" y="322" initRadius="50" contagion="5"/>
+		<initAgentsDistribution type="random"/>
+	</environment>
+	<!-- if risk aversion = -1, random value will be chosen -->
+	<agents num="10000"/>
+	<!-- weight of agent and wall in the compression level, threshold before deaths and number of bodies that are defined as an obstacle -->
+	<compression agentWeight="5" wallWeight="1" threshold="25" obstacle="4"/>
+</config>
+

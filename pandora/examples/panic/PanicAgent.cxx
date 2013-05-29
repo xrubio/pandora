@@ -28,16 +28,15 @@ Engine::Point2D<float> PanicAgent::getNextPos( const int & direction, const Engi
 	Engine::Point2D<float> directionVector(std::sin(radians), std::cos(radians));
 
 	Engine::Point2D<float> newPos = Engine::Point2D<float>(position._x+directionVector._x, position._y-directionVector._y);
-//	std::cout << "direction: " << directionVector << " for direction: " << direction << " old pos: " << position << " new pos: " << newPos << std::endl;
+	//std::cout << "direction: " << directionVector << " for direction: " << direction << " old pos: " << position << " new pos: " << newPos << std::endl;
 	return newPos;
 }
 	
 float PanicAgent::getDistToNearestObstacle( const int & direction )
 {
-	Engine::Point2D<float> newPos = Engine::Point2D<float>(_position._x, _position._y);
+	Engine::Point2D<float> newPos = Engine::Point2D<float>(_position._x+_rest._x, _position._y+_rest._y);
 	while(1)
 	{
-		//newPos = getNextPos(_direction, Engine::Point2D<float>(newPos._x+_rest._x, newPos._y+_rest._y));
 		newPos = getNextPos(direction, newPos);
 		Engine::Point2D<int> newIntPos = Engine::Point2D<int>(std::floor(newPos._x), std::floor(newPos._y));
 		// out of position
@@ -67,7 +66,7 @@ float PanicAgent::getDistToNearestObstacle( const int & direction )
 		}
 		
 		// too many people (>4 persons)
-		if(_world->getValue(eNumAgents, newIntPos)>1)
+		if(_world->getValue(eNumAgents, newIntPos)>=_config->_bodiesToObstacle)
 		{	
 			if(newIntPos!=_position)
 			{
@@ -120,15 +119,15 @@ void PanicAgent::selectActions()
 		{
 			desiredDegrees+= 360.0f;
 		}
-//		std::cout << "pos: " << _position << " to 0,0 rads: " << desiredRadians<< " degrees: " << desiredDegrees<< std::endl;
-//		std::cout << "pos: " << _position << " basic dir: " << _direction << " fov: " << fov << " direction to test: " << direction << " dist to obstacle: " << distToObstacle << std::endl;
+		//std::cout << "pos: " << _position << " to 0,0 rads: " << desiredRadians<< " degrees: " << desiredDegrees << std::endl;
+		//std::cout << "pos: " << _position << " basic dir: " << _direction << " fov: " << fov << " direction to test: " << direction << " dist to obstacle: " << distToObstacle << std::endl;
 
 		float diffRadiansCos = std::cos(desiredRadians)*std::cos(radians) + std::sin(desiredRadians)*std::sin(radians);
 		float diffRadians = std::acos(diffRadiansCos);
 		float diffDegrees = diffRadians*180.0f/M_PI;
 
 		float value = rangeOfSight*rangeOfSight + distToObstacle*distToObstacle - 2*rangeOfSight*distToObstacle*std::cos(diffRadians);
-//		std::cout << "degreea: " << desiredDegrees << " degreeb: " << direction << " diff: " << diffDegrees << " rada: " << desiredRadians << " radb: " << radians << " diffRadians: " << diffRadians << " value: " << value << std::endl;
+		//std::cout << "degreea: " << desiredDegrees << " degreeb: " << direction << " diff: " << diffDegrees << " rada: " << desiredRadians << " radb: " << radians << " diffRadians: " << diffRadians << " value: " << value << std::endl;
 		if(value<minValue)
 		{
 			minValue = value;
@@ -136,21 +135,18 @@ void PanicAgent::selectActions()
 		}
 	}
 
-//	std::cout << "final direction: " << finalDirection << " with value: " << minValue << std::endl;
+	//std::cout << "final direction: " << finalDirection << " with value: " << minValue << std::endl;
 	_direction = finalDirection;
 
 	Engine::Point2D<float> newPos = getNextPos(_direction, Engine::Point2D<float>(_position._x+_rest._x, _position._y+_rest._y));
 	Engine::Point2D<int> newIntPos = Engine::Point2D<int>(std::floor(newPos._x), std::floor(newPos._y));
 	_rest._x = newPos._x - newIntPos._x;
 	_rest._y = newPos._y - newIntPos._y;
-//	std::cout << "rest: " << _rest << " new pos: " << newPos << " new int pos: " << newIntPos << std::endl;
+	//std::cout << "rest: " << _rest << " new pos: " << newPos << " new int pos: " << newIntPos << " for step: " << _world->getCurrentStep() << std::endl;
 
 	if(_world->checkPosition(newIntPos) && _world->getDynamicRaster(eObstacles).getValue(newIntPos)==0)
 	{
-	//	if(_world->getDynamicRaster(eExits).getValue(newIntPos)!=0) // || _world->getAgent(newIntPos).size()==0)
-	//	{
-			_actions.push_back(new MoveAction(newIntPos, _config->_agentCompressionWeight, _config->_wallCompressionWeight, _config->_contagion));
-	//	}
+		_actions.push_back(new MoveAction(newIntPos, _config->_agentCompressionWeight, _config->_wallCompressionWeight, _config->_contagion));
 	}
 }
 
