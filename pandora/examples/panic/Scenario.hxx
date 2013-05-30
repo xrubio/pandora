@@ -43,6 +43,7 @@ class Scenario: public Engine::World
 	void computeShortestExit(PanicAgent & agent );
 	void stepEnvironment();
 	bool maxCapacity( const Engine::Point2D<int> & position );
+	void checkPanicEvents();
 public:
 	Scenario( Engine::Simulation &simulation, ScenarioConfig &config );
 	virtual ~Scenario();

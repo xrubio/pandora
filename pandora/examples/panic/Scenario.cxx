@@ -190,22 +190,6 @@ void Scenario::createRasters()
 			setValue(eWalls, index, adjacentWalls);
 		}
 	}
-
-	// initial panic conditions
-	for(index._x=0; index._x<_overlapBoundaries._size._x; index._x++)
-	{
-		for(index._y=0; index._y<_overlapBoundaries._size._y; index._y++)
-		{
-			if(getValue(eObstacles, index)==1)
-			{
-				continue;
-			}
-			if(index.distance(_config._initPanic)<_config._initPanicRadius)
-			{
-				setValue(ePanic, index, 1);
-			}
-		}
-	}
 }
 
 void Scenario::fillExitList()
@@ -224,8 +208,59 @@ void Scenario::fillExitList()
 	}
 }
 
+void Scenario::checkPanicEvents()
+{
+	ScenarioConfig::PanicEventsList::iterator it=_config._panicEvents.begin();
+	while(it!=_config._panicEvents.end())
+	{
+		PanicEvent & event = *it;
+		std::cout << "checking event with step: " << event._step << " and current: " << getCurrentStep() << std::endl;
+		if(event._step!=getCurrentStep())
+		{
+			it++;
+			continue;
+		}
+		// new event
+		// activate panic in those zones
+		Engine::Point2D<int> index;
+		for(index._x=event._position._x-event._radius; index._x<=event._position._x+event._radius; index._x++)
+		{
+			for(index._y=event._position._y-event._radius; index._y<=event._position._y+event._radius; index._y++)
+			{
+				if(getValue(eObstacles, index)==1)
+				{
+					continue;
+				}
+				if(index.distance(event._position)<event._radius)
+				{
+					setValue(ePanic, index, 1);
+				}
+				
+				if(index.distance(event._position)<event._obstacleRadius)
+				{
+					setMaxValue(eObstacles, index, 1);
+					setValue(eObstacles, index, 1);
+					AgentsVector agents = getAgent(index);
+					for(int i=0; i<agents.size(); i++)
+					{
+						removeAgent(agents.at(i));
+						setValue(eDeaths, index, getValue(eDeaths, index)+1);		
+						setValue(eNumAgents, index, getValue(eNumAgents, index)-1);		
+						setValue(eCompression, index, 0);		
+					}
+				}
+			}
+		}
+
+		it = _config._panicEvents.erase(it);
+	}
+
+}
+
 void Scenario::stepEnvironment()
 {
+	checkPanicEvents();
+	/*
 	// update body compression
 	Engine::Point2D<int> index;
 	for(index._x=0; index._x<_overlapBoundaries._size._x; index._x++)
@@ -237,7 +272,6 @@ void Scenario::stepEnvironment()
 				continue;
 			}
 	
-			/*
 			// 4 deaths = not passable
 			if(getValue(eDeaths, index)>_config._bodiesToObstacle)
 			{
@@ -250,9 +284,9 @@ void Scenario::stepEnvironment()
 
 				}
 			}
-			*/
 		}
 	}
+	*/
 }
 
 } // namespace Panic

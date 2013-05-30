@@ -4,33 +4,42 @@
 #include <Config.hxx>
 #include <Point2D.hxx>
 #include <map>
+#include <list>
 
 namespace Panic 
 {
 
+struct PanicEvent
+{
+	Engine::Point2D<int> _position;	
+	int _radius;
+	// if != 0 is defines the a zone that will be transformed to obstacle and all the agents there will die
+	int _obstacleRadius;
+	int _step;
+};
+
 class ScenarioConfig : public Engine::Config
 {
 	typedef std::map<std::string, std::string> SupportRastersMap;
+	typedef std::list<PanicEvent> PanicEventsList;
 
 	int _size;
 	std::string _obstacleFile;
 
 	// agents
 	int _numAgents;
-
+	int _contagion;
 	float _agentCompressionWeight;
 	float _wallCompressionWeight;
 	float _compressionThreshold;
 	int _bodiesToObstacle;
 
-	// place where panic begins
-	Engine::Point2D<int> _initPanic;
-	int _initPanicRadius;
-	int _contagion;
-
 	// rasters map to show in the final outcome
 	// they are not used during the execution
 	SupportRastersMap _supportMaps;
+
+	// list of panic events
+	PanicEventsList _panicEvents;
 
 	// type of distribution (random, file and then a file="foo"
 	std::string _initAgentsDistributionType;
