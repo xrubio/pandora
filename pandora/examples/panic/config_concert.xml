@@ -3,7 +3,7 @@
 	<!-- simulation config -->
 	<output resultsFile="./data/panic.h5" logsDir="./logs"/>
 	<!-- each step is 0.5 secs -->
-	<numSteps value="1" serializeResolution="1"/>	
+	<numSteps value="200" serializeResolution="1"/>	
 	<!-- concert 1 exit -->
 	<panicEvents>
 		<event x="50" y="50" initRadius="10" obstacleRadius="0" step="0"/>
@@ -34,9 +34,10 @@
 	-->
 	<agents num="5000">
 		<!-- weight of agent and wall in the compression level -->
-		<compression agentWeight="5" wallWeight="1"/>
+		<compression agentWeight="3" wallWeight="1"/>
 		<!-- threshold before deaths, number of bodies that are defined as an obstacle and radius of panic contagion in cells-->
-		<physicalParameters threshold="25" obstacle="4" contagion="3"/>
+		<!-- importance of direction in front of compression level of cells -->
+		<physicalParameters threshold="50" obstacle="4" contagion="3" knowledge="7"/>		
 	</agents>
 </config>
 

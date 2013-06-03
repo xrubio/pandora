@@ -23,7 +23,10 @@ class PanicAgent : public Engine::Agent
 
 	Engine::Point2D<float> getNextPos( const int & direction, const Engine::Point2D<float> & position );
 	float getDistToNearestObstacle( const int & direction );
-	
+	float getCompressionLevel( float direction );
+
+	int _consecutive;
+
 public:
 	// todo remove environment from here
 	PanicAgent( const std::string & id, ScenarioConfig & config);

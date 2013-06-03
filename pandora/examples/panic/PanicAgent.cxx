@@ -13,7 +13,7 @@
 namespace Panic
 {
 
-PanicAgent::PanicAgent( const std::string & id, ScenarioConfig & config ) : Agent(id), _direction(0), _exited(false), _panicked(false), _config(&config), _compressionThreshold(config._compressionThreshold), _rest(0.0f, 0.0f)
+PanicAgent::PanicAgent( const std::string & id, ScenarioConfig & config ) : Agent(id), _direction(0), _exited(false), _panicked(false), _config(&config), _compressionThreshold(config._compressionThreshold), _rest(0.0f, 0.0f), _consecutive(0)
 {
 	_direction = Engine::GeneralState::statistics().getUniformDistValue(0,359);
 }
@@ -65,8 +65,17 @@ float PanicAgent::getDistToNearestObstacle( const int & direction )
 			}
 		}
 		
-		// too many people (>4 persons)
+		// too many people (>_bodiesToObstacle)
 		if(_world->getValue(eNumAgents, newIntPos)>=_config->_bodiesToObstacle)
+		{	
+			if(newIntPos!=_position)
+			{
+				return newIntPos.distance(_position);
+			}
+		}	
+		
+		// too many injured people (>_bodiesToObstacle)
+		if(_world->getValue(eDeaths, newIntPos)>=_config->_bodiesToObstacle)
 		{	
 			if(newIntPos!=_position)
 			{
@@ -76,6 +85,26 @@ float PanicAgent::getDistToNearestObstacle( const int & direction )
 	}
 }
 
+float PanicAgent::getCompressionLevel( float direction )
+{
+	float compressionLevel = 0;
+	
+	Engine::Point2D<float> newPos = getNextPos(_direction, Engine::Point2D<float>(_position._x+_rest._x, _position._y+_rest._y));
+	Engine::Point2D<int> newIntPos = Engine::Point2D<int>(std::floor(newPos._x), std::floor(newPos._y));
+	Engine::Point2D<int> index;
+	for(index._x=newIntPos._x-1; index._x<=newIntPos._x+1; index._x++)
+	{
+		for(index._y=newIntPos._y-1; index._y<=newIntPos._y+1; index._y++)
+		{
+			if(!_world->checkPosition(index))
+			{
+				continue;
+			}
+			compressionLevel += _world->getValue(eCompression, index);
+		}
+	}
+	return compressionLevel;
+}
 
 
 void PanicAgent::selectActions()
@@ -87,7 +116,7 @@ void PanicAgent::selectActions()
 
 	float rangeOfSight = 200.0f;
 	// fov in degrees
-	int fov = 90;
+	int fov = 180;
 	int increaseDirection = 5;
 
 	float minValue = std::numeric_limits<float>::max();
@@ -126,12 +155,25 @@ void PanicAgent::selectActions()
 		float diffRadians = std::acos(diffRadiansCos);
 		float diffDegrees = diffRadians*180.0f/M_PI;
 
-		float value = rangeOfSight*rangeOfSight + distToObstacle*distToObstacle - 2*rangeOfSight*distToObstacle*std::cos(diffRadians);
+		float dirValue = rangeOfSight*rangeOfSight + distToObstacle*distToObstacle - 2*rangeOfSight*distToObstacle*std::cos(diffRadians);
+	//	float value = _config->_weightDir*dirValue + _config->_weightCompression*getCompressionLevel(newDirection);
+		float value = (1+getCompressionLevel(newDirection))*dirValue;
+//		std::cout << "dir: " <<newDirection << " dir: " <<  _config->_weightDir*dirValue << " compression: " << _config->_weightCompression*getCompressionLevel(newDirection) << std::endl;
 		//std::cout << "degreea: " << desiredDegrees << " degreeb: " << direction << " diff: " << diffDegrees << " rada: " << desiredRadians << " radb: " << radians << " diffRadians: " << diffRadians << " value: " << value << std::endl;
+
+
 		if(value<minValue)
-		{
-			minValue = value;
-			finalDirection = direction;
+		{	
+			Engine::Point2D<float> newPos = getNextPos(direction, Engine::Point2D<float>(_position._x+_rest._x, _position._y+_rest._y));
+			Engine::Point2D<int> newIntPos = Engine::Point2D<int>(std::floor(newPos._x), std::floor(newPos._y));
+			if(newIntPos!=_position || _consecutive<2)
+			{
+				if(_world->checkPosition(newIntPos) && _world->getDynamicRaster(eObstacles).getValue(newIntPos)==0)
+				{
+					minValue = value;
+					finalDirection = direction;
+				}
+			}
 		}
 	}
 
@@ -142,10 +184,24 @@ void PanicAgent::selectActions()
 	Engine::Point2D<int> newIntPos = Engine::Point2D<int>(std::floor(newPos._x), std::floor(newPos._y));
 	_rest._x = newPos._x - newIntPos._x;
 	_rest._y = newPos._y - newIntPos._y;
-	//std::cout << "rest: " << _rest << " new pos: " << newPos << " new int pos: " << newIntPos << " for step: " << _world->getCurrentStep() << std::endl;
+//	std::cout << this << " rest: " << _rest << " new pos: " << newPos << " new int pos: " << newIntPos << " for step: " << " dir: " << _direction << " step: " <<  _world->getCurrentStep() << std::endl;
 
 	if(_world->checkPosition(newIntPos) && _world->getDynamicRaster(eObstacles).getValue(newIntPos)==0)
 	{
+		if(newIntPos!=_position)
+		{
+			_consecutive = 0;
+		}
+		else
+		{
+			_consecutive++;
+			/*
+			if(_consecutive>1)
+			{
+				std::cout << "consecutive at pos: " << newIntPos << " - " << _consecutive << std::endl;
+			}
+			*/
+		}
 		_actions.push_back(new MoveAction(newIntPos, _config->_agentCompressionWeight, _config->_wallCompressionWeight, _config->_contagion));
 	}
 }
@@ -159,7 +215,8 @@ void PanicAgent::updateState()
 
 	if(_world->getValue(eExits, _position)==1)
 	{
-		_exited = true;
+		_exited = true;	
+		_world->removeAgent(this);
 	}
 
 	if(_world->getValue(eCompression, _position)>_compressionThreshold)

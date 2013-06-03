@@ -33,6 +33,7 @@ class ScenarioConfig : public Engine::Config
 	float _wallCompressionWeight;
 	float _compressionThreshold;
 	int _bodiesToObstacle;
+	int _knowledge;
 
 	// rasters map to show in the final outcome
 	// they are not used during the execution

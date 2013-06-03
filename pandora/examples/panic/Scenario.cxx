@@ -60,7 +60,7 @@ void Scenario::computeShortestExit(PanicAgent & agent )
 	std::vector< Engine::Point2D<int> > possibleExits;
 	int randomValue = Engine::GeneralState::statistics().getUniformDistValue(0,9);
 	// probability 20% of not knowing the exit
-	if(randomValue<2)
+	if(randomValue>_config._knowledge)
 	{
 		int randomExitIndex = Engine::GeneralState::statistics().getUniformDistValue(0, _exits.size()-1);
 		ExitsList::const_iterator it=_exits.begin();
@@ -95,14 +95,6 @@ void Scenario::computeShortestExit(PanicAgent & agent )
 
 void Scenario::createRasters()
 {
-	for(ScenarioConfig::SupportRastersMap::iterator it=_config._supportMaps.begin(); it!=_config._supportMaps.end(); it++)
-	{
-		std::string name = it->first;
-		std::string fileName = it->second;
-		registerStaticRaster(name, true);
-		Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(name), fileName, this);
-	}
-
 	registerDynamicRaster("obstacles", true, eObstacles);
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getDynamicRaster(eObstacles), _config._obstacleFile, this);	
 	getDynamicRaster(eObstacles).setMaxValue(1);
@@ -111,19 +103,19 @@ void Scenario::createRasters()
 	getDynamicRaster(eExits).setInitValues(0, 0, 0);
 	getDynamicRaster(eExits).setMaxValue(1);
 	
-	registerDynamicRaster("numAgents", true, eNumAgents);
+	registerDynamicRaster("numAgents", false, eNumAgents);
 	getDynamicRaster(eNumAgents).setInitValues(0, std::numeric_limits<int>::max(), 0);
 	
-	registerDynamicRaster("walls", true, eWalls);
+	registerDynamicRaster("walls", false, eWalls);
 	getDynamicRaster(eWalls).setInitValues(0, 8, 0);
 
 	registerDynamicRaster("compression", true, eCompression);
 	getDynamicRaster(eCompression).setInitValues(0, std::numeric_limits<int>::max(), 0);
 
-	registerDynamicRaster("deaths", true, eDeaths);
+	registerDynamicRaster("deaths", false, eDeaths);
 	getDynamicRaster(eDeaths).setInitValues(0, std::numeric_limits<int>::max(), 0);
 
-	registerDynamicRaster("panic", true, ePanic);
+	registerDynamicRaster("panic", false, ePanic);
 	getDynamicRaster(ePanic).setInitValues(0, 1, 0);
 	
 	if(_config._initAgentsDistributionType.compare("raster")==0)
@@ -190,6 +182,16 @@ void Scenario::createRasters()
 			setValue(eWalls, index, adjacentWalls);
 		}
 	}
+	
+	for(ScenarioConfig::SupportRastersMap::iterator it=_config._supportMaps.begin(); it!=_config._supportMaps.end(); it++)
+	{
+		std::string name = it->first;
+		std::string fileName = it->second;
+		registerStaticRaster(name, true);
+		Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(name), fileName, this);
+	}
+
+
 }
 
 void Scenario::fillExitList()
@@ -214,7 +216,6 @@ void Scenario::checkPanicEvents()
 	while(it!=_config._panicEvents.end())
 	{
 		PanicEvent & event = *it;
-		std::cout << "checking event with step: " << event._step << " and current: " << getCurrentStep() << std::endl;
 		if(event._step!=getCurrentStep())
 		{
 			it++;

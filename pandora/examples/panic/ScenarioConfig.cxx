@@ -58,7 +58,6 @@ void ScenarioConfig::extractParticularAttribs(TiXmlElement * root)
 	element = root->FirstChildElement("agents");
 	retrieveAttributeMandatory(element, "num", _numAgents);
 	
-	// contagion
 	element2 = element->FirstChildElement("compression");
 	retrieveAttributeMandatory(element2, "agentWeight", _agentCompressionWeight);
 	retrieveAttributeMandatory(element2, "wallWeight", _wallCompressionWeight);
@@ -68,6 +67,7 @@ void ScenarioConfig::extractParticularAttribs(TiXmlElement * root)
 	retrieveAttributeMandatory(element2, "threshold", _compressionThreshold);
 	retrieveAttributeMandatory(element2, "obstacle", _bodiesToObstacle);
 	retrieveAttributeMandatory(element2, "contagion", _contagion);
+	retrieveAttributeMandatory(element2, "knowledge", _knowledge);
 }
 
 int ScenarioConfig::getSize() const
