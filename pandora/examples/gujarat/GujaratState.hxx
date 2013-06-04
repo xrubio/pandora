@@ -36,6 +36,8 @@ private:
 	SectorsMask _HRSectorsMask;
 	SectorsMask _LRSectorsMask;
 	
+	long int HRCellsInHomeRange;
+	long int LRCellsInHomeRange;
 	
 protected:
 	GujaratState();

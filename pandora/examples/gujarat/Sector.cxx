@@ -14,29 +14,29 @@ Sector::Sector( const GujaratWorld & world )
 {
 }
 
-/*
-Sector::Sector( const Sector& other )
+
+Sector::Sector( const Sector* other )
 {
-	_world = other._world;
-	_cells = other._cells;
-	_biomassAmount = other._biomassAmount;
-	_biomassAmountClass = other._biomassAmountClass;
+	_world = other->_world;
+	_cells = other->_cells;
+	_biomassAmount = other->_biomassAmount;
+	//_biomassAmountClass = other._biomassAmountClass;
 }
-*/
+
 
 Sector::~Sector()
 {
-		_cells.clear();
+	_cells.clear();
 }
 
-Engine::Point2D<int>	Sector::getNearestTo( Engine::Point2D<int> p ) const
+Engine::Point2D<int> *	Sector::getNearestTo( Engine::Point2D<int> p ) const
 {
-	Engine::Point2D<int> nearest = _cells[0];
-	double nearestDist = nearest.distance( p );
+	Engine::Point2D<int> * nearest = _cells[0];
+	double nearestDist = nearest->distance( p );
 
 	for ( unsigned i = 1; i < _cells.size(); i++ )
 	{
-		double currDist = _cells[i].distance( p );
+		double currDist = _cells[i]->distance( p );
 		if ( currDist < nearestDist )
 		{
 			nearest = _cells[i];
@@ -52,13 +52,12 @@ void	Sector::computeBiomassAmount( const Engine::Raster& r )
 	_biomassAmount = 0;
 //	int maxBiomassAmount = r.getCurrentMaxValue();
 
-
 	// TODO refactor
 	for ( unsigned i = 0; i < _cells.size(); i++ )
 	{
 		//*?
 		//std::cout << "INCREASE UTILITY " << r.getValue( _cells[i]-_world.getOverlapBoundaries()._origin ) << std::endl;
-		_biomassAmount += r.getValue( _cells[i]-_world.getOverlapBoundaries()._origin );
+		_biomassAmount += r.getValue( *(_cells[i]) - _world.getOverlapBoundaries()._origin);
 	}
 /*	
 	double normAmount = (double)_biomassAmount;
@@ -90,7 +89,7 @@ void Sector::computeBiomassAmountLR( const Engine::Raster& r )
 		//std::cout << "INCREASE UTILITY " << r.getValue( _cells[i]-_world.getOverlapBoundaries()._origin ) << std::endl;
 		
 		//std::cout << "[" << std::endl;
-		_biomassAmount += r.getValue( _cells[i] );
+		_biomassAmount += r.getValue( *_cells[i] );
 		
 		//std::cout << "INCREASE UTILITY2 " << _world.getValueLR(r,_cells[i]) << std::endl;
 		
@@ -156,12 +155,12 @@ void	Sector::showFeatures( std::ostream& stream )
 }
 */
 
-void	Sector::getAdjacent( Engine::Point2D<int> p, std::vector<Engine::Point2D<int> >& adjList ) const
+void	Sector::getAdjacent( Engine::Point2D<int> p, std::vector<Engine::Point2D<int>* >& adjList ) const
 {
 
 	for ( unsigned i = 0; i < _cells.size(); i++ )
 	{
-		Engine::Point2D<int> delta = p - _cells[i];
+		Engine::Point2D<int> delta = p - *_cells[i];
 		delta._x = abs(delta._x);
 		delta._y = abs(delta._y);
 		if ( delta._x <= 1 && delta._y <= 1 )

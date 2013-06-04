@@ -14,6 +14,7 @@ class	Sector;
 
 class MDPAction : public Engine::Action
 {
+
 public:
 	MDPAction();
 	virtual ~MDPAction();
@@ -25,6 +26,8 @@ public:
 	virtual Sector * getVisitedSector() = 0;
 	
 	friend class GujaratAgent;
+	
+	virtual void getOwnershipMDPSectorKnowledge(bool v[]) const = 0;
 };
 	
 } // namespace Gujarat

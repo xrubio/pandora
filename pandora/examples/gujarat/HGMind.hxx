@@ -26,6 +26,9 @@ namespace Gujarat
 		std::vector<Sector *> _HRSectors;
 		std::vector<Sector *> _LRSectors;
 		
+		std::vector< Engine::Point2D<int> > _HRCellPool;
+		std::vector< Engine::Point2D<int> > _LRCellPool;
+		
 		Engine::Raster & _LRResourceRaster;
 		Engine::Raster _LRTimeStamps;
 		
@@ -40,15 +43,22 @@ namespace Gujarat
 			return _LRResourceRaster;
 		}
 		
-		void createHRSectors( 	const Engine::Point2D<int>& agentPos,
-										std::vector< Sector* >& HRSectors) const;
+		void createHRSectors( const Engine::Point2D<int>& agentPos
+							, std::vector< Sector* >& HRSectors
+							, std::vector< Engine::Point2D<int> >& cellPool ) const;
 										
 		
-		void createLRSectors( 	const Engine::Point2D<int>& agentPos, 
-								std::vector< Sector* >& LRSectors ) const;
+		void createLRSectors( 	const Engine::Point2D<int>& agentPos
+							, std::vector< Sector* >& LRSectors
+							, std::vector< Engine::Point2D<int> >& cellPool ) const;
 		
 		const std::vector<Sector *> & getHRSectors()const{return _HRSectors;}
 		const std::vector<Sector *> & getLRSectors()const{return _LRSectors;}
+		const std::vector< Engine::Point2D<int> > & getHRCellPool()const
+		{return _HRCellPool;}
+		const std::vector< Engine::Point2D<int> > & getLRCellPool()const
+		{return _LRCellPool;}
+		
 		
 		Engine::Raster & getLRTimeStamps() { return _LRTimeStamps; }
 		
@@ -57,7 +67,10 @@ namespace Gujarat
 		void	updateKnowledge( const Engine::Point2D<int>& agentPos
 								, const Engine::Raster& dataRaster
 								, std::vector< Sector* >& HRSectors
-								, std::vector< Sector* >& LRSectors  ) const;	
+								, std::vector< Sector* >& LRSectors
+								, std::vector< Engine::Point2D<int> >& HRCellPool
+								, std::vector< Engine::Point2D<int> >& LRCellPool
+   							) const;	
 				
 		void clearSectorKnowledge();
 		

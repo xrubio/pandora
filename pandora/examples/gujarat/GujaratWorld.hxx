@@ -79,6 +79,10 @@ class GujaratWorld : public Engine::World
 	// biomass of a cell at the end of the previous year
 	std::vector<float> _remainingBiomass;
 
+	//****?
+	//std::vector<int> vFOO;
+//	int * _vFOO;
+	
 	//*********************************************
 	void createRasters();
 	/*! \callgraph 
@@ -92,6 +96,7 @@ class GujaratWorld : public Engine::World
 	//void updateMoisture();
 	void updateSoilCondition();
 	void updateResources();
+	void updateResourcesFOO();
 	void updateResourcesLowResMap();
 	void recomputeYearlyBiomass();
 	void recomputeLowResYearlyBiomass();

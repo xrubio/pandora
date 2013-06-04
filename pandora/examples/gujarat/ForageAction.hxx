@@ -31,6 +31,7 @@ class ForageAction : public MDPAction
 	int	_caloriesCollected;
 	bool _useFullPopulation;
 
+		
 	void selectBestNearestCell( GujaratAgent& agent, 
 								const Engine::Point2D<int>& n, 
 								const Engine::Raster& r, 
@@ -49,7 +50,7 @@ class ForageAction : public MDPAction
 						const Engine::Point2D<int>& n,
 						const Engine::Raster& r,
 						int maxDistAgentWalk,
-						std::vector< Engine::Point2D<int> > & walk );
+						std::vector< Engine::Point2D<int>* > & walk );
 	
 	void doWalk( const GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected ) const;
 	void doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected );
@@ -101,28 +102,28 @@ public:
 	//******************
 	//** Add-ons for doWalk efficiency
 	
-	struct distance_from_home : public std::binary_function<Engine::Point2D<int>,Engine::Point2D<int>,bool>
+	struct distance_from_home : public std::binary_function<Engine::Point2D<int>*,Engine::Point2D<int>*,bool>
 	{
 		Engine::Point2D<int> _homeCell;
 		
-		inline bool operator() (const Engine::Point2D<int> & p1, const Engine::Point2D<int> & p2) 
+		inline bool operator() (const Engine::Point2D<int> * p1, const Engine::Point2D<int> * p2) 
 		{
-			return ( _homeCell.distanceSQ(p1) < _homeCell.distanceSQ(p2) );
+			return ( _homeCell.distanceSQ(*p1) < _homeCell.distanceSQ(*p2) );
 			//return ( r.getValue( struct1 ) < r.getValue( struct2 ));
 		}
 	};
 	
 
-	struct less_than : public std::binary_function<Engine::Point2D<int>,Engine::Point2D<int>,bool>
+	struct less_than : public std::binary_function<Engine::Point2D<int>*,Engine::Point2D<int>*,bool>
 	{		
 		const Engine::Raster * _workingRaster;
 		GujaratWorld * _workingWorld;
 	
 		//add inline keyword
-		inline bool operator() (const Engine::Point2D<int> & p1, const Engine::Point2D<int> & p2) 
+		inline bool operator() (const Engine::Point2D<int> * p1, const Engine::Point2D<int> * p2) 
 		{
-			return ( _workingWorld->getValueGW(*_workingRaster, p1 ) 
-			< _workingWorld->getValueGW(*_workingRaster, p2 ));
+			return ( _workingWorld->getValueGW(*_workingRaster, *p1 ) 
+			< _workingWorld->getValueGW(*_workingRaster, *p2 ));
 			/*return ( _workingWorld->World::getValue(eResources, p1 ) 
 			< _workingWorld->World::getValue(eResources, p2 ));*/
 		}
@@ -131,6 +132,17 @@ public:
 	//Gujarat::GujaratWorld::getValue(Engine::Raster&, const Engine::Point2D<int>&)
 	
 	//int Engine::World::getValue(const int&, const Engine::Point2D<int>&) const
+	
+	//**********************
+	//** ownership of sector structures int the MDP tree
+	
+	void getOwnershipMDPSectorKnowledge(bool v[]) const
+	{
+		v[0] = false;// HRSectors
+		v[1] = false;// HRPool
+		v[2] = true;// LRSectors
+		v[3] = false;// LRPools
+	}
 	
 };
 

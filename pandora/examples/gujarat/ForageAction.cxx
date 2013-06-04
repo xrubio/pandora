@@ -48,6 +48,23 @@ MDPAction*	ForageAction::copy() const
 	return newAction;
 }
 
+/*
+MDPAction*	ForageAction::shallowCopy() const
+{
+	ForageAction * newAction = 0;
+	if( !_ownsForageAreaPointer )
+	{
+		newAction = new ForageAction(_HRForageArea, _LRForageArea, false);
+	}
+	else
+	{
+		newAction = new ForageAction( new Sector( *_HRForageArea ), new Sector( *_LRForageArea ),true);
+	}
+	newAction->setFullPopulation(_useFullPopulation);
+	return newAction;
+}
+*/
+
 std::string ForageAction::describe() const
 {
 	std::stringstream logForage;
@@ -114,11 +131,11 @@ void	ForageAction::selectBestWalk( const GujaratAgent& agent,
 									  const Engine::Point2D<int>& n,
 								   const Engine::Raster& r,
 								   int maxDistAgentWalk,
-								   std::vector< Engine::Point2D<int> > & walk )
+								   std::vector< Engine::Point2D<int>* > & walk )
 {
 	double minDist = std::numeric_limits<double>::max();
 	
-	std::vector< Engine::Point2D<int> >& sectorCells = _HRForageArea->cellsNoConst();
+	std::vector< Engine::Point2D<int>* >& sectorCells = _HRForageArea->cellsNoConst();
 	
 	// ordering the cells based on the values/resources
 	
@@ -161,15 +178,15 @@ void	ForageAction::selectBestNearestCell( GujaratAgent& agent,
 											 Engine::Point2D<int>& best ) const
 {
 	bestScore = 0;
-	std::vector< Engine::Point2D<int> > candidates;	
+	std::vector< Engine::Point2D<int>* > candidates;	
 	double minDist = std::numeric_limits<double>::max();
 
-	const std::vector< Engine::Point2D<int> >& sectorCells = _HRForageArea->cells();
+	const std::vector< Engine::Point2D<int>* >& sectorCells = _HRForageArea->cells();
 
 	for ( unsigned k = 0; k < _HRForageArea->numCells(); k++ )
 	{
-		int score =  r.getValue( sectorCells[k] - _HRForageArea->getWorld().getOverlapBoundaries()._origin );
-		double dist = sectorCells[k].distance(n);
+		int score =  r.getValue( *sectorCells[k] - _HRForageArea->getWorld().getOverlapBoundaries()._origin );
+		double dist = sectorCells[k]->distance(n);
 		if ( score > bestScore )
 		{
 			bestScore = score;
@@ -194,7 +211,7 @@ void	ForageAction::selectBestNearestCell( GujaratAgent& agent,
 	
 	//std::random_shuffle(candidates.begin(), candidates.end());
 	//best = candidates[0];
-	best = candidates[Engine::GeneralState::statistics().getUniformDistValue(0,candidates.size()-1)];
+	best = *candidates[Engine::GeneralState::statistics().getUniformDistValue(0,candidates.size()-1)];
 	
 	candidates.clear();
 }
@@ -210,10 +227,10 @@ void	ForageAction::selectBestNearestCell( const GujaratAgent& agent,
 										     Engine::Point2D<int>& best ) const
 {
 	bestScore = 0;
-	std::vector< Engine::Point2D<int> > candidates;	
+	std::vector< Engine::Point2D<int>* > candidates;	
 	double minDist = std::numeric_limits<double>::max();
 	
-	const std::vector< Engine::Point2D<int> >& sectorCells = _LRForageArea->cells();
+	const std::vector< Engine::Point2D<int>* >& sectorCells = _LRForageArea->cells();
 	
 	for ( unsigned k = 0; k < _LRForageArea->numCells(); k++ )
 	{	
@@ -233,10 +250,10 @@ void	ForageAction::selectBestNearestCell( const GujaratAgent& agent,
 		 *			score = xr
 		 */
 		
-		int score = LRcellOutcomeHeuristic(sectorCells[k], gw, explorableCells
+		int score = LRcellOutcomeHeuristic(*sectorCells[k], gw, explorableCells
 		,resourceRaster);
 		
-		double dist = sectorCells[k].distance(n);
+		double dist = sectorCells[k]->distance(n);
 		if ( score > bestScore )
 		{
 			bestScore = score;
@@ -260,7 +277,7 @@ void	ForageAction::selectBestNearestCell( const GujaratAgent& agent,
 	}
 	//TODO cost n, instead: best=candidates[uniformRandom(0,candidates.size()-1)]
 	//std::random_shuffle(candidates.begin(), candidates.end());
-	best = candidates[Engine::GeneralState::statistics().getUniformDistValue(0,candidates.size()-1)];
+	best = *candidates[Engine::GeneralState::statistics().getUniformDistValue(0,candidates.size()-1)];
 
 	candidates.clear();	
 }
@@ -273,7 +290,7 @@ void	ForageAction::doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0,
 	Engine::Point2D<int> n = n0;
 	double distHome = 0.0;
 	
-	//std::vector< Engine::Point2D<int> > walk;
+	//std::vector< Engine::Point2D<int>* > walk;
 	//selectBestWalk( agent,n0,r,maxDist,walk);
 	//int w = 0;
 	
@@ -390,8 +407,7 @@ void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>
 	//TODO
 	// update l'LRraster??? done a few lines below with setValueLR
 	// update LRSectors??? (utility attribute) 
-	//*?
-	//assert(collected >0);
+	
 }
 
 

@@ -327,6 +327,8 @@ void GujaratState::initializeSectorsMask( int numSectors, int homeRange, Sectors
 		b = c;
 	}
 
+	//*?
+	
 	sm.at(0).at(0) = -1;
 	for ( int x=-homeRange; x<=homeRange; x++ )
 	{
@@ -346,11 +348,9 @@ void GujaratState::initializeSectorsMask( int numSectors, int homeRange, Sectors
 					break;
 				}
 			}
-		//*?	
-		//std::cout << sm[x+homeRange][y+homeRange] << std::endl;
+		 
 		}
-	//*?	
-	//std::cout << std::endl;
+	 
 	}
 
 }

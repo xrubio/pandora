@@ -20,9 +20,11 @@ HunterGathererMDPModel::HunterGathererMDPModel()
 }
 
 HunterGathererMDPModel::~HunterGathererMDPModel()
-{
+{	
 	if ( _initial != NULL )
+	{
 		delete _initial;
+	}
 }
 
 void	HunterGathererMDPModel::setup( const HunterGathererMDPConfig& cfg )
@@ -36,12 +38,57 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	if ( _initial != NULL )
 		delete _initial;
 
-
 	_simAgent = dynamic_cast<HunterGatherer *>(&agent);
 
+	// Copy of the Sector & Pool structures.
+	// If we pass ones owned by the agent, even if we protect them
+	// from being altered in cell contents, the utility shall be
+	// modified. So, to preserve the same state before and after
+	// reasoning a duplication is needed.
+	// Only altered utility : LRSectors
+	// HRSectors, HRCellPool, LRCellPool, shall not be altered.
+	// A state associated to a MoveHomeAction shall see its sector
+	// structures created with new items
+	
+	// The main matter : do not alter Sector's utility -->
+	// --> Sector duplication
+	std::vector< bool > ownsItems(4);
+	ownsItems[0]=false;
+	ownsItems[1]=true;
+	ownsItems[2]=false;
+	ownsItems[3]=false;
+	const std::vector< Sector* > & sourceLRSectors = agentRef().getLRSectors();
+	std::vector< Sector* > * LRActionSectors = 
+			new std::vector< Sector* >(sourceLRSectors.size());
+	
+	std::vector< Sector* >::const_iterator it = sourceLRSectors.begin();
+	int i = 0;
+	while(it!=sourceLRSectors.end())
+	{
+		Sector * s = (Sector*)*it;
+		Sector * r = new Sector(s);
+		//s->shallowCopy(r);
+		(*LRActionSectors)[i++] = r;
+		it++;
+	}
+	// We have copied the Sectors, but still referencing the same LR cells!!!
+	// that's good
+	
+	
 	// Build initial state from current state in the simulation
-	_initial = new HunterGathererMDPState(	agentRef().getPosition(), agentRef().getOnHandResources(), agentRef().getLRResourcesRaster()
-	, _config.getHorizon(), agentRef().computeConsumedResources(1));
+	_initial = new HunterGathererMDPState(	agentRef().getPosition()
+											, agentRef().getOnHandResources()
+											, agentRef().getLRResourcesRaster()
+											, _config.getHorizon()
+											, agentRef().computeConsumedResources(1)
+					
+											, agentRef().getHRSectors()
+											, *LRActionSectors 
+											, agentRef().getHRCellPool()
+											, agentRef().getLRCellPool()
+											, ownsItems);
+	
+	//TODO refactor it, instead of passing HR and LR structures pass a HGMind
 	makeActionsForState( *_initial );
 	//std::cout << "Initial state: " << *_initial << std::endl;	
 }
@@ -78,13 +125,24 @@ float HunterGathererMDPModel::cost( const HunterGathererMDPState& s,
 	return cost;
 }
 
+
 void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s, 
 					action_t a, 
 					OutcomeVector& outcomes ) const
 {
-	HunterGathererMDPState sp;
-	s.initializeSuccessor(sp);
 	const MDPAction* act = s.availableActions(a);
+	/*
+	 * Here, where I know whether "act" is ForageAction or MoveHomeAction,
+	 * according to these, what I pass to sp depends on it... copies,refs,
+	 * or new adhoc creation... etc...
+	 */
+	
+	bool ownership[4];
+	act->getOwnershipMDPSectorKnowledge(ownership);
+	
+	//s.initializeSuccessor(sp,ownership);
+	HunterGathererMDPState sp(s,ownership);
+	
 	act->executeMDP( agentRef(), s, sp );
 	applyFrameEffects( s, sp );
 	sp.computeHash();	
@@ -113,14 +171,18 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 	
 	// Make Forage actions
 	std::vector< Sector* > validActionSectors;
-	std::vector< Sector* > LRActionSectors;// Low Resolution
-	std::vector< Sector* > HRActionSectors;// = agentRef().getHRSectors();// High Resolution
+	// Low Resolution
+	std::vector< Sector* > & LRActionSectors = s.getLRActionSectors();
+	// High Resolution
+	std::vector< Sector* > & HRActionSectors = s.getHRActionSectors();	
 	// It is not needed to recalculate each time the HR cells per sector.
+	std::vector< Engine::Point2D<int> > & HRCellPool = s.getHRCellPool();
+	std::vector< Engine::Point2D<int> > & LRCellPool = s.getLRCellPool();	
 	
 	
 	//TODO cal update dels HRSectors?
 	//TODO watch HRSectors update : BOTTLENECK
-	agentRef().updateKnowledge( s.getLocation(), s.getResourcesRaster(), HRActionSectors, LRActionSectors );
+	agentRef().updateKnowledge( s.getLocation(), s.getResourcesRaster(), HRActionSectors, LRActionSectors, HRCellPool, LRCellPool );
 	
 	// MRJ: Remove empty sectors if any
 	for ( unsigned i = 0; i < LRActionSectors.size(); i++ )

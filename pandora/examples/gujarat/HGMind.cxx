@@ -43,13 +43,21 @@ HGMind::~HGMind()
 }
 
 void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos,
-										std::vector< Sector* >& HRSectors) const
+								std::vector< Sector* >& HRSectors,
+							   std::vector< Engine::Point2D<int> >& cellPool
+							) const
 {
 	int homeRange  = ((GujaratConfig)_world.getConfig())._homeRange;
 	int numSectors = ((GujaratConfig)_world.getConfig())._numSectors;
 	
 	//if(HRSectors.size()==0)
 	//{
+		
+		//*?
+		//cellPool.resize(GujaratState::HRCellsInHomeRange);
+		cellPool.resize((2*homeRange+1)*(2*homeRange+1));
+		int insertPoint = 0;
+		
 		HRSectors.resize(numSectors);	
 		for ( unsigned k = 0; k < numSectors; k++ )
 		{
@@ -75,7 +83,12 @@ void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos,
 				{
 					continue;
 				}
-				HRSectors[indexSector]->addCell( p );
+				
+				//*?
+				cellPool[insertPoint]=p;
+				HRSectors[indexSector]->addCell( &cellPool[insertPoint] );
+				insertPoint++;
+				//HRSectors[indexSector]->addCell( p );
 				//getWorld()->setValue( "sectors", p, 1 );	
 			}
 		}
@@ -85,13 +98,21 @@ void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos,
 
 
 void HGMind::createLRSectors( 	const Engine::Point2D<int>& agentPos, 
-								std::vector< Sector* >& LRSectors ) const
+								std::vector< Sector* >& LRSectors,
+							   std::vector< Engine::Point2D<int> >& cellPool
+							) const
 {
 	int homeRange  = ((GujaratConfig)_world.getConfig())._homeRange;
 	int numSectors = ((GujaratConfig)_world.getConfig())._numSectors;
 	
+	int lowResHomeRange = ((GujaratConfig)_world.getConfig())._lowResHomeRange;	
+	
 	//if(LRSectors.size()==0)
 	//{
+		//cellPool.resize(GujaratState::LRCellsInHomeRange);
+		cellPool.resize((2*lowResHomeRange+1)*(2*lowResHomeRange+1));
+		int insertPoint = 0;
+		
 		LRSectors.resize(numSectors);
 		for ( unsigned k = 0; k < numSectors; k++ )
 		{			
@@ -100,18 +121,20 @@ void HGMind::createLRSectors( 	const Engine::Point2D<int>& agentPos,
 		
 		//std::cout << "**********************" << std::endl;
 		
-		int lowResHomeRange = ((GujaratConfig)_world.getConfig())._lowResHomeRange;
+		
 		//TODO Those low resolution calculi should be arranged by the GujaratWorld class
 		register int C = ((GujaratConfig)_world.getConfig())._lowResolution;
 		Engine::Point2D<int> LRpos;
 		_world.worldCell2LowResCell( agentPos, LRpos );
+		int insertPoint00 = -1;
 		for ( int x=-lowResHomeRange; x<=lowResHomeRange; x++ )
 		{
 			for ( int y=-lowResHomeRange; y<=lowResHomeRange; y++ )
 			{				
-				//*?
 				if (x==0 && y==0)
 				{
+					insertPoint00 = insertPoint;
+					insertPoint++;
 					continue;
 				}
 				
@@ -146,14 +169,18 @@ void HGMind::createLRSectors( 	const Engine::Point2D<int>& agentPos,
 					continue;
 				}
 				
-				LRSectors[indexSector]->addCell( LRxycell );
+				//*?
+				cellPool[insertPoint]=LRxycell;
+				LRSectors[indexSector]->addCell( &cellPool[insertPoint] );
+				insertPoint++;
+				//LRSectors[indexSector]->addCell( LRxycell );
 				
 			}//for
 		}//for
 		
 		for ( unsigned k = 0; k < numSectors; k++ )
 		{
-			LRSectors[k]->addCell( LRpos );
+			LRSectors[k]->addCell( &cellPool[insertPoint00] );
 		}	
 	//}	   
 	
@@ -170,12 +197,12 @@ void HGMind::updateKnowledge(Engine::Point2D<int> position)
 	
 	if (_HRSectors.size()==0)
 	{
-		createHRSectors( position, _HRSectors);
+		createHRSectors( position, _HRSectors, _HRCellPool);
 		
 	}
 	if (_LRSectors.size()==0)
 	{
-		createLRSectors( position, _LRSectors);
+		createLRSectors( position, _LRSectors, _LRCellPool);
 	}
 	
 	for ( unsigned k = 0; k < numSectors; k++ )
@@ -189,19 +216,22 @@ void HGMind::updateKnowledge(Engine::Point2D<int> position)
 void HGMind::updateKnowledge( const Engine::Point2D<int>& agentPos
 								, const Engine::Raster& dataRaster
 								, std::vector< Sector* >& HRSectors
-								, std::vector< Sector* >& LRSectors  ) const
+								, std::vector< Sector* >& LRSectors
+								, std::vector< Engine::Point2D<int> >& HRCellPool
+								, std::vector< Engine::Point2D<int> >& LRCellPool
+							) const
 {	
 	
 	int numSectors = ((GujaratConfig)_world.getConfig())._numSectors;
 	
 	if (HRSectors.size()==0)
 	{
-		createHRSectors(agentPos,HRSectors);
+		createHRSectors(agentPos,HRSectors, HRCellPool);
 	}
 	
 	if (LRSectors.size()==0)
 	{
-		createLRSectors(agentPos,LRSectors);
+		createLRSectors(agentPos,LRSectors, LRCellPool);
 	}
 	
 	for ( unsigned k = 0; k < numSectors; k++ )

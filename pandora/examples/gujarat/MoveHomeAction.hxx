@@ -21,6 +21,7 @@ class ForageAction;
 	
 class MoveHomeAction : public MDPAction
 {
+	
 	Engine::Point2D<int>	_newHomeLoc;
 	// forage with half adult population is executed at the same time than MoveHome
 	ForageAction * _forageAction;     
@@ -48,6 +49,14 @@ public:
 	/*Sector * getVisitedSector(GujaratAgent & ag) 
 	 * { return ag.getSectorOfLRCell(_newHomeLoc); }
 	 * */
+	
+	void getOwnershipMDPSectorKnowledge(bool v[]) const
+	{
+		v[0] = true;
+		v[1] = true;
+		v[2] = true;
+		v[3] = true;
+	}
 };
 	
 } // namespace Gujarat

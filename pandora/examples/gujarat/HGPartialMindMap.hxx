@@ -27,10 +27,19 @@ namespace Gujarat
 		
 		void updateKnowledge(Engine::Point2D<int> position);
 		
-		void updateKnowledge( const Engine::Point2D<int>& agentPos
+		/*void updateKnowledge( const Engine::Point2D<int>& agentPos
 							, const Engine::Raster& dataRaster
 							, std::vector< Sector* >& HRSectors
 							, std::vector< Sector* >& LRSectors  ) const;	
+		*/
+		/*
+		void	updateKnowledge( const Engine::Point2D<int>& agentPos
+								, const Engine::Raster& dataRaster
+								, std::vector< Sector* >& HRSectors
+								, std::vector< Sector* >& LRSectors
+								,std::vector< Engine::Point2D<int> >& HRCellPool
+								,std::vector< Engine::Point2D<int> >& LRCellPool ) const;	
+		*/
 							
 		void clearSectorKnowledge();
 							

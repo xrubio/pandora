@@ -22,10 +22,6 @@ protected:
 	HGMind * _myHGMind; 
 	//void updateKnowledge();
 
-	// this method checks whether P1 and P2 are in the same side of the line that goes from B to C
-	bool sameSide( Engine::Point2D<int> P1, Engine::Point2D<int> P2, Engine::Point2D<int> A, Engine::Point2D<int> B );
-	bool insideTriangle( Engine::Point2D<int> p,  Engine::Point2D<int> b, Engine::Point2D<int> c ); 
-	
 	void selectActions();
 	
 	GujaratAgent * createNewAgent();
@@ -56,9 +52,17 @@ public:
 	{ return _myHGMind->getLRSectors(); }
 	//{ return _LRSectors; }
 	
+	const std::vector<Engine::Point2D<int> > & getHRCellPool() const 
+	{ return _myHGMind->getHRCellPool(); }
+	
+	const std::vector<Engine::Point2D<int> > & getLRCellPool() const 
+	{ return _myHGMind->getLRCellPool(); }
+	
+	
 	Sector * getHRSectors(int i) { return getHRSectors()[i]; }
 	
-	inline Engine::Raster & getLRResourcesRaster();
+	//inline 
+	Engine::Raster & getLRResourcesRaster();
 	
 	//void setSurplusForReproductionThreshold( int v ) { _surplusForReproductionThreshold = v; }
 	//void setSurplusWanted( int v ) { _surplusWanted = v; }
@@ -75,7 +79,16 @@ public:
 	void createLRSectors( 	const Engine::Point2D<int>& agentPos, 
 							std::vector< Sector* >& LRSectors ) const;
 	void updateKnowledge();
-	void updateKnowledge( 	const Engine::Point2D<int>& agentPos, const Engine::Raster& dataRaster, std::vector< Sector* >& HRSectors, std::vector< Sector* >& LRSectors  )const;
+	//void updateKnowledge( 	const Engine::Point2D<int>& agentPos, const Engine::Raster& dataRaster, std::vector< Sector* >& HRSectors, std::vector< Sector* >& LRSectors  )const;
+	
+	void updateKnowledge( const Engine::Point2D<int>& agentPos
+						, const Engine::Raster& dataRaster
+						, std::vector< Sector* >& HRSectors
+						, std::vector< Sector* >& LRSectors
+						, std::vector< Engine::Point2D<int> >& HRCellPool
+						, std::vector< Engine::Point2D<int> >& LRCellPool
+						) const;	
+	
 	//virtual void fillKnowledge() = 0;
 	void updateKnowledgeFromFirstHandVisit(Sector * s){};	
 	

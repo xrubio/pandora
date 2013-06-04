@@ -25,13 +25,9 @@ namespace Gujarat
 HunterGatherer::HunterGatherer( const std::string & id ) 
 	: GujaratAgent(id)/*, _surplusForReproductionThreshold(2), _surplusWanted(1)*/ ,_homeRange(50)
 	,_numSectors( -1 )
-	//_myHGMind(HGMindFactory::getInstance().getHGMind(*(GujaratWorld*)_world))
+	
 {
-	//_myHGMind = *(HGMindFactory::getHGMind(*(GujaratWorld*)_world));
-	/*
-	static Gujarat::HGMind* Gujarat::HGMindFactory::getHGMind(Gujarat::HGMindFactory::GujaratWorld&)
-	./HGMindFactory.hxx:29:17: note:   no known conversion for argument 1 from ‘Gujarat::GujaratWorld’ to ‘Gujarat::HGMindFactory::GujaratWorld&’
-	*/
+	
 }
 
 void HunterGatherer::createMind()
@@ -85,9 +81,17 @@ void HunterGatherer::updateKnowledge()
 }
 
 
-void	HunterGatherer::updateKnowledge( 	const Engine::Point2D<int>& agentPos, const Engine::Raster& dataRaster, std::vector< Sector* >& HRSectors, std::vector< Sector* >& LRSectors  ) const
+void	HunterGatherer::updateKnowledge( const Engine::Point2D<int>& agentPos
+										, const Engine::Raster& dataRaster
+										, std::vector< Sector* >& HRSectors
+										, std::vector< Sector* >& LRSectors
+										, std::vector< Engine::Point2D<int> >& HRCellPool
+										, std::vector< Engine::Point2D<int> >& LRCellPool
+									   ) const
 {	
-	_myHGMind->updateKnowledge(agentPos, dataRaster, HRSectors, LRSectors);
+	_myHGMind->updateKnowledge(agentPos, dataRaster
+								, HRSectors, LRSectors
+								, HRCellPool, LRCellPool);
 }
 
 
@@ -138,10 +142,6 @@ GujaratAgent * HunterGatherer::createNewAgent()
 	std::ostringstream oss;
 	oss << "HunterGatherer_" << world->getId() << "-" << world->getNewKey();
 
-	//*? 
-	// NO CHILDREN
-	return 0;
-	/*
 	HunterGatherer * agent = new HunterGatherer(oss.str());
 
 	agent->_world = _world;
@@ -167,7 +167,7 @@ GujaratAgent * HunterGatherer::createNewAgent()
 	agent->_populationAges.resize(2);
 
 	return agent;
-	*/
+	
 }
 
 /*
@@ -293,7 +293,7 @@ void HunterGatherer::shareInformation( HunterGatherer * a)
 
 void HunterGatherer::putInformation(Sector *s, const Engine::Raster & r, const Engine::Raster & t)
 {
-	const 	std::vector< Engine::Point2D<int> > & cells = s->cells();
+	const 	std::vector< Engine::Point2D<int>* > & cells = s->cells();
 	
 	Engine::Raster & myLRTimeRaster = _myHGMind->getLRTimeStamps();
 	Engine::Raster & myLRResRaster = _myHGMind->getLRResourcesRaster();
@@ -310,15 +310,15 @@ void HunterGatherer::putInformation(Sector *s, const Engine::Raster & r, const E
 			((GujaratWorld*)_world)->setValueLR(_myLRTimeRaster,cells[i],ts_i);
 		}
 		*/
-		int ts_i = t.getValue(cells[i]);
+		int ts_i = t.getValue(*cells[i]);
 		//check timestamp!!! do not take information older than yours
-		if (ts_i > myLRTimeRaster.getValue(cells[i]) 
+		if (ts_i > myLRTimeRaster.getValue(*cells[i]) 
 			&& 
-			ts_i - myLRTimeRaster.getValue(cells[i]) > 3 )
+			ts_i - myLRTimeRaster.getValue(*cells[i]) > 3 )
 		{
-			int u  = r.getValue(cells[i]);
-			myLRResRaster.setInitValue(cells[i],u);
-			myLRTimeRaster.setInitValue(cells[i],ts_i);
+			int u  = r.getValue(*cells[i]);
+			myLRResRaster.setInitValue(*cells[i],u);
+			myLRTimeRaster.setInitValue(*cells[i],ts_i);
 		}
 	}
 	

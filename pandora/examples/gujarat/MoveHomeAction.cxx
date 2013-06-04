@@ -65,7 +65,7 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent,
 	//log_DEBUG(logName.str(), "generate possible actions for pos: " << agentPos);
 
 	int scoreBestCell = 0;
-	std::vector< Engine::Point2D<int> > candidateCells;
+	std::vector< Engine::Point2D<int>* > candidateCells;
    
 	const HunterGatherer & agentConcrete = dynamic_cast< const HunterGatherer & >( agent );
 	GujaratWorld * gw = (GujaratWorld *)agentConcrete.getWorld();
@@ -77,12 +77,12 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent,
 	{
         if(!(*it)->isEmpty())
 		{
-				const std::vector< Engine::Point2D<int> > & sectCells = (*it)->cells();	
+				const std::vector< Engine::Point2D<int>* > & sectCells = (*it)->cells();	
 				for(int cellsIdx = 0; cellsIdx < sectCells.size(); cellsIdx++)
 				{
-                	int numDunes      = gw->getValueLR(LRCounterSoilDUNE,sectCells[cellsIdx]);
+                	int numDunes      = gw->getValueLR(LRCounterSoilDUNE,*sectCells[cellsIdx]);
 					
-					int resourcesCell = gw->getValueLR(eLRResources,sectCells[cellsIdx]);
+					int resourcesCell = gw->getValueLR(eLRResources,*sectCells[cellsIdx]);
 					//TODO usa getBiomassAmount
 					//int resourcesCell = sectCells[cellsIdx]->getBiomassAmount();
 					
@@ -116,7 +116,7 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent,
 					assert(resourcesCell > 0);
 					*/
 
-					if ( numDunes - gw->getValueLR(eLRPopulation,sectCells[cellsIdx]) > 0 && scoreBestCell <= scoreCell )
+					if ( numDunes - gw->getValueLR(eLRPopulation,*sectCells[cellsIdx]) > 0 && scoreBestCell <= scoreCell )
                 	{
                     		if ( scoreBestCell < scoreCell )
                     		{           
@@ -137,7 +137,7 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent,
     {   
         uint32_t diceSelectOneRandomDune = Engine::GeneralState::statistics().getUniformDistValue(0, candidateCells.size()-1);
 
-        Engine::Point2D<int> newPos = candidateCells.at(diceSelectOneRandomDune);
+        Engine::Point2D<int> newPos = *candidateCells.at(diceSelectOneRandomDune);
 		Engine::Point2D<int> newHome;
 		//gw->LowRes2HighResCellCorner(newPos,newHome);
 		gw->getHRFreeCell(newPos,newHome);

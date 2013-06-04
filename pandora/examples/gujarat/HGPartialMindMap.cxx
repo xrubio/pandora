@@ -32,9 +32,7 @@ void HGPartialMindMap::setGuessHeuristicResourceRaster()
 {
 	int minValue =  _world.getDynamicRaster(eResources).getCurrentMinValue();
 	int maxValue =  _world.getDynamicRaster(eResources).getCurrentMaxValue();
-	int averageValueHR = 1000;
-	//*?
-	//(maxValue+minValue)/2;
+	int averageValueHR = (maxValue+minValue)/2;
 	
 	for(int i = 0; i < _LRResourceRaster.getSize()._x;i++)
 	{
@@ -75,26 +73,25 @@ void HGPartialMindMap::knowledgeExpirationDateProcess()
 	int minValue =  _world.getDynamicRaster(eResources).getCurrentMinValue();
 	int maxValue =  _world.getDynamicRaster(eResources).getCurrentMaxValue();
 	int averageValueHR = (maxValue+minValue)/2;
+	int n;
 	
 	for ( unsigned k = 0; k < numSectors; k++ )
 	{
-		const std::vector< Engine::Point2D<int> > & cells = _LRSectors[k]->cells();
+		const std::vector< Engine::Point2D<int>* > & cells = _LRSectors[k]->cells();
 		for( int i = 0; i < cells.size(); i++)
 		{
-			int ts = _LRTimeStamps.getValue(cells[i]);
+			int ts = _LRTimeStamps.getValue(*cells[i]);
 			if ( _world.getCurrentTimeStep() - ts 
 				>= 
 				((GujaratConfig) _world.getConfig())._hunterGathererInformationCaducityTime )
 			{
-				int n = 0;
-				//*?
-				//_world.getValueLR(LRCounterSoilINTERDUNE,cells[i]);
-				_LRResourceRaster.setInitValue(cells[i],n*averageValueHR);
-				_LRTimeStamps.setInitValue(cells[i],_world.getCurrentTimeStep());
+				n = _world.getValueLR(LRCounterSoilINTERDUNE,*cells[i]);
+				_LRResourceRaster.setInitValue(*cells[i],n*averageValueHR);
+				_LRTimeStamps.setInitValue(*cells[i],_world.getCurrentTimeStep());
 			}
 			else
 			{
-				_LRTimeStamps.setInitValue(cells[i],ts+1);
+				_LRTimeStamps.setInitValue(*cells[i],ts+1);
 			}
 		}
 	}
@@ -120,12 +117,12 @@ void HGPartialMindMap::updateDueToExecuteAction(Sector *s)
 	//		sector
 	if (s != 0)
 	{
-		const std::vector< Engine::Point2D<int> > & cells = s->cells();	
+		const std::vector< Engine::Point2D<int>* > & cells = s->cells();	
 		for(int i=0; i < cells.size(); i++)
 		{
-			_LRTimeStamps.setInitValue(cells[i],_world.getCurrentTimeStep());
-			int res = _world.getValueLR(eLRResources,cells[i]);
-			_LRResourceRaster.setInitValue(cells[i],res);
+			_LRTimeStamps.setInitValue(*(cells[i]),_world.getCurrentTimeStep());
+			int res = _world.getValueLR(eLRResources,*cells[i]);
+			_LRResourceRaster.setInitValue(*(cells[i]),res);
 		}
 	}
 }

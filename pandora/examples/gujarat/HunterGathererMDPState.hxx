@@ -12,18 +12,53 @@ namespace Gujarat
 
 class HunterGathererMDPState
 {
+	
+protected:	
+	
+	static std::vector< Sector* > 				_emptySectorVector;
+	static std::vector< Engine::Point2D<int> >  _emptyCellPool;	
+	
+	std::vector< Sector* > & _HRActionSectors;// High Resolution
+	std::vector< Sector* > & _LRActionSectors;// Low Resolution
+	std::vector< Engine::Point2D<int> > & _HRCellPool;
+	std::vector< Engine::Point2D<int> > & _LRCellPool;
+	std::vector< bool > _ownItems;
+	
+	/* _ownItems SEMANTICS 
+		if (_ownsItems[0])
+			delete _HRActionSectors;;
+		if (_ownsItems[1])
+			delete _LRActionSectors;;
+		if (_ownsItems[2])
+			delete _HRCellPool;;
+		if (_ownsItems[3])
+			delete _LRCellPool;;
+	*/
+	
 public:
 	// Constructors, I don't want this to be ever invoked
 	explicit HunterGathererMDPState();
 
+	void HunterGathererMDPState( HunterGathererMDPState& s, bool ownership[] ) const;
+	
 	// The real one
-	HunterGathererMDPState(Engine::Point2D<int> loc, int initialOnHand, const Engine::Raster& resourcesRaster, int maxResources, int divider);
+	HunterGathererMDPState(	Engine::Point2D<int> loc
+							, int initialOnHand
+							, const Engine::Raster& resourcesRaster
+							, int maxResources
+							, int divider
+							, const std::vector< Sector* > & HRActionSectors
+							, const std::vector< Sector* > & LRActionSectors
+							, const std::vector< Engine::Point2D<int> > & HRCellPool
+							, const std::vector< Engine::Point2D<int> > & LRCellPool
+							, const std::vector< bool > ownsItems);
+	
 	HunterGathererMDPState( const HunterGathererMDPState& s );
 	const HunterGathererMDPState&	operator=(const HunterGathererMDPState& s );
 	
 	~HunterGathererMDPState();
 
-	void		initializeSuccessor( HunterGathererMDPState& s ) const;
+	void		initializeSuccessor( HunterGathererMDPState& s, bool ownership[] ) const;
 
 	unsigned	hash() const;
 	bool		operator==( const HunterGathererMDPState& s ) const;
@@ -32,9 +67,9 @@ public:
 
 	void		print( std::ostream& os ) const;
 
-	void					increaseTimeIndex() { _timeIndex++; }
-	unsigned				getTimeIndex() const { return _timeIndex; }
-	int					getOnHandResources() const { return _onHandResources; }
+	void		increaseTimeIndex() { _timeIndex++; }
+	unsigned	getTimeIndex() const { return _timeIndex; }
+	int			getOnHandResources() const { return _onHandResources; }
 	void addResources( int amt )
 	{
 		_onHandResources += amt;
@@ -77,32 +112,41 @@ public:
 	}
 
 	//void					spoilage( float v ) { _onHandResources = (float)_onHandResources * v; }
-	void					setLocation( Engine::Point2D<int> newLoc ) { _mapLocation = newLoc; }
-	const Engine::Point2D<int>&		getLocation() const { return _mapLocation; }
-	Engine::IncrementalRaster&		getResourcesRaster() { return _resources; }
-	const Engine::IncrementalRaster&	getResourcesRaster() const { return _resources; }
+	void setLocation( Engine::Point2D<int> newLoc ) { _mapLocation = newLoc; }
+	const Engine::Point2D<int>& 		getLocation() const { return _mapLocation; }
+	Engine::IncrementalRaster& 			getResourcesRaster() { return _resources; }
+	const Engine::IncrementalRaster& 	getResourcesRaster() const { return _resources; }
 
-	void		addAction( MDPAction* a );
-	MDPAction*		availableActions( Problem::action_t actIndex ) { return _availableActions.at(actIndex); }
-	const MDPAction*	availableActions( Problem::action_t actIndex ) const { return _availableActions.at(actIndex); }
+	void addAction( MDPAction* a );
+	MDPAction* availableActions( Problem::action_t actIndex ) 
+		{ return _availableActions.at(actIndex); }
+	const MDPAction* availableActions( Problem::action_t actIndex ) const 
+		{ return _availableActions.at(actIndex); }
 
 	unsigned	numAvailableActions() const { return _availableActions.size(); }
 
 	void	computeHash();
+	
+	
+	const std::vector< Sector* > & getLRActionSectors() { return _LRActionSectors; }
+	const std::vector< Sector* > & getHRActionSectors() { return _HRActionSectors; }
+	const std::vector< Engine::Point2D<int> > & getHRCellPool() { return _HRCellPool; }
+	const std::vector< Engine::Point2D<int> > & getLRCellPool() { return _LRCellPool; }	
+	
 private:
 	
 
 private:
-	unsigned			_timeIndex;
+	unsigned					_timeIndex;
 	Engine::Point2D<int>		_mapLocation;
-	int				_onHandResources;
+	int							_onHandResources;
 	Engine::IncrementalRaster	_resources;
-	Engine::HashKey			_hashKey;
-	std::vector<MDPAction*>		_availableActions;
-	int				_maxResources;
-	int				_resourcesDivider;
-	int _daysStarving;
-	bool				_isCopy;
+	Engine::HashKey				_hashKey;
+	std::vector<MDPAction*> 	_availableActions;
+	int							_maxResources;
+	int							_resourcesDivider;
+	int 						_daysStarving;
+	bool						_isCopy;
 };
 
 inline std::ostream& operator<<( std::ostream& os, const HunterGathererMDPState& s )

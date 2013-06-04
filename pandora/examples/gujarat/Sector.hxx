@@ -28,7 +28,8 @@ class Sector
 {
 	//const Engine::World & _world; needed change due to use of LR methods for raster access.
 	const GujaratWorld & _world;
-	std::vector< Engine::Point2D<int> >	_cells;
+	std::vector< Engine::Point2D<int> * > _cells;
+	//std::vector< Engine::Point2D<int> > _cells;
 	int					_biomassAmount;
 //	BiomassAmountClass			_biomassAmountClass;
 
@@ -40,17 +41,17 @@ private:
 public:
 	//Sector( const Engine::World & world );
 	Sector( const GujaratWorld & world );
-//	Sector( const Sector& other );
+	Sector( const Sector* other );
 	virtual ~Sector();
 
 	bool		isEmpty() const { return _cells.empty(); }
 	unsigned	numCells() const { return _cells.size(); }
 
-	const 	std::vector< Engine::Point2D<int> > & cells() const { return _cells; }
-	std::vector< Engine::Point2D<int> > & cellsNoConst() { return _cells; }
+	const 	std::vector< Engine::Point2D<int>* > & cells() const { return _cells; }
+	std::vector< Engine::Point2D<int>* > & cellsNoConst() { return _cells; }
 
 
-	void	addCell( Engine::Point2D<int>& p )
+	void	addCell( Engine::Point2D<int> * p )
 	{
 		_cells.push_back( p );
 	}
@@ -84,6 +85,14 @@ public:
 	//void	showFeatures( std::ostream& );
 	//std::string	biomassClass() const;
 	const GujaratWorld & getWorld() const;
+	
+	/*
+	void shallowCopy(Sector *target)
+	{
+		target->_world = _world;
+		target->_cells = _cells;
+		target->_biomassAmount = _biomassAmount;
+	}*/
 };
 
 class SectorBestFirstSortPtrVecPredicate

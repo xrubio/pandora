@@ -213,7 +213,7 @@ std::cout << "init LR water" << std::endl;
 	}
 std::cout << "end init LR" << std::endl;	
 
-
+ 
 }
 
 
@@ -245,12 +245,6 @@ void GujaratWorld::fillHRRasterWithLRRaster(enum Rasters idLRSource, enum Raster
 		{			
 			Engine::Point2D<int> mapCell; 
 			worldCell2LowResCell(index, mapCell);
-			//*?
-			//setValue(idHRTarget,index,getValueLR(idLRSource,mapCell));
-			//setValue(idHRTarget,index,100);
-			//getDynamicRaster(idHRTarget).setValue(index, getValueLR(idLRSource,mapCell));
-			//getDynamicRaster(idHRTarget).setInitValue(index, getValueLR(idLRSource,mapCell));
-			//getDynamicRaster(idHRTarget).setInitValue(index, 5);
 			getDynamicRaster(idHRTarget).setValue(index, getValueLR(idLRSource,mapCell));
 		}
 	}
@@ -264,10 +258,9 @@ void GujaratWorld::fillIniRaster(enum Rasters idRaster, int val)
 	for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
 	{	
 		for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)		
-		{			
-			//*? getDynamicRaster(idRaster).setValue(index, val);
-			//getDynamicRaster(idRaster).setInitValue(index, val);
-			//setInitValue(idRaster, index, val);
+		{		
+			//*?
+			//getDynamicRaster(idHRTarget).setValue(index, val);
 			setValue(idRaster, index, val);
 		}
 	}
@@ -402,10 +395,6 @@ int GujaratWorld::getValueLR( const Engine::Raster & r, const Engine::Point2D<in
 
 void GujaratWorld::setValueLR( const int & index, const Engine::Point2D<int> & position, int value )
 {
-	//*?
-	//setInitValueLR( index, position, value );
-	//return;
-	
 	
 	Engine::Point2D<int> originLR;
 	worldCell2LowResCell( _overlapBoundaries._origin, originLR );
@@ -614,6 +603,29 @@ void GujaratWorld::updateSoilCondition()
 		}
 	}
 }
+
+
+//void GujaratWorld::updateResourcesFOO()
+//{
+	
+	/*
+	if(vFOO.size()==0)
+		{
+			vFOO.resize(_boundaries._size._x * _boundaries._size._y);
+		}
+
+	for(int i = 0; i < _boundaries._size._x * _boundaries._size._y; i++)
+	{
+		vFOO[i]=2000;
+	}
+	*/
+	
+//	for(int i = 0; i < _boundaries._size._x * _boundaries._size._y; i++)
+//	{
+//		_vFOO[i]=2000;
+//	}
+	
+//}
 
 void GujaratWorld::updateResources()
 {
