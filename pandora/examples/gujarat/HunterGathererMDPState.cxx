@@ -56,12 +56,6 @@ HunterGathererMDPState::HunterGathererMDPState( HunterGathererMDPState& s, bool 
 , _LRActionSectors((ownership[1])?*(new std::vector<Sector*>):s._LRActionSectors)
 , _HRCellPool((ownership[2])?*(new std::vector<Engine::Point2D<int>):s._HRCellPool)
 , _LRCellPool((ownership[3])?*(new std::vector<Engine::Point2D<int>):s._LRCellPool)
-/*
-, _HRActionSectors(s._HRActionSectors)
-, _LRActionSectors(s._LRActionSectors)
-, _HRCellPool(s._HRCellPool)
-, _LRCellPool(s._LRCellPool)
-*/
 {
 	_ownItems.resize(s._ownItems.getSize());
 	for(int i = 0; i < _ownItems.size(); i++)
