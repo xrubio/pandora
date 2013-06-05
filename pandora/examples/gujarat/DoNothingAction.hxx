@@ -16,6 +16,7 @@ class GujaratAgent;
 
 class DoNothingAction : public MDPAction
 {
+	static std::string _className;
 public:
 	DoNothingAction();
 	virtual ~DoNothingAction();
@@ -33,7 +34,7 @@ protected:
 	
 	Sector * getVisitedSector() { return 0; };
 	
-	void getOwnershipMDPSectorKnowledge(bool v[]) const
+	void getOwnershipMDPSectorKnowledge(std::vector<bool> & v) const
 	{
 		v[0] = false;
 		v[1] = false;
@@ -41,9 +42,14 @@ protected:
 		v[3] = false;
 	}
 	
-	
+	std::string & getClassName() { return _className; }
 };
+
+
+std::string DoNothingAction::_className = "DoNothingAction";
 
 }
 
 #endif // DoNothingAction.hxx
+
+

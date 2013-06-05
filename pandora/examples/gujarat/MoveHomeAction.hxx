@@ -21,7 +21,7 @@ class ForageAction;
 	
 class MoveHomeAction : public MDPAction
 {
-	
+	static std::string _className;
 	Engine::Point2D<int>	_newHomeLoc;
 	// forage with half adult population is executed at the same time than MoveHome
 	ForageAction * _forageAction;     
@@ -50,15 +50,19 @@ public:
 	 * { return ag.getSectorOfLRCell(_newHomeLoc); }
 	 * */
 	
-	void getOwnershipMDPSectorKnowledge(bool v[]) const
+	void getOwnershipMDPSectorKnowledge(std::vector<bool> & v) const
 	{
 		v[0] = true;
 		v[1] = true;
 		v[2] = true;
 		v[3] = true;
 	}
+	
+	std::string & getClassName() { return _className; }
 };
 	
+std::string MoveHomeAction::_className = "MoveHomeAction";
+
 } // namespace Gujarat
 
 #endif // __MoveHomeAction_hxx__

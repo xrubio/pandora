@@ -10,6 +10,15 @@
 namespace Gujarat
 {
 
+enum Ownership
+{
+	reference,
+	shallow,
+	deep
+};
+	
+	
+	
 class HunterGathererMDPState
 {
 	
@@ -54,11 +63,20 @@ public:
 							, const std::vector< bool > ownsItems);
 	
 	HunterGathererMDPState( const HunterGathererMDPState& s );
+	
+	HunterGathererMDPState( const HunterGathererMDPState& s
+							, const std::vector< Sector* > & HRActionSectors
+							, const std::vector< Sector* > & LRActionSectors
+							, const std::vector< Engine::Point2D<int> > & HRCellPool
+							, const std::vector< Engine::Point2D<int> > & LRCellPool
+							, const std::vector< bool > ownsItems );
+	
+	
 	const HunterGathererMDPState&	operator=(const HunterGathererMDPState& s );
 	
 	~HunterGathererMDPState();
 
-	void		initializeSuccessor( HunterGathererMDPState& s, bool ownership[] ) const;
+	void		initializeSuccessor( HunterGathererMDPState& s, const std::vector< bool > ownership ) const;
 
 	unsigned	hash() const;
 	bool		operator==( const HunterGathererMDPState& s ) const;

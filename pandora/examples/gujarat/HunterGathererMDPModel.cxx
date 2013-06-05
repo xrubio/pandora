@@ -67,13 +67,12 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	{
 		Sector * s = (Sector*)*it;
 		Sector * r = new Sector(s);
-		//s->shallowCopy(r);
+		// Shallow Copy;
 		(*LRActionSectors)[i++] = r;
 		it++;
 	}
 	// We have copied the Sectors, but still referencing the same LR cells!!!
-	// that's good
-	
+	// that's good, reusing Point2D pool	
 	
 	// Build initial state from current state in the simulation
 	_initial = new HunterGathererMDPState(	agentRef().getPosition()
@@ -137,11 +136,65 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 	 * or new adhoc creation... etc...
 	 */
 	
-	bool ownership[4];
+	std::vector<bool> ownership(4);
+	//TODO An action should know nothing about ownerships. Refactor the thing.
 	act->getOwnershipMDPSectorKnowledge(ownership);
-	
+	std::vector< Sector* > * HRActionSectors;
+	std::vector< Sector* > * LRActionSectors;
+	std::vector< Engine::Point2D<int> > * HRCellPool;
+	std::vector< Engine::Point2D<int> > * LRCellPool;
+	if (act->getClassName().compare("MoveHomeAction")==0)
+	{
+		// Move implies a new set of cells around the home.
+		// New containers are created to be filled by updateKnowledge(...) const
+		HRActionSectors = new std::vector< Sector* >(0);
+		LRActionSectors = new std::vector< Sector* >(0);
+		HRCellPool = new std::vector< Engine::Point2D<int> >;
+		LRCellPool = new std::vector< Engine::Point2D<int> >;
+	}
+	else if (act->getClassName().compare("ForageAction")==0)
+	{
+		// New Sectors are created to preserve utility markers of parent state.
+		// But the same cell pools are used.
+		const std::vector< Sector* > & sourceLRSectors = agentRef().getLRSectors();
+		LRActionSectors = new std::vector< Sector* >(sourceLRSectors.size());
+		
+		std::vector< Sector* >::const_iterator it = sourceLRSectors.begin();
+		int i = 0;
+		while(it!=sourceLRSectors.end())
+		{
+			Sector * se = (Sector*)*it;
+			Sector * r = new Sector(se);
+			// Shallow Copy;
+			(*LRActionSectors)[i] = r;
+			i++;
+			it++;
+		}
+		
+		HRActionSectors = &s.getHRActionSectors();
+		HRCellPool = &s.getHRCellPool();
+		LRCellPool = &s.getLRCellPool();
+		
+	}
+	else if (act->getClassName().compare("DoNothingAction")==0)
+	{
+		HRActionSectors = &s.getHRActionSectors();
+		LRActionSectors = &s.getLRActionSectors();
+		HRCellPool = &s.getHRCellPool();
+		LRCellPool = &s.getLRCellPool();
+	}
+	else{
+		/* Should be left this case to a default initialization of sectors and pools?
+		 * It could produce a backdoor effect that would lead to errors when a new
+		 * action is added to the model.
+		 */		
+		std::stringstream oss;
+		oss << "HunterGathererMDPModel::next() - Action is not recognized :" << act->getClassName();
+		throw Engine::Exception(oss.str());
+	}
+		
 	//s.initializeSuccessor(sp,ownership);
-	HunterGathererMDPState sp(s,ownership);
+	HunterGathererMDPState sp(s, *HRActionSectors, *LRActionSectors, *HRCellPool, *LRCellPool, ownership);
 	
 	act->executeMDP( agentRef(), s, sp );
 	applyFrameEffects( s, sp );
@@ -169,7 +222,6 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 	//if ( _config.isDoNothingAllowed() )
 	//	s.addAction( new DoNothingAction() );	
 	
-	// Make Forage actions
 	std::vector< Sector* > validActionSectors;
 	// Low Resolution
 	std::vector< Sector* > & LRActionSectors = s.getLRActionSectors();
@@ -178,9 +230,7 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 	// It is not needed to recalculate each time the HR cells per sector.
 	std::vector< Engine::Point2D<int> > & HRCellPool = s.getHRCellPool();
 	std::vector< Engine::Point2D<int> > & LRCellPool = s.getLRCellPool();	
-	
-	
-	//TODO cal update dels HRSectors?
+		
 	//TODO watch HRSectors update : BOTTLENECK
 	agentRef().updateKnowledge( s.getLocation(), s.getResourcesRaster(), HRActionSectors, LRActionSectors, HRCellPool, LRCellPool );
 	
@@ -189,8 +239,11 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 	{
 		if ( LRActionSectors[i]->isEmpty() )
 		{
-			delete LRActionSectors[i];
-			delete HRActionSectors[i];
+			// You can't do that if you do not own it.
+			// Any delete is postponed at the end of lifecycle of the MDPState
+			
+			// delete LRActionSectors[i];
+			// delete HRActionSectors[i];
 			continue;
 		}
 		validActionSectors.push_back( LRActionSectors[i] );
@@ -199,6 +252,9 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 	//TODO why 2 reorderings??? first random, then according a predicate
 	//std::random_shuffle( validActionSectors.begin(), validActionSectors.end() );
 	std::sort( validActionSectors.begin(), validActionSectors.end(), SectorBestFirstSortPtrVecPredicate() );
+	
+	// Make Forage actions
+	
 	int forageActions = _config.getNumberForageActions();
 	if ( forageActions >= validActionSectors.size() )
 	{
@@ -217,9 +273,11 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 			}
 		for ( unsigned i = forageActions; i < validActionSectors.size(); i++ )
 			{
-			int sectorIdx = sectorIdxMap[validActionSectors[i]];
-			delete validActionSectors[i];
-			delete HRActionSectors[sectorIdx];
+			//int sectorIdx = sectorIdxMap[validActionSectors[i]];
+			
+			// Structures from a MDPState cannot be destroyed till the State disappears
+			// delete validActionSectors[i];
+			// delete HRActionSectors[sectorIdx];
 			// delete LRActionSectors[sectorIdx]; redundancy because validActionSectors[i]==LRActionSectors[sectorIdx]
 			}
 	}
@@ -245,8 +303,10 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 	sectorIdxMap.clear();
 	possibleMoveHomeActions.clear();
 	validActionSectors.clear();
-	HRActionSectors.clear();
-	LRActionSectors.clear();
+	
+	// Reference to structures that could reference structures from a MDPState cannot be destroyed. The MDPState's will destroy the ones created and are owned.	
+	//HRActionSectors.clear();
+	//LRActionSectors.clear();
 	//std::cout << "finished creating actions for state with time index: " << s.getTimeIndex() << " and resources: " << s.getOnHandResources() << std::endl;
 } 
 

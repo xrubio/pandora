@@ -14,7 +14,7 @@ class	Sector;
 
 class MDPAction : public Engine::Action
 {
-
+	static std::string _className;
 public:
 	MDPAction();
 	virtual ~MDPAction();
@@ -27,9 +27,13 @@ public:
 	
 	friend class GujaratAgent;
 	
-	virtual void getOwnershipMDPSectorKnowledge(bool v[]) const = 0;
+	virtual void getOwnershipMDPSectorKnowledge(std::vector<bool> & v) const = 0;
+	
+	std::string & getClassName() { return _className; }
 };
 	
+std::string MDPAction::_className = "MDPAction";
+
 } // namespace Gujarat
 
 #endif // __MDPAction_hxx__

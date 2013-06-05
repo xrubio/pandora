@@ -23,6 +23,8 @@ class GujaratAgent;
 
 class ForageAction : public MDPAction
 {
+	static std::string _className;
+	
 	Sector* _HRForageArea;
 	Sector* _LRForageArea;
 	
@@ -136,7 +138,7 @@ public:
 	//**********************
 	//** ownership of sector structures int the MDP tree
 	
-	void getOwnershipMDPSectorKnowledge(bool v[]) const
+	void getOwnershipMDPSectorKnowledge(std::vector<bool> & v) const
 	{
 		v[0] = false;// HRSectors
 		v[1] = false;// HRPool
@@ -144,8 +146,13 @@ public:
 		v[3] = false;// LRPools
 	}
 	
+	std::string & getClassName() { return _className; }
 };
+
+
+std::string ForageAction::_className = "ForageAction";
 
 }
 
 #endif // ForageAction.hxx
+
