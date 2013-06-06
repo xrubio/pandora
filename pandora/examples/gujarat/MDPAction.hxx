@@ -1,6 +1,7 @@
 #ifndef __MDPAction_hxx__
 #define __MDPAction_hxx__
 
+#include <vector>
 #include <cstdlib>
 #include <iosfwd>
 
@@ -14,7 +15,7 @@ class	Sector;
 
 class MDPAction : public Engine::Action
 {
-	static std::string _className;
+	
 public:
 	MDPAction();
 	virtual ~MDPAction();
@@ -29,10 +30,10 @@ public:
 	
 	virtual void getOwnershipMDPSectorKnowledge(std::vector<bool> & v) const = 0;
 	
-	std::string & getClassName() { return _className; }
+	
 };
 	
-std::string MDPAction::_className = "MDPAction";
+
 
 } // namespace Gujarat
 

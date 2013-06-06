@@ -23,7 +23,6 @@ class GujaratAgent;
 
 class ForageAction : public MDPAction
 {
-	static std::string _className;
 	
 	Sector* _HRForageArea;
 	Sector* _LRForageArea;
@@ -146,11 +145,8 @@ public:
 		v[3] = false;// LRPools
 	}
 	
-	std::string & getClassName() { return _className; }
 };
 
-
-std::string ForageAction::_className = "ForageAction";
 
 }
 

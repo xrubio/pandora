@@ -16,7 +16,7 @@ class GujaratAgent;
 	
 class HarvestAction : public MDPAction
 {
-	static std::string _className;
+
 public:
 	HarvestAction();
 	virtual ~HarvestAction();
@@ -30,10 +30,8 @@ public:
 	
 	virtual void getOwnershipMDPSectorKnowledge(bool v[]) const = 0;
 	
-	std::string & getClassName() { return _className; }
 };
 	
-std::string HarvestAction::_className = "HarvestAction";
 
 
 } // namespace Gujarat

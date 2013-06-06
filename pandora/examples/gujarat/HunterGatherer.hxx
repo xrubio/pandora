@@ -44,7 +44,7 @@ public:
 	int  getNumSectors() const { return _numSectors; }
 	void setLowResHomeRange(int v) { _lowResHomeRange = v; }
 	int getLowResHomeRange() const { return _lowResHomeRange; }
-	
+	//-------------------------------------------------------------------
 	const std::vector<Sector *> & getHRSectors() const 
 	{ return _myHGMind->getHRSectors(); }
 	//{ return _HRSectors; }
@@ -57,7 +57,20 @@ public:
 	
 	const std::vector<Engine::Point2D<int> > & getLRCellPool() const 
 	{ return _myHGMind->getLRCellPool(); }
+	//-------------------------------------------------------------------
+	std::vector<Sector *> & getHRSectorsNoConst() const 
+	{ return _myHGMind->getHRSectorsNoConst(); }
+	//{ return _HRSectors; }
+	std::vector<Sector *> & getLRSectorsNoConst() const 
+	{ return _myHGMind->getLRSectorsNoConst(); }
+	//{ return _LRSectors; }
 	
+	std::vector<Engine::Point2D<int> > & getHRCellPoolNoConst() const 
+	{ return _myHGMind->getHRCellPoolNoConst(); }
+	
+	std::vector<Engine::Point2D<int> > & getLRCellPoolNoConst() const 
+	{ return _myHGMind->getLRCellPoolNoConst(); }
+	//-------------------------------------------------------------------
 	
 	Sector * getHRSectors(int i) { return getHRSectors()[i]; }
 	

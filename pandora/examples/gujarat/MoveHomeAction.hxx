@@ -21,7 +21,7 @@ class ForageAction;
 	
 class MoveHomeAction : public MDPAction
 {
-	static std::string _className;
+	
 	Engine::Point2D<int>	_newHomeLoc;
 	// forage with half adult population is executed at the same time than MoveHome
 	ForageAction * _forageAction;     
@@ -58,10 +58,10 @@ public:
 		v[3] = true;
 	}
 	
-	std::string & getClassName() { return _className; }
+
 };
 	
-std::string MoveHomeAction::_className = "MoveHomeAction";
+
 
 } // namespace Gujarat
 

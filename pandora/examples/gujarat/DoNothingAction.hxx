@@ -16,7 +16,7 @@ class GujaratAgent;
 
 class DoNothingAction : public MDPAction
 {
-	static std::string _className;
+	
 public:
 	DoNothingAction();
 	virtual ~DoNothingAction();
@@ -42,11 +42,9 @@ protected:
 		v[3] = false;
 	}
 	
-	std::string & getClassName() { return _className; }
+	
 };
 
-
-std::string DoNothingAction::_className = "DoNothingAction";
 
 }
 

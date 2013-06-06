@@ -15,11 +15,11 @@ Sector::Sector( const GujaratWorld & world )
 }
 
 
-Sector::Sector( const Sector* other )
+Sector::Sector( const Sector* other ):
+	_world(other->_world)
+	, _cells(other->_cells)
+	, _biomassAmount(other->_biomassAmount)
 {
-	_world = other->_world;
-	_cells = other->_cells;
-	_biomassAmount = other->_biomassAmount;
 	//_biomassAmountClass = other._biomassAmountClass;
 }
 

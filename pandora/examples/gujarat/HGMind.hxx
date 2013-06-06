@@ -52,13 +52,25 @@ namespace Gujarat
 							, std::vector< Sector* >& LRSectors
 							, std::vector< Engine::Point2D<int> >& cellPool ) const;
 		
-		const std::vector<Sector *> & getHRSectors()const{return _HRSectors;}
-		const std::vector<Sector *> & getLRSectors()const{return _LRSectors;}
+		//----------------------------------------------------------------------
+		const std::vector<Sector *> & getHRSectors()const
+		{return _HRSectors;}
+		const std::vector<Sector *> & getLRSectors()const
+		{return _LRSectors;}
 		const std::vector< Engine::Point2D<int> > & getHRCellPool()const
 		{return _HRCellPool;}
 		const std::vector< Engine::Point2D<int> > & getLRCellPool()const
 		{return _LRCellPool;}
-		
+		//----------------------------------------------------------------------
+		std::vector<Sector *> & getHRSectorsNoConst()
+		{return _HRSectors;}
+		std::vector<Sector *> & getLRSectorsNoConst()
+		{return _LRSectors;}
+		std::vector< Engine::Point2D<int> > & getHRCellPoolNoConst()
+		{return _HRCellPool;}
+		std::vector< Engine::Point2D<int> > & getLRCellPoolNoConst()
+		{return _LRCellPool;}
+		//----------------------------------------------------------------------
 		
 		Engine::Raster & getLRTimeStamps() { return _LRTimeStamps; }
 		

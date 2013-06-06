@@ -91,7 +91,7 @@ void ForageAction::execute( Engine::Agent & a )
 	double  maxDistAgentWalk = agent.computeMaxForagingDistance( _useFullPopulation );
 		
 	// 2. select nearest cell
-	Engine::Point2D<int> nearest = _HRForageArea->getNearestTo( agent.getPosition() );
+	Engine::Point2D<int> nearest = *_HRForageArea->getNearestTo( agent.getPosition() );
 
 	// 3. execute walk
 	_biomassCollected = 0;

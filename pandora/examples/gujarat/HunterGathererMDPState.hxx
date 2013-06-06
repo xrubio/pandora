@@ -10,21 +10,13 @@
 namespace Gujarat
 {
 
-enum Ownership
-{
-	reference,
-	shallow,
-	deep
-};
-	
-	
 	
 class HunterGathererMDPState
 {
 	
 protected:	
 	
-	static std::vector< Sector* > 				_emptySectorVector;
+	static std::vector< Sector* >				_emptySectorVector;
 	static std::vector< Engine::Point2D<int> >  _emptyCellPool;	
 	
 	std::vector< Sector* > & _HRActionSectors;// High Resolution
@@ -46,37 +38,37 @@ protected:
 	
 public:
 	// Constructors, I don't want this to be ever invoked
-	explicit HunterGathererMDPState();
+	//explicit HunterGathererMDPState();
 
-	void HunterGathererMDPState( HunterGathererMDPState& s, bool ownership[] ) const;
+	//HunterGathererMDPState( HunterGathererMDPState& s, bool ownership[] );
 	
 	// The real one
-	HunterGathererMDPState(	Engine::Point2D<int> loc
+	HunterGathererMDPState(	const Engine::Point2D<int> loc
 							, int initialOnHand
-							, const Engine::Raster& resourcesRaster
+							, Engine::Raster& resourcesRaster
 							, int maxResources
 							, int divider
-							, const std::vector< Sector* > & HRActionSectors
-							, const std::vector< Sector* > & LRActionSectors
-							, const std::vector< Engine::Point2D<int> > & HRCellPool
-							, const std::vector< Engine::Point2D<int> > & LRCellPool
-							, const std::vector< bool > ownsItems);
+							, std::vector< Sector* > & HRActionSectors
+							, std::vector< Sector* > & LRActionSectors
+							, std::vector< Engine::Point2D<int> > & HRCellPool
+							, std::vector< Engine::Point2D<int> > & LRCellPool
+							, std::vector< bool > ownsItems);
 	
 	HunterGathererMDPState( const HunterGathererMDPState& s );
 	
 	HunterGathererMDPState( const HunterGathererMDPState& s
-							, const std::vector< Sector* > & HRActionSectors
-							, const std::vector< Sector* > & LRActionSectors
-							, const std::vector< Engine::Point2D<int> > & HRCellPool
-							, const std::vector< Engine::Point2D<int> > & LRCellPool
-							, const std::vector< bool > ownsItems );
+							, std::vector< Sector* > & HRActionSectors
+							, std::vector< Sector* > & LRActionSectors
+							, std::vector< Engine::Point2D<int> > & HRCellPool
+							, std::vector< Engine::Point2D<int> > & LRCellPool
+							, std::vector< bool > ownsItems );
 	
 	
 	const HunterGathererMDPState&	operator=(const HunterGathererMDPState& s );
 	
 	~HunterGathererMDPState();
 
-	void		initializeSuccessor( HunterGathererMDPState& s, const std::vector< bool > ownership ) const;
+	//void		initializeSuccessor( HunterGathererMDPState& s, const std::vector< bool > ownership ) const;
 
 	unsigned	hash() const;
 	bool		operator==( const HunterGathererMDPState& s ) const;
@@ -146,10 +138,18 @@ public:
 	void	computeHash();
 	
 	
-	const std::vector< Sector* > & getLRActionSectors() { return _LRActionSectors; }
+	/*
 	const std::vector< Sector* > & getHRActionSectors() { return _HRActionSectors; }
+	const std::vector< Sector* > & getLRActionSectors() { return _LRActionSectors; }
 	const std::vector< Engine::Point2D<int> > & getHRCellPool() { return _HRCellPool; }
 	const std::vector< Engine::Point2D<int> > & getLRCellPool() { return _LRCellPool; }	
+	*/
+	
+	std::vector< Sector* > & getHRActionSectors() const { return _HRActionSectors; }
+	std::vector< Sector* > & getLRActionSectors() const { return _LRActionSectors; }
+	std::vector< Engine::Point2D<int> > & getHRCellPool() const { return _HRCellPool; }
+	std::vector< Engine::Point2D<int> > & getLRCellPool() const { return _LRCellPool; }	
+	
 	
 private:
 	

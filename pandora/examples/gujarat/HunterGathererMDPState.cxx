@@ -3,14 +3,14 @@
 namespace Gujarat
 {
 
-
+/*
 HunterGathererMDPState::HunterGathererMDPState() : _timeIndex(0), _mapLocation(-1,-1), _onHandResources(0), _maxResources(0), _resourcesDivider(1), _daysStarving(0), _isCopy( false)
-, _LRActionSectors( HunterGathererMDPState::_emptySectorVector )
 , _HRActionSectors( HunterGathererMDPState::_emptySectorVector )
+, _LRActionSectors( HunterGathererMDPState::_emptySectorVector )
 , _HRCellPool( HunterGathererMDPState::_emptyCellPool )
 , _LRCellPool( HunterGathererMDPState::_emptyCellPool )	
 {
-}
+}*/
 
 HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s )
 : _timeIndex( s._timeIndex )
@@ -27,7 +27,7 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 , _HRCellPool(s._HRCellPool)
 , _LRCellPool(s._LRCellPool)
 {
-	_ownItems.resize(s._ownItems.getSize());
+	_ownItems.resize(s._ownItems.size());
 	for(int i = 0; i < _ownItems.size(); i++)
 	{
 		_ownItems[i] = false;
@@ -43,7 +43,13 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 }
 
 
-HunterGathererMDPState::HunterGathererMDPState( HunterGathererMDPState& s, bool ownership[] ): _timeIndex( s._timeIndex )
+HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
+						, std::vector< Sector* > & HRActionSectors
+						, std::vector< Sector* > & LRActionSectors
+						, std::vector< Engine::Point2D<int> > & HRCellPool
+						, std::vector< Engine::Point2D<int> > & LRCellPool
+						, std::vector< bool > ownItems )
+: _timeIndex( s._timeIndex )
 , _mapLocation( s._mapLocation )
 , _onHandResources( s._onHandResources )
 , _resources( s._resources )
@@ -52,10 +58,10 @@ HunterGathererMDPState::HunterGathererMDPState( HunterGathererMDPState& s, bool 
 , _resourcesDivider( s._resourcesDivider )
 , _daysStarving( s._daysStarving )
 , _isCopy(true)
-, _HRActionSectors(s._HRActionSectors)
-, _LRActionSectors(s._LRActionSectors)
-, _HRCellPool(s._HRCellPool)
-, _LRCellPool(s._LRCellPool)
+, _HRActionSectors(HRActionSectors)
+, _LRActionSectors(LRActionSectors)
+, _HRCellPool(HRCellPool)
+, _LRCellPool(LRCellPool)
 
 /*
 , _HRActionSectors((ownership[0])?*(new std::vector<Sector*>):s._HRActionSectors)
@@ -64,10 +70,10 @@ HunterGathererMDPState::HunterGathererMDPState( HunterGathererMDPState& s, bool 
 , _LRCellPool((ownership[3])?*(new std::vector<Engine::Point2D<int>):s._LRCellPool)
 */
 {
-	_ownItems.resize(s._ownItems.getSize());
-	for(int i = 0; i < _ownItems.size(); i++)
+	_ownItems.resize(ownItems.size());
+	for(int i = 0; i < ownItems.size(); i++)
 	{
-		_ownItems[i] = ownership[i];
+		_ownItems[i] = ownItems[i];
 	}
 	
 	for ( unsigned k = 0; k < s._availableActions.size(); k++ )
@@ -82,16 +88,16 @@ HunterGathererMDPState::HunterGathererMDPState( HunterGathererMDPState& s, bool 
 
 
 HunterGathererMDPState::HunterGathererMDPState( 
-			Engine::Point2D<int> loc
+			const Engine::Point2D<int> loc
 			, int initResources
-			, const Engine::Raster& resourcesRaster
+			, Engine::Raster& resourcesRaster
 			, int maxResources
 			, int divider 
-			, const std::vector< Sector* > & HRActionSectors
-			, const std::vector< Sector* > & LRActionSectors
-			, const std::vector< Engine::Point2D<int> > & HRCellPool
-			, const std::vector< Engine::Point2D<int> > & LRCellPool
-			, const std::vector< bool > ownItems)
+			, std::vector< Sector* > & HRActionSectors
+			, std::vector< Sector* > & LRActionSectors
+			, std::vector< Engine::Point2D<int> > & HRCellPool
+			, std::vector< Engine::Point2D<int> > & LRCellPool
+			, std::vector< bool > ownItems)
 
 	: _timeIndex(0)
 	, _mapLocation( loc )
@@ -128,7 +134,7 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	_HRCellPool = s._HRCellPool;
 	_LRCellPool = s._LRCellPool;
 	
-	_ownItems.resize(s._ownItems.getSize());
+	_ownItems.resize(s._ownItems.size());
 	for(int i = 0; i < _ownItems.size(); i++)
 	{
 		_ownItems[i] = false;
@@ -148,6 +154,9 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	assert( s._availableActions.size() == _availableActions.size() );
 	return *this;
 }
+/*
+// HunterGathererMDPState has a bunch of ref to vector, they cannot be initialized
+so HunterGathererMDPState::initializeSuccessor must be disabled.
 
 void	HunterGathererMDPState::initializeSuccessor( HunterGathererMDPState& s,bool ownership[]) const
 {
@@ -200,17 +209,21 @@ void	HunterGathererMDPState::initializeSuccessor( HunterGathererMDPState& s,bool
 	}
 
 }
+*/
+
 
 HunterGathererMDPState::~HunterGathererMDPState()
 {
 	for ( unsigned k = 0; k < _availableActions.size(); k++ )
 		delete _availableActions[k];
 	
+	//*?
+	
 	if (_ownItems[0])
 	{
 		// stop before deleting referenced Points, this happens in the
 		// part for Pool deletion if _ownItems allows so.
-		for(int i=0;i<_HRActionSectors;i++)
+		for(int i=0;i<_HRActionSectors.size();i++)
 		{
 			delete _HRActionSectors[i];
 		}
@@ -218,7 +231,7 @@ HunterGathererMDPState::~HunterGathererMDPState()
 	}
 	if (_ownItems[1])
 	{
-		for(int i=0;i<_LRActionSectors;i++)
+		for(int i=0;i<_LRActionSectors.size();i++)
 		{
 			delete _LRActionSectors[i];
 		}

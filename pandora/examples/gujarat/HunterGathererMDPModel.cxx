@@ -75,16 +75,17 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	// that's good, reusing Point2D pool	
 	
 	// Build initial state from current state in the simulation
+	
 	_initial = new HunterGathererMDPState(	agentRef().getPosition()
 											, agentRef().getOnHandResources()
 											, agentRef().getLRResourcesRaster()
 											, _config.getHorizon()
 											, agentRef().computeConsumedResources(1)
 					
-											, agentRef().getHRSectors()
+											, agentRef().getHRSectorsNoConst()
 											, *LRActionSectors 
-											, agentRef().getHRCellPool()
-											, agentRef().getLRCellPool()
+											, agentRef().getHRCellPoolNoConst()
+											, agentRef().getLRCellPoolNoConst()
 											, ownsItems);
 	
 	//TODO refactor it, instead of passing HR and LR structures pass a HGMind
@@ -143,7 +144,8 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 	std::vector< Sector* > * LRActionSectors;
 	std::vector< Engine::Point2D<int> > * HRCellPool;
 	std::vector< Engine::Point2D<int> > * LRCellPool;
-	if (act->getClassName().compare("MoveHomeAction")==0)
+	
+	if(dynamic_cast<const MoveHomeAction*>(act))
 	{
 		// Move implies a new set of cells around the home.
 		// New containers are created to be filled by updateKnowledge(...) const
@@ -151,8 +153,8 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		LRActionSectors = new std::vector< Sector* >(0);
 		HRCellPool = new std::vector< Engine::Point2D<int> >;
 		LRCellPool = new std::vector< Engine::Point2D<int> >;
-	}
-	else if (act->getClassName().compare("ForageAction")==0)
+	}	
+	else if(dynamic_cast<const ForageAction*>(act))
 	{
 		// New Sectors are created to preserve utility markers of parent state.
 		// But the same cell pools are used.
@@ -175,8 +177,8 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		HRCellPool = &s.getHRCellPool();
 		LRCellPool = &s.getLRCellPool();
 		
-	}
-	else if (act->getClassName().compare("DoNothingAction")==0)
+	}	
+	else if(dynamic_cast<const DoNothingAction*>(act))
 	{
 		HRActionSectors = &s.getHRActionSectors();
 		LRActionSectors = &s.getLRActionSectors();
@@ -188,8 +190,10 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		 * It could produce a backdoor effect that would lead to errors when a new
 		 * action is added to the model.
 		 */		
+		#include <typeinfo>
+		
 		std::stringstream oss;
-		oss << "HunterGathererMDPModel::next() - Action is not recognized :" << act->getClassName();
+		oss << "HunterGathererMDPModel::next() - Action is of not recognized type :";
 		throw Engine::Exception(oss.str());
 	}
 		
