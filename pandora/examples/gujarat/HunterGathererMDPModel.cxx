@@ -190,10 +190,10 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		 * It could produce a backdoor effect that would lead to errors when a new
 		 * action is added to the model.
 		 */		
-		#include <typeinfo>
+		
 		
 		std::stringstream oss;
-		oss << "HunterGathererMDPModel::next() - Action is of not recognized type :";
+		oss << "HunterGathererMDPModel::next() - Action is of not recognized type.";
 		throw Engine::Exception(oss.str());
 	}
 		
