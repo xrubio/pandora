@@ -38,8 +38,16 @@ public:
 
 	int getTimeNeeded() const;
 
-	static void	generatePossibleActions( const GujaratAgent& agent, std::vector< MoveHomeAction* >& actions );
-	static void	generatePossibleActions( const GujaratAgent& agent, const Engine::Point2D<int>& agentPos, std::vector< MoveHomeAction* >& actions );
+	static void	generatePossibleActions( const GujaratAgent& agent
+										, const std::vector< Sector* > & HRActionSectors
+										, const std::vector< Sector* > & LRActionSectors
+										, std::vector< MoveHomeAction* >& actions);
+	
+	static void	generatePossibleActions( const GujaratAgent& agent
+										, const Engine::Point2D<int>& agentPos
+										, const std::vector< Sector* > & HRActionSectors
+										, const std::vector< Sector* > & LRActionSectors
+										, std::vector< MoveHomeAction* > & actions);
 
 	MDPAction* copy() const;
 	std::string describe() const;
@@ -50,15 +58,7 @@ public:
 	 * { return ag.getSectorOfLRCell(_newHomeLoc); }
 	 * */
 	
-	void getOwnershipMDPSectorKnowledge(std::vector<bool> & v) const
-	{
-		v[0] = true;
-		v[1] = true;
-		v[2] = true;
-		v[3] = true;
-	}
 	
-
 };
 	
 

@@ -7,12 +7,23 @@
 #include <MDPAction.hxx>
 #include <engine/problem.h>
 
+#include <map>
+
 namespace Gujarat
 {
 
 	
 class HunterGathererMDPState
 {
+	//*?
+	//static std::vector< std::map<long,long> > _objectUseCounter;
+	static std::map<long,long> _objectUseCounter;
+	
+	
+public:
+	int _creator;
+	int _dni;
+	std::string _actionName;
 	
 protected:	
 	
@@ -150,6 +161,22 @@ public:
 	std::vector< Engine::Point2D<int> > & getHRCellPool() const { return _HRCellPool; }
 	std::vector< Engine::Point2D<int> > & getLRCellPool() const { return _LRCellPool; }	
 	
+	const std::vector< bool > & getOwnerShip() const { return _ownItems;} 
+	
+	//*?
+	int dniTicket () {
+		static int counter = 0;
+		return counter++;
+	}
+	
+	//static void resetTicket() { HunterGathererMDPState::counter = 0; }
+	
+	static void clearRefCounterMap();
+	
+	void registerKnowledgeStructuresAtCounterMap();
+	
+	void deRegisterFromCounterMapAndDeleteKnowledgeStructures();
+	
 	
 private:
 	
@@ -158,6 +185,7 @@ private:
 	unsigned					_timeIndex;
 	Engine::Point2D<int>		_mapLocation;
 	int							_onHandResources;
+	
 	Engine::IncrementalRaster	_resources;
 	Engine::HashKey				_hashKey;
 	std::vector<MDPAction*> 	_availableActions;
@@ -166,6 +194,8 @@ private:
 	int 						_daysStarving;
 	bool						_isCopy;
 };
+
+//std::vector<abc> xyz::myvector;
 
 inline std::ostream& operator<<( std::ostream& os, const HunterGathererMDPState& s )
 {

@@ -36,6 +36,11 @@ ForageAction::~ForageAction()
 MDPAction*	ForageAction::copy() const
 {
 	ForageAction * newAction = 0;
+	
+	//* According to the strategy of sharing sector structures
+	// between MDP states, no MDPAction owns its ForageArea, so it
+	// can not do any delete nor creation.
+	/*
 	if( !_ownsForageAreaPointer )
 	{
 		newAction = new ForageAction(_HRForageArea, _LRForageArea, false);
@@ -44,6 +49,9 @@ MDPAction*	ForageAction::copy() const
 	{
 		newAction = new ForageAction( new Sector( *_HRForageArea ), new Sector( *_LRForageArea ),true);
 	}
+	*/
+	newAction = new ForageAction(_HRForageArea, _LRForageArea, false);
+	
 	newAction->setFullPopulation(_useFullPopulation);
 	return newAction;
 }

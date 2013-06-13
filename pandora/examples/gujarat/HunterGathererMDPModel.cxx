@@ -9,6 +9,9 @@
 #include <Exceptions.hxx>
 #include <typeinfo>
 
+#include <sstream>
+#include <Logger.hxx>
+
 using Problem::action_t;
 
 namespace Gujarat
@@ -35,6 +38,9 @@ void	HunterGathererMDPModel::setup( const HunterGathererMDPConfig& cfg )
 
 void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 {
+	std::stringstream logName;
+	logName << "infoshar";
+	
 	if ( _initial != NULL )
 		delete _initial;
 
@@ -76,6 +82,10 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	
 	// Build initial state from current state in the simulation
 	
+	log_INFO(logName.str(),"CREA INITIAL");
+	
+	//*?
+	//HunterGathererMDPState::clearRefCounterMap();
 	_initial = new HunterGathererMDPState(	agentRef().getPosition()
 											, agentRef().getOnHandResources()
 											, agentRef().getLRResourcesRaster()
@@ -87,9 +97,17 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 											, agentRef().getHRCellPoolNoConst()
 											, agentRef().getLRCellPoolNoConst()
 											, ownsItems);
+											
 	
 	//TODO refactor it, instead of passing HR and LR structures pass a HGMind
+	
+	log_INFO(logName.str(),"MAKE ACTIONS INITIAL");
+	
 	makeActionsForState( *_initial );
+	
+	log_INFO(logName.str(),"MAKE ACTIONS INITIAL AFTER");
+	
+	
 	//std::cout << "Initial state: " << *_initial << std::endl;	
 }
 
@@ -130,6 +148,10 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 					action_t a, 
 					OutcomeVector& outcomes ) const
 {
+	std::stringstream logName;
+	logName << "infoshar";
+	
+	
 	const MDPAction* act = s.availableActions(a);
 	/*
 	 * Here, where I know whether "act" is ForageAction or MoveHomeAction,
@@ -139,7 +161,7 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 	
 	std::vector<bool> ownership(4);
 	//TODO An action should know nothing about ownerships. Refactor the thing.
-	act->getOwnershipMDPSectorKnowledge(ownership);
+	
 	std::vector< Sector* > * HRActionSectors;
 	std::vector< Sector* > * LRActionSectors;
 	std::vector< Engine::Point2D<int> > * HRCellPool;
@@ -149,10 +171,17 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 	{
 		// Move implies a new set of cells around the home.
 		// New containers are created to be filled by updateKnowledge(...) const
-		HRActionSectors = new std::vector< Sector* >(0);
+		// HR information remains untouched, not used along MDP
+		HRActionSectors = &s.getHRActionSectors();	
+		//HRActionSectors = new std::vector< Sector* >(0);
 		LRActionSectors = new std::vector< Sector* >(0);
-		HRCellPool = new std::vector< Engine::Point2D<int> >;
-		LRCellPool = new std::vector< Engine::Point2D<int> >;
+		HRCellPool = &s.getHRCellPool();
+		//HRCellPool = new std::vector< Engine::Point2D<int> >;
+		LRCellPool = new std::vector< Engine::Point2D<int> >(0);
+		ownership[0]=false;
+		ownership[1]=true;
+		ownership[2]=false;
+		ownership[3]=true;
 	}	
 	else if(dynamic_cast<const ForageAction*>(act))
 	{
@@ -177,6 +206,13 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		HRCellPool = &s.getHRCellPool();
 		LRCellPool = &s.getLRCellPool();
 		
+		ownership = s.getOwnerShip();
+		ownership[1]=true;
+		/*
+		ownership[0]=false;
+		ownership[1]=true;
+		ownership[2]=false;
+		ownership[3]=false;*/
 	}	
 	else if(dynamic_cast<const DoNothingAction*>(act))
 	{
@@ -184,6 +220,12 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		LRActionSectors = &s.getLRActionSectors();
 		HRCellPool = &s.getHRCellPool();
 		LRCellPool = &s.getLRCellPool();
+		
+		ownership = s.getOwnerShip();
+		/*ownership[0]=false;
+		ownership[1]=false;
+		ownership[2]=false;
+		ownership[3]=false;*/
 	}
 	else{
 		/* Should be left this case to a default initialization of sectors and pools?
@@ -191,19 +233,26 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		 * action is added to the model.
 		 */		
 		
-		
 		std::stringstream oss;
 		oss << "HunterGathererMDPModel::next() - Action is of not recognized type.";
 		throw Engine::Exception(oss.str());
 	}
 		
+	log_INFO(logName.str(),"I AM HunterGathererMDPModel::next");
 	//s.initializeSuccessor(sp,ownership);
 	HunterGathererMDPState sp(s, *HRActionSectors, *LRActionSectors, *HRCellPool, *LRCellPool, ownership);
 	
+	log_INFO(logName.str(),"EXECUTE MDP "<< s._dni << " " << sp._dni);
 	act->executeMDP( agentRef(), s, sp );
 	applyFrameEffects( s, sp );
 	sp.computeHash();	
+	
+	log_INFO(logName.str(),"HunterGathererMDPModel::next BEFORE make actions");
+	
 	makeActionsForState( sp );
+	
+	log_INFO(logName.str(),"HunterGathererMDPModel::next AFTER make actions");
+	
 	outcomes.push_back( std::make_pair(sp, 1.0) );
 }
 
@@ -265,7 +314,9 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 		for ( unsigned i = 0; i < validActionSectors.size(); i++ )
 		{
 			int sectorIdx = sectorIdxMap[validActionSectors[i]];
-			s.addAction( new ForageAction( HRActionSectors[sectorIdx], validActionSectors[i], true ) );	
+			//*?
+			//s.addAction( new ForageAction( HRActionSectors[sectorIdx], validActionSectors[i], true ) );
+			s.addAction( new ForageAction( HRActionSectors[sectorIdx], validActionSectors[i], false ) );	
 		}
 	}
 	else
@@ -273,7 +324,8 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 		for ( unsigned i = 0; i < forageActions; i++ )
 			{
 			int sectorIdx = sectorIdxMap[validActionSectors[i]];
-			s.addAction( new ForageAction( HRActionSectors[sectorIdx],validActionSectors[i], true ) );
+			//s.addAction( new ForageAction( HRActionSectors[sectorIdx],validActionSectors[i], true ) );
+			s.addAction( new ForageAction( HRActionSectors[sectorIdx],validActionSectors[i], false ) );
 			}
 		for ( unsigned i = forageActions; i < validActionSectors.size(); i++ )
 			{
@@ -289,7 +341,7 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 
 	// Make Move Home
 	std::vector< MoveHomeAction* > possibleMoveHomeActions;
-	MoveHomeAction::generatePossibleActions( agentRef(), s.getLocation(), possibleMoveHomeActions );
+	MoveHomeAction::generatePossibleActions( agentRef(), s.getLocation(), HRActionSectors, validActionSectors, possibleMoveHomeActions );
 	int moveHomeActions =  _config.getNumberMoveHomeActions();
 	if (  moveHomeActions >=  possibleMoveHomeActions.size() )
 	{

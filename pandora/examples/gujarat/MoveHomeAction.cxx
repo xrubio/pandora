@@ -49,14 +49,22 @@ std::string MoveHomeAction::describe() const
 	return logMove.str();
 }
 
-void	MoveHomeAction::generatePossibleActions( const GujaratAgent & agent, std::vector< MoveHomeAction* > & actions )
+
+
+void	MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
+												, const  std::vector< Sector* > & HRActionSectors
+												, const std::vector< Sector* > & LRActionSectors
+												, std::vector< MoveHomeAction* > & actions )
+												
 {
-	generatePossibleActions( agent, agent.getPosition(), actions );
+	generatePossibleActions( agent, agent.getPosition(), HRActionSectors, LRActionSectors, actions );
 }
 
-void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent,
-						const Engine::Point2D<int> & agentPos, 
-						std::vector< MoveHomeAction* > & actions )
+void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
+											, const Engine::Point2D<int> & agentPos
+											, const std::vector< Sector* > & HRActionSectors
+											, const std::vector< Sector* > & LRActionSectors
+											, std::vector< MoveHomeAction* > & actions )
 {
 	std::stringstream logName;
 	logName << "agents_" << agent.getWorld()->getId() << "_" << agent.getId();
@@ -117,45 +125,42 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent,
 					*/
 
 					if ( numDunes - gw->getValueLR(eLRPopulation,*sectCells[cellsIdx]) > 0 && scoreBestCell <= scoreCell )
-                	{
-                    		if ( scoreBestCell < scoreCell )
-                    		{           
-                        		scoreBestCell = scoreCell;
-                        		candidateCells.clear();
-                    		}
-                    		candidateCells.push_back(sectCells[cellsIdx]);
-                	}
-            	}
-        }
+					{
+						if ( scoreBestCell < scoreCell )
+						{           
+							scoreBestCell = scoreCell;
+							candidateCells.clear();
+						}
+						candidateCells.push_back(sectCells[cellsIdx]);
+					}
+				}
+		}
         
-    }
+	}
     // Select candidate
    
-   assert(!candidateCells.empty());   
+	assert(!candidateCells.empty());   
    
-    if(!candidateCells.empty())
-    {   
-        uint32_t diceSelectOneRandomDune = Engine::GeneralState::statistics().getUniformDistValue(0, candidateCells.size()-1);
+	if(!candidateCells.empty())
+	{   
+		uint32_t diceSelectOneRandomDune = Engine::GeneralState::statistics().getUniformDistValue(0, candidateCells.size()-1);
 
-        Engine::Point2D<int> newPos = *candidateCells.at(diceSelectOneRandomDune);
+		Engine::Point2D<int> newPos = *candidateCells.at(diceSelectOneRandomDune);
 		Engine::Point2D<int> newHome;
 		//gw->LowRes2HighResCellCorner(newPos,newHome);
 		gw->getHRFreeCell(newPos,newHome);
 		
-		for( int i = 0; i < agentConcrete.getLRSectors().size(); i++)
-        //for(std::vector<Sector *>::const_iterator it=agentConcrete.getLRSectors().begin(); it!=agentConcrete.getLRSectors().end(); it++)
-        {
-            //if(!(*it)->isEmpty())
-            if(!agentConcrete.getLRSectors()[i]->isEmpty())
-            {
-				actions.push_back( new MoveHomeAction( newHome, agentConcrete.getHRSectors()[i], agentConcrete.getLRSectors()[i] ) );
-				//actions.push_back( new MoveHomeAction( newHome, *it ) );
-				//actions.push_back( new MoveHomeAction( newPos, *it ) );
-            }
-        }
-    }
+		for( int i = 0; i < LRActionSectors.size(); i++)
+		//for( int i = 0; i < agentConcrete.getLRSectors().size(); i++)
+		{           
+			if(!LRActionSectors[i]->isEmpty())
+			{
+				actions.push_back( new MoveHomeAction( newHome, HRActionSectors[i],LRActionSectors[i],false ) );
+			}
+		}	
+	}
     
-    candidateCells.clear();
+	candidateCells.clear();
 
 	assert( !actions.empty() );
 	
@@ -209,7 +214,6 @@ void MoveHomeAction::executeMDP( const GujaratAgent& agent, const HunterGatherer
 	<< "t=" << s.getTimeIndex() << ","
 	<< "pos=" << s.getLocation() 
 	<< std::endl;*/
-	
 }
 
 int MoveHomeAction::getTimeNeeded() const

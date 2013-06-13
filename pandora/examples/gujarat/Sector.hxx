@@ -26,6 +26,13 @@ enum	BiomassAmountClass
 
 class Sector
 {
+	//*?
+	int dniTicket () {
+		static int counter = 0;
+		return counter++;
+	}	
+	int _dni;
+	
 	//const Engine::World & _world; needed change due to use of LR methods for raster access.
 	const GujaratWorld & _world;
 	std::vector< Engine::Point2D<int> * > _cells;
@@ -93,6 +100,9 @@ public:
 		target->_cells = _cells;
 		target->_biomassAmount = _biomassAmount;
 	}*/
+	
+	
+	
 };
 
 class SectorBestFirstSortPtrVecPredicate

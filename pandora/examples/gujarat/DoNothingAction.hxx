@@ -34,15 +34,7 @@ protected:
 	
 	Sector * getVisitedSector() { return 0; };
 	
-	void getOwnershipMDPSectorKnowledge(std::vector<bool> & v) const
-	{
-		v[0] = false;
-		v[1] = false;
-		v[2] = false;
-		v[3] = false;
-	}
-	
-	
+		
 };
 
 

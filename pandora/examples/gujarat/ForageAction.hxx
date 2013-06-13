@@ -137,13 +137,7 @@ public:
 	//**********************
 	//** ownership of sector structures int the MDP tree
 	
-	void getOwnershipMDPSectorKnowledge(std::vector<bool> & v) const
-	{
-		v[0] = false;// HRSectors
-		v[1] = false;// HRPool
-		v[2] = true;// LRSectors
-		v[3] = false;// LRPools
-	}
+	
 	
 };
 

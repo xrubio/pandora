@@ -6,12 +6,15 @@
 #include <GujaratWorld.hxx>
 #include <cassert>
 
+#include <Logger.hxx>
+
 namespace Gujarat
 {
 
 Sector::Sector( const GujaratWorld & world ) 
 	: _world(world), _biomassAmount(0)
 {
+	_dni = dniTicket();
 }
 
 
@@ -21,11 +24,15 @@ Sector::Sector( const Sector* other ):
 	, _biomassAmount(other->_biomassAmount)
 {
 	//_biomassAmountClass = other._biomassAmountClass;
+	_dni = dniTicket();
 }
 
 
 Sector::~Sector()
 {
+	std::stringstream logName;
+	logName << "infoshar";	
+	log_INFO(logName.str(),"DELETING Sector " << _dni);
 	_cells.clear();
 }
 

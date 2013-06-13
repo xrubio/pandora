@@ -44,7 +44,8 @@ void HunterGathererProgrammedController::selectActions( GujaratAgent & agent, st
 	else
 	{
 		std::vector< MoveHomeAction* > possibleActions;
-		MoveHomeAction::generatePossibleActions( agent, possibleActions );
+		
+		MoveHomeAction::generatePossibleActions( (HunterGatherer&)agent,((HunterGatherer&)agent).getHRSectors(),((HunterGatherer&)agent).getLRSectors(), possibleActions );
 		dice = Engine::GeneralState::statistics().getUniformDistValue( 0, possibleActions.size() - 1 );
 		MoveHomeAction * selectedAction = possibleActions.at(dice);
 		possibleActions.at(dice) = 0;

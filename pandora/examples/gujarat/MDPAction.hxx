@@ -28,8 +28,6 @@ public:
 	
 	friend class GujaratAgent;
 	
-	virtual void getOwnershipMDPSectorKnowledge(std::vector<bool> & v) const = 0;
-	
 	
 };
 	

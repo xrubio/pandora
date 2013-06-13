@@ -131,7 +131,7 @@ MDPAction* HunterGathererDecisionTreeController::shouldMoveHome( HunterGatherer 
 	{
 		return 0;
 	}
-	MoveHomeAction::generatePossibleActions( agent, possibleActions );
+	MoveHomeAction::generatePossibleActions( agent, agent.getHRSectors(), agent.getLRSectors(), possibleActions );
 	
 	// generatePossibleAction generates potential MoveHome actions ordered by the score of potential SettlementAreas
 	// thus, the first possible action with the best potential biomass is the optimal move

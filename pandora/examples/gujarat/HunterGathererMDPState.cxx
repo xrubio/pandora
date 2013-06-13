@@ -1,4 +1,7 @@
 #include <HunterGathererMDPState.hxx>
+#include <Logger.hxx>
+
+#include <sstream>
 
 namespace Gujarat
 {
@@ -11,6 +14,8 @@ HunterGathererMDPState::HunterGathererMDPState() : _timeIndex(0), _mapLocation(-
 , _LRCellPool( HunterGathererMDPState::_emptyCellPool )	
 {
 }*/
+
+std::map<long,long> HunterGathererMDPState::_objectUseCounter;
 
 HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s )
 : _timeIndex( s._timeIndex )
@@ -27,10 +32,19 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 , _HRCellPool(s._HRCellPool)
 , _LRCellPool(s._LRCellPool)
 {
+	std::stringstream logName;
+	logName << "infoshar";
+	
+	_dni=dniTicket ();
+	
+	//log_INFO(logName.str(),"XXXX CREA 1:" << s._dni << "->" << _dni);
+	_creator=1;
+	
 	_ownItems.resize(s._ownItems.size());
 	for(int i = 0; i < _ownItems.size(); i++)
 	{
-		_ownItems[i] = false;
+		//_ownItems[i] = false;
+		_ownItems[i] = s._ownItems[i];
 	}
 	
 	for ( unsigned k = 0; k < s._availableActions.size(); k++ )
@@ -40,6 +54,8 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 		//addAction( s._availableActions[k] );
 	}
 	assert( s._availableActions.size() == _availableActions.size() );
+	
+	registerKnowledgeStructuresAtCounterMap();
 }
 
 
@@ -70,12 +86,22 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 , _LRCellPool((ownership[3])?*(new std::vector<Engine::Point2D<int>):s._LRCellPool)
 */
 {
+	std::stringstream logName;
+	logName << "infoshar";	
+		
+	_dni=dniTicket ();
+	
+	//log_INFO(logName.str(),"XXXX CREA 2:" << s._dni << "->" << _dni);
+	_creator=2;
+	
 	_ownItems.resize(ownItems.size());
 	for(int i = 0; i < ownItems.size(); i++)
 	{
 		_ownItems[i] = ownItems[i];
 	}
 	
+//*?
+	/*
 	for ( unsigned k = 0; k < s._availableActions.size(); k++ )
 	{
 		//*?
@@ -83,6 +109,8 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 		//addAction( s._availableActions[k] );
 	}
 	assert( s._availableActions.size() == _availableActions.size() );
+	*/
+	registerKnowledgeStructuresAtCounterMap();
 }
 
 
@@ -113,12 +141,35 @@ HunterGathererMDPState::HunterGathererMDPState(
 	, _daysStarving( 0 )
 	, _isCopy(false)
 {
+	std::stringstream logName;
+	logName << "infoshar";	
+
+	_dni=dniTicket ();
+	
+	//log_INFO(logName.str(),"XXXX CREA 3:" << _dni);
+	_creator=3;
+
+	_ownItems.resize(ownItems.size());
+	for(int i = 0; i < ownItems.size(); i++)
+	{
+		_ownItems[i] = ownItems[i];
+	}
+	
 	computeHash();	
+	registerKnowledgeStructuresAtCounterMap();
 }
 
 
 const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGathererMDPState& s )
-{
+{	
+	std::stringstream logName;
+	logName << "infoshar";	
+	
+	_dni=dniTicket ();
+	
+	log_INFO(logName.str(),"XXXX CREA 4:" << s._dni << "->" << _dni);
+	_creator=4;
+	
 	_timeIndex 		 = s._timeIndex;
 	_mapLocation 	 = s._mapLocation;
 	_onHandResources = s._onHandResources;
@@ -129,6 +180,8 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	_daysStarving 	 = s._daysStarving;
 	_isCopy 		 = true;	
 
+	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
+	
 	_HRActionSectors = s._HRActionSectors;
 	_LRActionSectors = s._LRActionSectors;
 	_HRCellPool = s._HRCellPool;
@@ -137,9 +190,9 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	_ownItems.resize(s._ownItems.size());
 	for(int i = 0; i < _ownItems.size(); i++)
 	{
-		_ownItems[i] = false;
+	//	_ownItems[i] = false;
+		_ownItems[i] = s._ownItems[i];
 	}
-	
 	
 	for ( unsigned k = 0; k < _availableActions.size(); k++ )
 	{
@@ -152,12 +205,16 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 		addAction( s._availableActions[k]->copy() );
 	}
 	assert( s._availableActions.size() == _availableActions.size() );
+	
+	registerKnowledgeStructuresAtCounterMap();
+	
 	return *this;
 }
+
+
 /*
 // HunterGathererMDPState has a bunch of ref to vector, they cannot be initialized
 so HunterGathererMDPState::initializeSuccessor must be disabled.
-
 void	HunterGathererMDPState::initializeSuccessor( HunterGathererMDPState& s,bool ownership[]) const
 {
 	s._timeIndex 		= _timeIndex;
@@ -214,13 +271,27 @@ void	HunterGathererMDPState::initializeSuccessor( HunterGathererMDPState& s,bool
 
 HunterGathererMDPState::~HunterGathererMDPState()
 {
+	std::stringstream logName;
+	logName << "infoshar";	
+	
+	
+	/*log_INFO(logName.str(),"DELETE "<< _dni 
+					<<" , CREATED WITH:" << _creator 
+					<< " , owns:" 	<< _ownItems[0]
+									<< _ownItems[1]
+									<< _ownItems[2]
+									<< _ownItems[3]);	
+	*/
 	for ( unsigned k = 0; k < _availableActions.size(); k++ )
 		delete _availableActions[k];
 	
-	//*?
 	
+	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
+	
+	/*
 	if (_ownItems[0])
 	{
+		log_INFO(logName.str(),"DELETE HRSectors");
 		// stop before deleting referenced Points, this happens in the
 		// part for Pool deletion if _ownItems allows so.
 		for(int i=0;i<_HRActionSectors.size();i++)
@@ -231,6 +302,7 @@ HunterGathererMDPState::~HunterGathererMDPState()
 	}
 	if (_ownItems[1])
 	{
+		log_INFO(logName.str(),"DELETE LRSectors");
 		for(int i=0;i<_LRActionSectors.size();i++)
 		{
 			delete _LRActionSectors[i];
@@ -239,13 +311,15 @@ HunterGathererMDPState::~HunterGathererMDPState()
 	}
 	if (_ownItems[2])
 	{
+		log_INFO(logName.str(),"DELETE HRPool");
 		delete &_HRCellPool;
 	}
 	if (_ownItems[3])
 	{
+		log_INFO(logName.str(),"DELETE LRPool");
 		delete &_LRCellPool;
 	}
-	
+	*/
 }
 
 void	HunterGathererMDPState::addAction( MDPAction* a )
@@ -333,4 +407,115 @@ void	HunterGathererMDPState::print( std::ostream& os ) const
 }
 
 
+
+void HunterGathererMDPState::registerKnowledgeStructuresAtCounterMap()
+	{		
+		//static std::map<long,long> _objectUseCounter;
+		
+		if (HunterGathererMDPState::_objectUseCounter.count((long)&_HRActionSectors) > 0)
+		{
+			HunterGathererMDPState::_objectUseCounter[(long)&_HRActionSectors]++;
+		}
+		else
+		{
+			HunterGathererMDPState::_objectUseCounter[(long)&_HRActionSectors]=1;
+		}
+		
+		if (HunterGathererMDPState::_objectUseCounter.count((long)&_LRActionSectors) > 0)
+		{
+			HunterGathererMDPState::_objectUseCounter[(long)&_LRActionSectors]++;
+		}
+		else
+		{
+			HunterGathererMDPState::_objectUseCounter[(long)&_LRActionSectors]=1;
+		}
+		
+		if (HunterGathererMDPState::_objectUseCounter.count((long)&_HRCellPool) > 0)
+		{
+			HunterGathererMDPState::_objectUseCounter[(long)&_HRCellPool]++;
+		}
+		else
+		{
+			HunterGathererMDPState::_objectUseCounter[(long)&_HRCellPool]=1;
+		}
+		
+		if (HunterGathererMDPState::_objectUseCounter.count((long)&_LRCellPool) > 0)
+		{
+			HunterGathererMDPState::_objectUseCounter[(long)&_LRCellPool]++;
+		}
+		else
+		{
+			HunterGathererMDPState::_objectUseCounter[(long)&_LRCellPool]=1;
+		}
+		
+	}
+	
+
+void HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructures()
+	{
+		//static std::map<long,long> _objectUseCounter;
+		
+		//std::cout << "DELETING state " << _dni << std::endl;
+		
+		if (HunterGathererMDPState::_objectUseCounter.count((long)&_HRActionSectors) > 1)
+		{	
+			HunterGathererMDPState::_objectUseCounter[(long)&_HRActionSectors]--;
+		}
+		else if (_ownItems[0])
+		{
+			HunterGathererMDPState::_objectUseCounter.erase((long)&_HRActionSectors);
+			for(int i=0;i<_HRActionSectors.size();i++)
+			{
+				delete _HRActionSectors[i];
+			}
+			
+			delete &_HRActionSectors;
+		}
+		
+		
+		if (HunterGathererMDPState::_objectUseCounter.count((long)&_LRActionSectors) > 0)
+		{
+			HunterGathererMDPState::_objectUseCounter[(long)&_LRActionSectors]--;
+		}
+		else if (_ownItems[1])
+		{
+			HunterGathererMDPState::_objectUseCounter.erase((long)&_LRActionSectors);
+			for(int i=0;i<_LRActionSectors.size();i++)
+			{
+				delete _LRActionSectors[i];
+			}			
+			delete &_LRActionSectors;
+		}
+		
+		
+		if (HunterGathererMDPState::_objectUseCounter.count((long)&_HRCellPool) > 0)
+		{
+			HunterGathererMDPState::_objectUseCounter[(long)&_HRCellPool]--;
+		}
+		else if (_ownItems[2])
+		{
+			HunterGathererMDPState::_objectUseCounter.erase((long)&_HRCellPool);
+			delete &_HRCellPool;
+		}
+		
+		
+		if (HunterGathererMDPState::_objectUseCounter.count((long)&_LRCellPool) > 0)
+		{
+			HunterGathererMDPState::_objectUseCounter[(long)&_LRCellPool]--;
+		}
+		else if (_ownItems[3])
+		{
+			HunterGathererMDPState::_objectUseCounter.erase((long)&_LRCellPool);
+			delete &_LRCellPool;
+		}
+		
+	}
+
+	
+	void HunterGathererMDPState::clearRefCounterMap() 
+	{ 
+		HunterGathererMDPState::_objectUseCounter.clear();
+	}
+	
 }
+
