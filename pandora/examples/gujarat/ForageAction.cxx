@@ -304,7 +304,7 @@ void	ForageAction::doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0,
 	
 	while ( ( walkedDist + distHome ) < maxDist )
 	{		
-		//*?
+		
 		/*
 		std::cout << "MSG> WALK:";
 		std::cout << " maxDist: " << maxDist;

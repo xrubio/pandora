@@ -82,10 +82,8 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	
 	// Build initial state from current state in the simulation
 	
-	log_INFO(logName.str(),"CREA INITIAL");
+	//log_INFO(logName.str(),"CREA INITIAL");
 	
-	//*?
-	//HunterGathererMDPState::clearRefCounterMap();
 	_initial = new HunterGathererMDPState(	agentRef().getPosition()
 											, agentRef().getOnHandResources()
 											, agentRef().getLRResourcesRaster()
@@ -101,11 +99,11 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	
 	//TODO refactor it, instead of passing HR and LR structures pass a HGMind
 	
-	log_INFO(logName.str(),"MAKE ACTIONS INITIAL");
+	//log_INFO(logName.str(),"MAKE ACTIONS INITIAL");
 	
 	makeActionsForState( *_initial );
 	
-	log_INFO(logName.str(),"MAKE ACTIONS INITIAL AFTER");
+	//log_INFO(logName.str(),"MAKE ACTIONS INITIAL AFTER");
 	
 	
 	//std::cout << "Initial state: " << *_initial << std::endl;	
@@ -206,13 +204,10 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		HRCellPool = &s.getHRCellPool();
 		LRCellPool = &s.getLRCellPool();
 		
-		ownership = s.getOwnerShip();
-		ownership[1]=true;
-		/*
 		ownership[0]=false;
 		ownership[1]=true;
 		ownership[2]=false;
-		ownership[3]=false;*/
+		ownership[3]=s.getOwnerShip()[3];
 	}	
 	else if(dynamic_cast<const DoNothingAction*>(act))
 	{
@@ -221,11 +216,11 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		HRCellPool = &s.getHRCellPool();
 		LRCellPool = &s.getLRCellPool();
 		
-		ownership = s.getOwnerShip();
-		/*ownership[0]=false;
-		ownership[1]=false;
+		//ownership = s.getOwnerShip();
+		ownership[0]=false;
+		ownership[1]=s.getOwnerShip()[1];
 		ownership[2]=false;
-		ownership[3]=false;*/
+		ownership[3]=s.getOwnerShip()[3];
 	}
 	else{
 		/* Should be left this case to a default initialization of sectors and pools?
@@ -238,20 +233,15 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		throw Engine::Exception(oss.str());
 	}
 		
-	log_INFO(logName.str(),"I AM HunterGathererMDPModel::next");
+	
 	//s.initializeSuccessor(sp,ownership);
 	HunterGathererMDPState sp(s, *HRActionSectors, *LRActionSectors, *HRCellPool, *LRCellPool, ownership);
-	
-	log_INFO(logName.str(),"EXECUTE MDP "<< s._dni << " " << sp._dni);
+		
 	act->executeMDP( agentRef(), s, sp );
 	applyFrameEffects( s, sp );
 	sp.computeHash();	
-	
-	log_INFO(logName.str(),"HunterGathererMDPModel::next BEFORE make actions");
-	
+
 	makeActionsForState( sp );
-	
-	log_INFO(logName.str(),"HunterGathererMDPModel::next AFTER make actions");
 	
 	outcomes.push_back( std::make_pair(sp, 1.0) );
 }
@@ -314,7 +304,6 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 		for ( unsigned i = 0; i < validActionSectors.size(); i++ )
 		{
 			int sectorIdx = sectorIdxMap[validActionSectors[i]];
-			//*?
 			//s.addAction( new ForageAction( HRActionSectors[sectorIdx], validActionSectors[i], true ) );
 			s.addAction( new ForageAction( HRActionSectors[sectorIdx], validActionSectors[i], false ) );	
 		}

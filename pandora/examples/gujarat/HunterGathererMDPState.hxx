@@ -8,6 +8,9 @@
 #include <engine/problem.h>
 
 #include <map>
+//#include <unordered_map>
+
+//#include <boost/thread/mutex.hpp>
 
 namespace Gujarat
 {
@@ -16,8 +19,16 @@ namespace Gujarat
 class HunterGathererMDPState
 {
 	//*?
-	//static std::vector< std::map<long,long> > _objectUseCounter;
+	//static std::vector< std::unordered_map<long,long> > _objectUseCounter;
+	//boost::mutex _mtx;
 	static std::map<long,long> _objectUseCounter;
+	/* There is some posibility of interference between threads and
+	 * data corruption in _objecUseCounter? RACE CONDITIONS?
+	 * Threads belong to a same process, they share same space address
+	 * Each threads registers different objects here. Each object with a
+	 * different memory address. Will two different threads use the same
+	 * address from a MDPState object? I dont think so. 
+	 */
 	
 	
 public:

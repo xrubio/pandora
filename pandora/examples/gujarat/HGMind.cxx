@@ -53,7 +53,7 @@ void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos,
 	//if(HRSectors.size()==0)
 	//{
 		
-		//*?
+		
 		//cellPool.resize(GujaratState::HRCellsInHomeRange);
 		cellPool.resize((2*homeRange+1)*(2*homeRange+1));
 		int insertPoint = 0;
@@ -84,7 +84,6 @@ void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos,
 					continue;
 				}
 				
-				//*?
 				cellPool[insertPoint]=p;
 				HRSectors[indexSector]->addCell( &cellPool[insertPoint] );
 				insertPoint++;
@@ -169,7 +168,6 @@ void HGMind::createLRSectors( 	const Engine::Point2D<int>& agentPos,
 					continue;
 				}
 				
-				//*?
 				cellPool[insertPoint]=LRxycell;
 				LRSectors[indexSector]->addCell( &cellPool[insertPoint] );
 				insertPoint++;

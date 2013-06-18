@@ -326,8 +326,6 @@ void GujaratState::initializeSectorsMask( int numSectors, int homeRange, Sectors
 		sectors.at(i).push_back( Engine::Point2D<int>( (int)c._x, (int)c._y ) );
 		b = c;
 	}
-
-	//*?
 	
 	sm.at(0).at(0) = -1;
 	for ( int x=-homeRange; x<=homeRange; x++ )

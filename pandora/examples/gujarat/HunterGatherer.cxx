@@ -126,8 +126,16 @@ void HunterGatherer::clearSectorKnowledge()
 	
 void HunterGatherer::selectActions()
 {
+	//*?
+	//std::stringstream logName;
+	//logName << "infoshar";
+	
 	std::list<MDPAction*> actions;
+	
+	
 	GujaratState::controller().selectActions(*this, actions);
+	
+	
 	std::list<MDPAction*>::iterator it=actions.begin();
 	while(it!=actions.end())
 	{

@@ -854,7 +854,7 @@ int GujaratWorld::getLowResMapsSideSize()
 }
 	
 
-//*?
+
 //*********************************************************
 
 void GujaratWorld::updateeSectorUtility(const std::vector< Engine::Point2D<int> > & cells, int val)

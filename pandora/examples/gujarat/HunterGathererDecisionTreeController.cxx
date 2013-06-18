@@ -43,7 +43,7 @@ int HunterGathererDecisionTreeController::getMaxBiomassSector(  HunterGatherer &
 	}
 	
 	// MRJ: Remove empty sectors if any
-	int maxBiomass    = -1;
+	int maxBiomass = -1;
 	for ( int i = 0; i < agent.getLRSectors().size(); i++ )
 	{
 		if( !(agent.getLRSectors()[i]->isEmpty()) )
@@ -85,6 +85,7 @@ MDPAction* HunterGathererDecisionTreeController::shouldForage( HunterGatherer & 
 {	
 	//Sector * maxSector = getMaxBiomassSector(agent);
 	int maxSectorIdx = getMaxBiomassSector(agent);
+
 	if(maxSectorIdx < 0) 
 	{
 		return 0;
@@ -98,10 +99,10 @@ MDPAction* HunterGathererDecisionTreeController::shouldForage( HunterGatherer & 
 	float maxNumCells = agent.getNrAvailableAdults()*agent.getAvailableTime()/agent.getForageTimeCost();
 	float percentageOfCells = maxNumCells/numCells;
 
-	std::cout 	<< "avail time:" 		<< agent.getAvailableTime()
+	/*std::cout 	<< "avail time:" 		<< agent.getAvailableTime()
 				<< ",forage time cost:"	<< agent.getForageTimeCost()
 				<< ",maxNumCells:" 		<< maxNumCells 
-				<< std::endl;
+				<< std::endl;*/
 	
 	/*
 	std::cout << agent << " required needs: " << agent.computeConsumedResources(1) << " max biomass: " << biomass << " potential calories: " << agent.convertBiomassToCalories(biomass) << " adults: " << agent.getNrAvailableAdults() << " max num cells: " << maxNumCells << " of: " << numCells  << " percentage: " << percentageOfCells << " estimation: " <<  0.5*percentageOfCells*(agent.convertBiomassToCalories(biomass)) << std::endl;	
@@ -111,7 +112,7 @@ MDPAction* HunterGathererDecisionTreeController::shouldForage( HunterGatherer & 
 	// You should go and forage something, at least for the couple.
 	if( 0.5*percentageOfCells*(agent.convertBiomassToCalories(biomass)) >= agent.computeConsumedResources(1) )
 	{
-		return new ForageAction(agent.getHRSectors()[maxSectorIdx],agent.getLRSectors()[maxSectorIdx], true);
+		return new ForageAction(agent.getHRSectors()[maxSectorIdx],agent.getLRSectors()[maxSectorIdx], false);
 	}
 	//std::cout << "maxSector: " << maxSector << std::endl;
 	//delete maxSector;
@@ -167,13 +168,13 @@ void HunterGathererDecisionTreeController::selectActions( GujaratAgent & agent, 
 	*/
 
 	MDPAction * selectedAction = shouldForage(agentConcrete);
-	if(selectedAction)
+	if(selectedAction!=0)
 	{
 		actions.push_back(selectedAction);
 		return;
 	}
 	selectedAction = shouldMoveHome(agentConcrete);
-	if(selectedAction)
+	if(selectedAction!=0)
 	{
 		actions.push_back(selectedAction);
 	}

@@ -1,7 +1,12 @@
+
 #include <HunterGathererMDPState.hxx>
 #include <Logger.hxx>
 
 #include <sstream>
+
+#include <mutex>
+
+#include <omp.h>
 
 namespace Gujarat
 {
@@ -15,6 +20,7 @@ HunterGathererMDPState::HunterGathererMDPState() : _timeIndex(0), _mapLocation(-
 {
 }*/
 
+//boost::mutex _mtx;
 std::map<long,long> HunterGathererMDPState::_objectUseCounter;
 
 HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s )
@@ -162,12 +168,14 @@ HunterGathererMDPState::HunterGathererMDPState(
 
 const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGathererMDPState& s )
 {	
+	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
+	
 	std::stringstream logName;
 	logName << "infoshar";	
 	
 	_dni=dniTicket ();
 	
-	log_INFO(logName.str(),"XXXX CREA 4:" << s._dni << "->" << _dni);
+	//log_INFO(logName.str(),"XXXX CREA 4:" << s._dni << "->" << _dni);
 	_creator=4;
 	
 	_timeIndex 		 = s._timeIndex;
@@ -282,8 +290,10 @@ HunterGathererMDPState::~HunterGathererMDPState()
 									<< _ownItems[2]
 									<< _ownItems[3]);	
 	*/
-	for ( unsigned k = 0; k < _availableActions.size(); k++ )
+	for ( int k = 0; k < _availableActions.size(); k++ )
+	{
 		delete _availableActions[k];
+	}
 	
 	
 	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
@@ -410,44 +420,53 @@ void	HunterGathererMDPState::print( std::ostream& os ) const
 
 void HunterGathererMDPState::registerKnowledgeStructuresAtCounterMap()
 	{		
+		//std::cout << "SIZE OF MAP " << HunterGathererMDPState::_objectUseCounter.size() << std::endl;
+		
 		//static std::map<long,long> _objectUseCounter;
+		
+		#pragma omp critical(refmap)
+		{
+			
 		
 		if (HunterGathererMDPState::_objectUseCounter.count((long)&_HRActionSectors) > 0)
 		{
-			HunterGathererMDPState::_objectUseCounter[(long)&_HRActionSectors]++;
+				HunterGathererMDPState::_objectUseCounter[(long)&_HRActionSectors]++;		
+	
 		}
 		else
 		{
-			HunterGathererMDPState::_objectUseCounter[(long)&_HRActionSectors]=1;
+				HunterGathererMDPState::_objectUseCounter[(long)&_HRActionSectors]=1;		
 		}
 		
 		if (HunterGathererMDPState::_objectUseCounter.count((long)&_LRActionSectors) > 0)
 		{
-			HunterGathererMDPState::_objectUseCounter[(long)&_LRActionSectors]++;
+				HunterGathererMDPState::_objectUseCounter[(long)&_LRActionSectors]++;
 		}
 		else
 		{
-			HunterGathererMDPState::_objectUseCounter[(long)&_LRActionSectors]=1;
+				HunterGathererMDPState::_objectUseCounter[(long)&_LRActionSectors]=1;
 		}
 		
 		if (HunterGathererMDPState::_objectUseCounter.count((long)&_HRCellPool) > 0)
 		{
-			HunterGathererMDPState::_objectUseCounter[(long)&_HRCellPool]++;
+				HunterGathererMDPState::_objectUseCounter[(long)&_HRCellPool]++;
 		}
 		else
 		{
-			HunterGathererMDPState::_objectUseCounter[(long)&_HRCellPool]=1;
+				HunterGathererMDPState::_objectUseCounter[(long)&_HRCellPool]=1;
 		}
 		
 		if (HunterGathererMDPState::_objectUseCounter.count((long)&_LRCellPool) > 0)
 		{
-			HunterGathererMDPState::_objectUseCounter[(long)&_LRCellPool]++;
+				HunterGathererMDPState::_objectUseCounter[(long)&_LRCellPool]++;
 		}
 		else
 		{
-			HunterGathererMDPState::_objectUseCounter[(long)&_LRCellPool]=1;
+				HunterGathererMDPState::_objectUseCounter[(long)&_LRCellPool]=1;
 		}
-		
+	
+		}//pragma critical
+	
 	}
 	
 
@@ -456,14 +475,20 @@ void HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructure
 		//static std::map<long,long> _objectUseCounter;
 		
 		//std::cout << "DELETING state " << _dni << std::endl;
+		std::cout << "DELETING state. thread [" << omp_get_thread_num() <<"]"<< std::endl;
+		#pragma omp critical(refmap)
+		{
 		
 		if (HunterGathererMDPState::_objectUseCounter.count((long)&_HRActionSectors) > 1)
 		{	
-			HunterGathererMDPState::_objectUseCounter[(long)&_HRActionSectors]--;
+			
+				HunterGathererMDPState::_objectUseCounter[(long)&_HRActionSectors]--;
+		
 		}
 		else if (_ownItems[0])
 		{
 			HunterGathererMDPState::_objectUseCounter.erase((long)&_HRActionSectors);
+		
 			for(int i=0;i<_HRActionSectors.size();i++)
 			{
 				delete _HRActionSectors[i];
@@ -471,15 +496,20 @@ void HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructure
 			
 			delete &_HRActionSectors;
 		}
-		
-		
+	//	}//pragma
+	//	#pragma omp critical(refmap)
+	//	{
+			
 		if (HunterGathererMDPState::_objectUseCounter.count((long)&_LRActionSectors) > 0)
 		{
-			HunterGathererMDPState::_objectUseCounter[(long)&_LRActionSectors]--;
+		
+				HunterGathererMDPState::_objectUseCounter[(long)&_LRActionSectors]--;
+		
 		}
 		else if (_ownItems[1])
 		{
-			HunterGathererMDPState::_objectUseCounter.erase((long)&_LRActionSectors);
+			HunterGathererMDPState::_objectUseCounter.erase ((long)&_LRActionSectors);				
+		
 			for(int i=0;i<_LRActionSectors.size();i++)
 			{
 				delete _LRActionSectors[i];
@@ -487,34 +517,46 @@ void HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructure
 			delete &_LRActionSectors;
 		}
 		
-		
+	//	}//pragma
+	//	#pragma omp critical(refmap)
+	//	{
+			
 		if (HunterGathererMDPState::_objectUseCounter.count((long)&_HRCellPool) > 0)
 		{
-			HunterGathererMDPState::_objectUseCounter[(long)&_HRCellPool]--;
+				HunterGathererMDPState::_objectUseCounter[(long)&_HRCellPool]--;
+		
 		}
 		else if (_ownItems[2])
 		{
-			HunterGathererMDPState::_objectUseCounter.erase((long)&_HRCellPool);
+				HunterGathererMDPState::_objectUseCounter.erase((long)&_HRCellPool);
+		
 			delete &_HRCellPool;
 		}
 		
-		
+	//	}//pragma
+	//	#pragma omp critical(refmap)
+	//	{
+			
 		if (HunterGathererMDPState::_objectUseCounter.count((long)&_LRCellPool) > 0)
 		{
-			HunterGathererMDPState::_objectUseCounter[(long)&_LRCellPool]--;
+				HunterGathererMDPState::_objectUseCounter[(long)&_LRCellPool]--;
+		
 		}
 		else if (_ownItems[3])
 		{
-			HunterGathererMDPState::_objectUseCounter.erase((long)&_LRCellPool);
+				HunterGathererMDPState::_objectUseCounter.erase((long)&_LRCellPool);
+		
 			delete &_LRCellPool;
 		}
+		
+		}//pragma critical
 		
 	}
 
 	
 	void HunterGathererMDPState::clearRefCounterMap() 
 	{ 
-		HunterGathererMDPState::_objectUseCounter.clear();
+		//#pragma omp critical(refmap){HunterGathererMDPState::_objectUseCounter.clear();}
 	}
 	
 }

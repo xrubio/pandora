@@ -26,6 +26,22 @@ enum	BiomassAmountClass
 
 class Sector
 {
+	static int pop;
+	//*? just for debugging
+	void incSects()
+	{		
+		#pragma omp critical(changepop)
+		{ pop++; }
+	}	
+	
+	//*? just for debugging
+	void decSects()
+	{	
+		#pragma omp critical(changepop)
+		{ pop--; }
+	}	
+	
+	
 	//*?
 	int dniTicket () {
 		static int counter = 0;
