@@ -249,7 +249,10 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 	
 	//s.initializeSuccessor(sp,ownership);
 	HunterGathererMDPState sp(s, *HRActionSectors, *LRActionSectors, *HRCellPool, *LRCellPool, ownership);
-		
+	
+	assert(LRActionSectors->size() > 0);
+	
+	
 	act->executeMDP( agentRef(), s, sp );
 	applyFrameEffects( s, sp );
 	sp.computeHash();	
@@ -286,7 +289,10 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 	// It is not needed to recalculate each time the HR cells per sector.
 	std::vector< Engine::Point2D<int> > & HRCellPool = s.getHRCellPool();
 	std::vector< Engine::Point2D<int> > & LRCellPool = s.getLRCellPool();	
-		
+	
+	assert
+	
+	
 	//TODO watch HRSectors update : BOTTLENECK
 	agentRef().updateKnowledge( s.getLocation(), s.getResourcesRaster(), HRActionSectors, LRActionSectors, HRCellPool, LRCellPool );
 	

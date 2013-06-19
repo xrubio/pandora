@@ -240,6 +240,8 @@ void	ForageAction::selectBestNearestCell( const GujaratAgent& agent,
 	
 	const std::vector< Engine::Point2D<int>* >& sectorCells = _LRForageArea->cells();
 	
+	assert(_LRForageArea->cells().size() > 0);
+	
 	for ( unsigned k = 0; k < _LRForageArea->numCells(); k++ )
 	{	
 		/* Rationale for score function :
@@ -285,6 +287,7 @@ void	ForageAction::selectBestNearestCell( const GujaratAgent& agent,
 	}
 	//TODO cost n, instead: best=candidates[uniformRandom(0,candidates.size()-1)]
 	//std::random_shuffle(candidates.begin(), candidates.end());
+	
 	best = *candidates[Engine::GeneralState::statistics().getUniformDistValue(0,candidates.size()-1)];
 
 	candidates.clear();	
@@ -431,6 +434,9 @@ void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>
 	
 	//Engine::Point2D<int> nearest = _LRForageArea->getNearestTo( s.getLocation() );
 
+	assert(_LRForageArea->cells().size() > 0);
+	
+	
 	int collected = 0;
 
 	doWalk( agent, nearest, maxDist, sp.getResourcesRaster(), collected );

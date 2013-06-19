@@ -12,8 +12,11 @@
 
 //#include <boost/thread/mutex.hpp>
 
+#include "Sector.hxx"
+
 namespace Gujarat
 {
+
 
 	
 class HunterGathererMDPState

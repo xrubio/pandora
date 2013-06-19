@@ -21,6 +21,8 @@ namespace Gujarat
 
 MoveHomeAction::MoveHomeAction( const Engine::Point2D<int>& p, Sector * HRSectorToForage, Sector * LRSectorToForage, bool ownsSectorPointer ) : _newHomeLoc( p ), _forageAction(0)
 {
+	assert(LRSectorToForage->cells().size() > 0);
+	
 	_forageAction = new ForageAction(HRSectorToForage, LRSectorToForage, false);
 	_forageAction->setFullPopulation(false);
 }
