@@ -73,6 +73,8 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	{
 		Sector * s = (Sector*)*it;
 		Sector * r = new Sector(s);
+		//*?
+		r->setMetaInfo(1);
 		// Shallow Copy;
 		(*LRActionSectors)[i++] = r;
 		it++;
@@ -83,6 +85,8 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	// Build initial state from current state in the simulation
 	
 	//log_INFO(logName.str(),"CREA INITIAL");
+	
+	assert(agentRef().getHRSectorsNoConst().size()>0 && agentRef().getHRCellPoolNoConst().size()>0);
 	
 	_initial = new HunterGathererMDPState(	agentRef().getPosition()
 											, agentRef().getOnHandResources()
@@ -165,6 +169,8 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 	std::vector< Engine::Point2D<int> > * HRCellPool;
 	std::vector< Engine::Point2D<int> > * LRCellPool;
 	
+	
+	
 	if(dynamic_cast<const MoveHomeAction*>(act))
 	{
 		// Move implies a new set of cells around the home.
@@ -180,6 +186,8 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		ownership[1]=true;
 		ownership[2]=false;
 		ownership[3]=true;
+		
+		assert(HRActionSectors->size()>0 && HRCellPool->size()>0);
 	}	
 	else if(dynamic_cast<const ForageAction*>(act))
 	{
@@ -194,6 +202,7 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		{
 			Sector * se = (Sector*)*it;
 			Sector * r = new Sector(se);
+			r->setMetaInfo(2);
 			// Shallow Copy;
 			(*LRActionSectors)[i] = r;
 			i++;
@@ -208,6 +217,8 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		ownership[1]=true;
 		ownership[2]=false;
 		ownership[3]=s.getOwnerShip()[3];
+		
+		assert(HRActionSectors->size()>0 && HRCellPool->size()>0);
 	}	
 	else if(dynamic_cast<const DoNothingAction*>(act))
 	{
@@ -221,6 +232,8 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		ownership[1]=s.getOwnerShip()[1];
 		ownership[2]=false;
 		ownership[3]=s.getOwnerShip()[3];
+		
+		assert(HRActionSectors->size()>0 && HRCellPool->size()>0);
 	}
 	else{
 		/* Should be left this case to a default initialization of sectors and pools?

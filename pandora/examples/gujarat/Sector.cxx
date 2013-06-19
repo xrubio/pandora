@@ -15,7 +15,7 @@ namespace Gujarat
 	int Sector::pop = 0;
 	
 Sector::Sector( const GujaratWorld & world ) 
-	: _world(world), _biomassAmount(0)
+	: _world(world), _biomassAmount(0), _metaInfo(-1)
 {
 	_dni = dniTicket();
 	
@@ -27,6 +27,7 @@ Sector::Sector( const Sector* other ):
 	_world(other->_world)
 	, _cells(other->_cells)
 	, _biomassAmount(other->_biomassAmount)
+	, _metaInfo(-1)
 {
 	//_biomassAmountClass = other._biomassAmountClass;
 	_dni = dniTicket();
@@ -39,7 +40,9 @@ Sector::~Sector()
 {
 	std::stringstream logName;
 	logName << "infoshar";	
-	log_INFO(logName.str(),"DELETING Sector; population " << pop);
+	log_INFO(logName.str(),"DELETING Sector; " 
+					<< " population " << pop 
+					<< " metainfo " << _metaInfo);
 	_cells.clear();
 	
 	decSects();
