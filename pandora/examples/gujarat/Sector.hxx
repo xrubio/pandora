@@ -47,9 +47,10 @@ class Sector
 		static int counter = 0;
 		return counter++;
 	}	
+public:	
 	int _dni;
 	int _metaInfo;
-	
+protected:	
 	//const Engine::World & _world; needed change due to use of LR methods for raster access.
 	const GujaratWorld & _world;
 	std::vector< Engine::Point2D<int> * > _cells;

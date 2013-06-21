@@ -165,7 +165,61 @@ HunterGathererMDPState::HunterGathererMDPState(
 	registerKnowledgeStructuresAtCounterMap();
 }
 
+HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s,HunterGathererMDPState*y ): _timeIndex( s._timeIndex )
+, _mapLocation( s._mapLocation )
+, _onHandResources( s._onHandResources )
+, _resources( s._resources )
+, _hashKey( s._hashKey )
+, _maxResources( s._maxResources)
+, _resourcesDivider( s._resourcesDivider )
+, _daysStarving( s._daysStarving )
+, _isCopy(true)
+, _HRActionSectors(s._HRActionSectors)
+, _LRActionSectors(s._LRActionSectors)
+, _HRCellPool(s._HRCellPool)
+, _LRCellPool(s._LRCellPool)
+{
+	std::stringstream logName;
+	logName << "infoshar";
+	
+	_dni=dniTicket ();
+	
+	//log_INFO(logName.str(),"XXXX CREA 1:" << s._dni << "->" << _dni);
+	_creator=1;
+	
+	_ownItems.resize(s._ownItems.size());
+	for(int i = 0; i < _ownItems.size(); i++)
+	{
+		//_ownItems[i] = false;
+		_ownItems[i] = s._ownItems[i];
+	}
+	
+	for ( unsigned k = 0; k < s._availableActions.size(); k++ )
+	{
+		//*?
+		addAction( s._availableActions[k]->copy() );
+		//addAction( s._availableActions[k] );
+	}
+	assert( s._availableActions.size() == _availableActions.size() );
+	
+	registerKnowledgeStructuresAtCounterMap();
+	
+	delete y;
+}
 
+
+const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGathererMDPState& s )
+{
+	//*? 
+	//TODO MEMORY LEAK !!!
+
+	//return *(new HunterGathererMDPState(s,this));	
+
+	return *(new HunterGathererMDPState(s));	
+	
+}
+
+/*
 const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGathererMDPState& s )
 {	
 	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
@@ -173,9 +227,11 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	std::stringstream logName;
 	logName << "infoshar";	
 	
+	
+	
 	_dni=dniTicket ();
 	
-	//log_INFO(logName.str(),"XXXX CREA 4:" << s._dni << "->" << _dni);
+	log_INFO(logName.str(),"XXXX CREA 4:" << s._dni << "->" << _dni);
 	_creator=4;
 	
 	_timeIndex 		 = s._timeIndex;
@@ -188,13 +244,29 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	_daysStarving 	 = s._daysStarving;
 	_isCopy 		 = true;	
 
-	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
 	
+	std::cout << "CREA 4 : source "<<s._dni<<" with "<< (long)&s._LRActionSectors <<" has " ;
+	for(int i=0; i <s._LRActionSectors.size(); i++)
+		std::cout << " " << s._LRActionSectors[i]->_dni;
+	
+	std::cout << std::endl;
+	
+	std::cout << "CREA 4 : receiver "<<_dni<<" with "<< (long)&_LRActionSectors <<" has " ;
+	for(int i=0; i <_LRActionSectors.size(); i++)
+		std::cout << " " << _LRActionSectors[i]->_dni;
+	
+	std::cout << std::endl;
+	
+	
+//	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
+	
+
 	_HRActionSectors = s._HRActionSectors;
 	_LRActionSectors = s._LRActionSectors;
 	_HRCellPool = s._HRCellPool;
 	_LRCellPool = s._LRCellPool;
-	
+
+
 	_ownItems.resize(s._ownItems.size());
 	for(int i = 0; i < _ownItems.size(); i++)
 	{
@@ -218,7 +290,7 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	
 	return *this;
 }
-
+*/
 
 /*
 // HunterGathererMDPState has a bunch of ref to vector, they cannot be initialized
@@ -282,6 +354,7 @@ HunterGathererMDPState::~HunterGathererMDPState()
 	std::stringstream logName;
 	logName << "infoshar";	
 	
+	//std::cout << "destroying MDPState:" << _dni << std::endl;
 	
 	/*log_INFO(logName.str(),"DELETE "<< _dni 
 					<<" , CREATED WITH:" << _creator 
@@ -423,6 +496,8 @@ void HunterGathererMDPState::registerKnowledgeStructuresAtCounterMap()
 		//std::cout << "SIZE OF MAP " << HunterGathererMDPState::_objectUseCounter.size() << std::endl;
 		
 		//static std::map<long,long> _objectUseCounter;
+
+
 		
 		#pragma omp critical(refmap)
 		{
@@ -440,10 +515,26 @@ void HunterGathererMDPState::registerKnowledgeStructuresAtCounterMap()
 		
 		if (HunterGathererMDPState::_objectUseCounter.count((long)&_LRActionSectors) > 0)
 		{
+			/*long foo = (long)&_LRActionSectors;
+			std::cout << "MDPState " << _dni << " increases entry LRActionSectors:" << foo <<std::endl;
+			for(int i=0; i <_LRActionSectors.size(); i++)
+				std::cout << " " << _LRActionSectors[i]->_dni; 
+				
+			std::cout << std::endl;
+			*/
+			
+			
 			HunterGathererMDPState::_objectUseCounter[(long)&_LRActionSectors]++;
 		}
 		else
 		{
+			/*long foo = (long)&_LRActionSectors;
+			std::cout << "MDPState " << _dni << " registres entry LRActionSectors:" << foo <<std::endl;			
+			for(int i=0; i <_LRActionSectors.size(); i++)
+				std::cout << foo << " has sector " << _LRActionSectors[i]->_dni << std::endl;
+			*/
+			
+			
 			HunterGathererMDPState::_objectUseCounter[(long)&_LRActionSectors]=1;
 		}
 		
@@ -511,10 +602,15 @@ void HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructure
 		
 		if ((HunterGathererMDPState::_objectUseCounter.count((long)&_LRActionSectors) == 0) && _ownItems[1])
 		{		
+			//long foo = (long)&_LRActionSectors;
+			//std::cout << "MDPState " << _dni << " erases entry LRActionSectors:" <<  foo << std::endl;
 		
 			for(int i=0;i<_LRActionSectors.size();i++)
 			{
 		
+				//std::cout << "MDPState " << _dni << " erases sector " << _LRActionSectors[i]->_dni << std::endl;
+				
+				
 				//(void) sizeof(Sector);
 				delete _LRActionSectors[i];
 		

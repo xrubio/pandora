@@ -22,6 +22,10 @@ namespace Gujarat
 	: _HRForageArea( HRLoc ), _LRForageArea( LRLoc ), _ownsForageAreaPointer( ownsPointer ), _biomassCollected(0), _caloriesCollected(0), _useFullPopulation(true)
 {
 //	std::cout << "creating ForageAction with sector: " << _forageArea << " resources: " << _forageArea->getBiomassAmount() << std::endl;
+
+//*?
+assert(_LRForageArea->cells().size() >0);
+
 }
 
 ForageAction::~ForageAction()
@@ -50,6 +54,9 @@ MDPAction*	ForageAction::copy() const
 		newAction = new ForageAction( new Sector( *_HRForageArea ), new Sector( *_LRForageArea ),true);
 	}
 	*/
+	
+	assert(_LRForageArea->cells().size() >0);
+	
 	newAction = new ForageAction(_HRForageArea, _LRForageArea, false);
 	
 	newAction->setFullPopulation(_useFullPopulation);
@@ -424,6 +431,9 @@ void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>
 
  void ForageAction::executeMDP( const GujaratAgent& agent, const HunterGathererMDPState& s, HunterGathererMDPState& sp ) const
 {
+	
+	assert(_LRForageArea->cells().size() >0);
+	
 	double  maxDist= agent.computeMaxForagingDistance(_useFullPopulation);
 	
 	Engine::Point2D<int> LRlocation;

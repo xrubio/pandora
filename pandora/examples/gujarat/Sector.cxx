@@ -32,20 +32,29 @@ Sector::Sector( const Sector* other ):
 	//_biomassAmountClass = other._biomassAmountClass;
 	_dni = dniTicket();
 	
+	//std::cout << "SECTOR COPY: " << other->_dni << " -> " << _dni << std::endl;
+	
+	//std::cout << "SECTOR COPIED CELLS: " << _cells.size() << std::endl ;
+	
 	incSects();
 }
 
 
 Sector::~Sector()
 {
-	std::stringstream logName;
+	/*std::stringstream logName;
 	logName << "infoshar";	
 	log_INFO(logName.str(),"DELETING Sector; " 
 					<< " population " << pop 
-					<< " metainfo " << _metaInfo);
+					<< " metainfo " << _metaInfo);*/
+	
+	
 	_cells.clear();
 	
 	decSects();
+	
+	//std::cout << "SECTOR DELETE: " << _dni << " metaInfo:" << _metaInfo << std::endl;
+	
 }
 
 Engine::Point2D<int> *	Sector::getNearestTo( Engine::Point2D<int> p ) const

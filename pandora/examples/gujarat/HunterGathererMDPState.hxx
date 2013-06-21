@@ -67,6 +67,8 @@ public:
 
 	//HunterGathererMDPState( HunterGathererMDPState& s, bool ownership[] );
 	
+	
+	
 	// The real one
 	HunterGathererMDPState(	const Engine::Point2D<int> loc
 							, int initialOnHand
@@ -80,6 +82,8 @@ public:
 							, std::vector< bool > ownsItems);
 	
 	HunterGathererMDPState( const HunterGathererMDPState& s );
+	
+	HunterGathererMDPState( const HunterGathererMDPState& s, HunterGathererMDPState *y);
 	
 	HunterGathererMDPState( const HunterGathererMDPState& s
 							, std::vector< Sector* > & HRActionSectors

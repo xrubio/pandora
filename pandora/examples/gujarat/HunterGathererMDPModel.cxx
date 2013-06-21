@@ -86,7 +86,7 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	
 	//log_INFO(logName.str(),"CREA INITIAL");
 	
-	assert(agentRef().getHRSectorsNoConst().size()>0 && agentRef().getHRCellPoolNoConst().size()>0);
+	//assert(agentRef().getHRSectorsNoConst().size()>0 && agentRef().getHRCellPoolNoConst().size()>0);
 	
 	_initial = new HunterGathererMDPState(	agentRef().getPosition()
 											, agentRef().getOnHandResources()
@@ -100,6 +100,8 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 											, agentRef().getLRCellPoolNoConst()
 											, ownsItems);
 											
+	//std::cout << "creat MDPState:" << _initial->_dni << std::endl;
+	
 	
 	//TODO refactor it, instead of passing HR and LR structures pass a HGMind
 	
@@ -196,6 +198,13 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		const std::vector< Sector* > & sourceLRSectors = agentRef().getLRSectors();
 		LRActionSectors = new std::vector< Sector* >(sourceLRSectors.size());
 		
+		/*std::cout << "source has " ;
+		for(int i=0; i <sourceLRSectors.size(); i++)
+			std::cout << " " << sourceLRSectors[i]->_dni;
+		
+		std::cout << std::endl;*/
+		
+		
 		std::vector< Sector* >::const_iterator it = sourceLRSectors.begin();
 		int i = 0;
 		while(it!=sourceLRSectors.end())
@@ -219,6 +228,15 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		ownership[3]=s.getOwnerShip()[3];
 		
 		assert(HRActionSectors->size()>0 && HRCellPool->size()>0);
+		
+		/*std::cout << "AFTER COPY source has " ;
+		for(int i=0; i <sourceLRSectors.size(); i++)
+			std::cout << " " << sourceLRSectors[i]->_dni;
+		
+		std::cout << std::endl;*/
+		
+		
+		
 	}	
 	else if(dynamic_cast<const DoNothingAction*>(act))
 	{
@@ -250,8 +268,18 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 	//s.initializeSuccessor(sp,ownership);
 	HunterGathererMDPState sp(s, *HRActionSectors, *LRActionSectors, *HRCellPool, *LRCellPool, ownership);
 	
-	assert(LRActionSectors->size() > 0);
+	//std::cout << "creat MDPState:" << sp._dni << std::endl;
 	
+	//assert(LRActionSectors->size() > 0);
+	
+	/*for(int i=0;i<s.getLRActionSectors().size();i++)
+	{
+		if(s.getLRActionSectors()[i]->cells().size() == 0)
+		{
+			std::cout << "FOUND SECTOR ZERO CELLS, sector:" << s.getLRActionSectors()[i]->_dni << " state:" << s._dni << std::endl;
+		}
+		assert(s.getLRActionSectors()[i]->cells().size() >0);
+	}*/
 	
 	act->executeMDP( agentRef(), s, sp );
 	applyFrameEffects( s, sp );
@@ -290,7 +318,8 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 	std::vector< Engine::Point2D<int> > & HRCellPool = s.getHRCellPool();
 	std::vector< Engine::Point2D<int> > & LRCellPool = s.getLRCellPool();	
 	
-	assert
+	for(int i = 0; i < LRActionSectors.size(); i++)
+		assert(LRActionSectors[i]->cells().size() >0);
 	
 	
 	//TODO watch HRSectors update : BOTTLENECK
