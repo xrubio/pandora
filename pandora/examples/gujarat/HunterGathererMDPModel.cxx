@@ -88,16 +88,21 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	
 	//assert(agentRef().getHRSectorsNoConst().size()>0 && agentRef().getHRCellPoolNoConst().size()>0);
 	
+	//*?
+	//TODO
+	// passing as paramater this : &agentRef().getHRSectorsNoConst()
+	// could be dangerous	
+	
 	_initial = new HunterGathererMDPState(	agentRef().getPosition()
 											, agentRef().getOnHandResources()
 											, agentRef().getLRResourcesRaster()
 											, _config.getHorizon()
 											, agentRef().computeConsumedResources(1)
 					
-											, agentRef().getHRSectorsNoConst()
-											, *LRActionSectors 
-											, agentRef().getHRCellPoolNoConst()
-											, agentRef().getLRCellPoolNoConst()
+											, &agentRef().getHRSectorsNoConst()
+											, LRActionSectors 
+											, &agentRef().getHRCellPoolNoConst()
+											, &agentRef().getLRCellPoolNoConst()
 											, ownsItems);
 											
 	//std::cout << "creat MDPState:" << _initial->_dni << std::endl;
@@ -171,17 +176,15 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 	std::vector< Engine::Point2D<int> > * HRCellPool;
 	std::vector< Engine::Point2D<int> > * LRCellPool;
 	
-	
-	
 	if(dynamic_cast<const MoveHomeAction*>(act))
 	{
 		// Move implies a new set of cells around the home.
 		// New containers are created to be filled by updateKnowledge(...) const
 		// HR information remains untouched, not used along MDP
-		HRActionSectors = &s.getHRActionSectors();	
+		HRActionSectors = s.getHRActionSectors();	
 		//HRActionSectors = new std::vector< Sector* >(0);
 		LRActionSectors = new std::vector< Sector* >(0);
-		HRCellPool = &s.getHRCellPool();
+		HRCellPool = s.getHRCellPool();
 		//HRCellPool = new std::vector< Engine::Point2D<int> >;
 		LRCellPool = new std::vector< Engine::Point2D<int> >(0);
 		ownership[0]=false;
@@ -218,9 +221,9 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 			it++;
 		}
 		
-		HRActionSectors = &s.getHRActionSectors();
-		HRCellPool = &s.getHRCellPool();
-		LRCellPool = &s.getLRCellPool();
+		HRActionSectors = s.getHRActionSectors();
+		HRCellPool = s.getHRCellPool();
+		LRCellPool = s.getLRCellPool();
 		
 		ownership[0]=false;
 		ownership[1]=true;
@@ -240,10 +243,10 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 	}	
 	else if(dynamic_cast<const DoNothingAction*>(act))
 	{
-		HRActionSectors = &s.getHRActionSectors();
-		LRActionSectors = &s.getLRActionSectors();
-		HRCellPool = &s.getHRCellPool();
-		LRCellPool = &s.getLRCellPool();
+		HRActionSectors = s.getHRActionSectors();
+		LRActionSectors = s.getLRActionSectors();
+		HRCellPool = s.getHRCellPool();
+		LRCellPool = s.getLRCellPool();
 		
 		//ownership = s.getOwnerShip();
 		ownership[0]=false;
@@ -266,19 +269,19 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		
 	
 	//s.initializeSuccessor(sp,ownership);
-	HunterGathererMDPState sp(s, *HRActionSectors, *LRActionSectors, *HRCellPool, *LRCellPool, ownership);
+	HunterGathererMDPState sp(s, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, ownership);
 	
 	//std::cout << "creat MDPState:" << sp._dni << std::endl;
 	
 	//assert(LRActionSectors->size() > 0);
 	
-	/*for(int i=0;i<s.getLRActionSectors().size();i++)
+	/*for(int i=0;i<s.getLRActionSectors()->size();i++)
 	{
-		if(s.getLRActionSectors()[i]->cells().size() == 0)
+		if((*s.getLRActionSectors())[i]->cells().size() == 0)
 		{
-			std::cout << "FOUND SECTOR ZERO CELLS, sector:" << s.getLRActionSectors()[i]->_dni << " state:" << s._dni << std::endl;
+			std::cout << "FOUND SECTOR ZERO CELLS, sector:" << (*s.getLRActionSectors())[i]->_dni << " state:" << s._dni << std::endl;
 		}
-		assert(s.getLRActionSectors()[i]->cells().size() >0);
+		assert((*s.getLRActionSectors())[i]->cells().size() >0);
 	}*/
 	
 	act->executeMDP( agentRef(), s, sp );
@@ -311,34 +314,34 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 	
 	std::vector< Sector* > validActionSectors;
 	// Low Resolution
-	std::vector< Sector* > & LRActionSectors = s.getLRActionSectors();
+	std::vector< Sector* > * LRActionSectors = s.getLRActionSectors();
 	// High Resolution
-	std::vector< Sector* > & HRActionSectors = s.getHRActionSectors();	
+	std::vector< Sector* > * HRActionSectors = s.getHRActionSectors();	
 	// It is not needed to recalculate each time the HR cells per sector.
-	std::vector< Engine::Point2D<int> > & HRCellPool = s.getHRCellPool();
-	std::vector< Engine::Point2D<int> > & LRCellPool = s.getLRCellPool();	
+	std::vector< Engine::Point2D<int> > * HRCellPool = s.getHRCellPool();
+	std::vector< Engine::Point2D<int> > * LRCellPool = s.getLRCellPool();	
 	
-	for(int i = 0; i < LRActionSectors.size(); i++)
-		assert(LRActionSectors[i]->cells().size() >0);
+	//for(int i = 0; i < LRActionSectors.size(); i++)
+		//assert(LRActionSectors[i]->cells().size() >0);
 	
 	
 	//TODO watch HRSectors update : BOTTLENECK
-	agentRef().updateKnowledge( s.getLocation(), s.getResourcesRaster(), HRActionSectors, LRActionSectors, HRCellPool, LRCellPool );
+	agentRef().updateKnowledge( s.getLocation(), s.getResourcesRaster(), *HRActionSectors, *LRActionSectors, *HRCellPool, *LRCellPool );
 	
 	// MRJ: Remove empty sectors if any
-	for ( unsigned i = 0; i < LRActionSectors.size(); i++ )
+	for ( unsigned i = 0; i < LRActionSectors->size(); i++ )
 	{
-		if ( LRActionSectors[i]->isEmpty() )
+		if ( (*LRActionSectors)[i]->isEmpty() )
 		{
 			// You can't do that if you do not own it.
 			// Any delete is postponed at the end of lifecycle of the MDPState
 			
-			// delete LRActionSectors[i];
-			// delete HRActionSectors[i];
+			// delete (*LRActionSectors)[i];
+			// delete (*HRActionSectors)[i];
 			continue;
 		}
-		validActionSectors.push_back( LRActionSectors[i] );
-		sectorIdxMap[LRActionSectors[i]] = i;
+		validActionSectors.push_back( (*LRActionSectors)[i] );
+		sectorIdxMap[(*LRActionSectors)[i]] = i;
 	}	
 	//TODO why 2 reorderings??? first random, then according a predicate
 	//std::random_shuffle( validActionSectors.begin(), validActionSectors.end() );
@@ -353,7 +356,7 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 		{
 			int sectorIdx = sectorIdxMap[validActionSectors[i]];
 			//s.addAction( new ForageAction( HRActionSectors[sectorIdx], validActionSectors[i], true ) );
-			s.addAction( new ForageAction( HRActionSectors[sectorIdx], validActionSectors[i], false ) );	
+			s.addAction( new ForageAction( (*HRActionSectors)[sectorIdx], validActionSectors[i], false ) );	
 		}
 	}
 	else
@@ -362,7 +365,7 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 			{
 			int sectorIdx = sectorIdxMap[validActionSectors[i]];
 			//s.addAction( new ForageAction( HRActionSectors[sectorIdx],validActionSectors[i], true ) );
-			s.addAction( new ForageAction( HRActionSectors[sectorIdx],validActionSectors[i], false ) );
+			s.addAction( new ForageAction( (*HRActionSectors)[sectorIdx],validActionSectors[i], false ) );
 			}
 		for ( unsigned i = forageActions; i < validActionSectors.size(); i++ )
 			{
@@ -378,7 +381,7 @@ void	HunterGathererMDPModel::makeActionsForState( HunterGathererMDPState& s ) co
 
 	// Make Move Home
 	std::vector< MoveHomeAction* > possibleMoveHomeActions;
-	MoveHomeAction::generatePossibleActions( agentRef(), s.getLocation(), HRActionSectors, validActionSectors, possibleMoveHomeActions );
+	MoveHomeAction::generatePossibleActions( agentRef(), s.getLocation(), *HRActionSectors, validActionSectors, possibleMoveHomeActions );
 	int moveHomeActions =  _config.getNumberMoveHomeActions();
 	if (  moveHomeActions >=  possibleMoveHomeActions.size() )
 	{

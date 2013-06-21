@@ -44,10 +44,10 @@ protected:
 	static std::vector< Sector* >				_emptySectorVector;
 	static std::vector< Engine::Point2D<int> >  _emptyCellPool;	
 	
-	std::vector< Sector* > & _HRActionSectors;// High Resolution
-	std::vector< Sector* > & _LRActionSectors;// Low Resolution
-	std::vector< Engine::Point2D<int> > & _HRCellPool;
-	std::vector< Engine::Point2D<int> > & _LRCellPool;
+	std::vector< Sector* > * _HRActionSectors;// High Resolution
+	std::vector< Sector* > * _LRActionSectors;// Low Resolution
+	std::vector< Engine::Point2D<int> > * _HRCellPool;
+	std::vector< Engine::Point2D<int> > * _LRCellPool;
 	std::vector< bool > _ownItems;
 	
 	/* _ownItems SEMANTICS 
@@ -75,10 +75,10 @@ public:
 							, Engine::Raster& resourcesRaster
 							, int maxResources
 							, int divider
-							, std::vector< Sector* > & HRActionSectors
-							, std::vector< Sector* > & LRActionSectors
-							, std::vector< Engine::Point2D<int> > & HRCellPool
-							, std::vector< Engine::Point2D<int> > & LRCellPool
+							, std::vector< Sector* > * HRActionSectors
+							, std::vector< Sector* > * LRActionSectors
+							, std::vector< Engine::Point2D<int> > * HRCellPool
+							, std::vector< Engine::Point2D<int> > * LRCellPool
 							, std::vector< bool > ownsItems);
 	
 	HunterGathererMDPState( const HunterGathererMDPState& s );
@@ -86,10 +86,10 @@ public:
 	HunterGathererMDPState( const HunterGathererMDPState& s, HunterGathererMDPState *y);
 	
 	HunterGathererMDPState( const HunterGathererMDPState& s
-							, std::vector< Sector* > & HRActionSectors
-							, std::vector< Sector* > & LRActionSectors
-							, std::vector< Engine::Point2D<int> > & HRCellPool
-							, std::vector< Engine::Point2D<int> > & LRCellPool
+							, std::vector< Sector* > * HRActionSectors
+							, std::vector< Sector* > * LRActionSectors
+							, std::vector< Engine::Point2D<int> > * HRCellPool
+							, std::vector< Engine::Point2D<int> > * LRCellPool
 							, std::vector< bool > ownsItems );
 	
 	
@@ -167,17 +167,10 @@ public:
 	void	computeHash();
 	
 	
-	/*
-	const std::vector< Sector* > & getHRActionSectors() { return _HRActionSectors; }
-	const std::vector< Sector* > & getLRActionSectors() { return _LRActionSectors; }
-	const std::vector< Engine::Point2D<int> > & getHRCellPool() { return _HRCellPool; }
-	const std::vector< Engine::Point2D<int> > & getLRCellPool() { return _LRCellPool; }	
-	*/
-	
-	std::vector< Sector* > & getHRActionSectors() const { return _HRActionSectors; }
-	std::vector< Sector* > & getLRActionSectors() const { return _LRActionSectors; }
-	std::vector< Engine::Point2D<int> > & getHRCellPool() const { return _HRCellPool; }
-	std::vector< Engine::Point2D<int> > & getLRCellPool() const { return _LRCellPool; }	
+	std::vector< Sector* > * getHRActionSectors() const { return _HRActionSectors; }
+	std::vector< Sector* > * getLRActionSectors() const { return _LRActionSectors; }
+	std::vector< Engine::Point2D<int> > * getHRCellPool() const { return _HRCellPool; }
+	std::vector< Engine::Point2D<int> > * getLRCellPool() const { return _LRCellPool; }	
 	
 	const std::vector< bool > & getOwnerShip() const { return _ownItems;} 
 	
