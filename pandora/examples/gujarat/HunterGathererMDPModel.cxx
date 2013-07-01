@@ -93,6 +93,10 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	// passing as paramater this : &agentRef().getHRSectorsNoConst()
 	// could be dangerous	
 	
+	omp_lock_t * mapLock = _simAgent->getMapLock();
+	//new omp_lock_t();
+	//omp_init_lock(mapLock);
+	
 	_initial = new HunterGathererMDPState(	agentRef().getPosition()
 											, agentRef().getOnHandResources()
 											, agentRef().getLRResourcesRaster()
@@ -103,7 +107,9 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 											, LRActionSectors 
 											, &agentRef().getHRCellPoolNoConst()
 											, &agentRef().getLRCellPoolNoConst()
-											, ownsItems);
+											, ownsItems
+											, _simAgent->getObjectUseCounter()
+											, mapLock);
 											
 	//std::cout << "creat MDPState:" << _initial->_dni << std::endl;
 	

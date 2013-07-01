@@ -27,7 +27,7 @@ HunterGatherer::HunterGatherer( const std::string & id )
 	,_numSectors( -1 )
 	
 {
-	
+	omp_init_lock(&_mapLock);
 }
 
 void HunterGatherer::createMind()

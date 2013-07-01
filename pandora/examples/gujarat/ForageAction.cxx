@@ -201,7 +201,7 @@ void	ForageAction::selectBestNearestCell( GujaratAgent& agent,
 	for ( unsigned k = 0; k < _HRForageArea->numCells(); k++ )
 	{
 		int score =  r.getValue( *sectorCells[k] - _HRForageArea->getWorld().getOverlapBoundaries()._origin );
-		double dist = sectorCells[k]->distanceSQ(n);
+		double dist = sectorCells[k]->distance(n);
 		if ( score > bestScore )
 		{
 			bestScore = score;
@@ -270,7 +270,7 @@ void	ForageAction::selectBestNearestCell( const GujaratAgent& agent,
 		int score = LRcellOutcomeHeuristic(*sectorCells[k], gw, explorableCells
 		,resourceRaster);
 		
-		double dist = sectorCells[k]->distanceSQ(n);
+		double dist = sectorCells[k]->distance(n);
 		if ( score > bestScore )
 		{
 			bestScore = score;

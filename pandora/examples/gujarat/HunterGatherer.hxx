@@ -4,6 +4,7 @@
 
 #include <GujaratAgent.hxx>
 #include <HGMind.hxx>
+#include <omp.h>
 
 namespace Gujarat
 {
@@ -29,6 +30,8 @@ protected:
 	//std::vector<Sector *> _HRSectors;
 	//std::vector<Sector *> _LRSectors;
 	
+	std::map<long,long> _objectUseCounter;
+	omp_lock_t  _mapLock;
 	
 public:
 	HunterGatherer( const std::string & id );
@@ -119,7 +122,8 @@ public:
 	void putInformation(Sector *s, const Engine::Raster & r, const Engine::Raster & t);
 	//********************************
 	
-	
+	std::map<long,long> * getObjectUseCounter() { return &_objectUseCounter; }
+	omp_lock_t * getMapLock(){ return &_mapLock; }
 	
 	////////////////////////////////////////////////
 	// This code has been automatically generated //

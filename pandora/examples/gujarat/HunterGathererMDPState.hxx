@@ -9,6 +9,7 @@
 
 #include <map>
 //#include <unordered_map>
+#include <omp.h>
 
 //#include <boost/thread/mutex.hpp>
 
@@ -24,7 +25,10 @@ class HunterGathererMDPState
 	//*?
 	//static std::vector< std::unordered_map<long,long> > _objectUseCounter;
 	//boost::mutex _mtx;
-	static std::map<long,long> _objectUseCounter;
+	//static 
+	std::map<long,long> * _objectUseCounter;
+	omp_lock_t * _mapLock;
+	
 	/* There is some posibility of interference between threads and
 	 * data corruption in _objecUseCounter? RACE CONDITIONS?
 	 * Threads belong to a same process, they share same space address
@@ -79,11 +83,11 @@ public:
 							, std::vector< Sector* > * LRActionSectors
 							, std::vector< Engine::Point2D<int> > * HRCellPool
 							, std::vector< Engine::Point2D<int> > * LRCellPool
-							, std::vector< bool > ownsItems);
+							, std::vector< bool > ownsItems
+							, std::map<long,long> * objectUseCounter
+							, omp_lock_t * mapLock);
 	
 	HunterGathererMDPState( const HunterGathererMDPState& s );
-	
-	HunterGathererMDPState( const HunterGathererMDPState& s, HunterGathererMDPState *y);
 	
 	HunterGathererMDPState( const HunterGathererMDPState& s
 							, std::vector< Sector* > * HRActionSectors
