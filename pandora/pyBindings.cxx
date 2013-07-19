@@ -295,6 +295,7 @@ BOOST_PYTHON_MODULE(libpyPandora)
 	boost::python::class_< Point2DInt >("Point2DIntStub", boost::python::init<const int & , const int & >() )
 		.def_readwrite("_x", &Point2DInt::_x) 
 		.def_readwrite("_y", &Point2DInt::_y) 
+		.def("distance", &Point2DInt::distance) 
 	;	
 	
 	boost::python::class_< StaticRasterWrap, boost::noncopyable >("StaticRasterStub")

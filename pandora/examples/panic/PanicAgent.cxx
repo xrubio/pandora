@@ -236,14 +236,14 @@ void PanicAgent::updateState()
 
 void PanicAgent::registerAttributes()
 {
-	registerIntAttribute("direction");
-	registerIntAttribute("panicked");
+//	registerIntAttribute("direction");
+//	registerIntAttribute("panicked");
 }
 
 void PanicAgent::serialize()
 {
-	serializeAttribute("direction", _direction);
-	serializeAttribute("panicked", _panicked);
+//	serializeAttribute("direction", _direction);
+//	serializeAttribute("panicked", _panicked);
 }
 	
 void PanicAgent::setExit( const Engine::Point2D<int> & exit )
