@@ -432,6 +432,10 @@ std::string Display2D::getAgentToolTip( const Engine::Point2D<int> & position )
 	for(int i=0; i<agents.size(); i++)
 	{
 		Engine::AgentRecord * agentRecord = agents.at(i);
+		if(agentRecord->getState(_viewedStep/_simulationRecord->getFinalResolution(), "exists")==false)
+		{
+			continue;
+		}
 		toolTipString << std::endl << agentRecord->getCompleteState(_viewedStep/_simulationRecord->getFinalResolution());
 	}
 	return toolTipString.str();
