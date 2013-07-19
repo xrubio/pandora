@@ -46,7 +46,7 @@ public:
 	void setNumSectors( int v ) { _numSectors = v; }
 	int  getNumSectors() const { return _numSectors; }
 	void setLowResHomeRange(int v) { _lowResHomeRange = v; }
-	int getLowResHomeRange() const { return _lowResHomeRange; }
+	int  getLowResHomeRange() const { return _lowResHomeRange; }
 	//-------------------------------------------------------------------
 	const std::vector<Sector *> & getHRSectors() const 
 	{ return _myHGMind->getHRSectors(); }

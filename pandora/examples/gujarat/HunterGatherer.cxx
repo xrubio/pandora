@@ -116,7 +116,8 @@ void HunterGatherer::executeActions()
 	//		touches nothing
 	
 	GujaratAgent::executeActions();
-	doInformationSharing();
+//*?
+		doInformationSharing();
 }
 
 void HunterGatherer::clearSectorKnowledge() 

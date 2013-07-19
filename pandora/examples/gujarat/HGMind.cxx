@@ -59,7 +59,7 @@ void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos,
 		int insertPoint = 0;
 		
 		HRSectors.resize(numSectors);	
-		for ( unsigned k = 0; k < numSectors; k++ )
+		for ( int k = 0; k < numSectors; k++ )
 		{
 			HRSectors[k] = new Sector(_world);
 		}
@@ -92,6 +92,33 @@ void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos,
 			}
 		}
 	//}
+	
+	
+	// Remove empty sectors.
+	// Empty sectors can happen if agent is near enough of a world boundary.
+	unsigned int read  = 0;
+	unsigned int write = 0;
+	while (read<HRSectors.size())
+	{
+		if(HRSectors[read]->cells().size()<1)
+		{
+			read++;
+		}
+		else
+		{
+			if(read!=write)
+			{
+				if(HRSectors[write]->cells().size()<1) 
+				{
+					delete HRSectors[write];
+				}
+				HRSectors[write] = HRSectors[read];
+			}
+			read++;
+			write++;
+		}
+	}	
+	HRSectors.resize(write);
 	
 }
 
@@ -176,10 +203,37 @@ void HGMind::createLRSectors( 	const Engine::Point2D<int>& agentPos,
 			}//for
 		}//for
 		
-		for ( unsigned k = 0; k < numSectors; k++ )
+		// Remove empty sectors.
+		// Empty sectors can happen if agent is near enough of a world boundary.
+		unsigned int read  = 0;
+		unsigned int write = 0;
+		while (read<LRSectors.size())
+		{
+			if(LRSectors[read]->cells().size()<1)
+			{
+				read++;
+			}
+			else
+			{
+				if(read!=write) 
+				{
+					if(LRSectors[write]->cells().size()<1) 
+					{
+						delete LRSectors[write];
+					}
+					LRSectors[write] = LRSectors[read];
+				}
+				read++;
+				write++;
+			}
+		}	
+		LRSectors.resize(write);
+		
+		
+		for ( unsigned k = 0; k < LRSectors.size(); k++ )
 		{
 			LRSectors[k]->addCell( &cellPool[insertPoint00] );
-		}	
+		}
 	//}	   
 	
 }	
@@ -191,7 +245,6 @@ void HGMind::updateKnowledge(Engine::Point2D<int> position)
 	// _HRsectors contain only Point2D referencing HR cells in HR raster of resources,
 	// so there are no utility attribs to update.
 	
-	int numSectors = ((GujaratConfig)_world.getConfig())._numSectors;
 	
 	if (_HRSectors.size()==0)
 	{
@@ -203,7 +256,7 @@ void HGMind::updateKnowledge(Engine::Point2D<int> position)
 		createLRSectors( position, _LRSectors, _LRCellPool);
 	}
 	
-	for ( unsigned k = 0; k < numSectors; k++ )
+	for ( unsigned k = 0; k < _LRSectors.size(); k++ )
 	{
 		_LRSectors[k]->updateFeaturesLR(_LRResourceRaster);
 	}
@@ -219,8 +272,7 @@ void HGMind::updateKnowledge( const Engine::Point2D<int>& agentPos
 								, std::vector< Engine::Point2D<int> >& LRCellPool
 							) const
 {	
-	
-	int numSectors = ((GujaratConfig)_world.getConfig())._numSectors;
+
 	
 	if (HRSectors.size()==0)
 	{
@@ -232,7 +284,7 @@ void HGMind::updateKnowledge( const Engine::Point2D<int>& agentPos
 		createLRSectors(agentPos,LRSectors, LRCellPool);
 	}
 	
-	for ( unsigned k = 0; k < numSectors; k++ )
+	for ( unsigned k = 0; k < LRSectors.size(); k++ )
 	{	
 		LRSectors[k]->updateFeaturesLR(dataRaster);
 	} 

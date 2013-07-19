@@ -9,7 +9,7 @@ namespace Gujarat{
 HGPartialMindMap::HGPartialMindMap(GujaratWorld & w):
 	HGMind(w)
 { 
-	int LowResRasterSideSize     = w.getLowResMapsSideSize();
+	int LowResRasterSideSize = w.getLowResMapsSideSize();
 	Engine::Point2D<int> lowResSize2D( LowResRasterSideSize, LowResRasterSideSize);
 	
 	
@@ -115,6 +115,10 @@ void HGPartialMindMap::updateDueToExecuteAction(Sector *s)
 	//		Erases all sectors
 	//		updateKnowledge after creating sectors should do an init call for each
 	//		sector
+	
+	
+	
+	
 	if (s != 0)
 	{
 		const std::vector< Engine::Point2D<int>* > & cells = s->cells();	
@@ -125,6 +129,9 @@ void HGPartialMindMap::updateDueToExecuteAction(Sector *s)
 			_LRResourceRaster.setInitValue(*(cells[i]),res);
 		}
 	}
+	
+	
+	
 }
 
 /*

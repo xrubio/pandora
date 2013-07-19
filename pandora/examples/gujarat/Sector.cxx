@@ -59,6 +59,7 @@ Sector::~Sector()
 
 Engine::Point2D<int> *	Sector::getNearestTo( Engine::Point2D<int> p ) const
 {
+	assert(_cells.size()>0);
 	Engine::Point2D<int> * nearest = _cells[0];
 	double nearestDist = nearest->distance( p );
 
