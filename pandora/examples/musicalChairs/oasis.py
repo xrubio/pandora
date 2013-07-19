@@ -17,24 +17,20 @@ def enum(**enums):
 terrainTypes = enum(ePastures=0, eFields=1)
 
 class OasisConfig():
-	_size = 0
-	_numSteps = 0
-
-	# farmer config
-	_initFarmers = 0
-	_farmersStrength = 0.0
-	_farmersGrowthRate = 0.0
-	_farmersImmigrationRate = 0.0
-
-	_initHerders = 0
-	_herdersRelativeStrength = 0.0
-	_herdersGrowthRate = 0.0
-	_herdersImmigrationRate = 0.0
-
 	def __init__(self):
-		return
+		self._size = 0
+		self._numSteps = 0
 
-#	Config.__init__(self)
+		# farmer config
+		self._initFarmers = 0
+		self._farmersStrength = 0.0
+		self._farmersGrowthRate = 0.0
+		self._farmersImmigrationRate = 0.0
+
+		self._initHerders = 0
+		self._herdersRelativeStrength = 0.0
+		self._herdersGrowthRate = 0.0
+		self._herdersImmigrationRate = 0.0
 	
 	def deserialize(self, xmlFile):
 		tree = xml.etree.ElementTree.parse(xmlFile)
@@ -58,33 +54,40 @@ class OasisConfig():
 
 class OasisAgent(Agent):
 	""" Base class for the Musical Chairs model """
-	_aggressiveness = 0.0
-	_strength = 0.0
-	_naturalGrowth = 0.0
-	_numChildren = 0
 
 	def __init__(self, id):
 		Agent.__init__( self, id)
+		self._aggressiveness = 1.0
+		self._strength = 1.0
+		self._naturalGrowth = 0.0
 
 	def naturalGrowth(self):
 		# check natural growth
 		randomValue = random.random()
-		#print self.id + ' checking random: '+str(randomValue)+' against natural growth: '+str(self._naturalGrowth)
-		if randomValue >= self._naturalGrowth:
+		if randomValue > self._naturalGrowth:
 			return
 		newAgent = self.duplicateAgent()
 		if newAgent == 0:
 			return
-		self._numChildren += 1
 		newAgent._strength = self._strength
 		newAgent._aggressiveness = self._aggressiveness
 		newAgent._naturalGrowth = self._naturalGrowth
 
+	def registerAttributes(self):
+		self.registerIntAttribute('strength x100')
+		self.registerIntAttribute('aggressiveness x100')
+
+	def serialize(self):
+		self.serializeIntAttribute('strength x100', int(100.0*self._strength))
+		self.serializeIntAttribute('aggressiveness x100', int(100*self._aggressiveness))
+	
 class Herder(OasisAgent):
 	def __init__(self, id):
 		OasisAgent.__init__( self, id)
 
 	def updateState(self):
+		if self.exists == False:
+			return
 		self.naturalGrowth()
 
 	def getNewHerderPosition(self):
@@ -96,7 +99,8 @@ class Herder(OasisAgent):
 		return Point2DInt(-1,-1) 
 
 	def duplicateAgent(self):
-		newAgent = Herder(self.id+'_'+str(self._numChildren))
+		newAgent = Herder('Herder_'+str(self.getWorld()._numHerders))
+		self.getWorld()._numHerders += 1
 		newAgent.position = self.getNewHerderPosition()
 		# all occupied by farmers
 		if(newAgent.position._x == -1):
@@ -105,14 +109,13 @@ class Herder(OasisAgent):
 		self.getWorld().addAgent(newAgent)
 		return newAgent
 		 
-	def serialize(self):
-		return
-
 class Farmer(OasisAgent):
 	def __init__(self, id):
 		OasisAgent.__init__( self, id)
 
-	def updateState(self):
+	def updateState(self):	
+		if self.exists == False:
+			return
 		self.naturalGrowth()
 
 	def getNewFarmerPosition(self):
@@ -124,7 +127,8 @@ class Farmer(OasisAgent):
 		return Point2DInt(-1,-1) 
 
 	def duplicateAgent(self):
-		newAgent = Farmer(self.id+'_'+str(self._numChildren))
+		newAgent = Farmer('Farmer_'+str(self.getWorld()._numFarmers))
+		self.getWorld()._numFarmers += 1
 		newAgent.position = self.getNewFarmerPosition()
 		# all occupied by farmers
 		if(newAgent.position._x == -1):
@@ -133,21 +137,19 @@ class Farmer(OasisAgent):
 		self.getWorld().addAgent(newAgent)
 		return newAgent
 
-	def serialize(self):
-		return
-
 class Oasis(World):
-	_numFields = 0
-	_herdersOut = 0
-	_farmersOut = 0
-	_aggressions = 0
-	_invasions = 0
-
-	_config	= OasisConfig()
 
 	def __init__(self, simulation, config ):
 		World.__init__( self, simulation)
 		self._config = config
+		self._numFields = 0
+		self._herdersOut = 0
+		self._farmersOut = 0
+		self._aggressions = 0
+		self._invasions = 0
+
+		self._numFarmers = 0
+		self._numHerders = 0
 
 	def createRasters(self):
 		self.registerDynamicRaster("farmers", 1)
@@ -165,6 +167,7 @@ class Oasis(World):
 			newAgent._naturalGrowth = self._config._farmersGrowthRate
 			newAgent._strength = self._config._farmersStrength
 			newAgent.position = Point2DInt(i%self._config._size,i/self._config._size)
+			self._numFarmers += 1
 			self.setValue('farmers', newAgent.position, 1) 
 
 		for i in range (0, self._config._initHerders):
@@ -173,6 +176,7 @@ class Oasis(World):
 			newAgent._naturalGrowth = self._config._herdersGrowthRate
 			newAgent._strength = self._config._farmersStrength*self._config._herdersRelativeStrength
 			newAgent.position = Point2DInt(self._config._size-1-i%self._config._size,self._config._size-1-i/self._config._size)
+			self._numHerders += 1
 			self.setValue('herders', newAgent.position, 1) 
 	
 	def farmersMigration(self):
@@ -182,6 +186,7 @@ class Oasis(World):
 		return
 	
 	def resolveConflicts( self, position ):
+		print 'resolving conflict at position: ' + str(position._x) + '/' + str(position._y)
 		# just one of each per cell
 		herder = self.getAgent(self.getAgentIds(position, 'Herder')[0])
 		farmer = self.getAgent(self.getAgentIds(position, 'Farmer')[0])
@@ -192,9 +197,10 @@ class Oasis(World):
 		ratioOfStrengths = herder._strength/(herder._strength+farmer._strength)
 		incentiveForMigration = 1 - ratioOfStrengths*indexOfOpportunity
 		print '\tratio of strength: '+str(ratioOfStrengths) + ' incentive migration: ' + str(incentiveForMigration) + ' index of opportunity: ' + str(indexOfOpportunity) + ' num fields: ' + str(self._numFields) + ' size: ' + str(self._config._size)
+
 		if incentiveForMigration>herder._aggressiveness:
 			print '\therder migrated, removing agent: '+herder.id
-			self.removeAgent(herder)
+			herder.remove()
 			self.setValue('herders', position, 0)
 			self._herdersOut += 1
 			return
@@ -203,14 +209,14 @@ class Oasis(World):
 		self._aggressions += 1
 		randomValue = random.random()
 		if herder._aggressiveness > randomValue:
-			print '\t herder invasion success with random: '+str(randomValue) + ' and aggressiveness: ' + str(herder._aggressiveness) + ' farmer removed: ' + farmer.id
-			self.removeAgent(farmer)
+			print '\therder invasion success with random: '+str(randomValue) + ' and aggressiveness: ' + str(herder._aggressiveness) + ' farmer removed: ' + farmer.id
+			farmer.remove()
 			self.setValue('farmers', position, 0)
-			_invasions += 1
+			self._invasions += 1
 			return
 		else:
-			print '\t herder invasion failed with random: '+str(randomValue) + ' and aggressiveness: ' + str(herder._aggressiveness) + ' herder removed: ' + herder.id
-			self.removeAgent(herder)
+			print '\therder invasion failed with random: '+str(randomValue) + ' and aggressiveness: ' + str(herder._aggressiveness) + ' herder removed: ' + herder.id
+			herder.remove()
 			self.setValue('herders', position, 0)
 			return
 	
@@ -223,19 +229,72 @@ class Oasis(World):
 					self._numFields += 1
 				
 	def checkConflicts(self):
-		self.updateNumFields()
 		self._aggressions = 0
 		self._invasions = 0
-		for i in range(0,self._config._size):
-			for j in range(0,self._config._size):
-				position = Point2DInt(i,j)
-				if self.getValue('herders', position)==1 and self.getValue('farmers', position)==1:
-					self.resolveConflicts(position)
+		index = Point2DInt(0,0)
+		for index._y in range(0,self._config._size):
+			for index._x in range(0,self._config._size):
+				if self.getValue('herders', index)==1 and self.getValue('farmers', index)==1:
+					self.resolveConflicts(index)
+	
+	def shufflePositions(self):
+		"""We need to shuffle the positions of the agents before checking conflicts"""
+		listFarmers = []
+		index = Point2DInt(0,0)
+		for index._y in range(0,self._config._size):
+			for index._x in range(0,self._config._size):
+				if self.getValue('farmers', index)==1:
+					aFarmer = self.getAgent(self.getAgentIds(index, 'Farmer')[0])
+					self.setValue('farmers', index, 0)
+					listFarmers.append(aFarmer)
+
+		random.shuffle(listFarmers)
+		index = Point2DInt(0,0)
+		for i in range(0, len(listFarmers)):
+			aFarmer = listFarmers[i]
+			aFarmer.position = index
+			self.setValue('farmers', index, 1)
+			# next column
+			if(index._x<(self._config._size-1)):
+				index._x +=1
+			# next row
+			else:
+			 	index._x = 0
+			 	index._y += 1	
+	
+		listHerders = []
+		index = Point2DInt(0,0)	
+		for index._y in range(self._config._size-1, -1, -1):
+			for index._x in range(self._config._size-1, -1, -1):
+				if self.getValue('herders', index)==1:
+					aHerder = self.getAgent(self.getAgentIds(index, 'Herder')[0])
+					self.setValue('herders', index, 0)
+					listHerders.append(aHerder)
+
+		random.shuffle(listHerders)
+		index = Point2DInt(self._config._size-1,self._config._size-1)
+		for i in range(0, len(listHerders)):
+			aHerder= listHerders[i]
+			aHerder.position = index
+			self.setValue('herders', index, 1)
+			# next column
+			if index._x > 0:
+				index._x -=1
+			# next row
+			else:
+			 	index._x = self._config._size-1
+			 	index._y -= 1
+
+
 	def stepEnvironment(self):
+		print 'new step environment for step: ' + str(self.currentStep)
 		self.farmersMigration()
 		self.herdersMigration()
+
+		self.updateNumFields()
+
+		self.shufflePositions()
 		self.checkConflicts()
-		return
 
 def main():
 	parser = argparse.ArgumentParser()
