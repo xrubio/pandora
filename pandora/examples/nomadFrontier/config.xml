@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<config>  
+	<!-- Global simulation parameters -->
+	<output resultsFile="./data/oasis.h5" logsDir="./logs"/>
+	<numSteps value="100" serializeResolution="1"/>
+	<size value="30"/>
+<!--	<numAgents value="1"/> -->
+	<agents>	
+		<farmers init="20" strength="1" growthRate="0.3" immigrationRate="0.1"/>
+		<herders init="20" relativeStrength="5.0" growthRate="0.3" immigrationRate="0.1"/>
+	</agents>
+</config>
+
