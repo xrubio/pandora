@@ -68,14 +68,16 @@ void HGPartialMindMap::knowledgeExpirationDateProcess()
 {
 	// HGPartialMindMap::updateKnowledge calls it
 	
-	int numSectors = ((GujaratConfig)_world.getConfig())._numSectors;
+	//int numSectors = ((GujaratConfig)_world.getConfig())._numSectors;
 	
 	int minValue =  _world.getDynamicRaster(eResources).getCurrentMinValue();
 	int maxValue =  _world.getDynamicRaster(eResources).getCurrentMaxValue();
 	int averageValueHR = (maxValue+minValue)/2;
 	int n;
 	
-	for ( unsigned k = 0; k < numSectors; k++ )
+	// Some sectors where empty at creation and where removed
+	//for ( unsigned k = 0; k < numSectors; k++ )
+	for ( unsigned k = 0; k < _LRSectors.size(); k++ )
 	{
 		const std::vector< Engine::Point2D<int>* > & cells = _LRSectors[k]->cells();
 		for( int i = 0; i < cells.size(); i++)
