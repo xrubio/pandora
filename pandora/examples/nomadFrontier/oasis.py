@@ -38,6 +38,9 @@ class OasisConfig():
 		self._asabiyaIncrease = 0.2
 		self._asabiyaDecay = 0.1
 
+		# importance of distance related to conflict for herder decision making
+		self._distParam = 0.0
+
 		# max depth of the recursivity function
 		self._maxDepth = 3
 		# maximum distance at which a cell can be used as a pasture from the central point of the Herder's activity
@@ -72,7 +75,7 @@ class OasisAgent(Agent):
 		self._numId = numId
 
 		# variables
-		self._aggressiveness = 0.5
+		self._aggressiveness = random.random()
 		self._asabiya = 0.5
 		self._hadConflict = False
 
@@ -93,10 +96,11 @@ class OasisAgent(Agent):
 	def updateAsabiya(self):
 		# if conflict, logistic growth 
 		if self._hadConflict:
-			self._asabiya += self.getWorld()._config._asabiyaIncrease*self._asabiya*(1-self-_asabiya)
+			self._asabiya += self.getWorld()._config._asabiyaIncrease*self._asabiya*(1-self._asabiya)
 		# if not, exponential decay
 		else:
 			self._asabiya -= self._asabiya*self.getWorld()._config._asabiyaDecay
+		self._hadConflict = False
 
 
 	def registerAttributes(self):
@@ -118,6 +122,7 @@ class Herder(OasisAgent):
 		# pasture used last odd step
 		self._lastPasture = Point2DInt(-1, -1)
 		self._pastures = []
+		self._aggressiveness = 0.0
 
 	def appendNewPastures(self, potentialPastures, locationToExpand, depth):
 
@@ -171,8 +176,16 @@ class Herder(OasisAgent):
 		return float(numFarmers)/float(len(potentialPastures))
 
 	def calculateUtility(self, distToCentre, farmingPercentage):
-		# TODO computes the utility based on distance, farming percentage and current asabiya*aggresiveness
-		return random.random()
+		# computes the utility based on distance, farming percentage and current asabiya*aggresiveness
+		distWeight = 1-(distToCentre/self.getWorld()._maxDist)
+		distWeight *= self.getWorld()._config._distParam
+		# the weight of conflict is calculated as conflictAcceptance * (1-conflictAcceptance)*(1-conflictPossibility)
+		conflictAcceptance = self._asabiya*self._aggressiveness
+		conflictWeight = conflictAcceptance + (1-conflictAcceptance)*(1-farmingPercentage)
+		conflictWeight *= (1.0-self.getWorld()._config._distParam)
+		finalUtility = distWeight + conflictWeight
+		print 'agent: ' + self.id + ' with asabiya: ' + str(self._asabiya) + ' aggresiveness: ' + str(self._aggressiveness) + ' farm percentage: ' + str(farmingPercentage) + ' and dist to centre: ' + str(distToCentre) + ' has dist weight: ' + str(distWeight) + ', conflict weight: ' + str(conflictWeight) + ' and final utility: ' + str(finalUtility)
+		return finalUtility
 
 	def choosePasture(self):
 		maxValue = 0.0
@@ -208,7 +221,7 @@ class Herder(OasisAgent):
 					maxValue = value
 					nextPasture = newPoint
 					bestPastures = potentialPastures
-		#print 'ending sampling for herder: ' + self.id + ' new pasture position: ' + str(nextPasture._x) + '/' + str(nextPasture._y)
+		print 'ending sampling for herder: ' + self.id + ' new pasture position: ' + str(nextPasture._x) + '/' + str(nextPasture._y) + ' with utility: ' + str(maxValue)
 		
 		# all eNothing cells are used until needed number; eFarming cells will be used if conflict is sucessful
 		self.position = nextPasture
@@ -275,6 +288,7 @@ class Farmer(OasisAgent):
 		OasisAgent.__init__( self, id, numId)
 
 		self._lands = []
+		self._aggressiveness = 0.0
 		
 	
 	def isBorder(self, cell):
@@ -310,7 +324,6 @@ class Farmer(OasisAgent):
 		frontierPerimeter = 0
 		potentialConflictCells = 0
 
-
 		for land in self._lands:
 			if self.isBorder(land):
 				frontierPerimeter += 1
@@ -341,7 +354,10 @@ class Farmer(OasisAgent):
 		# if not, popSize will be decrased to the number of controlled regions
 
 		neededLands = int(math.ceil(self._popSize)) - len(self._lands)
-		print 'decision to expand with potential conflict: ' + str(potentialConflict) + ' needs to expand: ' + str(neededLands)
+		print 'decision to expand with potential conflict: ' + str(potentialConflict) + ' needs to expand: ' + str(neededLands) + ' aggr: ' + str(self._aggressiveness) + ' asabiya: ' + str(self._asabiya)
+		if potentialConflict > self._aggressiveness*self._asabiya:
+			print 'potential conflict too high for agg: ' + str(self._aggressiveness) + ' and asabiya: ' + str(self._asabiya)
+			return
 
 		while neededLands != 0:
 			possibleExpansions = []
@@ -376,24 +392,22 @@ class Farmer(OasisAgent):
 		if self.exists == False:
 			return
 		
+		# decision of expanding is taken during fall
 		if self.getWorld().currentStep % 2 == 0:
-			potentialConflict = self.computePotentialConflict()
-			self.expandDecision(potentialConflict)
-		else:
-			self.updateAsabiya()
-			self.computeConsumedResources()
-			self.increasePopSize()
+			return
+
+		potentialConflict = self.computePotentialConflict()
+		self.updateAsabiya()
+		self.computeConsumedResources()
+		self.increasePopSize()
+		self.expandDecision(potentialConflict)
 
 class Oasis(World):
 
 	def __init__(self, simulation, config ):
 		World.__init__( self, simulation)
 		self._config = config
-		self._numFields = 0
-		self._herdersOut = 0
-		self._farmersOut = 0
-		self._aggressions = 0
-		self._invasions = 0
+		self._maxDist = math.sqrt(float(self._config._size*self._config._size))
 
 	def createRasters(self):
 		self.registerDynamicRaster("refuge", 1)
@@ -412,16 +426,6 @@ class Oasis(World):
 		# we create 2 arbitrary refuges
 		self.setValue("refuge", Point2DInt(5,5), 1)
 		self.setValue("refuge", Point2DInt(self._config._size-5,self._config._size-5), 1)
-
-
-		"""
-		self.registerDynamicRaster("farmers", 1)
-		self.registerDynamicRaster("herders", 1)
-		self.registerDynamicRaster("conflicts", 1)
-		self.getDynamicRaster("farmers").setInitValues(0, 1, 0)
-		self.getDynamicRaster("herders").setInitValues(0, 1, 0)
-		self.getDynamicRaster("conflicts").setInitValues(0, self._config._numSteps, 0)
-		"""
 
 	def createAgents(self):
 		print 'creating farmers: '+str(self._config._initFarmers)+' and herders: '+str(self._config._initHerders)
@@ -445,112 +449,6 @@ class Oasis(World):
 			else:
 				newAgent.position = Point2DInt(self._config._size-5, self._config._size-5)
 	
-	def farmersMigration(self):
-		return	
-			
-	def herdersMigration(self):
-		return
-	
-	def resolveConflicts( self, position ):
-		print 'resolving conflict at position: ' + str(position._x) + '/' + str(position._y)
-		# just one of each per cell
-		herder = self.getAgent(self.getAgentIds(position, 'Herder')[0])
-		farmer = self.getAgent(self.getAgentIds(position, 'Farmer')[0])
-		print 'conflict between herder: '+ herder.id + ' and farmer: ' + farmer.id + ' at pos: ' + str(position._x) + '/' + str(position._y)
-		self.setValue('conflicts', position, self.getValue('conflicts', position)+1)
-
-		indexOfOpportunity = self._numFields / (self._config._size*self._config._size)
-		ratioOfStrengths = herder._strength/(herder._strength+farmer._strength)
-		incentiveForMigration = 1 - ratioOfStrengths*indexOfOpportunity
-		print '\tratio of strength: '+str(ratioOfStrengths) + ' incentive migration: ' + str(incentiveForMigration) + ' index of opportunity: ' + str(indexOfOpportunity) + ' num fields: ' + str(self._numFields) + ' size: ' + str(self._config._size)
-
-		if incentiveForMigration>herder._aggressiveness:
-			print '\therder migrated, removing agent: '+herder.id
-			herder.remove()
-			self.setValue('herders', position, 0)
-			self._herdersOut += 1
-			return
-
-		# invasion attempt
-		self._aggressions += 1
-		randomValue = random.random()
-		if herder._aggressiveness > randomValue:
-			print '\therder invasion success with random: '+str(randomValue) + ' and aggressiveness: ' + str(herder._aggressiveness) + ' farmer removed: ' + farmer.id
-			farmer.remove()
-			self.setValue('farmers', position, 0)
-			self._invasions += 1
-			return
-		else:
-			print '\therder invasion failed with random: '+str(randomValue) + ' and aggressiveness: ' + str(herder._aggressiveness) + ' herder removed: ' + herder.id
-			herder.remove()
-			self.setValue('herders', position, 0)
-			return
-	
-	def updateNumFields(self):
-		self._numFields = 0
-		for i in range(0,self._config._size):
-			for j in range(0,self._config._size):
-				position = Point2DInt(i,j)
-				if self.getValue('farmers', position)==1 :
-					self._numFields += 1
-				
-	def checkConflicts(self):
-		self._aggressions = 0
-		self._invasions = 0
-		index = Point2DInt(0,0)
-		for index._y in range(0,self._config._size):
-			for index._x in range(0,self._config._size):
-				if self.getValue('herders', index)==1 and self.getValue('farmers', index)==1:
-					self.resolveConflicts(index)
-	
-	def shufflePositions(self):
-		"""We need to shuffle the positions of the agents before checking conflicts"""
-		listFarmers = []
-		index = Point2DInt(0,0)
-		for index._y in range(0,self._config._size):
-			for index._x in range(0,self._config._size):
-				if self.getValue('farmers', index)==1:
-					aFarmer = self.getAgent(self.getAgentIds(index, 'Farmer')[0])
-					self.setValue('farmers', index, 0)
-					listFarmers.append(aFarmer)
-
-		random.shuffle(listFarmers)
-		index = Point2DInt(0,0)
-		for i in range(0, len(listFarmers)):
-			aFarmer = listFarmers[i]
-			aFarmer.position = index
-			self.setValue('farmers', index, 1)
-			# next column
-			if(index._x<(self._config._size-1)):
-				index._x +=1
-			# next row
-			else:
-			 	index._x = 0
-			 	index._y += 1	
-	
-		listHerders = []
-		index = Point2DInt(0,0)	
-		for index._y in range(self._config._size-1, -1, -1):
-			for index._x in range(self._config._size-1, -1, -1):
-				if self.getValue('herders', index)==1:
-					aHerder = self.getAgent(self.getAgentIds(index, 'Herder')[0])
-					self.setValue('herders', index, 0)
-					listHerders.append(aHerder)
-
-		random.shuffle(listHerders)
-		index = Point2DInt(self._config._size-1,self._config._size-1)
-		for i in range(0, len(listHerders)):
-			aHerder= listHerders[i]
-			aHerder.position = index
-			self.setValue('herders', index, 1)
-			# next column
-			if index._x > 0:
-				index._x -=1
-			# next row
-			else:
-			 	index._x = self._config._size-1
-			 	index._y -= 1
-
 	def conflict(self, herder, farmer, location):
 		print 'conflict for location: ' + str(location._x) + '/' + str(location._y)
 		# farmer wins
@@ -580,6 +478,8 @@ class Oasis(World):
 					farmer = self.getAgent('Farmer_'+str(self.getValue('farmers', index)))				
 					print 'conflict between herder: '+ herder.id + ' and farmer: ' + farmer.id + ' at pos: ' + str(index._x) + '/' + str(index._y)
 					self.conflict(herder, farmer, index)
+					herder._hadConflict = True
+					farmer._hadConflict = True
 
 	def resetPastureUse(self):
 		"""this function resets to eNothing all cells used by pasture the previous year"""
@@ -599,14 +499,6 @@ class Oasis(World):
 		# beginning of fall, solve spring conflicts
 		else:
 			self.conflicts()
-
-		#self.farmersMigration()
-		#self.herdersMigration()
-
-		#self.updateNumFields()
-
-		#self.shufflePositions()
-		#self.checkConflicts()
 
 def main():
 	parser = argparse.ArgumentParser()
