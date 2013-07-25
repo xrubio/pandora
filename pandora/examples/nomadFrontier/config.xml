@@ -2,12 +2,13 @@
 <config>  
 	<!-- Global simulation parameters -->
 	<output resultsFile="./data/oasis.h5" logsDir="./logs"/>
-	<numSteps value="50" serializeResolution="1"/>
-	<size value="10"/>
-<!--	<numAgents value="1"/> -->
+	<numSteps value="100" serializeResolution="1"/>
+	<size value="30"/>
+	<conflict asabiyaIncrease="0.2" asabiyaDecay="0.1" distanceSensibility="2.0" conflictThreshold="0.0"/>
+	<herderSampling numSamples="10" distParam="0.0" maxDepth="3"/>
 	<agents>	
-		<farmers init="1" strength="1" growthRate="0.3" immigrationRate="0.1"/>
-		<herders init="1" relativeStrength="5.0" growthRate="0.3" immigrationRate="0.1"/>
+		<farmers num="10" aggressiveness="1.0" growthCoefficient="0.2"/>
+		<herders num="10" aggressiveness="1.0" growthCoefficient="0.2"/>
 	</agents>
 </config>
 

@@ -23,28 +23,28 @@ class OasisConfig():
 		self._numSteps = 0
 
 		# farmer config
-		self._initFarmers = 0
-		self._farmersStrength = 0.0
-		self._farmersGrowthRate = 0.0
-		self._farmersImmigrationRate = 0.0
-
+		self._numFarmers = 0
+		self._farmersAggresiveness = 0.0
+		self._farmersGrowthCoefficient = 0.0
 		# herder config
-		self._initHerders = 0
-		self._herdersRelativeStrength = 0.0
-		self._herdersGrowthRate = 0.0
-		self._herdersImmigrationRate = 0.0
-		self._samplingNumber = 10
+		self._numHerders = 0
+		self._herdersAggresiveness = 0.0
+		self._herdersGrowthCoefficient = 0.0
 
+		# conflict params
 		self._asabiyaIncrease = 0.2
 		self._asabiyaDecay = 0.1
+		# relevance of distance to agent centre in case of conflict
+		self._distanceSensibility = 2.0
+		# threshold upon herder wins the conflict (if 0 equal power, if >0 farmers superiors to herders in conflict)
+		self._conflictThreshold = 0.0
 
+		# herder sampling param
+		self._numSamples = 10
 		# importance of distance related to conflict for herder decision making
 		self._distParam = 0.0
-
 		# max depth of the recursivity function
 		self._maxDepth = 3
-		# maximum distance at which a cell can be used as a pasture from the central point of the Herder's activity
-		#self._maxPastureDistance = 10.0
 	
 	def deserialize(self, xmlFile):
 		tree = xml.etree.ElementTree.parse(xmlFile)
@@ -53,29 +53,38 @@ class OasisConfig():
 		self._size = int(root.find('size').get('value'))
 		self._numSteps = int(root.find('numSteps').get('value'))
 
+		conflict = root.find('conflict')
+		self._asabiyaIncrease = float(conflict.get('asabiyaIncrease'))
+		self._asabiyaDecay = float(conflict.get('asabiyaDecay'))
+		self._distanceSensibility = float(conflict.get('distanceSensibility'))
+		self._conflictThreshold = float(conflict.get('conflictThreshold'))
+
+		herderSampling = root.find('herderSampling')
+		self._numSamples = int(herderSampling.get('numSamples'))		
+		self._distParam = float(herderSampling.get('distParam'))
+		self._maxDepth = int(herderSampling.get('maxDepth'))
+		
 		agents = root.find('agents')
 		farmers = agents.find('farmers')
-		self._initFarmers = int(farmers.get('init'))
-		self._farmersStrength = float(farmers.get('strength'))
-		self._farmersGrowthRate = float(farmers.get('growthRate'))
-		self._farmersImmigrationRate = float(farmers.get('immigrationRate'))
+		self._numFarmers = int(farmers.get('num'))
+		self._farmersAggresiveness = float(farmers.get('aggressiveness'))
+		self._farmersGrowthCoefficient = float(farmers.get('growthCoefficient'))
 
 		herders = agents.find('herders')
-		self._initHerders = int(herders.get('init'))
-		self._herdersRelativeStrength = float(herders.get('relativeStrength'))
-		self._herdersGrowthRate = float(herders.get('growthRate'))
-		self._herdersImmigrationRate = float(herders.get('immigrationRate'))
+		self._numHerders = int(herders.get('num'))
+		self._herdersAggresiveness = float(herders.get('aggressiveness'))
+		self._herdersGrowthCoefficient = float(herders.get('growthCoefficient'))
 
 class OasisAgent(Agent):
 	""" Base class for the Musical Chairs model """
-	_growthCoefficient = 0.1
 
 	def __init__(self, id, numId):
 		Agent.__init__( self, id)
 		self._numId = numId
 
 		# variables
-		self._aggressiveness = random.random()
+		self._aggressiveness = 0.0
+		self._growthCoefficient = 0.0
 		self._asabiya = 0.5
 		self._hadConflict = False
 
@@ -146,7 +155,6 @@ class Herder(OasisAgent):
 							visited = True
 
 					# distance not used, depth is used to cut the recursivity
-					#if not visited and newLocation.distance(centralLocation)<self.getWorld()._config._maxPastureDistance:
 					if not visited :
 						candidates.append(newLocation)
 
@@ -206,7 +214,7 @@ class Herder(OasisAgent):
 
 		# map sampling
 		i = 0
-		while i < self.getWorld()._config._samplingNumber:
+		while i < self.getWorld()._config._numSamples:
 			newPoint = Point2DInt(random.randint(0, self.getWorld()._config._size-1), random.randint(0, self.getWorld()._config._size-1))
 			if self.getWorld().getValue("refuge", newPoint)==1:
 				continue
@@ -280,6 +288,8 @@ class Herder(OasisAgent):
 			self.updateAsabiya()
 			self.computeConsumedResources()
 			self.increasePopSize()
+			if self.exists == False:
+				return
 			self.moveToClosestRefuge()
 			#print 'herder: ' + self.id + ' chose refuge: ' + str(self.position._x) + '/' + str(self.position._y)
 			
@@ -400,6 +410,8 @@ class Farmer(OasisAgent):
 		self.updateAsabiya()
 		self.computeConsumedResources()
 		self.increasePopSize()
+		if self.exists == False:
+				return
 		self.expandDecision(potentialConflict)
 
 class Oasis(World):
@@ -420,16 +432,16 @@ class Oasis(World):
 		self.getDynamicRaster("refuge").setInitValues(0, 1, 0)
 		self.getDynamicRaster("landUse").setInitValues(0, landUses.ePastures, landUses.eNothing)
 		self.getDynamicRaster("conflicts").setInitValues(0, 1, 0)
-		self.getDynamicRaster("herders").setInitValues(0, self._config._initHerders, 0)		
-		self.getDynamicRaster("farmers").setInitValues(0, self._config._initFarmers, 0)
+		self.getDynamicRaster("herders").setInitValues(0, self._config._numHerders, 0)		
+		self.getDynamicRaster("farmers").setInitValues(0, self._config._numFarmers, 0)
 
 		# we create 2 arbitrary refuges
 		self.setValue("refuge", Point2DInt(5,5), 1)
 		self.setValue("refuge", Point2DInt(self._config._size-5,self._config._size-5), 1)
 
 	def createAgents(self):
-		print 'creating farmers: '+str(self._config._initFarmers)+' and herders: '+str(self._config._initHerders)
-		for i in range (1, 1+self._config._initFarmers):
+		print 'creating farmers: '+str(self._config._numFarmers)+' and herders: '+str(self._config._numHerders)
+		for i in range (1, 1+self._config._numFarmers):
 			newAgent = Farmer('Farmer_'+str(i), i)
 			self.addAgent(newAgent)
 			newAgent.setRandomPosition()
@@ -440,19 +452,35 @@ class Oasis(World):
 			newAgent._lands.append(newAgent.position)
 			# expand to meet needed resources the first time step
 			newAgent.expandDecision(0.0)
+			newAgent._aggressiveness = random.uniform(0.0,self._config._farmersAggresiveness)
+			newAgent._growthCoefficient = self._config._farmersGrowthCoefficient
 
-		for i in range (1, 1+self._config._initHerders):
+		for i in range (1, 1+self._config._numHerders):
 			newAgent = Herder('Herder_'+str(i), i)
-			self.addAgent(newAgent)
+			self.addAgent(newAgent)	
+			newAgent._aggressiveness = random.uniform(0.0,self._config._herdersAggresiveness)
+			newAgent._growthCoefficient = self._config._herdersGrowthCoefficient
+
 			if i % 2 == 0:
 				newAgent.position = Point2DInt(5,5)
 			else:
 				newAgent.position = Point2DInt(self._config._size-5, self._config._size-5)
-	
+
+	def computePower(self, agent, conflictLocation ):
+		value = float(agent._popSize)*agent._asabiya
+		value *= math.exp(-conflictLocation.distance(agent.position)/self._config._distanceSensibility)
+		print 'agent: ' + agent.id + ' conflict in position: ' + str(conflictLocation._x) + '/' + str(conflictLocation._y) + ' at distance: ' + str(conflictLocation.distance(agent.position)) + ' with distance sens: ' + str(self._config._distanceSensibility) + ' asabiya: ' + str(agent._asabiya) + ' popsize: ' + str(agent._popSize)
+		print 'agent: ' + agent.id + ' base value: ' + str(float(agent._popSize)*agent._asabiya) + ' exp: ' + str(-conflictLocation.distance(agent.position)/self._config._distanceSensibility) + ' exp: ' + str(math.exp(-conflictLocation.distance(agent.position)/self._config._distanceSensibility)) + ' final value: ' + str(value)
+		return value
+
+
 	def conflict(self, herder, farmer, location):
 		print 'conflict for location: ' + str(location._x) + '/' + str(location._y)
+		postHerder = self.computePower(herder, location)
+		postFarmer = self.computePower(farmer, location)
+
 		# farmer wins
-		if random.random()<-1:
+		if postHerder-postFarmer<=self._config._conflictThreshold:
 			for pasture in herder._pastures:
 				if pasture._x==location._x and pasture._y==location._y:
 					herder._pastures.remove(pasture)
@@ -464,6 +492,8 @@ class Oasis(World):
 			for land in farmer._lands:
 				if land._x==location._x and land._y==location._y:
 					farmer._lands.remove(land)
+					if len(farmer._lands)==0:
+						farmer.remove()
 			self.setValue('landUse', location, landUses.ePastures)
 			self.setValue('conflicts', location, 0)
 			self.setValue('farmers', location, 0)
