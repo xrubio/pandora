@@ -29,6 +29,8 @@
 #include <QGLWidget>
 #include <Point3D.hxx>
 #include "QuadTree.hxx"
+#include <QTime>
+
 
 
 class QListWidgetItem;
@@ -62,10 +64,11 @@ public:
 	void setSimulationRecord( Engine::SimulationRecord * simulationRecord );
 
     bool agentFocus;
-    string idAgentFocus;
+    int agentX, agentY;
     float frustum[6][4];
 
     int LOD;
+    int offset;
 // 	
 //Declarem els SLOTS públics que seràn les funcions que rebràn un 
 //paràmetre que serà l'angle amb el que rotarem el nostre ràster
@@ -82,9 +85,9 @@ protected:
 	void resizeGL(int w, int h);
 	void wheelEvent(QWheelEvent * event);
 	void mousePressEvent(QMouseEvent *event);
+    void keyPressEvent(QKeyEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
-	void mouseWheelEvent(QMouseEvent *event);
-        void mouseReleaseEvent (QMouseEvent *e);
+    void mouseReleaseEvent (QMouseEvent *e);
 	void paintLandscape();
 	void paintAgents();
 
@@ -120,6 +123,9 @@ private:
 	QPoint _rotation;
 	int _rotationZ;
 
+    int terrainSize;
+
+
 	Engine::Point3D<float> _cellScale;
 
 	// order of rasters
@@ -128,6 +134,9 @@ private:
 	const Configuration3D & _config3D;
 
     Quadtree *quadLandscape;
+
+    int m_frameCount;
+    QTime *m_time;
 
 };
 

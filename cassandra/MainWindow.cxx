@@ -493,7 +493,7 @@ void MainWindow::openRasterConfigurator(QListWidgetItem * item)
 	
 void MainWindow::agentConfigured( const std::string & type, const AgentConfiguration & config )
 {
-	ProjectConfiguration::instance()->updateAgentConfig(type, config);
+    ProjectConfiguration::instance()->updateAgentConfig(type, config);
 }
 	
 void MainWindow::rasterConfigured( const std::string & type, const RasterConfiguration & config )
@@ -518,12 +518,25 @@ void MainWindow::showSettings()
     Settings * set = new Settings(this,_display3D->LOD);
     set->show();
     connect(set, SIGNAL(LODmodif(int)), this, SLOT(updateLOD(int)));
+    connect(set, SIGNAL(Radiusmodif(int)), this, SLOT(updateRadius(int)));
+    connect(set, SIGNAL(Offsetmodif(int)), this, SLOT(updateOffset(int)));
 }
 
 void MainWindow::updateLOD(int lod)
 {
     _display3D->LOD = lod;
     _display3D->update();
+}
+
+void MainWindow::updateOffset(int o)
+{
+    _display3D->offset = o;
+    _display3D->update();
+}
+
+void MainWindow::updateRadius(int r)
+{
+    _display2D->radiAgent = r;
 }
 
 void MainWindow::show3DOptions()
@@ -607,27 +620,39 @@ void MainWindow::show3Dagent(QTreeWidgetItem * item, int i)
     if (item->child(0) != 0);
     else
     {
-        cout << item->parent()->text(0).toStdString() << endl;
-        //QDockWidget * displayAgentDock = new QDockWidget(tr(item->parent()->text(0).toStdString().c_str()), this);
-        //displayAgentDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-        //_displayAgent = new DisplayAgent(displayAgent);
+
+        Engine::AgentRecord* agentSelected;
+        Engine::AgentRecord* agentAux;
+
+        std::list<Engine::AgentRecord*>::iterator it = agentsSelected.begin();
+        while(it != agentsSelected.end())
+        {
+            agentAux = *it;
+            if (agentAux->getId() == item->parent()->text(0).toStdString()) agentSelected = agentAux;
+            it++;
+        }
 
         Display3D * displayAgent = new Display3D(0);
         connect(this, SIGNAL(newViewedStep(int)), displayAgent, SLOT(viewedStepChangedSlot(int)));
         connect(_rasterSelection, SIGNAL(rastersRearranged(std::list<std::string>)), displayAgent, SLOT(rastersRearranged(std::list<std::string>)));
         displayAgent->setWindowTitle(item->parent()->text(0));
 
-        //displayAgentDock->setWidget(displayAgent);
-        //addDockWidget(Qt::RightDockWidgetArea, displayAgentDock);
-
         displayAgent->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
         displayAgent->rastersRearranged(_rasterSelection->getRasterList());
         displayAgent->agentFocus = true;
-        displayAgent->idAgentFocus = item->parent()->text(0).toStdString();
+        displayAgent->agentX = agentSelected->getState(_viewedStep/_simulationRecord->getFinalResolution(), "x");
+        displayAgent->agentY = agentSelected->getState(_viewedStep/_simulationRecord->getFinalResolution(), "y");;
         displayAgent->show();
 
 
     }
+}
+
+void MainWindow::updateAgentsSelected(std::list<Engine::AgentRecord*> agents,Engine::SimulationRecord * sim)
+{
+    agentsSelected.clear();
+    agentsSelected = agents;
+    _simulationRecord = sim;
 }
 
 } // namespace GUI

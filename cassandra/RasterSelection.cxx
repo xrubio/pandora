@@ -34,8 +34,9 @@ namespace GUI
 
 RasterSelection::RasterSelection(QWidget * parent ) : QListWidget(parent), _simulationRecord(0)
 {
-	setDragDropMode(QAbstractItemView::InternalMove);
+    setDragDropMode(QAbstractItemView::InternalMove);
 	setMouseTracking(true);
+    connect(this,SIGNAL(itemChanged(QListWidgetItem*)),this,SLOT(updateRastersSlot(QListWidgetItem*)));
 }
 
 RasterSelection::~RasterSelection()
@@ -60,6 +61,11 @@ void RasterSelection::setSimulationRecord( Engine::SimulationRecord * simulation
 		addItem(it->first.c_str());
 	}
 	setCurrentRow(0);
+    for(int i=0; i<count(); i++)
+    {
+        item(i)->setFlags(item(i)->flags()|Qt::ItemIsUserCheckable);
+        item(i)->setCheckState(Qt::Checked);
+    }
 	update();
 	updateRasters();
 }
@@ -69,10 +75,13 @@ void RasterSelection::updateRasters()
 	_rasterList.clear();
 	std::list<std::string> items;
 	for(int i=0; i<count(); i++)
-	{
-		std::string newItem(item(i)->text().toStdString());
-		_rasterList.push_back(newItem);
-	}
+    {
+        if (item(i)->checkState() == 2) {
+            std::string newItem(item(i)->text().toStdString());
+            _rasterList.push_back(newItem);
+        }
+
+    }
 	emit rastersRearranged(_rasterList);
 }
 
@@ -81,6 +90,12 @@ void RasterSelection::dropEvent( QDropEvent * event )
 	QListWidget::dropEvent(event);
 	updateRasters();
 }
+
+void RasterSelection::updateRastersSlot(QListWidgetItem* a)
+{
+    updateRasters();
+}
+
 
 const std::list<std::string> & RasterSelection::getRasterList() const
 {

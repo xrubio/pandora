@@ -30,6 +30,7 @@
 #include <vector>
 #include <QListWidget>
 #include <string>
+#include <AgentRecord.hxx>
 
 #include <QTreeWidget>
 
@@ -80,6 +81,7 @@ public:
 	QSize minimumSizeHint() const;
 	QSize sizeHint() const;
     QTreeWidget *agentList;
+    int radiAgent;
 
 protected:  
 	bool event(QEvent *event);
@@ -98,6 +100,7 @@ public slots:
 	void rastersRearranged( std::list<std::string> items );
 signals:
 	void calculateStatistics( const std::string &, const std::string & );
+    void updateAgentsSelected(std::list<Engine::AgentRecord*>,Engine::SimulationRecord *);
 };
 
 } // namespace GUI

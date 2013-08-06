@@ -40,6 +40,8 @@
 #include <ProjectConfiguration.hxx>
 #include <algorithm>
 #include <glut.h>
+#include <QDebug>
+#include <QTime>
 
 namespace GUI
 {
@@ -50,6 +52,9 @@ Display3D::Display3D(QWidget *parent ) : QGLWidget(parent), _simulationRecord(0)
 {
 	//_landscapeMaterial.setTextureFileName("landscape1.bmp");
     agentFocus = false;
+    m_frameCount = 0;
+    m_time = new QTime();
+    offset = 300;
 }
 
 Display3D::~Display3D()
@@ -109,11 +114,11 @@ void Display3D::initializeGL()
         Engine::StaticRaster & DEMRaster = _simulationRecord->getRasterTmp(_config3D.getDEMRaster(), _viewedStep);
 
         float puntMig = sqrt(DEMRaster.getSize()._x*DEMRaster.getSize()._x+DEMRaster.getSize()._y*DEMRaster.getSize()._y);
-
+        terrainSize =  DEMRaster.getSize()._x;
         radi = (puntMig)/2.f; //mida escenari/2
         _vrp._x = DEMRaster.getSize()._x/2;
         _vrp._y = -DEMRaster.getSize()._y/2;
-		_vrp._z = 0;
+        _vrp._z = 0;
 
         cout << "Radi = " << radi << endl;
         dist = 3*radi;
@@ -138,8 +143,8 @@ void Display3D::initializeGL()
     GLfloat materialShininess[] = {100.0f};
 
     GLfloat lightPosition[] = {0.0f, 0.0f, -dist/1.05, 0.0f};
-	GLfloat whiteLight[] = {1.0f, 1.0f, 1.0f, 1.0f};
-    GLfloat modelAmbient[] = {0.05f, 0.05f, 0.05f, 1.0f};
+    GLfloat whiteLight[] = {1.0f, 1.0f, 1.0f, 0.0f};
+    GLfloat modelAmbient[] = {0.5f, 0.5f, 0.5f, 0.0f};
 
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glShadeModel(GL_FLAT);
@@ -167,7 +172,6 @@ void Display3D::initializeGL()
     glEnable(GL_NORMALIZE);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-
 
 
 	/*
@@ -354,9 +358,8 @@ void Display3D::focus()
         glRotatef(-angleX,1,0,0);
         glRotatef(-angleY,0,1,0);
         glRotatef(-angleZ,0,0,1);
-
         //cout << dist << " " << angleX << " " << angleY << " " << angleZ << endl;
-        glTranslatef(-10,-10,-_vrp._z);
+        glTranslatef(-agentX,agentY,-_vrp._z);
     }
 
 }
@@ -364,99 +367,105 @@ void Display3D::focus()
 void Display3D::paintLandscape()
 {
 	Engine::Point2D<int> index;
-//	Engine::Raster & raster = _simulationRecord->getRaster(_selectedRaster, _viewedStep);
-	Engine::StaticRaster & DEMRaster = _simulationRecord->getRasterTmp(_config3D.getDEMRaster(), _viewedStep);
-	Engine::StaticRaster & colorRaster = _simulationRecord->getRasterTmp(_config3D.getColorRaster(), _viewedStep);
+//	Engine::Raster & raster = _simulationRecord->getRaster(_selectedRaster, _viewedStep)
+    std::list<std::string>::const_iterator it =_orderedRasters.end();
+    int off = offset;
+    while(it!=_orderedRasters.begin())
+    {
+        it--;
+        Engine::StaticRaster & DEMRaster(_simulationRecord->getRasterTmp(*(it), _viewedStep));
+        Engine::StaticRaster & colorRaster = _simulationRecord->getRasterTmp(*(it), _viewedStep);
 
-	glPushMatrix();
-	_landscapeMaterial.activate();
-	
-	// general plane covering the entire world
+        glPushMatrix();
+        _landscapeMaterial.activate();
+
+        // general plane covering the entire world
+            /*
+        glBegin(GL_QUADS);
+            glTexCoord2f(0.0f, 0.0f);
+            glVertex3d(5000, 5000, 1);
+
+            glTexCoord2f(0.0f, 1.0f);
+            glVertex3d(-5000, 5000, 1);
+
+            glTexCoord2f(1.0f, 1.0f);
+            glVertex3d(-5000, -5000, 1);
+
+            glTexCoord2f(1.0f, 0.0f);
+            glVertex3d(5000, -5000, 1);
+        glEnd();
+            */
+        const Engine::Point3D<float> scale(_config3D.getSize3D());
+
+
+    //	glTranslatef(-_cellScale._x*_simulationRecord->getSize()/2, -_cellScale._y*_simulationRecord->getSize()/2, 0.0f);
+        RasterConfiguration * rasterConfig = ProjectConfiguration::instance()->getRasterConfig(*(it));
+        //const ColorSelector & colorSelector(rasterConfig->getColorRamp());
+
+        int pot2 = powf(2,ceil(log2(DEMRaster.getSize()._x)));
+        glEnable(GL_CULL_FACE);
+        //glEnable(GL_CULL_VERTEX_EXT);
+
+
+        quadLandscape->update(dist,pot2, rasterConfig->getColorRamp(), colorRaster,_simulationRecord->getSize(),scale,DEMRaster, LOD, off);
         /*
-	glBegin(GL_QUADS);
-		glTexCoord2f(0.0f, 0.0f);
-		glVertex3d(5000, 5000, 1);
-		
-		glTexCoord2f(0.0f, 1.0f);
-		glVertex3d(-5000, 5000, 1);
-		
-		glTexCoord2f(1.0f, 1.0f);
-		glVertex3d(-5000, -5000, 1);
-		
-		glTexCoord2f(1.0f, 0.0f);
-		glVertex3d(5000, -5000, 1);
-	glEnd();
-        */
-    const Engine::Point3D<float> scale(_config3D.getSize3D());
+        for(index._x=0; index._x<DEMRaster.getSize()._x-1; index._x++)
+        {
+            for(index._y=0; index._y<DEMRaster.getSize()._y-1; index._y++)
+            {
+                Engine::Point3D<float> topLeft(index._x, index._y, 0.0f);
+                topLeft._z = DEMRaster.getValue(Engine::Point2D<int>(topLeft._x,topLeft._y));
+                float topLeftColor = colorRaster.getValue(Engine::Point2D<int>(topLeft._x,topLeft._y));
 
-	
-//	glTranslatef(-_cellScale._x*_simulationRecord->getSize()/2, -_cellScale._y*_simulationRecord->getSize()/2, 0.0f);
-	RasterConfiguration * rasterConfig = ProjectConfiguration::instance()->getRasterConfig(_config3D.getColorRaster());
-	const ColorSelector & colorSelector(rasterConfig->getColorRamp());
+                Engine::Point3D<float> topRight(index._x+1, index._y, 0.0f);
+                topRight._z = DEMRaster.getValue(Engine::Point2D<int>(topRight._x,topRight._y));
+                float topRightColor = colorRaster.getValue(Engine::Point2D<int>(topRight._x,topRight._y));
 
-    int pot2 = powf(2,ceil(log2(DEMRaster.getSize()._x)));
-    glEnable(GL_CULL_FACE);
-    //glEnable(GL_CULL_VERTEX_EXT);
+                Engine::Point3D<float> bottomRight(index._x+1, index._y+1, 0.0f);
+                bottomRight._z = DEMRaster.getValue(Engine::Point2D<int>(bottomRight._x,bottomRight._y));
+                float bottomRightColor = colorRaster.getValue(Engine::Point2D<int>(bottomRight._x,bottomRight._y));
+
+                Engine::Point3D<float> bottomLeft(index._x, index._y+1, 0.0f);
+                bottomLeft._z = DEMRaster.getValue(Engine::Point2D<int>(bottomLeft._x,bottomLeft._y));
+                float bottomLeftColor = colorRaster.getValue(Engine::Point2D<int>(bottomLeft._x,bottomLeft._y));
+
+                // normal
+                Engine::Point3D<float> a = bottomLeft;
+                a = a - topRight;
+                Engine::Point3D<float> b = bottomRight;
+                b = b - topRight;
+
+                Engine::Point3D<float> c = a.crossProduct(b);
+                c = c.normalize();
+                glNormal3f(c._x, c._y, -c._z);
+
+                glBegin(GL_TRIANGLE_FAN);
+
+                setCellColor(colorSelector.getColor(topLeftColor));
+                glTexCoord2f(topLeft._x/_simulationRecord->getSize(), topLeft._y/_simulationRecord->getSize());
+                glVertex3f(scale._x*topLeft._x, -scale._y*topLeft._y, scale._z*topLeft._z);
+
+                setCellColor(colorSelector.getColor(bottomLeftColor));
+                glTexCoord2f(bottomLeft._x/_simulationRecord->getSize(), bottomLeft._y/_simulationRecord->getSize());
+                glVertex3f(scale._x*bottomLeft._x, -scale._y*bottomLeft._y, scale._z*bottomLeft._z);
+
+                setCellColor(colorSelector.getColor(bottomRightColor));
+                glTexCoord2f(bottomRight._x/_simulationRecord->getSize(), bottomRight._y/_simulationRecord->getSize());
+                glVertex3f(scale._x*bottomRight._x, -scale._y*bottomRight._y, scale._z*bottomRight._z);
+
+                setCellColor(colorSelector.getColor(topRightColor));
+                glTexCoord2f(topRight._x/_simulationRecord->getSize(), topRight._y/_simulationRecord->getSize());
+                glVertex3f(scale._x*topRight._x, -scale._y*topRight._y, scale._z*topRight._z);
 
 
+                glEnd();
+            }
+        }*/
+        _landscapeMaterial.deactivate();
+        glPopMatrix();
 
-    quadLandscape->update(dist,pot2, rasterConfig->getColorRamp(), colorRaster,_simulationRecord->getSize(),scale,DEMRaster, LOD);
-
-    /*
-    for(index._x=0; index._x<DEMRaster.getSize()._x-1; index._x++)
-	{	
-        for(index._y=0; index._y<DEMRaster.getSize()._y-1; index._y++)
-		{		
-			Engine::Point3D<float> topLeft(index._x, index._y, 0.0f);
-			topLeft._z = DEMRaster.getValue(Engine::Point2D<int>(topLeft._x,topLeft._y));
-			float topLeftColor = colorRaster.getValue(Engine::Point2D<int>(topLeft._x,topLeft._y));
-
-			Engine::Point3D<float> topRight(index._x+1, index._y, 0.0f);
-			topRight._z = DEMRaster.getValue(Engine::Point2D<int>(topRight._x,topRight._y));
-			float topRightColor = colorRaster.getValue(Engine::Point2D<int>(topRight._x,topRight._y));
-
-			Engine::Point3D<float> bottomRight(index._x+1, index._y+1, 0.0f);
-			bottomRight._z = DEMRaster.getValue(Engine::Point2D<int>(bottomRight._x,bottomRight._y));
-			float bottomRightColor = colorRaster.getValue(Engine::Point2D<int>(bottomRight._x,bottomRight._y));
-
-			Engine::Point3D<float> bottomLeft(index._x, index._y+1, 0.0f);
-			bottomLeft._z = DEMRaster.getValue(Engine::Point2D<int>(bottomLeft._x,bottomLeft._y));
-			float bottomLeftColor = colorRaster.getValue(Engine::Point2D<int>(bottomLeft._x,bottomLeft._y));
-
-			// normal
-			Engine::Point3D<float> a = bottomLeft;
-			a = a - topRight;
-			Engine::Point3D<float> b = bottomRight;
-			b = b - topRight;
-
-			Engine::Point3D<float> c = a.crossProduct(b);
-			c = c.normalize();
-			glNormal3f(c._x, c._y, -c._z);
-			
-            glBegin(GL_TRIANGLE_FAN);
-
-            setCellColor(colorSelector.getColor(topLeftColor));
-            glTexCoord2f(topLeft._x/_simulationRecord->getSize(), topLeft._y/_simulationRecord->getSize());
-            glVertex3f(scale._x*topLeft._x, -scale._y*topLeft._y, scale._z*topLeft._z);
-			
-            setCellColor(colorSelector.getColor(bottomLeftColor));
-            glTexCoord2f(bottomLeft._x/_simulationRecord->getSize(), bottomLeft._y/_simulationRecord->getSize());
-			glVertex3f(scale._x*bottomLeft._x, -scale._y*bottomLeft._y, scale._z*bottomLeft._z);
-			
-            setCellColor(colorSelector.getColor(bottomRightColor));
-            glTexCoord2f(bottomRight._x/_simulationRecord->getSize(), bottomRight._y/_simulationRecord->getSize());
-			glVertex3f(scale._x*bottomRight._x, -scale._y*bottomRight._y, scale._z*bottomRight._z);
-			
-            setCellColor(colorSelector.getColor(topRightColor));
-            glTexCoord2f(topRight._x/_simulationRecord->getSize(), topRight._y/_simulationRecord->getSize());
-            glVertex3f(scale._x*topRight._x, -scale._y*topRight._y, scale._z*topRight._z);
-
-			
-			glEnd();
-		}
-    }*/
-	_landscapeMaterial.deactivate();
-	glPopMatrix();
+        off = off - offset;
+    }
 }
 
 void Display3D::setCellColor( const QColor & color )
@@ -496,7 +505,7 @@ void Display3D::paintAgents()
 				continue;
 			}
 			Engine::Point3D<int> position(agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "x"), agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "y"), 0);
-			position._z = -1+raster.getValue(Engine::Point2D<int>(position._x,position._y));
+            position._z = 1+raster.getValue(Engine::Point2D<int>(position._x,position._y));
 					
 			glPushMatrix();
 			//std::cout << "painting agent: " << it->first << " at pos: " << position << std::endl;
@@ -514,6 +523,9 @@ void Display3D::paintAgents()
 //Métode on dibuixem la figura del ràster dins el Widget creat amb QT.
 void Display3D::paintGL()
 {
+
+    m_time->restart();
+    m_time->start();
 
 	if(!_simulationRecord || _orderedRasters.empty())
 	{
@@ -567,13 +579,29 @@ void Display3D::paintGL()
         quadLandscape->setFrustum(frustum);
 
         paintLandscape();
+
 		
 	paintAgents();
 
 	glPopMatrix();
 
-	
-	glFlush();
+
+    //glFlush();
+
+    /*if (m_frameCount == 0) {
+             m_time->start();
+        } else {
+            qDebug("FPS is %f ms\n", m_time->elapsed() / float(m_frameCount));
+        }
+        m_frameCount++;
+
+        qDebug() << "frameCount: " << m_frameCount;*/
+
+    char tmp[128];
+    sprintf(tmp, "s: %.2f", m_time->elapsed() / 1000.0);
+    QString title(tmp);
+    this->setWindowTitle(title);
+
 }
 
 //Mètode per re-estructurar el Widget en cas de que es modifiqui el tamany manualment.
@@ -594,7 +622,7 @@ void Display3D::wheelEvent( QWheelEvent * event )
     if(anglecam > 100) anglecam = 100;
     else if(anglecam < 5) anglecam = 5;
     */
-    dist -=event->delta()/30;
+    dist -=event->delta()/(10);
     if(dist < 45) dist = 45;
     anterior = dist/10;
     posterior = dist*4 + anterior;
@@ -607,6 +635,40 @@ void Display3D::mouseReleaseEvent( QMouseEvent *)
 {
   DoingInteractive = NONE;
 }
+
+void Display3D::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_R)
+    {
+        Engine::StaticRaster & DEMRaster = _simulationRecord->getRasterTmp(_config3D.getDEMRaster(), _viewedStep);
+
+        float puntMig = sqrt(DEMRaster.getSize()._x*DEMRaster.getSize()._x+DEMRaster.getSize()._y*DEMRaster.getSize()._y);
+
+        radi = (puntMig)/2.f; //mida escenari/2
+        _vrp._x = DEMRaster.getSize()._x/2;
+        _vrp._y = -DEMRaster.getSize()._y/2;
+        _vrp._z = 0;
+
+        cout << "Radi = " << radi << endl;
+        dist = 3*radi;
+
+        //cout << "Angle cam = " << ((atan(height()/(2*((3*dist) - dist))))*180)/3.1415 << endl;
+        anglecam = ((asin(radi/dist)*180)/3.1415)*2;
+
+        //anglecam = (((atan(radi/dist)*180)/3.1415)*2);
+        cout << "Angle cam = " << anglecam << endl;
+        ra = (float)width()/(float)height();
+        angleX = 0;
+        angleY = 0;
+        angleZ = 0;
+        anterior = radi;
+        posterior = radi*3 + anterior;
+        focus();
+        update();
+    }
+
+}
+
 
 //Mètode que ens retorna la posició del cursor en un moment determinat.
 void Display3D::mousePressEvent(QMouseEvent *event)
@@ -725,11 +787,11 @@ void Display3D::mouseMoveEvent(QMouseEvent *event)
         incY._y = mat[1][1];
         incY._z = mat[2][1];
 
-        incX = incX * (xClick - event->x())/20;
-        incY = incY * (event->y()-yClick)/20;
+        incX = incX * (xClick - event->x())/(dist/terrainSize);
+        incY = incY * (event->y()-yClick)/(dist/terrainSize);
 
-		_vrp = _vrp + incX;
-		_vrp = _vrp + incY;
+        _vrp = _vrp + incX;
+        _vrp = _vrp + incY;
     }
 
     xClick = event->x();
@@ -769,9 +831,9 @@ void Display3D::setSimulationRecord( Engine::SimulationRecord * simulationRecord
 void Display3D::rastersRearranged( std::list<std::string> items )
 {
 	_orderedRasters.clear();	
-	_orderedRasters.resize(items.size());
+    _orderedRasters.resize(items.size());
 	std::reverse_copy(items.begin(), items.end(), _orderedRasters.begin());
-	update();
+    update();
 }
 
 void Display3D::viewedStepChangedSlot( int newViewedStep )

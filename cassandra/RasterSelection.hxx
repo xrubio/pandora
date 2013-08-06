@@ -54,6 +54,9 @@ public:
 	void setSimulationRecord( Engine::SimulationRecord * simulationRecord );
 	const std::list<std::string> & getRasterList() const;
 
+private slots:
+    void updateRastersSlot(QListWidgetItem*);
+
 signals:
 	void rastersRearranged(std::list<std::string> items);
 }; 

@@ -20,9 +20,13 @@ private:
 
 public slots:
     void LODmodified(int LOD);
+    void Radiusmodified(int r);
+    void Offsetmodified(int o);
 
 signals:
     void LODmodif(int LOD);
+    void Radiusmodif(int r);
+    void Offsetmodif(int o);
 
 
 };

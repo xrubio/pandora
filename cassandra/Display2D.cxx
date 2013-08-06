@@ -51,8 +51,9 @@ Display2D::Display2D( QWidget * parent) : QWidget(parent), _simulationRecord(0),
 	p.setColor(QPalette::Background, Qt::lightGray);
     setPalette(p);
     agentList = new QTreeWidget();
-
+    radiAgent = 3;
     connect(agentList, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), parent, SLOT(show3Dagent(QTreeWidgetItem*,int)));
+    connect(this, SIGNAL(updateAgentsSelected(std::list<Engine::AgentRecord*>,Engine::SimulationRecord *)), parent, SLOT(updateAgentsSelected(std::list<Engine::AgentRecord*>,Engine::SimulationRecord *)));
 }
 
 Display2D::~Display2D()
@@ -297,7 +298,7 @@ void Display2D::mouseDoubleClickEvent(QMouseEvent *event)
         return;
     }
     int radiX, radiY;
-    radiX = radiY = 3;
+    radiX = radiY = radiAgent;
     Engine::Point2D<int> position(event->pos().x()-_offset.x(), event->pos().y()-_offset.y());
     // TODO program /= i *= in Engine::Point2D
     position._x /= _zoom;
@@ -307,7 +308,9 @@ void Display2D::mouseDoubleClickEvent(QMouseEvent *event)
 
     agentList->close();
     agentList->clear();
-    //agentList = new QListWidget();
+
+    std::list<Engine::AgentRecord*> agentsSelected;
+
     Engine::Point2D<int> positionAux(position._x, position._y);
     for (int iX = 0; iX <= radiX; iX++)
 	{
@@ -331,6 +334,7 @@ void Display2D::mouseDoubleClickEvent(QMouseEvent *event)
                     item2->setText(0,QString(info.c_str()));
                     item->addChild(item2);
                     agentList->addTopLevelItem(item);
+                    agentsSelected.push_front(agentRecord);
                 }
 
             }
@@ -351,6 +355,7 @@ void Display2D::mouseDoubleClickEvent(QMouseEvent *event)
                     item2->setText(0,QString(info.c_str()));
                     item->addChild(item2);
                     agentList->addTopLevelItem(item);
+                    agentsSelected.push_front(agentRecord);
                 }
             }
             positionAux._x = position._x - iX;
@@ -370,6 +375,7 @@ void Display2D::mouseDoubleClickEvent(QMouseEvent *event)
                     item2->setText(0,QString(info.c_str()));
                     item->addChild(item2);
                     agentList->addTopLevelItem(item);
+                    agentsSelected.push_front(agentRecord);
                 }
             }
             positionAux._x = position._x - iX;
@@ -389,6 +395,7 @@ void Display2D::mouseDoubleClickEvent(QMouseEvent *event)
                     item2->setText(0,QString(info.c_str()));
                     item->addChild(item2);
                     agentList->addTopLevelItem(item);
+                    agentsSelected.push_front(agentRecord);
                 }
             }
         }
@@ -396,6 +403,7 @@ void Display2D::mouseDoubleClickEvent(QMouseEvent *event)
     agentList->setAlternatingRowColors(true);
     agentList->resize(400,400);
     agentList->show();
+    emit updateAgentsSelected(agentsSelected,_simulationRecord);
 }
 
 void Display2D::mouseMoveEvent (QMouseEvent * event)

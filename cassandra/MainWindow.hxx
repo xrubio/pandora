@@ -29,7 +29,8 @@
 #include <Configuration3D.hxx>
 #include <LoadSimulationThread.hxx>
 #include <QTreeWidgetItem>
-
+#include <AgentRecord.hxx>
+#include <SimulationRecord.hxx>
 
 class QMenu;
 class QAction;
@@ -104,6 +105,11 @@ private:
 	AgentTraitSelection * _agentTraitSelection;
 	RasterSelection * _rasterSelection;
 	GenericStatistics * _genericStatistics;
+
+    std::list<Engine::AgentRecord*> agentsSelected;
+
+    Engine::SimulationRecord * _simulationRecord;
+
 	
 	int _viewedStep;
 	void setViewedStep( int viewedStep );
@@ -118,6 +124,7 @@ private:
 public:
 	MainWindow();
     virtual ~MainWindow();
+
 
 private slots:
 
@@ -153,6 +160,10 @@ private slots:
     void showSettings();
 
     void updateLOD(int lod);
+    void updateRadius(int r);
+    void updateOffset(int o);
+
+    void updateAgentsSelected(std::list<Engine::AgentRecord*> agents, Engine::SimulationRecord *sim);
 
 signals:
 	void stepChangeToStepBox(int stepChangeToStepBox);

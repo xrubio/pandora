@@ -18,3 +18,13 @@ void Settings::LODmodified(int LOD)
 {
     emit LODmodif(LOD);
 }
+
+void Settings::Radiusmodified(int r)
+{
+    emit Radiusmodif(r);
+}
+
+void Settings::Offsetmodified(int o)
+{
+    emit Offsetmodif(o);
+}

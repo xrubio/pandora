@@ -41,7 +41,7 @@ class Configuration3D
 public:
 	Configuration3D();
 	virtual ~Configuration3D();
-	void setRastersList( const std::list<std::string> & rasters );
+    void setRastersList( const std::list<std::string> & rasters );
 
 	void setSize3D( const Engine::Point3D<float> & size );
 	const Engine::Point3D<float> & getSize3D() const;
