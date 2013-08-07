@@ -108,16 +108,13 @@ void Display3D::initializeGL()
 
         //MOD
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);   //netejar vista
-
-
-        Engine::StaticRaster & DEMRaster = _simulationRecord->getRasterTmp(_config3D.getDEMRaster(), _viewedStep);
-
-        float puntMig = sqrt(DEMRaster.getSize()._x*DEMRaster.getSize()._x+DEMRaster.getSize()._y*DEMRaster.getSize()._y);
-        terrainSize =  DEMRaster.getSize()._x;
-        offset = terrainSize/5;
+		// squared landscapes by now
+		float size = _simulationRecord->getSize();
+        float puntMig = sqrt(size*size+size*size);
+        _offset = size/5.0f;
         radi = (puntMig)/2.f; //mida escenari/2
-        _vrp._x = DEMRaster.getSize()._x/2;
-        _vrp._y = -DEMRaster.getSize()._y/2;
+        _vrp._x = size/2.0f;
+        _vrp._y = -size/2.0f;
         _vrp._z = 0;
 
         cout << "Radi = " << radi << endl;
@@ -202,7 +199,7 @@ void Display3D::initializeGL()
 	*/
 
     //Potencia de 2 superior a l'area
-    int pot2 = powf(2,ceil(log2(DEMRaster.getSize()._x)));
+    int pot2 = powf(2,ceil(log2(size)));
 
     Engine::Point2D<int> central(pot2/2, pot2/2);
 
@@ -221,7 +218,7 @@ void Display3D::initializeGL()
 
     quadLandscape = new Quadtree(central,NW,NE,SE,SW,neighN,neighS,neighE,neighW);
 
-    quadLandscape->initializeChilds(DEMRaster);
+    quadLandscape->initializeChilds(size);
     //quadLandscape->update(DEMRaster.getSize()._x/2);
 
 
@@ -355,7 +352,7 @@ void Display3D::paintLandscape()
     int numRasters = _orderedRasters.size();
     int off;
     if (numRasters == 1) off = 0;
-    else off = (numRasters/2)*offset;
+    else off = (numRasters/2)*_offset;
 //	Engine::Raster & raster = _simulationRecord->getRaster(_selectedRaster, _viewedStep)
     std::list<std::string>::const_iterator it =_orderedRasters.end();
     while(it!=_orderedRasters.begin())
@@ -451,7 +448,7 @@ void Display3D::paintLandscape()
         _landscapeMaterial.deactivate();
         glPopMatrix();
 
-        off = off - offset;
+        off = off - _offset;
     }
 }
 
@@ -483,7 +480,7 @@ void Display3D::paintAgents()
 	for(Engine::SimulationRecord::AgentTypesMap::const_iterator itType = _simulationRecord->beginTypes(); itType!=_simulationRecord->endTypes(); itType++)
 	{
 		AgentConfiguration * agentConfig = ProjectConfiguration::instance()->getAgentConfig(itType->first);
-                for(Engine::SimulationRecord::AgentRecordsMap::const_iterator it= _simulationRecord->beginAgents(itType); it!=_simulationRecord->endAgents(itType); it++)
+		for(Engine::SimulationRecord::AgentRecordsMap::const_iterator it= _simulationRecord->beginAgents(itType); it!=_simulationRecord->endAgents(itType); it++)
 		{
 			Engine::AgentRecord * agent = it->second;
 			bool exists = agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "exists");
@@ -500,7 +497,7 @@ void Display3D::paintAgents()
 			//glRotatef(180.0f, 1.0f, 0.0f, 0.0f);
 			if(!agentConfig->getFileName3D().empty())
 			{
-                                agentConfig->getModel().paint();
+				agentConfig->getModel().paint();
 			}
 			glPopMatrix();
 		}

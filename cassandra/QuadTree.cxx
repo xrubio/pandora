@@ -116,9 +116,9 @@ void Quadtree::setFrustum(float frust[6][4])
 }
 
 //NETEJAR DEMRaster (NO NECESARI, es carreguen els valors de Z quan es pinta), guardar nomes 2 punts a larbre (X,Y)
-void Quadtree::initializeChilds(Engine::StaticRaster & DEMRaster)
+void Quadtree::initializeChilds( int size)
 {
-    int pot2 = powf(2,ceil(log2(DEMRaster.getSize()._x)));
+    int pot2 = powf(2,ceil(log2(size)));
     int prof = pot2/2;
     /*this->childNW = initializeChild(Engine::Point3D<int>(this->center._x/2,this->center._y/2,DEMRaster.getValue(Engine::Point2D<int>(this->center._x/2,this->center._y/2))),prof/2,DEMRaster);
     this->childNE = initializeChild(Engine::Point3D<int>(this->center._x+(this->center._x/2),this->center._y/2,DEMRaster.getValue(Engine::Point2D<int>(this->center._x+(this->center._x/2),this->center._y/2))),prof/2,DEMRaster);
@@ -127,17 +127,17 @@ void Quadtree::initializeChilds(Engine::StaticRaster & DEMRaster)
     */
     prof = prof / 2;
 
-    this->childNW = initializeChild(Engine::Point2D<int>(this->center._x-prof,this->center._y-prof),prof,DEMRaster);
+    this->childNW = initializeChild(Engine::Point2D<int>(this->center._x-prof,this->center._y-prof),prof,size);
 
-    this->childNE = initializeChild(Engine::Point2D<int>(this->center._x+prof,this->center._y-prof),prof,DEMRaster);
+    this->childNE = initializeChild(Engine::Point2D<int>(this->center._x+prof,this->center._y-prof),prof,size);
 
-    this->childSE = initializeChild(Engine::Point2D<int>(this->center._x+prof,this->center._y+prof),prof,DEMRaster);
+    this->childSE = initializeChild(Engine::Point2D<int>(this->center._x+prof,this->center._y+prof),prof,size);
 
-    this->childSW = initializeChild(Engine::Point2D<int>(this->center._x-prof,this->center._y+prof),prof,DEMRaster);
+    this->childSW = initializeChild(Engine::Point2D<int>(this->center._x-prof,this->center._y+prof),prof,size);
 
 }
 
-Quadtree* Quadtree::initializeChild(Engine::Point2D<int> center, int prof, Engine::StaticRaster & DEMRaster)
+Quadtree* Quadtree::initializeChild(Engine::Point2D<int> center, int prof, int size)
 {
     if (prof >= 1)
     {
@@ -157,10 +157,10 @@ Quadtree* Quadtree::initializeChild(Engine::Point2D<int> center, int prof, Engin
         child = new Quadtree(center,NW,NE,SE,SW,neighN,neighS,neighE,neighW);
         prof=prof/2;
 
-        child->childNW = initializeChild(Engine::Point2D<int>(center._x-prof,center._y-prof),prof,DEMRaster);
-        child->childNE = initializeChild(Engine::Point2D<int>(center._x+prof,center._y-prof),prof,DEMRaster);
-        child->childSE = initializeChild(Engine::Point2D<int>(center._x+prof,center._y+prof),prof,DEMRaster);
-        child->childSW = initializeChild(Engine::Point2D<int>(center._x-prof,center._y+prof),prof,DEMRaster);
+        child->childNW = initializeChild(Engine::Point2D<int>(center._x-prof,center._y-prof),prof,size);
+        child->childNE = initializeChild(Engine::Point2D<int>(center._x+prof,center._y-prof),prof,size);
+        child->childSE = initializeChild(Engine::Point2D<int>(center._x+prof,center._y+prof),prof,size);
+        child->childSW = initializeChild(Engine::Point2D<int>(center._x-prof,center._y+prof),prof,size);
 
         return child;
     }

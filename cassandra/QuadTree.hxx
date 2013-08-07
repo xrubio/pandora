@@ -46,8 +46,8 @@ public:
     void setOuterPoints(Engine::Point2D<int> NW, Engine::Point2D<int> NE, Engine::Point2D<int> SE, Engine::Point2D<int> SW);
     void setCenter(Engine::Point2D<int> center);
 
-    void initializeChilds(Engine::StaticRaster & DEMRaster);
-    Quadtree* initializeChild(Engine::Point2D<int> center, int prof, Engine::StaticRaster &DEMRaster);
+    void initializeChilds(int size);
+    Quadtree* initializeChild(Engine::Point2D<int> center, int prof, int size);
 
     void setCellColor( const QColor & color );
     int update(double anglecam, int prof, ColorSelector &colorSelector, Engine::StaticRaster &colorRaster, int size, const Engine::Point3D<float> scale, Engine::StaticRaster & DEMRaster, int LOD, int offset); //recorrer l'arbre i segons la distancia activar o desactivar nodes (childs) i afegirlos a points/polys
