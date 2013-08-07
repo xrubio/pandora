@@ -530,7 +530,7 @@ void MainWindow::updateLOD(int lod)
 
 void MainWindow::updateOffset(int o)
 {
-    _display3D->offset = o;
+    _display3D->_offset = o;
     _display3D->update();
 }
 

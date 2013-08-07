@@ -68,7 +68,7 @@ public:
     float frustum[6][4];
 
     int LOD;
-    int offset;
+    int _offset;
 // 	
 //Declarem els SLOTS públics que seràn les funcions que rebràn un 
 //paràmetre que serà l'angle amb el que rotarem el nostre ràster
