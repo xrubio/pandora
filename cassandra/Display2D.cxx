@@ -62,6 +62,7 @@ Display2D::~Display2D()
 
 void Display2D::setSimulationRecord( Engine::SimulationRecord * simulationRecord )
 {
+	_orderedRasters.clear();
 	_simulationRecord = simulationRecord;
 	_viewedStep = 0;
 	_zoom = 600.0f/float(simulationRecord->getSize());

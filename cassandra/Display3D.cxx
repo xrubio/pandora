@@ -814,11 +814,8 @@ void Display3D::normalizeAngle(int & angle)
 
 void Display3D::setSimulationRecord( Engine::SimulationRecord * simulationRecord )
 {
+	_orderedRasters.clear();
 	_simulationRecord = simulationRecord;
-	if(!_simulationRecord)
-	{
-		_orderedRasters.clear();
-	}
 	update();
 }
 
