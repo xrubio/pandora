@@ -25,7 +25,7 @@
 namespace GUI
 {
 
-Configuration3D::Configuration3D(): _dem("unknown"), _color("unknown")
+Configuration3D::Configuration3D(): _dem("unknown DEM"), _color("unknown Color")
 {
 	_size._x = 1.0f;
 	_size._y = 1.0f;
@@ -47,8 +47,8 @@ void Configuration3D::setRastersList( const std::list<std::string> & rasters )
 	}
 	else
 	{
-		_dem = "unknown";
-		_color = "unknown";
+		_dem = "unknown DEM";
+		_color = "unknown Color";
 	}
 }
 

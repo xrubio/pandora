@@ -110,6 +110,7 @@ void Display3D::initializeGL()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);   //netejar vista
 		// squared landscapes by now
 		float size = _simulationRecord->getSize();
+
         float puntMig = sqrt(size*size+size*size);
         _offset = size/5.0f;
         radi = (puntMig)/2.f; //mida escenari/2
@@ -139,7 +140,8 @@ void Display3D::initializeGL()
 	GLfloat materialSpecular[] = {1.0f, 1.0f, 1.0f, 1.0f};
     GLfloat materialShininess[] = {100.0f};
 
-    GLfloat lightPosition[] = {0.0f, 0.0f, -dist/1.05, 0.0f};
+	float value = dist/1.05f;
+    GLfloat lightPosition[] = {0.0f, 0.0f, value, 0.0f};
     GLfloat whiteLight[] = {1.0f, 1.0f, 1.0f, 0.0f};
     GLfloat modelAmbient[] = {0.5f, 0.5f, 0.5f, 0.0f};
 
@@ -474,7 +476,11 @@ void Display3D::setCellColor( const QColor & color )
 
 void Display3D::paintAgents()
 {
-	Engine::StaticRaster & raster = _simulationRecord->getRasterTmp(_config3D.getDEMRaster(), _viewedStep);
+	Engine::StaticRaster * raster = 0;
+	if(_orderedRasters.size()!=0)
+	{
+		raster = &(_simulationRecord->getRasterTmp(_config3D.getDEMRaster(), _viewedStep));
+	}
 	const Engine::Point3D<float> scale(_config3D.getSize3D());
 
 	for(Engine::SimulationRecord::AgentTypesMap::const_iterator itType = _simulationRecord->beginTypes(); itType!=_simulationRecord->endTypes(); itType++)
@@ -489,7 +495,11 @@ void Display3D::paintAgents()
 				continue;
 			}
 			Engine::Point3D<int> position(agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "x"), agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "y"), 0);
-            position._z = 1+raster.getValue(Engine::Point2D<int>(position._x,position._y));
+            position._z = 1;
+			if(raster)
+			{
+				position._z += raster->getValue(Engine::Point2D<int>(position._x,position._y));
+			}
 					
 			glPushMatrix();
 			//std::cout << "painting agent: " << it->first << " at pos: " << position << std::endl;
@@ -511,12 +521,12 @@ void Display3D::paintGL()
     m_time->restart();
     m_time->start();
 
-	if(!_simulationRecord || _orderedRasters.empty())
+	if(!_simulationRecord)
 	{
 		return;
 	}
 	
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
 
 //	float rotateX = 1 + float(_rotation.x());
