@@ -35,7 +35,7 @@ mpich2
 scons
 
 You can install all of them with this command:
-$ sudo apt-get install libtinyxml-dev libdevil-dev freeglut3-dev libqwt-dev libqwt6 libqt4-dev grass grass-dev libgdal1-dev mpich2 scons build-essential libboost-random-dev libboost-python-dev libboost-filesystem-dev libboost-system-dev
+$ sudo apt-get install libtinyxml-dev libdevil-dev freeglut3-dev libqwt-dev libqwt6 libqt4-dev libqt4-opengl-dev grass grass-dev libgdal1-dev mpich2 scons build-essential libboost-random-dev libboost-python-dev libboost-filesystem-dev libboost-system-dev libmpich2-dev
 
 To make sure that the operating system finds the needed libraries, add library directories that are not standard to LD_LIBRARY_PATH external variable. It can be done adding this line to the end of the file .bashrc inside your $HOME directory. You should also add Pandora directory
 
