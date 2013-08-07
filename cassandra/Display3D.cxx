@@ -54,7 +54,6 @@ Display3D::Display3D(QWidget *parent ) : QGLWidget(parent), _simulationRecord(0)
     agentFocus = false;
     m_frameCount = 0;
     m_time = new QTime();
-    offset = 300;
 }
 
 Display3D::~Display3D()
@@ -115,6 +114,7 @@ void Display3D::initializeGL()
 
         float puntMig = sqrt(DEMRaster.getSize()._x*DEMRaster.getSize()._x+DEMRaster.getSize()._y*DEMRaster.getSize()._y);
         terrainSize =  DEMRaster.getSize()._x;
+        offset = terrainSize/5;
         radi = (puntMig)/2.f; //mida escenari/2
         _vrp._x = DEMRaster.getSize()._x/2;
         _vrp._y = -DEMRaster.getSize()._y/2;
@@ -204,34 +204,19 @@ void Display3D::initializeGL()
     //Potencia de 2 superior a l'area
     int pot2 = powf(2,ceil(log2(DEMRaster.getSize()._x)));
 
-    Engine::Point3D<int> central(pot2/2, pot2/2, DEMRaster.getValue(Engine::Point2D<int>(pot2/2,pot2/2)));
+    Engine::Point2D<int> central(pot2/2, pot2/2);
 
-    Engine::Point3D<int> NW, NE, SE, SW, neighN, neighS, neighE, neighW;
+    //Engine::Point2D<int> NW, NE, SE, SW, neighN, neighS, neighE, neighW;
 
-    if (pot2 > DEMRaster.getSize()._x)
-    {
-        Engine::Point3D<int> NW(0,0, DEMRaster.getValue(Engine::Point2D<int>(0,0)));
-        Engine::Point3D<int> NE(pot2-1, 0, 0);
-        Engine::Point3D<int> SE(pot2-1, pot2-1, 0);
-        Engine::Point3D<int> SW(0, pot2-1, 0);
+    Engine::Point2D<int> NW(0,0);
+    Engine::Point2D<int> NE(pot2-1, 0);
+    Engine::Point2D<int> SE(pot2-1, pot2-1);
+    Engine::Point2D<int> SW(0, pot2-1);
 
-        Engine::Point3D<int> neighN(pot2/2,0, 0);
-        Engine::Point3D<int> neighS(pot2/2,pot2-1,0);
-        Engine::Point3D<int> neighE(pot2-1,pot2/2, 0);
-        Engine::Point3D<int> neighW(0,pot2/2,0);
-    }
-    else
-    {
-        Engine::Point3D<int> NW(0,0, DEMRaster.getValue(Engine::Point2D<int>(0,0)));
-        Engine::Point3D<int> NE(pot2-1, 0, DEMRaster.getValue(Engine::Point2D<int>(pot2-1,0)));
-        Engine::Point3D<int> SE(pot2-1, pot2-1, DEMRaster.getValue(Engine::Point2D<int>(pot2-1,pot2-1)));
-        Engine::Point3D<int> SW(0, pot2-1, DEMRaster.getValue(Engine::Point2D<int>(0,pot2-1)));
-
-        Engine::Point3D<int> neighN(pot2/2,0, DEMRaster.getValue(Engine::Point2D<int>(pot2/2,0)));
-        Engine::Point3D<int> neighS(pot2/2,pot2-1, DEMRaster.getValue(Engine::Point2D<int>(pot2/2,pot2-1)));
-        Engine::Point3D<int> neighE(pot2-1,pot2/2, DEMRaster.getValue(Engine::Point2D<int>(pot2-1,(pot2)/2)));
-        Engine::Point3D<int> neighW(0,pot2/2, DEMRaster.getValue(Engine::Point2D<int>(0,pot2/2)));
-    }
+    Engine::Point2D<int> neighN(pot2/2,0);
+    Engine::Point2D<int> neighS(pot2/2,pot2-1);
+    Engine::Point2D<int> neighE(pot2-1,pot2/2);
+    Engine::Point2D<int> neighW(0,pot2/2);
 
 
     quadLandscape = new Quadtree(central,NW,NE,SE,SW,neighN,neighS,neighE,neighW);
@@ -367,9 +352,12 @@ void Display3D::focus()
 void Display3D::paintLandscape()
 {
 	Engine::Point2D<int> index;
+    int numRasters = _orderedRasters.size();
+    int off;
+    if (numRasters == 1) off = 0;
+    else off = (numRasters/2)*offset;
 //	Engine::Raster & raster = _simulationRecord->getRaster(_selectedRaster, _viewedStep)
     std::list<std::string>::const_iterator it =_orderedRasters.end();
-    int off = offset;
     while(it!=_orderedRasters.begin())
     {
         it--;
@@ -405,7 +393,6 @@ void Display3D::paintLandscape()
         int pot2 = powf(2,ceil(log2(DEMRaster.getSize()._x)));
         glEnable(GL_CULL_FACE);
         //glEnable(GL_CULL_VERTEX_EXT);
-
 
         quadLandscape->update(dist,pot2, rasterConfig->getColorRamp(), colorRaster,_simulationRecord->getSize(),scale,DEMRaster, LOD, off);
         /*
