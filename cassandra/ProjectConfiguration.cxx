@@ -48,7 +48,7 @@ ProjectConfiguration * ProjectConfiguration::instance()
 	return _instance;
 }
 
-ProjectConfiguration::ProjectConfiguration() : _simulationRecord(0)
+ProjectConfiguration::ProjectConfiguration() : _simulationRecord(0), _projectCreated(false)
 {
 	reset();
 }
@@ -62,25 +62,33 @@ ProjectConfiguration::~ProjectConfiguration()
 	cleanConfigs();
 }
 
-void ProjectConfiguration::reset()
+void ProjectConfiguration::cleanSimulationRecord()
 {
-	_fileName = "unknown.cas";
-	_simulationFileName = "unknown.h5";
 	_resolution = 1;	
-	
 	if(_simulationRecord)
 	{
 		delete _simulationRecord;
 		_simulationRecord = 0;
 	}
 	cleanConfigs();
+
+}
+
+void ProjectConfiguration::reset()
+{
+	_projectCreated = false;
+	_fileName = "unknown.cas";
+	_simulationFileName = "unknown.h5";
+	cleanSimulationRecord();
 }
 
 void ProjectConfiguration::loadProject( const std::string & fileName )
 {
 	reset();
 	_fileName = fileName;
+	_projectCreated = true;
 
+	
 	TiXmlDocument fileProject;
 	bool loadOkay = fileProject.LoadFile(_fileName);
 	if(!loadOkay)
@@ -100,10 +108,17 @@ void ProjectConfiguration::loadProject( const std::string & fileName )
 
 bool ProjectConfiguration::loadSimulation()
 {
-	if(_simulationRecord)
+	if(!_projectCreated)
 	{
-		delete _simulationRecord;
-		_simulationRecord = 0;
+		cleanSimulationRecord();
+	}
+	else
+	{
+		if(_simulationRecord)
+		{
+			delete _simulationRecord;
+			_simulationRecord = 0;
+		}
 	}
 	_simulationRecord = new Engine::SimulationRecord(_resolution);
 
@@ -113,7 +128,12 @@ bool ProjectConfiguration::loadSimulation()
 		_simulationRecord = 0;
 		return false;
 	}
-	checkConfigs();
+
+	// if project was not already created we need to create configs again
+	if(!_projectCreated)
+	{
+		loadConfigs();
+	}
 	return true;
 }
 
@@ -265,6 +285,7 @@ void ProjectConfiguration::storeProject()
 	fileProject.LinkEndChild( declaration );
 	fileProject.LinkEndChild( simulation );
 	fileProject.SaveFile(_fileName);
+	_projectCreated = true;
 }
 
 void ProjectConfiguration::setResolution( const int & resolution )
@@ -316,20 +337,15 @@ void ProjectConfiguration::cleanConfigs()
 	_rastersConfig.clear();
 }
 
-void ProjectConfiguration::checkConfigs()
+void ProjectConfiguration::loadConfigs()
 {	
-	if(!_simulationRecord)
-	{
-		cleanConfigs();
-		return;
-	}
-	// if config already present don't create default configs
 	if(_agentsConfig.size()!=0 || _rastersConfig.size()!=0)
 	{
-		std::cout << "configs already created" << std::endl;
+		std::stringstream oss;
+		oss << "ProjectConfiguration::loadConfigs - trying to load configs without cleaning previous data";
+		throw Engine::Exception(oss.str());
 		return;
 	}
-	std::cout << "creating default configs" << std::endl;
 
 	for(Engine::SimulationRecord::AgentTypesMap::const_iterator itType = _simulationRecord->beginTypes(); itType!=_simulationRecord->endTypes(); itType++)
 	{

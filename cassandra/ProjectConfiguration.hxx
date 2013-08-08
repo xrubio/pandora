@@ -70,15 +70,22 @@ private:
 	void loadAgentsConfigs( TiXmlElement * agents );
 	void loadRastersConfigs( TiXmlElement * rasters );
 
-	// this method checks whether default configs are needed for a simulation
-	// if this is the case, they are created
-	void checkConfigs();
+	// this method created agent and raster configurations based on currently loaded SimulationRecord
+	void loadConfigs();
+
+	// this flag is used to keep track whether the user created a project or is just loading a simulation
+	bool _projectCreated;
+	
+	// cleans SimulationRecord and related configurations from existing data
+	void cleanSimulationRecord();
 
 public:
 	static ProjectConfiguration * instance();
 	virtual ~ProjectConfiguration();
 
+	// removes all existing data
 	void reset();
+
 
 	void loadProject( const std::string & fileName );
 	// this function is used to store the project to a fileName different from _fileName
