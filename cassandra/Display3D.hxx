@@ -138,6 +138,9 @@ private:
     int m_frameCount;
     QTime *m_time;
 
+	// cleans all the display options
+	void resetView();
+
 };
 
 }

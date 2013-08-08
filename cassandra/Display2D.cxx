@@ -60,11 +60,19 @@ Display2D::~Display2D()
 {
 }
 
+void Display2D::resetView()
+{
+	_viewedStep = 0;
+	_orderedRasters.clear();
+	_zoom = 1.0f;
+	_offset.setX(0);
+	_offset.setY(0);
+}
+
 void Display2D::setSimulationRecord( Engine::SimulationRecord * simulationRecord )
 {
-	_orderedRasters.clear();
+	resetView();
 	_simulationRecord = simulationRecord;
-	_viewedStep = 0;
 	_zoom = 600.0f/float(simulationRecord->getSize());
 	update();
 }

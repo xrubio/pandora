@@ -48,7 +48,7 @@ namespace GUI
 
 //Inicialitzem els paràmetres al constructor per defecte i carreguem l'arxiu on hi ha tota la informació referent al ràster
 //que posteriorment haurem de representar (x,y,z).
-Display3D::Display3D(QWidget *parent ) : QGLWidget(parent), _simulationRecord(0), _viewedStep(0), _zoom(1.0f), _position(0,0), _lastPos(0,0), _rotation(0,0), _rotationZ(0),  _cellScale(1.0f, 1.0f, 1.0f), _config3D(ProjectConfiguration::instance()->getConfig3D())
+Display3D::Display3D(QWidget *parent ) : QGLWidget(parent), _simulationRecord(0), _viewedStep(0), _zoom(1.0f), _position(0,0), _lastPos(0,0), _rotation(0,0), _rotationZ(0), _cellScale(1.0f, 1.0f, 1.0f), _config3D(ProjectConfiguration::instance()->getConfig3D())
 {
 	//_landscapeMaterial.setTextureFileName("landscape1.bmp");
     agentFocus = false;
@@ -812,10 +812,17 @@ void Display3D::normalizeAngle(int & angle)
 	}
 }
 
-void Display3D::setSimulationRecord( Engine::SimulationRecord * simulationRecord )
+void Display3D::resetView()
 {
 	_orderedRasters.clear();
+	_viewedStep = 0;
+	initializeGL();
+}
+
+void Display3D::setSimulationRecord( Engine::SimulationRecord * simulationRecord )
+{
 	_simulationRecord = simulationRecord;
+	resetView();
 	update();
 }
 
