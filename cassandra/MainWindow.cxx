@@ -352,11 +352,11 @@ void MainWindow::adjustGUI()
 	std::cout << "adjusting GUI" << std::endl;
 
     _display2D->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
+    _display3D->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
 	_agentTypeSelection->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
 	_agentTraitSelection->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
 	_rasterSelection->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
     _genericStatistics->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
-    _display3D->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
 
 	if(!ProjectConfiguration::instance()->getSimulationRecord())
 	{	
