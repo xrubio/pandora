@@ -28,7 +28,7 @@
 namespace GUI
 {
 
-RasterConfiguration::RasterConfiguration( const int & minValue, const int & maxValue, bool init ) : _colorSelector(0), _minValue(minValue), _maxValue(maxValue), _transparentEnabled(false), _transparentValue(0)
+RasterConfiguration::RasterConfiguration( const int & minValue, const int & maxValue, bool init ) : _colorSelector(0), _minValue(minValue), _maxValue(maxValue), _transparentEnabled(false), _transparentValue(0), _elevationRaster("none (use plane)"), _elevationExaggeration(1.0f), _hasElevationRaster(false)
 {
 	resetColorRamp();
 
@@ -53,7 +53,7 @@ RasterConfiguration::RasterConfiguration( const int & minValue, const int & maxV
 	}
 }
 
-RasterConfiguration::RasterConfiguration( const RasterConfiguration & prototype ) : _colorSelector(0), _minValue(prototype.getMinValue()), _maxValue(prototype.getMaxValue()), _transparentEnabled(prototype.isTransparentEnabled()), _transparentValue(prototype.getTransparentValue())
+RasterConfiguration::RasterConfiguration( const RasterConfiguration & prototype ) : _colorSelector(0), _minValue(prototype.getMinValue()), _maxValue(prototype.getMaxValue()), _transparentEnabled(prototype.isTransparentEnabled()), _transparentValue(prototype.getTransparentValue()), _elevationRaster(prototype.getElevationRaster()), _elevationExaggeration(prototype.getElevationExaggeration())
 {
 	_colorSelector =  prototype.getColorRamp().copy();
 }
@@ -110,6 +110,39 @@ const int & RasterConfiguration::getTransparentValue() const
 void RasterConfiguration::setTransparentValue( const int & transparentValue )
 {
 	_transparentValue = transparentValue;
+}
+
+void RasterConfiguration::setElevationRaster( const std::string & elevationRaster )
+{
+	_elevationRaster = elevationRaster;
+	if(_elevationRaster.compare("none (use plane)")==0)
+	{
+		_hasElevationRaster = false;
+	}
+	else
+	{
+		_hasElevationRaster = true;
+	}
+}
+
+const std::string & RasterConfiguration::getElevationRaster() const
+{
+	return _elevationRaster;
+}
+
+void RasterConfiguration::setElevationExaggeration( float elevationExaggeration)
+{
+	_elevationExaggeration = elevationExaggeration;
+}
+
+float RasterConfiguration::getElevationExaggeration() const
+{
+	return _elevationExaggeration;
+}
+
+bool RasterConfiguration::hasElevationRaster() const
+{
+	return _hasElevationRaster;
 }
 
 } // namespace GUI

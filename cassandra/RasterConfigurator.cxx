@@ -30,7 +30,7 @@
 namespace GUI
 {
 
-RasterConfigurator::RasterConfigurator(QWidget * parent, const std::string & type ) : QDialog(parent), _type(type), _configuration(*ProjectConfiguration::instance()->getRasterConfig(type))
+RasterConfigurator::RasterConfigurator(QWidget * parent, const std::string & type, const std::list<std::string> & orderedRasters) : QDialog(parent), _type(type), _configuration(*ProjectConfiguration::instance()->getRasterConfig(type))
 {
 	setModal(true);
 	_rasterConfig.setupUi(this);
@@ -94,7 +94,21 @@ RasterConfigurator::RasterConfigurator(QWidget * parent, const std::string & typ
 	{
 		_rasterConfig.transparentValue->setEnabled(false);
 	}
-	
+
+	// load rasters
+	_rasterConfig.elevationRaster->addItem("none (use plane)");
+	std::cout << "active: " << _configuration.getElevationRaster() << " deform: " << _configuration.getElevationExaggeration() << std::endl;
+
+	for(std::list<std::string>::const_iterator it=orderedRasters.begin(); it!=orderedRasters.end(); it++)
+	{
+		_rasterConfig.elevationRaster->addItem((*it).c_str());
+		if(_configuration.getElevationRaster().compare(*it)==0)
+		{
+			_rasterConfig.elevationRaster->setCurrentIndex(_rasterConfig.elevationRaster->count()-1);
+		}
+	}
+
+	_rasterConfig.elevationExaggeration->setValue(_configuration.getElevationExaggeration());
 	show();
 }
 
@@ -120,6 +134,8 @@ void RasterConfigurator::accept()
 
 	_configuration.setTransparentValue(_rasterConfig.transparentValue->value());
 	_configuration.setTransparentEnabled(_rasterConfig.transparentEnabled->isChecked());
+	_configuration.setElevationRaster(_rasterConfig.elevationRaster->currentText().toStdString());
+	_configuration.setElevationExaggeration(_rasterConfig.elevationExaggeration->value());
 
 	emit rasterConfigured(_type, _configuration);
 	close();

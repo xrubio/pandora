@@ -23,6 +23,8 @@
 #ifndef __RasterConfiguration_hxx__
 #define __RasterConfiguration_hxx__
 
+#include <string>
+
 namespace GUI
 {
 class ColorSelector;
@@ -35,6 +37,12 @@ class RasterConfiguration
 
 	bool _transparentEnabled;
 	int _transparentValue;
+
+	// raster being used for z coordinates in 3D
+	std::string _elevationRaster;
+	// deformation of z coordinates
+	float _elevationExaggeration;
+	bool _hasElevationRaster;
 public:
 	RasterConfiguration( const int & minValue = 0, const int & maxValue = 10, bool init = true);
 	RasterConfiguration( const RasterConfiguration & prototype );
@@ -51,6 +59,13 @@ public:
 	void setTransparentEnabled( const bool & transparentEnabled );
 	const int & getTransparentValue() const;
 	void setTransparentValue( const int & transparentValue );
+
+	void setElevationRaster( const std::string & elevationRaster );
+	const std::string & getElevationRaster() const;
+	void setElevationExaggeration( float elevationExaggeration);
+	float getElevationExaggeration() const;
+
+	bool hasElevationRaster() const;
 
 }; // class RasterConfiguration
 

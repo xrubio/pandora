@@ -45,7 +45,6 @@ namespace GUI
 class Model3D;
 class AgentConfiguration;
 class RasterConfiguration;
-class Configuration3D;
 
 class Display3D : public QGLWidget
 {
@@ -105,6 +104,8 @@ protected:
         int   xClick, yClick;
 
 
+		Engine::StaticRaster _plane;
+
 private:
 	void normalizeAngle(int &angle);
 	Engine::SimulationRecord * _simulationRecord;
@@ -130,8 +131,6 @@ private:
 
 	// order of rasters
 	std::list<std::string> _orderedRasters;
-
-	const Configuration3D & _config3D;
 
     Quadtree *quadLandscape;
 

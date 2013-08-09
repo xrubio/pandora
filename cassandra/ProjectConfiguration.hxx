@@ -25,7 +25,6 @@
 
 #include <string>
 #include <map>
-#include <Configuration3D.hxx>
 
 class TiXmlElement;
 
@@ -60,7 +59,6 @@ private:
 
 	AgentsConfigurationMap _agentsConfig;
 	RastersConfigurationMap _rastersConfig;
-	Configuration3D _config3D;
 	
 	void cleanConfigs();
 
@@ -109,7 +107,6 @@ public:
 	void updateRasterConfig( const std::string & type, const RasterConfiguration & config );
 	AgentConfiguration * getAgentConfig( const std::string & type );
 	RasterConfiguration * getRasterConfig( const std::string & type );
-	Configuration3D & getConfig3D();
 
 };
 

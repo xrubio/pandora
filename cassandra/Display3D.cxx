@@ -34,7 +34,6 @@
 #include <QtGui>
 #include <AgentConfiguration.hxx>
 #include <RasterConfiguration.hxx>
-#include <Configuration3D.hxx>
 #include <ColorSelector.hxx>
 #include <StaticRaster.hxx>
 #include <ProjectConfiguration.hxx>
@@ -48,13 +47,15 @@ namespace GUI
 
 //Inicialitzem els paràmetres al constructor per defecte i carreguem l'arxiu on hi ha tota la informació referent al ràster
 //que posteriorment haurem de representar (x,y,z).
-Display3D::Display3D(QWidget *parent ) : QGLWidget(parent), _simulationRecord(0), _viewedStep(0), _zoom(1.0f), _position(0,0), _lastPos(0,0), _rotation(0,0), _rotationZ(0), _cellScale(1.0f, 1.0f, 1.0f), _config3D(ProjectConfiguration::instance()->getConfig3D())
+Display3D::Display3D(QWidget *parent ) : QGLWidget(parent), _simulationRecord(0), _viewedStep(0), _zoom(1.0f), _position(0,0), _lastPos(0,0), _rotation(0,0), _rotationZ(0), _cellScale(1.0f, 1.0f, 1.0f)
 {
 	//_landscapeMaterial.setTextureFileName("landscape1.bmp");
     agentFocus = false;
     m_frameCount = 0;
     m_time = new QTime();
+
 }
+
 
 Display3D::~Display3D()
 {
@@ -359,8 +360,7 @@ void Display3D::paintLandscape()
     std::list<std::string>::const_iterator it =_orderedRasters.end();
     while(it!=_orderedRasters.begin())
     {
-        it--;
-        Engine::StaticRaster & DEMRaster(_simulationRecord->getRasterTmp(*(it), _viewedStep));
+        it--;		
         Engine::StaticRaster & colorRaster = _simulationRecord->getRasterTmp(*(it), _viewedStep);
 
         glPushMatrix();
@@ -382,18 +382,23 @@ void Display3D::paintLandscape()
             glVertex3d(5000, -5000, 1);
         glEnd();
             */
-        const Engine::Point3D<float> scale(_config3D.getSize3D());
-
-
     //	glTranslatef(-_cellScale._x*_simulationRecord->getSize()/2, -_cellScale._y*_simulationRecord->getSize()/2, 0.0f);
-        RasterConfiguration * rasterConfig = ProjectConfiguration::instance()->getRasterConfig(*(it));
         //const ColorSelector & colorSelector(rasterConfig->getColorRamp());
 
-        int pot2 = powf(2,ceil(log2(DEMRaster.getSize()._x)));
+        int pot2 = powf(2,ceil(log2(_simulationRecord->getSize())));
         glEnable(GL_CULL_FACE);
         //glEnable(GL_CULL_VERTEX_EXT);
 
-        quadLandscape->update(dist,pot2, rasterConfig->getColorRamp(), colorRaster,_simulationRecord->getSize(),scale,DEMRaster, LOD, off);
+		RasterConfiguration * rasterConfig = ProjectConfiguration::instance()->getRasterConfig(*(it));
+		if(rasterConfig->hasElevationRaster())
+		{
+        	Engine::StaticRaster & elevationRaster(_simulationRecord->getRasterTmp(rasterConfig->getElevationRaster(), _viewedStep));
+        	quadLandscape->update(dist,pot2, rasterConfig->getColorRamp(), colorRaster,_simulationRecord->getSize(),elevationRaster, LOD, off);
+		}
+		else
+		{
+        	quadLandscape->update(dist,pot2, rasterConfig->getColorRamp(), colorRaster,_simulationRecord->getSize(),_plane, LOD, off);
+		}
         /*
         for(index._x=0; index._x<DEMRaster.getSize()._x-1; index._x++)
         {
@@ -479,9 +484,9 @@ void Display3D::paintAgents()
 	Engine::StaticRaster * raster = 0;
 	if(_orderedRasters.size()!=0)
 	{
-		raster = &(_simulationRecord->getRasterTmp(_config3D.getDEMRaster(), _viewedStep));
+		// TODO which raster??
+		//raster = &(_simulationRecord->getRasterTmp(_config3D.getDEMRaster(), _viewedStep));
 	}
-	const Engine::Point3D<float> scale(_config3D.getSize3D());
 
 	for(Engine::SimulationRecord::AgentTypesMap::const_iterator itType = _simulationRecord->beginTypes(); itType!=_simulationRecord->endTypes(); itType++)
 	{
@@ -503,7 +508,8 @@ void Display3D::paintAgents()
 					
 			glPushMatrix();
 			//std::cout << "painting agent: " << it->first << " at pos: " << position << std::endl;
-			glTranslatef(scale._x*position._x, -scale._y*position._y, scale._z*position._z);
+			//glTranslatef(scale._x*position._x, -scale._y*position._y, scale._z*position._z);
+			glTranslatef(position._x, -position._y, position._z);
 			//glRotatef(180.0f, 1.0f, 0.0f, 0.0f);
 			if(!agentConfig->getFileName3D().empty())
 			{
@@ -634,13 +640,12 @@ void Display3D::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_R)
     {
-        Engine::StaticRaster & DEMRaster = _simulationRecord->getRasterTmp(_config3D.getDEMRaster(), _viewedStep);
-
-        float puntMig = sqrt(DEMRaster.getSize()._x*DEMRaster.getSize()._x+DEMRaster.getSize()._y*DEMRaster.getSize()._y);
+		float size = _simulationRecord->getSize();
+        float puntMig = sqrt(size*size+size*size);
 
         radi = (puntMig)/2.f; //mida escenari/2
-        _vrp._x = DEMRaster.getSize()._x/2;
-        _vrp._y = -DEMRaster.getSize()._y/2;
+        _vrp._x = size/2.0f;
+        _vrp._y = -size/2.0f;
         _vrp._z = 0;
 
         cout << "Radi = " << radi << endl;
@@ -816,6 +821,8 @@ void Display3D::resetView()
 {
 	_orderedRasters.clear();
 	_viewedStep = 0;
+	_plane.resize(Engine::Point2D<int>(_simulationRecord->getSize(), _simulationRecord->getSize()));
+	_plane.setDefaultInitValues(1,1,1);
 	initializeGL();
 }
 

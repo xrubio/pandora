@@ -42,7 +42,7 @@ class RasterConfigurator : public QDialog
 	RasterConfiguration _configuration;
 
 public:
-	RasterConfigurator(QWidget * parent, const std::string & type );
+	RasterConfigurator(QWidget * parent, const std::string & type, const std::list<std::string> & orderedRasters );
 	virtual ~RasterConfigurator();
 
 private slots:

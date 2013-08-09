@@ -208,7 +208,6 @@ void ProjectConfiguration::loadRastersConfigs( TiXmlElement * rasters )
 		rastersNames.push_back(raster->Attribute("name"));
 		raster = raster->NextSiblingElement();
 	}
-	_config3D.setRastersList(rastersNames);
 }
 
 TiXmlElement * ProjectConfiguration::storeAgentsConfigs()
@@ -370,7 +369,6 @@ void ProjectConfiguration::loadConfigs()
 		_rastersConfig.insert(make_pair( itRaster->first, new RasterConfiguration(minValue,maxValue)));
 		rastersNames.push_back(itRaster->first);
 	}
-	_config3D.setRastersList(rastersNames);
 }
 
 void ProjectConfiguration::updateAgentConfig( const std::string & type, const AgentConfiguration & config )
@@ -433,11 +431,6 @@ RasterConfiguration * ProjectConfiguration::getRasterConfig( const std::string &
 		return 0;
 	}
 	return it->second;
-}
-
-Configuration3D & ProjectConfiguration::getConfig3D()
-{
-	return _config3D;
 }
 
 } // namespace GUI

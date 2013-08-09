@@ -26,7 +26,6 @@
 #include <QMainWindow>
 #include <map>
 #include <Point3D.hxx>
-#include <Configuration3D.hxx>
 #include <LoadSimulationThread.hxx>
 #include <QTreeWidgetItem>
 #include <AgentRecord.hxx>
@@ -89,7 +88,6 @@ private:
 	QAction * _showAgentsAction;
 
 	QAction * _show3DAction;
-	QAction * _options3DAction;
 
 	QSpinBox * _stepBox;
 	QLabel * _numStepsLabel;
@@ -148,11 +146,9 @@ private slots:
 	void openRasterConfigurator(QListWidgetItem * item);
 	
 	void show3DWindow();
-	void show3DOptions();
 
 	void agentConfigured( const std::string & , const AgentConfiguration &); 
 	void rasterConfigured( const std::string & , const RasterConfiguration &); 	
-	void configured3D( const Configuration3D &);
 
 	void loadSimulationFinished( bool correct);
 

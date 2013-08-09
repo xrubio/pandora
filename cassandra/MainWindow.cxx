@@ -31,7 +31,6 @@
 #include <Display3D.hxx>
 #include <AgentConfiguration.hxx>
 #include <RasterConfigurator.hxx>
-#include <Configurator3D.hxx>
 #include <Exceptions.hxx>
 #include <ProjectConfiguration.hxx>
 #include <SimulationRecord.hxx>
@@ -191,12 +190,6 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_show3DAction->setStatusTip(tr("Show 3D raster"));
 	connect(_show3DAction, SIGNAL(triggered()), this, SLOT(show3DWindow()));
 
-	
-	_options3DAction = new QAction(QIcon(":/resources/icons/3doptions.png"), tr("&Edit 3D View"), this);
-	_options3DAction->setShortcut(tr("Ctrl+E"));
-	_options3DAction->setStatusTip(tr("Edit 3D View"));
-	connect(_options3DAction, SIGNAL(triggered()), this, SLOT(show3DOptions()));
-
     _settings = new QAction(tr("&Settings"),this);
     _settings->setShortcut(tr("Ctrl+O"));
     _settings->setStatusTip(tr("Settings"));
@@ -226,7 +219,6 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_viewMenu->addAction(_showAgentsAction);
 	_viewMenu->addSeparator();
 	_viewMenu->addAction(_show3DAction);
-	_viewMenu->addAction(_options3DAction);
 
     _settingsBar = menuBar()->addMenu(tr("&Settings"));
     _settingsBar->addAction(_settings);
@@ -269,7 +261,6 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_viewBar->addAction(_showAgentsAction);
 	_viewBar->addSeparator();
 	_viewBar->addAction(_show3DAction);
-	_viewBar->addAction(_options3DAction);
 	
 	// TODO un thread diferent?
 	_playTimer = new QTimer(this);
@@ -291,7 +282,6 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_zoomOutAction->setEnabled(false);
 	_showAgentsAction->setEnabled(false);
 	_show3DAction->setEnabled(false);
-	_options3DAction->setEnabled(false);
 
 	_saveProjectAction->setEnabled(false);
 	_saveProjectAsAction->setEnabled(false);
@@ -372,7 +362,6 @@ void MainWindow::adjustGUI()
 		_zoomOutAction->setEnabled(false);
 		_showAgentsAction->setEnabled(false);
 		_show3DAction->setEnabled(false);
-		_options3DAction->setEnabled(false);	
 		
 		_saveProjectAction->setEnabled(false);
 		_saveProjectAsAction->setEnabled(false);
@@ -397,7 +386,6 @@ void MainWindow::adjustGUI()
 	_zoomOutAction->setEnabled(true);
 	_showAgentsAction->setEnabled(true);
 	_show3DAction->setEnabled(true);
-	_options3DAction->setEnabled(true);
 
 	_saveProjectAction->setEnabled(true);
 	_saveProjectAsAction->setEnabled(true);
@@ -487,7 +475,7 @@ void MainWindow::openAgentConfigurator(QListWidgetItem * item)
 void MainWindow::openRasterConfigurator(QListWidgetItem * item)
 {
 	std::string type(item->text().toStdString());
-	RasterConfigurator * rasterConfigurator = new RasterConfigurator(this, type);
+	RasterConfigurator * rasterConfigurator = new RasterConfigurator(this, type, _rasterSelection->getRasterList());
 	connect(rasterConfigurator, SIGNAL(rasterConfigured(const std::string &, const RasterConfiguration &)), this, SLOT(rasterConfigured(const std::string &, const RasterConfiguration &)));
 }
 	
@@ -537,19 +525,6 @@ void MainWindow::updateOffset(int o)
 void MainWindow::updateRadius(int r)
 {
     _display2D->radiAgent = r;
-}
-
-void MainWindow::show3DOptions()
-{
-	Configurator3D * config = new Configurator3D(this);
-	connect(config, SIGNAL(configured3D(const Configuration3D &)), this, SLOT(configured3D(const Configuration3D &)));
-}
-
-
-void MainWindow::configured3D( const Configuration3D & config3D )
-{
-	ProjectConfiguration::instance()->getConfig3D().setRasters(config3D.getDEMRaster(), config3D.getColorRaster());
-	ProjectConfiguration::instance()->getConfig3D().setSize3D(config3D.getSize3D());
 }
 
 void MainWindow::newProject()
