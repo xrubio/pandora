@@ -60,7 +60,7 @@ class Display2D : public QWidget
 	
 	float _zoom;
 	bool _showAgents;
-
+    int _radiusSelection;
 
 	QPoint _offset;
 	QPoint _clickedPos;
@@ -84,7 +84,9 @@ public:
 	QSize minimumSizeHint() const;
 	QSize sizeHint() const;
     QTreeWidget *agentList;
-    int radiAgent;
+
+	void setRadiusSelection( int radiusSelection );
+	int getRadiusSelection() const;
 
 protected:  
 	bool event(QEvent *event);
@@ -101,6 +103,7 @@ public slots:
 	void typeSelected( QListWidgetItem * item);
 	void stateSelected( QListWidgetItem * item);
 	void rastersRearranged( std::list<std::string> items );
+	void radiusSelectionModified(int);
 signals:
 	void calculateStatistics( const std::string &, const std::string & );
     void updateAgentsSelected(std::list<Engine::AgentRecord*>,Engine::SimulationRecord *);

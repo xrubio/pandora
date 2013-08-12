@@ -85,12 +85,15 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 
 	genericStatisticsDock->setWidget(_genericStatistics);
 	addDockWidget(Qt::BottomDockWidgetArea, genericStatisticsDock);
+
 	// resource display 2D
 	_display2D = new Display2D(this);
 	_display3D = new Display3D(0);
-
+	_settings = new Settings;
+	
 	_display2D->show();
 	_display3D->hide();
+	_settings->hide();
 	
     setCentralWidget(_display2D);
 //	setCentralWidget(_display3D);
@@ -106,6 +109,7 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	connect(_rasterSelection, SIGNAL(rastersRearranged(std::list<std::string>)), _display2D, SLOT(rastersRearranged(std::list<std::string>)));
 	connect(_rasterSelection, SIGNAL(rastersRearranged(std::list<std::string>)), _display3D, SLOT(rastersRearranged(std::list<std::string>)));
 	connect(_rasterSelection, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(openRasterConfigurator(QListWidgetItem *)));
+	connect(_settings, SIGNAL(radiusSelectionModified(int)), _display2D, SLOT(radiusSelectionModified(int)));
 
 //    connect(this, SIGNAL(newViewedStep(int)), displayAgent, SLOT(viewedStepChangedSlot(int)));
   //  connect(_rasterSelection, SIGNAL(rastersRearranged(std::list<std::string>)), displayAgent, SLOT(rastersRearranged(std::list<std::string>)));
@@ -133,10 +137,13 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	connect(_saveProjectAsAction, SIGNAL(triggered()), this, SLOT(saveProjectAs()));
 	
 	_selectSimulationAction= new QAction(QIcon(":/resources/icons/simulation_select.png"), tr("&Select Simulation..."), this);
-	_selectSimulationAction->setShortcut(tr("Ctrl+S"));
 	_selectSimulationAction->setStatusTip(tr("Select simulation to load"));
 	connect(_selectSimulationAction, SIGNAL(triggered()), this, SLOT(selectSimulation()));
-   
+
+	_settingsAction = new QAction(QIcon(":/resources/icons/settings.png"), tr("&Settings"), this);
+	_settingsAction->setStatusTip(tr("General Settings"));
+	connect(_settingsAction, SIGNAL(triggered()), this, SLOT(showSettings()));
+
 	_quitAction = new QAction(tr("&Quit"), this);
 	_quitAction->setShortcut(tr("Ctrl+Q"));
 	_quitAction->setStatusTip(tr("Quit the application"));
@@ -190,11 +197,6 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_show3DAction->setStatusTip(tr("Show 3D raster"));
 	connect(_show3DAction, SIGNAL(triggered()), this, SLOT(show3DWindow()));
 
-    _settings = new QAction(tr("&Settings"),this);
-    _settings->setShortcut(tr("Ctrl+O"));
-    _settings->setStatusTip(tr("Settings"));
-    connect(_settings, SIGNAL(triggered()), this, SLOT(showSettings()));
-	
 	// menus
 	_fileMenu = menuBar()->addMenu(tr("&File"));
 	_fileMenu->addAction(_newProjectAction);
@@ -202,6 +204,7 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_fileMenu->addAction(_saveProjectAction);
 	_fileMenu->addAction(_saveProjectAsAction);
 	_fileMenu->addAction(_selectSimulationAction);
+	_fileMenu->addAction(_settingsAction);
 	_fileMenu->addAction(_quitAction);
 
 	_simulationMenu = menuBar()->addMenu(tr("&Simulation"));
@@ -220,9 +223,6 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_viewMenu->addSeparator();
 	_viewMenu->addAction(_show3DAction);
 
-    _settingsBar = menuBar()->addMenu(tr("&Settings"));
-    _settingsBar->addAction(_settings);
-	
 	// toolbars
 	_fileBar= addToolBar(tr("File"));
 	_fileBar->addAction(_newProjectAction);
@@ -389,6 +389,8 @@ void MainWindow::adjustGUI()
 
 	_saveProjectAction->setEnabled(true);
 	_saveProjectAsAction->setEnabled(true);
+	
+	_settings->setRadiusSelection(3);
 
 	update();
 }
@@ -478,7 +480,7 @@ void MainWindow::openRasterConfigurator(QListWidgetItem * item)
 	RasterConfigurator * rasterConfigurator = new RasterConfigurator(this, type, _rasterSelection->getRasterList());
 	connect(rasterConfigurator, SIGNAL(rasterConfigured(const std::string &, const RasterConfiguration &)), this, SLOT(rasterConfigured(const std::string &, const RasterConfiguration &)));
 }
-	
+
 void MainWindow::agentConfigured( const std::string & type, const AgentConfiguration & config )
 {
     ProjectConfiguration::instance()->updateAgentConfig(type, config);
@@ -503,29 +505,10 @@ void MainWindow::show3DWindow()
 
 void MainWindow::showSettings()
 {
-    Settings * set = new Settings(this,_display3D->LOD);
-    set->show();
-    connect(set, SIGNAL(LODmodif(int)), this, SLOT(updateLOD(int)));
-    connect(set, SIGNAL(Radiusmodif(int)), this, SLOT(updateRadius(int)));
-    connect(set, SIGNAL(Offsetmodif(int)), this, SLOT(updateOffset(int)));
+	_settings->setRadiusSelection(_display2D->getRadiusSelection());
+	_settings->show();
 }
 
-void MainWindow::updateLOD(int lod)
-{
-    _display3D->LOD = lod;
-    _display3D->update();
-}
-
-void MainWindow::updateOffset(int o)
-{
-    _display3D->_offset = o;
-    _display3D->update();
-}
-
-void MainWindow::updateRadius(int r)
-{
-    _display2D->radiAgent = r;
-}
 
 void MainWindow::newProject()
 {

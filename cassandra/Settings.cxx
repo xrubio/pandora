@@ -1,30 +1,50 @@
-#include "Settings.hxx"
-#include "ui_Settings.h"
+/*
+ * Copyright (c) 2013
+ * COMPUTER APPLICATIONS IN SCIENCE & ENGINEERING
+ * BARCELONA SUPERCOMPUTING CENTRE - CENTRO NACIONAL DE SUPERCOMPUTACIÓN
+ * http://www.bsc.es
+ *
+ * This file is part of Cassandra.
+ * Cassandra is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Cassandra is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *  
+ * You should have received a copy of the GNU General Public 
+ * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ */
 
-Settings::Settings(QWidget *parent, int LOD) :
-    QMainWindow(parent),
-    ui(new Ui::Settings)
+#include <Settings.hxx>
+
+namespace GUI
 {
-    ui->setupUi(this);
-    ui->LODspinBox->setValue(LOD);
+
+Settings::Settings(QWidget * parent) : QDialog(parent)
+{
+	setModal(true);
+	_settingsUi.setupUi(this);
 }
 
 Settings::~Settings()
 {
-    delete ui;
+}
+	
+void Settings::accept()
+{
+	emit radiusSelectionModified(_settingsUi.radiusSelection->value());
+	close();
+}
+	
+void Settings::setRadiusSelection( int radiusSelection )
+{
+	_settingsUi.radiusSelection->setValue(radiusSelection);
 }
 
-void Settings::LODmodified(int LOD)
-{
-    emit LODmodif(LOD);
-}
+} // namespace GUI
 
-void Settings::Radiusmodified(int r)
-{
-    emit Radiusmodif(r);
-}
-
-void Settings::Offsetmodified(int o)
-{
-    emit Offsetmodif(o);
-}

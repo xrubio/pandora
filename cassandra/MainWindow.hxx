@@ -30,6 +30,7 @@
 #include <QTreeWidgetItem>
 #include <AgentRecord.hxx>
 #include <SimulationRecord.hxx>
+#include "ui_Settings.h"
 
 class QMenu;
 class QAction;
@@ -50,6 +51,7 @@ class GenericStatistics;
 class Display3D;
 class AgentConfiguration;
 class RasterConfiguration;
+class Settings;
 
 class LoadingProgressBar;
 
@@ -62,19 +64,18 @@ private:
 	QMenu * _fileMenu;
 	QMenu * _simulationMenu;
 	QMenu * _viewMenu;
-    QMenu * _settingsBar;
 
 	QToolBar * _fileBar;
 	QToolBar * _simulationBar;
     QToolBar * _viewBar;
 
-    QAction * _settings;
 
 	QAction * _newProjectAction;
 	QAction * _loadProjectAction;
 	QAction * _saveProjectAction;
 	QAction * _saveProjectAsAction;
 	QAction * _selectSimulationAction;
+    QAction * _settingsAction;
 	QAction * _quitAction;
 
 	QAction * _firstStepAction;
@@ -98,6 +99,7 @@ private:
 
 	Display2D * _display2D;
     Display3D * _display3D;
+	Settings * _settings;
 
 	AgentTypeSelection * _agentTypeSelection;
 	AgentTraitSelection * _agentTraitSelection;
@@ -154,10 +156,6 @@ private slots:
 
     void show3Dagent(QTreeWidgetItem * item, int i);
     void showSettings();
-
-    void updateLOD(int lod);
-    void updateRadius(int r);
-    void updateOffset(int o);
 
     void updateAgentsSelected(std::list<Engine::AgentRecord*> agents, Engine::SimulationRecord *sim);
 

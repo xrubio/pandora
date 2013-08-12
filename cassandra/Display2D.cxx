@@ -43,7 +43,7 @@
 namespace GUI
 {
 
-Display2D::Display2D( QWidget * parent) : QWidget(parent), _simulationRecord(0), _viewedStep(0), _zoom(1), _showAgents(true), _offset(0,0), _clickedPos(0,0), _type("unknown"), _state("unknown")
+Display2D::Display2D( QWidget * parent) : QWidget(parent), _simulationRecord(0), _viewedStep(0), _zoom(1), _showAgents(true), _radiusSelection(7), _offset(0,0), _clickedPos(0,0), _type("unknown"), _state("unknown")
 {
 	setMouseTracking(true);
 	setAutoFillBackground(true);
@@ -51,7 +51,6 @@ Display2D::Display2D( QWidget * parent) : QWidget(parent), _simulationRecord(0),
 	p.setColor(QPalette::Background, Qt::lightGray);
     setPalette(p);
     agentList = new QTreeWidget();
-    radiAgent = 3;
     connect(agentList, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), parent, SLOT(show3Dagent(QTreeWidgetItem*,int)));
     connect(this, SIGNAL(updateAgentsSelected(std::list<Engine::AgentRecord*>,Engine::SimulationRecord *)), parent, SLOT(updateAgentsSelected(std::list<Engine::AgentRecord*>,Engine::SimulationRecord *)));
 }
@@ -306,8 +305,6 @@ void Display2D::mouseDoubleClickEvent(QMouseEvent *event)
     {
         return;
     }
-    int radiX, radiY;
-    radiX = radiY = radiAgent;
     Engine::Point2D<int> position(event->pos().x()-_offset.x(), event->pos().y()-_offset.y());
     // TODO program /= i *= in Engine::Point2D
     position._x /= _zoom;
@@ -321,9 +318,9 @@ void Display2D::mouseDoubleClickEvent(QMouseEvent *event)
     std::list<Engine::AgentRecord*> agentsSelected;
 
     Engine::Point2D<int> positionAux(position._x, position._y);
-    for (int iX = 0; iX <= radiX; iX++)
+    for (int iX = 0; iX <= _radiusSelection; iX++)
 	{
-        for (int iY = 0; iY <= radiY; iY++)
+        for (int iY = 0; iY <= _radiusSelection; iY++)
 		{
             positionAux._x = position._x + iX;
             positionAux._y = position._y + iY;
@@ -491,6 +488,17 @@ void Display2D::showAgents()
 {
 	_showAgents = !_showAgents;
 	update();
+}
+
+int Display2D::getRadiusSelection() const
+{
+	return _radiusSelection;
+}
+	
+void Display2D::radiusSelectionModified(int radiusSelection)
+{
+	_radiusSelection = radiusSelection;
+	std::cout << "radius selection: " << _radiusSelection << std::endl;
 }
 
 } // namespace GUI
