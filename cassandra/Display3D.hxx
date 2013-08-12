@@ -72,7 +72,7 @@ public:
 //paràmetre que serà l'angle amb el que rotarem el nostre ràster
 public slots:
 	void viewedStepChangedSlot( int newViewedStep );
-	void rastersRearranged( std::list<std::string> items );
+	void rastersRearranged( std::list<std::string> items, std::list<bool> views );
 	
 //Declarem les variables i métodes que farem servir dins la nostra 
 //clase. 

@@ -45,6 +45,7 @@ class RasterSelection : public QListWidget
 
 	Engine::SimulationRecord * _simulationRecord;
 	std::list<std::string> _rasterList;
+	std::list<bool> _rasterView;
 	void dropEvent( QDropEvent * event);
 	void updateRasters();
 public:
@@ -53,12 +54,13 @@ public:
 	virtual ~RasterSelection();
 	void setSimulationRecord( Engine::SimulationRecord * simulationRecord );
 	const std::list<std::string> & getRasterList() const;
+	const std::list<bool> & getRasterView() const;
 
 private slots:
     void updateRastersSlot(QListWidgetItem*);
 
 signals:
-	void rastersRearranged(std::list<std::string> items);
+	void rastersRearranged(std::list<std::string> items, std::list<bool> views);
 }; 
 
 } // namespace GUI

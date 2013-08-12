@@ -106,8 +106,8 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	connect(_agentTypeSelection, SIGNAL(itemActivated(QListWidgetItem *)), _agentTraitSelection, SLOT(typeSelected(QListWidgetItem *)));
 	connect(_agentTypeSelection, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(openAgentConfigurator(QListWidgetItem *)));
 	connect(_agentTraitSelection, SIGNAL(itemActivated(QListWidgetItem *)), _display2D, SLOT(stateSelected(QListWidgetItem *)));
-	connect(_rasterSelection, SIGNAL(rastersRearranged(std::list<std::string>)), _display2D, SLOT(rastersRearranged(std::list<std::string>)));
-	connect(_rasterSelection, SIGNAL(rastersRearranged(std::list<std::string>)), _display3D, SLOT(rastersRearranged(std::list<std::string>)));
+	connect(_rasterSelection, SIGNAL(rastersRearranged(std::list<std::string>, std::list<bool>)), _display2D, SLOT(rastersRearranged(std::list<std::string>, std::list<bool>)));
+	connect(_rasterSelection, SIGNAL(rastersRearranged(std::list<std::string>, std::list<bool>)), _display3D, SLOT(rastersRearranged(std::list<std::string>, std::list<bool>)));
 	connect(_rasterSelection, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(openRasterConfigurator(QListWidgetItem *)));
 	connect(_settings, SIGNAL(radiusSelectionModified(int)), _display2D, SLOT(radiusSelectionModified(int)));
 
@@ -596,7 +596,7 @@ void MainWindow::show3Dagent(QTreeWidgetItem * item, int i)
         displayAgent->setWindowTitle(item->parent()->text(0));
 
         displayAgent->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
-        displayAgent->rastersRearranged(_rasterSelection->getRasterList());
+        displayAgent->rastersRearranged(_rasterSelection->getRasterList(), _rasterSelection->getRasterView());
         displayAgent->agentFocus = true;
         displayAgent->agentX = agentSelected->getState(_viewedStep/_simulationRecord->getFinalResolution(), "x");
         displayAgent->agentY = agentSelected->getState(_viewedStep/_simulationRecord->getFinalResolution(), "y");;

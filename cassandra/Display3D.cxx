@@ -832,11 +832,19 @@ void Display3D::setSimulationRecord( Engine::SimulationRecord * simulationRecord
 	update();
 }
 
-void Display3D::rastersRearranged( std::list<std::string> items )
+void Display3D::rastersRearranged( std::list<std::string> items, std::list<bool> views )
 {
-	_orderedRasters.clear();	
-    _orderedRasters.resize(items.size());
-	std::reverse_copy(items.begin(), items.end(), _orderedRasters.begin());
+	_orderedRasters.clear();
+
+	std::list<bool>::const_iterator itView = views.begin();
+	for(std::list<std::string>::const_iterator it=items.begin(); it!=items.end(); it++)
+	{
+		if((*itView)==true)
+		{
+			_orderedRasters.push_back(*it);
+		}
+		itView++;
+	}
     update();
 }
 

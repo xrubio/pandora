@@ -73,16 +73,22 @@ void RasterSelection::setSimulationRecord( Engine::SimulationRecord * simulation
 void RasterSelection::updateRasters()
 {
 	_rasterList.clear();
+	_rasterView.clear();
 	std::list<std::string> items;
 	for(int i=0; i<count(); i++)
     {
-        if (item(i)->checkState() == 2) {
-            std::string newItem(item(i)->text().toStdString());
-            _rasterList.push_back(newItem);
+		std::string newItem(item(i)->text().toStdString());
+		_rasterList.push_back(newItem);
+        if (item(i)->checkState()==Qt::Checked)
+		{
+			_rasterView.push_back(true);
         }
-
+		else
+		{
+			_rasterView.push_back(false);
+		}
     }
-	emit rastersRearranged(_rasterList);
+	emit rastersRearranged(_rasterList, _rasterView);
 }
 
 void RasterSelection::dropEvent( QDropEvent * event )
@@ -100,6 +106,11 @@ void RasterSelection::updateRastersSlot(QListWidgetItem* a)
 const std::list<std::string> & RasterSelection::getRasterList() const
 {
 	return _rasterList;
+}
+
+const std::list<bool> & RasterSelection::getRasterView() const
+{
+	return _rasterView;
 }
 
 } // namespace GUI

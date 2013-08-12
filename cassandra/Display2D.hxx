@@ -102,7 +102,7 @@ public slots:
 	void showAgents();
 	void typeSelected( QListWidgetItem * item);
 	void stateSelected( QListWidgetItem * item);
-	void rastersRearranged( std::list<std::string> items );
+	void rastersRearranged( std::list<std::string> items, std::list<bool> views );
 	void radiusSelectionModified(int);
 signals:
 	void calculateStatistics( const std::string &, const std::string & );
