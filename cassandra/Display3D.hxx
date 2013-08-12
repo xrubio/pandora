@@ -66,7 +66,6 @@ public:
     int agentX, agentY;
     float frustum[6][4];
 
-    int LOD;
     int _offset;
 // 	
 //Declarem els SLOTS públics que seràn les funcions que rebràn un 

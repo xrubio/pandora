@@ -97,7 +97,7 @@ RasterConfigurator::RasterConfigurator(QWidget * parent, const std::string & typ
 
 	// load rasters
 	_rasterConfig.elevationRaster->addItem("none (use plane)");
-	std::cout << "active: " << _configuration.getElevationRaster() << " deform: " << _configuration.getElevationExaggeration() << std::endl;
+	//std::cout << "active: " << _configuration.getElevationRaster() << " deform: " << _configuration.getElevationExaggeration() << std::endl;
 
 	for(std::list<std::string>::const_iterator it=orderedRasters.begin(); it!=orderedRasters.end(); it++)
 	{
@@ -108,7 +108,16 @@ RasterConfigurator::RasterConfigurator(QWidget * parent, const std::string & typ
 		}
 	}
 
+	_rasterConfig.cellResolution->setValue(_configuration.getCellResolution());
 	_rasterConfig.elevationExaggeration->setValue(_configuration.getElevationExaggeration());
+
+
+	_rasterConfig.xOffset->setValue(_configuration.getOffset()._x);
+	_rasterConfig.yOffset->setValue(_configuration.getOffset()._y);
+	_rasterConfig.zOffset->setValue(_configuration.getOffset()._z);
+
+	_rasterConfig.levelOfDetail->setValue(_configuration.getLOD());
+
 	show();
 }
 
@@ -134,8 +143,17 @@ void RasterConfigurator::accept()
 
 	_configuration.setTransparentValue(_rasterConfig.transparentValue->value());
 	_configuration.setTransparentEnabled(_rasterConfig.transparentEnabled->isChecked());
+
+
+	// 3D
 	_configuration.setElevationRaster(_rasterConfig.elevationRaster->currentText().toStdString());
+	_configuration.setCellResolution(_rasterConfig.cellResolution->value());
 	_configuration.setElevationExaggeration(_rasterConfig.elevationExaggeration->value());
+
+	Engine::Point3D<float> offset(_rasterConfig.xOffset->value(), _rasterConfig.yOffset->value(), _rasterConfig.zOffset->value());
+	_configuration.setOffset(offset);
+
+	_configuration.setLOD(_rasterConfig.levelOfDetail->value());
 
 	emit rasterConfigured(_type, _configuration);
 	close();

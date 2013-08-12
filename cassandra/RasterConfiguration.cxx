@@ -28,7 +28,7 @@
 namespace GUI
 {
 
-RasterConfiguration::RasterConfiguration( const int & minValue, const int & maxValue, bool init ) : _colorSelector(0), _minValue(minValue), _maxValue(maxValue), _transparentEnabled(false), _transparentValue(0), _elevationRaster("none (use plane)"), _elevationExaggeration(1.0f), _hasElevationRaster(false)
+RasterConfiguration::RasterConfiguration( const int & minValue, const int & maxValue, bool init ) : _colorSelector(0), _minValue(minValue), _maxValue(maxValue), _transparentEnabled(false), _transparentValue(0), _elevationRaster("none (use plane)"), _cellResolution(1.0f), _elevationExaggeration(1.0f), _offset(0.0f, 0.0f, 0.0f), _lod(25), _hasElevationRaster(false)
 {
 	resetColorRamp();
 
@@ -53,7 +53,7 @@ RasterConfiguration::RasterConfiguration( const int & minValue, const int & maxV
 	}
 }
 
-RasterConfiguration::RasterConfiguration( const RasterConfiguration & prototype ) : _colorSelector(0), _minValue(prototype.getMinValue()), _maxValue(prototype.getMaxValue()), _transparentEnabled(prototype.isTransparentEnabled()), _transparentValue(prototype.getTransparentValue()), _elevationRaster(prototype.getElevationRaster()), _elevationExaggeration(prototype.getElevationExaggeration())
+RasterConfiguration::RasterConfiguration( const RasterConfiguration & prototype ) : _colorSelector(0), _minValue(prototype.getMinValue()), _maxValue(prototype.getMaxValue()), _transparentEnabled(prototype.isTransparentEnabled()), _transparentValue(prototype.getTransparentValue()), _elevationRaster(prototype.getElevationRaster()), _cellResolution(prototype.getCellResolution()), _elevationExaggeration(prototype.getElevationExaggeration()), _offset(prototype.getOffset()), _lod(prototype.getLOD()), _hasElevationRaster(prototype.hasElevationRaster())
 {
 	_colorSelector =  prototype.getColorRamp().copy();
 }
@@ -138,6 +138,36 @@ void RasterConfiguration::setElevationExaggeration( float elevationExaggeration)
 float RasterConfiguration::getElevationExaggeration() const
 {
 	return _elevationExaggeration;
+}
+
+void RasterConfiguration::setCellResolution( float cellResolution)
+{
+	_cellResolution = cellResolution;
+}
+
+float RasterConfiguration::getCellResolution() const
+{
+	return _cellResolution;
+}
+
+void RasterConfiguration::setOffset( const Engine::Point3D<float> & offset)
+{
+	_offset = offset;
+}
+
+const Engine::Point3D<float> & RasterConfiguration::getOffset() const
+{
+	return _offset;
+}
+
+void RasterConfiguration::setLOD( int lod )
+{
+	_lod = lod;
+}
+
+int RasterConfiguration::getLOD() const
+{
+	return _lod;
 }
 
 bool RasterConfiguration::hasElevationRaster() const

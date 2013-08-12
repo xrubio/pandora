@@ -24,6 +24,7 @@
 #define __RasterConfiguration_hxx__
 
 #include <string>
+#include <Point3D.hxx>
 
 namespace GUI
 {
@@ -40,8 +41,17 @@ class RasterConfiguration
 
 	// raster being used for z coordinates in 3D
 	std::string _elevationRaster;
+	// meters per cell
+	float _cellResolution;
 	// deformation of z coordinates
 	float _elevationExaggeration;
+	// offset (in times the size of the raster)
+	Engine::Point3D<float> _offset;
+
+	// quad tree config
+	// level of detail
+	int _lod;	
+
 	bool _hasElevationRaster;
 public:
 	RasterConfiguration( const int & minValue = 0, const int & maxValue = 10, bool init = true);
@@ -62,8 +72,16 @@ public:
 
 	void setElevationRaster( const std::string & elevationRaster );
 	const std::string & getElevationRaster() const;
+	void setCellResolution( float cellResolution);
+	float getCellResolution() const;
 	void setElevationExaggeration( float elevationExaggeration);
 	float getElevationExaggeration() const;
+
+	void setOffset( const Engine::Point3D<float> & offset);
+	const Engine::Point3D<float> & getOffset() const;
+
+	void setLOD( int lod );
+	int getLOD() const;
 
 	bool hasElevationRaster() const;
 
