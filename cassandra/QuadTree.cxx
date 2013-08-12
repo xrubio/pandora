@@ -168,7 +168,7 @@ Quadtree* Quadtree::initializeChild(Engine::Point2D<int> center, int prof, int s
 
 }
 
-int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine::StaticRaster & colorRaster, int size, Engine::StaticRaster & DEMRaster, int LOD, int offset)
+int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine::StaticRaster & colorRaster, int size, Engine::StaticRaster & DEMRaster, int LOD, int offset, float exaggeration)
 {
     //si la distancia(camara-punt(anglecam))/profunditat_arbre < Constant -> habilita punt
     //cout << "Relacio " << (abs(dist-this->center._z))/prof << endl;
@@ -208,28 +208,28 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
         int aux;
         if (this->childNW != 0)
         {
-            aux = this->childNW->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset);
+            aux = this->childNW->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset,exaggeration);
             if (aux < prof) profNW = aux;
         }
 
         int profNE = prof;
         if (childNE != 0)
         {
-            aux = this->childNE->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset);
+            aux = this->childNE->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset,exaggeration);
             if (aux < prof) profNE = aux;
         }
 
         int profSE = prof;
         if (childSE != 0)
         {
-            aux = this->childSE->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset);
+            aux = this->childSE->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset,exaggeration);
             if (aux < prof) profSE = aux;
         }
 
         int profSW = prof;
         if (childSW != 0)
         {
-            aux = this->childSW->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset);
+            aux = this->childSW->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset,exaggeration);
             if (aux < prof) profSW = aux;
         }
 /*
@@ -627,7 +627,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(center._x/size, center._y/size);
-                glVertex3f(center._x,-center._y,(DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))+offset));
+                glVertex3f(center._x,-center._y,((DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))*exaggeration)+offset));
                 //glVertex3f(center._x,-center._y,1);
 
                 if(colorRaster.hasColorTable())
@@ -640,7 +640,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(NW._x/size, NW._y/size);
-                glVertex3f(NW._x,-NW._y,(DEMRaster.getValue(Engine::Point2D<int>(NW._x,NW._y))+offset));
+                glVertex3f(NW._x,-NW._y,((DEMRaster.getValue(Engine::Point2D<int>(NW._x,NW._y))*exaggeration)+offset));
                //glVertex3f(NW._x,-NW._y,1);
 
                 if(colorRaster.hasColorTable())
@@ -653,7 +653,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(neighW._x/size, neighW._y/size);
-                glVertex3f(neighW._x,-neighW._y,(DEMRaster.getValue(Engine::Point2D<int>(neighW._x,neighW._y))+offset));
+                glVertex3f(neighW._x,-neighW._y,((DEMRaster.getValue(Engine::Point2D<int>(neighW._x,neighW._y))*exaggeration)+offset));
                //glVertex3f(neighW._x,-neighW._y,1);
                 glEnd();
             }
@@ -675,7 +675,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(center._x/size, center._y/size);
-                glVertex3f(center._x,-center._y,(DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))+offset));
+                glVertex3f(center._x,-center._y,((DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))*exaggeration)+offset));
                //glVertex3f(center._x,-center._y,1);
 
                 if(colorRaster.hasColorTable())
@@ -688,7 +688,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(neighN._x/size, neighN._y/size);
-                glVertex3f(neighN._x,-neighN._y,(DEMRaster.getValue(Engine::Point2D<int>(neighN._x,neighN._y))+offset));
+                glVertex3f(neighN._x,-neighN._y,((DEMRaster.getValue(Engine::Point2D<int>(neighN._x,neighN._y))*exaggeration)+offset));
                //glVertex3f(neighN._x,-neighN._y,1);
 
                 if(colorRaster.hasColorTable())
@@ -701,7 +701,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(NW._x/size, NW._y/size);
-                glVertex3f(NW._x,-NW._y,(DEMRaster.getValue(Engine::Point2D<int>(NW._x,NW._y))+offset));
+                glVertex3f(NW._x,-NW._y,((DEMRaster.getValue(Engine::Point2D<int>(NW._x,NW._y))*exaggeration)+offset));
                //glVertex3f(NW._x,-NW._y,1);
                 glEnd();
             }
@@ -722,7 +722,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(center._x/size, center._y/size);
-                glVertex3f(center._x,-center._y,(DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))+offset));
+                glVertex3f(center._x,-center._y,((DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))*exaggeration)+offset));
                //glVertex3f(center._x,-center._y,1);
 
                 if(colorRaster.hasColorTable())
@@ -734,7 +734,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(NE._x/size, NE._y/size);
-                glVertex3f(NE._x,-NE._y,(DEMRaster.getValue(Engine::Point2D<int>(NE._x,NE._y))+offset));
+                glVertex3f(NE._x,-NE._y,((DEMRaster.getValue(Engine::Point2D<int>(NE._x,NE._y))*exaggeration)+offset));
                //glVertex3f(NE._x,-NE._y,1);
 
                 if(colorRaster.hasColorTable())
@@ -746,7 +746,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(neighN._x/size, neighN._y/size);
-                glVertex3f(neighN._x,-neighN._y,(DEMRaster.getValue(Engine::Point2D<int>(neighN._x,neighN._y))+offset));
+                glVertex3f(neighN._x,-neighN._y,((DEMRaster.getValue(Engine::Point2D<int>(neighN._x,neighN._y))*exaggeration)+offset));
                //glVertex3f(neighN._x,-neighN._y,1);
                 glEnd();
             }
@@ -767,7 +767,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(center._x/size, center._y/size);
-                glVertex3f(center._x,-center._y,(DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))+offset));
+                glVertex3f(center._x,-center._y,((DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))*exaggeration)+offset));
                //glVertex3f(center._x,-center._y,1);
 
                 if(colorRaster.hasColorTable())
@@ -780,7 +780,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(neighE._x/size, neighE._y/size);
-                glVertex3f(neighE._x,-neighE._y,(DEMRaster.getValue(Engine::Point2D<int>(neighE._x,neighE._y))+offset));
+                glVertex3f(neighE._x,-neighE._y,((DEMRaster.getValue(Engine::Point2D<int>(neighE._x,neighE._y))*exaggeration)+offset));
                //glVertex3f(neighE._x,-neighE._y,1);
 
                 if(colorRaster.hasColorTable())
@@ -793,7 +793,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(NE._x/size, NE._y/size);
-                glVertex3f(NE._x,-NE._y,(DEMRaster.getValue(Engine::Point2D<int>(NE._x,NE._y))+offset));
+                glVertex3f(NE._x,-NE._y,((DEMRaster.getValue(Engine::Point2D<int>(NE._x,NE._y))*exaggeration)+offset));
                //glVertex3f(NE._x,-NE._y,1);
                 glEnd();
             }
@@ -814,7 +814,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(center._x/size, center._y/size);
-                glVertex3f(center._x,-center._y,(DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))+offset));
+                glVertex3f(center._x,-center._y,((DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))*exaggeration)+offset));
                //glVertex3f(center._x,-center._y,1);
 
                 if(colorRaster.hasColorTable())
@@ -827,7 +827,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(SE._x/size, SE._y/size);
-                glVertex3f(SE._x,-SE._y,(DEMRaster.getValue(Engine::Point2D<int>(SE._x,SE._y))+offset));
+                glVertex3f(SE._x,-SE._y,((DEMRaster.getValue(Engine::Point2D<int>(SE._x,SE._y))*exaggeration)+offset));
                //glVertex3f(SE._x,-SE._y,1);
 
                 if(colorRaster.hasColorTable())
@@ -840,7 +840,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(neighE._x/size, neighE._y/size);
-                glVertex3f(neighE._x,-neighE._y,(DEMRaster.getValue(Engine::Point2D<int>(neighE._x,neighE._y))+offset));
+                glVertex3f(neighE._x,-neighE._y,((DEMRaster.getValue(Engine::Point2D<int>(neighE._x,neighE._y))*exaggeration)+offset));
                //glVertex3f(neighE._x,-neighE._y,1);
                 glEnd();
             }
@@ -861,7 +861,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(center._x/size, center._y/size);
-                glVertex3f(center._x,-center._y,(DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))+offset));
+                glVertex3f(center._x,-center._y,((DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))*exaggeration)+offset));
                //glVertex3f(center._x,-center._y,1);
 
                 if(colorRaster.hasColorTable())
@@ -874,7 +874,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(neighS._x/size, neighS._y/size);
-                glVertex3f(neighS._x,-neighS._y,(DEMRaster.getValue(Engine::Point2D<int>(neighS._x,neighS._y))+offset));
+                glVertex3f(neighS._x,-neighS._y,((DEMRaster.getValue(Engine::Point2D<int>(neighS._x,neighS._y))*exaggeration)+offset));
                //glVertex3f(neighS._x,-neighS._y,1);
 
                 if(colorRaster.hasColorTable())
@@ -887,7 +887,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(SE._x/size, SE._y/size);
-                glVertex3f(SE._x,-SE._y,(DEMRaster.getValue(Engine::Point2D<int>(SE._x,SE._y))+offset));
+                glVertex3f(SE._x,-SE._y,((DEMRaster.getValue(Engine::Point2D<int>(SE._x,SE._y))*exaggeration)+offset));
                //glVertex3f(SE._x,-SE._y,1);
                 glEnd();
             }
@@ -908,7 +908,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(center._x/size, center._y/size);
-                glVertex3f(center._x,-center._y,(DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))+offset));
+                glVertex3f(center._x,-center._y,((DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))*exaggeration)+offset));
                //glVertex3f(center._x,-center._y,1);
 
                 if(colorRaster.hasColorTable())
@@ -921,7 +921,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(SW._x/size, SW._y/size);
-                glVertex3f(SW._x,-SW._y,(DEMRaster.getValue(Engine::Point2D<int>(SW._x,SW._y))+offset));
+                glVertex3f(SW._x,-SW._y,((DEMRaster.getValue(Engine::Point2D<int>(SW._x,SW._y))*exaggeration)+offset));
                //glVertex3f(SW._x,-SW._y,1);
 
                 if(colorRaster.hasColorTable())
@@ -934,7 +934,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(neighS._x/size, neighS._y/size);
-                glVertex3f(neighS._x,-neighS._y,(DEMRaster.getValue(Engine::Point2D<int>(neighS._x,neighS._y))+offset));
+                glVertex3f(neighS._x,-neighS._y,((DEMRaster.getValue(Engine::Point2D<int>(neighS._x,neighS._y))*exaggeration)+offset));
                //glVertex3f(neighS._x,-neighS._y,1);
                 glEnd();
             }
@@ -955,7 +955,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(center._x/size, center._y/size);
-                glVertex3f(center._x,-center._y,(DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))+offset));
+                glVertex3f(center._x,-center._y,((DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))*exaggeration)+offset));
                //glVertex3f(center._x,-center._y,1);
 
                 if(colorRaster.hasColorTable())
@@ -968,7 +968,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(neighW._x/size, neighW._y/size);
-                glVertex3f(neighW._x,-neighW._y,(DEMRaster.getValue(Engine::Point2D<int>(neighW._x,neighW._y))+offset));
+                glVertex3f(neighW._x,-neighW._y,((DEMRaster.getValue(Engine::Point2D<int>(neighW._x,neighW._y))*exaggeration)+offset));
                //glVertex3f(neighW._x,-neighW._y,1);
 
                 if(colorRaster.hasColorTable())
@@ -981,7 +981,7 @@ int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine
                     setCellColor(colorSelector.getColor(color));
                 }
                 glTexCoord2f(SW._x/size, SW._y/size);
-                glVertex3f(SW._x,-SW._y,(DEMRaster.getValue(Engine::Point2D<int>(SW._x,SW._y))+offset));
+                glVertex3f(SW._x,-SW._y,((DEMRaster.getValue(Engine::Point2D<int>(SW._x,SW._y))*exaggeration)+offset));
                //glVertex3f(SW._x,-SW._y,1);
                 glEnd();
             }

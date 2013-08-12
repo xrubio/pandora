@@ -392,11 +392,11 @@ void Display3D::paintLandscape()
 		if(rasterConfig->hasElevationRaster())
 		{
         	Engine::StaticRaster & elevationRaster(_simulationRecord->getRasterTmp(rasterConfig->getElevationRaster(), _viewedStep));
-        	quadLandscape->update(dist,pot2, rasterConfig->getColorRamp(), colorRaster,_simulationRecord->getSize(),elevationRaster, rasterConfig->getLOD(), off);
+        	quadLandscape->update(dist,pot2, rasterConfig->getColorRamp(), colorRaster,_simulationRecord->getSize(),elevationRaster, rasterConfig->getLOD(), off, rasterConfig->getElevationExaggeration());
 		}
 		else
 		{
-        	quadLandscape->update(dist,pot2, rasterConfig->getColorRamp(), colorRaster,_simulationRecord->getSize(),_plane, rasterConfig->getLOD(), off);
+        	quadLandscape->update(dist,pot2, rasterConfig->getColorRamp(), colorRaster,_simulationRecord->getSize(),_plane, rasterConfig->getLOD(), off, 1.0f);
 		}
         /*
         for(index._x=0; index._x<DEMRaster.getSize()._x-1; index._x++)

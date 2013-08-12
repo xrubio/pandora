@@ -49,7 +49,7 @@ public:
     Quadtree* initializeChild(Engine::Point2D<int> center, int prof, int size);
 
     void setCellColor( const QColor & color );
-    int update(double anglecam, int prof, ColorSelector &colorSelector, Engine::StaticRaster &colorRaster, int size, Engine::StaticRaster & DEMRaster, int LOD, int offset); //recorrer l'arbre i segons la distancia activar o desactivar nodes (childs) i afegirlos a points/polys
+    int update(double anglecam, int prof, ColorSelector &colorSelector, Engine::StaticRaster &colorRaster, int size, Engine::StaticRaster & DEMRaster, int LOD, int offset, float exaggeration); //recorrer l'arbre i segons la distancia activar o desactivar nodes (childs) i afegirlos a points/polys
     bool PolygonInFrustum(Engine::Point3D<int> a, Engine::Point3D<int> b, Engine::Point3D<int> c );
     void setFrustum(float frust[6][4]);
 
