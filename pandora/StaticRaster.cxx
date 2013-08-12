@@ -194,12 +194,12 @@ void StaticRaster::addColorEntry( int index, short r, short g, short b, short al
 	_colorTable.at(index) = entry;
 }
 	
-int StaticRaster::getNumColorEntries()
+int StaticRaster::getNumColorEntries() const
 {
 	return _colorTable.size();
 }
 
-ColorEntry StaticRaster::getColorEntry(int index )
+ColorEntry StaticRaster::getColorEntry(int index ) const
 {
 	if(!_hasColorTable)
 	{	
@@ -216,7 +216,7 @@ ColorEntry StaticRaster::getColorEntry(int index )
 	return _colorTable.at(index);
 }
 
-bool StaticRaster::hasColorTable()
+bool StaticRaster::hasColorTable() const
 {
 	return _hasColorTable;
 }

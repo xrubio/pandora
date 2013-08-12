@@ -76,9 +76,9 @@ public:
 
 	void setColorTable( bool hasColorTable, int size);
 	void addColorEntry( int index, short r, short g, short b, short alpha );
-	int getNumColorEntries();
-	bool hasColorTable();
-	ColorEntry getColorEntry(int index );
+	int getNumColorEntries() const;
+	bool hasColorTable() const;
+	ColorEntry getColorEntry(int index ) const;
 	
 	friend class RasterLoader;
 }; 
