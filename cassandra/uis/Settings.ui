@@ -1,256 +1,126 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>Settings</class>
- <widget class="QMainWindow" name="Settings">
+ <widget class="QDialog" name="Settings">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>322</width>
-    <height>251</height>
+    <width>349</width>
+    <height>183</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Settings</string>
+   <string>Dialog</string>
   </property>
-  <property name="animated">
-   <bool>false</bool>
-  </property>
-  <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout_2">
-    <item row="0" column="0">
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Level of detail</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QSpinBox" name="LODspinBox">
-          <property name="maximum">
-           <number>1000</number>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="11" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <spacer name="horizontalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>100</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="cancel">
-          <property name="text">
-           <string>Cancel</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="accept">
-          <property name="text">
-           <string>Accept</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="1" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Radius</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QSpinBox" name="spinBox">
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="value">
-           <number>3</number>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="3" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
-        <item>
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Separation</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QSlider" name="horizontalSlider">
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>1000</number>
-          </property>
-          <property name="singleStep">
-           <number>5</number>
-          </property>
-          <property name="sliderPosition">
-           <number>300</number>
-          </property>
-          <property name="tracking">
-           <bool>true</bool>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
+  <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>322</width>
-     <height>25</height>
+     <x>130</x>
+     <y>140</y>
+     <width>201</width>
+     <height>32</height>
     </rect>
    </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>10</y>
+     <width>321</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Display Options</string>
+   </property>
+   <widget class="QWidget" name="horizontalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>301</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Radius Selection</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="radiusSelection">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="value">
+        <number>3</number>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
  </widget>
  <resources/>
  <connections>
   <connection>
-   <sender>accept</sender>
-   <signal>clicked()</signal>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
    <receiver>Settings</receiver>
-   <slot>close()</slot>
+   <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>310</x>
-     <y>204</y>
-    </hint>
-    <hint type="destinationlabel">
      <x>248</x>
-     <y>133</y>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>LODspinBox</sender>
-   <signal>valueChanged(int)</signal>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
    <receiver>Settings</receiver>
-   <slot>LODmodified(int)</slot>
+   <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>310</x>
-     <y>68</y>
+     <x>316</x>
+     <y>260</y>
     </hint>
     <hint type="destinationlabel">
-     <x>223</x>
-     <y>70</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>cancel</sender>
-   <signal>clicked()</signal>
-   <receiver>Settings</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>219</x>
-     <y>204</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>164</x>
-     <y>112</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>spinBox</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>Settings</receiver>
-   <slot>Radiusmodified(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>310</x>
-     <y>116</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>81</x>
-     <y>141</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>horizontalSlider</sender>
-   <signal>sliderMoved(int)</signal>
-   <receiver>Settings</receiver>
-   <slot>Offsetmodified(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>132</x>
-     <y>139</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>117</x>
-     <y>177</y>
+     <x>286</x>
+     <y>274</y>
     </hint>
    </hints>
   </connection>
  </connections>
- <slots>
-  <slot>LODmodified(int)</slot>
-  <slot>Radiusmodified(int)</slot>
-  <slot>Offsetmodified(int)</slot>
- </slots>
 </ui>
