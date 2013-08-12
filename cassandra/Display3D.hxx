@@ -131,7 +131,7 @@ private:
 	// order of rasters
 	std::list<std::string> _orderedRasters;
 
-    Quadtree *quadLandscape;
+    QuadTree * _quadLandscape;
 
     int m_frameCount;
     QTime *m_time;

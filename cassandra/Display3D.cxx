@@ -47,7 +47,7 @@ namespace GUI
 
 //Inicialitzem els paràmetres al constructor per defecte i carreguem l'arxiu on hi ha tota la informació referent al ràster
 //que posteriorment haurem de representar (x,y,z).
-Display3D::Display3D(QWidget *parent ) : QGLWidget(parent), _simulationRecord(0), _viewedStep(0), _zoom(1.0f), _position(0,0), _lastPos(0,0), _rotation(0,0), _rotationZ(0), _cellScale(1.0f, 1.0f, 1.0f)
+Display3D::Display3D(QWidget *parent ) : QGLWidget(parent), _simulationRecord(0), _viewedStep(0), _zoom(1.0f), _position(0,0), _lastPos(0,0), _rotation(0,0), _rotationZ(0), _cellScale(1.0f, 1.0f, 1.0f), _quadLandscape(0)
 {
 	//_landscapeMaterial.setTextureFileName("landscape1.bmp");
     agentFocus = false;
@@ -59,6 +59,10 @@ Display3D::Display3D(QWidget *parent ) : QGLWidget(parent), _simulationRecord(0)
 
 Display3D::~Display3D()
 {
+	if(_quadLandscape)
+	{
+		delete _quadLandscape;
+	}
 }
 
 //Fixem el minim tamany que podrà tenir el quadre on mostrem el ràster.
@@ -119,14 +123,14 @@ void Display3D::initializeGL()
         _vrp._y = -size/2.0f;
         _vrp._z = 0;
 
-        cout << "Radi = " << radi << endl;
+		std::cout << "Radi = " << radi << std::endl;
         dist = 3*radi;
 
         //cout << "Angle cam = " << ((atan(height()/(2*((3*dist) - dist))))*180)/3.1415 << endl;
         anglecam = ((asin(radi/dist)*180)/3.1415)*2;
 
         //anglecam = (((atan(radi/dist)*180)/3.1415)*2);
-        cout << "Angle cam = " << anglecam << endl;
+        std::cout << "Angle cam = " << anglecam << std::endl;
         ra = (float)width()/(float)height();
         angleX = 0;
         angleY = 0;
@@ -218,9 +222,8 @@ void Display3D::initializeGL()
     Engine::Point2D<int> neighW(0,pot2/2);
 
 
-    quadLandscape = new Quadtree(central,NW,NE,SE,SW,neighN,neighS,neighE,neighW);
-
-    quadLandscape->initializeChilds(size);
+    _quadLandscape = new QuadTree(central,NW,NE,SE,SW,neighN,neighS,neighE,neighW);
+	_quadLandscape->initializeChilds(size);
     //quadLandscape->update(DEMRaster.getSize()._x/2);
 
 
@@ -392,11 +395,11 @@ void Display3D::paintLandscape()
 		if(rasterConfig->hasElevationRaster())
 		{
         	Engine::StaticRaster & elevationRaster(_simulationRecord->getRasterTmp(rasterConfig->getElevationRaster(), _viewedStep));
-        	quadLandscape->update(dist,pot2, rasterConfig->getColorRamp(), colorRaster,_simulationRecord->getSize(),elevationRaster, rasterConfig->getLOD(), off, rasterConfig->getElevationExaggeration());
+        	_quadLandscape->update(dist,pot2, rasterConfig->getColorRamp(), colorRaster,_simulationRecord->getSize(),elevationRaster, rasterConfig->getLOD(), off, rasterConfig->getElevationExaggeration(), rasterConfig->getCellResolution());
 		}
 		else
 		{
-        	quadLandscape->update(dist,pot2, rasterConfig->getColorRamp(), colorRaster,_simulationRecord->getSize(),_plane, rasterConfig->getLOD(), off, 1.0f);
+        	_quadLandscape->update(dist,pot2, rasterConfig->getColorRamp(), colorRaster,_simulationRecord->getSize(),_plane, rasterConfig->getLOD(), off, 1.0f, rasterConfig->getCellResolution());
 		}
         /*
         for(index._x=0; index._x<DEMRaster.getSize()._x-1; index._x++)
@@ -575,7 +578,7 @@ void Display3D::paintGL()
         ExtractFrustum();
         glPopMatrix();
 
-        quadLandscape->setFrustum(frustum);
+        _quadLandscape->setFrustum(frustum);
 
         paintLandscape();
 
@@ -647,14 +650,14 @@ void Display3D::keyPressEvent(QKeyEvent *event)
         _vrp._y = -size/2.0f;
         _vrp._z = 0;
 
-        cout << "Radi = " << radi << endl;
+		std::cout << "Radi = " << radi << std::endl;
         dist = 3*radi;
 
         //cout << "Angle cam = " << ((atan(height()/(2*((3*dist) - dist))))*180)/3.1415 << endl;
         anglecam = ((asin(radi/dist)*180)/3.1415)*2;
 
         //anglecam = (((atan(radi/dist)*180)/3.1415)*2);
-        cout << "Angle cam = " << anglecam << endl;
+		std::cout << "Angle cam = " << anglecam << std::endl;
         ra = (float)width()/(float)height();
         angleX = 0;
         angleY = 0;

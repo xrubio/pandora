@@ -9,60 +9,81 @@
 
 namespace GUI {
 
-Quadtree::Quadtree(Engine::Point2D<int> center, Engine::Point2D<int> NW, Engine::Point2D<int> NE, Engine::Point2D<int> SE, Engine::Point2D<int> SW, Engine::Point2D<int> neighN, Engine::Point2D<int> neighS, Engine::Point2D<int> neighE,Engine::Point2D<int> neighW)
+QuadTree::QuadTree(Engine::Point2D<int> center, Engine::Point2D<int> NW, Engine::Point2D<int> NE, Engine::Point2D<int> SE, Engine::Point2D<int> SW, Engine::Point2D<int> neighN, Engine::Point2D<int> neighS, Engine::Point2D<int> neighE,Engine::Point2D<int> neighW) : _childNW(0), _childNE(0), _childSE(0), _childSW(0)
 {
-    this->NW = NW;
-    this->NE = NE;
-    this->SE = SE;
-    this->SW = SW;
-    this->center = center;
-    this->neighN = neighN;
-    this->neighS = neighS;
-    this->neighE = neighE;
-    this->neighW = neighW;
+    _NW = NW;
+    _NE = NE;
+    _SE = SE;
+    _SW = SW;
+    _center = center;
+    _neighN = neighN;
+    _neighS = neighS;
+    _neighE = neighE;
+    _neighW = neighW;
 }
 
-Quadtree*  Quadtree::getChildNodeNW()
+QuadTree::~QuadTree()
 {
-    return this->childNW;
+	if(_childNW)
+	{
+		delete _childNW;
+	}
+	if(_childNE)
+	{
+		delete _childNE;
+	}	
+	if(_childSE)
+	{
+		delete _childSE;
+	}
+	if(_childSW)
+	{
+		delete _childSW;
+	}
 }
 
-Quadtree*  Quadtree::getChildNodeNE()
+/*
+QuadTree*  QuadTree::getChildNodeNW()
+{
+    return _childNW;
+}
+
+QuadTree*  QuadTree::getChildNodeNE()
 {
     return this->childNE;
 
 }
-Quadtree*  Quadtree::getChildNodeSE()
+QuadTree*  QuadTree::getChildNodeSE()
 {
     return this->childSE;
 
 }
-Quadtree*  Quadtree::getChildNodeSW()
+QuadTree*  QuadTree::getChildNodeSW()
 {
     return this->childSW;
 }
 
-Engine::Point2D<int>  Quadtree::getOuterPointNW()
+Engine::Point2D<int>  QuadTree::getOuterPointNW()
 {
     return this->NW;
 }
 
-Engine::Point2D<int>  Quadtree::getOuterPointNE()
+Engine::Point2D<int>  QuadTree::getOuterPointNE()
 {
     return this->NE;
 }
 
-Engine::Point2D<int>  Quadtree::getOuterPointSE()
+Engine::Point2D<int>  QuadTree::getOuterPointSE()
 {
     return this->SE;
 }
 
-Engine::Point2D<int>  Quadtree::getOuterPointSW()
+Engine::Point2D<int>  QuadTree::getOuterPointSW()
 {
     return this->SW;
 }
 
-void Quadtree::setChildNodes(Quadtree *NW, Quadtree *NE, Quadtree *SE, Quadtree *SW)
+void QuadTree::setChildNodes(QuadTree *NW, QuadTree *NE, QuadTree *SE, QuadTree *SW)
 {
     this->childNW = NW;
     this->childNE = NE;
@@ -71,7 +92,7 @@ void Quadtree::setChildNodes(Quadtree *NW, Quadtree *NE, Quadtree *SE, Quadtree 
 }
 
 
-void Quadtree::setOuterPoints(Engine::Point2D<int> NW, Engine::Point2D<int> NE, Engine::Point2D<int> SE, Engine::Point2D<int> SW)
+void QuadTree::setOuterPoints(Engine::Point2D<int> NW, Engine::Point2D<int> NE, Engine::Point2D<int> SE, Engine::Point2D<int> SW)
 {
     this->NW = NW;
     this->NE = NE;
@@ -80,14 +101,15 @@ void Quadtree::setOuterPoints(Engine::Point2D<int> NW, Engine::Point2D<int> NE, 
 }
 
 
-void Quadtree::setCenter(Engine::Point2D<int>  center)
+void QuadTree::setCenter(Engine::Point2D<int>  center)
 {
     this->center = center;
 
 }
+*/
 
 
-bool Quadtree::PolygonInFrustum(Engine::Point3D<int> a, Engine::Point3D<int> b, Engine::Point3D<int> c )
+bool QuadTree::PolygonInFrustum(Engine::Point3D<int> a, Engine::Point3D<int> b, Engine::Point3D<int> c )
 {
    int f, p;
 
@@ -104,7 +126,7 @@ bool Quadtree::PolygonInFrustum(Engine::Point3D<int> a, Engine::Point3D<int> b, 
    return true;
 }
 
-void Quadtree::setFrustum(float frust[6][4])
+void QuadTree::setFrustum(float frust[6][4])
 {
     for (int i = 0; i < 6; i++)
     {
@@ -116,7 +138,7 @@ void Quadtree::setFrustum(float frust[6][4])
 }
 
 //NETEJAR DEMRaster (NO NECESARI, es carreguen els valors de Z quan es pinta), guardar nomes 2 punts a larbre (X,Y)
-void Quadtree::initializeChilds( int size)
+void QuadTree::initializeChilds( int size)
 {
     int pot2 = powf(2,ceil(log2(size)));
     int prof = pot2/2;
@@ -127,22 +149,19 @@ void Quadtree::initializeChilds( int size)
     */
     prof = prof / 2;
 
-    this->childNW = initializeChild(Engine::Point2D<int>(this->center._x-prof,this->center._y-prof),prof,size);
-
-    this->childNE = initializeChild(Engine::Point2D<int>(this->center._x+prof,this->center._y-prof),prof,size);
-
-    this->childSE = initializeChild(Engine::Point2D<int>(this->center._x+prof,this->center._y+prof),prof,size);
-
-    this->childSW = initializeChild(Engine::Point2D<int>(this->center._x-prof,this->center._y+prof),prof,size);
+    _childNW = initializeChild(Engine::Point2D<int>(_center._x-prof,_center._y-prof),prof,size);
+    _childNE = initializeChild(Engine::Point2D<int>(_center._x+prof,_center._y-prof),prof,size);
+    _childSE = initializeChild(Engine::Point2D<int>(_center._x+prof,_center._y+prof),prof,size);
+    _childSW = initializeChild(Engine::Point2D<int>(_center._x-prof,_center._y+prof),prof,size);
 
 }
 
-Quadtree* Quadtree::initializeChild(Engine::Point2D<int> center, int prof, int size)
+QuadTree* QuadTree::initializeChild(Engine::Point2D<int> center, int prof, int size)
 {
     if (prof >= 1)
     {
         //Engine::Point2D<int> NW, NE, SE, SW, neighN, neighS, neighE, neighW;
-        Quadtree *child;
+        QuadTree *child;
 
         Engine::Point2D<int> NW(center._x-prof,center._y-prof);
         Engine::Point2D<int> NE(center._x+prof,center._y-prof);
@@ -154,13 +173,13 @@ Quadtree* Quadtree::initializeChild(Engine::Point2D<int> center, int prof, int s
         Engine::Point2D<int> neighE(center._x+prof,center._y);
         Engine::Point2D<int> neighW(center._x-prof,center._y);
 
-        child = new Quadtree(center,NW,NE,SE,SW,neighN,neighS,neighE,neighW);
+        child = new QuadTree(center,NW,NE,SE,SW,neighN,neighS,neighE,neighW);
         prof=prof/2;
 
-        child->childNW = initializeChild(Engine::Point2D<int>(center._x-prof,center._y-prof),prof,size);
-        child->childNE = initializeChild(Engine::Point2D<int>(center._x+prof,center._y-prof),prof,size);
-        child->childSE = initializeChild(Engine::Point2D<int>(center._x+prof,center._y+prof),prof,size);
-        child->childSW = initializeChild(Engine::Point2D<int>(center._x-prof,center._y+prof),prof,size);
+        child->_childNW = initializeChild(Engine::Point2D<int>(center._x-prof,center._y-prof),prof,size);
+        child->_childNE = initializeChild(Engine::Point2D<int>(center._x+prof,center._y-prof),prof,size);
+        child->_childSE = initializeChild(Engine::Point2D<int>(center._x+prof,center._y+prof),prof,size);
+        child->_childSW = initializeChild(Engine::Point2D<int>(center._x-prof,center._y+prof),prof,size);
 
         return child;
     }
@@ -168,854 +187,170 @@ Quadtree* Quadtree::initializeChild(Engine::Point2D<int> center, int prof, int s
 
 }
 
-int Quadtree::update(double dist, int prof, ColorSelector &colorSelector, Engine::StaticRaster & colorRaster, int size, Engine::StaticRaster & DEMRaster, int LOD, int offset, float exaggeration)
+void QuadTree::paintTriangle( const Engine::Point2D<int> & point1, const Engine::Point2D<int> & point2, int size, const Engine::StaticRaster & DEMRaster, float exaggeration, const Engine::StaticRaster & colorRaster, ColorSelector & colorSelector, int offset )
 {
-    //si la distancia(camara-punt(anglecam))/profunditat_arbre < Constant -> habilita punt
-    //cout << "Relacio " << (abs(dist-this->center._z))/prof << endl;
-    //MIRAR POSICIO CAMARA, NO DIST!!!
-
-    float camara1[16];
-    glGetFloatv(GL_MODELVIEW_MATRIX,camara1);
-    //cout << camara1[12] << " " << camara1[13] << " " <<camara1[14] << endl;
-
-    /*Engine::Point3D<float> camara(camara1[0]*camara1[12]+camara1[4]*camara1[13]+camara1[8]*camara1[14],
-                                  camara1[1]*camara1[12]+camara1[5]*camara1[13]+camara1[9]*camara1[14],
-                                  camara1[2]*camara1[12]+camara1[6]*camara1[13]+camara1[10]*camara1[14]);*/
-
-    Engine::Point3D<float> camara(0,0,0);
-
-
-    float px, py, pz;
-
-    if (center._x < DEMRaster.getSize()._x && center._y < DEMRaster.getSize()._y) {
-        px = camara1[0] * center._x + -camara1[4] * center._y + camara1[8] * DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y)) +camara1[12];
-        py = camara1[1] * center._x + -camara1[5] * center._y + camara1[9] * DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y)) +camara1[13];
-        pz = camara1[2] * center._x + -camara1[6] * center._y + camara1[10]* DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y)) +camara1[14];
-    }
-    /*else {
-        px = camara1[0] * center._x + -camara1[4] * center._y + camara1[8]  +camara1[12];
-        py = camara1[1] * center._x + -camara1[5] * center._y + camara1[9]  +camara1[13];
-        pz = camara1[2] * center._x + -camara1[6] * center._y + camara1[10] +camara1[14];
-    }*/
-
-    Engine::Point3D<float> punt(px,py,pz);
-
-    //cout << camara.distance(punt)/prof << " " << prof << endl;
-
-    if (abs(camara.distance(punt))/prof < LOD and this->childNW != 0)
-    {
-        int profNW = prof;
-        int aux;
-        if (this->childNW != 0)
-        {
-            aux = this->childNW->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset,exaggeration);
-            if (aux < prof) profNW = aux;
-        }
-
-        int profNE = prof;
-        if (childNE != 0)
-        {
-            aux = this->childNE->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset,exaggeration);
-            if (aux < prof) profNE = aux;
-        }
-
-        int profSE = prof;
-        if (childSE != 0)
-        {
-            aux = this->childSE->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset,exaggeration);
-            if (aux < prof) profSE = aux;
-        }
-
-        int profSW = prof;
-        if (childSW != 0)
-        {
-            aux = this->childSW->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset,exaggeration);
-            if (aux < prof) profSW = aux;
-        }
-/*
-        float color;
-        //CRACKS
-        if (profNW < profNE and childNW != 0 and childNE != 0)
-        {
-            //NW(NE,E),NE(center)
-            glBegin(GL_TRIANGLES);
-            color = colorRaster.getValue(Engine::Point2D<int>(childNE->center._x,childNE->center._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childNE->center._x/size, childNE->center._y/size);
-           glVertex3f(childNE->center._x,-childNE->center._y,DEMRaster.getValue(Engine::Point2D<int>(childNE->center._x,childNE->center._y))*scale._z+offset);
-            //glVertex3f(center._x,-center._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childNW->NE._x,childNW->NE._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childNW->NE._x/size, childNW->NE._y/size);
-            glVertex3f(childNW->NE._x,-childNW->NE._y,DEMRaster.getValue(Engine::Point2D<int>(childNW->NE._x,childNW->NE._y))*scale._z+offset);
-           //glVertex3f(neighW._x,-neighW._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childNW->neighE._x,childNW->neighE._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childNW->neighE._x/size, childNW->neighE._y/size);
-            glVertex3f(childNW->neighE._x,-childNW->neighE._y,DEMRaster.getValue(Engine::Point2D<int>(childNW->neighE._x,childNW->neighE._y))*scale._z+offset);
-           //glVertex3f(NW._x,-NW._y,1);
-            glEnd();
-
-            //NW(E,SE),NE(center)
-            glBegin(GL_TRIANGLES);
-            color = colorRaster.getValue(Engine::Point2D<int>(childNE->center._x,childNE->center._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childNE->center._x/size, childNE->center._y/size);
-           glVertex3f(childNE->center._x,-childNE->center._y,DEMRaster.getValue(Engine::Point2D<int>(childNE->center._x,childNE->center._y))*scale._z+offset);
-            //glVertex3f(center._x,-center._y,1);
-
-           color = colorRaster.getValue(Engine::Point2D<int>(childNW->neighE._x,childNW->neighE._y));
-           setCellColor(colorSelector.getColor(color));
-           glTexCoord2f(childNW->neighE._x/size, childNW->neighE._y/size);
-           glVertex3f(childNW->neighE._x,-childNW->neighE._y,DEMRaster.getValue(Engine::Point2D<int>(childNW->neighE._x,childNW->neighE._y))*scale._z+offset);
-          //glVertex3f(NW._x,-NW._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childNW->SE._x,childNW->SE._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childNW->SE._x/size, childNW->SE._y/size);
-            glVertex3f(childNW->SE._x,-childNW->SE._y,DEMRaster.getValue(Engine::Point2D<int>(childNW->SE._x,childNW->SE._y))*scale._z+offset);
-           //glVertex3f(neighW._x,-neighW._y,1);
-            glEnd();
-        }
-
-        if (profNW < profSW and childNW != 0 and childSW != 0)
-        {
-            //NW(SE,S),SW(center)
-            glBegin(GL_TRIANGLES);
-            color = colorRaster.getValue(Engine::Point2D<int>(childSW->center._x,childSW->center._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childSW->center._x/size, childSW->center._y/size);
-           glVertex3f(childSW->center._x,-childSW->center._y,DEMRaster.getValue(Engine::Point2D<int>(childSW->center._x,childSW->center._y))*scale._z+offset);
-            //glVertex3f(center._x,-center._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childNW->SE._x,childNW->SE._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childNW->SE._x/size, childNW->SE._y/size);
-            glVertex3f(childNW->SE._x,-childNW->SE._y,DEMRaster.getValue(Engine::Point2D<int>(childNW->SE._x,childNW->SE._y))*scale._z+offset);
-           //glVertex3f(neighW._x,-neighW._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childNW->neighS._x,childNW->neighS._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childNW->neighS._x/size, childNW->neighS._y/size);
-            glVertex3f(childNW->neighS._x,-childNW->neighS._y,DEMRaster.getValue(Engine::Point2D<int>(childNW->neighS._x,childNW->neighS._y))*scale._z+offset);
-           //glVertex3f(NW._x,-NW._y,1);
-            glEnd();
-
-            //NW(S,SW),SW(center)
-            glBegin(GL_TRIANGLES);
-            color = colorRaster.getValue(Engine::Point2D<int>(childSW->center._x,childSW->center._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childSW->center._x/size, childSW->center._y/size);
-           glVertex3f(childSW->center._x,-childSW->center._y,DEMRaster.getValue(Engine::Point2D<int>(childSW->center._x,childSW->center._y))*scale._z+offset);
-            //glVertex3f(center._x,-center._y,1);
-
-           color = colorRaster.getValue(Engine::Point2D<int>(childNW->neighS._x,childNW->neighS._y));
-           setCellColor(colorSelector.getColor(color));
-           glTexCoord2f(childNW->neighS._x/size, childNW->neighS._y/size);
-           glVertex3f(childNW->neighS._x,-childNW->neighS._y,DEMRaster.getValue(Engine::Point2D<int>(childNW->neighS._x,childNW->neighS._y))*scale._z+offset);
-          //glVertex3f(NW._x,-NW._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childNW->SW._x,childNW->SW._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childNW->SW._x/size, childNW->SW._y/size);
-            glVertex3f(childNW->SW._x,-childNW->SW._y,DEMRaster.getValue(Engine::Point2D<int>(childNW->SW._x,childNW->SW._y))*scale._z+offset);
-           //glVertex3f(neighW._x,-neighW._y,1);
-            glEnd();
-        }
-
-        if (profNE < profSE and childNE != 0 and childSE != 0)
-        {
-            //NE(SW,S),SE(center)
-            glBegin(GL_TRIANGLES);
-            color = colorRaster.getValue(Engine::Point2D<int>(childSE->center._x,childSE->center._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childSE->center._x/size, childSE->center._y/size);
-           glVertex3f(childSE->center._x,-childSE->center._y,DEMRaster.getValue(Engine::Point2D<int>(childSE->center._x,childSE->center._y))*scale._z+offset);
-            //glVertex3f(center._x,-center._y,1);
-
-           color = colorRaster.getValue(Engine::Point2D<int>(childNE->neighS._x,childNE->neighS._y));
-           setCellColor(colorSelector.getColor(color));
-           glTexCoord2f(childNE->neighS._x/size, childNE->neighS._y/size);
-           glVertex3f(childNE->neighS._x,-childNE->neighS._y,DEMRaster.getValue(Engine::Point2D<int>(childNE->neighS._x,childNE->neighS._y))*scale._z+offset);
-          //glVertex3f(NW._x,-NW._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childNE->SW._x,childNE->SW._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childNE->SW._x/size, childNE->SW._y/size);
-            glVertex3f(childNE->SW._x,-childNE->SW._y,DEMRaster.getValue(Engine::Point2D<int>(childNE->SW._x,childNE->SW._y))*scale._z+offset);
-           //glVertex3f(neighW._x,-neighW._y,1);
-            glEnd();
-
-            //NE(S,SE),SE(center)
-            glBegin(GL_TRIANGLES);
-            color = colorRaster.getValue(Engine::Point2D<int>(childSE->center._x,childSE->center._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childSE->center._x/size, childSE->center._y/size);
-           glVertex3f(childSE->center._x,-childSE->center._y,DEMRaster.getValue(Engine::Point2D<int>(childSE->center._x,childSE->center._y))*scale._z+offset);
-            //glVertex3f(center._x,-center._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childNE->SE._x,childNE->SE._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childNE->SE._x/size, childNE->SE._y/size);
-            glVertex3f(childNE->SE._x,-childNE->SE._y,DEMRaster.getValue(Engine::Point2D<int>(childNE->SE._x,childNE->SE._y))*scale._z+offset);
-           //glVertex3f(neighW._x,-neighW._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childNE->neighS._x,childNE->neighS._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childNE->neighS._x/size, childNE->neighS._y/size);
-            glVertex3f(childNE->neighS._x,-childNE->neighS._y,DEMRaster.getValue(Engine::Point2D<int>(childNE->neighS._x,childNE->neighS._y))*scale._z+offset);
-           //glVertex3f(NE._x,-NE._y,1);
-            glEnd();
-        }
-
-        if (profNE < profNW and childNE != 0 and childNW != 0)
-        {
-            //NE(W,NW),NW(center)
-            glBegin(GL_TRIANGLES);
-            color = colorRaster.getValue(Engine::Point2D<int>(childNW->center._x,childNW->center._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childNW->center._x/size, childNW->center._y/size);
-           glVertex3f(childNW->center._x,-childNW->center._y,DEMRaster.getValue(Engine::Point2D<int>(childNW->center._x,childNW->center._y))*scale._z+offset);
-            //glVertex3f(center._x,-center._y,1);
-
-           color = colorRaster.getValue(Engine::Point2D<int>(childNE->neighW._x,childNE->neighW._y));
-           setCellColor(colorSelector.getColor(color));
-           glTexCoord2f(childNE->neighW._x/size, childNE->neighW._y/size);
-           glVertex3f(childNE->neighW._x,-childNE->neighW._y,DEMRaster.getValue(Engine::Point2D<int>(childNE->neighW._x,childNE->neighW._y))*scale._z+offset);
-          //glVertex3f(NW._x,-NW._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childNE->NW._x,childNE->NW._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childNE->NW._x/size, childNE->NW._y/size);
-            glVertex3f(childNE->NW._x,-childNE->NW._y,DEMRaster.getValue(Engine::Point2D<int>(childNE->NW._x,childNE->NW._y))*scale._z+offset);
-           //glVertex3f(neighW._x,-neighW._y,1);
-            glEnd();
-
-            //NE(SW,W),NW(center)
-            glBegin(GL_TRIANGLES);
-            color = colorRaster.getValue(Engine::Point2D<int>(childNW->center._x,childNW->center._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childNW->center._x/size, childNW->center._y/size);
-           glVertex3f(childNW->center._x,-childNW->center._y,DEMRaster.getValue(Engine::Point2D<int>(childNW->center._x,childNW->center._y))*scale._z+offset);
-            //glVertex3f(center._x,-center._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childNE->SW._x,childNE->SW._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childNE->SW._x/size, childNE->SW._y/size);
-            glVertex3f(childNE->SW._x,-childNE->SW._y,DEMRaster.getValue(Engine::Point2D<int>(childNE->SW._x,childNE->SW._y))*scale._z+offset);
-           //glVertex3f(neighW._x,-neighW._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childNE->neighW._x,childNE->neighW._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childNE->neighW._x/size, childNE->neighW._y/size);
-            glVertex3f(childNE->neighW._x,-childNE->neighW._y,DEMRaster.getValue(Engine::Point2D<int>(childNE->neighW._x,childNE->neighW._y))*scale._z+offset);
-           //glVertex3f(NE._x,-NE._y,1);
-            glEnd();
-        }
-
-        if (profSE < profSW and childSE != 0 and childSW != 0)
-        {
-            //SE(W,NW),SW(center)
-            glBegin(GL_TRIANGLES);
-            color = colorRaster.getValue(Engine::Point2D<int>(childSW->center._x,childSW->center._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childSW->center._x/size, childSW->center._y/size);
-           glVertex3f(childSW->center._x,-childSW->center._y,DEMRaster.getValue(Engine::Point2D<int>(childSW->center._x,childSW->center._y))*scale._z+offset);
-            //glVertex3f(center._x,-center._y,1);
-
-           color = colorRaster.getValue(Engine::Point2D<int>(childSE->neighW._x,childSE->neighW._y));
-           setCellColor(colorSelector.getColor(color));
-           glTexCoord2f(childSE->neighW._x/size, childSE->neighW._y/size);
-           glVertex3f(childSE->neighW._x,-childSE->neighW._y,DEMRaster.getValue(Engine::Point2D<int>(childSE->neighW._x,childSE->neighW._y))*scale._z+offset);
-          //glVertex3f(NW._x,-NW._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childSE->NW._x,childSE->NW._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childSE->NW._x/size, childSE->NW._y/size);
-            glVertex3f(childSE->NW._x,-childSE->NW._y,DEMRaster.getValue(Engine::Point2D<int>(childSE->NW._x,childSE->NW._y))*scale._z+offset);
-           //glVertex3f(neighW._x,-neighW._y,1);
-            glEnd();
-
-            //SE(SW,W),SW(center)
-            glBegin(GL_TRIANGLES);
-            color = colorRaster.getValue(Engine::Point2D<int>(childSW->center._x,childSW->center._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childSW->center._x/size, childSW->center._y/size);
-           glVertex3f(childSW->center._x,-childSW->center._y,DEMRaster.getValue(Engine::Point2D<int>(childSW->center._x,childSW->center._y))*scale._z+offset);
-            //glVertex3f(center._x,-center._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childSE->SW._x,childSE->SW._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childSE->SW._x/size, childSE->SW._y/size);
-            glVertex3f(childSE->SW._x,-childSE->SW._y,DEMRaster.getValue(Engine::Point2D<int>(childSE->SW._x,childSE->SW._y))*scale._z+offset);
-           //glVertex3f(neighW._x,-neighW._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childSE->neighW._x,childSE->neighW._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childSE->neighW._x/size, childSE->neighW._y/size);
-            glVertex3f(childSE->neighW._x,-childSE->neighW._y,DEMRaster.getValue(Engine::Point2D<int>(childSE->neighW._x,childSE->neighW._y))*scale._z+offset);
-           //glVertex3f(NE._x,-NE._y,1);
-            glEnd();
-        }
-
-        if (profSE < profNE and childSE != 0 and childNE != 0)
-        {
-            //SE(N,NW),NE(center)
-            glBegin(GL_TRIANGLES);
-            color = colorRaster.getValue(Engine::Point2D<int>(childNE->center._x,childNE->center._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childNE->center._x/size, childNE->center._y/size);
-           glVertex3f(childNE->center._x,-childNE->center._y,DEMRaster.getValue(Engine::Point2D<int>(childNE->center._x,childNE->center._y))*scale._z+offset);
-            //glVertex3f(center._x,-center._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childSE->NW._x,childSE->NW._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childSE->NW._x/size, childSE->NW._y/size);
-            glVertex3f(childSE->NW._x,-childSE->NW._y,DEMRaster.getValue(Engine::Point2D<int>(childSE->NW._x,childSE->NW._y))*scale._z+offset);
-           //glVertex3f(neighW._x,-neighW._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childSE->neighN._x,childSE->neighN._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childSE->neighN._x/size, childSE->neighN._y/size);
-            glVertex3f(childSE->neighN._x,-childSE->neighN._y,DEMRaster.getValue(Engine::Point2D<int>(childSE->neighN._x,childSE->neighN._y))*scale._z+offset);
-           //glVertex3f(NW._x,-NW._y,1);
-            glEnd();
-
-            //SE(NE,N),NE(center)
-            glBegin(GL_TRIANGLES);
-            color = colorRaster.getValue(Engine::Point2D<int>(childNE->center._x,childNE->center._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childNE->center._x/size, childNE->center._y/size);
-           glVertex3f(childNE->center._x,-childNE->center._y,DEMRaster.getValue(Engine::Point2D<int>(childNE->center._x,childNE->center._y))*scale._z+offset);
-            //glVertex3f(center._x,-center._y,1);
-
-           color = colorRaster.getValue(Engine::Point2D<int>(childSE->neighN._x,childSE->neighN._y));
-           setCellColor(colorSelector.getColor(color));
-           glTexCoord2f(childSE->neighN._x/size, childSE->neighN._y/size);
-           glVertex3f(childSE->neighN._x,-childSE->neighN._y,DEMRaster.getValue(Engine::Point2D<int>(childSE->neighN._x,childSE->neighN._y))*scale._z+offset);
-          //glVertex3f(NE._x,-NE._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childSE->NE._x,childSE->NE._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childSE->NE._x/size, childSE->NE._y/size);
-            glVertex3f(childSE->NE._x,-childSE->NE._y,DEMRaster.getValue(Engine::Point2D<int>(childSE->NE._x,childSE->NE._y))*scale._z+offset);
-           //glVertex3f(neighW._x,-neighW._y,1);
-            glEnd();
-        }
-
-        if (profSW < profSE and childSW != 0 and childSE != 0)
-        {
-            //SW(E,NE),SE(center)
-            glBegin(GL_TRIANGLES);
-            color = colorRaster.getValue(Engine::Point2D<int>(childSE->center._x,childSE->center._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childSE->center._x/size, childSE->center._y/size);
-           glVertex3f(childSE->center._x,-childSE->center._y,DEMRaster.getValue(Engine::Point2D<int>(childSE->center._x,childSE->center._y))*scale._z+offset);
-            //glVertex3f(center._x,-center._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childSW->NE._x,childSW->NE._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childSW->NE._x/size, childSW->NE._y/size);
-            glVertex3f(childSW->NE._x,-childSW->NE._y,DEMRaster.getValue(Engine::Point2D<int>(childSW->NE._x,childSW->NE._y))*scale._z+offset);
-           //glVertex3f(neighW._x,-neighW._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childSW->neighE._x,childSW->neighE._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childSW->neighE._x/size, childSW->neighE._y/size);
-            glVertex3f(childSW->neighE._x,-childSW->neighE._y,DEMRaster.getValue(Engine::Point2D<int>(childSW->neighE._x,childSW->neighE._y))*scale._z+offset);
-           //glVertex3f(NW._x,-NW._y,1);
-            glEnd();
-
-            //SW(SE,E),SE(center)
-            glBegin(GL_TRIANGLES);
-            color = colorRaster.getValue(Engine::Point2D<int>(childSE->center._x,childSE->center._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childSE->center._x/size, childSE->center._y/size);
-           glVertex3f(childSE->center._x,-childSE->center._y,DEMRaster.getValue(Engine::Point2D<int>(childSE->center._x,childSE->center._y))*scale._z+offset);
-            //glVertex3f(center._x,-center._y,1);
-
-           color = colorRaster.getValue(Engine::Point2D<int>(childSW->neighE._x,childSW->neighE._y));
-           setCellColor(colorSelector.getColor(color));
-           glTexCoord2f(childSW->neighE._x/size, childSW->neighE._y/size);
-           glVertex3f(childSW->neighE._x,-childSW->neighE._y,DEMRaster.getValue(Engine::Point2D<int>(childSW->neighE._x,childSW->neighE._y))*scale._z+offset);
-          //glVertex3f(NE._x,-NE._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childSW->SE._x,childSW->SE._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childSW->SE._x/size, childSW->SE._y/size);
-            glVertex3f(childSW->SE._x,-childSW->SE._y,DEMRaster.getValue(Engine::Point2D<int>(childSW->SE._x,childSW->SE._y))*scale._z+offset);
-           //glVertex3f(SEighW._x,-SEighW._y,1);
-            glEnd();
-        }
-
-        if (profSW < profNW and childSW != 0 and childNW != 0)
-        {
-            //SW(N,NE),NW(center)
-            glBegin(GL_TRIANGLES);
-            color = colorRaster.getValue(Engine::Point2D<int>(childNW->center._x,childNW->center._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childNW->center._x/size, childNW->center._y/size);
-           glVertex3f(childNW->center._x,-childNW->center._y,DEMRaster.getValue(Engine::Point2D<int>(childNW->center._x,childNW->center._y))*scale._z+offset);
-            //glVertex3f(center._x,-center._y,1);
-
-           color = colorRaster.getValue(Engine::Point2D<int>(childSW->neighN._x,childSW->neighN._y));
-           setCellColor(colorSelector.getColor(color));
-           glTexCoord2f(childSW->neighN._x/size, childSW->neighN._y/size);
-           glVertex3f(childSW->neighN._x,-childSW->neighN._y,DEMRaster.getValue(Engine::Point2D<int>(childSW->neighN._x,childSW->neighN._y))*scale._z+offset);
-          //glVertex3f(NW._x,-NW._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childSW->NE._x,childSW->NE._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childSW->NE._x/size, childSW->NE._y/size);
-            glVertex3f(childSW->NE._x,-childSW->NE._y,DEMRaster.getValue(Engine::Point2D<int>(childSW->NE._x,childSW->NE._y))*scale._z+offset);
-           //glVertex3f(neighW._x,-neighW._y,1);
-            glEnd();
-
-            //SW(NW,N),NW(center)
-            glBegin(GL_TRIANGLES);
-            color = colorRaster.getValue(Engine::Point2D<int>(childNW->center._x,childNW->center._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childNW->center._x/size, childNW->center._y/size);
-           glVertex3f(childNW->center._x,-childNW->center._y,DEMRaster.getValue(Engine::Point2D<int>(childNW->center._x,childNW->center._y))*scale._z+offset);
-            //glVertex3f(center._x,-center._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childSW->NW._x,childSW->NW._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childSW->NW._x/size, childSW->NW._y/size);
-            glVertex3f(childSW->NW._x,-childSW->NW._y,DEMRaster.getValue(Engine::Point2D<int>(childSW->NW._x,childSW->NW._y))*scale._z+offset);
-           //glVertex3f(SEighW._x,-SEighW._y,1);
-
-            color = colorRaster.getValue(Engine::Point2D<int>(childSW->neighN._x,childSW->neighN._y));
-            setCellColor(colorSelector.getColor(color));
-            glTexCoord2f(childSW->neighN._x/size, childSW->neighN._y/size);
-            glVertex3f(childSW->neighN._x,-childSW->neighN._y,DEMRaster.getValue(Engine::Point2D<int>(childSW->neighN._x,childSW->neighN._y))*scale._z+offset);
-           //glVertex3f(NE._x,-NE._y,1);
-            glEnd();
-        }
-
-        int min = profNW;
-        if (profNE < min) min = profNE;
-        if (profSE < min) min = profSE;
-        if (profSW < min) min = profSW;
-        return min;
-        */
-
-    }
-    else
-    {
-        float color;
-
-
-        //glBegin(GL_LINES);
-            //C-W-NW
-            if (center._x < DEMRaster.getSize()._x && center._y < DEMRaster.getSize()._x) {
-
-            if (neighW._x < DEMRaster.getSize()._x && neighW._y < DEMRaster.getSize()._x && NW._x < DEMRaster.getSize()._x && NW._y < DEMRaster.getSize()._x
-                      && PolygonInFrustum(Engine::Point3D<int>(neighW._x,neighW._y,DEMRaster.getValue(Engine::Point2D<int>(neighW._x,neighW._y))), Engine::Point3D<int>(NW._x,NW._y,DEMRaster.getValue(Engine::Point2D<int>(NW._x,NW._y))), Engine::Point3D<int>(center._x,center._y,DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y)))))
-            {
-                glBegin(GL_TRIANGLES);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(center._x,center._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(center._x,center._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(center._x/size, center._y/size);
-                glVertex3f(center._x,-center._y,((DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))*exaggeration)+offset));
-                //glVertex3f(center._x,-center._y,1);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(NW._x,NW._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(NW._x,NW._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(NW._x/size, NW._y/size);
-                glVertex3f(NW._x,-NW._y,((DEMRaster.getValue(Engine::Point2D<int>(NW._x,NW._y))*exaggeration)+offset));
-               //glVertex3f(NW._x,-NW._y,1);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(neighW._x,neighW._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(neighW._x,neighW._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(neighW._x/size, neighW._y/size);
-                glVertex3f(neighW._x,-neighW._y,((DEMRaster.getValue(Engine::Point2D<int>(neighW._x,neighW._y))*exaggeration)+offset));
-               //glVertex3f(neighW._x,-neighW._y,1);
-                glEnd();
-            }
-
-            //C-NW-N
-            if (neighN._x < DEMRaster.getSize()._x && neighN._y < DEMRaster.getSize()._x && NW._x < DEMRaster.getSize()._x && NW._y < DEMRaster.getSize()._x
-                      && PolygonInFrustum(Engine::Point3D<int>(neighN._x,neighN._y,DEMRaster.getValue(Engine::Point2D<int>(neighN._x,neighN._y))), Engine::Point3D<int>(NW._x,NW._y,DEMRaster.getValue(Engine::Point2D<int>(NW._x,NW._y))), Engine::Point3D<int>(center._x,center._y,DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y)))))
-
-            {
-                glBegin(GL_TRIANGLES);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(center._x,center._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(center._x,center._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(center._x/size, center._y/size);
-                glVertex3f(center._x,-center._y,((DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))*exaggeration)+offset));
-               //glVertex3f(center._x,-center._y,1);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(neighN._x,neighN._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(neighN._x,neighN._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(neighN._x/size, neighN._y/size);
-                glVertex3f(neighN._x,-neighN._y,((DEMRaster.getValue(Engine::Point2D<int>(neighN._x,neighN._y))*exaggeration)+offset));
-               //glVertex3f(neighN._x,-neighN._y,1);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(NW._x,NW._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(NW._x,NW._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(NW._x/size, NW._y/size);
-                glVertex3f(NW._x,-NW._y,((DEMRaster.getValue(Engine::Point2D<int>(NW._x,NW._y))*exaggeration)+offset));
-               //glVertex3f(NW._x,-NW._y,1);
-                glEnd();
-            }
-
-            //C-N-NE
-            if (neighN._x < DEMRaster.getSize()._x && neighN._y < DEMRaster.getSize()._x && NE._x < DEMRaster.getSize()._x && NE._y < DEMRaster.getSize()._x
-                      && PolygonInFrustum(Engine::Point3D<int>(neighN._x,neighN._y,DEMRaster.getValue(Engine::Point2D<int>(neighN._x,neighN._y))),Engine::Point3D<int>(NE._x,NE._y,DEMRaster.getValue(Engine::Point2D<int>(NE._x,NE._y))),Engine::Point3D<int>(center._x,center._y,DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y)))))
-            {
-                glBegin(GL_TRIANGLES);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(center._x,center._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(center._x,center._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(center._x/size, center._y/size);
-                glVertex3f(center._x,-center._y,((DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))*exaggeration)+offset));
-               //glVertex3f(center._x,-center._y,1);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(NE._x,NE._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                } else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(NE._x,NE._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(NE._x/size, NE._y/size);
-                glVertex3f(NE._x,-NE._y,((DEMRaster.getValue(Engine::Point2D<int>(NE._x,NE._y))*exaggeration)+offset));
-               //glVertex3f(NE._x,-NE._y,1);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(neighN._x,neighN._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                } else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(neighN._x,neighN._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(neighN._x/size, neighN._y/size);
-                glVertex3f(neighN._x,-neighN._y,((DEMRaster.getValue(Engine::Point2D<int>(neighN._x,neighN._y))*exaggeration)+offset));
-               //glVertex3f(neighN._x,-neighN._y,1);
-                glEnd();
-            }
-
-            //C-NE-E
-            if (neighE._x < DEMRaster.getSize()._x && neighE._y < DEMRaster.getSize()._x && NE._x < DEMRaster.getSize()._x && NE._y < DEMRaster.getSize()._x
-                      && PolygonInFrustum(Engine::Point3D<int>(neighE._x,neighE._y,DEMRaster.getValue(Engine::Point2D<int>(neighE._x,neighE._y))),Engine::Point3D<int>(NE._x,NE._y,DEMRaster.getValue(Engine::Point2D<int>(NE._x,NE._y))),Engine::Point3D<int>(center._x,center._y,DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y)))))
-            {
-                glBegin(GL_TRIANGLES);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(center._x,center._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(center._x,center._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(center._x/size, center._y/size);
-                glVertex3f(center._x,-center._y,((DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))*exaggeration)+offset));
-               //glVertex3f(center._x,-center._y,1);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(neighE._x,neighE._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(neighE._x,neighE._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(neighE._x/size, neighE._y/size);
-                glVertex3f(neighE._x,-neighE._y,((DEMRaster.getValue(Engine::Point2D<int>(neighE._x,neighE._y))*exaggeration)+offset));
-               //glVertex3f(neighE._x,-neighE._y,1);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(NE._x,NE._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(NE._x,NE._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(NE._x/size, NE._y/size);
-                glVertex3f(NE._x,-NE._y,((DEMRaster.getValue(Engine::Point2D<int>(NE._x,NE._y))*exaggeration)+offset));
-               //glVertex3f(NE._x,-NE._y,1);
-                glEnd();
-            }
-
-            //C-E-SE
-            if (neighE._x < DEMRaster.getSize()._x && neighE._y < DEMRaster.getSize()._x && SE._x < DEMRaster.getSize()._x && SE._y < DEMRaster.getSize()._x
-                      && PolygonInFrustum(Engine::Point3D<int>(neighE._x,neighE._y,DEMRaster.getValue(Engine::Point2D<int>(neighE._x,neighE._y))),Engine::Point3D<int>(SE._x,SE._y,DEMRaster.getValue(Engine::Point2D<int>(SE._x,SE._y))),Engine::Point3D<int>(center._x,center._y,DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y)))))
-            {
-                glBegin(GL_TRIANGLES);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(center._x,center._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(center._x,center._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(center._x/size, center._y/size);
-                glVertex3f(center._x,-center._y,((DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))*exaggeration)+offset));
-               //glVertex3f(center._x,-center._y,1);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(SE._x,SE._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(SE._x,SE._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(SE._x/size, SE._y/size);
-                glVertex3f(SE._x,-SE._y,((DEMRaster.getValue(Engine::Point2D<int>(SE._x,SE._y))*exaggeration)+offset));
-               //glVertex3f(SE._x,-SE._y,1);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(neighE._x,neighE._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(neighE._x,neighE._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(neighE._x/size, neighE._y/size);
-                glVertex3f(neighE._x,-neighE._y,((DEMRaster.getValue(Engine::Point2D<int>(neighE._x,neighE._y))*exaggeration)+offset));
-               //glVertex3f(neighE._x,-neighE._y,1);
-                glEnd();
-            }
-
-            //C-SE-S
-            if (neighS._x < DEMRaster.getSize()._x && neighS._y < DEMRaster.getSize()._x && NE._x < DEMRaster.getSize()._x && NE._y < DEMRaster.getSize()._x
-                      && PolygonInFrustum(Engine::Point3D<int>(neighS._x,neighS._y,DEMRaster.getValue(Engine::Point2D<int>(neighS._x,neighS._y))),Engine::Point3D<int>(SE._x,SE._y,DEMRaster.getValue(Engine::Point2D<int>(SE._x,SE._y))),Engine::Point3D<int>(center._x,center._y,DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y)))))
-            {
-                glBegin(GL_TRIANGLES);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(center._x,center._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(center._x,center._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(center._x/size, center._y/size);
-                glVertex3f(center._x,-center._y,((DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))*exaggeration)+offset));
-               //glVertex3f(center._x,-center._y,1);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(neighS._x,neighS._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(neighS._x,neighS._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(neighS._x/size, neighS._y/size);
-                glVertex3f(neighS._x,-neighS._y,((DEMRaster.getValue(Engine::Point2D<int>(neighS._x,neighS._y))*exaggeration)+offset));
-               //glVertex3f(neighS._x,-neighS._y,1);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(SE._x,SE._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(SE._x,SE._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(SE._x/size, SE._y/size);
-                glVertex3f(SE._x,-SE._y,((DEMRaster.getValue(Engine::Point2D<int>(SE._x,SE._y))*exaggeration)+offset));
-               //glVertex3f(SE._x,-SE._y,1);
-                glEnd();
-            }
-
-            //C-S-SW
-            if (neighS._x < DEMRaster.getSize()._x && neighS._y < DEMRaster.getSize()._x && SW._x < DEMRaster.getSize()._x && SW._y < DEMRaster.getSize()._x
-                      && PolygonInFrustum(Engine::Point3D<int>(neighS._x,neighS._y,DEMRaster.getValue(Engine::Point2D<int>(neighS._x,neighS._y))),Engine::Point3D<int>(SW._x,SW._y,DEMRaster.getValue(Engine::Point2D<int>(SW._x,SW._y))),Engine::Point3D<int>(center._x,center._y,DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y)))))
-            {
-                glBegin(GL_TRIANGLES);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(center._x,center._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(center._x,center._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(center._x/size, center._y/size);
-                glVertex3f(center._x,-center._y,((DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))*exaggeration)+offset));
-               //glVertex3f(center._x,-center._y,1);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(SW._x,SW._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(SW._x,SW._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(SW._x/size, SW._y/size);
-                glVertex3f(SW._x,-SW._y,((DEMRaster.getValue(Engine::Point2D<int>(SW._x,SW._y))*exaggeration)+offset));
-               //glVertex3f(SW._x,-SW._y,1);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(neighS._x,neighS._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(neighS._x,neighS._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(neighS._x/size, neighS._y/size);
-                glVertex3f(neighS._x,-neighS._y,((DEMRaster.getValue(Engine::Point2D<int>(neighS._x,neighS._y))*exaggeration)+offset));
-               //glVertex3f(neighS._x,-neighS._y,1);
-                glEnd();
-            }
-
-            //C-SW-W
-            if (neighW._x < DEMRaster.getSize()._x && neighW._y < DEMRaster.getSize()._x && SW._x < DEMRaster.getSize()._x && SW._y < DEMRaster.getSize()._x
-                      && PolygonInFrustum(Engine::Point3D<int>(neighW._x,neighW._y,DEMRaster.getValue(Engine::Point2D<int>(neighW._x,neighW._y))),Engine::Point3D<int>(SW._x,SW._y,DEMRaster.getValue(Engine::Point2D<int>(SW._x,SW._y))),Engine::Point3D<int>(center._x,center._y,DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y)))))
-            {
-                glBegin(GL_TRIANGLES);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(center._x,center._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(center._x,center._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(center._x/size, center._y/size);
-                glVertex3f(center._x,-center._y,((DEMRaster.getValue(Engine::Point2D<int>(center._x,center._y))*exaggeration)+offset));
-               //glVertex3f(center._x,-center._y,1);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(neighW._x,neighW._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(neighW._x,neighW._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(neighW._x/size, neighW._y/size);
-                glVertex3f(neighW._x,-neighW._y,((DEMRaster.getValue(Engine::Point2D<int>(neighW._x,neighW._y))*exaggeration)+offset));
-               //glVertex3f(neighW._x,-neighW._y,1);
-
-                if(colorRaster.hasColorTable())
-                {
-                    Engine::ColorEntry color = colorRaster.getColorEntry(colorRaster.getValue(Engine::Point2D<int>(SW._x,SW._y)));
-                    setCellColor(QColor(color._r, color._g, color._b, color._alpha));
-                }
-                else {
-                    color = colorRaster.getValue(Engine::Point2D<int>(SW._x,SW._y));
-                    setCellColor(colorSelector.getColor(color));
-                }
-                glTexCoord2f(SW._x/size, SW._y/size);
-                glVertex3f(SW._x,-SW._y,((DEMRaster.getValue(Engine::Point2D<int>(SW._x,SW._y))*exaggeration)+offset));
-               //glVertex3f(SW._x,-SW._y,1);
-                glEnd();
-            }
-            //glEnd();
+	// size check
+	if(point1._x>=size || point1._y>=size)
+	{
+		return;
+	}
+	if(point2._x>=size || point2._y>=size)
+	{
+		return;
+	}
+
+	// frustrum check
+	Engine::Point3D<int> point3D1(point1._x, point1._y, DEMRaster.getValue(point1)*exaggeration);
+	Engine::Point3D<int> point3D2(point2._x, point2._y, DEMRaster.getValue(point2)*exaggeration);
+	Engine::Point3D<int> point3D3(_center._x, _center._y, DEMRaster.getValue(_center)*exaggeration);
+	if(!PolygonInFrustum(point3D1, point3D2, point3D3))
+	{
+		return;
+	}
+//	std::cout << "\tpainting triangle between: " << point1 << " -- " << point2 << " and centre: " << _center << std::endl;
+	glBegin(GL_TRIANGLES);
+	
+	float sizeF = (float)size;
+
+	setCellColor(colorRaster, colorSelector, point1);
+	glTexCoord2f((float)(point1._x)/sizeF, (float)(point1._y)/sizeF);
+	glVertex3f(point1._x,-point1._y,offset+((DEMRaster.getValue(point1)*exaggeration)));
+
+	setCellColor(colorRaster, colorSelector, _center);
+	glTexCoord2f((float)(_center._x)/sizeF, (float)(_center._y)/sizeF);
+	glVertex3f(_center._x,-_center._y,offset+((DEMRaster.getValue(_center)*exaggeration)));
+
+	setCellColor(colorRaster, colorSelector, point2);
+	glTexCoord2f((float)(point2._x)/sizeF, (float)(point2._y)/sizeF);
+	glVertex3f(point2._x,-point2._y,offset+((DEMRaster.getValue(point2)*exaggeration)));
+
+	glEnd();
+}
+
+int QuadTree::update(double dist, int prof, ColorSelector &colorSelector, Engine::StaticRaster & colorRaster, int size, Engine::StaticRaster & DEMRaster, int LOD, int offset, float exaggeration, float cellResolution)
+{
+//	float totalSize = size * cellResolution;
+	//si la distancia(camara-punt(anglecam))/profunditat_arbre < Constant -> habilita punt
+	//cout << "Relacio " << (abs(dist-this->center._z))/prof << endl;
+	//MIRAR POSICIO CAMARA, NO DIST!!!
+
+	float camara1[16];
+	glGetFloatv(GL_MODELVIEW_MATRIX,camara1);
+	//cout << camara1[12] << " " << camara1[13] << " " <<camara1[14] << endl;
+
+	/*Engine::Point3D<float> camara(camara1[0]*camara1[12]+camara1[4]*camara1[13]+camara1[8]*camara1[14],
+	camara1[1]*camara1[12]+camara1[5]*camara1[13]+camara1[9]*camara1[14],
+	camara1[2]*camara1[12]+camara1[6]*camara1[13]+camara1[10]*camara1[14]);*/
+		
+	Engine::Point3D<float> camara(0,0,0);
+	Engine::Point3D<float> punt(0.0f,0.0f,0.0f);
+
+	if(_center._x < size && _center._y < size )
+	{
+		punt._x = camara1[0] * _center._x + -camara1[4] * _center._y + camara1[8] * DEMRaster.getValue(_center)*exaggeration +camara1[12];
+		punt._y = camara1[1] * _center._x + -camara1[5] * _center._y + camara1[9] * DEMRaster.getValue(_center)*exaggeration +camara1[13];
+		punt._z = camara1[2] * _center._x + -camara1[6] * _center._y + camara1[10]* DEMRaster.getValue(_center)*exaggeration +camara1[14];
+	}
+	/*else {
+	px = camara1[0] * center._x + -camara1[4] * center._y + camara1[8]  +camara1[12];
+	py = camara1[1] * center._x + -camara1[5] * center._y + camara1[9]  +camara1[13];
+	pz = camara1[2] * center._x + -camara1[6] * center._y + camara1[10] +camara1[14];
+	}*/
+
+	if(abs(camara.distance(punt))/prof < LOD && _childNW)
+	{
+		int profNW = prof;
+		int aux;
+		if(_childNW != 0)
+		{
+			aux = _childNW->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset,exaggeration, cellResolution);
+			if (aux < prof)
+			{
+				profNW = aux;
+			}
+		}
+				
+		int profNE = prof;
+		if(_childNE != 0)
+		{
+			aux = _childNE->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset,exaggeration, cellResolution);
+			if(aux < prof)
+			{
+				profNE = aux;
+			}
+		}
+
+		int profSE = prof;
+		if(_childSE != 0)
+		{
+			aux = _childSE->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset,exaggeration, cellResolution);
+			if(aux < prof)
+			{
+				profSE = aux;
+			}
+		}
+
+		int profSW = prof;
+		if(_childSW != 0)
+		{
+			aux = _childSW->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset,exaggeration, cellResolution);
+			if(aux < prof)
+			{
+				profSW = aux;
+			}
+		}
+	}
+	else
+	{
+		if(_center._x < size && _center._y < size)
+		{
+			paintTriangle(_neighN, _NE, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset);
+			paintTriangle(_NE, _neighE, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset);
+			paintTriangle(_neighE, _SE, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset);
+			paintTriangle(_SE, _neighS, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset);
+
+			paintTriangle(_neighS, _SW, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset);
+			paintTriangle(_SW, _neighW, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset);
+			paintTriangle(_neighW, _NW, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset);
+			paintTriangle(_NW, _neighN, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset);
             return prof;
-
         }
     }
 
 }
 
-void Quadtree::setCellColor( const QColor & color )
+void QuadTree::setCellColor( const Engine::StaticRaster & raster, ColorSelector & colorSelector, const Engine::Point2D<int> & cell )
 {
+	QColor color;
+	if(raster.hasColorTable())
+	{
+		Engine::ColorEntry entry = raster.getColorEntry(raster.getValue(cell));
+		color = QColor(entry._r, entry._g, entry._b, entry._alpha);
+	}
+	else
+	{
+		color = colorSelector.getColor(raster.getValue(cell));
+	}
+    
+	float ambientColor[3];
+	float diffuseColor[3];
+	float specularColor[3];
 
-    float ambientColor[3];
-    float diffuseColor[3];
-    float specularColor[3];
+//	std::cout << "painting cell: " << cell << " with color: " << color.name().toStdString() << std::endl;
 
-    //QColor color(255,255,255,0);
-    //QColor color(rand()%255,rand()%255,rand()%255);
+	ambientColor[0] = color.redF();
+	ambientColor[1] = color.greenF();
+	ambientColor[2] = color.blueF();
 
-        ambientColor[0] = color.redF();
-        ambientColor[1] = color.greenF();
-        ambientColor[2] = color.blueF();
+	diffuseColor[0] = color.redF();
+	diffuseColor[1] = color.greenF();
+	diffuseColor[2] = color.blueF();
 
-        diffuseColor[0] = color.redF();
-        diffuseColor[1] = color.greenF();
-        diffuseColor[2] = color.blueF();
-
-        specularColor[0] = specularColor[1] = specularColor[2] = 1.0f;
-        glMaterialfv( GL_FRONT, GL_AMBIENT, ambientColor);
-        glMaterialfv( GL_FRONT, GL_DIFFUSE, diffuseColor);
-        glMaterialfv( GL_FRONT, GL_SPECULAR, specularColor);
+	specularColor[0] = specularColor[1] = specularColor[2] = 1.0f;
+	glMaterialfv( GL_FRONT, GL_AMBIENT, ambientColor);
+	glMaterialfv( GL_FRONT, GL_DIFFUSE, diffuseColor);
+	glMaterialfv( GL_FRONT, GL_SPECULAR, specularColor);
 }
 
+} // namespace GUI
 
-}
