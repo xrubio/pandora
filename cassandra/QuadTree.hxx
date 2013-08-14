@@ -1,17 +1,27 @@
 #ifndef __QuadTree_hxx__
 #define __QuadTree_hxx__
 
-#include <iostream>
+#include <Point2D.hxx>
 #include <Point3D.hxx>
-#include <SimulationRecord.hxx>
-#include <QColor>
-#include <ColorSelector.hxx>
+
+namespace Engine
+{
+	class StaticRaster;
+}
 
 namespace GUI
 {
 
+class RasterConfiguration;
+class ColorSelector;
+
 class QuadTree
 {  
+	int _size;	
+	
+	// center points [x,y,z]
+	Engine::Point2D<int> _center;
+
 	// child nodes
     QuadTree * _childNW;
 	QuadTree * _childNE;
@@ -30,22 +40,24 @@ class QuadTree
 	Engine::Point2D<int> _SE;
 	Engine::Point2D<int> _SW;
 
-	// center points [x,y,z]
-	Engine::Point2D<int> _center;
 
-	void paintTriangle( const Engine::Point2D<int> & point1, const Engine::Point2D<int> & point2, int size, const Engine::StaticRaster & DEMRaster, float exaggeration, const Engine::StaticRaster & colorRaster, ColorSelector & colorSelector, int offset, bool randomColor);
+	void paintTriangle( const Engine::Point2D<int> & point1, const Engine::Point2D<int> & point2, const Engine::StaticRaster & DEMRaster, float exaggeration, const Engine::StaticRaster & colorRaster, ColorSelector & colorSelector, bool randomColor);
+
 public:
-    QuadTree(Engine::Point2D<int> center, Engine::Point2D<int> NW, Engine::Point2D<int> NE, Engine::Point2D<int> SE, Engine::Point2D<int> SW,Engine::Point2D<int> neighN, Engine::Point2D<int> neighS, Engine::Point2D<int> neighE,Engine::Point2D<int> neighW);
+	// initial QuadTree 
+	QuadTree(int size = 0);
+	// child QuadTree
+	QuadTree(int size, const Engine::Point2D<int> & center, int prof);
 	virtual ~QuadTree();
 
     float frustum[6][4];
 
-    void initializeChilds(int size);
-    QuadTree* initializeChild(int depth, Engine::Point2D<int> center, int prof, int size);
+    void initializeChilds();
+    QuadTree* initializeChild(int depth, Engine::Point2D<int> center, int prof);
 
     void setCellColor(const Engine::StaticRaster & raster, ColorSelector & colorSelector, const Engine::Point2D<int> & cell, bool randomColor );
-	void update(double anglecam, int prof, ColorSelector &colorSelector, Engine::StaticRaster &colorRaster, int size, Engine::StaticRaster & DEMRaster, int LOD, int offset, float exaggeration, float cellResolution, bool randomColor); //recorrer l'arbre i segons la distancia activar o desactivar nodes (childs) i afegirlos a points/polys
-    bool PolygonInFrustum(Engine::Point3D<int> a, Engine::Point3D<int> b, Engine::Point3D<int> c );
+	void update(int prof, RasterConfiguration & rasterConfig, Engine::StaticRaster &colorRaster, Engine::StaticRaster & DEMRaster, bool randomColor); //recorrer l'arbre i segons la distancia activar o desactivar nodes (childs) i afegirlos a points/polys
+    bool polygonInFrustum(Engine::Point3D<int> a, Engine::Point3D<int> b, Engine::Point3D<int> c );
     void setFrustum(float frust[6][4]);
 	
 };

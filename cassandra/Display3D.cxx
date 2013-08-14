@@ -35,13 +35,13 @@
 #include <AgentConfiguration.hxx>
 #include <RasterConfiguration.hxx>
 #include <ColorSelector.hxx>
-#include <StaticRaster.hxx>
 #include <ProjectConfiguration.hxx>
 #include <algorithm>
 #include <glut.h>
 #include <QDebug>
 #include <QTime>
 #include <AgentRecord.hxx>
+#include <QuadTree.hxx>
 
 namespace GUI
 {
@@ -76,13 +76,11 @@ QSize Display3D::sizeHint() const
 //Métode per inicialitzar les propietats de color, brillantor, llum, etc. de la figura en 3D.
 void Display3D::initializeGL()
 {
-	//MOD
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);   //netejar vista
 	// squared landscapes by now
 	float size = _simulationRecord->getSize();
 
 	float puntMig = sqrt(size*size+size*size);
-	_offset = size/5.0f;
 	radi = (puntMig)/2.f; //mida escenari/2
 	_vrp._x = size/2.0f;
 	_vrp._y = -size/2.0f;
@@ -98,7 +96,6 @@ void Display3D::initializeGL()
 	posterior = radi*3 + anterior;
 	focus();
 
-	//FI MOD
 	GLfloat materialSpecular[] = {1.0f, 1.0f, 1.0f, 1.0f};
 	GLfloat materialShininess[] = {100.0f};
 
@@ -136,22 +133,12 @@ void Display3D::initializeGL()
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-		//Potencia de 2 superior a l'area
-	int pot2 = powf(2,ceil(log2(size)));
-	Engine::Point2D<int> central(pot2/2, pot2/2);
-
-	Engine::Point2D<int> NW(0,0);
-	Engine::Point2D<int> NE(pot2-1, 0);
-	Engine::Point2D<int> SE(pot2-1, pot2-1);
-	Engine::Point2D<int> SW(0, pot2-1);
-
-	Engine::Point2D<int> neighN(pot2/2,0);
-	Engine::Point2D<int> neighS(pot2/2,pot2-1);
-	Engine::Point2D<int> neighE(pot2-1,pot2/2);
-	Engine::Point2D<int> neighW(0,pot2/2);
-
-	_quadLandscape = new QuadTree(central,NW,NE,SE,SW,neighN,neighS,neighE,neighW);
-	_quadLandscape->initializeChilds(size);
+	if(_quadLandscape)
+	{
+		delete _quadLandscape;
+	}
+	_quadLandscape = new QuadTree(_simulationRecord->getSize()); //, central,NW,NE,SE,SW,neighN,neighS,neighE,neighW);
+	_quadLandscape->initializeChilds();
 }
 
 void Display3D::extractFrustum()
@@ -261,16 +248,7 @@ void Display3D::focus()
 void Display3D::paintLandscape()
 {
 	Engine::Point2D<int> index;
-    int numRasters = _orderedRasters.size();
-    int off;
-    if (numRasters == 1)
-	{
-		off = 0;
-	}
-    else
-	{
-		off = (numRasters/2)*_offset;
-	}
+
     std::list<std::string>::const_iterator it =_orderedRasters.end();
     while(it!=_orderedRasters.begin())
     {
@@ -287,17 +265,15 @@ void Display3D::paintLandscape()
 		if(rasterConfig->hasElevationRaster())
 		{
         	Engine::StaticRaster & elevationRaster(_simulationRecord->getRasterTmp(rasterConfig->getElevationRaster(), _viewedStep));
-        	_quadLandscape->update(dist,pot2, rasterConfig->getColorRamp(), colorRaster,_simulationRecord->getSize(),elevationRaster, rasterConfig->getLOD(), off, rasterConfig->getElevationExaggeration(), rasterConfig->getCellResolution(), _randomColor);
+        	_quadLandscape->update(pot2, *rasterConfig, colorRaster, elevationRaster, _randomColor);
 		}
 		else
 		{
-        	_quadLandscape->update(dist,pot2, rasterConfig->getColorRamp(), colorRaster,_simulationRecord->getSize(),_plane, rasterConfig->getLOD(), off, 1.0f, rasterConfig->getCellResolution(), _randomColor);
+        	_quadLandscape->update(pot2, *rasterConfig, colorRaster,_plane, _randomColor);
 		}
 
         _landscapeMaterial.deactivate();
         glPopMatrix();
-
-        off = off - _offset;
     }
 }
 

@@ -28,10 +28,8 @@
 
 #include <QGLWidget>
 #include <Point3D.hxx>
-#include "QuadTree.hxx"
 #include <QTime>
-
-
+#include <StaticRaster.hxx>
 
 class QListWidgetItem;
 
@@ -43,10 +41,12 @@ namespace Engine
 
 namespace GUI
 {
+
 class Model3D;
 class AgentConfiguration;
 class RasterConfiguration;
-      
+class QuadTree;
+
 enum InteractiveAction
 {
 	eNone,
@@ -157,7 +157,6 @@ private:
 	Engine::AgentRecord * _agentFocus;
     float frustum[6][4];
 
-    int _offset;
 	bool _randomColor;
 
 };

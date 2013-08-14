@@ -104,7 +104,7 @@
         <x>10</x>
         <y>10</y>
         <width>321</width>
-        <height>92</height>
+        <height>96</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -282,7 +282,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="xOffset"/>
+        <widget class="QDoubleSpinBox" name="xOffset">
+         <property name="minimum">
+          <double>-100.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>100.000000000000000</double>
+         </property>
+        </widget>
        </item>
        <item>
         <spacer name="horizontalSpacer_3">
@@ -305,7 +312,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="yOffset"/>
+        <widget class="QDoubleSpinBox" name="yOffset">
+         <property name="minimum">
+          <double>-100.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>100.000000000000000</double>
+         </property>
+        </widget>
        </item>
        <item>
         <spacer name="horizontalSpacer_5">
@@ -328,7 +342,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QDoubleSpinBox" name="zOffset"/>
+        <widget class="QDoubleSpinBox" name="zOffset">
+         <property name="minimum">
+          <double>-100.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>100.000000000000000</double>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
