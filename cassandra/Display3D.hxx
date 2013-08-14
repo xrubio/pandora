@@ -45,6 +45,15 @@ namespace GUI
 class Model3D;
 class AgentConfiguration;
 class RasterConfiguration;
+      
+enum InteractiveAction
+{
+	eNone,
+	eRotate,
+	eZoom,
+	ePan,
+	eMove	
+};
 
 class Display3D : public QGLWidget
 {
@@ -54,59 +63,66 @@ class Display3D : public QGLWidget
 	typedef std::map<std::string, std::string > FileNamesMap;
 	typedef std::map<std::string, AgentConfiguration *> AgentsConfigurationMap;
 	typedef std::map<std::string, RasterConfiguration *> RastersConfigurationMap;
+
 public:
 	Display3D(QWidget *parent);
 	virtual ~Display3D();
-	//Funcions que definiràn el tamany del quadre on mostrarem el raster.
+
+	// size of widget
 	QSize minimumSizeHint() const;
 	QSize sizeHint() const;
 	void setSimulationRecord( Engine::SimulationRecord * simulationRecord );
 
-    bool agentFocus;
-    int agentX, agentY;
-    float frustum[6][4];
+	// if this setter is used the Display3D will follow this position
+	void setAgentFocus( const Engine::Point2D<int> & agentFocus );
 
-    int _offset;
-// 	
-//Declarem els SLOTS públics que seràn les funcions que rebràn un 
-//paràmetre que serà l'angle amb el que rotarem el nostre ràster
 public slots:
 	void viewedStepChangedSlot( int newViewedStep );
 	void rastersRearranged( std::list<std::string> items, std::list<bool> views );
 	
-//Declarem les variables i métodes que farem servir dins la nostra 
-//clase. 
-protected:
+private:
+
+	// OpenGL basic related functions
 	//TODO Zoom y moviments amb el mouse
 	void initializeGL();
 	void paintGL();
 	void resizeGL(int w, int h);
-	void wheelEvent(QWheelEvent * event);
+
+	// interaction
+	InteractiveAction _interactiveAction;
+	QPoint _clickedPos;
+
 	void mousePressEvent(QMouseEvent *event);
-    void keyPressEvent(QKeyEvent *event);
+
+	// modifies camera point of view based on mouse actions
 	void mouseMoveEvent(QMouseEvent *event);
+	void move( const QPoint & eventPos );
+	void pan( const QPoint & eventPos );
+	void rotate( const QPoint & eventPos );
+
     void mouseReleaseEvent (QMouseEvent *e);
+	void wheelEvent(QWheelEvent * event);
+    void keyPressEvent(QKeyEvent *event);
+
+	// drawing methods
 	void paintLandscape();
 	void paintAgents();
-
-    void ExtractFrustum();
-
-	void registerModel( const std::string & key, AgentConfiguration & agentConfig, const RastersConfigurationMap & rastersConfig );
+	void extractFrustum();
 	void setCellColor( const QColor & color );
+    
+	// selection of agent
+	void focus();
 
-        void focus();
+	Engine::Point3D<float> _angle;
+	double dist, anterior, posterior, radi, anglecam, ra;
+	// point of view of observer
+	Engine::Point3D<float> _vrp;
 
-        double dist, anterior, posterior, radi, angleX, angleY, angleZ, anglecam, ra;
-		Engine::Point3D<float> _vrp; //Punt on mira l'observador
-        typedef  enum {NONE, ROTATE, ZOOM, PAN, MOV} InteractiveAction;
-        InteractiveAction DoingInteractive;
-        int   xClick, yClick;
+	// helper raster used when no elevation raster is defined
+	Engine::StaticRaster _plane;
 
-
-		Engine::StaticRaster _plane;
 
 private:
-	void normalizeAngle(int &angle);
 	Engine::SimulationRecord * _simulationRecord;
 	int _viewedStep;
 	Models3DMap _models;
@@ -133,11 +149,15 @@ private:
 
     QuadTree * _quadLandscape;
 
-    int m_frameCount;
-    QTime *m_time;
+    QTime _time;
 
 	// cleans all the display options
 	void resetView();
+	Engine::Point2D<int> _agentFocus;
+    float frustum[6][4];
+
+    int _offset;
+	bool _randomColor;
 
 };
 

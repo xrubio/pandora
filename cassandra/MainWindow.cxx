@@ -586,7 +586,10 @@ void MainWindow::show3Dagent(QTreeWidgetItem * item, int i)
         while(it != agentsSelected.end())
         {
             agentAux = *it;
-            if (agentAux->getId() == item->parent()->text(0).toStdString()) agentSelected = agentAux;
+            if (agentAux->getId() == item->parent()->text(0).toStdString())
+			{
+				agentSelected = agentAux;
+			}
             it++;
         }
 
@@ -597,12 +600,8 @@ void MainWindow::show3Dagent(QTreeWidgetItem * item, int i)
 
         displayAgent->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
         displayAgent->rastersRearranged(_rasterSelection->getRasterList(), _rasterSelection->getRasterView());
-        displayAgent->agentFocus = true;
-        displayAgent->agentX = agentSelected->getState(_viewedStep/_simulationRecord->getFinalResolution(), "x");
-        displayAgent->agentY = agentSelected->getState(_viewedStep/_simulationRecord->getFinalResolution(), "y");;
+        displayAgent->setAgentFocus( Engine::Point2D<int>(agentSelected->getState(_viewedStep/_simulationRecord->getFinalResolution(), "x"), agentSelected->getState(_viewedStep/_simulationRecord->getFinalResolution(), "y")));
         displayAgent->show();
-
-
     }
 }
 

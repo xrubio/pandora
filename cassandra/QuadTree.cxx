@@ -42,73 +42,6 @@ QuadTree::~QuadTree()
 	}
 }
 
-/*
-QuadTree*  QuadTree::getChildNodeNW()
-{
-    return _childNW;
-}
-
-QuadTree*  QuadTree::getChildNodeNE()
-{
-    return this->childNE;
-
-}
-QuadTree*  QuadTree::getChildNodeSE()
-{
-    return this->childSE;
-
-}
-QuadTree*  QuadTree::getChildNodeSW()
-{
-    return this->childSW;
-}
-
-Engine::Point2D<int>  QuadTree::getOuterPointNW()
-{
-    return this->NW;
-}
-
-Engine::Point2D<int>  QuadTree::getOuterPointNE()
-{
-    return this->NE;
-}
-
-Engine::Point2D<int>  QuadTree::getOuterPointSE()
-{
-    return this->SE;
-}
-
-Engine::Point2D<int>  QuadTree::getOuterPointSW()
-{
-    return this->SW;
-}
-
-void QuadTree::setChildNodes(QuadTree *NW, QuadTree *NE, QuadTree *SE, QuadTree *SW)
-{
-    this->childNW = NW;
-    this->childNE = NE;
-    this->childSE = SE;
-    this->childSW = SW;
-}
-
-
-void QuadTree::setOuterPoints(Engine::Point2D<int> NW, Engine::Point2D<int> NE, Engine::Point2D<int> SE, Engine::Point2D<int> SW)
-{
-    this->NW = NW;
-    this->NE = NE;
-    this->SE = SE;
-    this->SW = SW;
-}
-
-
-void QuadTree::setCenter(Engine::Point2D<int>  center)
-{
-    this->center = center;
-
-}
-*/
-
-
 bool QuadTree::PolygonInFrustum(Engine::Point3D<int> a, Engine::Point3D<int> b, Engine::Point3D<int> c )
 {
    int f, p;
@@ -137,57 +70,78 @@ void QuadTree::setFrustum(float frust[6][4])
     }
 }
 
-//NETEJAR DEMRaster (NO NECESARI, es carreguen els valors de Z quan es pinta), guardar nomes 2 punts a larbre (X,Y)
 void QuadTree::initializeChilds( int size)
 {
     int pot2 = powf(2,ceil(log2(size)));
     int prof = pot2/2;
-    /*this->childNW = initializeChild(Engine::Point3D<int>(this->center._x/2,this->center._y/2,DEMRaster.getValue(Engine::Point2D<int>(this->center._x/2,this->center._y/2))),prof/2,DEMRaster);
-    this->childNE = initializeChild(Engine::Point3D<int>(this->center._x+(this->center._x/2),this->center._y/2,DEMRaster.getValue(Engine::Point2D<int>(this->center._x+(this->center._x/2),this->center._y/2))),prof/2,DEMRaster);
-    this->childSE = initializeChild(Engine::Point3D<int>(this->center._x+(this->center._x/2),this->center._y+(this->center._y/2),DEMRaster.getValue(Engine::Point2D<int>(this->center._x+(this->center._x/2),this->center._y+(this->center._y/2)))),prof/2,DEMRaster);
-    this->childSW = initializeChild(Engine::Point3D<int>(this->center._x/2,this->center._y+(this->center._y/2),DEMRaster.getValue(Engine::Point2D<int>(this->center._x/2,this->center._y+(this->center._y/2)))),prof/2,DEMRaster);
-    */
     prof = prof / 2;
 
-    _childNW = initializeChild(Engine::Point2D<int>(_center._x-prof,_center._y-prof),prof,size);
-    _childNE = initializeChild(Engine::Point2D<int>(_center._x+prof,_center._y-prof),prof,size);
-    _childSE = initializeChild(Engine::Point2D<int>(_center._x+prof,_center._y+prof),prof,size);
-    _childSW = initializeChild(Engine::Point2D<int>(_center._x-prof,_center._y+prof),prof,size);
-
+    _childNW = initializeChild(1, Engine::Point2D<int>( _center._x-prof,_center._y-prof),prof,size);
+    _childNE = initializeChild(1, Engine::Point2D<int>( _center._x+prof,_center._y-prof),prof,size);
+    _childSE = initializeChild(1, Engine::Point2D<int>( _center._x+prof,_center._y+prof),prof,size);
+    _childSW = initializeChild(1, Engine::Point2D<int>( _center._x-prof,_center._y+prof),prof,size);
 }
 
-QuadTree* QuadTree::initializeChild(Engine::Point2D<int> center, int prof, int size)
+QuadTree* QuadTree::initializeChild(int depth, Engine::Point2D<int> center, int prof, int size)
 {
-    if (prof >= 1)
-    {
-        //Engine::Point2D<int> NW, NE, SE, SW, neighN, neighS, neighE, neighW;
-        QuadTree *child;
 
-        Engine::Point2D<int> NW(center._x-prof,center._y-prof);
-        Engine::Point2D<int> NE(center._x+prof,center._y-prof);
-        Engine::Point2D<int> SE(center._x+prof,center._y+prof);
-        Engine::Point2D<int> SW(center._x-prof,center._y+prof);
+	if(prof<1)
+	{
+		return 0;
+	}
+	for(int i=0; i<depth; i++)
+	{
+		std::cout << "\t";
+	}
+	int outOfBounds_x = center._x+prof;
+	int outOfBounds_y = center._y+prof;
+	int pot2 = powf(2,ceil(log2(size)));
+	if(outOfBounds_x >= pot2)
+	{
+		outOfBounds_x = pot2-1;
+	}
+	if(outOfBounds_y >= pot2)
+	{
+		outOfBounds_y = pot2-1;
+	}
 
-        Engine::Point2D<int> neighN(center._x,center._y-prof);
-        Engine::Point2D<int> neighS(center._x,center._y+prof);
-        Engine::Point2D<int> neighE(center._x+prof,center._y);
-        Engine::Point2D<int> neighW(center._x-prof,center._y);
+	QuadTree *child = 0;
+	if (outOfBounds_x > size || outOfBounds_y > size || center._x-prof > size || center._y-prof > size)
+	{
 
-        child = new QuadTree(center,NW,NE,SE,SW,neighN,neighS,neighE,neighW);
-        prof=prof/2;
+	}
+	else
+	{
+		if(outOfBounds_x == size)
+		{
+			outOfBounds_x = size-1;
+		}
+		if(outOfBounds_y == size)
+		{
+			outOfBounds_y = size-1;
+		}
+	}
+	Engine::Point2D<int> NW(center._x-prof,center._y-prof);
+	Engine::Point2D<int> NE(outOfBounds_x,center._y-prof);
+	Engine::Point2D<int> SE(outOfBounds_x,outOfBounds_y);
+	Engine::Point2D<int> SW(center._x-prof,outOfBounds_y);
 
-        child->_childNW = initializeChild(Engine::Point2D<int>(center._x-prof,center._y-prof),prof,size);
-        child->_childNE = initializeChild(Engine::Point2D<int>(center._x+prof,center._y-prof),prof,size);
-        child->_childSE = initializeChild(Engine::Point2D<int>(center._x+prof,center._y+prof),prof,size);
-        child->_childSW = initializeChild(Engine::Point2D<int>(center._x-prof,center._y+prof),prof,size);
+	Engine::Point2D<int> neighN(center._x,center._y-prof);
+	Engine::Point2D<int> neighS(center._x,outOfBounds_y);
+	Engine::Point2D<int> neighE(outOfBounds_x,center._y);
+	Engine::Point2D<int> neighW(center._x-prof,center._y);
 
-        return child;
-    }
-    else return 0;
+	child = new QuadTree(center,NW,NE,SE,SW,neighN,neighS,neighE,neighW);
+	prof=prof/2;
 
+	child->_childNW = initializeChild(depth+1, Engine::Point2D<int>(center._x-prof,center._y-prof),prof,size);
+	child->_childNE = initializeChild(depth+1, Engine::Point2D<int>(center._x+prof,center._y-prof),prof,size);
+	child->_childSE = initializeChild(depth+1, Engine::Point2D<int>(center._x+prof,center._y+prof),prof,size);
+	child->_childSW = initializeChild(depth+1, Engine::Point2D<int>(center._x-prof,center._y+prof),prof,size);
+	return child;
 }
 
-void QuadTree::paintTriangle( const Engine::Point2D<int> & point1, const Engine::Point2D<int> & point2, int size, const Engine::StaticRaster & DEMRaster, float exaggeration, const Engine::StaticRaster & colorRaster, ColorSelector & colorSelector, int offset )
+void QuadTree::paintTriangle( const Engine::Point2D<int> & point1, const Engine::Point2D<int> & point2, int size, const Engine::StaticRaster & DEMRaster, float exaggeration, const Engine::StaticRaster & colorRaster, ColorSelector & colorSelector, int offset, bool randomColor )
 {
 	// size check
 	if(point1._x>=size || point1._y>=size)
@@ -212,35 +166,26 @@ void QuadTree::paintTriangle( const Engine::Point2D<int> & point1, const Engine:
 	
 	float sizeF = (float)size;
 
-	setCellColor(colorRaster, colorSelector, point1);
-	glTexCoord2f((float)(point1._x)/sizeF, (float)(point1._y)/sizeF);
-	glVertex3f(point1._x,-point1._y,offset+((DEMRaster.getValue(point1)*exaggeration)));
-
-	setCellColor(colorRaster, colorSelector, _center);
+	setCellColor(colorRaster, colorSelector, _center, randomColor);
 	glTexCoord2f((float)(_center._x)/sizeF, (float)(_center._y)/sizeF);
 	glVertex3f(_center._x,-_center._y,offset+((DEMRaster.getValue(_center)*exaggeration)));
 
-	setCellColor(colorRaster, colorSelector, point2);
+	//setCellColor(colorRaster, colorSelector, point1, randomColor);
+	glTexCoord2f((float)(point1._x)/sizeF, (float)(point1._y)/sizeF);
+	glVertex3f(point1._x,-point1._y,offset+((DEMRaster.getValue(point1)*exaggeration)));
+
+	//setCellColor(colorRaster, colorSelector, point2, randomColor);
 	glTexCoord2f((float)(point2._x)/sizeF, (float)(point2._y)/sizeF);
 	glVertex3f(point2._x,-point2._y,offset+((DEMRaster.getValue(point2)*exaggeration)));
 
 	glEnd();
 }
 
-int QuadTree::update(double dist, int prof, ColorSelector &colorSelector, Engine::StaticRaster & colorRaster, int size, Engine::StaticRaster & DEMRaster, int LOD, int offset, float exaggeration, float cellResolution)
+void QuadTree::update(double dist, int prof, ColorSelector &colorSelector, Engine::StaticRaster & colorRaster, int size, Engine::StaticRaster & DEMRaster, int LOD, int offset, float exaggeration, float cellResolution, bool randomColor)
 {
-//	float totalSize = size * cellResolution;
-	//si la distancia(camara-punt(anglecam))/profunditat_arbre < Constant -> habilita punt
-	//cout << "Relacio " << (abs(dist-this->center._z))/prof << endl;
-	//MIRAR POSICIO CAMARA, NO DIST!!!
-
 	float camara1[16];
 	glGetFloatv(GL_MODELVIEW_MATRIX,camara1);
-	//cout << camara1[12] << " " << camara1[13] << " " <<camara1[14] << endl;
 
-	/*Engine::Point3D<float> camara(camara1[0]*camara1[12]+camara1[4]*camara1[13]+camara1[8]*camara1[14],
-	camara1[1]*camara1[12]+camara1[5]*camara1[13]+camara1[9]*camara1[14],
-	camara1[2]*camara1[12]+camara1[6]*camara1[13]+camara1[10]*camara1[14]);*/
 		
 	Engine::Point3D<float> camara(0,0,0);
 	Engine::Point3D<float> punt(0.0f,0.0f,0.0f);
@@ -251,75 +196,49 @@ int QuadTree::update(double dist, int prof, ColorSelector &colorSelector, Engine
 		punt._y = camara1[1] * _center._x + -camara1[5] * _center._y + camara1[9] * DEMRaster.getValue(_center)*exaggeration +camara1[13];
 		punt._z = camara1[2] * _center._x + -camara1[6] * _center._y + camara1[10]* DEMRaster.getValue(_center)*exaggeration +camara1[14];
 	}
-	/*else {
-	px = camara1[0] * center._x + -camara1[4] * center._y + camara1[8]  +camara1[12];
-	py = camara1[1] * center._x + -camara1[5] * center._y + camara1[9]  +camara1[13];
-	pz = camara1[2] * center._x + -camara1[6] * center._y + camara1[10] +camara1[14];
-	}*/
 
-	if(abs(camara.distance(punt))/prof < LOD && _childNW)
+//	std::cout << "dist: " << dist << " punt: " << punt << " prof: " << prof << " lod: " << LOD << std::endl;
+	if(abs(camara.distance(punt))/prof < LOD)
 	{
-		int profNW = prof;
-		int aux;
-		if(_childNW != 0)
+		if(_childNW)
 		{
-			aux = _childNW->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset,exaggeration, cellResolution);
-			if (aux < prof)
-			{
-				profNW = aux;
-			}
+			_childNW->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset,exaggeration, cellResolution, randomColor);
 		}
 				
-		int profNE = prof;
-		if(_childNE != 0)
+		if(_childNE)
 		{
-			aux = _childNE->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset,exaggeration, cellResolution);
-			if(aux < prof)
-			{
-				profNE = aux;
-			}
+			_childNE->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset,exaggeration, cellResolution, randomColor);
 		}
 
-		int profSE = prof;
-		if(_childSE != 0)
+		if(_childSE)
 		{
-			aux = _childSE->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset,exaggeration, cellResolution);
-			if(aux < prof)
-			{
-				profSE = aux;
-			}
+			_childSE->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset,exaggeration, cellResolution, randomColor);
 		}
 
-		int profSW = prof;
-		if(_childSW != 0)
+		if(_childSW)
 		{
-			aux = _childSW->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset,exaggeration, cellResolution);
-			if(aux < prof)
-			{
-				profSW = aux;
-			}
+			_childSW->update(dist,prof/2,colorSelector,colorRaster,size,DEMRaster,LOD,offset,exaggeration, cellResolution, randomColor);
 		}
 	}
 	else
 	{
 		if(_center._x < size && _center._y < size)
 		{
-			paintTriangle(_neighN, _NE, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset);
-			paintTriangle(_NE, _neighE, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset);
-			paintTriangle(_neighE, _SE, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset);
-			paintTriangle(_SE, _neighS, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset);
+			paintTriangle(_neighN, _NE, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset, randomColor);
+			paintTriangle(_NE, _neighE, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset, randomColor);
+			paintTriangle(_neighE, _SE, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset, randomColor);
+			paintTriangle(_SE, _neighS, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset, randomColor);
 
-			paintTriangle(_neighS, _SW, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset);
-			paintTriangle(_SW, _neighW, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset);
-			paintTriangle(_neighW, _NW, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset);
-			paintTriangle(_NW, _neighN, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset);
-            return prof;
+			paintTriangle(_neighS, _SW, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset, randomColor);
+			paintTriangle(_SW, _neighW, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset, randomColor);
+			paintTriangle(_neighW, _NW, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset, randomColor);
+			paintTriangle(_NW, _neighN, size, DEMRaster, exaggeration, colorRaster, colorSelector, offset, randomColor);
         }
     }
 
 }
 
-void QuadTree::setCellColor( const Engine::StaticRaster & raster, ColorSelector & colorSelector, const Engine::Point2D<int> & cell )
+void QuadTree::setCellColor( const Engine::StaticRaster & raster, ColorSelector & colorSelector, const Engine::Point2D<int> & cell, bool randomColor)
 {
 	QColor color;
 	if(raster.hasColorTable())
@@ -330,6 +249,11 @@ void QuadTree::setCellColor( const Engine::StaticRaster & raster, ColorSelector 
 	else
 	{
 		color = colorSelector.getColor(raster.getValue(cell));
+	}
+
+	if(randomColor)
+	{
+		color = QColor(rand()%255, rand()%255, rand()%255);
 	}
     
 	float ambientColor[3];
