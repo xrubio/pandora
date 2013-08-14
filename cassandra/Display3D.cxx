@@ -41,13 +41,14 @@
 #include <glut.h>
 #include <QDebug>
 #include <QTime>
+#include <AgentRecord.hxx>
 
 namespace GUI
 {
 
 //Inicialitzem els paràmetres al constructor per defecte i carreguem l'arxiu on hi ha tota la informació referent al ràster
 //que posteriorment haurem de representar (x,y,z).
-Display3D::Display3D(QWidget *parent ) : QGLWidget(parent), _simulationRecord(0), _viewedStep(0), _zoom(1.0f), _position(0,0), _lastPos(0,0), _rotation(0,0), _rotationZ(0), _cellScale(1.0f, 1.0f, 1.0f), _quadLandscape(0), _agentFocus(-1, -1), _randomColor(false)
+Display3D::Display3D(QWidget *parent ) : QGLWidget(parent), _simulationRecord(0), _viewedStep(0), _zoom(1.0f), _position(0,0), _lastPos(0,0), _rotation(0,0), _rotationZ(0), _cellScale(1.0f, 1.0f, 1.0f), _quadLandscape(0), _agentFocus(0), _randomColor(false)
 {
 }
 
@@ -231,7 +232,7 @@ void Display3D::focus()
 	gluPerspective(anglecam, ra, anterior, posterior);
 
 	// if not agent
-	if(_agentFocus._x==-1)
+	if(!_agentFocus)
 	{
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
@@ -252,7 +253,9 @@ void Display3D::focus()
 	glRotatef(-_angle._y,0,1,0);
 	glRotatef(-_angle._z,0,0,1);
 	//cout << dist << " " << angleX << " " << angleY << " " << angleZ << endl;
-	glTranslatef(-_agentFocus._x, _agentFocus._y, -_vrp._z);
+	
+	Engine::Point2D<int> position(_agentFocus->getState(_viewedStep/_simulationRecord->getFinalResolution(), "x"), _agentFocus->getState(_viewedStep/_simulationRecord->getFinalResolution(), "y"));
+	glTranslatef(-position._x, position._y, -_vrp._z);
 }
 
 void Display3D::paintLandscape()
@@ -593,7 +596,7 @@ void Display3D::viewedStepChangedSlot( int newViewedStep )
 	update();
 }
 
-void Display3D::setAgentFocus( const Engine::Point2D<int> & agentFocus )
+void Display3D::setAgentFocus(  Engine::AgentRecord * agentFocus )
 {
 	_agentFocus = agentFocus;
 }

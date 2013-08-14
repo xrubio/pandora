@@ -578,20 +578,21 @@ void MainWindow::show3Dagent(QTreeWidgetItem * item, int i)
     if (item->child(0) != 0);
     else
     {
-
-        Engine::AgentRecord* agentSelected;
-        Engine::AgentRecord* agentAux;
-
+        Engine::AgentRecord* agentSelected = 0;
         std::list<Engine::AgentRecord*>::iterator it = agentsSelected.begin();
         while(it != agentsSelected.end())
         {
-            agentAux = *it;
-            if (agentAux->getId() == item->parent()->text(0).toStdString())
+			Engine::AgentRecord * agentAux = *it;
+            if (agentAux->getId().compare(item->parent()->text(0).toStdString())==0)
 			{
 				agentSelected = agentAux;
 			}
             it++;
         }
+		if(!agentSelected)
+		{
+			return;
+		}
 
         Display3D * displayAgent = new Display3D(0);
         connect(this, SIGNAL(newViewedStep(int)), displayAgent, SLOT(viewedStepChangedSlot(int)));
@@ -600,8 +601,8 @@ void MainWindow::show3Dagent(QTreeWidgetItem * item, int i)
 
         displayAgent->setSimulationRecord(ProjectConfiguration::instance()->getSimulationRecord());
         displayAgent->rastersRearranged(_rasterSelection->getRasterList(), _rasterSelection->getRasterView());
-        displayAgent->setAgentFocus( Engine::Point2D<int>(agentSelected->getState(_viewedStep/_simulationRecord->getFinalResolution(), "x"), agentSelected->getState(_viewedStep/_simulationRecord->getFinalResolution(), "y")));
-        displayAgent->show();
+        displayAgent->setAgentFocus(agentSelected);
+		displayAgent->show();
     }
 }
 

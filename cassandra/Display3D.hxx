@@ -38,6 +38,7 @@ class QListWidgetItem;
 namespace Engine
 {
 	class SimulationRecord;
+	class AgentRecord;
 }
 
 namespace GUI
@@ -74,7 +75,7 @@ public:
 	void setSimulationRecord( Engine::SimulationRecord * simulationRecord );
 
 	// if this setter is used the Display3D will follow this position
-	void setAgentFocus( const Engine::Point2D<int> & agentFocus );
+	void setAgentFocus( Engine::AgentRecord * agentRecord );
 
 public slots:
 	void viewedStepChangedSlot( int newViewedStep );
@@ -153,7 +154,7 @@ private:
 
 	// cleans all the display options
 	void resetView();
-	Engine::Point2D<int> _agentFocus;
+	Engine::AgentRecord * _agentFocus;
     float frustum[6][4];
 
     int _offset;
