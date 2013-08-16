@@ -494,10 +494,10 @@ void Display3D::pan( const QPoint & eventPos )
 	incY._y = mat[1][1];
 	incY._z = mat[2][1];
 
-	incX = incX * (_clickedPos.x()-eventPos.x());
+	incX = incX * _simulationRecord->getSize() * (_clickedPos.x()-eventPos.x());
 	incX = incX/dist;
 	
-	incY = incY * (eventPos.y()-_clickedPos.y());
+	incY = incY * _simulationRecord->getSize() * (eventPos.y()-_clickedPos.y());
 	incY = incY/dist;
 
 	_vrp = _vrp + incX;
