@@ -36,6 +36,7 @@
 #include <SimulationRecord.hxx>
 #include <LoadingProgressBar.hxx>
 #include <Settings.hxx>
+#include <Laboratory.hxx>
 
 #include <iostream>
 
@@ -52,9 +53,6 @@
 #include <QDockWidget>
 #include <QListWidgetItem>
 #include <QInputDialog>
-
-
-
 
 namespace GUI
 {
@@ -89,10 +87,12 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	// resource display 2D
 	_display2D = new Display2D(this);
 	_display3D = new Display3D(0);
+	_laboratory = new Laboratory(0);
 	_settings = new Settings;
 	
 	_display2D->show();
 	_display3D->hide();
+	_laboratory->hide();
 	_settings->hide();
 	
     setCentralWidget(_display2D);
@@ -197,6 +197,10 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_show3DAction->setStatusTip(tr("Show 3D raster"));
 	connect(_show3DAction, SIGNAL(triggered()), this, SLOT(show3DWindow()));
 
+	_showLabAction = new QAction(QIcon(":/resources/icons/lab.png"), tr("&Laboratory"), this);
+	_showLabAction->setStatusTip(tr("Open Laboratory"));
+	connect(_showLabAction, SIGNAL(triggered()), this, SLOT(showLaboratory()));
+
 	// menus
 	_fileMenu = menuBar()->addMenu(tr("&File"));
 	_fileMenu->addAction(_newProjectAction);
@@ -222,6 +226,7 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_viewMenu->addAction(_showAgentsAction);
 	_viewMenu->addSeparator();
 	_viewMenu->addAction(_show3DAction);
+	_viewMenu->addAction(_showLabAction);
 
 	// toolbars
 	_fileBar= addToolBar(tr("File"));
@@ -261,6 +266,7 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_viewBar->addAction(_showAgentsAction);
 	_viewBar->addSeparator();
 	_viewBar->addAction(_show3DAction);
+	_viewBar->addAction(_showLabAction);
 	
 	// TODO un thread diferent?
 	_playTimer = new QTimer(this);
@@ -282,6 +288,7 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_zoomOutAction->setEnabled(false);
 	_showAgentsAction->setEnabled(false);
 	_show3DAction->setEnabled(false);
+	_showLabAction->setEnabled(true);
 
 	_saveProjectAction->setEnabled(false);
 	_saveProjectAsAction->setEnabled(false);
@@ -500,6 +507,18 @@ void MainWindow::show3DWindow()
     else
     {
         _display3D->show();
+    }
+}
+
+void MainWindow::showLaboratory()
+{
+    if(_laboratory->isVisible())
+    {
+        _laboratory->hide();
+    }
+    else
+    {
+        _laboratory->show();
     }
 }
 

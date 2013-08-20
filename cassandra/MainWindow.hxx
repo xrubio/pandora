@@ -51,6 +51,7 @@ class GenericStatistics;
 class Display3D;
 class AgentConfiguration;
 class RasterConfiguration;
+class Laboratory;
 class Settings;
 
 class LoadingProgressBar;
@@ -89,6 +90,7 @@ private:
 	QAction * _showAgentsAction;
 
 	QAction * _show3DAction;
+	QAction * _showLabAction;
 
 	QSpinBox * _stepBox;
 	QLabel * _numStepsLabel;
@@ -98,8 +100,9 @@ private:
 	QTimer * _loadSimulationTimer;
 
 	Display2D * _display2D;
-    Display3D * _display3D;
+    Display3D * _display3D;	
 	Settings * _settings;
+	Laboratory * _laboratory;
 
 	AgentTypeSelection * _agentTypeSelection;
 	AgentTraitSelection * _agentTraitSelection;
@@ -148,6 +151,7 @@ private slots:
 	void openRasterConfigurator(QListWidgetItem * item);
 	
 	void show3DWindow();
+	void showLaboratory();
 
 	void agentConfigured( const std::string & , const AgentConfiguration &); 
 	void rasterConfigured( const std::string & , const RasterConfiguration &); 	

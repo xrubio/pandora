@@ -18,6 +18,7 @@
 		<file>resources/icons/play.png</file>
 		<file>resources/icons/agents.png</file>
 		<file>resources/icons/3dview.png</file>
+		<file>resources/icons/lab.png</file>
 
 		<file>resources/agentIcons/default_agent_1.png</file>
 		<file>resources/agentIcons/default_agent_2.png</file>
