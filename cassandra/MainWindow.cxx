@@ -87,7 +87,7 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	// resource display 2D
 	_display2D = new Display2D(this);
 	_display3D = new Display3D(0);
-	_laboratory = new Laboratory(0);
+	_laboratory = new Laboratory(this);
 	_settings = new Settings;
 	
 	_display2D->show();

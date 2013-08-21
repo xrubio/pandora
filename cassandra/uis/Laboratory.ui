@@ -32,7 +32,7 @@
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QGroupBox" name="groupBox_3">
+  <widget class="QGroupBox" name="experimentsGroup">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -53,6 +53,9 @@
       <height>23</height>
      </rect>
     </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QPushButton" name="outputButton">
     <property name="geometry">
@@ -67,21 +70,34 @@
      <string>Output dir</string>
     </property>
    </widget>
+   <widget class="QSpinBox" name="numRepeats">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>80</y>
+      <width>54</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+   </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>90</y>
-      <width>471</width>
-      <height>16</height>
+      <x>97</x>
+      <y>83</y>
+      <width>241</width>
+      <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>TextLabel</string>
+     <string>Number of repetitions per experiments</string>
     </property>
    </widget>
   </widget>
-  <widget class="QGroupBox" name="groupBox">
+  <widget class="QGroupBox" name="modelGroup">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -105,6 +121,9 @@
       <height>23</height>
      </rect>
     </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QPushButton" name="simulationButton">
     <property name="geometry">
@@ -120,7 +139,7 @@
     </property>
    </widget>
   </widget>
-  <widget class="QGroupBox" name="groupBox_2">
+  <widget class="QGroupBox" name="paramGroup">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -137,7 +156,7 @@
      <rect>
       <x>20</x>
       <y>30</y>
-      <width>111</width>
+      <width>81</width>
       <height>24</height>
      </rect>
     </property>
@@ -148,32 +167,22 @@
    <widget class="QLineEdit" name="configEdit">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>110</x>
       <y>30</y>
       <width>341</width>
       <height>23</height>
      </rect>
     </property>
-   </widget>
-   <widget class="QPushButton" name="parseButton">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>60</y>
-      <width>91</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Parse</string>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QPushButton" name="showButton">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>60</y>
-      <width>91</width>
+      <x>460</x>
+      <y>30</y>
+      <width>71</width>
       <height>24</height>
      </rect>
     </property>
@@ -185,9 +194,9 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>90</y>
+      <y>60</y>
       <width>511</width>
-      <height>271</height>
+      <height>301</height>
      </rect>
     </property>
     <property name="indentation">
@@ -225,6 +234,19 @@
      </property>
     </column>
    </widget>
+  </widget>
+  <widget class="QLabel" name="statusLabel">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>600</y>
+     <width>471</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>TextLabel</string>
+   </property>
   </widget>
  </widget>
  <resources/>

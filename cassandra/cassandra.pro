@@ -27,7 +27,7 @@ INCLUDEPATH += /usr/local/qwt-6.0.0/include/
 CONFIG += qt
 
 # Required when installing qwt-6.0.0 from sources
-LIBS += -fopenmp -L../pandora/ -lpandora -L/usr/local/qwt-6.0.0/lib/ -L/usr/local/hdf5/lib/ -lqwt -lhdf5 -lmpich -lmpi -lGL -lGLU -lQtOpenGL -lIL -ltinyxml
+LIBS += -fopenmp -L../pandora/ -lpandora -L/usr/local/qwt-6.0.0/lib/ -L/usr/local/hdf5/lib/ -lqwt -lhdf5 -lmpich -lmpi -lGL -lGLU -lQtOpenGL -lIL -ltinyxml -lboost_filesystem -lboost_system 
 
 # Input
 HEADERS += Display2D.hxx MainWindow.hxx AgentTypeSelection.hxx AgentTraitSelection.hxx DataPlot.hxx GenericStatistics.hxx StepDataPlot.hxx RasterSelection.hxx Display3D.hxx AgentConfigurator.hxx Model3D.hxx Object3D.hxx Material.hxx Loader3DS.hxx ColorSelector.hxx DefaultColorSelector.hxx AgentConfiguration.hxx RasterConfigurator.hxx ColorInterval.hxx RasterConfiguration.cxx ProjectConfiguration.hxx LoadSimulationThread.hxx LoadingProgressBar.hxx QuadTree.hxx Settings.hxx Laboratory.hxx

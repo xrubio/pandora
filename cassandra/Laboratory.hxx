@@ -41,6 +41,11 @@ enum ParamColumn
 
 class Laboratory : public QDialog
 {
+
+	typedef std::map< QTreeWidgetItem *, std::string > ParamsMap;
+	typedef std::vector<ParamsMap> RunsVector;
+
+private:
 	Q_OBJECT
 	Ui::Laboratory _lab;
 
@@ -48,12 +53,25 @@ class Laboratory : public QDialog
 	std::string _simulationConfig;
 	std::string _outputDir;
 
+	RunsVector _runs;
+
 	void parseLevel( TiXmlNode * parent, QTreeWidgetItem * parentItem);
 	void parseAttributes( TiXmlElement * parent, QTreeWidgetItem * parentItem);
 
 	void generateConfigs();
+	// fill _runs with possible experiments
+	void computeExperiments();
 	void runSimulations();
 
+	// returns true if xml was correctly loaded
+	bool parseConfig();
+	// returns the number of executions if config is correct, or -1 in other case
+	void updateNumberOfExecutions();
+
+	QPushButton * _generateButton;
+	QPushButton * _runButton;
+	// number of experiments to be performed (without repeats)
+	int _numExperiments;
 public:
 	Laboratory(QWidget * parent);
 	virtual ~Laboratory();
@@ -63,10 +81,10 @@ private slots:
 	void selectConfig();
 	void selectOutput();
 	void showConfig();
-	void parseConfig();
 	void paramChanged( QTreeWidgetItem * item, int column );
 	void doubleClick(QTreeWidgetItem * item, int column);
 	void buttonClicked( QAbstractButton * button );
+	void numRepeatsChanged(int numRepeats);
 };
 
 }
