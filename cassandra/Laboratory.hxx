@@ -26,6 +26,8 @@
 #include <QDialog>
 #include <ui_Laboratory.h>
 #include <tinyxml.h>
+#include <map>
+#include <vector>
 
 namespace GUI
 {
@@ -42,7 +44,7 @@ enum ParamColumn
 class Laboratory : public QDialog
 {
 
-	typedef std::map< QTreeWidgetItem *, std::string > ParamsMap;
+	typedef std::map< QTreeWidgetItem *, std::string> ParamsMap;
 	typedef std::vector<ParamsMap> RunsVector;
 
 private:
@@ -61,12 +63,17 @@ private:
 	void generateConfigs();
 	// fill _runs with possible experiments
 	void computeExperiments();
+	// creates a config file at dir filling it with parameters stored at index of _runs
+	void createConfigFile( const std::string & dir, int index );
 	void runSimulations();
 
 	// returns true if xml was correctly loaded
 	bool parseConfig();
 	// returns the number of executions if config is correct, or -1 in other case
 	void updateNumberOfExecutions();
+
+	// recursive method that stores the children of an element for index run
+	void storeChildren(TiXmlElement * parentElement, QTreeWidgetItem * parentItem, int index);
 
 	QPushButton * _generateButton;
 	QPushButton * _runButton;

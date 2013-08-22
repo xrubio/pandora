@@ -27,6 +27,7 @@
 #include <QTextStream>
 #include <boost/filesystem.hpp>
 #include <iomanip>
+#include <Exceptions.hxx>
 
 namespace GUI
 {
@@ -86,24 +87,117 @@ void Laboratory::computeExperiments()
 	_runs.resize(_numExperiments*_lab.numRepeats->value());
 
 	QTreeWidgetItem * item = _lab.paramsTree->topLevelItem(0);
+
+	int totalRuns = _lab.numRepeats->value()*_numExperiments;
+	int iterations = _numExperiments;
 	while(item)
 	{
-		// text
-		if(!item->text(eDefault).isEmpty())
+		// number params are the only ones to be recorded in _runs
+		if(!item->text(eMin).isEmpty())
 		{
-			for(int i=0; i<_runs.size(); i++)
+			float minValue = item->text(eMin).toFloat();
+			float maxValue = item->text(eMax).toFloat();
+			float stepValue = item->text(eStep).toFloat();
+			int index = 0;
+			// repetition
+			if(minValue==maxValue)
 			{
-				ParamsMap & paramsMap = _runs.at(i);
-				paramsMap.insert(make_pair(item, item->text(eDefault).toStdString()));
+				for(int i=0; i<totalRuns; i++)
+				{
+					ParamsMap & params = _runs.at(index);
+					params.insert(std::make_pair(item, item->text(eMin).toStdString()));
+					index++;
+				}
+			}
+			// parameter sweep
+			else
+			{
+				int series = _numExperiments/iterations;
+				int numCombinations = 1+(maxValue-minValue)/stepValue;
+				iterations /= numCombinations;
+				
+				// for the number of repetitions
+				for(int r=0; r<_lab.numRepeats->value(); r++)
+				{
+					for(int z=0; z<series; z++)
+					{
+						// iterate trough values
+						for(int j=minValue; j<=maxValue; j+=stepValue)
+						{
+							// a number of times equal to iterations
+							for(int i=0; i<iterations; i++)
+							{
+								ParamsMap & params = _runs.at(index);
+								params.insert(std::make_pair(item, QString::number(j).toStdString()));
+								index++;
+							}
+						}
+					}
+				}
+			}
+			if(index!=_runs.size())
+			{	
+				std::stringstream oss;
+				oss << "Laboratory::computeExperiments - number of experiments: " << _runs.size() << " does not match with computed number: " << index << " for attribute: " << item->text(eName).toStdString() << " of element: " << item->parent()->text(eName).toStdString();
+				throw Engine::Exception(oss.str());
+				return;
 			}
 		}
-		// number
-		else if(!item->text(eMin).isEmpty())
-		{
-		}
-
 		item = _lab.paramsTree->itemBelow(item);
 	}
+}
+
+void Laboratory::storeChildren(TiXmlElement * parentElement, QTreeWidgetItem * parentItem, int index)
+{
+	for(int i=0; i<parentItem->childCount(); i++)
+	{
+		QTreeWidgetItem * item = parentItem->child(i);
+		// attribute
+		if(item->childCount()==0)
+		{
+			// string
+			if(!item->text(eDefault).isEmpty())
+			{
+				parentElement->SetAttribute(item->text(eName).toStdString(), item->text(eDefault).toStdString());
+			}
+			// number
+			else if(!item->text(eMin).isEmpty())
+			{
+				ParamsMap & params = _runs.at(index);
+				ParamsMap::iterator it = params.find(item);
+				if(it==params.end())
+				{	
+					std::stringstream oss;
+					oss << "Laboratory::storeChildren - trying to get unknown number attribute: " << item->text(eName).toStdString() << " for element: " << parentItem->text(eName).toStdString();
+					throw Engine::Exception(oss.str());
+					return;
+				}
+				parentElement->SetAttribute(item->text(eName).toStdString(), it->second);
+			}
+		}
+		else
+		{
+			TiXmlElement * element = new TiXmlElement(item->text(eName).toStdString());
+			storeChildren(element, item, index);
+			parentElement->LinkEndChild(element);
+		}
+	}
+}
+
+void Laboratory::createConfigFile( const std::string & dir, int index )
+{
+	TiXmlDocument doc;
+	doc.LinkEndChild(new TiXmlDeclaration( "1.0", "", "" ));
+	
+
+	for(int i=0; i<_lab.paramsTree->topLevelItemCount(); i++)
+	{
+		QTreeWidgetItem * item = _lab.paramsTree->topLevelItem(i);
+		TiXmlElement * element = new TiXmlElement(item->text(eName).toStdString());
+		storeChildren(element, item, index);
+		doc.LinkEndChild( element );
+	}
+	doc.SaveFile(dir+"/config.xml" );
 }
 
 void Laboratory::generateConfigs()
@@ -134,7 +228,7 @@ void Laboratory::generateConfigs()
 		numNumbers= 2;
 	}
 
-	//computeExperiments();
+	computeExperiments();
 
 
 	for(int i=0; i<totalExperiments; i++)
@@ -144,6 +238,7 @@ void Laboratory::generateConfigs()
 		boost::filesystem::create_directory(oss.str());
 		boost::filesystem::create_directory(oss.str()+"/data");
 		boost::filesystem::create_directory(oss.str()+"/logs");
+		createConfigFile(oss.str(), i);
 	}
 	_lab.statusLabel->setText("Experiments generated, ready to run");
 	_runButton->setEnabled(true);
