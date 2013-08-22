@@ -28,6 +28,8 @@
 #include <boost/filesystem.hpp>
 #include <iomanip>
 #include <Exceptions.hxx>
+#include <RunSimulations.hxx>
+#include <SimulationControlThread.hxx>
 
 namespace GUI
 {
@@ -58,6 +60,9 @@ Laboratory::Laboratory(QWidget * parent) : QDialog(parent)
 
 	_lab.outputEdit->setText(QString(boost::filesystem::current_path().c_str()).append("/experiments"));
 	_outputDir = _lab.outputEdit->text().toStdString();
+
+	_runSimulations = new RunSimulations(0);
+	connect(this, SIGNAL(nextSimulation()), _runSimulations, SLOT(updateSimulationRun()));
 }
 
 Laboratory::~Laboratory()
@@ -213,31 +218,15 @@ void Laboratory::generateConfigs()
 		boost::filesystem::remove_all(_outputDir);
 	}
 	boost::filesystem::create_directory(_outputDir);
-	int numNumbers = 1;
 	int totalExperiments = _numExperiments*_lab.numRepeats->value();
-	if(totalExperiments>1000)
-	{
-		numNumbers= 4;
-	}
-	else if(totalExperiments>100)
-	{
-		numNumbers= 3;
-	}
-	else if(totalExperiments>10)
-	{
-		numNumbers= 2;
-	}
-
 	computeExperiments();
 
 
 	for(int i=0; i<totalExperiments; i++)
 	{
 		std::stringstream oss;
-		oss << _outputDir << "/run_" << std::setfill('0') << std::setw(numNumbers) << i;
+		oss << _outputDir << "/run_" << std::setfill('0') << std::setw(4) << i;
 		boost::filesystem::create_directory(oss.str());
-		boost::filesystem::create_directory(oss.str()+"/data");
-		boost::filesystem::create_directory(oss.str()+"/logs");
 		createConfigFile(oss.str(), i);
 	}
 	_lab.statusLabel->setText("Experiments generated, ready to run");
@@ -246,6 +235,13 @@ void Laboratory::generateConfigs()
 
 void Laboratory::runSimulations()
 {
+	int totalExperiments = _numExperiments*_lab.numRepeats->value();
+	_runSimulations->init(totalExperiments);
+	_runSimulations->show();
+	SimulationControlThread * thread = new SimulationControlThread(_simulationBinary, _outputDir, totalExperiments);
+
+	connect(_runSimulations, SIGNAL(rejected()), thread, SLOT(cancelExecution()));
+	connect(thread, SIGNAL(nextSimulation()), _runSimulations, SLOT(updateSimulationRun()));
 }
 
 void Laboratory::selectSimulation()

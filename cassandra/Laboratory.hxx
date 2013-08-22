@@ -29,6 +29,7 @@
 #include <map>
 #include <vector>
 
+
 namespace GUI
 {
 
@@ -40,6 +41,8 @@ enum ParamColumn
 	eMax = 3,
 	eStep = 4
 };
+
+class RunSimulations;
 
 class Laboratory : public QDialog
 {
@@ -79,6 +82,7 @@ private:
 	QPushButton * _runButton;
 	// number of experiments to be performed (without repeats)
 	int _numExperiments;
+	RunSimulations * _runSimulations;
 public:
 	Laboratory(QWidget * parent);
 	virtual ~Laboratory();
@@ -92,6 +96,9 @@ private slots:
 	void doubleClick(QTreeWidgetItem * item, int column);
 	void buttonClicked( QAbstractButton * button );
 	void numRepeatsChanged(int numRepeats);
+
+signals:
+	void nextSimulation();
 };
 
 }
