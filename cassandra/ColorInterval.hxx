@@ -67,8 +67,6 @@ public:
 	const QColor & getColor();
 
 	void connectToNext( ColorInterval * next );
-	void disconnectMaxValue();
-	void disconnectMinValue();
 
 	void deactivateMinValue();
 

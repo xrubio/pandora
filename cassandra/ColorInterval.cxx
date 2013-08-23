@@ -12,8 +12,6 @@ ColorInterval::ColorInterval(QWidget * parent ) : QWidget(parent)
 	connect(_colorInterval.colorChooserButton, SIGNAL(clicked()), this, SLOT(selectColor()));
 	connect(_colorInterval.splitButton, SIGNAL(clicked()), this, SLOT(split()));
 	connect(_colorInterval.removeButton, SIGNAL(clicked()), this, SLOT(remove()));
-//	connect(_colorInterval.minValue, SIGNAL(valueChanged(int)), this, SLOT(checkMinimum(int)));
-//	connect(_colorInterval.maxValue, SIGNAL(valueChanged(int)), this, SLOT(checkMaximum(int)));
 }
 
 void ColorInterval::split()
@@ -49,7 +47,6 @@ ColorInterval::~ColorInterval()
 
 void ColorInterval::setMinValue( const int & value )
 {
-	//_colorInterval.maxValue->setMinimum(value+1);	
 	_colorInterval.minValue->setValue(value);
 }
 
@@ -89,41 +86,18 @@ const QColor & ColorInterval::getColor()
 
 void ColorInterval::connectToNext( ColorInterval * next )
 {
-	//std::cout << "connecting things" << std::endl;
-	//connect(_colorInterval.maxValue, SIGNAL(valueChanged(int)), next->_colorInterval.minValue, SLOT(setValue(int)));
 	connect(next->_colorInterval.minValue, SIGNAL(valueChanged(int)), this, SLOT(updateMaxValue(int)));
 	connect(_colorInterval.minValue, SIGNAL(valueChanged(int)), next, SLOT(updateMinValue(int)));
-
-	//connect(next, SIGNAL(adjustMax(int)), this, SLOT(adjustMaxValue(int)));
-	//connect(this, SIGNAL(adjustMin(int)), next, SLOT(adjustMinValue(int)));
 }
 
 void ColorInterval::updateMaxValue( int value )
 {
-	//std::cout << "updating max value: " << _colorInterval.maxValue->value() << " following min, to: " << value-1 << std::endl;
 	setMaxValue(value-1);
 }
 
 void ColorInterval::updateMinValue( int value )
 {
-	//std::cout << "minimum value set to: " << value+1 << " when actual value of: " << _colorInterval.minValue->value() << std::endl;
 	_colorInterval.minValue->setMinimum(value+1);
-}
-
-void ColorInterval::disconnectMaxValue()
-{
-	//disconnect(_colorInterval.maxValue, SIGNAL(valueChanged(int)), 0, 0);
-	//disconnect(this, SIGNAL(adjustMax(int)), 0, 0);
-	// we need to reconnect min/max checks
-	//connect(_colorInterval.maxValue, SIGNAL(valueChanged(int)), this, SLOT(checkMaximum(int)));
-}
-
-void ColorInterval::disconnectMinValue()
-{
-	//disconnect(_colorInterval.minValue, SIGNAL(valueChanged(int)), 0, 0);
-	//disconnect(this, SIGNAL(adjustMin(int)), 0, 0);
-	// we need to reconnect min/max checks
-	//connect(_colorInterval.minValue, SIGNAL(valueChanged(int)), this, SLOT(checkMinimum(int)));
 }
 
 void ColorInterval::deactivateMinValue()
