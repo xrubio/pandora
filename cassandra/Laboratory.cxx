@@ -342,7 +342,6 @@ void Laboratory::updateNumberOfExecutions()
 				return;
 			}
 			_numExperiments *= 1+((maxValue-minValue)/stepValue);
-			//std::cout << "min: " << minValue << " - max: " << maxValue << " step: " << stepValue << " numExecs: " << 1+((maxValue-minValue)/stepValue) << std::endl;
 		}
 		item = _lab.paramsTree->itemBelow(item);
 	}

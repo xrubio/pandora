@@ -22,7 +22,6 @@
 
 #include <RunSimulations.hxx>
 #include <QPushButton>
-#include <iostream>
 
 namespace GUI
 {
@@ -52,7 +51,6 @@ void RunSimulations::init( int numberOfExperiments )
 void RunSimulations::updateSimulationRun()
 {
 	int nextValue = 1+_run.progressBar->value();
-	std::cout << "updating simulation, next run: " << nextValue << std::endl;
 	_run.progressBar->setValue(nextValue);
 	
 	if(nextValue==_run.progressBar->maximum())
