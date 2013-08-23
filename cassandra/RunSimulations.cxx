@@ -22,6 +22,7 @@
 
 #include <RunSimulations.hxx>
 #include <QPushButton>
+#include <iostream>
 
 namespace GUI
 {
@@ -31,6 +32,7 @@ RunSimulations::RunSimulations( QWidget * parent ) : QDialog(parent)
 	setModal(true);
 	_run.setupUi(this);
 	_run.status->setText("running!");
+	_doneButton = _run.buttonBox->addButton("Done", QDialogButtonBox::AcceptRole);
 }
 
 RunSimulations::~RunSimulations()
@@ -39,18 +41,18 @@ RunSimulations::~RunSimulations()
 
 void RunSimulations::init( int numberOfExperiments )
 {
-	_run.progressBar->setRange(1, numberOfExperiments);
-	_run.progressBar->setValue(1);
+	_run.progressBar->setRange(0, numberOfExperiments);
+	_run.progressBar->setValue(0);
 	QString message("executing run: ");
-	message.append(QString::number(_run.progressBar->value())+"/"+QString::number(_run.progressBar->maximum()));
+	message.append(QString::number(1+_run.progressBar->value())+"/"+QString::number(_run.progressBar->maximum()));
 	_run.status->setText(message);
-	_doneButton = _run.buttonBox->addButton("Done", QDialogButtonBox::AcceptRole);
 	_doneButton->setEnabled(false);
 }
 
 void RunSimulations::updateSimulationRun()
 {
 	int nextValue = 1+_run.progressBar->value();
+	std::cout << "updating simulation, next run: " << nextValue << std::endl;
 	_run.progressBar->setValue(nextValue);
 	
 	if(nextValue==_run.progressBar->maximum())
@@ -61,7 +63,7 @@ void RunSimulations::updateSimulationRun()
 	else
 	{
 		QString message("executing run: ");
-		message.append(QString::number(_run.progressBar->value())+"/"+QString::number(_run.progressBar->maximum()));
+		message.append(QString::number(1+_run.progressBar->value())+"/"+QString::number(_run.progressBar->maximum()));
 		_run.status->setText(message);
 	}
 	update();

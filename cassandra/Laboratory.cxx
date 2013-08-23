@@ -63,6 +63,9 @@ Laboratory::Laboratory(QWidget * parent) : QDialog(parent)
 
 	_runSimulations = new RunSimulations(0);
 	connect(this, SIGNAL(nextSimulation()), _runSimulations, SLOT(updateSimulationRun()));
+
+	_lab.paramsTree->header()->setMovable(false);
+	_lab.paramsTree->header()->setResizeMode(0, QHeaderView::ResizeToContents);
 }
 
 Laboratory::~Laboratory()
@@ -161,9 +164,9 @@ void Laboratory::storeChildren(TiXmlElement * parentElement, QTreeWidgetItem * p
 		if(item->childCount()==0)
 		{
 			// string
-			if(!item->text(eDefault).isEmpty())
+			if(!item->text(eText).isEmpty())
 			{
-				parentElement->SetAttribute(item->text(eName).toStdString(), item->text(eDefault).toStdString());
+				parentElement->SetAttribute(item->text(eName).toStdString(), item->text(eText).toStdString());
 			}
 			// number
 			else if(!item->text(eMin).isEmpty())
@@ -242,6 +245,7 @@ void Laboratory::runSimulations()
 
 	connect(_runSimulations, SIGNAL(rejected()), thread, SLOT(cancelExecution()));
 	connect(thread, SIGNAL(nextSimulation()), _runSimulations, SLOT(updateSimulationRun()));
+	thread->start();
 }
 
 void Laboratory::selectSimulation()
@@ -431,7 +435,7 @@ void Laboratory::parseAttributes(TiXmlElement * parent, QTreeWidgetItem * parent
 		}
 		else
 		{
-			item->setText(eDefault, attribute->Value());
+			item->setText(eText, attribute->Value());
 		}
 		parentItem->addChild(item);
 		item->setExpanded(true);
@@ -488,7 +492,7 @@ void Laboratory::parseLevel( TiXmlNode * parent, QTreeWidgetItem * parentItem)
 	
 void Laboratory::paramChanged( QTreeWidgetItem * item, int column )
 {
-	if(column==eDefault)
+	if(column==eText)
 	{
 		return;
 	}
@@ -518,12 +522,12 @@ void Laboratory::doubleClick(QTreeWidgetItem * item, int column)
 		return;
 	}
 	// a number
-	if(item->text(eDefault).isEmpty() && column==eDefault)
+	if(item->text(eText).isEmpty() && column==eText)
 	{
 		return;
 	}
 	// not a number
-	if(column!=eDefault)
+	if(column!=eText)
 	{
 		return;
 	}

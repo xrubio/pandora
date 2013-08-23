@@ -36,7 +36,7 @@ namespace GUI
 enum ParamColumn
 {
 	eName = 0,
-	eDefault = 1,
+	eText = 1,
 	eMin = 2,
 	eMax = 3,
 	eStep = 4

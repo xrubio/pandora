@@ -42,9 +42,7 @@ SimulationControlThread::~SimulationControlThread()
 void SimulationControlThread::run()
 {
 	_cancelExecution = false;
-	int status = 0;
-	bool finished = false;
-
+	std::cout << "thread running" << std::endl;
 	for(int i=0; i<_totalExperiments; i++)
 	{
 		std::stringstream workingDirectory;
@@ -60,23 +58,26 @@ void SimulationControlThread::run()
 		{
 			int status = 0;
 			bool finished = false;
+			std::cout << "check looping for experiment: " << i << std::endl;
 			while(!finished)
 			{
 				if(_cancelExecution)
 				{
 					finished = true;
 					kill(pid_ps, SIGKILL);
+					std::cout << "exec killed" << std::endl;
 				}
 				else
 				{
 					pid_t result = waitpid(pid_ps, &status, WNOHANG|WUNTRACED);
 					if(result==pid_ps)
 					{
+						std::cout << "experiment: " << i << " finished" << std::endl;
 						finished = true;
 					}
 					else
 					{
-						sleep(100);
+						msleep(100);
 					}
 				}
 			}
@@ -84,6 +85,7 @@ void SimulationControlThread::run()
 		if(_cancelExecution)
 		{
 			quit();
+			std::cout << "thread quit" << std::endl;
 			return;
 		}
 		emit nextSimulation();
@@ -92,6 +94,7 @@ void SimulationControlThread::run()
 
 void SimulationControlThread::cancelExecution()
 {
+	std::cout << "cancel execution signal received" << std::endl;
 	_cancelExecution = true;
 }
 	
