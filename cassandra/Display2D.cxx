@@ -240,7 +240,7 @@ void Display2D::rastersRearranged( std::list<std::string> items, std::list<bool>
 	{
 		if((*itView)==true)
 		{
-			_orderedRasters.push_back(*it);
+			_orderedRasters.push_front(*it);
 		}
 		itView++;
 	}

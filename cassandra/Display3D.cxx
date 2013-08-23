@@ -48,17 +48,18 @@ namespace GUI
 
 //Inicialitzem els paràmetres al constructor per defecte i carreguem l'arxiu on hi ha tota la informació referent al ràster
 //que posteriorment haurem de representar (x,y,z).
-Display3D::Display3D(QWidget *parent ) : QGLWidget(parent), _simulationRecord(0), _viewedStep(0), _zoom(1.0f), _position(0,0), _lastPos(0,0), _rotation(0,0), _rotationZ(0), _cellScale(1.0f, 1.0f, 1.0f), _quadLandscape(0), _agentFocus(0), _randomColor(false)
+Display3D::Display3D(QWidget *parent ) : QGLWidget(parent), _simulationRecord(0), _viewedStep(0), _zoom(1.0f), _position(0,0), _lastPos(0,0), _rotation(0,0), _rotationZ(0), _cellScale(1.0f, 1.0f, 1.0f), _agentFocus(0), _randomColor(false)
 {
 }
 
 
 Display3D::~Display3D()
 {
-	if(_quadLandscape)
+	for(QuadTreeMap::iterator it=_quadTrees.begin(); it!=_quadTrees.end(); it++)
 	{
-		delete _quadLandscape;
+		delete it->second;
 	}
+	_quadTrees.clear();
 }
 
 //Fixem el minim tamany que podrà tenir el quadre on mostrem el ràster.
@@ -78,12 +79,34 @@ void Display3D::initializeGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);   //netejar vista
 	// squared landscapes by now
-	float size = _simulationRecord->getSize();
+	float maxRasterSize = _simulationRecord->getSize();
 
-	float puntMig = sqrt(size*size+size*size);
+	// update quadtrees and check for max raster size
+	float maxResolution = 1.0f;
+
+	for(QuadTreeMap::iterator it=_quadTrees.begin(); it!=_quadTrees.end(); it++)
+	{
+		delete it->second;
+	}
+	_quadTrees.clear();
+
+	for(std::list<std::string>::const_iterator it =_orderedRasters.begin(); it!=_orderedRasters.end(); it++)
+	{
+		RasterConfiguration * rasterConfig = ProjectConfiguration::instance()->getRasterConfig(*it);
+		if(rasterConfig->getCellResolution()>maxResolution)
+		{
+			maxResolution = rasterConfig->getCellResolution();
+		}
+		QuadTree * newQuadTree = new QuadTree(_simulationRecord->getSize()*rasterConfig->getCellResolution());
+		newQuadTree->initializeChilds();
+		_quadTrees.insert(make_pair(*it, newQuadTree));
+	}
+	maxRasterSize *= maxResolution;
+
+	float puntMig = sqrt(maxRasterSize*maxRasterSize+maxRasterSize*maxRasterSize);
 	radi = (puntMig)/2.f; //mida escenari/2
-	_vrp._x = size/2.0f;
-	_vrp._y = -size/2.0f;
+	_vrp._x = maxRasterSize/2.0f;
+	_vrp._y = -maxRasterSize/2.0f;
 	_vrp._z = 0;
 
 	std::cout << "Radi = " << radi << std::endl;
@@ -132,13 +155,6 @@ void Display3D::initializeGL()
 	_landscapeMaterial.registerTexture();
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-	if(_quadLandscape)
-	{
-		delete _quadLandscape;
-	}
-	_quadLandscape = new QuadTree(_simulationRecord->getSize()); //, central,NW,NE,SE,SW,neighN,neighS,neighE,neighW);
-	_quadLandscape->initializeChilds();
 }
 
 void Display3D::extractFrustum()
@@ -175,40 +191,40 @@ void Display3D::extractFrustum()
 	clip[15] = modl[12] * proj[ 3] + modl[13] * proj[ 7] + modl[14] * proj[11] + modl[15] * proj[15];
 
 	/* Extract the numbers for the RIGHT plane */
-	frustum[0][0] = clip[ 3] - clip[ 0];
-	frustum[0][1] = clip[ 7] - clip[ 4];
-	frustum[0][2] = clip[11] - clip[ 8];
-	frustum[0][3] = clip[15] - clip[12];
+	_frustum[0][0] = clip[ 3] - clip[ 0];
+	_frustum[0][1] = clip[ 7] - clip[ 4];
+	_frustum[0][2] = clip[11] - clip[ 8];
+	_frustum[0][3] = clip[15] - clip[12];
 
 	/* Extract the numbers for the LEFT plane */
-	frustum[1][0] = clip[ 3] + clip[ 0];
-	frustum[1][1] = clip[ 7] + clip[ 4];
-	frustum[1][2] = clip[11] + clip[ 8];
-	frustum[1][3] = clip[15] + clip[12];
+	_frustum[1][0] = clip[ 3] + clip[ 0];
+	_frustum[1][1] = clip[ 7] + clip[ 4];
+	_frustum[1][2] = clip[11] + clip[ 8];
+	_frustum[1][3] = clip[15] + clip[12];
 	   
 	/* Extract the BOTTOM plane */
-	frustum[2][0] = clip[ 3] + clip[ 1];
-	frustum[2][1] = clip[ 7] + clip[ 5];
-	frustum[2][2] = clip[11] + clip[ 9];
-	frustum[2][3] = clip[15] + clip[13];
+	_frustum[2][0] = clip[ 3] + clip[ 1];
+	_frustum[2][1] = clip[ 7] + clip[ 5];
+	_frustum[2][2] = clip[11] + clip[ 9];
+	_frustum[2][3] = clip[15] + clip[13];
 
 	/* Extract the TOP plane */
-	frustum[3][0] = clip[ 3] - clip[ 1];
-	frustum[3][1] = clip[ 7] - clip[ 5];
-	frustum[3][2] = clip[11] - clip[ 9];
-	frustum[3][3] = clip[15] - clip[13];
+	_frustum[3][0] = clip[ 3] - clip[ 1];
+	_frustum[3][1] = clip[ 7] - clip[ 5];
+	_frustum[3][2] = clip[11] - clip[ 9];
+	_frustum[3][3] = clip[15] - clip[13];
 
 	/* Extract the FAR plane */
-	frustum[4][0] = clip[ 3] - clip[ 2];
-	frustum[4][1] = clip[ 7] - clip[ 6];
-	frustum[4][2] = clip[11] - clip[10];
-	frustum[4][3] = clip[15] - clip[14];
+	_frustum[4][0] = clip[ 3] - clip[ 2];
+	_frustum[4][1] = clip[ 7] - clip[ 6];
+	_frustum[4][2] = clip[11] - clip[10];
+	_frustum[4][3] = clip[15] - clip[14];
 
 	/* Extract the NEAR plane */
-	frustum[5][0] = clip[ 3] + clip[ 2];
-	frustum[5][1] = clip[ 7] + clip[ 6];
-	frustum[5][2] = clip[11] + clip[10];
-	frustum[5][3] = clip[15] + clip[14];
+	_frustum[5][0] = clip[ 3] + clip[ 2];
+	_frustum[5][1] = clip[ 7] + clip[ 6];
+	_frustum[5][2] = clip[11] + clip[10];
+	_frustum[5][3] = clip[15] + clip[14];
 
 }
 
@@ -245,6 +261,12 @@ void Display3D::focus()
 	glTranslatef(-position._x, position._y, -_vrp._z);
 }
 
+void Display3D::updateRasterConfig()
+{
+	initializeGL();
+	update();
+}
+
 void Display3D::paintLandscape()
 {
 	Engine::Point2D<int> index;
@@ -258,18 +280,20 @@ void Display3D::paintLandscape()
         glPushMatrix();
         _landscapeMaterial.activate();
 
-		int pot2 = powf(2,ceil(log2(_simulationRecord->getSize())));
         glEnable(GL_CULL_FACE);
 
 		RasterConfiguration * rasterConfig = ProjectConfiguration::instance()->getRasterConfig(*(it));
+		QuadTreeMap::iterator qIt = _quadTrees.find(*it);
+		QuadTree * quadTree = qIt->second;
+		int pot2 = powf(2,ceil(log2(rasterConfig->getCellResolution()*_simulationRecord->getSize())));
 		if(rasterConfig->hasElevationRaster())
 		{
         	Engine::StaticRaster & elevationRaster(_simulationRecord->getRasterTmp(rasterConfig->getElevationRaster(), _viewedStep));
-        	_quadLandscape->update(pot2, *rasterConfig, colorRaster, elevationRaster, _randomColor);
+        	quadTree->update(pot2, *rasterConfig, colorRaster, elevationRaster, _randomColor);
 		}
 		else
 		{
-        	_quadLandscape->update(pot2, *rasterConfig, colorRaster,_plane, _randomColor);
+        	quadTree->update(pot2, *rasterConfig, colorRaster,_plane, _randomColor);
 		}
 
         _landscapeMaterial.deactivate();
@@ -351,7 +375,12 @@ void Display3D::paintGL()
 	
 	extractFrustum();
 	glPopMatrix();
-	_quadLandscape->setFrustum(frustum);
+
+	for(QuadTreeMap::iterator it=_quadTrees.begin(); it!=_quadTrees.end(); it++)
+	{
+		QuadTree * quadTree = it->second;
+		quadTree->setFrustum(_frustum);
+	}
 	paintLandscape();
 	paintAgents();
 	
@@ -559,7 +588,7 @@ void Display3D::rastersRearranged( std::list<std::string> items, std::list<bool>
 	{
 		if((*itView)==true)
 		{
-			_orderedRasters.push_back(*it);
+			_orderedRasters.push_front(*it);
 		}
 		itView++;
 	}

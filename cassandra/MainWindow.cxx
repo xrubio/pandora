@@ -489,6 +489,7 @@ void MainWindow::agentConfigured( const std::string & type, const AgentConfigura
 void MainWindow::rasterConfigured( const std::string & type, const RasterConfiguration & config )
 {	
 	ProjectConfiguration::instance()->updateRasterConfig(type, config);
+	_display3D->updateRasterConfig();
 }
 
 void MainWindow::show3DWindow()

@@ -64,6 +64,7 @@ class Display3D : public QGLWidget
 	typedef std::map<std::string, std::string > FileNamesMap;
 	typedef std::map<std::string, AgentConfiguration *> AgentsConfigurationMap;
 	typedef std::map<std::string, RasterConfiguration *> RastersConfigurationMap;
+	typedef std::map<std::string, QuadTree * > QuadTreeMap;
 
 public:
 	Display3D(QWidget *parent);
@@ -76,6 +77,8 @@ public:
 
 	// if this setter is used the Display3D will follow this position
 	void setAgentFocus( Engine::AgentRecord * agentRecord );
+
+	void updateRasterConfig();
 
 public slots:
 	void viewedStepChangedSlot( int newViewedStep );
@@ -114,6 +117,7 @@ private:
 	// selection of agent
 	void focus();
 
+	QuadTreeMap _quadTrees;
 	Engine::Point3D<float> _angle;
 	double dist, anterior, posterior, radi, anglecam, ra;
 	// point of view of observer
@@ -122,8 +126,6 @@ private:
 	// helper raster used when no elevation raster is defined
 	Engine::StaticRaster _plane;
 
-
-private:
 	Engine::SimulationRecord * _simulationRecord;
 	int _viewedStep;
 	Models3DMap _models;
@@ -148,14 +150,12 @@ private:
 	// order of rasters
 	std::list<std::string> _orderedRasters;
 
-    QuadTree * _quadLandscape;
-
     QTime _time;
 
 	// cleans all the display options
 	void resetView();
 	Engine::AgentRecord * _agentFocus;
-    float frustum[6][4];
+    float _frustum[6][4];
 
 	bool _randomColor;
 

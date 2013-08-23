@@ -74,9 +74,9 @@ bool QuadTree::polygonInFrustum(Engine::Point3D<int> a, Engine::Point3D<int> b, 
    for( f = 0; f < 6; f++ )
    {
          p = 0;
-         if( frustum[f][0] * a._x + frustum[f][1] * a._y + frustum[f][2] * a._z + frustum[f][3] < 0 ) p++;
-         if( frustum[f][0] * b._x + frustum[f][1] * b._y + frustum[f][2] * b._z + frustum[f][3] < 0 ) p++;
-         if( frustum[f][0] * c._x + frustum[f][1] * c._y + frustum[f][2] * c._z + frustum[f][3] < 0 ) p++;
+         if( _frustum[f][0] * a._x + _frustum[f][1] * a._y + _frustum[f][2] * a._z + _frustum[f][3] < 0 ) p++;
+         if( _frustum[f][0] * b._x + _frustum[f][1] * b._y + _frustum[f][2] * b._z + _frustum[f][3] < 0 ) p++;
+         if( _frustum[f][0] * c._x + _frustum[f][1] * c._y + _frustum[f][2] * c._z + _frustum[f][3] < 0 ) p++;
 
       if( p == 3)
          return true;
@@ -90,7 +90,7 @@ void QuadTree::setFrustum(float frust[6][4])
     {
         for (int j = 0; j < 4; j++)
         {
-            frustum[i][j] = frust[i][j];
+            _frustum[i][j] = frust[i][j];
         }
     }
 }
@@ -125,7 +125,7 @@ QuadTree* QuadTree::initializeChild(int depth, Engine::Point2D<int> center, int 
 	return child;
 }
 
-void QuadTree::paintTriangle( const Engine::Point2D<int> & point1, const Engine::Point2D<int> & point2, const Engine::StaticRaster & DEMRaster, float exaggeration, const Engine::StaticRaster & colorRaster, ColorSelector & colorSelector, bool randomColor )
+void QuadTree::paintTriangle( const Engine::Point2D<int> & point1, const Engine::Point2D<int> & point2, const RasterConfiguration & rasterConfig, const Engine::StaticRaster & DEMRaster, const Engine::StaticRaster & colorRaster, bool randomColor )
 {
 	// size check
 	if(point1._x>=_size || point1._y>=_size)
@@ -138,9 +138,9 @@ void QuadTree::paintTriangle( const Engine::Point2D<int> & point1, const Engine:
 	}
 
 	// frustrum check
-	Engine::Point3D<int> point3D1(point1._x, point1._y, DEMRaster.getValue(point1)*exaggeration);
-	Engine::Point3D<int> point3D2(point2._x, point2._y, DEMRaster.getValue(point2)*exaggeration);
-	Engine::Point3D<int> point3D3(_center._x, _center._y, DEMRaster.getValue(_center)*exaggeration);
+	Engine::Point3D<int> point3D1(point1._x*rasterConfig.getCellResolution(), point1._y*rasterConfig.getCellResolution(), DEMRaster.getValue(point1)*rasterConfig.getElevationExaggeration());
+	Engine::Point3D<int> point3D2(point2._x*rasterConfig.getCellResolution(), point2._y*rasterConfig.getCellResolution(), DEMRaster.getValue(point2)*rasterConfig.getElevationExaggeration());
+	Engine::Point3D<int> point3D3(_center._x*rasterConfig.getCellResolution(), _center._y*rasterConfig.getCellResolution(), DEMRaster.getValue(_center)*rasterConfig.getElevationExaggeration());
 	if(!polygonInFrustum(point3D1, point3D2, point3D3))
 	{
 		return;
@@ -150,17 +150,17 @@ void QuadTree::paintTriangle( const Engine::Point2D<int> & point1, const Engine:
 	
 	float sizeF = (float)_size;
 
-	setCellColor(colorRaster, colorSelector, _center, randomColor);
+	setCellColor(colorRaster, rasterConfig.getColorRamp(), _center, randomColor);
 	glTexCoord2f((float)(_center._x)/sizeF, (float)(_center._y)/sizeF);
-	glVertex3f(_center._x,-_center._y,((DEMRaster.getValue(_center)*exaggeration)));
+	glVertex3f(_center._x*rasterConfig.getCellResolution(),-_center._y*rasterConfig.getCellResolution(),((DEMRaster.getValue(_center)*rasterConfig.getElevationExaggeration())));
 
 	//setCellColor(colorRaster, colorSelector, point2, randomColor);
 	glTexCoord2f((float)(point2._x)/sizeF, (float)(point2._y)/sizeF);
-	glVertex3f(point2._x,-point2._y,((DEMRaster.getValue(point2)*exaggeration)));
+	glVertex3f(point2._x*rasterConfig.getCellResolution(),-point2._y*rasterConfig.getCellResolution(),((DEMRaster.getValue(point2)*rasterConfig.getElevationExaggeration())));
 
 	//setCellColor(colorRaster, colorSelector, point1, randomColor);
 	glTexCoord2f((float)(point1._x)/sizeF, (float)(point1._y)/sizeF);
-	glVertex3f(point1._x,-point1._y,((DEMRaster.getValue(point1)*exaggeration)));
+	glVertex3f(point1._x*rasterConfig.getCellResolution(),-point1._y*rasterConfig.getCellResolution(),((DEMRaster.getValue(point1)*rasterConfig.getElevationExaggeration())));
 
 	glEnd();
 }
@@ -212,22 +212,22 @@ void QuadTree::update(int prof, RasterConfiguration & rasterConfig, Engine::Stat
 
 			glPushMatrix();
 			glTranslatef(offset._x, offset._y, offset._z);
-			paintTriangle(_neighN, _NE, DEMRaster, rasterConfig.getElevationExaggeration(), colorRaster, rasterConfig.getColorRamp(), randomColor);
-			paintTriangle(_NE, _neighE, DEMRaster, rasterConfig.getElevationExaggeration(), colorRaster, rasterConfig.getColorRamp(), randomColor);
-			paintTriangle(_neighE, _SE, DEMRaster, rasterConfig.getElevationExaggeration(), colorRaster, rasterConfig.getColorRamp(), randomColor);			
-			paintTriangle(_SE, _neighS, DEMRaster, rasterConfig.getElevationExaggeration(), colorRaster, rasterConfig.getColorRamp(), randomColor);
+			paintTriangle(_neighN, _NE, rasterConfig, DEMRaster, colorRaster, randomColor);
+			paintTriangle(_NE, _neighE, rasterConfig, DEMRaster, colorRaster, randomColor);
+			paintTriangle(_neighE, _SE, rasterConfig, DEMRaster, colorRaster, randomColor);			
+			paintTriangle(_SE, _neighS, rasterConfig, DEMRaster, colorRaster, randomColor);
 
-			paintTriangle(_neighS, _SW, DEMRaster, rasterConfig.getElevationExaggeration(), colorRaster, rasterConfig.getColorRamp(), randomColor);
-			paintTriangle(_SW, _neighW, DEMRaster, rasterConfig.getElevationExaggeration(), colorRaster, rasterConfig.getColorRamp(), randomColor);
-			paintTriangle(_neighW, _NW, DEMRaster, rasterConfig.getElevationExaggeration(), colorRaster, rasterConfig.getColorRamp(), randomColor);
-			paintTriangle(_NW, _neighN, DEMRaster, rasterConfig.getElevationExaggeration(), colorRaster, rasterConfig.getColorRamp(), randomColor);
+			paintTriangle(_neighS, _SW, rasterConfig, DEMRaster, colorRaster, randomColor);
+			paintTriangle(_SW, _neighW, rasterConfig, DEMRaster, colorRaster, randomColor);
+			paintTriangle(_neighW, _NW, rasterConfig, DEMRaster, colorRaster, randomColor);
+			paintTriangle(_NW, _neighN, rasterConfig, DEMRaster, colorRaster, randomColor);
 			glPopMatrix();
         }
     }
 
 }
 
-void QuadTree::setCellColor( const Engine::StaticRaster & raster, ColorSelector & colorSelector, const Engine::Point2D<int> & cell, bool randomColor)
+void QuadTree::setCellColor( const Engine::StaticRaster & raster, const ColorSelector & colorSelector, const Engine::Point2D<int> & cell, bool randomColor)
 {
 	QColor color;
 	if(raster.hasColorTable())

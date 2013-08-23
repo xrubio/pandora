@@ -41,7 +41,7 @@ class QuadTree
 	Engine::Point2D<int> _SW;
 
 
-	void paintTriangle( const Engine::Point2D<int> & point1, const Engine::Point2D<int> & point2, const Engine::StaticRaster & DEMRaster, float exaggeration, const Engine::StaticRaster & colorRaster, ColorSelector & colorSelector, bool randomColor);
+	void paintTriangle( const Engine::Point2D<int> & point1, const Engine::Point2D<int> & point2, const RasterConfiguration & rasterConfig, const Engine::StaticRaster & DEMRaster, const Engine::StaticRaster & colorRaster, bool randomColor);
 
 public:
 	// initial QuadTree 
@@ -50,12 +50,12 @@ public:
 	QuadTree(int size, const Engine::Point2D<int> & center, int prof);
 	virtual ~QuadTree();
 
-    float frustum[6][4];
+    float _frustum[6][4];
 
     void initializeChilds();
     QuadTree* initializeChild(int depth, Engine::Point2D<int> center, int prof);
 
-    void setCellColor(const Engine::StaticRaster & raster, ColorSelector & colorSelector, const Engine::Point2D<int> & cell, bool randomColor );
+    void setCellColor(const Engine::StaticRaster & raster, const ColorSelector & colorSelector, const Engine::Point2D<int> & cell, bool randomColor );
 	void update(int prof, RasterConfiguration & rasterConfig, Engine::StaticRaster &colorRaster, Engine::StaticRaster & DEMRaster, bool randomColor); //recorrer l'arbre i segons la distancia activar o desactivar nodes (childs) i afegirlos a points/polys
     bool polygonInFrustum(Engine::Point3D<int> a, Engine::Point3D<int> b, Engine::Point3D<int> c );
     void setFrustum(float frust[6][4]);
