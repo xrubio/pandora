@@ -37,6 +37,7 @@
 #include <LoadingProgressBar.hxx>
 #include <Settings.hxx>
 #include <Laboratory.hxx>
+#include <AgentAnalysis.hxx>
 
 #include <iostream>
 
@@ -88,11 +89,13 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_display2D = new Display2D(this);
 	_display3D = new Display3D(0);
 	_laboratory = new Laboratory(this);
+	_agentAnalysis = new AgentAnalysis(this);
 	_settings = new Settings;
 	
 	_display2D->show();
 	_display3D->hide();
 	_laboratory->hide();
+	_agentAnalysis->hide();
 	_settings->hide();
 	
     setCentralWidget(_display2D);
@@ -201,72 +204,82 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_showLabAction->setStatusTip(tr("Open Laboratory"));
 	connect(_showLabAction, SIGNAL(triggered()), this, SLOT(showLaboratory()));
 
+	_agentAnalysisAction = new QAction(QIcon(":/resources/icons/lab.png"), tr("&Agent Analysis"), this);
+	_agentAnalysisAction->setStatusTip(tr("Analyse agent stats"));
+	connect(_agentAnalysisAction, SIGNAL(triggered()), this, SLOT(showAgentAnalysis()));
+
+
 	// menus
-	_fileMenu = menuBar()->addMenu(tr("&File"));
-	_fileMenu->addAction(_newProjectAction);
-	_fileMenu->addAction(_loadProjectAction);
-	_fileMenu->addAction(_saveProjectAction);
-	_fileMenu->addAction(_saveProjectAsAction);
-	_fileMenu->addAction(_selectSimulationAction);
-	_fileMenu->addAction(_settingsAction);
-	_fileMenu->addAction(_quitAction);
+	QMenu * fileMenu = menuBar()->addMenu(tr("&File"));
+	fileMenu->addAction(_newProjectAction);
+	fileMenu->addAction(_loadProjectAction);
+	fileMenu->addAction(_saveProjectAction);
+	fileMenu->addAction(_saveProjectAsAction);
+	fileMenu->addAction(_selectSimulationAction);
+	fileMenu->addAction(_settingsAction);
+	fileMenu->addAction(_quitAction);
 
-	_simulationMenu = menuBar()->addMenu(tr("&Simulation"));
-	_simulationMenu->addAction(_firstStepAction);
-	_simulationMenu->addAction(_previousStepAction);
-	_simulationMenu->addAction(_nextStepAction);
-	_simulationMenu->addAction(_finalStepAction);
-	_simulationMenu->addSeparator();
-	_simulationMenu->addAction(_playAction);
+	QMenu * simulationMenu = menuBar()->addMenu(tr("&Simulation"));
+	simulationMenu->addAction(_firstStepAction);
+	simulationMenu->addAction(_previousStepAction);
+	simulationMenu->addAction(_nextStepAction);
+	simulationMenu->addAction(_finalStepAction);
+	simulationMenu->addSeparator();
+	simulationMenu->addAction(_playAction);
 
-	_viewMenu = menuBar()->addMenu(tr("&View"));
-	_viewMenu->addSeparator();
-	_viewMenu->addAction(_zoomOutAction);
-	_viewMenu->addAction(_zoomInAction);
-	_viewMenu->addAction(_showAgentsAction);
-	_viewMenu->addSeparator();
-	_viewMenu->addAction(_show3DAction);
-	_viewMenu->addAction(_showLabAction);
+	QMenu * viewMenu = menuBar()->addMenu(tr("&View"));
+	viewMenu->addSeparator();
+	viewMenu->addAction(_zoomOutAction);
+	viewMenu->addAction(_zoomInAction);
+	viewMenu->addAction(_showAgentsAction);
+	viewMenu->addSeparator();
+	viewMenu->addAction(_show3DAction);
+	viewMenu->addAction(_showLabAction);
+
+	QMenu * analysisMenu = menuBar()->addMenu(tr("&Analysis"));
+	analysisMenu->addSeparator();
+	analysisMenu->addAction(_agentAnalysisAction);
 
 	// toolbars
-	_fileBar= addToolBar(tr("File"));
-	_fileBar->addAction(_newProjectAction);
-	_fileBar->addAction(_loadProjectAction);
-	_fileBar->addAction(_saveProjectAction);
-	_fileBar->addAction(_saveProjectAsAction);
-	_fileBar->addAction(_selectSimulationAction);
+	QToolBar * fileBar= addToolBar(tr("File"));
+	fileBar->addAction(_newProjectAction);
+	fileBar->addAction(_loadProjectAction);
+	fileBar->addAction(_saveProjectAction);
+	fileBar->addAction(_saveProjectAsAction);
+	fileBar->addAction(_selectSimulationAction);
 	
-	_simulationBar = addToolBar(tr("Simulation Controls"));
-	_simulationBar->addAction(_firstStepAction);
-	_simulationBar->addAction(_previousStepAction);
+	QToolBar * simulationBar = addToolBar(tr("Simulation Controls"));
+	simulationBar->addAction(_firstStepAction);
+	simulationBar->addAction(_previousStepAction);
+
+	QToolBar * analysisBar = addToolBar(tr("Analysis"));
+	analysisBar->addAction(_agentAnalysisAction);
 	
 	QLabel * label = new QLabel("Step: ");
-	_simulationBar->addWidget(label);
+	simulationBar->addWidget(label);
 	
 	_stepBox = new QSpinBox();
 	connect(_stepBox, SIGNAL(valueChanged(int)), this, SLOT(viewedStepChanged(int)));
 	connect(this, SIGNAL(stepChangeToStepBox(int)), _stepBox, SLOT(setValue(int)));
-	_simulationBar->addWidget(_stepBox);
+	simulationBar->addWidget(_stepBox);
 	
 	QLabel * label2 = new QLabel(" of ");
-	_simulationBar->addWidget(label2);
+	simulationBar->addWidget(label2);
 	
 	_numStepsLabel = new QLabel();
 	_numStepsLabel->setNum(0);
-	_simulationBar->addWidget(_numStepsLabel);
-	
-	
-	_simulationBar->addAction(_nextStepAction);
-	_simulationBar->addAction(_finalStepAction);
-	_simulationBar->addAction(_playAction);
+	simulationBar->addWidget(_numStepsLabel);
+	simulationBar->addAction(_nextStepAction);
+	simulationBar->addAction(_finalStepAction);
+	simulationBar->addAction(_playAction);
 
-	_viewBar = addToolBar(tr("View Options"));
-	_viewBar->addAction(_zoomOutAction);			
-	_viewBar->addAction(_zoomInAction);
-	_viewBar->addAction(_showAgentsAction);
-	_viewBar->addSeparator();
-	_viewBar->addAction(_show3DAction);
-	_viewBar->addAction(_showLabAction);
+	QToolBar * viewBar = addToolBar(tr("View Options"));
+	viewBar->addAction(_zoomOutAction);			
+	viewBar->addAction(_zoomInAction);
+	viewBar->addAction(_showAgentsAction);
+	viewBar->addSeparator();
+	viewBar->addAction(_show3DAction);
+	viewBar->addAction(_showLabAction);
 	
 	// TODO un thread diferent?
 	_playTimer = new QTimer(this);
@@ -522,6 +535,19 @@ void MainWindow::showLaboratory()
         _laboratory->show();
     }
 }
+
+void MainWindow::showAgentAnalysis()
+{
+    if(_agentAnalysis->isVisible())
+    {
+        _agentAnalysis->hide();
+    }
+    else
+    {
+        _agentAnalysis->show();
+    }
+}
+
 
 void MainWindow::showSettings()
 {

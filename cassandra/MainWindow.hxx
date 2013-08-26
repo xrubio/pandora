@@ -30,7 +30,7 @@
 #include <QTreeWidgetItem>
 #include <AgentRecord.hxx>
 #include <SimulationRecord.hxx>
-#include "ui_Settings.h"
+#include <ui_Settings.h>
 
 class QMenu;
 class QAction;
@@ -52,6 +52,7 @@ class Display3D;
 class AgentConfiguration;
 class RasterConfiguration;
 class Laboratory;
+class AgentAnalysis;
 class Settings;
 
 class LoadingProgressBar;
@@ -61,15 +62,6 @@ class MainWindow : public QMainWindow
 
 private:
 	Q_OBJECT
-
-	QMenu * _fileMenu;
-	QMenu * _simulationMenu;
-	QMenu * _viewMenu;
-
-	QToolBar * _fileBar;
-	QToolBar * _simulationBar;
-    QToolBar * _viewBar;
-
 
 	QAction * _newProjectAction;
 	QAction * _loadProjectAction;
@@ -91,6 +83,7 @@ private:
 
 	QAction * _show3DAction;
 	QAction * _showLabAction;
+	QAction * _agentAnalysisAction;
 
 	QSpinBox * _stepBox;
 	QLabel * _numStepsLabel;
@@ -103,6 +96,7 @@ private:
     Display3D * _display3D;	
 	Settings * _settings;
 	Laboratory * _laboratory;
+	AgentAnalysis * _agentAnalysis;
 
 	AgentTypeSelection * _agentTypeSelection;
 	AgentTraitSelection * _agentTraitSelection;
@@ -152,6 +146,7 @@ private slots:
 	
 	void show3DWindow();
 	void showLaboratory();
+	void showAgentAnalysis();
 
 	void agentConfigured( const std::string & , const AgentConfiguration &); 
 	void rasterConfigured( const std::string & , const RasterConfiguration &); 	
