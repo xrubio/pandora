@@ -20,52 +20,35 @@
  * 
  */
 
-#ifndef __TraitAnalysis_hxx__
-#define __TraitAnalysis_hxx__
+#ifndef __RunAnalysis_hxx__
+#define __RunAnalysis_hxx__
 
-#include <QWidget>
-#include <ui_TraitAnalysis.h>
+#include <QDialog>
+#include <ui_RunProcess.h>
 
-namespace Engine
-{
-	class SimulationRecord;
-}
+class QPushButton;
 
 namespace GUI
 {
 
-class TraitAnalysis : public QWidget
+class RunAnalysis : public QDialog
 {
 	Q_OBJECT
 
-	Ui::TraitAnalysis _traits;
-	Engine::SimulationRecord * _record;
-
+	Ui::RunProcess _run;
+	QPushButton * _doneButton;
 public:
-	enum AnalysisType
-	{
-		eMean = 0,
-		eSum = 1,
-		eStandardDeviation = 2
-	};
-
+	RunAnalysis( QWidget * parent );
+	virtual ~RunAnalysis();
+	void init( int numberOfSimulations );
 
 public slots:
-	void analysisSelected( const QString & option);
-	void removeAnalysis();
+	void updateSimulationAnalysis();
 
-
-public:
-	TraitAnalysis( QWidget * parent, Engine::SimulationRecord * record, const std::string & type );
-	virtual ~TraitAnalysis();
-	AnalysisType getAnalysis() const;
-	std::string getTrait() const;
-signals:
-	void removeAnalysis(QWidget *);
 };
-
 
 } // namespace GUI
 
-#endif // __TraitAnalysis_hxx__
+#endif // __RunAnalysis_hxx__
+
 

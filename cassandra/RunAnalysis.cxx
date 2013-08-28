@@ -20,13 +20,13 @@
  * 
  */
 
-#include <RunSimulations.hxx>
+#include <RunAnalysis.hxx>
 #include <QPushButton>
 
 namespace GUI
 {
 
-RunSimulations::RunSimulations( QWidget * parent ) : QDialog(parent)
+RunAnalysis::RunAnalysis( QWidget * parent ) : QDialog(parent)
 {
 	setModal(true);
 	_run.setupUi(this);
@@ -34,13 +34,13 @@ RunSimulations::RunSimulations( QWidget * parent ) : QDialog(parent)
 	_doneButton = _run.buttonBox->addButton("Done!", QDialogButtonBox::AcceptRole);
 }
 
-RunSimulations::~RunSimulations()
+RunAnalysis::~RunAnalysis()
 {
 }
 
-void RunSimulations::init( int numberOfExperiments )
+void RunAnalysis::init( int numberOfSimulations )
 {
-	_run.progressBar->setRange(0, numberOfExperiments);
+	_run.progressBar->setRange(0, numberOfSimulations);
 	_run.progressBar->setValue(0);
 	QString message("executing run: ");
 	message.append(QString::number(1+_run.progressBar->value())+"/"+QString::number(_run.progressBar->maximum()));
@@ -50,7 +50,7 @@ void RunSimulations::init( int numberOfExperiments )
 
 }
 
-void RunSimulations::updateSimulationRun()
+void RunAnalysis::updateSimulationAnalysis()
 {
 	int nextValue = 1+_run.progressBar->value();
 	_run.progressBar->setValue(nextValue);
@@ -63,7 +63,7 @@ void RunSimulations::updateSimulationRun()
 	}
 	else
 	{
-		QString message("executing run: ");
+		QString message("analysis simulation: ");
 		message.append(QString::number(1+_run.progressBar->value())+"/"+QString::number(_run.progressBar->maximum()));
 		_run.status->setText(message);
 	}

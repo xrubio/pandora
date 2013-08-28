@@ -27,6 +27,12 @@
 #include <SimulationRecord.hxx>
 
 #include <TraitAnalysis.hxx>
+#include <RunAnalysis.hxx>
+#include <AnalysisControlThread.hxx>
+
+#include <AgentMean.hxx>
+#include <AgentSum.hxx>
+#include <AgentStdDev.hxx>
 
 namespace GUI
 {
@@ -38,8 +44,10 @@ AgentAnalysis::AgentAnalysis(QWidget * parent ) : QDialog(parent), _sampleRecord
 	
 	connect(_analysis.baseButton, SIGNAL(clicked()), this, SLOT(selectBaseDir()));
 	connect(_analysis.newTrait, SIGNAL(clicked()), this, SLOT(newAnalysis()));
+	connect(_analysis.outputButton, SIGNAL(clicked()), this, SLOT(selectOutput()));
 
 	_runButton = _analysis.buttonBox->addButton("Run", QDialogButtonBox::ApplyRole);
+	connect(_runButton, SIGNAL(clicked()), this, SLOT(run()));
 
 	_runButton->setEnabled(false);
 	_analysis.exploreConfig->widget(1)->setEnabled(false);	
@@ -47,6 +55,9 @@ AgentAnalysis::AgentAnalysis(QWidget * parent ) : QDialog(parent), _sampleRecord
 
 	_analysis.paramsTree->header()->setMovable(false);
 	_analysis.paramsTree->header()->setResizeMode(0, QHeaderView::ResizeToContents);
+
+	_analysis.outputButton->setEnabled(false);
+	_analysis.outputEdit->setEnabled(false);
 }
 
 AgentAnalysis::~AgentAnalysis()
@@ -55,6 +66,17 @@ AgentAnalysis::~AgentAnalysis()
 	{
 		delete _sampleRecord;
 	}
+}
+
+void AgentAnalysis::selectOutput()
+{
+	QString fileName = QFileDialog::getExistingDirectory(this, tr("Select Output dir"), "");
+	if (fileName.isEmpty())
+	{
+		return;
+	}
+	_analysis.outputEdit->setText(fileName);
+	_runButton->setEnabled(true);
 }
 
 void AgentAnalysis::selectBaseDir()
@@ -76,6 +98,9 @@ void AgentAnalysis::selectBaseDir()
 		_runButton->setEnabled(false);
 		_analysis.exploreConfig->widget(1)->setEnabled(false);	
 		_analysis.exploreConfig->widget(2)->setEnabled(false);
+
+		_analysis.outputButton->setEnabled(false);
+		_analysis.outputEdit->setEnabled(false);
 	}
 	else
 	{
@@ -84,6 +109,10 @@ void AgentAnalysis::selectBaseDir()
 		_analysis.exploreConfig->widget(2)->setEnabled(false);
 
 		fillParamsTree();
+		
+		_analysis.outputButton->setEnabled(true);
+		_analysis.outputEdit->setEnabled(true);
+
 	}
 }
 
@@ -312,7 +341,7 @@ void AgentAnalysis::loadConfigs()
 			msgBox.setText("Unable to open data file for experiment: "+QString(dataFile.c_str()));
 			msgBox.exec();
 			delete _sampleRecord;
-			continue;
+			return;
 		}
 
 		for(Engine::SimulationRecord::AgentTypesMap::const_iterator itType = _sampleRecord->beginTypes(); itType!=_sampleRecord->endTypes(); itType++)
@@ -351,6 +380,50 @@ void AgentAnalysis::newAnalysis()
 	connect(traitAnalysis, SIGNAL(removeAnalysis(QWidget *)), this, SLOT(removeAnalysis(QWidget *)));
 	
 	_analysis.exploreConfig->widget(2)->setEnabled(true);
+}
+
+void AgentAnalysis::run()
+{
+	AnalysisControlThread * thread = new AnalysisControlThread(_baseDir, _analysis.agentTypes->currentText().toStdString(), _analysis.outputEdit->text().toStdString());
+	
+	RunAnalysis * runAnalysis = new RunAnalysis(0);
+	
+	connect(thread, SIGNAL(nextSimulation()), runAnalysis, SLOT(updateSimulationAnalysis()));
+	connect(runAnalysis, SIGNAL(rejected()), thread, SLOT(cancelExecution()));
+
+	for(int i=0; i<_analysis.analysisLayout->count(); i++)
+	{
+		QWidget * aWidget = _analysis.analysisLayout->itemAt(i)->widget();
+		if(aWidget && aWidget->objectName().compare("TraitAnalysis")==0)
+		{
+			TraitAnalysis * widget = (TraitAnalysis*)aWidget;
+			TraitAnalysis::AnalysisType type = widget->getAnalysis();
+			std::string trait = widget->getTrait();
+			switch(type)
+			{
+				case TraitAnalysis::eMean:
+					thread->addAnalysis(new Analysis::AgentMean(trait));
+					break;
+				
+				case TraitAnalysis::eSum:
+					thread->addAnalysis(new Analysis::AgentSum(trait));
+					break;
+			
+				case TraitAnalysis::eStandardDeviation:
+					thread->addAnalysis(new Analysis::AgentStdDev(trait));
+					break;
+
+				default:
+					return;
+			}
+		}
+
+	}
+	std::cout << "compiled analysis to perform" << std::endl;
+	
+	runAnalysis->init(thread->getNumberOfSimulations());
+	runAnalysis->show();
+	thread->start();
 }
 
 } // namespace GUI

@@ -20,52 +20,48 @@
  * 
  */
 
-#ifndef __TraitAnalysis_hxx__
-#define __TraitAnalysis_hxx__
+#ifndef __AnalysisControlThread_hxx__
+#define __AnalysisControlThread_hxx__
 
-#include <QWidget>
-#include <ui_TraitAnalysis.h>
+#include <QThread>
 
-namespace Engine
+namespace Analysis 
 {
-	class SimulationRecord;
+	class AgentAnalysis;
 }
 
 namespace GUI
 {
 
-class TraitAnalysis : public QWidget
+class AnalysisControlThread : public QThread
 {
 	Q_OBJECT
 
-	Ui::TraitAnalysis _traits;
-	Engine::SimulationRecord * _record;
+	bool _cancelExecution;
+	std::string _baseDir;
+	std::string _agentType;
+	std::string _outputDir;
+
+	std::list<Analysis::AgentAnalysis *> _analysisToPerform;
 
 public:
-	enum AnalysisType
-	{
-		eMean = 0,
-		eSum = 1,
-		eStandardDeviation = 2
-	};
+	AnalysisControlThread( const std::string & baseDir, const std::string & agentType, const std::string & outputDir );
+	virtual ~AnalysisControlThread();
 
+	void run();
+	int getNumberOfSimulations();
+	void addAnalysis( Analysis::AgentAnalysis * analysis );
+
+signals:
+	void nextSimulation();
 
 public slots:
-	void analysisSelected( const QString & option);
-	void removeAnalysis();
-
-
-public:
-	TraitAnalysis( QWidget * parent, Engine::SimulationRecord * record, const std::string & type );
-	virtual ~TraitAnalysis();
-	AnalysisType getAnalysis() const;
-	std::string getTrait() const;
-signals:
-	void removeAnalysis(QWidget *);
+	void cancelExecution();
+	
 };
 
 
 } // namespace GUI
 
-#endif // __TraitAnalysis_hxx__
+#endif // __AnalysisControlThread_hxx__
 

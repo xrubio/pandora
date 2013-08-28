@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RunSimulations</class>
- <widget class="QDialog" name="RunSimulations">
+ <class>RunProcess</class>
+ <widget class="QDialog" name="RunProcess">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -97,7 +97,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>RunSimulations</receiver>
+   <receiver>RunProcess</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -113,7 +113,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>RunSimulations</receiver>
+   <receiver>RunProcess</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

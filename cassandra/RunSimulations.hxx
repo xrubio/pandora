@@ -24,7 +24,7 @@
 #define __RunSimulations_hxx__
 
 #include <QDialog>
-#include <ui_RunSimulations.h>
+#include <ui_RunProcess.h>
 
 class QPushButton;
 
@@ -35,7 +35,7 @@ class RunSimulations : public QDialog
 {
 	Q_OBJECT
 
-	Ui::RunSimulations _run;
+	Ui::RunProcess _run;
 	QPushButton * _doneButton;
 public:
 	RunSimulations( QWidget * parent );

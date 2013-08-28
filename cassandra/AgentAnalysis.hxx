@@ -73,7 +73,8 @@ private slots:
 	void selectBaseDir();
 	void newAnalysis();
 	void removeAnalysis( QWidget * analysis );
-
+	void selectOutput();
+	void run();
 public:
 	AgentAnalysis( QWidget * parent );
 	virtual ~AgentAnalysis();

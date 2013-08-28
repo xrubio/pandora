@@ -49,9 +49,9 @@ TraitAnalysis::TraitAnalysis( QWidget * parent, Engine::SimulationRecord * recor
 	analysis << "Standard Deviation";
 	*/
 
-	_traits.analysis->addItem("Mean", 0);
-	_traits.analysis->addItem("Sum", 1);
-	_traits.analysis->addItem("Standard Deviation", 2);
+	_traits.analysis->addItem("Mean", TraitAnalysis::eMean);
+	_traits.analysis->addItem("Sum", TraitAnalysis::eSum);
+	_traits.analysis->addItem("Standard Deviation", TraitAnalysis::eStandardDeviation);
 
 	connect(_traits.analysis, SIGNAL(activated(const QString &)), this, SLOT(analysisSelected(const QString &)));
 	connect(_traits.removeButton, SIGNAL(clicked()), this, SLOT(removeAnalysis()));
@@ -76,6 +76,16 @@ void TraitAnalysis::analysisSelected( const QString & option)
 	}
 	_traits.traits->setEnabled(true);
 	*/
+}
+
+TraitAnalysis::AnalysisType TraitAnalysis::getAnalysis() const
+{
+	return (AnalysisType)_traits.analysis->findData(_traits.analysis->currentIndex()); //currentText().toStdString();
+}
+
+std::string TraitAnalysis::getTrait() const
+{
+	return _traits.traits->currentText().toStdString();
 }
 
 } // namespace GUI
