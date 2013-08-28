@@ -25,15 +25,54 @@
 
 #include <QDialog>
 #include <ui_AgentAnalysis.h>
+#include <tinyxml.h>
+
+namespace Engine
+{
+	class SimulationRecord;
+}
 
 namespace GUI
 {
 
 class AgentAnalysis : public QDialog
 {
+	typedef std::map<std::string, int> ValuesMap;
+	typedef std::map< QTreeWidgetItem * , ValuesMap > PermutationsMap;
+
+	enum GroupColumn
+	{
+		eName = 0,
+		ePermutations = 1,
+		eUse = 2,
+		eField = 3
+	};
+
 	Q_OBJECT
 
 	Ui::AgentAnalysis _analysis;
+	PermutationsMap _permutations;
+
+	QPushButton * _runButton;
+
+	std::string _baseDir;
+
+	void loadConfigs();
+	void fillParamsTree();
+
+	Engine::SimulationRecord * _sampleRecord;
+
+	void parseLevel( TiXmlNode * parent, QTreeWidgetItem * parentItem);
+	void parseAttributes( TiXmlElement * parent, QTreeWidgetItem * parentItem);
+
+	void updateNumberOfPermutations();
+
+	void parseLevelPermutations(TiXmlElement * node, QTreeWidgetItem * item);
+	void computePermutations(TiXmlElement * node, QTreeWidgetItem * parentItem );
+private slots:
+	void selectBaseDir();
+	void newAnalysis();
+	void removeAnalysis( QWidget * analysis );
 
 public:
 	AgentAnalysis( QWidget * parent );

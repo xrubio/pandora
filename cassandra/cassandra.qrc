@@ -20,6 +20,8 @@
 		<file>resources/icons/3dview.png</file>
 		<file>resources/icons/lab.png</file>
 
+		<file>resources/icons/analysis.png</file>
+
 		<file>resources/agentIcons/default_agent_1.png</file>
 		<file>resources/agentIcons/default_agent_2.png</file>
 		<file>resources/agentIcons/default_agent_3.png</file>

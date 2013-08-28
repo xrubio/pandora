@@ -204,7 +204,7 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_showLabAction->setStatusTip(tr("Open Laboratory"));
 	connect(_showLabAction, SIGNAL(triggered()), this, SLOT(showLaboratory()));
 
-	_agentAnalysisAction = new QAction(QIcon(":/resources/icons/lab.png"), tr("&Agent Analysis"), this);
+	_agentAnalysisAction = new QAction(QIcon(":/resources/icons/analysis.png"), tr("&Agent Analysis"), this);
 	_agentAnalysisAction->setStatusTip(tr("Analyse agent stats"));
 	connect(_agentAnalysisAction, SIGNAL(triggered()), this, SLOT(showAgentAnalysis()));
 

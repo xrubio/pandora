@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>620</width>
-    <height>362</height>
+    <height>567</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,22 +36,22 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
-       <widget class="QPushButton" name="rootButton">
+       <widget class="QPushButton" name="baseButton">
         <property name="text">
          <string>Base dir</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="rootEdit">
+       <widget class="QLineEdit" name="baseEdit">
         <property name="readOnly">
          <bool>true</bool>
         </property>
        </widget>
       </item>
      </layout>
-     <zorder>rootEdit</zorder>
-     <zorder>rootButton</zorder>
+     <zorder>baseEdit</zorder>
+     <zorder>baseButton</zorder>
     </widget>
    </item>
    <item>
@@ -61,7 +61,10 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_5">
       <item>
-       <widget class="QToolBox" name="agentAnalysis">
+       <widget class="QToolBox" name="exploreConfig">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
           <horstretch>0</horstretch>
@@ -69,15 +72,15 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="page_1">
          <property name="geometry">
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>588</width>
-           <height>78</height>
+           <width>94</width>
+           <height>31</height>
           </rect>
          </property>
          <attribute name="label">
@@ -85,17 +88,20 @@
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
-           <widget class="QComboBox" name="agentTypeComboBox"/>
+           <widget class="QComboBox" name="agentTypes"/>
           </item>
          </layout>
         </widget>
         <widget class="QWidget" name="page_2">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
          <property name="geometry">
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>571</width>
-           <height>115</height>
+           <width>94</width>
+           <height>35</height>
           </rect>
          </property>
          <attribute name="label">
@@ -103,32 +109,38 @@
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout">
+           <layout class="QVBoxLayout" name="analysisLayout">
             <item>
-             <widget class="QPushButton" name="newTraitButton">
-              <property name="text">
-               <string>New</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="changeTraitButton">
-              <property name="text">
-               <string>Change</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="deleteTraitButton">
-              <property name="text">
-               <string>Delete</string>
-              </property>
-             </widget>
+             <layout class="QHBoxLayout" name="horizontalLayout">
+              <item>
+               <spacer name="horizontalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="newTrait">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>New</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
            </layout>
-          </item>
-          <item>
-           <widget class="QListWidget" name="chosenTraits"/>
           </item>
          </layout>
         </widget>
@@ -137,8 +149,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>571</width>
-           <height>84</height>
+           <width>588</width>
+           <height>293</height>
           </rect>
          </property>
          <attribute name="label">
@@ -146,13 +158,37 @@
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="QTreeWidget" name="groupParameters">
+           <widget class="QTreeWidget" name="paramsTree">
             <attribute name="headerVisible">
+             <bool>true</bool>
+            </attribute>
+            <attribute name="headerCascadingSectionResizes">
+             <bool>false</bool>
+            </attribute>
+            <attribute name="headerDefaultSectionSize">
+             <number>90</number>
+            </attribute>
+            <attribute name="headerStretchLastSection">
              <bool>false</bool>
             </attribute>
             <column>
              <property name="text">
-              <string>Item</string>
+              <string>Element</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Permutations</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Use?</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Field</string>
              </property>
             </column>
            </widget>
@@ -188,7 +224,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Close</set>
      </property>
     </widget>
    </item>
