@@ -26,12 +26,15 @@ protected:
 	std::string _outputFile;
 	std::string _type;
 	std::string _separator;
-	
+
+	// if true analysis will be deleted in destructor
+	bool _analysisOwnership;
 
 public:
 	Results( const Engine::SimulationRecord & simRecord, const std::string & outputFile, const std::string & type, const std::string & separator );	
 	virtual ~Results();
 
+	void setAnalysisOwnership( bool analysisOwnership );
 	void apply() const;
 	void addAnalysis( Analysis * analysis );
 	

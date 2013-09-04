@@ -11,12 +11,17 @@
 namespace Analysis
 {
 
-Results::Results( const Engine::SimulationRecord & simRecord, const std::string & outputFile, const std::string & type, const std::string & separator ) : _simRecord(simRecord), _outputFile(outputFile), _type(type), _separator(separator)
+Results::Results( const Engine::SimulationRecord & simRecord, const std::string & outputFile, const std::string & type, const std::string & separator ) : _simRecord(simRecord), _outputFile(outputFile), _type(type), _separator(separator), _analysisOwnership(true)
 {
 }
 
 Results::~Results()
 {
+	if(!_analysisOwnership)
+	{
+		return;
+	}
+
 	AnalysisList::iterator it =_analysisList.begin();
 	while(it!=_analysisList.end())
 	{
@@ -24,6 +29,10 @@ Results::~Results()
 		it = _analysisList.erase(it);
 		delete analysis;
 	}
+}
+void Results::setAnalysisOwnership( bool analysisOwnership )
+{
+	_analysisOwnership = analysisOwnership;
 }
 
 void Results::apply() const
@@ -142,6 +151,7 @@ void RasterResults::concreteApply() const
 		std::cout << " done" << std::endl;
 	}
 }
+
 
 } // namespace Analysis
 
