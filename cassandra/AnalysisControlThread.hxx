@@ -38,14 +38,19 @@ class AnalysisControlThread : public QThread
 	Q_OBJECT
 
 	bool _cancelExecution;
+
 	std::string _baseDir;
 	std::string _agentType;
 	std::string _outputDir;
 
+	int _numberOfSimulations;
+	int _resolution;
+
 	std::list<Analysis::AgentAnalysis *> _analysisToPerform;
+	void analyseSimulation( const std::string & dataFile, const std::string & fileName);
 
 public:
-	AnalysisControlThread( const std::string & baseDir, const std::string & agentType, const std::string & outputDir );
+	AnalysisControlThread( const std::string & baseDir, const std::string & agentType, const std::string & outputDir, int resolution);
 	virtual ~AnalysisControlThread();
 
 	void run();

@@ -42,7 +42,7 @@ class TraitAnalysis : public QWidget
 	Engine::SimulationRecord * _record;
 
 public:
-	enum AnalysisType
+	enum GlobalAnalysis 
 	{
 		eMean = 0,
 		eSum = 1,
@@ -58,7 +58,7 @@ public slots:
 public:
 	TraitAnalysis( QWidget * parent, Engine::SimulationRecord * record, const std::string & type );
 	virtual ~TraitAnalysis();
-	AnalysisType getAnalysis() const;
+	GlobalAnalysis getAnalysis() const;
 	std::string getTrait() const;
 signals:
 	void removeAnalysis(QWidget *);

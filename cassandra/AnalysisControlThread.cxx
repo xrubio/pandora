@@ -23,13 +23,34 @@
 #include <AnalysisControlThread.hxx>
 #include <Analysis.hxx>
 
+#include <boost/filesystem.hpp>
+#include <tinyxml.h>
+#include <QMessageBox>
+#include <iomanip>
+#include <Results.hxx>
+
 #include <iostream>
 
 namespace GUI
 {
 
-AnalysisControlThread::AnalysisControlThread( const std::string & baseDir, const std::string & agentType, const std::string & outputDir ) : _baseDir(baseDir), _agentType(agentType), _outputDir(outputDir)
+AnalysisControlThread::AnalysisControlThread( const std::string & baseDir, const std::string & agentType, const std::string & outputDir, int resolution) : _baseDir(baseDir), _agentType(agentType), _outputDir(outputDir), _numberOfSimulations(0), _resolution(resolution)
 {
+	// compute number of simulations to analyse
+	for( boost::filesystem::directory_iterator it(_baseDir); it!=boost::filesystem::directory_iterator(); it++ )
+	{
+		if(!boost::filesystem::is_directory(it->status()))
+		{
+			continue;
+		}
+		std::stringstream oss;
+		oss << (*it).path().native() << "/config.xml";
+		if(boost::filesystem::exists(oss.str()))
+		{
+			_numberOfSimulations++;
+		}
+	}
+	std::cout << "num sims: " << _numberOfSimulations << std::endl;
 }
 
 AnalysisControlThread::~AnalysisControlThread()
@@ -46,9 +67,36 @@ AnalysisControlThread::~AnalysisControlThread()
 void AnalysisControlThread::run()
 {
 	_cancelExecution = false;
-	for(std::list<Analysis::AgentAnalysis *>::iterator it=_analysisToPerform.begin(); it!=_analysisToPerform.end(); it++)
+	
+	boost::filesystem::path basePath(_baseDir); 
+	for( boost::filesystem::directory_iterator it(_baseDir); it!=boost::filesystem::directory_iterator(); it++ )
 	{
-		std::cout << "performing next analysis" << std::endl;	
+		std::cout << "next sim" << std::endl;
+		if(!boost::filesystem::is_directory(it->status()))
+		{
+			continue;
+		}
+		std::stringstream oss;
+		oss << (*it).path().native() << "/config.xml";	
+		TiXmlDocument doc(oss.str().c_str());
+		if (!doc.LoadFile())
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Unable to open config file in dir: "+QString(oss.str().c_str()));
+			msgBox.exec();
+			continue;
+		}
+		TiXmlHandle hDoc(&doc);
+		TiXmlHandle hRoot(0);
+    
+		TiXmlElement * root = doc.FirstChildElement( "config" );
+		TiXmlElement * output = root->FirstChildElement("output");
+		std::string dataFile = (*it).path().native()+"/"+output->Attribute("resultsFile");
+
+		boost::filesystem::path pathToDir = *it;
+		analyseSimulation(dataFile, pathToDir.filename().native());
+		std::cout << "simulation analysis tone for: " << pathToDir.filename().native() << std::endl;
+		emit nextSimulation();
 		
 		if(_cancelExecution)
 		{
@@ -56,7 +104,24 @@ void AnalysisControlThread::run()
 			return;
 		}
 	}
-	emit nextSimulation();
+}
+
+void AnalysisControlThread::analyseSimulation( const std::string & dataFile, const std::string & fileName)
+{
+	std::cout << "analysing file: " << dataFile << std::endl;
+	Engine::SimulationRecord record(_resolution, true);
+	record.loadHDF5(dataFile, false, true);
+
+	std::stringstream oss;
+	oss << _outputDir << "/" << fileName << ".csv";
+	Analysis::AgentResults results(record, oss.str(), _agentType);
+	results.setAnalysisOwnership(false);
+	std::cout << "output to: " << oss.str() << std::endl;
+	for(std::list<Analysis::AgentAnalysis *>::iterator it=_analysisToPerform.begin(); it!=_analysisToPerform.end(); it++)
+	{
+		results.addAnalysis(*it);
+	}
+	results.apply();
 }
 
 void AnalysisControlThread::addAnalysis( Analysis::AgentAnalysis * analysis )
@@ -71,7 +136,7 @@ void AnalysisControlThread::cancelExecution()
 
 int AnalysisControlThread::getNumberOfSimulations()
 {
-	return 10;
+	return _numberOfSimulations;
 }
 
 } // namespace GUI

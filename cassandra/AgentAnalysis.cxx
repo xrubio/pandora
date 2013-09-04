@@ -25,6 +25,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <SimulationRecord.hxx>
+#include <QCheckBox>
 
 #include <TraitAnalysis.hxx>
 #include <RunAnalysis.hxx>
@@ -33,6 +34,9 @@
 #include <AgentMean.hxx>
 #include <AgentSum.hxx>
 #include <AgentStdDev.hxx>
+#include <AgentFinalResults.hxx>
+#include <AgentHistogram.hxx>
+#include <AgentHDFtoSHP.hxx>
 
 namespace GUI
 {
@@ -48,6 +52,7 @@ AgentAnalysis::AgentAnalysis(QWidget * parent ) : QDialog(parent), _sampleRecord
 
 	_runButton = _analysis.buttonBox->addButton("Run", QDialogButtonBox::ApplyRole);
 	connect(_runButton, SIGNAL(clicked()), this, SLOT(run()));
+	_analysis.exploreConfig->setEnabled(false);
 
 	_runButton->setEnabled(false);
 	_analysis.exploreConfig->widget(1)->setEnabled(false);	
@@ -58,6 +63,18 @@ AgentAnalysis::AgentAnalysis(QWidget * parent ) : QDialog(parent), _sampleRecord
 
 	_analysis.outputButton->setEnabled(false);
 	_analysis.outputEdit->setEnabled(false);
+
+	connect(_analysis.analysisTypes, SIGNAL(currentIndexChanged(int)), this, SLOT(analysisTypeChosen(int)));
+	connect(_analysis.lastStep, SIGNAL(stateChanged(int)), this, SLOT(lastStepChanged(int)));
+	// analysis types
+	_analysis.analysisTypes->addItem("Global analysis", eGlobal);
+	_analysis.analysisTypes->addItem("Individual agent analysis", eIndividual);
+	_analysis.analysisTypes->addItem("Histogram", eHistogram);
+	_analysis.analysisTypes->addItem("Geospatial reference", eGeospatial);
+
+	_analysis.globalStatistics->hide();
+	_analysis.groupParams->hide();
+	_analysis.individualStats->hide();
 }
 
 AgentAnalysis::~AgentAnalysis()
@@ -75,6 +92,19 @@ void AgentAnalysis::selectOutput()
 	{
 		return;
 	}
+	_outputDir = fileName.toStdString();
+
+	if(boost::filesystem::exists(_outputDir) && !boost::filesystem::is_empty(_outputDir))
+	{
+		QMessageBox::StandardButton button = QMessageBox::question(0, "Directory exists", QString("Directory \"").append(QString(_outputDir.c_str()).append("\" is not empty; do you want to overwrite it?")), QMessageBox::Yes | QMessageBox::No);
+		if(button==QMessageBox::No)
+		{
+			return;
+		}
+		boost::filesystem::remove_all(_outputDir);
+	}
+	boost::filesystem::create_directory(_outputDir);
+
 	_analysis.outputEdit->setText(fileName);
 	_runButton->setEnabled(true);
 }
@@ -84,6 +114,7 @@ void AgentAnalysis::selectBaseDir()
 	QString fileName = QFileDialog::getExistingDirectory(this, tr("Select Base dir"), "");
 	if (fileName.isEmpty())
 	{
+		_analysis.exploreConfig->setEnabled(false);
 		return;
 	}
 	else
@@ -93,6 +124,7 @@ void AgentAnalysis::selectBaseDir()
 	}
 
 	loadConfigs();
+
 	if(!_sampleRecord)
 	{
 		_runButton->setEnabled(false);
@@ -106,13 +138,16 @@ void AgentAnalysis::selectBaseDir()
 	{
 		_runButton->setEnabled(false);
 		_analysis.exploreConfig->widget(1)->setEnabled(true);	
-		_analysis.exploreConfig->widget(2)->setEnabled(false);
+		_analysis.exploreConfig->widget(2)->setEnabled(true);
 
 		fillParamsTree();
+		analysisTypeChosen(eGlobal);
 		
 		_analysis.outputButton->setEnabled(true);
 		_analysis.outputEdit->setEnabled(true);
-
+		
+		_analysis.exploreConfig->setEnabled(true);
+		_analysis.exploreConfig->setCurrentWidget(_analysis.page_1);
 	}
 }
 
@@ -173,7 +208,6 @@ void AgentAnalysis::updateNumberOfPermutations()
 		// look for data file
 		std::stringstream oss;
 		oss << (*it).path().native() << "/config.xml";
-		std::cout << "file: " << oss.str()<< std::endl;
 		TiXmlDocument doc(oss.str().c_str());
 		if (!doc.LoadFile())
 		{
@@ -359,15 +393,14 @@ void AgentAnalysis::loadConfigs()
 			return;
 		}
 	}
-
 }
 
 void AgentAnalysis::removeAnalysis( QWidget * analysis )
 {
-	_analysis.analysisLayout->removeWidget(analysis);
+	_analysis.globalStatistics->layout()->removeWidget(analysis);
 	delete analysis;
 
-	if(_analysis.analysisLayout->count()==0)
+	if(_analysis.globalStatistics->layout()->count()==0)
 	{
 		_analysis.exploreConfig->widget(2)->setEnabled(false);	
 	}
@@ -376,28 +409,19 @@ void AgentAnalysis::removeAnalysis( QWidget * analysis )
 void AgentAnalysis::newAnalysis()
 {
 	TraitAnalysis * traitAnalysis = new TraitAnalysis(this, _sampleRecord, _analysis.agentTypes->currentText().toStdString());
-	_analysis.analysisLayout->addWidget(traitAnalysis);
+	_analysis.globalStatistics->layout()->addWidget(traitAnalysis);
 	connect(traitAnalysis, SIGNAL(removeAnalysis(QWidget *)), this, SLOT(removeAnalysis(QWidget *)));
-	
-	_analysis.exploreConfig->widget(2)->setEnabled(true);
 }
 
-void AgentAnalysis::run()
+void AgentAnalysis::addGlobalAnalysis( AnalysisControlThread* thread )
 {
-	AnalysisControlThread * thread = new AnalysisControlThread(_baseDir, _analysis.agentTypes->currentText().toStdString(), _analysis.outputEdit->text().toStdString());
-	
-	RunAnalysis * runAnalysis = new RunAnalysis(0);
-	
-	connect(thread, SIGNAL(nextSimulation()), runAnalysis, SLOT(updateSimulationAnalysis()));
-	connect(runAnalysis, SIGNAL(rejected()), thread, SLOT(cancelExecution()));
-
-	for(int i=0; i<_analysis.analysisLayout->count(); i++)
+	for(int i=0; i<_analysis.globalStatistics->layout()->count(); i++)
 	{
-		QWidget * aWidget = _analysis.analysisLayout->itemAt(i)->widget();
+		QWidget * aWidget = _analysis.globalStatistics->layout()->itemAt(i)->widget();
 		if(aWidget && aWidget->objectName().compare("TraitAnalysis")==0)
 		{
 			TraitAnalysis * widget = (TraitAnalysis*)aWidget;
-			TraitAnalysis::AnalysisType type = widget->getAnalysis();
+			TraitAnalysis::GlobalAnalysis type = widget->getAnalysis();
 			std::string trait = widget->getTrait();
 			switch(type)
 			{
@@ -417,14 +441,161 @@ void AgentAnalysis::run()
 					return;
 			}
 		}
-
 	}
-	std::cout << "compiled analysis to perform" << std::endl;
+}
+			
+void AgentAnalysis::addIndividualStats(AnalysisControlThread* thread )
+{
+	Analysis::AgentFinalResults * results = new Analysis::AgentFinalResults("individualStats.csv", _sampleRecord->getNumSteps()/_sampleRecord->getSerializedResolution(), ";");
+
+	for(int i=0; i<_analysis.individualStats->layout()->count(); i++)
+	{
+		QCheckBox * box = (QCheckBox*)_analysis.individualStats->layout()->itemAt(i)->widget();
+		if(box->isChecked())
+		{
+			results->addAttribute(box->text().toStdString());
+		}
+	}
+	thread->addAnalysis(results);
+}
+
+void AgentAnalysis::addHistogram( AnalysisControlThread* thread )
+{
+	int numStep = _sampleRecord->getNumSteps();
+	if(!_analysis.lastStep->isChecked())
+	{
+		numStep = _analysis.step->value();
+	}
+	Analysis::AgentHistogram * histogram = new Analysis::AgentHistogram("histogram.csv", _analysis.attributes->currentText().toStdString(), _analysis.interval->value(), numStep, ";");
+	thread->addAnalysis(histogram);
+}
+
+void AgentAnalysis::addGeoreference( AnalysisControlThread* thread )
+{
+	Analysis::AgentHDFtoSHP * shp = new Analysis::AgentHDFtoSHP("agents.shp", Engine::Point2D<int>(_analysis.west->value(), _analysis.north->value()), _analysis.resolution->value(), _analysis.datum->text().toStdString());
+
+	thread->addAnalysis(shp);
+}
+
+
+void AgentAnalysis::run()
+{
+	AnalysisControlThread * thread = new AnalysisControlThread(_baseDir, _analysis.agentTypes->currentText().toStdString(), _outputDir, _analysis.resolution->value());
 	
+	RunAnalysis * runAnalysis = new RunAnalysis(0);
+	
+	connect(thread, SIGNAL(nextSimulation()), runAnalysis, SLOT(updateSimulationAnalysis()));
+	connect(runAnalysis, SIGNAL(rejected()), thread, SLOT(cancelExecution()));
+
+	AnalysisType analysis = (AnalysisType)_analysis.analysisTypes->itemData(_analysis.analysisTypes->currentIndex()).toInt();
+	switch(analysis)
+	{	
+		case eGlobal:
+			addGlobalAnalysis(thread);
+			break;
+		case eIndividual:
+			addIndividualStats(thread);
+			break;
+		case eHistogram:
+			addHistogram(thread);
+			break;
+		case eGeospatial:
+			addGeoreference(thread);
+			break;
+		default:
+			return;
+	}
 	runAnalysis->init(thread->getNumberOfSimulations());
 	runAnalysis->show();
 	thread->start();
 }
+			
+void AgentAnalysis::fillIndividualStats()
+{	
+	std::string type = _analysis.agentTypes->currentText().toStdString();
+	Engine::SimulationRecord::AgentRecordsMap::const_iterator it=_sampleRecord->beginAgents(type);
+
+	QVBoxLayout * layout = new QVBoxLayout;
+	Engine::AgentRecord * agentRecord = it->second; 
+	for(Engine::AgentRecord::StatesMap::const_iterator itS=agentRecord->beginStates(); itS!=agentRecord->endStates(); itS++)
+	{
+		QCheckBox * box = new QCheckBox(QString(itS->first.c_str()));
+		layout->addWidget(box);
+	}
+	layout->addStretch(1);
+	delete _analysis.individualStats->layout();
+    _analysis.individualStats->setLayout(layout);
+}
+
+void AgentAnalysis::fillHistogram()
+{
+	std::string type = _analysis.agentTypes->currentText().toStdString();
+	Engine::SimulationRecord::AgentRecordsMap::const_iterator it=_sampleRecord->beginAgents(type);
+	Engine::AgentRecord * agentRecord = it->second;
+	
+	QStringList traits;
+	for(Engine::AgentRecord::StatesMap::const_iterator itS=agentRecord->beginStates(); itS!=agentRecord->endStates(); itS++)
+	{
+		traits << QString(itS->first.c_str());
+	}
+	_analysis.attributes->clear();
+	_analysis.attributes->addItems(traits);
+	_analysis.step->setMaximum(_sampleRecord->getNumSteps()-1);
+}
+
+void AgentAnalysis::analysisTypeChosen( int index )
+{
+	AnalysisType analysis = (AnalysisType)_analysis.analysisTypes->itemData(index).toInt();
+	switch(analysis)
+	{
+		case eGlobal:
+			_analysis.globalStatistics->show();
+			_analysis.groupParams->show();
+			_analysis.individualStats->hide();
+			_analysis.histogram->hide();
+			_analysis.georeference->hide();
+			break;
+		case eIndividual:
+			_analysis.globalStatistics->hide();
+			_analysis.groupParams->hide();
+			_analysis.individualStats->show();
+			_analysis.histogram->hide();
+			_analysis.georeference->hide();
+			fillIndividualStats();
+			break;
+		case eHistogram:
+			_analysis.globalStatistics->hide();
+			_analysis.groupParams->hide();
+			_analysis.individualStats->hide();
+			_analysis.histogram->show();
+			_analysis.georeference->hide();
+			fillHistogram();
+			break;
+		case eGeospatial:
+			_analysis.globalStatistics->hide();
+			_analysis.groupParams->hide();
+			_analysis.individualStats->hide();
+			_analysis.histogram->hide();
+			_analysis.georeference->show();
+			break;
+		default:
+			return;
+	}
+	_analysis.exploreConfig->setCurrentIndex(2);
+}
+
+void AgentAnalysis::lastStepChanged( int checked )
+{
+	if(checked==Qt::Checked)
+	{
+		_analysis.step->setEnabled(false);
+	}
+	else
+	{
+		_analysis.step->setEnabled(true);
+	}
+}
+
 
 } // namespace GUI
 
