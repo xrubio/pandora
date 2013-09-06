@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 	{	
 		if(argc>2)
 		{
-			throw Engine::Exception("USAGE: randomTest [config file]");
+			throw Engine::Exception("USAGE: randomWalkers [config file]");
 		}		
 	
 		std::string fileName("config.xml");
@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 		Examples::RandomWorldConfig config;
 		config.deserialize(fileName);
 	
-		Engine::Simulation helloWorldSim(config.getSize(), config.getNumSteps(), 10);
+		Engine::Simulation helloWorldSim(config.getSize(), config.getNumSteps(), config.getSerializeResolution());
 		Examples::RandomWorld world( helloWorldSim, config);
 	
 		world.init(argc, argv);
