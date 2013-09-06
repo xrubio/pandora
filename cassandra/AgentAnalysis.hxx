@@ -34,7 +34,7 @@ namespace Engine
 
 namespace GUI
 {
-
+class AnalysisControlThread;
 class AgentAnalysis : public QDialog
 {
 	typedef std::map<std::string, int> ValuesMap;
@@ -48,6 +48,15 @@ class AgentAnalysis : public QDialog
 		eField = 3
 	};
 
+	enum AnalysisType
+	{
+		eGlobal = 0,
+		eIndividual = 1,
+		eHistogram = 2,
+		eGeospatial = 3
+	};
+
+
 	Q_OBJECT
 
 	Ui::AgentAnalysis _analysis;
@@ -56,6 +65,7 @@ class AgentAnalysis : public QDialog
 	QPushButton * _runButton;
 
 	std::string _baseDir;
+	std::string _outputDir;
 
 	void loadConfigs();
 	void fillParamsTree();
@@ -69,12 +79,23 @@ class AgentAnalysis : public QDialog
 
 	void parseLevelPermutations(TiXmlElement * node, QTreeWidgetItem * item);
 	void computePermutations(TiXmlElement * node, QTreeWidgetItem * parentItem );
+	void fillIndividualStats();
+	void fillHistogram();
+
+
+	void addGlobalAnalysis( AnalysisControlThread* thread );
+	void addIndividualStats( AnalysisControlThread* thread );
+	void addHistogram( AnalysisControlThread* thread );
+	void addGeoreference( AnalysisControlThread* thread );
+
 private slots:
 	void selectBaseDir();
 	void newAnalysis();
 	void removeAnalysis( QWidget * analysis );
 	void selectOutput();
 	void run();
+	void analysisTypeChosen( int index );
+	void lastStepChanged( int checked );
 public:
 	AgentAnalysis( QWidget * parent );
 	virtual ~AgentAnalysis();

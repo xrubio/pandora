@@ -25,9 +25,9 @@
 
 #include <QThread>
 
-namespace Analysis 
+namespace PostProcess 
 {
-	class AgentAnalysis;
+	class Output;
 }
 
 namespace GUI
@@ -38,19 +38,24 @@ class AnalysisControlThread : public QThread
 	Q_OBJECT
 
 	bool _cancelExecution;
+
 	std::string _baseDir;
 	std::string _agentType;
 	std::string _outputDir;
 
-	std::list<Analysis::AgentAnalysis *> _analysisToPerform;
+	int _numberOfSimulations;
+	int _resolution;
+
+	PostProcess::Output * _output;
+	void analyseSimulation( const std::string & dataFile, const std::string & fileName);
 
 public:
-	AnalysisControlThread( const std::string & baseDir, const std::string & agentType, const std::string & outputDir );
+	AnalysisControlThread( const std::string & baseDir, const std::string & agentType, const std::string & outputDir, int resolution);
 	virtual ~AnalysisControlThread();
 
 	void run();
 	int getNumberOfSimulations();
-	void addAnalysis( Analysis::AgentAnalysis * analysis );
+	void setOutput( PostProcess::Output * output);
 
 signals:
 	void nextSimulation();

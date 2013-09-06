@@ -78,9 +78,9 @@ void TraitAnalysis::analysisSelected( const QString & option)
 	*/
 }
 
-TraitAnalysis::AnalysisType TraitAnalysis::getAnalysis() const
+TraitAnalysis::GlobalAnalysis TraitAnalysis::getAnalysis() const
 {
-	return (AnalysisType)_traits.analysis->findData(_traits.analysis->currentIndex()); //currentText().toStdString();
+	return (GlobalAnalysis)_traits.analysis->findData(_traits.analysis->currentIndex()); //currentText().toStdString();
 }
 
 std::string TraitAnalysis::getTrait() const
