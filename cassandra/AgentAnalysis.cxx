@@ -451,7 +451,6 @@ void AgentAnalysis::addGlobalAnalysis( AnalysisControlThread* thread )
 void AgentAnalysis::addIndividualStats(AnalysisControlThread* thread )
 {
 	PostProcess::IndividualStats * results = new PostProcess::IndividualStats(_sampleRecord->getNumSteps()/_sampleRecord->getSerializedResolution());
-
 	for(int i=0; i<_analysis.individualStats->layout()->count(); i++)
 	{
 		QCheckBox * box = (QCheckBox*)_analysis.individualStats->layout()->itemAt(i)->widget();
