@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 		Panic::ScenarioConfig config;
 		config.deserialize(fileName);
 	
-		Engine::Simulation panicSimulation(config.getSize(), config.getNumSteps());
+		Engine::Simulation panicSimulation(config.getSize(), config.getNumSteps(), config.getSerializeResolution());
 		Panic::Scenario scenario( panicSimulation, config);
 	
 		scenario.init(argc, argv);
