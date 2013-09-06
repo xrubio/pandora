@@ -9,7 +9,7 @@ namespace Engine
 	class AgentRecord;
 }
 
-namespace Analysis
+namespace PostProcess
 {
 
 class AgentSum : public AgentAnalysis
@@ -21,7 +21,7 @@ public:
 	void computeAgent( const Engine::AgentRecord & agentRecord );
 };
 
-} // namespace Analysis
+} // namespace PostProcess
 
 #endif // __AgentSum_hxx__
 

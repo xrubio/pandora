@@ -2,7 +2,7 @@
 #include <analysis/AgentSum.hxx>
 #include <AgentRecord.hxx>
 
-namespace Analysis
+namespace PostProcess
 {
 
 AgentSum::AgentSum( const std::string & attributeName ) : AgentAnalysis("Sum "+attributeName), _attributeName(attributeName)
@@ -22,5 +22,5 @@ void AgentSum::computeAgent( const Engine::AgentRecord & agentRecord )
 	}
 }
 
-} // namespace Analysis
+} // namespace PostProcess
 

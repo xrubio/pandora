@@ -19,41 +19,46 @@
  * 
  */
 
-#ifndef __AgentHistogram_hxx__
-#define __AgentHistogram_hxx__
+#ifndef __IndividualStats_hxx__
+#define __IndividualStats_hxx__
 
 #include <analysis/Output.hxx>
-#include <vector>
+#include <list>
+#include <iostream>
+#include <fstream>
+#include <iomanip>
 
 namespace Engine
 {
 	class AgentRecord;
 }
 
-namespace PostProcess 
+namespace PostProcess
 {
 
-class AgentHistogram : public Output
-{	
-	std::string _attribute;
-	int _interval;
-	// if a num step is passed the histogram will be generated from it
-	// if not, the final result of the simulation will be stored
+class IndividualStats : public Output 
+{
 	int _numStep;
+	std::ofstream _file;
 
-	std::vector<int> _histogram;
+	std::list<std::string> _attributes;
+
+	bool attributeToStore( const std::string & key );
 public:
-	AgentHistogram( const std::string & attribute, int interval = 1, int numStep = -1, const std::string & separator = ";");
-	virtual ~AgentHistogram();
+	// set a list of attributes and store for numStep time step, including agent id
+	IndividualStats( int numStep, const std::string & separator=";");
+	virtual ~IndividualStats();
 
-	void preProcess( const Engine::SimulationRecord & simRecord, const std::string & );
 	void computeAgent( const Engine::AgentRecord & agentRecord );
-	void postProcess( const Engine::SimulationRecord & simRecord, const std::string & );
+	void addAttribute( const std::string & attribute );
+	void preProcess( const Engine::SimulationRecord & simRecord, const std::string & outputFile );
+	void postProcess( const Engine::SimulationRecord & simRecord, const std::string & outputFile );
 
 	std::string getName() const;
+
 };
 
 } // namespace PostProcess
 
-#endif // __AgentHistogram_hxx__
+#endif // __IndividualStats_hxx__
 

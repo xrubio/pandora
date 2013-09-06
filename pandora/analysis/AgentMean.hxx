@@ -9,7 +9,7 @@ namespace Engine
 	class AgentRecord;
 }
 
-namespace Analysis
+namespace PostProcess
 {
 
 class AgentMean : public AgentAnalysis
@@ -25,7 +25,7 @@ public:
 	void postProcess();
 };
 
-} // namespace Analysis
+} // namespace PostProcess
 
 #endif // __AgentMean_hxx__
 

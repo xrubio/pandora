@@ -2,7 +2,7 @@
 #include <analysis/AgentNum.hxx>
 #include <AgentRecord.hxx>
 
-namespace Analysis
+namespace PostProcess
 {
 
 AgentNum::AgentNum() : AgentAnalysis("Number of agents")
@@ -22,5 +22,5 @@ void AgentNum::computeAgent( const Engine::AgentRecord & agentRecord )
 	}
 }
 
-} // namespace Analysis
+} // namespace PostProcess
 

@@ -2,7 +2,7 @@
 #include <analysis/AgentMean.hxx>
 #include <AgentRecord.hxx>
 
-namespace Analysis
+namespace PostProcess
 {
 
 AgentMean::AgentMean( const std::string & attributeName ) : AgentAnalysis("Mean "+attributeName), _attributeName(attributeName)
@@ -47,5 +47,5 @@ void AgentMean::postProcess()
 	}
 }
 
-} // namespace Analysis
+} // namespace PostProcess
 

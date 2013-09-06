@@ -1,19 +1,17 @@
 
 #include <analysis/AgentHDFtoSHP.hxx>
 #include <AgentRecord.hxx>
+#include <SimulationRecord.hxx>
 #include <ogrsf_frmts.h>
 #include <Exceptions.hxx>
 #include <sstream>
 #include <boost/filesystem.hpp>
 #include <iomanip>
-namespace Analysis
+
+namespace PostProcess 
 {
 
-AgentHDFtoSHP::AgentHDFtoSHP( const std::string & fileName, int numStep ) : AgentAnalysis("Agent HDF to SHP parser", false), _numStep(numStep), _fileName(fileName), _dataSource(0), _layer(0), _origin(0,0), _resolution(1.0f), _srs("no specified"), _definitionComplete(false)
-{
-}
-
-AgentHDFtoSHP::AgentHDFtoSHP( const std::string & fileName, const Engine::Point2D<int> & origin, float resolution, const std::string & srs, int numStep ) : AgentAnalysis("Agent HDF to SHP parser", false), _numStep(numStep), _fileName(fileName), _dataSource(0), _layer(0), _origin(origin), _resolution(resolution), _srs(srs), _definitionComplete(false)
+AgentHDFtoSHP::AgentHDFtoSHP( const Engine::Point2D<int> & origin, float resolution, const std::string & srs, int numStep ) : Output(";"), _origin(origin), _resolution(resolution), _srs(srs), _numStep(numStep), _definitionComplete(false)
 {
 }
 
@@ -21,18 +19,18 @@ AgentHDFtoSHP::~AgentHDFtoSHP()
 {
 }
 
-void AgentHDFtoSHP::preProcess()
+void AgentHDFtoSHP::preProcess(const Engine::SimulationRecord & , const std::string & outputFile)
 {
 	// check if directory exists
-	unsigned int filePos = _fileName.find_last_of("/");
-	std::string path = _fileName.substr(0,filePos+1);
+	unsigned int filePos = outputFile.find_last_of("/");
+	std::string path = outputFile.substr(0,filePos+1);
 	if(path.compare("")!=0)
 	{
 		// create dir where data will be stored if it is not already created
 		boost::filesystem::create_directory(path);
 	}
 	// delete the file if it already exists
-	boost::filesystem::remove(_fileName);
+	boost::filesystem::remove(outputFile);
 
 	std::string driverName("ESRI Shapefile");
 	OGRRegisterAll();	
@@ -45,11 +43,11 @@ void AgentHDFtoSHP::preProcess()
 		throw Engine::Exception(oss.str());
 		return;
 	}
-	_dataSource = driver->CreateDataSource(_fileName.c_str(), 0);
+	_dataSource = driver->CreateDataSource(outputFile.c_str(), 0);
 	if(!_dataSource)
 	{	
 		std::stringstream oss;
-		oss << "AgentHDFtoSHP::preProcess - unable to create new data source for file: " << _fileName;
+		oss << "AgentHDFtoSHP::preProcess - unable to create new data source for file: " << outputFile;
 		throw Engine::Exception(oss.str());
 		return;
 	}
@@ -62,7 +60,7 @@ void AgentHDFtoSHP::preProcess()
 	if(!_layer)
 	{
 		std::stringstream oss;
-		oss << "AgentHDFtoSHP::preProcess - unable to create layer for data source in file: " << _fileName;
+		oss << "AgentHDFtoSHP::preProcess - unable to create layer for data source in file: " << outputFile;
 		throw Engine::Exception(oss.str());
 		return;
 	}
@@ -74,7 +72,7 @@ void AgentHDFtoSHP::preProcess()
     if( _layer->CreateField( &fieldId) != OGRERR_NONE )
     {
 		std::stringstream oss;
-		oss << "AgentHDFtoSHP::preProcess - unable to create field id for file: " << _fileName;
+		oss << "AgentHDFtoSHP::preProcess - unable to create field id for file: " << outputFile;
 		throw Engine::Exception(oss.str());
 		return;
     }
@@ -85,7 +83,7 @@ void AgentHDFtoSHP::preProcess()
 	    if( _layer->CreateField( &fieldNumStep) != OGRERR_NONE )
     	{
 			std::stringstream oss;
-			oss << "AgentHDFtoSHP::preProcess - unable to create field num step for file: " << _fileName;
+			oss << "AgentHDFtoSHP::preProcess - unable to create field num step for file: " << outputFile;
 			throw Engine::Exception(oss.str());
 			return;
     	}
@@ -137,7 +135,7 @@ void AgentHDFtoSHP::createFeature( const Engine::AgentRecord & agentRecord, int 
 	if(_layer->CreateFeature(feature)!=OGRERR_NONE)
 	{	
 		std::stringstream oss;
-		oss << "AgentHDFtoSHP::preProcess - unable to create feature for agent with id: " << agentRecord.getId() << " for file: " << _fileName;
+		oss << "AgentHDFtoSHP::preProcess - unable to create feature for agent with id: " << agentRecord.getId();
 		throw Engine::Exception(oss.str());
 		return;
 	}
@@ -215,10 +213,16 @@ void AgentHDFtoSHP::computeAgent( const Engine::AgentRecord & agentRecord )
 	}
 }
 
-void AgentHDFtoSHP::postProcess()
+void AgentHDFtoSHP::postProcess(const Engine::SimulationRecord & , const std::string & )
 {
 	OGRDataSource::DestroyDataSource(_dataSource);
 }
 
-} // namespace Analysis
+std::string AgentHDFtoSHP::getName() const
+{
+	return "Shapefile parser";
+}
+
+
+} // namespace PostProcess
 

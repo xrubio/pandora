@@ -1,13 +1,14 @@
 
 #include <analysis/AgentHistogram.hxx>
 #include <AgentRecord.hxx>
+#include <SimulationRecord.hxx>
 #include <iostream>
 #include <fstream>
 
-namespace Analysis
+namespace PostProcess 
 {
 
-AgentHistogram::AgentHistogram( const std::string & fileName, const std::string & attribute, int interval, int numStep, const std::string & separator ) : AgentAnalysis("Agent Histogram", false), _fileName(fileName), _attribute(attribute), _interval(interval), _numStep(numStep), _separator(separator)
+AgentHistogram::AgentHistogram( const std::string & attribute, int interval, int numStep, const std::string & separator) : Output(separator ), _attribute(attribute), _interval(interval), _numStep(numStep)
 {
 }
 
@@ -15,12 +16,12 @@ AgentHistogram::~AgentHistogram()
 {
 }
 
-void AgentHistogram::preProcess()
+void AgentHistogram::preProcess( const Engine::SimulationRecord & simRecord, const std::string & )
 {
 	// if no num step specified we will pick the last one
 	if(_numStep==-1)
 	{		
-		_numStep = _results.size()-1;
+		_numStep = (simRecord.getNumSteps()/simRecord.getFinalResolution())-1;
 	}
 }
 
@@ -39,10 +40,10 @@ void AgentHistogram::computeAgent( const Engine::AgentRecord & agentRecord )
 	}
 }
 
-void AgentHistogram::postProcess()
+void AgentHistogram::postProcess( const Engine::SimulationRecord & , const std::string & outputFile )
 {
 	std::ofstream file;
-	file.open(_fileName.c_str());
+	file.open(outputFile.c_str());
 	std::stringstream header;
 	header << "beginInterval" << _separator << "time step: " << _numStep << _separator;
 	file << header.str() << std::endl;
@@ -55,5 +56,10 @@ void AgentHistogram::postProcess()
 	file.close();
 }
 
-} // namespace Analysis
+std::string AgentHistogram::getName() const
+{
+	return "Agent Histogram";
+}
+
+} // namespace PostProcess 
 

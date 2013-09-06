@@ -19,41 +19,35 @@
  * 
  */
 
-#ifndef __AgentHistogram_hxx__
-#define __AgentHistogram_hxx__
+#ifndef __GlobalStats_hxx__
+#define __GlobalStats_hxx__
 
 #include <analysis/Output.hxx>
-#include <vector>
 
-namespace Engine
+namespace PostProcess
 {
-	class AgentRecord;
-}
+class AgentAnalysis;
 
-namespace PostProcess 
+class GlobalStats : public Output
 {
+	typedef std::list<AgentAnalysis *> AgentAnalysisList;
+	AgentAnalysisList _analysisList;
 
-class AgentHistogram : public Output
-{	
-	std::string _attribute;
-	int _interval;
-	// if a num step is passed the histogram will be generated from it
-	// if not, the final result of the simulation will be stored
-	int _numStep;
+	// if true analysis will be deleted in destructor
+	bool _analysisOwnership;
 
-	std::vector<int> _histogram;
 public:
-	AgentHistogram( const std::string & attribute, int interval = 1, int numStep = -1, const std::string & separator = ";");
-	virtual ~AgentHistogram();
+	GlobalStats( const std::string & separator=";");	
+	virtual ~GlobalStats();
 
-	void preProcess( const Engine::SimulationRecord & simRecord, const std::string & );
-	void computeAgent( const Engine::AgentRecord & agentRecord );
-	void postProcess( const Engine::SimulationRecord & simRecord, const std::string & );
+	void setAnalysisOwnership( bool analysisOwnership );
+	void apply( const Engine::SimulationRecord & simRecord, const std::string & outputFile, const std::string & type );
+	void addAnalysis( AgentAnalysis * analysis );
 
 	std::string getName() const;
 };
 
 } // namespace PostProcess
 
-#endif // __AgentHistogram_hxx__
+#endif // __GlobalStats_hxx__
 

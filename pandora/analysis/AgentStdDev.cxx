@@ -2,7 +2,7 @@
 #include <analysis/AgentStdDev.hxx>
 #include <AgentRecord.hxx>
 
-namespace Analysis
+namespace PostProcess
 {
 
 AgentStdDev::AgentStdDev( const std::string & attributeName ) : AgentAnalysis("StdDev "+attributeName), _attributeName(attributeName)
@@ -74,5 +74,5 @@ void AgentStdDev::postProcess()
 	}
 }
 
-} // namespace Analysis
+} // namespace PostProcess
 

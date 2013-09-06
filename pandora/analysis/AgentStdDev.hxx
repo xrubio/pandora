@@ -9,7 +9,7 @@ namespace Engine
 	class AgentRecord;
 }
 
-namespace Analysis
+namespace PostProcess
 {
 
 class AgentStdDev : public AgentAnalysis
@@ -26,7 +26,7 @@ public:
 	void postProcess();
 };
 
-} // namespace Analysis
+} // namespace PostProcess
 
 #endif // __AgentStdDev_hxx__
 

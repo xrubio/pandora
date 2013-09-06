@@ -9,7 +9,7 @@ namespace Engine
 	class AgentRecord;
 }
 
-namespace Analysis
+namespace PostProcess
 {
 
 class AgentNum : public AgentAnalysis
@@ -20,7 +20,7 @@ public:
 	void computeAgent( const Engine::AgentRecord & agentRecord );
 };
 
-} // namespace Analysis
+} // namespace PostProcess
 
 #endif // __AgentNum_hxx__
 
