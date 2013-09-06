@@ -22,13 +22,16 @@
 #include <Exceptions.hxx>
 #include <SimulationRecord.hxx>
 
-#include <analysis/Results.hxx>
+#include <analysis/GlobalStats.hxx>
 #include <analysis/AgentMean.hxx>
 #include <analysis/AgentSum.hxx>
+/*
 #include <analysis/RasterMean.hxx>
 #include <analysis/RasterSum.hxx>
+*/
 #include <analysis/AgentNum.hxx>
-#include <analysis/AgentHDFtoSHP.hxx>
+#include <analysis/AgentStdDev.hxx>
+//#include <analysis/AgentHDFtoSHP.hxx>
 #include <iostream>
 
 int main(int argc, char *argv[])
@@ -44,17 +47,21 @@ int main(int argc, char *argv[])
 		Engine::SimulationRecord simRecord( 1, false);
 		simRecord.loadHDF5(argv[1], true, true);
 
-		Analysis::AgentResults agentResults(simRecord, argv[2], "RandomAgent");
-		agentResults.addAnalysis(new Analysis::AgentNum());
-		agentResults.addAnalysis(new Analysis::AgentMean("resources"));
+		PostProcess::GlobalStats agentResults(simRecord, argv[2], "RandomAgent");
+		agentResults.addAnalysis(new PostProcess::AgentNum());
+		agentResults.addAnalysis(new PostProcess::AgentMean("resources"));
+		agentResults.addAnalysis(new PostProcess::AgentStdDev("resources"));
+		agentResults.addAnalysis(new PostProcess::AgentSum("resources"));
 
 		agentResults.apply();
 
+		/*
 		Analysis::RasterResults rasterResults(simRecord, argv[3], "resources");
 		rasterResults.addAnalysis(new Analysis::RasterMean());
 		rasterResults.addAnalysis(new Analysis::RasterSum());		
 
 		rasterResults.apply();
+		*/
 	}
 	catch( std::exception & exceptionThrown )
 	{

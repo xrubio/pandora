@@ -33,7 +33,8 @@ if int(useMpi)==1:
 
 coreFiles = Split('World.cxx StaticRaster.cxx Raster.cxx Agent.cxx Statistics.cxx SimulationRecord.cxx AgentRecord.cxx Serializer.cxx Simulation.cxx Config.cxx MpiFactory.cxx IncrementalRaster.cxx RasterLoader.cxx Action.cxx LoggerBase.cxx GeneralState.cxx ShpLoader.cxx')
 
-analysisFiles = Split('analysis/Analysis.cxx analysis/AgentMean.cxx analysis/AgentSum.cxx analysis/AgentNum.cxx analysis/Results.cxx analysis/RasterSum.cxx analysis/RasterMean.cxx analysis/AgentHDFtoSHP.cxx analysis/AgentHistogram.cxx analysis/AgentFinalResults.cxx analysis/AgentStdDev.cxx')
+#analysisFiles = Split('analysis/Analysis.cxx analysis/AgentMean.cxx analysis/AgentSum.cxx analysis/AgentNum.cxx analysis/Results.cxx analysis/RasterSum.cxx analysis/RasterMean.cxx analysis/AgentHDFtoSHP.cxx analysis/AgentHistogram.cxx analysis/AgentFinalResults.cxx analysis/AgentStdDev.cxx')
+analysisFiles = Split('analysis/Analysis.cxx analysis/AgentMean.cxx analysis/AgentSum.cxx analysis/AgentNum.cxx analysis/Output.cxx analysis/AgentStdDev.cxx analysis/GlobalStats.cxx analysis/IndividualStats.cxx analysis/AgentHistogram.cxx analysis/AgentHDFtoSHP.cxx')
 
 srcFiles = coreFiles + analysisFiles
 
@@ -82,7 +83,7 @@ if int(mareNostrum)==0:
 	for src in srcFiles:
 		srcPyFiles.append('build_py/'+src)
 
-	srcPyFiles.append('build_py/pyBindings.cxx')
+#	srcPyFiles.append('build_py/pyBindings.cxx')
 
 	if int(useMpi) == 1:
 		srcPyFiles.append('build_py/MpiStubCode.cxx')

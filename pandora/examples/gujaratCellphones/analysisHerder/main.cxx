@@ -22,10 +22,8 @@
 #include <Exceptions.hxx>
 #include <SimulationRecord.hxx>
 
-#include <analysis/Results.hxx>
+#include <analysis/GlobalStats.hxx>
 #include <analysis/AgentMean.hxx>
-#include <analysis/AgentStdDev.hxx>
-#include <analysis/AgentSum.hxx>
 #include <analysis/AgentNum.hxx>
 #include <iostream>
 
@@ -42,14 +40,12 @@ int main(int argc, char *argv[])
 		Engine::SimulationRecord simRecord( 1, false);
 		simRecord.loadHDF5(argv[1], false, true);
 
-		Analysis::AgentResults agentResults(simRecord, argv[2], "Herder");
-		agentResults.addAnalysis(new Analysis::AgentNum());
-		agentResults.addAnalysis(new Analysis::AgentMean("starvation x100"));
-		agentResults.addAnalysis(new Analysis::AgentMean("herd size"));
-//		agentResults.addAnalysis(new Analysis::AgentStdDev("herd size"));
-		//agentResults.addAnalysis(new Analysis::AgentMean("needed resources"));
+		PostProcess::GlobalStats agentResults;
+		agentResults.addAnalysis(new PostProcess::AgentNum());
+		agentResults.addAnalysis(new PostProcess::AgentMean("starvation x100"));
+		agentResults.addAnalysis(new PostProcess::AgentMean("herd size"));
 
-		agentResults.apply();
+		agentResults.apply(simRecord, argv[2], "Herder");
 	}
 	catch( std::exception & exceptionThrown )
 	{

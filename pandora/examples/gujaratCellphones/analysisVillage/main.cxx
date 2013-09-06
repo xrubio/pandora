@@ -22,18 +22,18 @@
 #include <Exceptions.hxx>
 #include <SimulationRecord.hxx>
 
-#include <analysis/Results.hxx>
+#include <analysis/GlobalStats.hxx>
 #include <analysis/AgentMean.hxx>
 #include <analysis/AgentSum.hxx>
 #include <analysis/AgentNum.hxx>
-#include <analysis/AgentFinalResults.hxx>
+#include <analysis/IndividualStats.hxx>
 #include <iostream>
 
 int main(int argc, char *argv[])
 {
-	if(argc!=3)
+	if(argc!=4)
 	{
-		throw Engine::Exception("USAGE: analysis file.h5 results.csv");
+		throw Engine::Exception("USAGE: analysis file.h5 globalStats.csv individualStats.csv");
 		return 0;
 	}
 
@@ -42,20 +42,21 @@ int main(int argc, char *argv[])
 		Engine::SimulationRecord simRecord( 1, false);
 		simRecord.loadHDF5(argv[1], false, true);
 
-		Analysis::AgentResults agentResults(simRecord, "tmp.csv", "Village");
-		//agentResults.addAnalysis(new Analysis::AgentNum());
-		//agentResults.addAnalysis(new Analysis::AgentMean("starvation x100"));
-		//agentResults.addAnalysis(new Analysis::AgentMean("herd size"));
-		//agentResults.addAnalysis(new Analysis::AgentMean("needed resources"));
+		PostProcess::GlobalStats agentResults;
+		
+		agentResults.addAnalysis(new PostProcess::AgentNum());
+//		agentResults.addAnalysis(new PostProcess::AgentMean("starvation x100"));
+//		agentResults.addAnalysis(new PostProcess::AgentMean("herd size"));
+//		agentResults.addAnalysis(new PostProcess::AgentMean("needed resources"));
 
-		Analysis::AgentFinalResults * final = new Analysis::AgentFinalResults(argv[2], simRecord.getNumSteps()/simRecord.getSerializedResolution(), ";");
-		final->addAttribute("in village transmission");
-		final->addAttribute("herders");
-		final->addAttribute("total animals");
-		final->addAttribute("known 3-year cells");
-		agentResults.addAnalysis(final);
-
-		agentResults.apply();
+		PostProcess::IndividualStats stats(simRecord.getNumSteps()/simRecord.getSerializedResolution());
+		stats.addAttribute("in village transmission");
+		stats.addAttribute("herders");
+		stats.addAttribute("total animals");
+		stats.addAttribute("known 3-year cells");
+		
+		agentResults.apply(simRecord, argv[2], "Village");		
+		stats.apply(simRecord, argv[3], "Village");
 	}
 	catch( std::exception & exceptionThrown )
 	{
