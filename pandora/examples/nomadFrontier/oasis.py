@@ -6,8 +6,8 @@ import argparse
 import math
 import xml.etree.ElementTree
 
-sys.path.append('../../pyPandora/')
-sys.path.append('../../')
+sys.path.append('/home/xrubio/workspace/pandora/pandora/pyPandora/')
+sys.path.append('/home/xrubio/workspace/pandora/pandora/')
 
 from pyPandora import Simulation, Agent, World, Point2DInt
 
@@ -48,10 +48,14 @@ class OasisConfig():
 	
 	def deserialize(self, xmlFile):
 		tree = xml.etree.ElementTree.parse(xmlFile)
-		root = tree.getroot()
+		root = tree.getroot()	
+		
+		self._resultsFile = str(root.find('output').get('resultsFile'))
+		self._logsDir = str(root.find('output').get('logsDir'))
 
 		self._size = int(root.find('size').get('value'))
 		self._numSteps = int(root.find('numSteps').get('value'))
+		self._serializeResolution = int(root.find('numSteps').get('serializeResolution'))
 
 		conflict = root.find('conflict')
 		self._asabiyaIncrease = float(conflict.get('asabiyaIncrease'))
@@ -417,7 +421,7 @@ class Farmer(OasisAgent):
 class Oasis(World):
 
 	def __init__(self, simulation, config ):
-		World.__init__( self, simulation)
+		World.__init__( self, simulation, 1, 1, config._resultsFile)
 		self._config = config
 		self._maxDist = math.sqrt(float(self._config._size*self._config._size))
 

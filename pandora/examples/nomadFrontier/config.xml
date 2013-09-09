@@ -2,7 +2,7 @@
 <config>  
 	<!-- Global simulation parameters -->
 	<output resultsFile="./data/oasis.h5" logsDir="./logs"/>
-	<numSteps value="100" serializeResolution="1"/>
+	<numSteps value="1" serializeResolution="1"/>
 	<size value="30"/>
 	<conflict asabiyaIncrease="0.2" asabiyaDecay="0.1" distanceSensibility="2.0" conflictThreshold="0.0"/>
 	<herderSampling numSamples="10" distParam="0.0" maxDepth="3"/>

@@ -83,7 +83,7 @@ if int(mareNostrum)==0:
 	for src in srcFiles:
 		srcPyFiles.append('build_py/'+src)
 
-#	srcPyFiles.append('build_py/pyBindings.cxx')
+	srcPyFiles.append('build_py/pyBindings.cxx')
 
 	if int(useMpi) == 1:
 		srcPyFiles.append('build_py/MpiStubCode.cxx')

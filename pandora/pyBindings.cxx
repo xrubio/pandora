@@ -32,16 +32,21 @@
 #include <AgentRecord.hxx>
 #include <SimulationRecord.hxx>
 
-#include <analysis/Results.hxx>
+#include <analysis/Output.hxx>
 #include <analysis/Analysis.hxx>
+#include <analysis/IndividualStats.hxx>
+#include <analysis/GlobalStats.hxx>
 
 #include <analysis/AgentMean.hxx>
 #include <analysis/AgentSum.hxx>
 #include <analysis/AgentNum.hxx>
+#include <analysis/AgentStdDev.hxx>
 #include <analysis/AgentHDFtoSHP.hxx>
 
+/*
 #include <analysis/RasterSum.hxx>
 #include <analysis/RasterMean.hxx>
+*/
 
 #include <string>
 
@@ -236,6 +241,7 @@ public:
 
 };
 
+/*
 class AgentAnalysisWrap : public Analysis::AgentAnalysis, public boost::python::wrapper<Analysis::AgentAnalysis>
 {
 public:
@@ -280,6 +286,7 @@ void passAnalysisOwnership( Analysis::Results & results, std::auto_ptr<Analysis:
 	results.addAnalysis(analysisPtr.get());
 	analysisPtr.release();
 }
+*/
 
 // overloaded methods
 Engine::Raster & (Engine::World::*getDynamicRaster)(const std::string&) = &Engine::World::getDynamicRaster;
@@ -355,6 +362,7 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("loadHDF5", &Engine::SimulationRecord::loadHDF5)
 	;
 
+	/*
 	// analysis base
 	boost::python::class_< Analysis::Analysis, std::auto_ptr<Analysis::Analysis> >("AnalysisStub", boost::python::init< const std::string & >() )
 	;
@@ -407,6 +415,7 @@ BOOST_PYTHON_MODULE(libpyPandora)
 	;
 	boost::python::class_< Analysis::RasterResults, boost::python::bases< Analysis::Results> >("RasterResultsStub", boost::python::init< const Engine::SimulationRecord & , const std::string &, const std::string &, const std::string & >() )
 	;	
+	*/
 
 }
 

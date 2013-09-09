@@ -26,8 +26,8 @@ class Agent(libpyPandora.AgentStub):
 
 class World(libpyPandora.WorldStub):
 	_listOfAgents = []
-	def __init__(self, simulation ):
-		libpyPandora.WorldStub.__init__( self, simulation, 0, 1, "data/results.h5")
+	def __init__(self, simulation, overlap, allowMultipleAgentsPerCell, resultsFile ):
+		libpyPandora.WorldStub.__init__( self, simulation, overlap, allowMultipleAgentsPerCell, resultsFile)
 
 	def addAgent(self, agent):
 		self.addAgentStub(agent)
@@ -37,6 +37,7 @@ class SimulationRecord(libpyPandora.SimulationRecordStub):
 	def __init__(self):
 		libpyPandora.SimulationRecordStub.__init__( self )
 
+"""
 class AgentMean(libpyPandora.AgentMeanStub):
 	def __init__(self, attributeName):
 		libpyPandora.AgentMeanStub.__init__( self, attributeName )
@@ -68,4 +69,5 @@ class AgentResults(libpyPandora.AgentResultsStub):
 class RasterResults(libpyPandora.RasterResultsStub):	
 	def __init__(self, simRecord, outputFile, typeName, separator ):
 		libpyPandora.RasterResultsStub.__init__( self, simRecord, outputFile, typeName, separator )
+"""
 
