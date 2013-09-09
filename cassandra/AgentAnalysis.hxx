@@ -26,6 +26,7 @@
 #include <QDialog>
 #include <ui_AgentAnalysis.h>
 #include <tinyxml.h>
+#include <GlobalStats.hxx>
 
 namespace Engine
 {
@@ -88,6 +89,9 @@ class AgentAnalysis : public QDialog
 	void addHistogram( AnalysisControlThread* thread );
 	void addGeoreference( AnalysisControlThread* thread );
 
+	void groupGlobalStats( PostProcess::GlobalStats * global );
+
+	PostProcess::GlobalStats::Params * _groups;
 private slots:
 	void selectBaseDir();
 	void newAnalysis();

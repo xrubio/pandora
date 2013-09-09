@@ -35,14 +35,13 @@
 #include <AgentSum.hxx>
 #include <AgentStdDev.hxx>
 #include <IndividualStats.hxx>
-#include <GlobalStats.hxx>
 #include <AgentHistogram.hxx>
 #include <AgentHDFtoSHP.hxx>
 
 namespace GUI
 {
 
-AgentAnalysis::AgentAnalysis(QWidget * parent ) : QDialog(parent), _sampleRecord(0)
+AgentAnalysis::AgentAnalysis(QWidget * parent ) : QDialog(parent), _sampleRecord(0), _groups(0)
 {
 	setModal(false);
 	_analysis.setupUi(this);
@@ -83,6 +82,11 @@ AgentAnalysis::~AgentAnalysis()
 	if(_sampleRecord)
 	{
 		delete _sampleRecord;
+	}
+
+	if(_groups)
+	{
+		delete _groups;
 	}
 }
 
@@ -445,7 +449,52 @@ void AgentAnalysis::addGlobalAnalysis( AnalysisControlThread* thread )
 			}
 		}
 	}
+
+	if(_analysis.groupParams->isChecked())
+	{
+		groupGlobalStats(global);
+	}
 	thread->setOutput(global);
+}
+
+void AgentAnalysis::groupGlobalStats( PostProcess::GlobalStats * global )
+{
+	std::list<QTreeWidgetItem * > params;
+	QTreeWidgetItem * item = _analysis.paramsTree->topLevelItem(0);
+	while(item!=0)
+	{
+		int checked = item->checkState(AgentAnalysis::eUse);
+		if(checked==Qt::Checked)
+		{
+			std::cout << "group by param: " << item->text(AgentAnalysis::eName).toStdString() << std::endl;
+			params.push_back(item);
+		}
+		item = _analysis.paramsTree->itemBelow(item);
+	}
+
+	if(_groups)
+	{
+		delete _groups;
+	}
+
+	_groups = new PostProcess::GlobalStats::Params();
+
+	for(std::list<QTreeWidgetItem * >::iterator it=params.begin(); it!=params.end(); it++)
+	{
+		QTreeWidgetItem * item = *it;
+		std::list< std::string > aGrouping;
+		while(item!=0)
+		{			
+			aGrouping.push_back(item->text(AgentAnalysis::eName).toStdString());
+			item = item->parent();
+		}
+		_groups->push_back(aGrouping);
+	}
+	global->setParams(_groups, _outputDir+"/groupResults.csv");
+	// llistar els paràmetres que han de sortir
+	// obrir fitxer nou
+	// per cada simulació calcular els paràmetres finals
+	// guardar, per cada simulació: dir;llistat de paràmetres; llistat de valors finals.
 }
 			
 void AgentAnalysis::addIndividualStats(AnalysisControlThread* thread )
@@ -598,7 +647,6 @@ void AgentAnalysis::lastStepChanged( int checked )
 		_analysis.step->setEnabled(true);
 	}
 }
-
 
 } // namespace GUI
 

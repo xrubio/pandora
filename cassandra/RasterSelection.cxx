@@ -97,7 +97,7 @@ void RasterSelection::dropEvent( QDropEvent * event )
 	updateRasters();
 }
 
-void RasterSelection::updateRastersSlot(QListWidgetItem* a)
+void RasterSelection::updateRastersSlot(QListWidgetItem*)
 {
     updateRasters();
 }

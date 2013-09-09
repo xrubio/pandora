@@ -92,7 +92,7 @@ void AnalysisControlThread::run()
 
 		boost::filesystem::path pathToDir = *it;
 		analyseSimulation(dataFile, pathToDir.filename().native());
-		std::cout << "simulation analysis tone for: " << pathToDir.filename().native() << std::endl;
+		std::cout << "simulation analysis done for: " << pathToDir.filename().native() << std::endl;
 		emit nextSimulation();
 		
 		if(_cancelExecution)

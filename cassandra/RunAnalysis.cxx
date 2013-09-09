@@ -47,7 +47,6 @@ void RunAnalysis::init( int numberOfSimulations )
 	_run.status->setText(message);
 	_doneButton->hide();
 	_run.buttonBox->button(QDialogButtonBox::Cancel)->show();
-
 }
 
 void RunAnalysis::updateSimulationAnalysis()

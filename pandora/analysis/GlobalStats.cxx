@@ -28,7 +28,7 @@
 namespace PostProcess
 {
 
-GlobalStats::GlobalStats( const std::string & separator ) : Output(separator), _analysisOwnership(true)
+GlobalStats::GlobalStats( const std::string & separator ) : Output(separator), _analysisOwnership(true), _params(0)
 {
 }
 
@@ -45,6 +45,11 @@ GlobalStats::~GlobalStats()
 		Analysis * analysis = *it;
 		it = _analysisList.erase(it);
 		delete analysis;
+	}
+
+	if(_params)
+	{
+		delete _params;
 	}
 }
 
@@ -138,10 +143,48 @@ void GlobalStats::apply( const Engine::SimulationRecord & simRecord, const std::
 	}
 	file.close();
 	std::cout << "done!" << std::endl;
+	if(_params)
+	{
+		std::ofstream groupFile;
+		std::cout << "grouping by params" << std::endl;
+		groupFile.open(_groupFile.c_str(), std::ios_base::app);
+		std::stringstream line;
+		unsigned pos = outputFile.find_last_of("/");
+		std::string fileName = outputFile.substr(pos+1);
+		line << fileName << _separator;
+		for(AgentAnalysisList::const_iterator itL=_analysisList.begin(); itL!=_analysisList.end(); itL++)
+		{
+			line << std::setprecision(2) << std::fixed << (*itL)->getResult(simRecord.getNumSteps()/simRecord.getFinalResolution()) << _separator;				
+		}
+		groupFile << line.str() << std::endl;
+		groupFile.close();
+	}
 }
 void GlobalStats::addAnalysis( AgentAnalysis * analysis )
 {
 	_analysisList.push_back(analysis);
+}
+
+void GlobalStats::setParams( Params * params, const std::string & groupFile )
+{
+	_params = params;
+	_groupFile = groupFile;
+	
+	std::ofstream file;
+	file.open(_groupFile.c_str());
+  
+	std::stringstream header;
+	header << "run" << _separator;
+	for(AgentAnalysisList::const_iterator it=_analysisList.begin(); it!=_analysisList.end(); it++)
+	{
+		if((*it)->writeResults())
+		{
+			header << (*it)->getName() << _separator;
+		}
+	}
+	// TODO params
+	file << header.str() << std::endl;;
+	file.close();
 }
 
 std::string GlobalStats::getName() const

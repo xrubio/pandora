@@ -30,11 +30,17 @@ class AgentAnalysis;
 
 class GlobalStats : public Output
 {
+public:
+	typedef std::list< std::list<std::string> > Params;
+protected:
 	typedef std::list<AgentAnalysis *> AgentAnalysisList;
 	AgentAnalysisList _analysisList;
 
 	// if true analysis will be deleted in destructor
 	bool _analysisOwnership;
+
+	Params * _params;
+	std::string _groupFile;
 
 public:
 	GlobalStats( const std::string & separator=";");	
@@ -45,6 +51,7 @@ public:
 	void addAnalysis( AgentAnalysis * analysis );
 
 	std::string getName() const;
+	void setParams( Params * params, const std::string & groupFile);
 };
 
 } // namespace PostProcess

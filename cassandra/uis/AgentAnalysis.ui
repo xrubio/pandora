@@ -72,7 +72,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="page_1">
          <property name="geometry">
@@ -117,7 +117,7 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>0</y>
+           <y>-171</y>
            <width>571</width>
            <height>440</height>
           </rect>
@@ -378,6 +378,9 @@
               </property>
               <property name="title">
                <string>Group by parameter</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout">
                <item>
