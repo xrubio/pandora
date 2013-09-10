@@ -430,7 +430,7 @@ void MainWindow::previousStep()
 {
 	if(_viewedStep>0)
 	{
-		setViewedStep(_viewedStep-ProjectConfiguration::instance()->getResolution());
+		setViewedStep(_viewedStep-ProjectConfiguration::instance()->getSimulationRecord()->getSerializedResolution()*ProjectConfiguration::instance()->getResolution());
 	}
 }
 
@@ -438,7 +438,7 @@ void MainWindow::nextStep()
 {
 	if(_viewedStep<ProjectConfiguration::instance()->getSimulationRecord()->getNumSteps())
 	{
-		setViewedStep(_viewedStep+ProjectConfiguration::instance()->getResolution());
+		setViewedStep(_viewedStep+ProjectConfiguration::instance()->getSimulationRecord()->getSerializedResolution()*ProjectConfiguration::instance()->getResolution());
 	}
 }
 
@@ -461,7 +461,7 @@ void MainWindow::play()
 
 void MainWindow::updatePlay()
 {
-	setViewedStep(_viewedStep+ProjectConfiguration::instance()->getResolution());
+	setViewedStep(_viewedStep+ProjectConfiguration::instance()->getSimulationRecord()->getSerializedResolution()*ProjectConfiguration::instance()->getResolution());
 	if(_viewedStep>=ProjectConfiguration::instance()->getSimulationRecord()->getNumSteps())
 	{
 		_playTimer->stop();
@@ -475,7 +475,7 @@ void MainWindow::setViewedStep( int viewedStep )
 
 void MainWindow::viewedStepChanged( int viewedStep )
 {
-	int mod = viewedStep%ProjectConfiguration::instance()->getResolution();
+	int mod = viewedStep%(ProjectConfiguration::instance()->getSimulationRecord()->getSerializedResolution()*ProjectConfiguration::instance()->getResolution());
 	/*
 	if(mod!=0)
 	{	
