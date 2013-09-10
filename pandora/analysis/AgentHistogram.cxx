@@ -45,7 +45,7 @@ void AgentHistogram::postProcess( const Engine::SimulationRecord & , const std::
 	std::ofstream file;
 	file.open(outputFile.c_str());
 	std::stringstream header;
-	header << "beginInterval" << _separator << "time step: " << _numStep << _separator;
+	header << "time step: " << _numStep << _separator << _attribute << _separator;
 	file << header.str() << std::endl;
 	for(int i=0; i<_histogram.size(); i++)
 	{	

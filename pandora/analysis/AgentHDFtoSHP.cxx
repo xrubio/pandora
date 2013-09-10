@@ -119,6 +119,8 @@ void AgentHDFtoSHP::createFeature( const Engine::AgentRecord & agentRecord, int 
 		{
 			continue;
 		}
+
+		//std::cout << "setting field: " << getFieldNameFromString(key) << " state: " <<  agentRecord.getState(timeStep, key) << " for key: " << key << std::endl;
 		feature->SetField(getFieldNameFromString(key).c_str(), agentRecord.getState(timeStep, key));
 	}
 
