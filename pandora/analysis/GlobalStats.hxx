@@ -41,7 +41,9 @@ protected:
 
 	Params * _params;
 	std::string _groupFile;
+	std::string _inputDir;
 
+	void writeParams( std::stringstream & line, const std::string & fileName );
 public:
 	GlobalStats( const std::string & separator=";");	
 	virtual ~GlobalStats();
@@ -51,7 +53,7 @@ public:
 	void addAnalysis( AgentAnalysis * analysis );
 
 	std::string getName() const;
-	void setParams( Params * params, const std::string & groupFile);
+	void setParams( Params * params, const std::string & groupFile, const std::string & inputDir );
 };
 
 } // namespace PostProcess

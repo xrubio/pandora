@@ -23,6 +23,7 @@ void AgentHistogram::preProcess( const Engine::SimulationRecord & simRecord, con
 	{		
 		_numStep = (simRecord.getNumSteps()/simRecord.getFinalResolution())-1;
 	}
+	_histogram.clear();	
 }
 
 void AgentHistogram::computeAgent( const Engine::AgentRecord & agentRecord )

@@ -24,6 +24,7 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include <tinyxml.h>
 
 namespace PostProcess
 {
@@ -65,8 +66,7 @@ void GlobalStats::apply( const Engine::SimulationRecord & simRecord, const std::
 	for(AgentAnalysisList::const_iterator itL=_analysisList.begin(); itL!=_analysisList.end(); itL++)
 	{
 		std::cout << "Preprocessing analysis: " << (*itL)->getName() << "...";
-		(*itL)->setNumTimeSteps(1+(simRecord.getNumSteps()/simRecord.getFinalResolution()));	
-		(*itL)->preProcess();
+
 		std::cout << " done" << std::endl;
 	}
 	
@@ -84,48 +84,38 @@ void GlobalStats::apply( const Engine::SimulationRecord & simRecord, const std::
 	}
 	file << header.str() << std::endl;;
 
-	// all agents
-	if(type.compare("all")==0)
+	for(AgentAnalysisList::const_iterator itL=_analysisList.begin(); itL!=_analysisList.end(); itL++)
 	{
-		for(Engine::SimulationRecord::AgentTypesMap::const_iterator it=simRecord.beginTypes(); it!=simRecord.endTypes(); it++)
-		{
-			const Engine::SimulationRecord::AgentRecordsMap & agentRecords = it->second;
-			for(AgentAnalysisList::const_iterator itL=_analysisList.begin(); itL!=_analysisList.end(); itL++)
+		std::cout << "Preprocessing analysis: " << (*itL)->getName() << "...";
+		(*itL)->setNumTimeSteps(1+(simRecord.getNumSteps()/simRecord.getFinalResolution()));	
+		(*itL)->preProcess();
+		std::cout << "done" << std::endl;
+		std::cout << "Computing analysis: " << (*itL)->getName() << "...";
+		// all agents
+		if(type.compare("all")==0)
+		{	
+			for(Engine::SimulationRecord::AgentTypesMap::const_iterator it=simRecord.beginTypes(); it!=simRecord.endTypes(); it++)
 			{
-				std::cout << "Computing analysis: " << (*itL)->getName() << "...";
+				const Engine::SimulationRecord::AgentRecordsMap & agentRecords = it->second;
 				for(Engine::SimulationRecord::AgentRecordsMap::const_iterator itA=agentRecords.begin(); itA!=agentRecords.end(); itA++)
 				{
 					AgentAnalysis * analysis = (*itL);
 					analysis->computeAgent(*(itA->second));
 				}
-				std::cout << " done" << std::endl;
 			}
 		}
-	}
-	else
-	{
-		if(!simRecord.hasAgentType(type))
-		{
-			return;
-		}
-		for(AgentAnalysisList::const_iterator itL=_analysisList.begin(); itL!=_analysisList.end(); itL++)
-		{
-			std::cout << "Computing analysis: " << (*itL)->getName() << "...";
+		else
+		{	
 			for(Engine::SimulationRecord::AgentRecordsMap::const_iterator it=simRecord.beginAgents(type); it!=simRecord.endAgents(type); it++)
 			{
 				AgentAnalysis * analysis = (AgentAnalysis*)(*itL);
 				analysis->computeAgent(*(it->second));
 			}
-			std::cout << " done" << std::endl;
 		}
-	}	
-	
-	// post process
-	for(AgentAnalysisList::const_iterator itL=_analysisList.begin(); itL!=_analysisList.end(); itL++)
-	{
+		std::cout << "done" << std::endl;
 		std::cout << "Postprocessing analysis: " << (*itL)->getName() << "...";
 		(*itL)->postProcess();
-		std::cout << " done" << std::endl;
+		std::cout << "done" << std::endl;
 	}
 
 	for(int i=0; i<=simRecord.getNumSteps(); i=i+simRecord.getFinalResolution())
@@ -152,6 +142,9 @@ void GlobalStats::apply( const Engine::SimulationRecord & simRecord, const std::
 		unsigned pos = outputFile.find_last_of("/");
 		std::string fileName = outputFile.substr(pos+1);
 		line << fileName << _separator;
+
+		writeParams(line, fileName);
+
 		for(AgentAnalysisList::const_iterator itL=_analysisList.begin(); itL!=_analysisList.end(); itL++)
 		{
 			line << std::setprecision(2) << std::fixed << (*itL)->getResult(simRecord.getNumSteps()/simRecord.getFinalResolution()) << _separator;				
@@ -160,14 +153,57 @@ void GlobalStats::apply( const Engine::SimulationRecord & simRecord, const std::
 		groupFile.close();
 	}
 }
+
+void GlobalStats::writeParams( std::stringstream & line, const std::string & fileName )
+{
+		std::stringstream configFile;
+		unsigned pos = fileName.find_last_of(".");
+		configFile << _inputDir << "/" << fileName.substr(0,pos) << "/config.xml";
+
+		TiXmlDocument doc(configFile.str().c_str());
+		if (!doc.LoadFile())
+		{
+			return;
+		}
+		TiXmlHandle hDoc(&doc);
+		TiXmlHandle hRoot(0);
+
+		TiXmlElement * element = 0;
+		for(Params::iterator it=_params->begin(); it!=_params->end(); it++)
+		{
+			std::list<std::string> & paramsList = *it;
+			// backwards iteration, the first element is the attribute
+			std::list<std::string>::reverse_iterator itL=paramsList.rbegin();
+			for(int i=0; i<paramsList.size()-1; i++)
+			{
+				if(!element)
+				{
+					element = doc.FirstChildElement(*itL);
+				}
+				else
+				{
+					element = element->FirstChildElement(*itL);
+				}
+				itL++;
+			}
+			TiXmlElement * finalElement = element->ToElement();
+			std::string & attributeName = *(paramsList.begin());
+			line << finalElement->Attribute(attributeName.c_str()) << _separator;
+			element = 0;
+		}
+
+}
+
+
 void GlobalStats::addAnalysis( AgentAnalysis * analysis )
 {
 	_analysisList.push_back(analysis);
 }
 
-void GlobalStats::setParams( Params * params, const std::string & groupFile )
+void GlobalStats::setParams( Params * params, const std::string & groupFile, const std::string & inputDir )
 {
 	_params = params;
+	_inputDir = inputDir;
 	_groupFile = groupFile;
 	
 	std::ofstream file;
@@ -175,6 +211,33 @@ void GlobalStats::setParams( Params * params, const std::string & groupFile )
   
 	std::stringstream header;
 	header << "run" << _separator;
+
+	// header will have the name of the field + name of parent (if exists)
+	for(Params::iterator it=params->begin(); it!=params->end(); it++)
+	{
+		std::list<std::string> & paramsList = *it;
+		std::list<std::string>::iterator itL=paramsList.begin();
+		int numEntries = 0;
+		while(itL!=paramsList.end())
+		{
+			header << *itL;
+
+			numEntries++;
+			if(numEntries>=2)
+			{
+				break;
+			}
+			itL++;
+			if(itL!=paramsList.end())
+			{
+				header << "_";
+			}
+			
+		}
+		header << _separator;
+	}
+
+	// results
 	for(AgentAnalysisList::const_iterator it=_analysisList.begin(); it!=_analysisList.end(); it++)
 	{
 		if((*it)->writeResults())

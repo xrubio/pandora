@@ -490,7 +490,7 @@ void AgentAnalysis::groupGlobalStats( PostProcess::GlobalStats * global )
 		}
 		_groups->push_back(aGrouping);
 	}
-	global->setParams(_groups, _outputDir+"/groupResults.csv");
+	global->setParams(_groups, _outputDir+"/groupResults.csv", _baseDir);
 	// llistar els paràmetres que han de sortir
 	// obrir fitxer nou
 	// per cada simulació calcular els paràmetres finals

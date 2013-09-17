@@ -34,6 +34,14 @@ Analysis::~Analysis()
 {
 }
 
+void Analysis::preProcess()
+{
+	for(int i=0; i<_results.size(); i++)
+	{
+		_results.at(i) = 0.0f;
+	}
+}
+
 void Analysis::setNumTimeSteps( int numTimeSteps )
 {
 	_results.clear();

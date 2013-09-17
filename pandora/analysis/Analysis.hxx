@@ -50,7 +50,7 @@ public:
 	void setNumTimeSteps( int numTimeSteps );
 
 	const std::string & getName() const;
-	virtual void preProcess(){};
+	virtual void preProcess();
 	virtual void postProcess(){};
 	long double getResult( int timeStep ) const;
 	bool writeResults(){return _writeResults;}	

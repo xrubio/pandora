@@ -16,7 +16,14 @@ AgentStdDev::~AgentStdDev()
 void AgentStdDev::preProcess()
 {
 	_numAgents.resize(_results.size());
+	_values.clear();
 	_values.resize(_results.size());
+	
+	for(int i=0; i<_numAgents.size(); i++)
+	{
+		_numAgents.at(i) = 0;
+		_results.at(i) = 0.0f;
+	}
 }
 
 void AgentStdDev::computeAgent( const Engine::AgentRecord & agentRecord )
