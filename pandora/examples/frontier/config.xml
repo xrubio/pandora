@@ -1,13 +1,10 @@
 <?xml version="1.0" ?>
 <config>  
 	<!-- Global simulation parameters -->
-	<output resultsFile="./data/oasis.h5" logsDir="./logs"/>
-	<numSteps value="1" serializeResolution="1"/>
-	<size value="4"/>
-<!--	<numAgents value="1"/> -->
-	<agents>	
-		<farmers init="1" strength="1.0" growthRate="1.0" immigrationRate="0.1"/>
-		<herders init="1" relativeStrength="1.0" growthRate="1.0" immigrationRate="0.1"/>
-	</agents>
+	<output resultsFile="./data/frontier.h5" logsDir="./logs"/>
+	<numSteps value="200" serializeResolution="1"/>
+	<size value="30"/>
+	<asabiya increase="0.2" decay="0.1" min="0.0003"/>
+	<conflict distanceSensibility="2" attackThreshold="0.1"/>
 </config>
 
