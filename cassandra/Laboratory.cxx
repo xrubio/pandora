@@ -30,6 +30,7 @@
 #include <Exceptions.hxx>
 #include <RunSimulations.hxx>
 #include <SimulationControlThread.hxx>
+#include <limits>
 
 namespace GUI
 {
@@ -129,14 +130,13 @@ void Laboratory::computeExperiments()
 				{
 					for(int z=0; z<series; z++)
 					{
-						// iterate trough values
-						for(float j=minValue; j<=maxValue; j+=stepValue)
+						// iterate through float values (use epsilon to avoid rounding problems)						
+						for(float j=minValue; j-maxValue<=std::numeric_limits<float>::epsilon(); j+=stepValue)
 						{
 							// a number of times equal to iterations
 							for(int i=0; i<iterations; i++)
 							{
 								ParamsMap & params = _runs.at(index);
-								std::cout << "inserting value: " << j << " for item: " << item->text(eName).toStdString() << std::endl;
 								params.insert(std::make_pair(item, QString::number(j).toStdString()));
 								index++;
 							}
