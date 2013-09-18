@@ -542,7 +542,7 @@ def main():
 	config.deserialize(args.config)
 
 	print('size: '+str(config._size)+' num steps:'+str(config._numSteps))
-	mySimulation = Simulation(config._size, config._numSteps)
+	mySimulation = Simulation(config._size, config._numSteps, config._serializeResolution)
 	oasis = Oasis(mySimulation, config)
 	oasis.initialize()
 	oasis.run()
