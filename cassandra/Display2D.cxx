@@ -325,21 +325,22 @@ void Display2D::mouseDoubleClickEvent(QMouseEvent *event)
 
     std::list<Engine::AgentRecord*> agentsSelected;
 
-    Engine::Point2D<int> positionAux(position._x, position._y);
-    for (int iX = 0; iX <= _radiusSelection; iX++)
+    Engine::Point2D<int> positionAux(0,0);
+	for(positionAux._x=position._x-_radiusSelection; positionAux._x<=position._x+_radiusSelection; positionAux._x++)
 	{
-        for (int iY = 0; iY <= _radiusSelection; iY++)
+		for(positionAux._y=position._y-_radiusSelection; positionAux._y<=position._y+_radiusSelection; positionAux._y++)
 		{
-            positionAux._x = position._x + iX;
-            positionAux._y = position._y + iY;
 			Engine::SimulationRecord::AgentRecordsVector agents = _simulationRecord->getAgentsAtPosition(_viewedStep/_simulationRecord->getFinalResolution(), positionAux);
-
 			for(int i=0; i<agents.size(); i++)
 			{
 				Engine::AgentRecord * agentRecord = agents.at(i);
+				if(!agentRecord->getState(_viewedStep/_simulationRecord->getFinalResolution(), "exists"))
+				{
+					continue;
+				}
                 std::string stateName = agentRecord->getId();
 
-                if (agentList->findItems(stateName.c_str(),Qt::MatchFixedString).isEmpty())
+                if(agentList->findItems(stateName.c_str(),Qt::MatchFixedString).isEmpty())
 				{
                     std::string info = agentRecord->getCompleteState(_viewedStep/_simulationRecord->getFinalResolution());
                     QTreeWidgetItem *item = new QTreeWidgetItem();
@@ -350,68 +351,7 @@ void Display2D::mouseDoubleClickEvent(QMouseEvent *event)
                     agentList->addTopLevelItem(item);
                     agentsSelected.push_front(agentRecord);
                 }
-
-            }
-            positionAux._x = position._x + iX;
-            positionAux._y = position._y - iY;
-			
-			agents = _simulationRecord->getAgentsAtPosition(_viewedStep/_simulationRecord->getFinalResolution(), positionAux);
-			for(int i=0; i<agents.size(); i++)
-			{
-				Engine::AgentRecord * agentRecord = agents.at(i);
-                std::string stateName = agentRecord->getId();
-                if (agentList->findItems(stateName.c_str(),Qt::MatchFixedString).isEmpty())
-				{
-                    std::string info = agentRecord->getCompleteState(_viewedStep/_simulationRecord->getFinalResolution());
-                    QTreeWidgetItem *item = new QTreeWidgetItem();
-                    QTreeWidgetItem *item2 = new QTreeWidgetItem();
-                    item->setText(0,QString(stateName.c_str()));
-                    item2->setText(0,QString(info.c_str()));
-                    item->addChild(item2);
-                    agentList->addTopLevelItem(item);
-                    agentsSelected.push_front(agentRecord);
-                }
-            }
-            positionAux._x = position._x - iX;
-            positionAux._y = position._y + iY;	
-			
-			agents = _simulationRecord->getAgentsAtPosition(_viewedStep/_simulationRecord->getFinalResolution(), positionAux);
-			for(int i=0; i<agents.size(); i++)
-			{
-				Engine::AgentRecord * agentRecord = agents.at(i);
-                std::string stateName = agentRecord->getId();
-                if (agentList->findItems(stateName.c_str(),Qt::MatchFixedString).isEmpty())
-				{
-                    std::string info = agentRecord->getCompleteState(_viewedStep/_simulationRecord->getFinalResolution());
-                    QTreeWidgetItem *item = new QTreeWidgetItem();
-                    QTreeWidgetItem *item2 = new QTreeWidgetItem();
-                    item->setText(0,QString(stateName.c_str()));
-                    item2->setText(0,QString(info.c_str()));
-                    item->addChild(item2);
-                    agentList->addTopLevelItem(item);
-                    agentsSelected.push_front(agentRecord);
-                }
-            }
-            positionAux._x = position._x - iX;
-            positionAux._y = position._y - iY;	
-			
-			agents = _simulationRecord->getAgentsAtPosition(_viewedStep/_simulationRecord->getFinalResolution(), positionAux);
-			for(int i=0; i<agents.size(); i++)
-			{
-				Engine::AgentRecord * agentRecord = agents.at(i);
-                std::string stateName = agentRecord->getId();
-                if (agentList->findItems(stateName.c_str(),Qt::MatchFixedString).isEmpty())
-				{
-                    std::string info = agentRecord->getCompleteState(_viewedStep/_simulationRecord->getFinalResolution());
-                    QTreeWidgetItem *item = new QTreeWidgetItem();
-                    QTreeWidgetItem *item2 = new QTreeWidgetItem();
-                    item->setText(0,QString(stateName.c_str()));
-                    item2->setText(0,QString(info.c_str()));
-                    item->addChild(item2);
-                    agentList->addTopLevelItem(item);
-                    agentsSelected.push_front(agentRecord);
-                }
-            }
+			}
         }
     }
     agentList->setAlternatingRowColors(true);
