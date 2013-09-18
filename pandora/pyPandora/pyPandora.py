@@ -17,8 +17,8 @@ class Raster(libpyPandora.RasterStub):
 		libpyPandora.RasterStub.__init__(self)
 
 class Simulation(libpyPandora.SimulationStub):
-	def __init__(self, size, numSteps):
-		libpyPandora.SimulationStub.__init__(self, size, numSteps )
+	def __init__(self, size, numSteps, serializeResolution=1 ):
+		libpyPandora.SimulationStub.__init__(self, size, numSteps, serializeResolution )
 
 class Agent(libpyPandora.AgentStub):
 	def __init__(self, id):
