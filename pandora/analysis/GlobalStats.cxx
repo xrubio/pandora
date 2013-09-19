@@ -145,9 +145,22 @@ void GlobalStats::apply( const Engine::SimulationRecord & simRecord, const std::
 
 		writeParams(line, fileName);
 
-		for(AgentAnalysisList::const_iterator itL=_analysisList.begin(); itL!=_analysisList.end(); itL++)
+		// time series for one attribute
+		if(_analysisList.size()==1)
 		{
-			line << std::setprecision(2) << std::fixed << (*itL)->getResult(simRecord.getNumSteps()/simRecord.getFinalResolution()) << _separator;				
+			AgentAnalysis * analysis = *(_analysisList.begin());
+			for(int i=0; i<simRecord.getNumSteps(); i+=simRecord.getFinalResolution())
+			{
+				line << std::setprecision(2) << std::fixed << analysis->getResult(i) << _separator;
+			}
+		}
+		// outcome at the end of simulation for several attributes
+		else
+		{
+			for(AgentAnalysisList::const_iterator itL=_analysisList.begin(); itL!=_analysisList.end(); itL++)
+			{
+				line << std::setprecision(2) << std::fixed << (*itL)->getResult(simRecord.getNumSteps()/simRecord.getFinalResolution()) << _separator;				
+			}
 		}
 		groupFile << line.str() << std::endl;
 		groupFile.close();
@@ -200,7 +213,7 @@ void GlobalStats::addAnalysis( AgentAnalysis * analysis )
 	_analysisList.push_back(analysis);
 }
 
-void GlobalStats::setParams( Params * params, const std::string & groupFile, const std::string & inputDir )
+void GlobalStats::setParams( Params * params, const std::string & groupFile, const std::string & inputDir, int numSteps, int resolution)
 {
 	_params = params;
 	_inputDir = inputDir;
@@ -237,15 +250,25 @@ void GlobalStats::setParams( Params * params, const std::string & groupFile, con
 		header << _separator;
 	}
 
-	// results
-	for(AgentAnalysisList::const_iterator it=_analysisList.begin(); it!=_analysisList.end(); it++)
-	{
-		if((*it)->writeResults())
+	// results, time series if one attribute
+	if(_analysisList.size()==1)
+	{	
+		for(int i=0; i<numSteps; i+=resolution)
 		{
-			header << (*it)->getName() << _separator;
+			header << i<<_separator;
 		}
 	}
-	// TODO params
+	// outcome at the end of simulation for several attributes
+	else
+	{
+		for(AgentAnalysisList::const_iterator it=_analysisList.begin(); it!=_analysisList.end(); it++)
+		{
+			if((*it)->writeResults())
+			{
+				header << (*it)->getName() << _separator;
+			}
+		}
+	}
 	file << header.str() << std::endl;;
 	file.close();
 }

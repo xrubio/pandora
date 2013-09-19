@@ -53,7 +53,8 @@ public:
 	void addAnalysis( AgentAnalysis * analysis );
 
 	std::string getName() const;
-	void setParams( Params * params, const std::string & groupFile, const std::string & inputDir );
+	// set params for performing group analysis. If a single analysis is applied a time series file will be generated following resolution and numSteps.
+	void setParams( Params * params, const std::string & groupFile, const std::string & inputDir, int numSteps=1, int resolution=1);
 };
 
 } // namespace PostProcess
