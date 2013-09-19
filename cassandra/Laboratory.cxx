@@ -130,14 +130,14 @@ void Laboratory::computeExperiments()
 				{
 					for(int z=0; z<series; z++)
 					{
-						// iterate through float values (use epsilon to avoid rounding problems)						
-						for(float j=minValue; j-maxValue<=std::numeric_limits<float>::epsilon(); j+=stepValue)
+						// iterate through float values (use transformed integer to avoir iterating through floats)						
+						for(int j=int(1000000.0f*minValue); j<=int(1000000.0f*maxValue); j+=(1000000.0f*stepValue))
 						{
 							// a number of times equal to iterations
 							for(int i=0; i<iterations; i++)
 							{
 								ParamsMap & params = _runs.at(index);
-								params.insert(std::make_pair(item, QString::number(j).toStdString()));
+								params.insert(std::make_pair(item, QString::number(float(j)/1000000.0).toStdString()));
 								index++;
 							}
 						}
