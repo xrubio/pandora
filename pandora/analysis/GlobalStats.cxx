@@ -74,12 +74,12 @@ void GlobalStats::apply( const Engine::SimulationRecord & simRecord, const std::
 	file.open(outputFile.c_str());
   
 	std::stringstream header;
-	header << "timeStep" << _separator;
+	header << "timeStep";
 	for(AgentAnalysisList::const_iterator it=_analysisList.begin(); it!=_analysisList.end(); it++)
 	{
 		if((*it)->writeResults())
 		{
-			header << (*it)->getName() << _separator;
+			header << _separator << (*it)->getName();
 		}
 	}
 	file << header.str() << std::endl;;
@@ -121,12 +121,12 @@ void GlobalStats::apply( const Engine::SimulationRecord & simRecord, const std::
 	for(int i=0; i<=simRecord.getNumSteps(); i=i+simRecord.getFinalResolution())
 	{
 		std::stringstream newLine;
-		newLine << i << _separator;
+		newLine << _separator << i;
 		for(AgentAnalysisList::const_iterator itL=_analysisList.begin(); itL!=_analysisList.end(); itL++)
 		{
 			if((*itL)->writeResults())
 			{
-				newLine << std::setprecision(2) << std::fixed << (*itL)->getResult(i/simRecord.getFinalResolution()) << _separator;				
+				newLine  << _separator << std::setprecision(2) << std::fixed << (*itL)->getResult(i/simRecord.getFinalResolution());				
 			}
 		}
 		file << newLine.str() << std::endl;
@@ -141,7 +141,7 @@ void GlobalStats::apply( const Engine::SimulationRecord & simRecord, const std::
 		std::stringstream line;
 		unsigned pos = outputFile.find_last_of("/");
 		std::string fileName = outputFile.substr(pos+1);
-		line << fileName << _separator;
+		line << fileName;
 
 		writeParams(line, fileName);
 
@@ -151,7 +151,7 @@ void GlobalStats::apply( const Engine::SimulationRecord & simRecord, const std::
 			AgentAnalysis * analysis = *(_analysisList.begin());
 			for(int i=0; i<simRecord.getNumSteps(); i+=simRecord.getFinalResolution())
 			{
-				line << std::setprecision(2) << std::fixed << analysis->getResult(i) << _separator;
+				line << _separator << std::setprecision(2) << std::fixed << analysis->getResult(i);
 			}
 		}
 		// outcome at the end of simulation for several attributes
@@ -159,7 +159,7 @@ void GlobalStats::apply( const Engine::SimulationRecord & simRecord, const std::
 		{
 			for(AgentAnalysisList::const_iterator itL=_analysisList.begin(); itL!=_analysisList.end(); itL++)
 			{
-				line << std::setprecision(2) << std::fixed << (*itL)->getResult(simRecord.getNumSteps()/simRecord.getFinalResolution()) << _separator;				
+				line  << _separator << std::setprecision(2) << std::fixed << (*itL)->getResult(simRecord.getNumSteps()/simRecord.getFinalResolution());				
 			}
 		}
 		groupFile << line.str() << std::endl;
@@ -201,7 +201,7 @@ void GlobalStats::writeParams( std::stringstream & line, const std::string & fil
 			}
 			TiXmlElement * finalElement = element->ToElement();
 			std::string & attributeName = *(paramsList.begin());
-			line << finalElement->Attribute(attributeName.c_str()) << _separator;
+			line  << _separator << finalElement->Attribute(attributeName.c_str());
 			element = 0;
 		}
 
@@ -223,11 +223,12 @@ void GlobalStats::setParams( Params * params, const std::string & groupFile, con
 	file.open(_groupFile.c_str());
   
 	std::stringstream header;
-	header << "run" << _separator;
+	header << "run";
 
 	// header will have the name of the field + name of parent (if exists)
 	for(Params::iterator it=params->begin(); it!=params->end(); it++)
 	{
+		header << _separator;
 		std::list<std::string> & paramsList = *it;
 		std::list<std::string>::iterator itL=paramsList.begin();
 		int numEntries = 0;
@@ -247,7 +248,6 @@ void GlobalStats::setParams( Params * params, const std::string & groupFile, con
 			}
 			
 		}
-		header << _separator;
 	}
 
 	// results, time series if one attribute
@@ -255,7 +255,7 @@ void GlobalStats::setParams( Params * params, const std::string & groupFile, con
 	{	
 		for(int i=0; i<numSteps; i+=resolution)
 		{
-			header << i<<_separator;
+			header << _separator << "step" << i;
 		}
 	}
 	// outcome at the end of simulation for several attributes
@@ -265,7 +265,7 @@ void GlobalStats::setParams( Params * params, const std::string & groupFile, con
 		{
 			if((*it)->writeResults())
 			{
-				header << (*it)->getName() << _separator;
+				header << _separator << (*it)->getName();
 			}
 		}
 	}
