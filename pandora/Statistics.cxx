@@ -133,6 +133,8 @@ float Statistics::getNormalDistValue( float min, float max ) const
 
 int Statistics::getUniformDistValue( int min, int max ) const
 {	
+/* deprecated
+
 	float value = float(_nextRandomNumber())/float(_distributionSize-1);
 	float diff = max - min;
 	value *= diff;
@@ -142,6 +144,16 @@ int Statistics::getUniformDistValue( int min, int max ) const
 		return (int)(value-0.5f);
 	}
 	return (int)(value+0.5f);
+*/
+
+	float myRand = float(_nextRandomNumber())/float(_distributionSize);
+	float fmin=min;
+	float fmax=max;
+
+	int u = ((1.0f+fmax-fmin)*myRand);
+	u     = u + fmin;
+
+	return u;
 }
 
 uint64_t Statistics::getNewSeed()
