@@ -333,6 +333,7 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("setRandomPosition", &Engine::Agent::setRandomPosition)
 		.add_property("id", boost::python::make_function(&Engine::Agent::getId, boost::python::return_value_policy<boost::python::copy_const_reference>()))
 		.add_property("exists", &Engine::Agent::exists)
+		.add_property("_type", &Engine::Agent::getType)
 		.add_property("position", boost::python::make_function(&Engine::Agent::getPosition, boost::python::return_value_policy<boost::python::reference_existing_object>()), &Engine::Agent::setPosition )
 	;
 	
