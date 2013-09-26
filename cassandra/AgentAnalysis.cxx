@@ -47,6 +47,7 @@ AgentAnalysis::AgentAnalysis(QWidget * parent ) : QDialog(parent), _sampleRecord
 	_analysis.setupUi(this);
 	
 	connect(_analysis.baseButton, SIGNAL(clicked()), this, SLOT(selectBaseDir()));
+	connect(_analysis.baseConfigButton, SIGNAL(clicked()), this, SLOT(selectBaseConfig()));
 	connect(_analysis.newTrait, SIGNAL(clicked()), this, SLOT(newAnalysis()));
 	connect(_analysis.outputButton, SIGNAL(clicked()), this, SLOT(selectOutput()));
 
@@ -153,6 +154,19 @@ void AgentAnalysis::selectBaseDir()
 		
 		_analysis.exploreConfig->setEnabled(true);
 		_analysis.exploreConfig->setCurrentWidget(_analysis.page_1);
+	}
+}
+
+void AgentAnalysis::selectBaseConfig()
+{
+	QString fileName = QFileDialog::getExistingDirectory(this, tr("Select simulation to use as template"), "");
+	if (fileName.isEmpty())
+	{
+		return;
+	}
+	else
+	{
+		loadConfig(fileName.toStdString());
 	}
 }
 
@@ -339,6 +353,63 @@ void AgentAnalysis::parseLevel( TiXmlNode * parent, QTreeWidgetItem * parentItem
 		parseLevel(child, newItem);
 	}
 }
+
+bool AgentAnalysis::loadConfig( const std::string & configDir )
+{		
+	// look for data file
+	std::stringstream oss;
+	oss << configDir << "/config.xml";
+
+	TiXmlDocument doc(oss.str().c_str());
+	if (!doc.LoadFile())
+	{
+		QMessageBox msgBox;
+		msgBox.setText("Unable to open config file in dir: "+QString(oss.str().c_str()));
+		msgBox.exec();
+		return false;
+	}
+	TiXmlHandle hDoc(&doc);
+	TiXmlHandle hRoot(0);
+   
+	TiXmlElement * root = doc.FirstChildElement( "config" );
+	TiXmlElement * output = root->FirstChildElement("output");
+	std::string dataFile = configDir+"/"+output->Attribute("resultsFile");
+
+	std::cout << "next experiment with data dir: " << dataFile << std::endl;
+	if(_sampleRecord)
+	{
+		delete _sampleRecord;
+	}
+	_analysis.agentTypes->clear();
+	_sampleRecord = new Engine::SimulationRecord(1);
+
+	// TODO load simulations too expensive, it could be faster just checking every data file for agent types
+	if(!_sampleRecord->loadHDF5(dataFile))
+	{
+		QMessageBox msgBox;
+		msgBox.setText("Unable to open data file for experiment: "+QString(dataFile.c_str()));
+		msgBox.exec();
+		delete _sampleRecord;
+		_sampleRecord = 0;
+		return false;
+	}
+	for(Engine::SimulationRecord::AgentTypesMap::const_iterator itType = _sampleRecord->beginTypes(); itType!=_sampleRecord->endTypes(); itType++)
+	{
+		QString newType(itType->first.c_str());
+		if(_analysis.agentTypes->findText(newType)==-1)
+		{
+			_analysis.agentTypes->addItem(newType, newType);
+		}
+	}
+
+
+	if(_analysis.agentTypes->count()>0)
+	{
+		_analysis.baseConfigEdit->setText(oss.str().c_str());
+		return true;
+	}
+	return false;
+}
 	
 void AgentAnalysis::loadConfigs()
 {
@@ -351,52 +422,12 @@ void AgentAnalysis::loadConfigs()
 			continue;
 		}
 
-		// look for data file
-		std::stringstream oss;
-		oss << (*it).path().native() << "/config.xml";
-		std::cout << "file: " << oss.str()<< std::endl;
-		TiXmlDocument doc(oss.str().c_str());
-		if (!doc.LoadFile())
-		{
-			QMessageBox msgBox;
-			msgBox.setText("Unable to open config file in dir: "+QString(oss.str().c_str()));
-			msgBox.exec();
-			continue;
-		}
-		TiXmlHandle hDoc(&doc);
-		TiXmlHandle hRoot(0);
-    
-		TiXmlElement * root = doc.FirstChildElement( "config" );
-		TiXmlElement * output = root->FirstChildElement("output");
-		std::string dataFile = (*it).path().native()+"/"+output->Attribute("resultsFile");
 
-		std::cout << "next experiment with data dir: " << dataFile << std::endl;
-		_sampleRecord = new Engine::SimulationRecord(1);
-
-		// TODO load simulations too expensive, it could be faster just checking every data file for agent types
-		if(!_sampleRecord->loadHDF5(dataFile))
-		{
-			QMessageBox msgBox;
-			msgBox.setText("Unable to open data file for experiment: "+QString(dataFile.c_str()));
-			msgBox.exec();
-			delete _sampleRecord;
-			return;
-		}
-
-		for(Engine::SimulationRecord::AgentTypesMap::const_iterator itType = _sampleRecord->beginTypes(); itType!=_sampleRecord->endTypes(); itType++)
-		{
-			QString newType(itType->first.c_str());
-			if(_analysis.agentTypes->findText(newType)==-1)
-			{
-				_analysis.agentTypes->addItem(newType, newType);
-			}
-		}
-
-		// something has been loaded, finish the process
-		if(_analysis.agentTypes->count()>0)
+		if(loadConfig((*it).path().native()))
 		{
 			return;
 		}
+
 	}
 }
 

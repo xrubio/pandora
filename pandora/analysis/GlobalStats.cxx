@@ -106,10 +106,13 @@ void GlobalStats::apply( const Engine::SimulationRecord & simRecord, const std::
 		}
 		else
 		{	
-			for(Engine::SimulationRecord::AgentRecordsMap::const_iterator it=simRecord.beginAgents(type); it!=simRecord.endAgents(type); it++)
+			if(simRecord.hasAgentType(type))
 			{
-				AgentAnalysis * analysis = (AgentAnalysis*)(*itL);
-				analysis->computeAgent(*(it->second));
+				for(Engine::SimulationRecord::AgentRecordsMap::const_iterator it=simRecord.beginAgents(type); it!=simRecord.endAgents(type); it++)
+				{
+					AgentAnalysis * analysis = (AgentAnalysis*)(*itL);
+					analysis->computeAgent(*(it->second));
+				}
 			}
 		}
 		std::cout << "done" << std::endl;

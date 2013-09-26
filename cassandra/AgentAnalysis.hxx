@@ -69,6 +69,7 @@ class AgentAnalysis : public QDialog
 	std::string _outputDir;
 
 	void loadConfigs();
+	bool loadConfig( const std::string & configFile );
 	void fillParamsTree();
 
 	Engine::SimulationRecord * _sampleRecord;
@@ -94,6 +95,7 @@ class AgentAnalysis : public QDialog
 	PostProcess::GlobalStats::Params * _groups;
 private slots:
 	void selectBaseDir();
+	void selectBaseConfig();
 	void newAnalysis();
 	void removeAnalysis( QWidget * analysis );
 	void selectOutput();

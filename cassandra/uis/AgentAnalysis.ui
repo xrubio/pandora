@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>620</width>
-    <height>658</height>
+    <height>688</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,24 +34,56 @@
      <property name="alignment">
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <layout class="QVBoxLayout" name="verticalLayout_8">
       <item>
-       <widget class="QPushButton" name="baseButton">
-        <property name="text">
-         <string>Base dir</string>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <item>
+         <widget class="QPushButton" name="baseButton">
+          <property name="text">
+           <string>Base dir</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="baseEdit">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
-       <widget class="QLineEdit" name="baseEdit">
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QPushButton" name="baseConfigButton">
+          <property name="minimumSize">
+           <size>
+            <width>97</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>97</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Base config</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="baseConfigEdit">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
-     <zorder>baseEdit</zorder>
-     <zorder>baseButton</zorder>
     </widget>
    </item>
    <item>
@@ -119,7 +151,7 @@
            <x>0</x>
            <y>0</y>
            <width>571</width>
-           <height>440</height>
+           <height>452</height>
           </rect>
          </property>
          <attribute name="label">
@@ -472,13 +504,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QLabel" name="status">
-     <property name="text">
-      <string>TextLabel</string>
-     </property>
-    </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">

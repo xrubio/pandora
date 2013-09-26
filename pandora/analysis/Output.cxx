@@ -91,14 +91,12 @@ void Output::apply( const Engine::SimulationRecord & simRecord, const std::strin
 	}
 	else
 	{
-		if(!simRecord.hasAgentType(type))
+		if(simRecord.hasAgentType(type))
 		{
-			return;
-		}	
-		
-		for(Engine::SimulationRecord::AgentRecordsMap::const_iterator it=simRecord.beginAgents(type); it!=simRecord.endAgents(type); it++)
-		{
-			computeAgent(*(it->second));
+			for(Engine::SimulationRecord::AgentRecordsMap::const_iterator it=simRecord.beginAgents(type); it!=simRecord.endAgents(type); it++)
+			{
+				computeAgent(*(it->second));
+			}
 		}
 	}	
 	std::cout << " done" << std::endl;
