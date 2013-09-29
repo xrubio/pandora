@@ -26,7 +26,7 @@ class Agent(libpyPandora.AgentStub):
 
 class World(libpyPandora.WorldStub):
 	_listOfAgents = []
-	def __init__(self, simulation, overlap, allowMultipleAgentsPerCell, resultsFile ):
+	def __init__(self, simulation, overlap=1, allowMultipleAgentsPerCell=0, resultsFile="data/results.h5" ):
 		libpyPandora.WorldStub.__init__( self, simulation, overlap, allowMultipleAgentsPerCell, resultsFile)
 
 	def addAgent(self, agent):
