@@ -56,7 +56,6 @@ public:
 	bool writeResults(){return _writeResults;}	
 };
 
-/*
 class RasterAnalysis : public Analysis
 {
 public:
@@ -67,13 +66,13 @@ public:
 	virtual void computeRaster( const Engine::SimulationRecord::RasterHistory & rasterHistory ) = 0;
 };
 
-*/
 class AgentAnalysis : public Analysis
 {
 public:
 	AgentAnalysis( const std::string & name, bool writeResults = true ) : Analysis(name, writeResults)
 	{
 	}
+	virtual ~AgentAnalysis(){}
 	virtual void computeAgent( const Engine::AgentRecord & ) = 0;
 };
 

@@ -451,7 +451,7 @@ void AgentAnalysis::newAnalysis()
 
 void AgentAnalysis::addGlobalAnalysis( AnalysisControlThread* thread )
 {
-	PostProcess::GlobalStats * global = new PostProcess::GlobalStats();
+	PostProcess::GlobalAgentStats * global = new PostProcess::GlobalAgentStats();
 	global->setAnalysisOwnership(false);
 	for(int i=0; i<_analysis.globalStatistics->layout()->count(); i++)
 	{
@@ -488,7 +488,7 @@ void AgentAnalysis::addGlobalAnalysis( AnalysisControlThread* thread )
 	thread->setOutput(global);
 }
 
-void AgentAnalysis::groupGlobalStats( PostProcess::GlobalStats * global )
+void AgentAnalysis::groupGlobalStats( PostProcess::GlobalAgentStats * global )
 {
 	std::list<QTreeWidgetItem * > params;
 	QTreeWidgetItem * item = _analysis.paramsTree->topLevelItem(0);
@@ -508,7 +508,7 @@ void AgentAnalysis::groupGlobalStats( PostProcess::GlobalStats * global )
 		delete _groups;
 	}
 
-	_groups = new PostProcess::GlobalStats::Params();
+	_groups = new PostProcess::GlobalAgentStats::Params();
 
 	for(std::list<QTreeWidgetItem * >::iterator it=params.begin(); it!=params.end(); it++)
 	{

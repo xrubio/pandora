@@ -33,8 +33,7 @@ if int(useMpi)==1:
 
 coreFiles = Split('World.cxx StaticRaster.cxx Raster.cxx Agent.cxx Statistics.cxx SimulationRecord.cxx AgentRecord.cxx Serializer.cxx Simulation.cxx Config.cxx MpiFactory.cxx IncrementalRaster.cxx RasterLoader.cxx Action.cxx LoggerBase.cxx GeneralState.cxx ShpLoader.cxx')
 
-#analysisFiles = Split('analysis/Analysis.cxx analysis/AgentMean.cxx analysis/AgentSum.cxx analysis/AgentNum.cxx analysis/Results.cxx analysis/RasterSum.cxx analysis/RasterMean.cxx analysis/AgentHDFtoSHP.cxx analysis/AgentHistogram.cxx analysis/AgentFinalResults.cxx analysis/AgentStdDev.cxx')
-analysisFiles = Split('analysis/Analysis.cxx analysis/AgentMean.cxx analysis/AgentSum.cxx analysis/AgentNum.cxx analysis/Output.cxx analysis/AgentStdDev.cxx analysis/GlobalStats.cxx analysis/IndividualStats.cxx analysis/AgentHistogram.cxx analysis/AgentHDFtoSHP.cxx')
+analysisFiles = Split('analysis/Analysis.cxx analysis/AgentMean.cxx analysis/AgentSum.cxx analysis/AgentNum.cxx analysis/Output.cxx analysis/AgentStdDev.cxx analysis/GlobalAgentStats.cxx analysis/IndividualStats.cxx analysis/AgentHistogram.cxx analysis/AgentHDFtoSHP.cxx analysis/GlobalRasterStats.cxx analysis/RasterMean.cxx analysis/RasterSum.cxx')
 
 srcFiles = coreFiles + analysisFiles
 

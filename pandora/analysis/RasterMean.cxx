@@ -2,8 +2,8 @@
 #include <analysis/RasterMean.hxx>
 #include <Raster.hxx>
 #include <Exceptions.hxx>
-#include <iostream>
-namespace Analysis
+
+namespace PostProcess
 {
 
 RasterMean::RasterMean() : RasterAnalysis("Mean"), _numCells(0)
@@ -20,9 +20,7 @@ void RasterMean::computeRaster( const Engine::SimulationRecord::RasterHistory & 
 	{
 		if(rasterHistory.size()==0)
 		{
-			std::stringstream oss;
-			oss << "RasterMean::computeRaster - Raster with history of 0 time steps";
-			throw Engine::Exception(oss.str());
+			return;
 		}
 		const Engine::Raster & raster = rasterHistory.at(0);
 		_numCells = raster.getSize()._x * raster.getSize()._y;
@@ -56,5 +54,5 @@ void RasterMean::postProcess()
 	}
 }
 
-} // namespace Analysis
+} // namespace PostProcess
 

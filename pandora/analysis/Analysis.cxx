@@ -21,7 +21,6 @@
 
 
 #include <analysis/Analysis.hxx>
-#include <AgentRecord.hxx>
 
 namespace PostProcess
 {

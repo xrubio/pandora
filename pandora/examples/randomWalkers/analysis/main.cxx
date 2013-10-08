@@ -22,13 +22,11 @@
 #include <Exceptions.hxx>
 #include <SimulationRecord.hxx>
 
-#include <analysis/GlobalStats.hxx>
+#include <analysis/GlobalAgentStats.hxx>
 #include <analysis/AgentMean.hxx>
 #include <analysis/AgentSum.hxx>
-/*
 #include <analysis/RasterMean.hxx>
 #include <analysis/RasterSum.hxx>
-*/
 #include <analysis/AgentNum.hxx>
 #include <analysis/AgentStdDev.hxx>
 //#include <analysis/AgentHDFtoSHP.hxx>
@@ -47,13 +45,13 @@ int main(int argc, char *argv[])
 		Engine::SimulationRecord simRecord( 1, false);
 		simRecord.loadHDF5(argv[1], true, true);
 
-		PostProcess::GlobalStats agentResults(simRecord, argv[2], "RandomAgent");
+		PostProcess::GlobalAgentStats agentResults;
 		agentResults.addAnalysis(new PostProcess::AgentNum());
 		agentResults.addAnalysis(new PostProcess::AgentMean("resources"));
 		agentResults.addAnalysis(new PostProcess::AgentStdDev("resources"));
 		agentResults.addAnalysis(new PostProcess::AgentSum("resources"));
 
-		agentResults.apply();
+		agentResults.apply(simRecord, argv[2], "RandomAgent");
 
 		/*
 		Analysis::RasterResults rasterResults(simRecord, argv[3], "resources");

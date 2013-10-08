@@ -2,7 +2,7 @@
 #include <analysis/RasterSum.hxx>
 #include <Raster.hxx>
 
-namespace Analysis
+namespace PostProcess
 {
 
 RasterSum::RasterSum() : RasterAnalysis("Sum")
@@ -28,5 +28,6 @@ void RasterSum::computeRaster( const Engine::SimulationRecord::RasterHistory & r
 	}
 }
 
-} // namespace Analysis
+} // namespace PostProcess
+
 

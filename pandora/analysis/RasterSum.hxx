@@ -5,14 +5,12 @@
 #include <analysis/Analysis.hxx>
 #include <SimulationRecord.hxx>
 
-/*
 namespace Engine
 {
-	class ;
+	class SimulationRecord;
 }
-*/
 
-namespace Analysis
+namespace PostProcess
 {
 
 class RasterSum : public RasterAnalysis
@@ -23,7 +21,7 @@ public:
 	void computeRaster( const Engine::SimulationRecord::RasterHistory & rasterHistory );
 };
 
-} // namespace Analysis
+} // namespace PostProcess
 
 #endif // __RasterSum_hxx__
 

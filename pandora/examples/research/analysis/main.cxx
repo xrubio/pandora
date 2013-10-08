@@ -22,7 +22,7 @@
 #include <Exceptions.hxx>
 #include <SimulationRecord.hxx>
 
-#include <analysis/GlobalStats.hxx>
+#include <analysis/GlobalAgentStats.hxx>
 #include <analysis/AgentMean.hxx>
 #include <analysis/AgentSum.hxx>
 #include <analysis/AgentNum.hxx>
@@ -42,19 +42,19 @@ int main(int argc, char *argv[])
 		Engine::SimulationRecord simRecord;
 		simRecord.loadHDF5(argv[1], true, true);
 
-		PostProcess::GlobalStats paperResults(simRecord, "papers.csv", "Paper");
+		PostProcess::GlobalAgentStats paperResults;
 		paperResults.addAnalysis(new PostProcess::AgentNum());
-		paperResults.apply();
+		paperResults.apply(simRecord, "papers.csv", "Paper");
 
-		PostProcess::GlobalStats authorResults(simRecord, "authors.csv", "Author");
+		PostProcess::GlobalAgentStats authorResults;
 		authorResults.addAnalysis(new PostProcess::AgentNum());
-		authorResults.apply();
+		authorResults.apply(simRecord, "authors.csv", "Author");
 
-		PostProcess::AgentHistogram citations(simRecord, "numCitationsPerPaper.csv", "Paper", "citations", 3);
-		PostProcess::AgentHistogram references(simRecord, "numReferencesPerPaper.csv", "Paper", "cited papers", 3);
+		PostProcess::AgentHistogram citations("citations", 3);
+		PostProcess::AgentHistogram references("cited papers", 3);
 
-		citations.apply();
-		references.apply();
+		citations.apply(simRecord, "numCitationsPerPaper.csv", "Paper");
+		references.apply(simRecord, "numReferencesPerPaper.csv", "Paper");
 	}
 	catch( std::exception & exceptionThrown )
 	{

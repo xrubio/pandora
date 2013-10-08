@@ -22,7 +22,7 @@
 #include <Exceptions.hxx>
 #include <SimulationRecord.hxx>
 
-#include <analysis/GlobalStats.hxx>
+#include <analysis/GlobalAgentStats.hxx>
 
 #include <analysis/AgentMean.hxx>
 #include <analysis/AgentSum.hxx>
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 		Engine::SimulationRecord simRecord( 1, false);
 		simRecord.loadHDF5(argv[1], false, true);
 
-		PostProcess::GlobalStats agentResults(simRecord, argv[2], "HunterGatherer");
+		PostProcess::GlobalAgentStats agentResults;
 		agentResults.addAnalysis(new PostProcess::AgentNum());
 		agentResults.addAnalysis(new PostProcess::AgentMean("agent age"));
 		agentResults.addAnalysis(new PostProcess::AgentMean("children"));
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 		agentResults.addAnalysis(new PostProcess::AgentMean("MoveHome actions"));
 //		agentResults.addAnalysis(new PostProcess::AgentHDFtoSHP(argv[4], Engine::Point2D<int>(774000,2623000), 31.5f, "EPSG:24312"));
 
-		agentResults.apply();
+		agentResults.apply(simRecord, argv[2], "HunterGatherer");
 
 		/*
 		Analysis::RasterResults rasterResults(simRecord, argv[3], "resources");

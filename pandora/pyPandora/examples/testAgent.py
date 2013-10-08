@@ -27,12 +27,12 @@ class MyWorld(World):
 		self.getDynamicRaster("test").setInitValues(0, 0, 0)
 
 	def createAgents(self):
-		for i in range (0, 10):
+		for i in range (0, 300):
 			newAgent = MyAgent('id_'+str(i))
 			self.addAgent(newAgent)
 			newAgent.setRandomPosition()
 
-mySimulation = Simulation(32, 10)
+mySimulation = Simulation(32, 300)
 myWorld = MyWorld(mySimulation)
 myWorld.initialize()
 myWorld.run()

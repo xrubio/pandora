@@ -22,7 +22,7 @@
 #include <Exceptions.hxx>
 #include <SimulationRecord.hxx>
 
-#include <analysis/GlobalStats.hxx>
+#include <analysis/GlobalAgentStats.hxx>
 #include <analysis/AgentMean.hxx>
 #include <analysis/AgentSum.hxx>
 #include <analysis/AgentNum.hxx>
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 		Engine::SimulationRecord simRecord( 1, false);
 		simRecord.loadHDF5(argv[1], false, true);
 
-		PostProcess::GlobalStats agentResults;
+		PostProcess::GlobalAgentStats agentResults;
 		
 		agentResults.addAnalysis(new PostProcess::AgentNum());
 //		agentResults.addAnalysis(new PostProcess::AgentMean("starvation x100"));

@@ -3,16 +3,13 @@
 #define __RasterMean_hxx__
 
 #include <analysis/Analysis.hxx>
-#include <SimulationRecord.hxx>
 
-/*
 namespace Engine
 {
-	class ;
+	class SimulationRecord;
 }
-*/
 
-namespace Analysis
+namespace PostProcess
 {
 
 class RasterMean : public RasterAnalysis
@@ -26,7 +23,7 @@ public:
 	void postProcess();
 };
 
-} // namespace Analysis
+} // namespace PostProcess
 
 #endif // __RasterMean_hxx__
 

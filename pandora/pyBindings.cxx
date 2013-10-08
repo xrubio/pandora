@@ -35,7 +35,7 @@
 #include <analysis/Output.hxx>
 #include <analysis/Analysis.hxx>
 #include <analysis/IndividualStats.hxx>
-#include <analysis/GlobalStats.hxx>
+#include <analysis/GlobalAgentStats.hxx>
 
 #include <analysis/AgentMean.hxx>
 #include <analysis/AgentSum.hxx>
@@ -43,10 +43,8 @@
 #include <analysis/AgentStdDev.hxx>
 #include <analysis/AgentHDFtoSHP.hxx>
 
-/*
 #include <analysis/RasterSum.hxx>
 #include <analysis/RasterMean.hxx>
-*/
 
 #include <string>
 
