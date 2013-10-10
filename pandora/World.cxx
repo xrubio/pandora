@@ -1,7 +1,3 @@
-
-std::vector< std::vector<int> > foo;
-foo[i][j] = 0;
-
 /*
  * Copyright (c) 2012
  * COMPUTER APPLICATIONS IN SCIENCE & ENGINEERING
