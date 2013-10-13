@@ -85,6 +85,7 @@ class GujaratConfig : public Engine::Config
 
 	std::string	_hunterGathererMind;
 	
+	bool _shareInfo;
 	
 	//CaloricRequirementsTable* _hgCaloryRequirements;
 	//CaloricRequirementsTable* _apCaloryRequirements;

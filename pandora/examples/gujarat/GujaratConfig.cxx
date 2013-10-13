@@ -6,6 +6,9 @@
 #include <GujaratState.hxx>
 #include <HGMindFactory.hxx>
 
+#include <locale>         // std::locale, std::tolower
+
+
 namespace Gujarat
 {
 
@@ -171,6 +174,31 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 
 	retrieveAttributeMandatory( element, "mindType", _hunterGathererMind );
 	HGMindFactory::getInstance().setHGMind(_hunterGathererMind);
+	
+	
+	std::string strShareInfo;
+	retrieveAttributeMandatory( element, "shareInfo", strShareInfo );
+	std::locale loc;
+	for (std::string::size_type i=0; i<strShareInfo.length(); ++i)
+	{
+		strShareInfo[i]=std::tolower(strShareInfo[i],loc);
+	}
+	
+	if (strShareInfo.compare("yes")==0) 
+	{
+		_shareInfo = true;
+	}
+	else if (strShareInfo.compare("no")==0)
+	{
+		_shareInfo = false;
+	}
+	else
+	{
+		std::stringstream sstr;
+		sstr << "[CONFIG]: ERROR: Unrecognized value for shareInfo : " << strShareInfo << std::endl;
+		throw Engine::Exception(sstr.str());
+	}
+	
 	
 	float minValue = 0;
 	float adultValue = 0;
