@@ -32,30 +32,79 @@ class ForageAction : public MDPAction
 	int	_caloriesCollected;
 	bool _useFullPopulation;
 
-		
-	void selectBestNearestCell( GujaratAgent& agent, 
-								const Engine::Point2D<int>& n, 
-								const Engine::Raster& r, 
-								int& bestScore, 
-								Engine::Point2D<int>& best ) const; 
-	
-	void selectBestNearestCell( const GujaratAgent& agent, 
-								const Engine::Point2D<int>& n,
-								const GujaratWorld *gw,
-								Engine::Raster& resourceRaster,
-								int explorableCells,
-								int& bestScore,
-								Engine::Point2D<int>& best ) const;
 							 
-	void selectBestWalk( const GujaratAgent& agent, 
-						const Engine::Point2D<int>& n,
-						const Engine::Raster& r,
-						int maxDistAgentWalk,
-						std::vector< Engine::Point2D<int>* > & walk );
+	
+	void selectBestWalk( const GujaratAgent& agent
+			,const Engine::Point2D<int>& n
+			,const Engine::Raster& r
+			,int maxDistAgentWalk
+			,std::vector< Engine::Point2D<int>* > & walk );
+
+	void selectBestNearestHRCell( GujaratAgent& agent
+				,const Engine::Point2D<int>& n
+				,const Engine::Raster& r
+				,int& bestScore
+				,Engine::Point2D<int>& best ) const;
+
+
+	void selectBestNearestHRCellInLRCell_ScanFrame( const GujaratWorld * gw
+					, GujaratAgent&  agent
+					, const Engine::Point2D<int>& LRn
+					, const Engine::Point2D<int>& HRNearest
+					, Engine::Raster& HRRes
+					, int & bestScoreHR
+					, Engine::Point2D<int>& bestHR );
+
+	
+	void selectBestNearestLRCell( const GujaratAgent& agent
+					,const Engine::Point2D<int>& n
+					,const GujaratWorld *gw
+					,Engine::Raster& resourceRaster
+					,int explorableCells
+					,int& bestScore
+					,Engine::Point2D<int>& best ) const;
+
+	void selectBestNearestHRCellInTrend_ScanFrame( const GujaratWorld * gw
+				, GujaratAgent&  agent
+				, const Engine::Point2D<int>& HRBegin
+				, Engine::Point2D<int>& HREndPoint
+				, const Engine::Point2D<int>& LREndPoint
+				, Engine::Raster& HRRes
+				, bool wasInsideLR
+				, int & bestScoreHR
+				, Engine::Point2D<int>& bestHR );
+
+	
+	void selectBestNearestHRCellInSector_ScanFrame(const GujaratWorld * gw
+				, GujaratAgent&  agent
+				, const Engine::Point2D<int>& HRBegin
+				, Engine::Raster& HRRes	
+				, int & bestScoreHR
+				, Engine::Point2D<int>& bestHR );
+
+					
+	
+	void selectBestNearestHRCellInLRCell_ScanAllLRCell( const GujaratWorld * gw
+					, GujaratAgent&  agent
+					, const Engine::Point2D<int>& LRn
+					, const Engine::Point2D<int>& HRNearest
+					, Engine::Raster& HRRes
+					, int & bestScoreHR
+					, Engine::Point2D<int>& bestHR );
+
 	
 	void doWalk( const GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected ) const;
 	void doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected );
+
+	void doClassicalWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected );
+
+	//void doLRClassicWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected );
+
+	void doLRVicinityWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected );
+
+	void doVicinityWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected );	
 	
+	void doTrendVicinityWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected );	
 	
 	
 public:

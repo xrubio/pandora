@@ -1,14 +1,10 @@
-nameProgram = 'gujarat'
+#nameProgram = 'gujarat'
 
 agents = ['HunterGatherer']
 world = 'GujaratWorld'
 namespaceAgents = ['Gujarat']
 
 srcFiles = Split('main.cxx GujaratWorld.cxx GujaratConfig.cxx Climate.cxx GujaratAgent.cxx HunterGatherer.cxx MDPAction.cxx MoveHomeAction.cxx Sector.cxx ForageAction.cxx SettlementAreas.cxx HunterGathererMDPConfig.cxx HunterGathererMDPState.cxx HunterGathererMDPModel.cxx DoNothingAction.cxx AgentController.cxx HunterGathererProgrammedController.cxx HunterGathererDecisionTreeController.cxx HunterGathererMDPController.cxx GujaratDemographics.cxx OriginalDemographics.cxx CaloricRequirementsTable.cxx GujaratState.cxx HGMind.cxx HGOmniMindMap.cxx HGPartialMindMap.cxx HGMindFactory.cxx')
-
-
-
-
 
 
 # APFiles = Split('APMoveHomeAction.cxx EstablishPlotAction.cxx SowAction.cxx HarvestAction.cxx MaintainPlotAction.cxx CultivatedField.cxx AgroPastoralist.cxx') 
@@ -23,6 +19,30 @@ release = ARGUMENTS.get('release', 1)
 mareNostrum = ARGUMENTS.get('mn', 0)
 extremeDebug = ARGUMENTS.get('edebug', 0)
 useMpi = ARGUMENTS.get('mpi', 1)
+
+walkArg = ARGUMENTS.get('walk', 'c')
+
+walkFlagsTable={
+	'c'   : 'CLASSICWALK'
+	,'lrc' : 'LRCLASSICWALK'
+	,'lrv' : 'LRVICINITYWALK'
+	,'v'   : 'VICINITYWALK'
+	,'tv'  : 'TRENDVICINITYWALK'
+	}
+
+walkProgramTable={
+	'c'   : 'gujarat_c'
+	,'lrc' : 'gujarat_lrc'
+	,'lrv' : 'gujarat_lrv'
+	,'v'   : 'gujarat_v'
+	,'tv'  : 'gujarat_tv'
+	}
+
+nameProgram = [walkProgramTable[walkArg]]
+
+walkFlag = '-D ' + walkFlagsTable[walkArg]
+
+print "WALK IS : " + walkFlag + "\n"
 
 if int(useMpi) == 1:
 	env = Environment(ENV=os.environ, CXX='mpicxx')
@@ -47,6 +67,8 @@ if int(useMpi)==1:
 	env['CCFLAGS'] += ['-DPANDORAMPI']
 
 env['CCFLAGS'] += ['-std=c++0x']
+
+env['CCFLAGS'] += [walkFlag]
 
 
 includeDirs = Split('./ ../../ ../../../libs/libmdp/')

@@ -2,8 +2,9 @@
 #include <Agent.hxx>
 #include <GujaratAgent.hxx>
 #include <HunterGatherer.hxx>
-//#include <GujaratWorld.hxx>
+#include <GujaratConfig.hxx>
 #include <HunterGathererMDPState.hxx>
+#include <GujaratState.hxx>
 #include <cassert>
 
 #include <Logger.hxx>
@@ -142,11 +143,11 @@ void ForageAction::execute( Engine::Agent & a )
 	//agent.updateKnowledgeFromFirstHandVisit(_LRForageArea);
 }
 
-void	ForageAction::selectBestWalk( const GujaratAgent& agent, 
-									  const Engine::Point2D<int>& n,
-								   const Engine::Raster& r,
-								   int maxDistAgentWalk,
-								   std::vector< Engine::Point2D<int>* > & walk )
+void	ForageAction::selectBestWalk( const GujaratAgent& agent
+				,const Engine::Point2D<int>& n
+				,const Engine::Raster& r
+				,int maxDistAgentWalk
+				,std::vector< Engine::Point2D<int>* > & walk )
 {
 	double minDist = std::numeric_limits<double>::max();
 	
@@ -186,11 +187,11 @@ void	ForageAction::selectBestWalk( const GujaratAgent& agent,
 // ForageAction::selectBestNearestCell without const agent parameter applies HR operations
 //TODO : one only ForageAction::selectBestNearestCell, add parameter forageArea
 // the caller will put either LRForageArea, HRForageArea, as needed.
-void	ForageAction::selectBestNearestCell( GujaratAgent& agent, 
-											 const Engine::Point2D<int>& n,
-											 const Engine::Raster& r,
-											 int& bestScore,
-											 Engine::Point2D<int>& best ) const
+void	ForageAction::selectBestNearestHRCell( GujaratAgent& agent
+					,const Engine::Point2D<int>& n
+					,const Engine::Raster& r
+					,int& bestScore
+					,Engine::Point2D<int>& best ) const
 {
 	bestScore = 0;
 	std::vector< Engine::Point2D<int>* > candidates;	
@@ -231,33 +232,122 @@ void	ForageAction::selectBestNearestCell( GujaratAgent& agent,
 	candidates.clear();
 }
 
-// ForageAction::selectBestNearestCell with const agent parameter applies LR operations
-// ForageAction::selectBestNearestCell without const agent parameter applies HR operations
-void	ForageAction::selectBestNearestCell( const GujaratAgent& agent, 
-											 const Engine::Point2D<int>& n,
-											 const GujaratWorld *gw,
-										     Engine::Raster& resourceRaster,
-										     int explorableCells,
-										     int& bestScore,
-										     Engine::Point2D<int>& best ) const
+
+void ForageAction::selectBestNearestHRCellInLRCell_ScanFrame( const GujaratWorld * gw
+					, GujaratAgent&  agent
+					, const Engine::Point2D<int>& LRn
+					, const Engine::Point2D<int>& HRNearest
+					, Engine::Raster& HRRes
+					, int & bestScoreHR
+					, Engine::Point2D<int>& bestHR )
 {
+	int FRAMESIZE = 40;
+	Engine::Point2D<int> curr;
+	Engine::Point2D<int> corner;
+	int lowResolution = ((GujaratConfig)gw->getConfig()).getLowResolution();	
+	gw->LowRes2HighResCellCorner(LRn, corner);
+	
+	//std::cout << "CORNER:" << LRn << " --> " << curr << std::endl;
+	
+	bestScoreHR = -1;
+	long bestDistanceHR = gw->getOverlapBoundaries()._origin.distanceSQ(gw->getOverlapBoundaries()._origin + gw->getOverlapBoundaries()._size);
+	
+	std::vector < Engine::Point2D<int> > candidates(10);
+	int numCandidates = 0;
+	
+	// Explore the intersection between the frame of neighbours and the cells 
+	// contained in the LRCell
+	int iInit  = (corner._x>HRNearest._x-FRAMESIZE)?corner._x:HRNearest._x-FRAMESIZE;
+	int iBound = (corner._x+lowResolution-1<HRNearest._x+FRAMESIZE)?corner._x+lowResolution-1:HRNearest._x+FRAMESIZE;
+	int jInit  = (corner._y>HRNearest._y-FRAMESIZE)?corner._y:HRNearest._y-FRAMESIZE;
+	int jBound = (corner._y+lowResolution-1<HRNearest._y+FRAMESIZE)?corner._y+lowResolution-1:HRNearest._y+FRAMESIZE;
+	
+	for(int i = iInit; i <= iBound; i++)
+	{
+		curr._x = i;
+		for(int j = jInit; j <= jBound; j++)
+		{	
+			curr._y = j;
+			
+			//std::cout << "CURRENT " << curr << " LOWRES=" << lowResolution << std::endl;
+			
+			int currRes = HRRes.getValue(curr - gw->getOverlapBoundaries()._origin);
+			
+			if(currRes == bestScoreHR)
+			{
+				long d = curr.distanceSQ(HRNearest);
+				if(d < bestDistanceHR)
+				{
+					//candidates.clear();
+					numCandidates = 0;
+					bestScoreHR = currRes;
+					bestDistanceHR = d;
+					
+					candidates[numCandidates] = curr;
+					numCandidates++;
+				}
+				else if(d == bestDistanceHR)
+				{					
+					candidates[numCandidates] = curr;
+					numCandidates++;
+					bestDistanceHR = d;
+				}
+			}
+			else if (currRes > bestScoreHR)
+			{
+				//candidates.clear();
+				numCandidates = 0;
+				bestScoreHR = currRes;
+				
+				candidates[numCandidates] = curr;
+				numCandidates++;
+			}
+		}
+	}
+	
+	bestHR = candidates[Engine::GeneralState::statistics().getUniformDistValue(0,numCandidates-1)];
+	
+	candidates.clear();
+}
+
+
+void	ForageAction::selectBestNearestLRCell( const GujaratAgent& agent
+					,const Engine::Point2D<int>& n
+					,const GujaratWorld *gw
+					,Engine::Raster& resourceRaster
+					,int explorableCells
+					,int& bestScore
+					,Engine::Point2D<int>& best ) const
+{
+		
 	bestScore = 0;
-	std::vector< Engine::Point2D<int>* > candidates;	
+	std::vector< Engine::Point2D<int>* > candidates;
 	double minDist = std::numeric_limits<double>::max();
-	
+
+	try{
 	const std::vector< Engine::Point2D<int>* >& sectorCells = _LRForageArea->cells();
-	
+	}catch(const std::exception & e)
+			{
+				std::cout << "EXCP: LRForageArea" << std::endl;
+				
+			}
+			
+	const std::vector< Engine::Point2D<int>* >& sectorCells = _LRForageArea->cells();
+			
+			
 	assert(_LRForageArea->cells().size() > 0);
-	
+
 	for ( unsigned k = 0; k < _LRForageArea->numCells(); k++ )
-	{	
+	{
+		//std::cout << " good? " << *sectorCells[k] << std::endl;
+		
 		/* Rationale for score function :
-		 *			
+		 *
 		 *			// before calling selectBest...
 		 *			t = free time
 		 *			tc = time to explore 1 cell
 		 *			explorableCells = t / tc
-		 *			
+		 *
 		 *			// computed at LRcellOutcomeHeuristic
 		 *			n = # resource cells in area
 		 *			r = amount of resource in cell
@@ -266,10 +356,9 @@ void	ForageAction::selectBestNearestCell( const GujaratAgent& agent,
 		 *			xr = expected retrieved resources =  m*xx
 		 *			score = xr
 		 */
-		
-		int score = LRcellOutcomeHeuristic(*sectorCells[k], gw, explorableCells
-		,resourceRaster);
-		
+
+		int score = LRcellOutcomeHeuristic(*sectorCells[k], gw, explorableCells,resourceRaster);
+
 		double dist = sectorCells[k]->distance(n);
 		if ( score > bestScore )
 		{
@@ -294,41 +383,678 @@ void	ForageAction::selectBestNearestCell( const GujaratAgent& agent,
 	}
 	//TODO cost n, instead: best=candidates[uniformRandom(0,candidates.size()-1)]
 	//std::random_shuffle(candidates.begin(), candidates.end());
-	
+
 	best = *candidates[Engine::GeneralState::statistics().getUniformDistValue(0,candidates.size()-1)];
 
-	candidates.clear();	
+	candidates.clear();
 }
+
+void ForageAction::selectBestNearestHRCellInTrend_ScanFrame(
+				const GujaratWorld * gw
+				, GujaratAgent&  agent
+				, const Engine::Point2D<int>& HRBegin
+				, Engine::Point2D<int>& HREndPoint
+				, const Engine::Point2D<int>& LREndPoint
+				, Engine::Raster& HRRes
+				, bool wasInsideLR
+				, int & bestScoreHR
+				, Engine::Point2D<int>& bestHR )
+{
+	int FRAMESIZE = 40;
+	int HOMERANGE = ((HunterGatherer&)agent).getHomeRange();
+	Engine::Point2D<int> curr;
+	Engine::Point2D<int> home = agent.getPosition();
+	Engine::Point2D<int> cornerLeftUp;
+	Engine::Point2D<int> cornerDownRight;
+	int lowResolution = ((GujaratConfig)gw->getConfig()).getLowResolution();
+	
+	//if(!wasInsideLR)
+	//{
+		// update "wasInsideLR". Once you enter the LR cell you
+		// do not come out. So once "wasInsideLR" becomes true it
+		// will be true always. Do not check re-update when it is true.
+	wasInsideLR = 	HRBegin._x >= (LREndPoint._x*lowResolution) &&
+			HRBegin._x < ((LREndPoint._x+1)*lowResolution) &&
+			HRBegin._y >= (LREndPoint._y*lowResolution) &&
+			HRBegin._y < ((LREndPoint._y+1)*lowResolution);
+	//}
+	
+	if(wasInsideLR)
+	{
+				
+		/*cornerLeftUp._x = (LREndPoint._x*lowResolution)
+		cornerLeftUp._y = (LREndPoint._y*lowResolution)
+		cornerDownRight._x = cornerLeftUp._x + lowResolution;
+		cornerDownRight._y = cornerLeftUp._y + lowResolution;
+		*/
+		
+		cornerLeftUp._x = HRBegin._x - FRAMESIZE;
+		cornerLeftUp._y = HRBegin._y - FRAMESIZE; 		
+		if(cornerLeftUp._x < (LREndPoint._x*lowResolution))
+		{
+			cornerLeftUp._x = (LREndPoint._x*lowResolution);
+		}
+
+		if(cornerLeftUp._y < (LREndPoint._y*lowResolution))
+		{
+			cornerLeftUp._y = (LREndPoint._y*lowResolution);
+		}
+
+		cornerDownRight._x = HRBegin._x + FRAMESIZE;
+		cornerDownRight._y = HRBegin._y + FRAMESIZE; 
+		if(cornerDownRight._x >= ((LREndPoint._x+1)*lowResolution))
+		{
+			cornerDownRight._x = ((LREndPoint._x+1)*lowResolution) - 1;
+		}
+
+		if(cornerDownRight._y >= ((LREndPoint._y+1)*lowResolution))
+		{
+			cornerDownRight._y = ((LREndPoint._x+1)*lowResolution) - 1;
+		}		
+		// Inside LR cell always take the nearest to the last visited place.
+		HREndPoint = HRBegin;	
+	}
+	else
+	{
+		cornerLeftUp._x = HRBegin._x - FRAMESIZE;
+		cornerLeftUp._y = HRBegin._y - FRAMESIZE; 
+		
+		if(cornerLeftUp._x < gw->getBoundaries()._origin._x)
+		{
+			cornerLeftUp._x = gw->getBoundaries()._origin._x;
+		}
+
+		if(cornerLeftUp._y < gw->getBoundaries()._origin._y)
+		{
+			cornerLeftUp._y = gw->getBoundaries()._origin._y;
+		}
+
+		cornerDownRight._x = HRBegin._x + FRAMESIZE;
+		cornerDownRight._y = HRBegin._y + FRAMESIZE; 
+		if(cornerDownRight._x > gw->getBoundaries()._origin._x + gw->getBoundaries()._size._x -1 )
+		{
+			cornerDownRight._x = gw->getBoundaries()._origin._x + gw->getBoundaries()._size._x-1;
+		}
+
+		if(cornerDownRight._y > gw->getBoundaries()._origin._y + gw->getBoundaries()._size._y -1)
+		{
+			cornerDownRight._y = gw->getBoundaries()._origin._y + gw->getBoundaries()._size._y-1;
+		}
+	}
+	
+	/*
+	std::cout << "*******BEGIN: " << HRBegin <<" * " << home << std::endl;
+	std::cout << "*******BEGIN2: " << (HRBegin - home) << std::endl;*/
+
+	
+	bestScoreHR = -1;
+	long bestDistanceHR = cornerLeftUp.distanceSQ(cornerDownRight);
+
+	std::vector < Engine::Point2D<int> > candidates(10);
+	int numCandidates = 0;
+
+	// Explore the intersection between the frame of neighbours and the cells 
+	// contained in the LRCell
+	int iInit  = cornerLeftUp._x;
+	int iBound = cornerDownRight._x;
+	int jInit  = cornerLeftUp._y;
+	int jBound = cornerDownRight._y;
+
+	for(int i = iInit; i <= iBound; i++)
+	{
+		curr._x = i;
+		for(int j = jInit; j <= jBound; j++)
+		{
+			curr._y = j;
+		/*
+			std::cout << "*******SECTOR: " << curr <<" * " << home << std::endl;
+			std::cout << "*******SECTOR2: " << (curr - home) << std::endl;
+		*/
+			//std::cout << "CURRENT " << curr << " LOWRES=" << lowResolution << std::endl;
+
+			int currRes = HRRes.getValue(curr - gw->getOverlapBoundaries()._origin);
+
+			if(currRes == bestScoreHR)
+			{
+				long d = curr.distanceSQ(HREndPoint);
+				if(d < bestDistanceHR)
+				{
+					//candidates.clear();
+					numCandidates = 0;
+					bestScoreHR = currRes;
+					bestDistanceHR = d;
+
+					candidates[numCandidates] = curr;
+					numCandidates++;
+				}
+				else if(d == bestDistanceHR)
+				{
+					candidates[numCandidates] = curr;
+					numCandidates++;
+					bestDistanceHR = d;
+				}
+			}
+			else if (currRes > bestScoreHR)
+			{
+				//candidates.clear();
+				numCandidates = 0;
+				bestScoreHR = currRes;
+
+				candidates[numCandidates] = curr;
+				numCandidates++;
+			}
+		}
+	}
+
+
+	try{
+	bestHR = candidates[Engine::GeneralState::statistics().getUniformDistValue(0,numCandidates-1)];
+	}catch(const std::exception & e)
+			{
+				std::cout << "EXCP: candidates" << std::endl;
+			}
+	candidates.clear();
+}
+
+
+
+void ForageAction::selectBestNearestHRCellInSector_ScanFrame(const GujaratWorld * gw
+				, GujaratAgent&  agent					, const Engine::Point2D<int>& HRBegin			, Engine::Raster& HRRes					, int & bestScoreHR					, Engine::Point2D<int>& bestHR )
+{
+	int FRAMESIZE = 40;
+	int HOMERANGE = ((HunterGatherer&)agent).getHomeRange();
+	Engine::Point2D<int> curr;
+	Engine::Point2D<int> home = agent.getPosition();
+	Engine::Point2D<int> cornerLeftUp;
+	Engine::Point2D<int> cornerDownRight;
+
+
+	cornerLeftUp._x = HRBegin._x - FRAMESIZE;
+	cornerLeftUp._y = HRBegin._y - FRAMESIZE; 
+	if(cornerLeftUp._x < gw->getBoundaries()._origin._x)
+	{
+		cornerLeftUp._x = gw->getBoundaries()._origin._x;
+	}
+
+	if(cornerLeftUp._y < gw->getBoundaries()._origin._y)
+	{
+		cornerLeftUp._y = gw->getBoundaries()._origin._y;
+	}
+
+	cornerDownRight._x = HRBegin._x + FRAMESIZE;
+	cornerDownRight._y = HRBegin._y + FRAMESIZE; 
+	if(cornerDownRight._x > gw->getBoundaries()._origin._x + gw->getBoundaries()._size._x -1 )
+	{
+		cornerDownRight._x = gw->getBoundaries()._origin._x + gw->getBoundaries()._size._x-1;
+	}
+
+	if(cornerDownRight._y > gw->getBoundaries()._origin._y + gw->getBoundaries()._size._y -1)
+	{
+		cornerDownRight._y = gw->getBoundaries()._origin._y + gw->getBoundaries()._size._y-1;
+	}
+
+	//SectorsMask & HRSectorsMask = GujaratState::getHRSectorsMask();
+
+	/*
+	std::cout << "*******BEGIN: " << HRBegin <<" * " << home << std::endl;
+	std::cout << "*******BEGIN2: " << (HRBegin - home) << std::endl;*/
+
+	int currentSector=-1;
+	//try{
+	currentSector = GujaratState::sectorsMask(HRBegin._x-home._x+HOMERANGE,HRBegin._y-home._y+HOMERANGE, GujaratState::getHRSectorsMask());
+	/*}catch(const std::exception & e)
+			{
+				Engine::Point2D<int> p = HRBegin - home;
+				Engine::Point2D<int> q = p;
+				q._x += HOMERANGE+1;
+				q._y += HOMERANGE+1;
+
+				std::cout << "EXCEPT:" << p << "|" << q << std::endl;
+			}*/
+	//std::cout << "CORNER:" << LRn << " --> " << curr << std::endl;
+
+	bestScoreHR = -1;
+	long bestDistanceHR = cornerLeftUp.distanceSQ(cornerDownRight);
+
+	std::vector < Engine::Point2D<int> > candidates(10);
+	int numCandidates = 0;
+
+	// Explore the intersection between the frame of neighbours and the cells 
+	// contained in the LRCell
+	int iInit  = cornerLeftUp._x;
+	int iBound = cornerDownRight._x;
+	int jInit  = cornerLeftUp._y;
+	int jBound = cornerDownRight._y;
+
+
+	for(int i = iInit; i <= iBound; i++)
+	{
+		curr._x = i;
+		for(int j = jInit; j <= jBound; j++)
+		{
+			curr._y = j;
+
+		/*
+			std::cout << "*******SECTOR: " << curr <<" * " << home << std::endl;
+			std::cout << "*******SECTOR2: " << (curr - home) << std::endl;
+		*/
+
+			//try{
+				if (currentSector != GujaratState::sectorsMask(
+					curr._x - home._x+HOMERANGE
+					,curr._y - home._y+HOMERANGE
+					,GujaratState::getHRSectorsMask()))
+				{
+					//continue;
+					int xxx;
+					xxx=0;
+				}
+			//}catch(const std::exception & e)
+			/*{
+				Engine::Point2D<int> q;
+
+				q = curr - HRBegin;
+				q = q + HOMERANGE;
+
+				std::cout << "***EXCEPTION***" << curr << "|" << q << "|" << std::endl; 
+			}*/
+
+			//std::cout << "CURRENT " << curr << " LOWRES=" << lowResolution << std::endl;
+
+			int currRes = HRRes.getValue(curr - gw->getOverlapBoundaries()._origin);
+
+			if(currRes == bestScoreHR)
+			{
+				long d = curr.distanceSQ(HRBegin);
+				if(d < bestDistanceHR)
+				{
+					//candidates.clear();
+					numCandidates = 0;
+					bestScoreHR = currRes;
+					bestDistanceHR = d;
+
+					candidates[numCandidates] = curr;
+					numCandidates++;
+				}
+				else if(d == bestDistanceHR)
+				{
+					candidates[numCandidates] = curr;
+					numCandidates++;
+					bestDistanceHR = d;
+				}
+			}
+			else if (currRes > bestScoreHR)
+			{
+				//candidates.clear();
+				numCandidates = 0;
+				bestScoreHR = currRes;
+
+				candidates[numCandidates] = curr;
+				numCandidates++;
+			}
+		}
+	}
+
+
+	try{
+	bestHR = candidates[Engine::GeneralState::statistics().getUniformDistValue(0,numCandidates-1)];
+	}catch(const std::exception & e)
+			{
+				std::cout << "EXCP: candidates" << std::endl;
+			}
+	candidates.clear();
+}
+
+
+
+
+void ForageAction::selectBestNearestHRCellInLRCell_ScanAllLRCell( 
+					const GujaratWorld * gw
+					, GujaratAgent&  agent
+					, const Engine::Point2D<int>& LRn
+					, const Engine::Point2D<int>& HRNearest
+					, Engine::Raster& HRRes
+					, int & bestScoreHR
+					, Engine::Point2D<int>& bestHR )
+{
+	Engine::Point2D<int> curr;
+	Engine::Point2D<int> corner;
+	
+	gw->LowRes2HighResCellCorner(LRn, corner);
+	
+	//std::cout << "CORNER:" << LRn << " --> " << curr << std::endl;
+	
+	bestScoreHR = -1;
+	long bestDistanceHR = gw->getOverlapBoundaries()._origin.distanceSQ(gw->getOverlapBoundaries()._origin + gw->getOverlapBoundaries()._size);
+	
+	
+	std::vector < Engine::Point2D<int> > candidates(10);
+	int numCandidates = 0;
+	
+	int lowResolution = ((GujaratConfig)gw->getConfig()).getLowResolution();
+	for(int i = 0; i < lowResolution; i++)
+	{
+		curr._x = corner._x + i;
+		for(int j = 0; j < lowResolution; j++)
+		{	
+			curr._y = corner._y + j;
+			
+			//std::cout << "CURRENT " << curr << " LOWRES=" << lowResolution << std::endl;
+			
+			int currRes = HRRes.getValue(curr - gw->getOverlapBoundaries()._origin);
+			
+			if(currRes == bestScoreHR)
+			{
+				long d = curr.distanceSQ(HRNearest);
+				if(d < bestDistanceHR)
+				{
+					//candidates.clear();
+					numCandidates = 0;
+					bestScoreHR = currRes;
+					bestDistanceHR = d;
+					
+					candidates[numCandidates] = curr;
+					numCandidates++;
+				}
+				else if(d == bestDistanceHR)
+				{					
+					candidates[numCandidates] = curr;
+					numCandidates++;
+					bestDistanceHR = d;
+				}
+			}
+			else if (currRes > bestScoreHR)
+			{
+				//candidates.clear();
+				numCandidates = 0;
+				bestScoreHR = currRes;
+				
+				candidates[numCandidates] = curr;
+				numCandidates++;
+			}
+		}
+	}
+	
+	bestHR = candidates[Engine::GeneralState::statistics().getUniformDistValue(0,numCandidates-1)];
+	
+	candidates.clear();
+}
+
+
+
 
 
 void	ForageAction::doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, 
 				double maxDist, Engine::Raster& r, int & collected ) 
 {
+	
+//std::cout << "there are " << _LRForageArea->cells().size() << " cells" << std::endl;	
+	
+	
+#ifdef CLASSICWALK
+	doClassicalWalk( agent, n0, maxDist, r, collected );
+#endif
+	
+/*	
+#ifdef LRCLASSICWALK
+	doLRClassicWalk( agent, n0, maxDist, r, collected );
+#endif
+*/
+
+#ifdef LRVICINITYWALK
+	doLRVicinityWalk( agent, n0, maxDist, r, collected );
+#endif
+	
+#ifdef VICINITYWALK
+	doVicinityWalk( agent, n0, maxDist, r, collected );
+#endif
+	
+#ifdef TRENDVICINITYWALK
+	doTrendVicinityWalk( agent, n0, maxDist, r, collected );
+#endif
+	
+}
+
+void	ForageAction::doTrendVicinityWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int & collected ) 
+{
+	double walkedDist 	= 0.0;
+	Engine::Point2D<int> n 	= n0;
+	double distHome 	= 0.0;
+	Engine::Point2D<int> best;
+	int bestScore 		= 0;
+		
+	std::stringstream logName;
+	logName << agent.getWorld()->getId() << "_" << agent.getId();
+	
+	GujaratWorld * gw = (GujaratWorld *)agent.getWorld();
+	
+	Engine::Point2D<int> HRHome(agent.getPosition());
+	Engine::Point2D<int> LRHome;
+        gw->worldCell2LowResCell( agent.getPosition(), LRHome);
+	Engine::Point2D<int> LRn    = LRHome;
+	Engine::Point2D<int> LRBest;	
+	Engine::Point2D<int> HRNearest;
+	
+	
+	//*? TODO eLRResources??? what about non omniscience?
+	//std::cout << "1111111:" << LRn <<":"<< HRHome << std::endl;
+	selectBestNearestLRCell( agent, LRn, gw, agent.getWorld()->getDynamicRaster(eLRResources)
+	, (int)(agent.getAvailableTime() / agent.getForageTimeCost())
+	, bestScore, LRBest );
+	//std::cout << "2222222" << std::endl;
+	// find endpoint
+	int lowResolution = ((GujaratConfig)gw->getConfig()).getLowResolution();
+	Engine::Point2D<int> HREndPoint= LRBest*lowResolution;
+	if (HREndPoint._x >= HRHome._x )
+	{
+		HREndPoint._x = HREndPoint._x + lowResolution -1;
+	}
+	if (HREndPoint._y >= HRHome._y )
+	{
+		HREndPoint._y = HREndPoint._y + lowResolution -1;
+	}	
+	bool wasInsideLR;
+	int loops = 0;
+	while ( ( walkedDist + distHome ) < maxDist )
+	{	
+		loops++;
+		
+		//std::cout << "33333333" << std::endl;
+		selectBestNearestHRCellInTrend_ScanFrame( 
+			(GujaratWorld*)(agent.getWorld())
+			,agent
+			, n
+			, HREndPoint
+			, LRBest
+			, r
+			, wasInsideLR
+			, bestScore
+			, best );		
+		//std::cout << "444444444" << std::endl;
+		//bestScore = r.getValue(best - agent.getWorld()->getOverlapBoundaries()._origin); 
+
+		// 2. update walk distance
+		walkedDist += agent.getTimeSpentForagingTile();
+		walkedDist += best.distance(n);
+		n = best;
+		distHome = n0.distance(n);
+		int amtCollected = agent.computeEffectiveBiomassForaged( bestScore );
+		//int prevActivity = agent.getWorld()->getValue(eForageActivity, n );
+		//agent.getWorld()->setValue(eForageActivity, n, prevActivity + 1 );
+		collected += amtCollected;
+
+		// 4. update cell resources & amount collected
+		int prevValue = r.getValue(n - agent.getWorld()->getOverlapBoundaries()._origin); 
+		r.setValue( n - agent.getWorld()->getOverlapBoundaries()._origin, prevValue - amtCollected );
+
+		//w++;
+	}
+	
+	//std::cout << "res " << collected << " loops " << loops << " wd " << walkedDist << " dH " << distHome << " mD " << maxDist << std::endl;
+	std::cout << "LOOP " << collected << "," << loops << "," << walkedDist << "," << distHome << "," << maxDist << std::endl;
+	
+	// update l'LRraster??? and LRsectors???
+	// One action per timestep -> Next time I need LRraster and LRsectors they will be updated by
+	// nextstep method in world -> do not update LRraster, LRsectors
+}
+
+
+
+void	ForageAction::doVicinityWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int & collected ) 
+{
+	double walkedDist 	= 0.0;
+	Engine::Point2D<int> n 	= n0;
+	double distHome 	= 0.0;
+	Engine::Point2D<int> best;
+	int bestScore 		= 0;
+	
+	// needed by selectBestNearestHRCellInSector_ScanFrame
+	selectBestNearestHRCell( agent, n0, r, bestScore, best );
+	n = best;	
+	
+	while ( ( walkedDist + distHome ) < maxDist )
+	{	
+		selectBestNearestHRCellInSector_ScanFrame( 
+			(GujaratWorld*)(agent.getWorld())
+			,agent
+			, n
+			, r
+			, bestScore
+			, best );		
+
+		//bestScore = r.getValue(best - agent.getWorld()->getOverlapBoundaries()._origin); 
+
+		// 2. update walk distance
+		walkedDist += agent.getTimeSpentForagingTile();
+		walkedDist += best.distance(n);
+		n = best;
+		distHome = n0.distance(n);
+		int amtCollected = agent.computeEffectiveBiomassForaged( bestScore );
+		//int prevActivity = agent.getWorld()->getValue(eForageActivity, n );
+		//agent.getWorld()->setValue(eForageActivity, n, prevActivity + 1 );
+		collected += amtCollected;
+
+		// 4. update cell resources & amount collected
+		int prevValue = r.getValue(n - agent.getWorld()->getOverlapBoundaries()._origin); 
+		r.setValue( n - agent.getWorld()->getOverlapBoundaries()._origin, prevValue - amtCollected );
+
+		//w++;
+	}
+	// update l'LRraster??? and LRsectors???
+	// One action per timestep -> Next time I need LRraster and LRsectors they will be updated by
+	// nextstep method in world -> do not update LRraster, LRsectors
+}
+
+
+void	ForageAction::doLRVicinityWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int & collected ) 
+{
+	std::stringstream logName;
+	logName << agent.getWorld()->getId() << "_" << agent.getId();
+	
+	GujaratWorld * gw = (GujaratWorld *)agent.getWorld();
+	
+	Engine::Raster & LRRes = gw->getDynamicRaster(eLRResources);
+	
+	double walkedDist         = 0.0;
+	Engine::Point2D<int> LRHome;
+        gw->worldCell2LowResCell( agent.getPosition(), LRHome);
+	Engine::Point2D<int> LRn  = LRHome;
+	Engine::Point2D<int> LRBest = LRHome;
+	double distHome           = 0.0;
+	int bestScore;
+	Engine::Point2D<int> HRNearest;
+	Engine::Point2D<int> HRHome(agent.getPosition());
+	
+	selectBestNearestLRCell(agent, LRHome, gw, agent.getWorld()->getDynamicRaster(eLRResources)
+	, (int)(agent.getAvailableTime() / agent.getForageTimeCost())
+	, bestScore, LRBest );
+	
+	do{
+		
+		// 2. update walk distance
+		LRn               = LRBest;
+		int cellResources = ((GujaratWorld*)agent.getWorld())->getValueLR(LRRes,LRn);
+		walkedDist       = walkedDist + LRBest.distance(LRn);// distance 0, free for LR
+		
+		int numInterDune = ((GujaratWorld*)agent.getWorld())->getValueLR(LRCounterSoilINTERDUNE,LRn);
+		int nonVisited   = numInterDune;
+		//int prevActivity = ((GujaratWorld*)agent.getWorld())->getValueLR(eLRForageActivity, n );
+		int amtCollected = 0;
+		
+		// Exploit LR cell
+		gw->LowRes2HighResCellCorner(LRn,HRNearest);
+		distHome = HRHome.distance(HRNearest);
+		while ( nonVisited > 0 && (( walkedDist + distHome ) < maxDist) )
+		{
+			Engine::Point2D<int> bestHR;
+			int bestScoreHR = 0;
+			int amtCollected;
+
+			//**************************************************************
+			
+			selectBestNearestHRCellInLRCell_ScanFrame( gw, agent, LRn, HRNearest, r, bestScoreHR, bestHR );
+			
+			//best = walk[w];
+			//bestScore = r.getValue(best - agent.getWorld()->getOverlapBoundaries()._origin); 
+			
+			//*************************************************************
+			// 2. update walk distance
+			walkedDist += agent.getTimeSpentForagingTile();
+			walkedDist += bestHR.distance(HRNearest);
+			HRNearest = bestHR;
+			distHome = HRHome.distance(HRNearest);	
+			amtCollected = agent.computeEffectiveBiomassForaged( bestScoreHR );
+			//std::cout << "collected: " << amtCollected << " from: " << bestScore << " walkeddist: " << walkedDist << " distHome: " << distHome << " maxdist: " << maxDist << std::endl;
+			//int prevActivity = agent.getWorld()->getValue(eForageActivity, n );
+			//agent.getWorld()->setValue(eForageActivity, n, prevActivity + 1 );
+			collected += amtCollected;
+			
+			// 4. update cell resources & amount collected
+			int prevValue = r.getValue(HRNearest - gw->getOverlapBoundaries()._origin); 
+			r.setValue( HRNearest - gw->getOverlapBoundaries()._origin, prevValue - amtCollected );
+			
+			nonVisited--;
+			
+		}
+		
+		cellResources = cellResources - amtCollected;
+		collected += amtCollected;
+		//((GujaratWorld*)agent.getWorld())->setValueLR(eLRForageActivity, n, prevActivity + numInterDune - nonVisited);
+		// 4. update cell resources & amount collected
+		((GujaratWorld*)agent.getWorld())->setValueLR(LRRes,LRn,cellResources);
+		bestScore = 0;
+		selectBestNearestLRCell( 	agent
+		, LRn
+		, ((GujaratWorld*)agent.getWorld())
+		, LRRes
+		, (int)(agent.getAvailableTime() / agent.getForageTimeCost())
+		, bestScore, LRBest );
+		
+	}while ( ( walkedDist + distHome ) < maxDist && (bestScore > 0));
+	
+	//TODO
+	// update l'LRraster??? done a few lines below with setValueLR
+	// update LRSectors??? (utility attribute) 	
+}
+
+
+void	ForageAction::doClassicalWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int & collected ) 
+{
 	double walkedDist = 0.0;
 	Engine::Point2D<int> n = n0;
 	double distHome = 0.0;
+	std::stringstream logName;
+	logName << agent.getWorld()->getId() << "_" << agent.getId();	
 	
-	//std::vector< Engine::Point2D<int>* > walk;
-	//selectBestWalk( agent,n0,r,maxDist,walk);
-	//int w = 0;
-	
+	int loops=0;
 	while ( ( walkedDist + distHome ) < maxDist )
 	{		
-		
-		/*
-		std::cout << "MSG> WALK:";
-		std::cout << " maxDist: " << maxDist;
-		std::cout << " walked dist: " << walkedDist << " dist home: " << distHome << " max dist: " << maxDist << " biomass collected: " << collected << std::endl;
-		*/
-		//std::cout << "walked dist: " << walkedDist << " dist home: " << distHome << " max dist: " << maxDist << " biomass collected: " << collected << " calories: " << agent.convertBiomassToCalories(collected) << std::endl;
+		loops++;
 		
 		Engine::Point2D<int> best;
 		int bestScore = 0;
-		selectBestNearestCell( agent, n, r, bestScore, best );
-		
-		//best = walk[w];
-		//bestScore = r.getValue(best - agent.getWorld()->getOverlapBoundaries()._origin); 
-		
+	
+		selectBestNearestHRCell( agent, n, r, bestScore, best );		
 		
 		// 2. update walk distance
 		walkedDist += agent.getTimeSpentForagingTile();
@@ -336,7 +1062,6 @@ void	ForageAction::doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0,
 		n = best;
 		distHome = n0.distance(n);	
 		int amtCollected = agent.computeEffectiveBiomassForaged( bestScore );
-		//std::cout << "collected: " << amtCollected << " from: " << bestScore << " walkeddist: " << walkedDist << " distHome: " << distHome << " maxdist: " << maxDist << std::endl;
 		//int prevActivity = agent.getWorld()->getValue(eForageActivity, n );
 		//agent.getWorld()->setValue(eForageActivity, n, prevActivity + 1 );
 		collected += amtCollected;
@@ -347,18 +1072,17 @@ void	ForageAction::doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0,
 		
 		//w++;
 	}
-	/*std::cout << "MSG> WALK:";
-	std::cout << " maxDist: " << maxDist;
-	std::cout << " walked dist: " << walkedDist << " dist home: " << distHome << " max dist: " << maxDist << " biomass collected: " << collected << std::endl;
-	*/
+	
+	//std::cout << "res " << collected << " loops " << loops << " wd " << walkedDist << " dH " << distHome << " mD " << maxDist << std::endl;
+	std::cout << "LOOP " << collected << "," << loops << "," << walkedDist << "," << distHome << "," << maxDist << std::endl;
+	
 	// update l'LRraster??? and LRsectors???
 	// One action per timestep -> Next time I need LRraster and LRsectors they will be updated by
 	// nextstep method in world -> do not update LRraster, LRsectors
 }
 
 
-void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>& n0, 
-				double maxDist, Engine::Raster& r, int& collected ) const
+void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected ) const
 {
 	std::stringstream logName;
 	logName << agent.getWorld()->getId() << "_" << agent.getId();
@@ -392,16 +1116,11 @@ void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>
 		walkedDist += agent.getTimeSpentForagingTile() * visitable;
 */		
 		
+		
 		while ( nonVisited > 0 && (( walkedDist + distHome ) < maxDist) )
 		{
 			amtCollected = amtCollected + std::min(cellResources, agent.computeEffectiveBiomassForaged( cellResources/numInterDune ));
 		
-			/*std::cout << "MSG> RES:" 
-				<< amtCollected << ","
-				<< cellResources << ","
-				<< numInterDune << ","
-				<< std::endl;
-			*/
 			walkedDist += agent.getTimeSpentForagingTile();
 			
 			nonVisited--;
@@ -413,12 +1132,13 @@ void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>
 		// 4. update cell resources & amount collected
 		((GujaratWorld*)agent.getWorld())->setValueLR(r,n,cellResources);
 		bestScore = 0;
-		selectBestNearestCell( 	agent
-								, n
-								, ((GujaratWorld*)agent.getWorld())
-								, r
-								, (int)(agent.getAvailableTime() / agent.getForageTimeCost())
-								, bestScore, best );
+		selectBestNearestLRCell( 	agent
+					, n
+					, ((GujaratWorld*)agent.getWorld())
+					, r
+					, (int)(agent.getAvailableTime() / agent.getForageTimeCost())
+					, bestScore
+					, best );
 		
 	}while ( ( walkedDist + distHome ) < maxDist && (bestScore > 0));
 	

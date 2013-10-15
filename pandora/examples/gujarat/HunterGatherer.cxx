@@ -116,8 +116,11 @@ void HunterGatherer::executeActions()
 	//		touches nothing
 	
 	GujaratAgent::executeActions();
-//*?
+
+	if(((GujaratConfig)((GujaratWorld*)_world)->getConfig())._shareInfo) 
+	{
 		doInformationSharing();
+	}
 }
 
 void HunterGatherer::clearSectorKnowledge() 

@@ -31,15 +31,15 @@
 	<dem fileName="resources/1600/dem_1600.tiff" size="1600"/>
 	<duneMap fileName="resources/1600/dunes_1600_low.tiff" size="1600"/>
 	<!-- Climatic model parameters -->
-	<climateSeed value="1"/>
-	<rainHistoricalDistribution mean="4643.848" stdev="1885.158"/>
+	<climateSeed value="1234"/>
+	<rainHistoricalDistribution mean="4643.848" stdev="500.158" meanbkk="43.848" stdevbkk="1885.158"/>
 	<!-- Agents definition -->
 	<!-- overlap will be defined as homeRange + 1. It must be < 1/4 of world size -->
 	<!-- * Walking Speed Hour = # meters traversed per hour -->
 	<!-- * Available Forage Time = # hours a day the forage action takes -->
 	<!-- * forageTimeCost = how much time (in hours) does it cost the agent to exploit a tile resources -->
 	<hunterGatherers
-		num="10" homeRange="299"
+		num="1" homeRange="299"
 		adulthoodAge="15"
 		numSectors="8"
 		lowResolution="160"
@@ -47,8 +47,9 @@
 		forageTimeCost="0.5"
 		demographicsModel="original"
 		hunterGathererInformationCaducityTime="7"
-		controllerType="MDP" 
-		mindType="omniscient">
+		controllerType="DecisionTree" 
+		mindType="omniscient"
+		shareInfo="no">
 		<!-- mindType:{omniscient,partial}-->
 		<!-- * width = number of trials before selecting an action, the higher the
 		 	the number, the more informed is the action selection and more

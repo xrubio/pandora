@@ -85,6 +85,7 @@ class GujaratConfig : public Engine::Config
 
 	std::string	_hunterGathererMind;
 	
+	bool _shareInfo;
 	
 	//CaloricRequirementsTable* _hgCaloryRequirements;
 	//CaloricRequirementsTable* _apCaloryRequirements;
@@ -116,6 +117,7 @@ public:
 		return it->second;
 	}
 	
+	int getLowResolution() {return _lowResolution; }
 	
 	friend class HunterGatherer;
 	friend class HunterGathererPartialMap;
