@@ -60,13 +60,13 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	// --> Sector duplication
 	std::vector< bool > ownsItems(4);
 	ownsItems[0]=false;
-	ownsItems[1]=true;
+	ownsItems[1]=false;
 	ownsItems[2]=false;
 	ownsItems[3]=false;
 	const std::vector< Sector* > & sourceLRSectors = agentRef().getLRSectors();
-	std::vector< Sector* > * LRActionSectors = 
-			new std::vector< Sector* >(sourceLRSectors.size());
-	
+	std::vector< Sector* > * LRActionSectors = & agentRef().getLRSectorsNoConst(); 
+			//new std::vector< Sector* >(sourceLRSectors.size());
+	/*	
 	std::vector< Sector* >::const_iterator it = sourceLRSectors.begin();
 	int i = 0;
 	while(it!=sourceLRSectors.end())
@@ -78,13 +78,11 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 		// Shallow Copy;
 		(*LRActionSectors)[i++] = r;
 		it++;
-	}
+	}*/
 	// We have copied the Sectors, but still referencing the same LR cells!!!
 	// that's good, reusing Point2D pool	
 	
 	// Build initial state from current state in the simulation
-	
-	//log_INFO(logName.str(),"CREA INITIAL");
 	
 	//assert(agentRef().getHRSectorsNoConst().size()>0 && agentRef().getHRCellPoolNoConst().size()>0);
 	
