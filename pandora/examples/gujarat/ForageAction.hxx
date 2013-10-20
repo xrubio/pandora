@@ -23,6 +23,7 @@ class GujaratAgent;
 
 class ForageAction : public MDPAction
 {
+	int _isMDP;
 	
 	Sector* _HRForageArea;
 	Sector* _LRForageArea;

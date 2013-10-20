@@ -480,6 +480,28 @@ void ForageAction::selectBestNearestHRCellInTrend_ScanFrame(
 		{
 			cornerDownRight._y = gw->getBoundaries()._origin._y + gw->getBoundaries()._size._y-1;
 		}
+		
+		// Intersection versus homerange boundaries
+		if(cornerLeftUp._x < home._x - HOMERANGE)
+		{
+			cornerLeftUp._x = home._x - HOMERANGE;
+		}
+
+		if(cornerLeftUp._y < home._y - HOMERANGE)
+		{
+			cornerLeftUp._y = home._y - HOMERANGE;
+		}
+
+		if(cornerDownRight._x > home._x + HOMERANGE)
+		{
+			cornerDownRight._x = home._x + HOMERANGE;
+		}
+
+		if(cornerDownRight._y > home._y + HOMERANGE)
+		{
+			cornerDownRight._y = home._y + HOMERANGE;
+		}
+		
 	}
 	
 	/*
@@ -556,13 +578,24 @@ void ForageAction::selectBestNearestHRCellInTrend_ScanFrame(
 	candidates.clear();
 }
 
+Engine::Point2D<int> toAbs(int x, int y, int hx, int hy, int homerange) {
 
+  Engine::Point2D<int> r;
+  
+  
+  
+  
+ // r.x
+  
+  
+  
+}
 
 void ForageAction::selectBestNearestHRCellInSector_ScanFrame(const GujaratWorld * gw
 				, GujaratAgent&  agent					, const Engine::Point2D<int>& HRBegin			, Engine::Raster& HRRes					, int & bestScoreHR					, Engine::Point2D<int>& bestHR )
 {
-	int FRAMESIZE = 40;
-	int HOMERANGE = ((HunterGatherer&)agent).getHomeRange();
+	const int FRAMESIZE = 40;
+	const int HOMERANGE = ((HunterGatherer&)agent).getHomeRange();
 	Engine::Point2D<int> curr;
 	Engine::Point2D<int> home = agent.getPosition();
 	Engine::Point2D<int> cornerLeftUp;
@@ -571,18 +604,28 @@ void ForageAction::selectBestNearestHRCellInSector_ScanFrame(const GujaratWorld 
 
 	cornerLeftUp._x = HRBegin._x - FRAMESIZE;
 	cornerLeftUp._y = HRBegin._y - FRAMESIZE; 
+
+	cornerDownRight._x = HRBegin._x + FRAMESIZE;
+	cornerDownRight._y = HRBegin._y + FRAMESIZE; 
+	
+	if(cornerLeftUp._x < home._x - HOMERANGE)	
+		cornerLeftUp._x = (home._x - HOMERANGE);
+	if(cornerLeftUp._y < home._y - HOMERANGE)	
+		cornerLeftUp._y = (home._y - HOMERANGE);
+	if( cornerDownRight._x > home._x + HOMERANGE )
+		cornerDownRight._x = (home._x + HOMERANGE);
+	if(cornerDownRight._y > home._y + HOMERANGE)	
+		cornerDownRight._y = (home._y + HOMERANGE);
+	
 	if(cornerLeftUp._x < gw->getBoundaries()._origin._x)
 	{
 		cornerLeftUp._x = gw->getBoundaries()._origin._x;
 	}
-
 	if(cornerLeftUp._y < gw->getBoundaries()._origin._y)
 	{
 		cornerLeftUp._y = gw->getBoundaries()._origin._y;
 	}
 
-	cornerDownRight._x = HRBegin._x + FRAMESIZE;
-	cornerDownRight._y = HRBegin._y + FRAMESIZE; 
 	if(cornerDownRight._x > gw->getBoundaries()._origin._x + gw->getBoundaries()._size._x -1 )
 	{
 		cornerDownRight._x = gw->getBoundaries()._origin._x + gw->getBoundaries()._size._x-1;
@@ -600,9 +643,9 @@ void ForageAction::selectBestNearestHRCellInSector_ScanFrame(const GujaratWorld 
 	std::cout << "*******BEGIN2: " << (HRBegin - home) << std::endl;*/
 
 	int currentSector=-1;
-	//try{
+	try{
 	currentSector = GujaratState::sectorsMask(HRBegin._x-home._x+HOMERANGE,HRBegin._y-home._y+HOMERANGE, GujaratState::getHRSectorsMask());
-	/*}catch(const std::exception & e)
+	}catch(const std::exception & e)
 			{
 				Engine::Point2D<int> p = HRBegin - home;
 				Engine::Point2D<int> q = p;
@@ -610,7 +653,7 @@ void ForageAction::selectBestNearestHRCellInSector_ScanFrame(const GujaratWorld 
 				q._y += HOMERANGE+1;
 
 				std::cout << "EXCEPT:" << p << "|" << q << std::endl;
-			}*/
+			}
 	//std::cout << "CORNER:" << LRn << " --> " << curr << std::endl;
 
 	bestScoreHR = -1;
@@ -639,25 +682,27 @@ void ForageAction::selectBestNearestHRCellInSector_ScanFrame(const GujaratWorld 
 			std::cout << "*******SECTOR2: " << (curr - home) << std::endl;
 		*/
 
-			//try{
+			try{
 				if (currentSector != GujaratState::sectorsMask(
 					curr._x - home._x+HOMERANGE
 					,curr._y - home._y+HOMERANGE
 					,GujaratState::getHRSectorsMask()))
 				{
-					//continue;
-					int xxx;
-					xxx=0;
+					continue;
 				}
-			//}catch(const std::exception & e)
-			/*{
+			}catch(const std::exception & e)
+			{
 				Engine::Point2D<int> q;
 
 				q = curr - HRBegin;
 				q = q + HOMERANGE;
 
 				std::cout << "***EXCEPTION***" << curr << "|" << q << "|" << std::endl; 
-			}*/
+				std::cout << " x= " << (curr._x - home._x+HOMERANGE) << "; y= " << curr._y - home._y+HOMERANGE << std::endl;
+				std::cout << "Home Range: " << HOMERANGE << std::endl;
+				std::cout << "Home cell: x= " << home._x << "; y= " << home._y << std::endl;
+				exit(0);
+			}
 
 			//std::cout << "CURRENT " << curr << " LOWRES=" << lowResolution << std::endl;
 
@@ -854,12 +899,12 @@ void	ForageAction::doTrendVicinityWalk( GujaratAgent& agent, const Engine::Point
 		HREndPoint._y = HREndPoint._y + lowResolution -1;
 	}	
 	bool wasInsideLR;
-	int loops = 0;
+	
 	while ( ( walkedDist + distHome ) < maxDist )
 	{	
-		loops++;
+	
 		
-		//std::cout << "33333333" << std::endl;
+		//std::cout << "walked dist: " << walkedDist << " dist home: " << distHome << " max dist: " << maxDist << " biomass collected: " << collected << " calories: " << agent.convertBiomassToCalories(collected) << std::endl;
 		selectBestNearestHRCellInTrend_ScanFrame( 
 			(GujaratWorld*)(agent.getWorld())
 			,agent
@@ -890,8 +935,8 @@ void	ForageAction::doTrendVicinityWalk( GujaratAgent& agent, const Engine::Point
 		//w++;
 	}
 	
-	//std::cout << "res " << collected << " loops " << loops << " wd " << walkedDist << " dH " << distHome << " mD " << maxDist << std::endl;
-	std::cout << "LOOP " << collected << "," << loops << "," << walkedDist << "," << distHome << "," << maxDist << std::endl;
+	//std::cout << "res " << collected << " loops " << loops << " wd " << walkedDist << " dH " << distHome << " mD " << maxDist << " foraging dist: " << agent.getTimeSpentForagingTile() << " fm " << agent.getPopulationSize() << std::endl;
+	//std::cout << "LOOP " << collected << "," << loops << "," << walkedDist << "," << distHome << "," << maxDist << std::endl;
 	
 	// update l'LRraster??? and LRsectors???
 	// One action per timestep -> Next time I need LRraster and LRsectors they will be updated by
@@ -912,8 +957,9 @@ void	ForageAction::doVicinityWalk( GujaratAgent& agent, const Engine::Point2D<in
 	selectBestNearestHRCell( agent, n0, r, bestScore, best );
 	n = best;	
 	
-	while ( ( walkedDist + distHome ) < maxDist )
+	do 
 	{	
+	
 		selectBestNearestHRCellInSector_ScanFrame( 
 			(GujaratWorld*)(agent.getWorld())
 			,agent
@@ -939,8 +985,9 @@ void	ForageAction::doVicinityWalk( GujaratAgent& agent, const Engine::Point2D<in
 		r.setValue( n - agent.getWorld()->getOverlapBoundaries()._origin, prevValue - amtCollected );
 
 		//w++;
-	}
-	// update l'LRraster??? and LRsectors???
+	} while ( ( walkedDist + distHome ) < maxDist );
+	//std::cout << "LOOP " << collected << "," << loops << "," << walkedDist << "," << distHome << "," << maxDist << std::endl;
+// update l'LRraster??? and LRsectors???
 	// One action per timestep -> Next time I need LRraster and LRsectors they will be updated by
 	// nextstep method in world -> do not update LRraster, LRsectors
 }

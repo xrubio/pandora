@@ -60,13 +60,16 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	// --> Sector duplication
 	std::vector< bool > ownsItems(4);
 	ownsItems[0]=false;
-	ownsItems[1]=true;
+
+	//*?* ownsItems[1]=true;
+	ownsItems[1]=false;
 	ownsItems[2]=false;
 	ownsItems[3]=false;
 	const std::vector< Sector* > & sourceLRSectors = agentRef().getLRSectors();
-	std::vector< Sector* > * LRActionSectors = 
-			new std::vector< Sector* >(sourceLRSectors.size());
+	std::vector< Sector* > * LRActionSectors = &(agentRef().getLRSectorsNoConst());
+	//*?*		new std::vector< Sector* >(sourceLRSectors.size());
 	
+	/*?*
 	std::vector< Sector* >::const_iterator it = sourceLRSectors.begin();
 	int i = 0;
 	while(it!=sourceLRSectors.end())
@@ -78,7 +81,7 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 		// Shallow Copy;
 		(*LRActionSectors)[i++] = r;
 		it++;
-	}
+	}*/
 	// We have copied the Sectors, but still referencing the same LR cells!!!
 	// that's good, reusing Point2D pool	
 	
@@ -98,18 +101,14 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	//omp_init_lock(mapLock);
 	
 	_initial = new HunterGathererMDPState(	agentRef().getPosition()
-											, agentRef().getOnHandResources()
-											, agentRef().getLRResourcesRaster()
-											, _config.getHorizon()
-											, agentRef().computeConsumedResources(1)
-					
-											, &agentRef().getHRSectorsNoConst()
-											, LRActionSectors 
-											, &agentRef().getHRCellPoolNoConst()
-											, &agentRef().getLRCellPoolNoConst()
-											, ownsItems
-											, _simAgent->getObjectUseCounter()
-											, mapLock);
+						, agentRef().getOnHandResources()
+						, agentRef().getLRResourcesRaster()
+						, _config.getHorizon()
+					, agentRef().computeConsumedResources(1)
+						, &agentRef().getHRSectorsNoConst()
+						, LRActionSectors 
+						, &agentRef().getHRCellPoolNoConst()	, &agentRef().getLRCellPoolNoConst()	, ownsItems
+						, _simAgent->getObjectUseCounter()	, mapLock);
 											
 	//std::cout << "creat MDPState:" << _initial->_dni << std::endl;
 	
@@ -198,7 +197,7 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		ownership[2]=false;
 		ownership[3]=true;
 		
-		assert(HRActionSectors->size()>0 && HRCellPool->size()>0);
+		//assert(HRActionSectors->size()>0 && HRCellPool->size()>0);
 	}	
 	else if(dynamic_cast<const ForageAction*>(act))
 	{
@@ -236,14 +235,13 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		ownership[2]=false;
 		ownership[3]=s.getOwnerShip()[3];
 		
-		assert(HRActionSectors->size()>0 && HRCellPool->size()>0);
+		//assert(HRActionSectors->size()>0 && HRCellPool->size()>0);
 		
 		/*std::cout << "AFTER COPY source has " ;
 		for(int i=0; i <sourceLRSectors.size(); i++)
 			std::cout << " " << sourceLRSectors[i]->_dni;
 		
 		std::cout << std::endl;*/
-		
 		
 		
 	}	

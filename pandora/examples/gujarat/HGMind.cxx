@@ -42,10 +42,9 @@ HGMind::~HGMind()
 	clearSectorKnowledge();
 }
 
-void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos,
-								std::vector< Sector* >& HRSectors,
-							   std::vector< Engine::Point2D<int> >& cellPool
-							) const
+void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos
+				,std::vector< Sector* >& HRSectors
+				,std::vector< Engine::Point2D<int> >& cellPool) const
 {
 	int homeRange  = ((GujaratConfig)_world.getConfig())._homeRange;
 	int numSectors = ((GujaratConfig)_world.getConfig())._numSectors;
