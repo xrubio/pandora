@@ -17,6 +17,8 @@
 #include <HunterGathererProgrammedController.hxx>
 #include <HunterGathererMDPController.hxx>
 
+#include <math.h> 
+
 namespace Gujarat 
 {
 
@@ -297,9 +299,98 @@ int GujaratState::sectorsMask( int i, int j, const SectorsMask & sm)
 }
 
 
+float GujaratState::getAngle(float xx, float yy)
+{	
+	float x=xx;
+	float y=yy;
+	
+	if(x < 0.0) x=-x;
+	if(y < 0.0) y=-y;
+	
+	float result = (atan(y/x)*180.0)/M_PI;	
+	
+	x=xx;
+	y=yy;
+	
+	//if ( 0 <= x && 0 <= y)
+	//	return result;
+	
+	if ( 0 > x && 0 <= y)
+		return 180.0 - result;
+	
+	if ( 0 > x && 0 > y)
+		return 180.0 + result;
+	
+	if ( 0 <= x && 0 > y)
+		return 360.0 - result;
+	
+	return result;
+}
+
+void GujaratState::initializeSectorsMaskTrigonometricaly( int numSectors, int homeRange, SectorsMask & sm )
+{
+	
+	float alpha = 360.0f/(float)numSectors;	
+	
+	// center position + home Range in any direction
+	sm.resize( 1+2*homeRange );
+	for ( unsigned k = 0; k < 1+2*homeRange; k++ )
+	{
+		sm.at(k).resize( 1+2*homeRange );
+	}
+
+	sm.at(0).at(0) = -1;
+	Engine::Point2D<int> center(0,0);
+	
+	for ( int x=-homeRange; x<=homeRange; x++ )
+	{
+		for ( int y=-homeRange; y<=homeRange; y++ )
+		{
+			float fX = x;
+			float fY = y;
+			Engine::Point2D<int> p( x, y );
+			
+			if((0==x && 0==y) || p.distanceSQ(center) > homeRange*homeRange)
+			{
+				sm.at(x+homeRange).at(y+homeRange) = -1;			
+			}
+			else
+			{
+				float angle = getAngle(fX,fY);
+				sm.at(x+homeRange).at(y+homeRange) =  (angle/alpha);	
+				
+				//std::cout <<"GNUPLOT "<< x <<"\t"<<y<<"\t"<< sm.at(x+homeRange).at(y+homeRange) << std::endl;
+			}
+			// show points from gnuplot :
+			// plot "./data.csv" u 1:2:3 with points pointtype 7 palette
+			
+		}
+	}
+
+	
+	std::cout << "SectorMask Homerange =" << homeRange << std::endl;		
+	for ( int x=-homeRange; x<=homeRange; x++ )
+	{
+		for ( int y=-homeRange; y<=homeRange; y++ )
+		{
+			std::cout << 1+sm.at(x+homeRange).at(y+homeRange);		
+		}
+		std::cout << std::endl;		
+	}
+	
+}
+
+
 
 void GujaratState::initializeSectorsMask( int numSectors, int homeRange, SectorsMask & sm )
 {
+	// Use a more elegant way of doing this
+	if(homeRange < 100) 
+	{
+		initializeSectorsMaskTrigonometricaly(numSectors, homeRange, sm );	
+		exit;
+	}
+	
 	std::vector< std::vector< Engine::Point2D<int> > > sectors;
 	
 	float alpha = 360/numSectors;
@@ -350,6 +441,7 @@ void GujaratState::initializeSectorsMask( int numSectors, int homeRange, Sectors
 		}
 	 
 	}
+
 
 }
 

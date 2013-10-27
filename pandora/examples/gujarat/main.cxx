@@ -5,6 +5,9 @@
 #include <Exceptions.hxx>
 #include <iostream>
 #include <cstdlib>
+
+#include <omp.h>
+
 //#include <mcheck.h>
 int main(int argc, char *argv[])
 {
@@ -21,6 +24,9 @@ int main(int argc, char *argv[])
 		{
 			fileName = argv[1];
 		}
+
+		omp_set_num_threads(4);
+
 		Gujarat::GujaratConfig config;
 		std::cout << "Loading config file: " << fileName << std::endl;
 		config.deserialize(fileName);

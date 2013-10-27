@@ -60,6 +60,10 @@ public:
 	static AgentController & controller();
 
 	static void initializeSectorsMask( int numSectors, int homeRange, SectorsMask & sm );
+	static void initializeSectorsMaskTrigonometricaly( int numSectors, int homeRange, SectorsMask & sm );
+	
+	
+	
 	//static int sectorsMask( int i, int j);
 	static int sectorsMask( int i, int j, const SectorsMask & sm );
 	static SectorsMask & getHRSectorsMask() { return instance()._HRSectorsMask; }
@@ -70,6 +74,7 @@ public:
 	
 	static float Point2Angle(float ex, float ey);
 	static float getAngle(int i, int j, int homeRange);
+	static float getAngle(float x, float y);
 	
 };
 

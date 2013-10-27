@@ -501,7 +501,7 @@ void GujaratWorld::createAgents()
 }
 
 
-Engine::Point2D<int> GujaratWorld::getHRFreeCell(const Engine::Point2D<int> LRpos, Engine::Point2D<int> & HRpos)
+void GujaratWorld::getHRFreeCell(const Engine::Point2D<int> LRpos, Engine::Point2D<int> & HRpos)
 {
 	
 	// posa un bucle recorrent la LR cell, comença a un punt random i recorres modularment la LRcell

@@ -164,7 +164,7 @@ public:
 		}
 	}
 	
-	Engine::Point2D<int> getHRFreeCell(const Engine::Point2D<int> LRpos, Engine::Point2D<int> & HRpos);
+	void getHRFreeCell(const Engine::Point2D<int> LRpos, Engine::Point2D<int> & HRpos);
 	
 	
 //*****************************************************************

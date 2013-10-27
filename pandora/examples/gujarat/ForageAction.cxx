@@ -449,7 +449,7 @@ void ForageAction::selectBestNearestHRCellInTrend_ScanFrame(
 
 		if(cornerDownRight._y >= ((LREndPoint._y+1)*lowResolution))
 		{
-			cornerDownRight._y = ((LREndPoint._x+1)*lowResolution) - 1;
+			cornerDownRight._y = ((LREndPoint._y+1)*lowResolution) - 1;
 		}		
 		// Inside LR cell always take the nearest to the last visited place.
 		HREndPoint = HRBegin;	
@@ -578,6 +578,8 @@ void ForageAction::selectBestNearestHRCellInTrend_ScanFrame(
 	candidates.clear();
 }
 
+
+/*
 Engine::Point2D<int> toAbs(int x, int y, int hx, int hy, int homerange) {
 
   Engine::Point2D<int> r;
@@ -589,7 +591,7 @@ Engine::Point2D<int> toAbs(int x, int y, int hx, int hy, int homerange) {
   
   
   
-}
+}*/
 
 void ForageAction::selectBestNearestHRCellInSector_ScanFrame(const GujaratWorld * gw
 				, GujaratAgent&  agent					, const Engine::Point2D<int>& HRBegin			, Engine::Raster& HRRes					, int & bestScoreHR					, Engine::Point2D<int>& bestHR )
