@@ -53,9 +53,9 @@ void Raster::resize( const Point2D<int> & size )
 
 void Raster::updateRasterIncrement()
 {
-	for(int i=0; i<_values.size(); i++)
+	for(size_t i=0; i<_values.size(); i++)
 	{
-		for(int j=0; j<_values[i].size(); j++)
+		for(size_t j=0; j<_values[i].size(); j++)
 		{
 			if(_values.at(i).at(j) < _maxValues[i][j])
 			{
@@ -167,8 +167,8 @@ void Raster::updateCurrentMinMaxValues()
 {
 	_currentMinValue = std::numeric_limits<int>::max();
 	_currentMaxValue = std::numeric_limits<int>::min();
-	for ( unsigned i = 0; i < _values.size(); i++  )
-		for ( unsigned j = 0; j < _values[i].size(); j++ )
+	for (size_t i = 0; i < _values.size(); i++  )
+		for (size_t j = 0; j < _values[i].size(); j++ )
 		{
 			_currentMaxValue = ( _values[i][j] > _currentMaxValue ? _values[i][j] : _currentMaxValue );
 			_currentMinValue = ( _values[i][j] < _currentMinValue ? _values[i][j] : _currentMinValue );
@@ -179,9 +179,9 @@ void Raster::setInitValues( int minValue, int maxValue, int defaultValue )
 {
 	_minValue = _currentMinValue = minValue;
 	_maxValue = _currentMaxValue = maxValue;
-	for(int i=0; i<_values.size(); i++)
+	for(size_t i=0; i<_values.size(); i++)
 	{
-		for(int j=0; j<_values[i].size(); j++)
+		for(size_t j=0; j<_values[i].size(); j++)
 		{
 			setMaxValue(Point2D<int>(i,j), _maxValue);
 			setValue(Point2D<int>(i,j), defaultValue);			

@@ -3,7 +3,7 @@
 	<!-- Global simulation parameters -->
 	<output resultsFile="./data/randomWalkers.h5" logsDir="./logs"/>
 	<numSteps value="100" serializeResolution="1"/>
-	<size value="32"/>
-	<numAgents value="1"/>
+	<size width="40" height="32"/>
+	<numAgents value="100"/>
 </config>
 

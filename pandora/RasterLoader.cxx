@@ -69,14 +69,8 @@ void RasterLoader::fillGDALRaster( StaticRaster & raster, const std::string & fi
 		throw Engine::Exception(oss.str());
 	}
 
-	int size = dataset->GetRasterXSize();
-	if(size!=dataset->GetRasterYSize())
-	{
-		std::stringstream oss;
-		oss << "RasterLoader::fillGDALRaster - file: " << fileName << " does not contain an squared raster. width: " << size << " and height: " << dataset->GetRasterYSize();
-		throw Engine::Exception(oss.str());
-	}
-	if(size!=simulation.getSize())
+	Point2D<int> size = Point2D<int>(dataset->GetRasterXSize(), dataset->GetRasterYSize());
+	if(size._x!=simulation.getSize()._x || size._y!=simulation.getSize()._y)
 	{
 		std::stringstream oss;
 		oss << "RasterLoader::fillGDALRaster - file: " << fileName << " with size: " << size << " different from defined size: " << simulation.getSize() << std::endl;
@@ -172,17 +166,11 @@ void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fi
 	hsize_t dims[2];
 	H5Sget_simple_extent_dims(dataspaceId, dims, NULL);
 	H5Sclose(dataspaceId);
-
-	if(dims[0]!=dims[1])
+	
+	if(world && (dims[0]!=world->getSimulation().getSize()._x || dims[1]!=world->getSimulation().getSize()._y))
 	{
 		std::stringstream oss;
-		oss << "RasterLoader::fillHDF5Raster - file: " << fileName << " and raster name: " << rasterName << " not squared, with width: " << dims[0] << " and height: " << dims[1] << std::endl;
-		throw Engine::Exception(oss.str());
-	}
-	if(world && dims[0]!=world->getSimulation().getSize())
-	{
-		std::stringstream oss;
-		oss << "RasterLoader::fillHDF5Raster - file: " << fileName << " and raster name: " << rasterName << " with size: " << dims[0] << " different from defined size: " << world->getSimulation().getSize() << std::endl;
+		oss << "RasterLoader::fillHDF5Raster - file: " << fileName << " and raster name: " << rasterName << " with size: " << dims[0] << "/" << dims[1] << " different from defined size: " << world->getSimulation().getSize() << std::endl;
 		throw Engine::Exception(oss.str());
 	}
 	
@@ -218,11 +206,11 @@ void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fi
 	}
 	else
 	{
-		for(int i=0; i<dims[0]; i++)
+		for(size_t i=0; i<dims[0]; i++)
 		{
-			for(int j=0; j<dims[1]; j++)
+			for(size_t j=0; j<dims[1]; j++)
 			{
-				int index = i+j*dims[0];
+				size_t index = i+j*dims[0];
 				raster._values[i][j] = dset_data[index];	
 			}
 		}
@@ -243,9 +231,9 @@ void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fi
 		raster.setColorTable(true, colorTableDims[0]);
 		int * colors = (int*)malloc(sizeof(int)*colorTableDims[0]*colorTableDims[1]);
 		H5Dread(colorTableId, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, colors);
-		for(int i=0; i<colorTableDims[0]; i++)
+		for(size_t i=0; i<colorTableDims[0]; i++)
 		{
-			int index = colorTableDims[1]*i;
+			size_t index = colorTableDims[1]*i;
 			raster.addColorEntry(i, short(colors[index]), short(colors[index+1]), short(colors[index+2]), short(colors[index+3]));
 			//std::cout << "entry: " << i << " colors: " << short(colors[index]) << "/" << short(colors[index+1]) << "/" << short(colors[index+2]) << " alpha: " << short(colors[index+3]) << std::endl;
 		}
@@ -285,18 +273,10 @@ void RasterLoader::fillGrassCellRaster( StaticRaster & raster, const std::string
 		throw Engine::Exception(oss.str());
 		return;
 	}
-	// squared rasters
-	if(G_window_cols()!=G_window_rows())
+	if(world && (G_window_cols()!=world->getSimulation().getSize()._x || G_window_rows()!=world->getSimulation().getSize()._y))
 	{
 		std::stringstream oss;
-		oss << "StaticRaster::loadGrassCellRasterFile - loading raster from GRASS raster: " <<rasterName << "  with num rows: " << G_window_rows() << " and num cols.: " << G_window_cols() << ". Rasters must be squared" << std::endl;
-		throw Engine::Exception(oss.str());
-		return;
-	}
-	if(world && G_window_cols()!=world->getSimulation().getSize())
-	{
-		std::stringstream oss;
-		oss << "StaticRaster::loadGrassCellRasterFile - Grass raster: " << rasterName << " with size: " << G_window_cols() << " different from defined size: " << world->getSimulation().getSize() << std::endl;
+		oss << "StaticRaster::loadGrassCellRasterFile - Grass raster: " << rasterName << " with size: " << G_window_cols() << "/" << G_window_rows() << " different from defined size: " << world->getSimulation().getSize() << std::endl;
 		throw Engine::Exception(oss.str());
 		return;
 	}

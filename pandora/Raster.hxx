@@ -33,8 +33,8 @@ namespace Engine
 class Raster : public StaticRaster
 {
 	std::vector< std::vector<int> >	_maxValues;
-	int				_currentMaxValue;
-	int				_currentMinValue;
+	int	_currentMaxValue;
+	int	_currentMinValue;
 public:
 	Raster();
 	virtual ~Raster();

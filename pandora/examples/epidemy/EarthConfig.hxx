@@ -9,7 +9,7 @@ namespace Examples
 
 struct GISData
 {
-	int _size;
+	Engine::Point2D<int> _size;
 	int _resolution;
 	std::string _demName;
 	std::string _populationName;
@@ -28,7 +28,7 @@ public:
 
 	void extractParticularAttribs(TiXmlElement *pRoot);
 
-	int getSize() const;
+	const Engine::Point2D<int> & getSize() const;
 
 	friend class Earth;
 };

@@ -51,9 +51,9 @@ void StaticRaster::setDefaultInitValues( int minValue, int maxValue, int default
 {
 	_minValue = minValue;
 	_maxValue = maxValue;
-	for(int i=0; i<_values.size(); i++)
+	for(size_t i=0; i<_values.size(); i++)
 	{
-		for(int j=0; j<_values[i].size(); j++)
+		for(size_t j=0; j<_values[i].size(); j++)
 		{		
 			setInitValue(Point2D<int>(i,j), defaultValue);			
 		}
@@ -135,9 +135,9 @@ float StaticRaster::getAvgValue() const
 	float norm = 0.0f;
 	float avg = 0.0f;
 
-	for(int i=0; i<_values.size(); i++)
+	for(size_t i=0; i<_values.size(); i++)
 	{
-		for(int j=0; j<_values[i].size(); j++)
+		for(size_t j=0; j<_values[i].size(); j++)
 		{		
 			norm += 1.0;
 			avg += _values[i][j];
@@ -150,9 +150,9 @@ void StaticRaster::updateMinMaxValues()
 {
 	_minValue = std::numeric_limits<int>::max();
 	_maxValue = std::numeric_limits<int>::min();
-	for(int i=0; i<_values.size(); i++)
+	for(size_t i=0; i<_values.size(); i++)
 	{
-		for(int j=0; j<_values[i].size(); j++)
+		for(size_t j=0; j<_values[i].size(); j++)
 		{
 			_minValue = std::min(_minValue, _values[i][j]);
 			_maxValue = std::max(_maxValue, _values[i][j]);

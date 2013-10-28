@@ -79,7 +79,7 @@ void Display3D::initializeGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);   //netejar vista
 	// squared landscapes by now
-	float maxRasterSize = _simulationRecord->getSize();
+	Engine::Point2D<int> maxRasterSize = _simulationRecord->getSize();
 
 	// update quadtrees and check for max raster size
 	float maxResolution = 1.0f;
@@ -101,22 +101,23 @@ void Display3D::initializeGL()
 		newQuadTree->initializeChilds();
 		_quadTrees.insert(make_pair(*it, newQuadTree));
 	}
-	maxRasterSize *= maxResolution;
+	maxRasterSize._x *= maxResolution;
+	maxRasterSize._y *= maxResolution;
 
-	float puntMig = sqrt(maxRasterSize*maxRasterSize+maxRasterSize*maxRasterSize);
-	radi = (puntMig)/2.f; //mida escenari/2
-	_vrp._x = maxRasterSize/2.0f;
-	_vrp._y = -maxRasterSize/2.0f;
+	float puntMig = sqrt(maxRasterSize._x*maxRasterSize._x+maxRasterSize._y*maxRasterSize._y);
+	_radius = (puntMig)/2.f; //mida escenari/2
+	_vrp._x = maxRasterSize._x/2.0f;
+	_vrp._y = -maxRasterSize._y/2.0f;
 	_vrp._z = 0;
 
-	std::cout << "Radi = " << radi << std::endl;
-	dist = 3*radi;
-	anglecam = ((asin(radi/dist)*180)/3.1415)*2;
+	std::cout << "Radius = " << _radius<< std::endl;
+	dist = 3*_radius;
+	anglecam = ((asin(_radius/dist)*180)/3.1415)*2;
 	std::cout << "Angle cam = " << anglecam << std::endl;
 	ra = (float)width()/(float)height();
 	_angle._x = _angle._y = _angle._z = 0;
-	anterior = radi;
-	posterior = radi*3 + anterior;
+	anterior = _radius;
+	posterior = _radius*3 + anterior;
 	focus();
 
 	GLfloat materialSpecular[] = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -285,15 +286,16 @@ void Display3D::paintLandscape()
 		RasterConfiguration * rasterConfig = ProjectConfiguration::instance()->getRasterConfig(*(it));
 		QuadTreeMap::iterator qIt = _quadTrees.find(*it);
 		QuadTree * quadTree = qIt->second;
-		int pot2 = powf(2,ceil(log2(rasterConfig->getCellResolution()*_simulationRecord->getSize())));
+		int pot2X = powf(2,ceil(log2(rasterConfig->getCellResolution()*_simulationRecord->getSize()._x)));
+		int pot2Y = powf(2,ceil(log2(rasterConfig->getCellResolution()*_simulationRecord->getSize()._y)));
 		if(rasterConfig->hasElevationRaster())
 		{
         	Engine::StaticRaster & elevationRaster(_simulationRecord->getRasterTmp(rasterConfig->getElevationRaster(), _viewedStep));
-        	quadTree->update(pot2, *rasterConfig, colorRaster, elevationRaster, _randomColor);
+        	quadTree->update(Engine::Point2D<int>(pot2X, pot2Y), *rasterConfig, colorRaster, elevationRaster, _randomColor);
 		}
 		else
 		{
-        	quadTree->update(pot2, *rasterConfig, colorRaster,_plane, _randomColor);
+        	quadTree->update(Engine::Point2D<int>(pot2X, pot2Y), *rasterConfig, colorRaster,_plane, _randomColor);
 		}
 
         _landscapeMaterial.deactivate();
@@ -423,19 +425,18 @@ void Display3D::keyPressEvent(QKeyEvent *event)
 {
     if(event->key()==Qt::Key_R)
     {
-		float size = _simulationRecord->getSize();
-        float puntMig = sqrt(size*size+size*size);
+        float center = sqrt(_simulationRecord->getSize()._x*_simulationRecord->getSize()._x+_simulationRecord->getSize()._y*_simulationRecord->getSize()._y);
 
-        radi = (puntMig)/2.f; //mida escenari/2
-        _vrp._x = size/2.0f;
-        _vrp._y = -size/2.0f;
+        _radius = (center)/2.f; //mida escenari/2
+        _vrp._x = _simulationRecord->getSize()._x/2.0f;
+        _vrp._y = -_simulationRecord->getSize()._y/2.0f;
         _vrp._z = 0;
 
-		std::cout << "Radi = " << radi << std::endl;
-        dist = 3*radi;
+		std::cout << "Radius = " << _radius<< std::endl;
+        dist = 3*_radius;
 
         //cout << "Angle cam = " << ((atan(height()/(2*((3*dist) - dist))))*180)/3.1415 << endl;
-        anglecam = ((asin(radi/dist)*180)/3.1415)*2;
+        anglecam = ((asin(_radius/dist)*180)/3.1415)*2;
 
         //anglecam = (((atan(radi/dist)*180)/3.1415)*2);
 		std::cout << "Angle cam = " << anglecam << std::endl;
@@ -443,8 +444,8 @@ void Display3D::keyPressEvent(QKeyEvent *event)
         _angle._x = 0;
         _angle._y = 0;
         _angle._z = 0;
-        anterior = radi;
-        posterior = radi*3 + anterior;
+        anterior = _radius;
+        posterior = _radius*3 + anterior;
         focus();
     }
     if(event->key()==Qt::Key_C)
@@ -523,10 +524,10 @@ void Display3D::pan( const QPoint & eventPos )
 	incY._y = mat[1][1];
 	incY._z = mat[2][1];
 
-	incX = incX * _simulationRecord->getSize() * (_clickedPos.x()-eventPos.x());
+	incX = incX * _simulationRecord->getSize()._x * (_clickedPos.x()-eventPos.x());
 	incX = incX/dist;
 	
-	incY = incY * _simulationRecord->getSize() * (eventPos.y()-_clickedPos.y());
+	incY = incY * _simulationRecord->getSize()._y * (eventPos.y()-_clickedPos.y());
 	incY = incY/dist;
 
 	_vrp = _vrp + incX;
@@ -567,7 +568,7 @@ void Display3D::resetView()
 {
 	_orderedRasters.clear();
 	_viewedStep = 0;
-	_plane.resize(Engine::Point2D<int>(_simulationRecord->getSize(), _simulationRecord->getSize()));
+	_plane.resize(_simulationRecord->getSize());
 	_plane.setDefaultInitValues(1,1,1);
 	initializeGL();
 }

@@ -46,14 +46,7 @@ namespace Engine
 {
 
 World::World( const Simulation & simulation, const int & overlap, const bool & allowMultipleAgentsPerCell, const std::string & fileName ) 
-    : _simulation(simulation)
-    , _worldPos(-1,-1)
-    , _globalBoundaries(Point2D<int>(0,0) , Point2D<int>(simulation.getSize(), simulation.getSize()))
-    , _allowMultipleAgentsPerCell(allowMultipleAgentsPerCell)
-    , _step(0)
-    , _overlap(overlap)
-    , _searchAgents(true)
-    , _initialTime(0.0f)
+    : _simulation(simulation), _worldPos(-1,-1), _globalBoundaries(Point2D<int>(0,0) , simulation.getSize()), _allowMultipleAgentsPerCell(allowMultipleAgentsPerCell), _step(0), _overlap(overlap), _searchAgents(true), _initialTime(0.0f)
 {
 #ifdef PANDORAMPI
 	GeneralState::serializer().setResultsFile(fileName);
@@ -69,7 +62,7 @@ World::~World()
 		it = _agents.erase(it);
 		delete agent;
 	}
-	for(int i=0; i<_rasters.size(); i++)
+	for(size_t i=0; i<_rasters.size(); i++)
 	{
 		if(_rasters.at(i))
 		{
@@ -111,11 +104,12 @@ void World::init( int argc, char *argv[] )
 
 void World::checkOverlapSize()
 {
-	int subfieldSize = _simulation.getLocalRasterSize()/2;
-	if(_overlap*2>subfieldSize)
+	int subfieldSizeX = _simulation.getLocalRasterSize()._x/2;
+	int subfieldSizeY = _simulation.getLocalRasterSize()._y/2;
+	if(_overlap*2>subfieldSizeX || _overlap*2>subfieldSizeY)
 	{
 		std::stringstream oss;
-		oss << "World::checkOverlapSize- subfieldize: " << subfieldSize << " must be at lest twice the value of overlap: " << _overlap << " to avoid conflicts between non adjacent subfields";
+		oss << "World::checkOverlapSize- subfield sizes: " << subfieldSizeX << "/" << subfieldSizeY << " from global: " << _simulation.getSize() << " and local: " << _simulation.getLocalRasterSize() << " must be at least twice the value of overlap: " << _overlap << " to avoid conflicts between non adjacent subfields";
 		throw Exception(oss.str());
 	}
 }
@@ -124,12 +118,6 @@ void World::stablishPosition()
 {
 #ifdef PANDORAMPI
 	int worldsPerRow = sqrt(_simulation.getNumTasks());	
-	if(_simulation.getSize()%worldsPerRow!=0)
-	{
-		std::stringstream oss;
-		oss << "World::stablishPosition - globalRasterSize: " << _simulation.getSize() << " is not divisible by sqrt(worlds): " << worldsPerRow;
-		throw Engine::Exception(oss.str());
-	}
 	_worldPos = getPositionFromId(_simulation.getId());
 
 	for(int x=_worldPos._x-1; x<=_worldPos._x+1; x++)
@@ -148,8 +136,7 @@ void World::stablishPosition()
 
 	// stablishing boundaries
 	_boundaries._origin = _worldPos*_simulation.getLocalRasterSize();
-	_boundaries._size._x = _simulation.getLocalRasterSize();
-	_boundaries._size._y = _simulation.getLocalRasterSize();
+	_boundaries._size = _simulation.getLocalRasterSize();
 
 	// defining overlap boundaries
 	_overlapBoundaries = _boundaries;
@@ -176,7 +163,7 @@ void World::stablishPosition()
 		_overlapBoundaries._size._y += _overlap;
 	}
 #else
-	_boundaries._size = Point2D<int>(_simulation.getLocalRasterSize(), _simulation.getLocalRasterSize());
+	_boundaries._size = _simulation.getLocalRasterSize();
 	_boundaries._origin = Point2D<int>(0,0);
 	_overlapBoundaries = _boundaries;
 #endif
@@ -277,7 +264,7 @@ void World::stepSection( const int & sectionIndex )
 	// plan actions, disabled for debug
 	#pragma omp parallel for
 #endif
-	for(int i=0; i<agentsToExecute.size(); i++)
+	for(size_t i=0; i<agentsToExecute.size(); i++)
 	{
 		Agent * agent = agentsToExecute[i];
 		//Agent * agent = *it;
@@ -290,7 +277,7 @@ void World::stepSection( const int & sectionIndex )
 	}
 
 	// execute actions
-	for(int i=0; i<agentsToExecute.size(); i++)
+	for(size_t i=0; i<agentsToExecute.size(); i++)
 	{
 		Agent * agent = agentsToExecute.at(i);
 		if(_sections[sectionIndex].isInside(agent->getPosition()) && !hasBeenExecuted(agent))
@@ -391,7 +378,7 @@ void World::sendAgents( AgentsList & agentsToSend )
 		}
 
 		MPI_Datatype * agentType = itType->second;
-		for(int i=0; i<_neighbors.size(); i++)
+		for(size_t i=0; i<_neighbors.size(); i++)
 		{	
 			int numAgents = agentsToNeighbors[i].size();
 			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sendAgent - sending num agents: " << numAgents << " to: " << _neighbors[i]);
@@ -432,7 +419,7 @@ void World::sendOverlapZones( const int & sectionIndex, const bool & entireOverl
 	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " sendOverlapZones");
 	std::vector<int> neighborsToUpdate;
 	
-	for(int i=0; i<_neighbors.size(); i++)
+	for(size_t i=0; i<_neighbors.size(); i++)
 	{
 		if(needsToBeUpdated(_neighbors[i], sectionIndex))
 		{
@@ -440,7 +427,7 @@ void World::sendOverlapZones( const int & sectionIndex, const bool & entireOverl
 		}
 	}
 
-	for(int d=0; d<_rasters.size(); d++)
+	for(size_t d=0; d<_rasters.size(); d++)
 	{
 		if(!_rasters.at(d) || !_dynamicRasters.at(d))
 		{
@@ -448,7 +435,7 @@ void World::sendOverlapZones( const int & sectionIndex, const bool & entireOverl
 			continue;
 		}
 		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " sending raster: " << d);
-		for(int i=0; i<neighborsToUpdate.size(); i++)
+		for(size_t i=0; i<neighborsToUpdate.size(); i++)
 		{
 			MpiOverlap * send = new MpiOverlap;
 			if(entireOverlap)
@@ -464,7 +451,7 @@ void World::sendOverlapZones( const int & sectionIndex, const bool & entireOverl
 			const Rectangle<int> & overlapZone = send->_overlap;
 			send->_data.resize(overlapZone._size._x * overlapZone._size._y);
 			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " will send overlap to: " << neighborsToUpdate[i] << " with size: " << send->_data.size() << " and zone: " << overlapZone);
-			for(int n=0; n<send->_data.size(); n++)
+			for(size_t n=0; n<send->_data.size(); n++)
 			{
 				Point2D<int> index(overlapZone._origin._x+n%overlapZone._size._x, overlapZone._origin._y+n/overlapZone._size._x);
 				send->_data.at(n) = getDynamicRaster(d).getValue(index);
@@ -485,7 +472,7 @@ void World::sendMaxOverlapZones()
 	std::stringstream logName;
 	logName << "MPI_raster_world_" << _simulation.getId();
 	log_DEBUG(logName.str(), getWallTime() << " step: "  << _step << " sendMaxOverlapZones");
-	for(int d=0; d<_rasters.size(); d++)
+	for(size_t d=0; d<_rasters.size(); d++)
 	{
 		if(!_rasters.at(d) || !_dynamicRasters.at(d))
 		{
@@ -493,14 +480,14 @@ void World::sendMaxOverlapZones()
 		}
 
 		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sending max raster: " << d);
-		for(int i=0; i<_neighbors.size(); i++)
+		for(size_t i=0; i<_neighbors.size(); i++)
 		{
 			MpiOverlap * send = new MpiOverlap;
 			send->_overlap = getInternalOverlap(_neighbors[i]);
 			send->_data.resize(send->_overlap._size._x * send->_overlap._size._y);
 			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " will send max overlap of: " << d << " to: " << _neighbors[i] << " with size: " << send->_data.size() << " and zone: " << send->_overlap << " to " << _neighbors[i]);
 			const Rectangle<int> & overlapZone = send->_overlap;
-			for(int n=0; n<send->_data.size(); n++)
+			for(size_t n=0; n<send->_data.size(); n++)
 			{
 				Point2D<int> index(overlapZone._origin._x+n%overlapZone._size._x, overlapZone._origin._y+n/overlapZone._size._x);
 				send->_data.at(n) = getDynamicRaster(d).getMaxValueAt(index);
@@ -522,7 +509,7 @@ void World::sendGhostAgents( const int & sectionIndex )
 	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " send ghost agents for section index: " << sectionIndex );
 
 	std::vector<int> neighborsToUpdate;
-	for(int i=0; i<_neighbors.size(); i++)
+	for(size_t i=0; i<_neighbors.size(); i++)
 	{
 		if(needsToBeUpdated(_neighbors[i], sectionIndex))
 		{
@@ -540,7 +527,7 @@ void World::sendGhostAgents( const int & sectionIndex )
 		std::vector< AgentsList > agentsToNeighbors;
 		agentsToNeighbors.resize(neighborsToUpdate.size());
 
-		for(int i=0; i<neighborsToUpdate.size(); i++)
+		for(size_t i=0; i<neighborsToUpdate.size(); i++)
 		{
 			Rectangle<int> overlapZone = getOverlap(neighborsToUpdate[i], sectionIndex);
 			for(AgentsList::iterator it=_agents.begin(); it!=_agents.end(); it++)
@@ -571,7 +558,7 @@ void World::sendGhostAgents( const int & sectionIndex )
 				}
 			}
 
-			int numAgents = agentsToNeighbors[i].size();
+			size_t numAgents = agentsToNeighbors[i].size();
 			log_DEBUG(logName.str(),  getWallTime() << " step: " << _step << " sending num ghost agents: " << numAgents << " to : " << neighborsToUpdate[i] << " in step: " << _step << " and section index: " << sectionIndex );
 			int error = MPI_Send(&numAgents, 1, MPI_INTEGER, neighborsToUpdate[i], eNumGhostAgents, MPI_COMM_WORLD);
 			if(error != MPI_SUCCESS)
@@ -610,7 +597,7 @@ void World::receiveGhostAgents( const int & sectionIndex )
 
 	// we need to calculate how many neighbors will send data to this id
 	std::vector<int> neighborsToUpdate;
-	for(int i=0; i<_neighbors.size(); i++)
+	for(size_t i=0; i<_neighbors.size(); i++)
 	{
 		if(needsToReceiveData(_neighbors[i], sectionIndex))
 		{
@@ -623,10 +610,10 @@ void World::receiveGhostAgents( const int & sectionIndex )
 	{
 		MPI_Datatype * agentType = itType->second;
 
-		for(int i=0; i<neighborsToUpdate.size(); i++)
+		for(size_t i=0; i<neighborsToUpdate.size(); i++)
 		{
 			AgentsList newGhostAgents;
-			int numAgentsToReceive;
+			size_t numAgentsToReceive;
 			MPI_Status status;
 
 			int error = MPI_Recv(&numAgentsToReceive, 1, MPI_INTEGER, neighborsToUpdate[i], eNumGhostAgents, MPI_COMM_WORLD, &status);			
@@ -637,7 +624,7 @@ void World::receiveGhostAgents( const int & sectionIndex )
 				throw Exception(oss.str());
 			}
 			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " has received message from " << neighborsToUpdate[i] << ", num ghost agents: " << numAgentsToReceive );
-			for(int j=0; j<numAgentsToReceive; j++)
+			for(size_t j=0; j<numAgentsToReceive; j++)
 			{
 				void * package = MpiFactory::instance()->createDefaultPackage(itType->first);
 				error = MPI_Recv(package, 1, *agentType, neighborsToUpdate[i], eGhostAgent, MPI_COMM_WORLD, &status);					
@@ -715,11 +702,11 @@ void World::receiveAgents( const int & sectionIndex )
 		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " receiveAgent - checking mpi type: " << itType->first);
 		MPI_Datatype * agentType = itType->second;
 
-		for(int i=0; i<_neighbors.size(); i++)
+		for(size_t i=0; i<_neighbors.size(); i++)
 		{
 			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " receiveAgent - checking mpi type: " << itType->first << " for neighbor: " << _neighbors[i] );
 
-			int numAgentsToReceive;
+			size_t numAgentsToReceive;
 			MPI_Status status;
 			int error = MPI_Recv(&numAgentsToReceive, 1, MPI_INTEGER, _neighbors[i], eNumAgents, MPI_COMM_WORLD, &status);			
 			if(error!=MPI_SUCCESS)
@@ -729,7 +716,7 @@ void World::receiveAgents( const int & sectionIndex )
 				throw Exception(oss.str());
 			}
 			log_DEBUG(logName.str(), getWallTime() <<  " receiveAgents - received message from " << _neighbors[i] << ", num agents: " << numAgentsToReceive);
-			for(int j=0; j<numAgentsToReceive; j++)
+			for(size_t j=0; j<numAgentsToReceive; j++)
 			{
 				void * package = MpiFactory::instance()->createDefaultPackage(itType->first);
 				error = MPI_Recv(package, 1, *agentType, _neighbors[i], eAgent, MPI_COMM_WORLD, &status);					
@@ -757,7 +744,7 @@ void World::receiveOverlapData( const int & sectionIndex, const bool & entireOve
 
 	// we need to calculate how many neighbors will send data to this id
 	std::vector<int> neighborsToUpdate;
-	for(int i=0; i<_neighbors.size(); i++)
+	for(size_t i=0; i<_neighbors.size(); i++)
 	{
 		if(needsToReceiveData(_neighbors[i], sectionIndex))
 		{
@@ -767,7 +754,7 @@ void World::receiveOverlapData( const int & sectionIndex, const bool & entireOve
 	}
 
 	// for each raster, we receive data from all the active neighbors
-	for(int d=0; d<_rasters.size(); d++)
+	for(size_t d=0; d<_rasters.size(); d++)
 	{	
 		if(!_rasters.at(d) || !_dynamicRasters.at(d))
 		{
@@ -775,7 +762,7 @@ void World::receiveOverlapData( const int & sectionIndex, const bool & entireOve
 		}
 		
 		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " receiving raster: " << d);
-		for(int i=0; i<neighborsToUpdate.size(); i++)
+		for(size_t i=0; i<neighborsToUpdate.size(); i++)
 		{
 			MpiOverlap* receive = new MpiOverlap;
 			// TODO move to index
@@ -807,14 +794,14 @@ void World::receiveMaxOverlapData()
 	logName << "MPI_raster_world_" << _simulation.getId();
 	log_DEBUG(logName.str(), getWallTime() << " step: "  << _step << " receiveMaxOverlapData");
 	// for each raster, we receive data from all the active neighbors
-	for(int d=0; d<_rasters.size(); d++)
+	for(size_t d=0; d<_rasters.size(); d++)
 	{
 		if(!_rasters.at(d) || !_dynamicRasters.at(d))
 		{
 			continue;
 		}
 		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " receiving max raster: " << d);
-		for(int i=0; i<_neighbors.size(); i++)			
+		for(size_t i=0; i<_neighbors.size(); i++)			
 		{
 			MpiOverlap* receive = new MpiOverlap;
 			receive->_rasterName = getRasterName(d);
@@ -870,7 +857,7 @@ void World::clearRequests( bool updateMaxValues )
 
 				const Rectangle<int> & overlapZone = receive->_overlap;
 				log_DEBUG(logName.str(), getWallTime() << " processing request for overlap: " << overlapZone << " raster: " << receive->_rasterName << " for max values");
-				for(int i=0; i<receive->_data.size(); i++)
+				for(size_t i=0; i<receive->_data.size(); i++)
 				{
 					Point2D<int> index(overlapZone._origin._x+i%overlapZone._size._x, overlapZone._origin._y+i/overlapZone._size._x);
 					if(updateMaxValues)
@@ -917,7 +904,7 @@ Point2D<int> World::getPositionFromId( const int & id ) const
 
 int World::getNeighborIndex( const int & id )
 {
-	for(int i=0; i<_neighbors.size(); i++)
+	for(size_t i=0; i<_neighbors.size(); i++)
 	{
 		if(_neighbors[i] == id)
 		{
@@ -1124,7 +1111,7 @@ void World::serializeRasters()
 		return;
 	}
 
-	for(int d=0; d<_rasters.size(); d++)
+	for(size_t d=0; d<_rasters.size(); d++)
 	{
 		if(!_rasters.at(d) || !_serializeRasters.at(d) || !_dynamicRasters.at(d))
 		{
@@ -1138,7 +1125,7 @@ void World::serializeRasters()
 
 void World::serializeStaticRasters()
 {
-	for(int d=0; d<_rasters.size(); d++)
+	for(size_t d=0; d<_rasters.size(); d++)
 	{
 		if(!_rasters.at(d) || !_serializeRasters.at(d) || _dynamicRasters.at(d))			
 		{
@@ -1152,7 +1139,7 @@ void World::serializeStaticRasters()
 
 void World::stepEnvironment()
 {
-	for(int d=0; d<_rasters.size(); d++)
+	for(size_t d=0; d<_rasters.size(); d++)
 	{
 		if(!_rasters.at(d) || !_dynamicRasters.at(d))
 		{
@@ -1186,9 +1173,9 @@ void World::registerDynamicRaster( const std::string & key, const bool & seriali
 	
 	if(_rasters.size()<=index)
 	{
-		int oldSize = _rasters.size();
+		size_t oldSize = _rasters.size();
 		_rasters.resize(index+1);
-		for(int i=oldSize; i<_rasters.size(); i++)
+		for(size_t i=oldSize; i<_rasters.size(); i++)
 		{
 			_rasters.at(i) = 0;
 		}
@@ -1216,9 +1203,9 @@ void World::registerStaticRaster( const std::string & key, const bool & serializ
 		
 	if(_rasters.size()<=index)
 	{	
-		int oldSize = _rasters.size();
+		size_t oldSize = _rasters.size();
 		_rasters.resize(index+1);
-		for(int i=oldSize; i<_rasters.size(); i++)
+		for(size_t i=oldSize; i<_rasters.size(); i++)
 		{
 			_rasters.at(i) = 0;
 		}
@@ -1257,7 +1244,7 @@ bool World::checkPosition( const Point2D<int> & newPosition )
 	{
 		return true;
 	}
-	for(int i=0; i<hosts.size(); i++)
+	for(size_t i=0; i<hosts.size(); i++)
 	{
 		Agent * agent = hosts.at(i);
 		if(agent->exists())
@@ -1273,7 +1260,7 @@ Simulation & World::getSimulation()
 	return _simulation;
 }
 
-StaticRaster & World::getStaticRaster( const int & index )
+StaticRaster & World::getStaticRaster( const size_t & index )
 {
 	return *(_rasters.at(index));
 }
@@ -1284,7 +1271,7 @@ StaticRaster & World::getStaticRaster( const std::string & key )
 	return getStaticRaster(it->second);
 }
 
-Raster & World::getDynamicRaster( const int & index)
+Raster & World::getDynamicRaster( const size_t & index)
 {
 	if(index>=_rasters.size())
 	{
@@ -1307,7 +1294,7 @@ Raster & World::getDynamicRaster( const std::string & key )
 	return getDynamicRaster(it->second);
 }
 
-const Raster & World::getDynamicRaster( const int & index ) const
+const Raster & World::getDynamicRaster( const size_t & index ) const
 {	
 	return (const Raster &)*(_rasters.at(index));
 }

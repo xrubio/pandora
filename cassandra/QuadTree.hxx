@@ -17,7 +17,7 @@ class ColorSelector;
 
 class QuadTree
 {  
-	int _size;	
+	Engine::Point2D<int> _size;	
 	
 	// center points [x,y,z]
 	Engine::Point2D<int> _center;
@@ -45,18 +45,19 @@ class QuadTree
 
 public:
 	// initial QuadTree 
-	QuadTree(int size = 0);
+	QuadTree( const Engine::Point2D<int> & size);
 	// child QuadTree
-	QuadTree(int size, const Engine::Point2D<int> & center, int prof);
+	QuadTree( const Engine::Point2D<int> & size, const Engine::Point2D<int> & center, const Engine::Point2D<int> & prof);
 	virtual ~QuadTree();
 
     float _frustum[6][4];
 
     void initializeChilds();
-    QuadTree* initializeChild(int depth, Engine::Point2D<int> center, int prof);
+    QuadTree* initializeChild(int depth, Engine::Point2D<int> center, const Engine::Point2D<int> & previousProf);
 
     void setCellColor(const Engine::StaticRaster & raster, const ColorSelector & colorSelector, const Engine::Point2D<int> & cell, bool randomColor );
-	void update(int prof, RasterConfiguration & rasterConfig, Engine::StaticRaster &colorRaster, Engine::StaticRaster & DEMRaster, bool randomColor); //recorrer l'arbre i segons la distancia activar o desactivar nodes (childs) i afegirlos a points/polys
+	//recorrer l'arbre i segons la distancia activar o desactivar nodes (childs) i afegirlos a points/polys
+	void update( const Engine::Point2D<int> & prof, RasterConfiguration & rasterConfig, Engine::StaticRaster &colorRaster, Engine::StaticRaster & DEMRaster, bool randomColor);
     bool polygonInFrustum(Engine::Point3D<int> a, Engine::Point3D<int> b, Engine::Point3D<int> c );
     void setFrustum(float frust[6][4]);
 	

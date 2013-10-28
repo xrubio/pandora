@@ -6,7 +6,8 @@ namespace Examples
 
 EarthConfig::EarthConfig() : _scale(1), _numCases(0), _firstCase(0,0)
 {
-	_gisData._size = 0;
+	_gisData._size._x = 0;
+	_gisData._size._y = 0;
 	_gisData._resolution = 0;
 	_gisData._demName = "no loaded";
 	_gisData._populationName = "no loaded";
@@ -19,7 +20,8 @@ EarthConfig::~EarthConfig()
 void EarthConfig::extractParticularAttribs(TiXmlElement * root)
 {
 	TiXmlElement * element = root->FirstChildElement("gis");
-	retrieveAttributeMandatory( element, "size", _gisData._size);
+	retrieveAttributeMandatory( element, "width", _gisData._size._x);
+	retrieveAttributeMandatory( element, "height", _gisData._size._y);
 	retrieveAttributeMandatory( element, "resolution", _gisData._resolution);
 
 	TiXmlElement * element2 = element->FirstChildElement("dem");
@@ -37,7 +39,7 @@ void EarthConfig::extractParticularAttribs(TiXmlElement * root)
 	retrieveAttributeMandatory(element, "y", _firstCase._y);
 }
 	
-int EarthConfig::getSize() const
+const Engine::Point2D<int> & EarthConfig::getSize() const
 {
 	return _gisData._size;
 }

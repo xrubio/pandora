@@ -23,6 +23,8 @@
 #ifndef __Simulation_hxx__
 #define __Simulation_hxx__
 
+#include <Point2D.hxx>
+
 namespace Engine
 {
 
@@ -31,21 +33,21 @@ class Simulation
 {
 	int _id;
 	int _numTasks;
-	int _size;
+	Point2D<int> _size;
 	int _numSteps;
-	int _localRasterSize;
+	Point2D<int> _localRasterSize;
 	// this attribute defines how many time steps are executed before serializing one.
 	int _serializerResolution;
 public:
-	Simulation( const int & size, const int & numSteps, const int & serializerResolution = 1 );
+	Simulation( const Point2D<int> & size, const int & numSteps, const int & serializerResolution = 1 );
 	virtual ~Simulation();
 	void init();
 
 	const int & getId() const;
 	const int & getNumTasks() const;
-	const int & getSize() const;
+	const Point2D<int> & getSize() const;
 	const int & getNumSteps() const;
-	const int & getLocalRasterSize() const;
+	const Point2D<int> & getLocalRasterSize() const;
 	const int & getSerializerResolution() const;
 }; 
 

@@ -33,7 +33,7 @@ namespace Engine
 {
 
 
-Simulation::Simulation( const int & size, const int & numSteps, const int & serializerResolution ) : _id(-1), _numTasks(1), _size(size), _numSteps(numSteps), _localRasterSize(0), _serializerResolution(serializerResolution)
+Simulation::Simulation( const Point2D<int> & size, const int & numSteps, const int & serializerResolution ) : _id(-1), _numTasks(1), _size(size), _numSteps(numSteps), _localRasterSize(0,0), _serializerResolution(serializerResolution)
 {
 }
 
@@ -51,12 +51,13 @@ void Simulation::init()
 	_id = 0;
 	_numTasks = 1;
 #endif	
-	_localRasterSize = _size/sqrt(_numTasks);
-	if(_localRasterSize%2!=0)
+	_localRasterSize._x = _size._x/sqrt(_numTasks);
+	_localRasterSize._y = _size._y/sqrt(_numTasks);
+	if(_localRasterSize._x%2!=0 || _localRasterSize._y%2!=0)
 	{
 		// TODO fix when matrix not squared
 		std::stringstream oss;
-		oss << "Simulation::init - local raster size: " << _localRasterSize << " must be divisible by 2";
+		oss << "Simulation::init - local raster width and height: " << _localRasterSize << " must be divisible by 2";
 		throw Exception(oss.str());
 	}
 }
@@ -71,7 +72,7 @@ const int & Simulation::getNumTasks() const
 	return _numTasks;
 }
 
-const int & Simulation::getSize() const
+const Point2D<int> & Simulation::getSize() const
 {
 	return _size;
 }
@@ -81,7 +82,7 @@ const int & Simulation::getNumSteps() const
 	return _numSteps;
 }
 
-const int & Simulation::getLocalRasterSize() const
+const Point2D<int> & Simulation::getLocalRasterSize() const
 {
 	return _localRasterSize;
 }

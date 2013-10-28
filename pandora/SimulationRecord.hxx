@@ -67,7 +67,7 @@ private:
 	ValuesMap _minAttributeValues;
 	ValuesMap _maxAttributeValues;
 
-	int _size;
+	Engine::Point2D<int> _size;
 
 	// we need this function in order to be called by H5Giterate. It must be static to match the C call signature
 	static herr_t registerAgentStep( hid_t loc_id, const char *name, void *opdata );
@@ -137,7 +137,7 @@ public:
 	
 	int getMinValueForState( const std::string & state );
 	int getMaxValueForState( const std::string & state );
-	int getSize();
+	const Engine::Point2D<int> & getSize() const;
 	const float & getLoadingPercentageDone() const;
 	const std::string & getLoadingState() const;
 };

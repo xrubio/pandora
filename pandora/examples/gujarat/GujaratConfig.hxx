@@ -3,6 +3,7 @@
 #define __GujaratConfig_hxx__
 
 #include <Config.hxx>
+#include <Point2D.hxx>
 #include <tinyxml.h>
 #include <string>
 #include <sstream>
@@ -18,7 +19,7 @@ class HunterGathererMDPConfig;
 
 class GujaratConfig : public Engine::Config
 { 
-	int _size;		
+	Engine::Point2D<int> _size;		
 	std::string _soilFile;
 	std::string _demFile;
 	std::string _distWaterFile;
@@ -100,7 +101,7 @@ public:
 	{
 		return stream << "Config(" << "path:" << config._resultsFile << "," << "size:" << config._size << "," << "steps:" << config._numSteps << " soil file: " << config._soilFile << ")";
 	}  
-	const int & getSize() const;
+	const Engine::Point2D<int> & getSize() const;
 	bool	isStorageRequired( std::string key ) const
 	{
 		std::map<std::string,bool>::const_iterator it = _storeRasters.find( key );

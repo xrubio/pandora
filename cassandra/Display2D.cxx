@@ -72,7 +72,7 @@ void Display2D::setSimulationRecord( Engine::SimulationRecord * simulationRecord
 {
 	resetView();
 	_simulationRecord = simulationRecord;
-	_zoom = 600.0f/float(simulationRecord->getSize());
+	_zoom = 600.0f/float(simulationRecord->getSize()._x);
 	update();
 }
 
@@ -82,7 +82,7 @@ void Display2D::paintEvent(QPaintEvent *event)
 	{
 		return;
 	}
-	QPixmap imageToDraw(_simulationRecord->getSize()*_zoom, _simulationRecord->getSize()*_zoom);
+	QPixmap imageToDraw(_simulationRecord->getSize()._x*_zoom, _simulationRecord->getSize()._y*_zoom);
 	//QImage imageToDraw(_simulationRecord->getSize()*_zoom, _simulationRecord->getSize()*_zoom, QImage::Format_ARGB32_Premultiplied);
 	QPainter painter(&imageToDraw);
 	QPen pen;
@@ -104,7 +104,7 @@ void Display2D::paintEvent(QPaintEvent *event)
 				{
 					it--;
 					RasterConfiguration * rasterConfig = ProjectConfiguration::instance()->getRasterConfig(*it);
-					Engine::StaticRaster & raster(_simulationRecord->getRasterTmp(*it, _viewedStep));				
+					Engine::StaticRaster & raster(_simulationRecord->getRasterTmp(*it, _viewedStep));
 					int value = raster.getValue(Engine::Point2D<int>(i,j));
 			
 					if(rasterConfig->isTransparentEnabled() && value==rasterConfig->getTransparentValue())
@@ -331,7 +331,7 @@ void Display2D::mouseDoubleClickEvent(QMouseEvent *event)
 		for(positionAux._y=position._y-_radiusSelection; positionAux._y<=position._y+_radiusSelection; positionAux._y++)
 		{
 			Engine::SimulationRecord::AgentRecordsVector agents = _simulationRecord->getAgentsAtPosition(_viewedStep/_simulationRecord->getFinalResolution(), positionAux);
-			for(int i=0; i<agents.size(); i++)
+			for(size_t i=0; i<agents.size(); i++)
 			{
 				Engine::AgentRecord * agentRecord = agents.at(i);
 				if(!agentRecord->getState(_viewedStep/_simulationRecord->getFinalResolution(), "exists"))
@@ -391,7 +391,7 @@ std::string Display2D::getAgentToolTip( const Engine::Point2D<int> & position )
 	std::stringstream toolTipString;
 	Engine::SimulationRecord::AgentRecordsVector agents = _simulationRecord->getAgentsAtPosition(_viewedStep/_simulationRecord->getFinalResolution(), position);
 
-	for(int i=0; i<agents.size(); i++)
+	for(size_t i=0; i<agents.size(); i++)
 	{
 		Engine::AgentRecord * agentRecord = agents.at(i);
 		if(agentRecord->getState(_viewedStep/_simulationRecord->getFinalResolution(), "exists")==false)
@@ -419,7 +419,7 @@ bool Display2D::event(QEvent *event)
 		posToolTip << "position: " << position << " zoom: " << _zoom;
 		finalToolTip += posToolTip.str();
 	
-		if(!_simulationRecord || position._x<0 || position._y<0 || position._x>=_simulationRecord->getSize() || position._y>=_simulationRecord->getSize())
+		if(!_simulationRecord || position._x<0 || position._y<0 || position._x>=_simulationRecord->getSize()._x || position._y>=_simulationRecord->getSize()._y)
 		{
 			QToolTip::showText(helpEvent->globalPos(), finalToolTip.c_str());
 			return QWidget::event(event);

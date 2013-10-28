@@ -77,8 +77,6 @@ public:
 protected:		
 	Simulation _simulation;
 
-	int _localRasterSize;
-
 	Point2D<int> _worldPos;
 	Rectangle<int> _boundaries;
 	Rectangle<int> _globalBoundaries;
@@ -117,10 +115,8 @@ protected:
 	//! returns true if neighbor id will send data to _id, according to index execution
 	bool needsToReceiveData( const int & id, const int & sectionIndex );
 
-
 	//! current simulation step
 	int _step;
-
 
 	//! provides a random valid position inside boundaries
 	Point2D<int> getRandomPosition();
@@ -304,12 +300,12 @@ public:
 	virtual void stepAgents();
 
 	//! returns raster identified by parameter 'key'.
-	Raster & getDynamicRaster( const int & index );
+	Raster & getDynamicRaster( const size_t & index );
 	Raster & getDynamicRaster( const std::string & key );
-	const Raster & getDynamicRaster( const int & index ) const;
+	const Raster & getDynamicRaster( const size_t & index ) const;
 
 	//! returns static raster identified by parameter 'key'.
-	StaticRaster & getStaticRaster( const int & index );
+	StaticRaster & getStaticRaster( const size_t & index );
 	StaticRaster & getStaticRaster( const std::string & key );
 
 	//! create a new static raster map with the stablished size and given key

@@ -28,7 +28,7 @@ class FrontierConfig():
 		self._resultsFile = str(root.find('output').get('resultsFile'))
 		self._logsDir = str(root.find('output').get('logsDir'))
 
-		self._size = int(root.find('size').get('value'))
+		self._size = Point2DInt(int(root.find('size').get('width')), int(root.find('size').get('height')))
 		self._numSteps = int(root.find('numSteps').get('value'))
 		self._serializeResolution = int(root.find('numSteps').get('serializeResolution'))
 
@@ -57,8 +57,8 @@ class Empire(Agent):
 	def updateNumRegions(self):
 		self._numRegions = 0
 		index = Point2DInt(0,0)
-		for index._x in range(0, self.getWorld()._config._size):
-			for index._y in range(0, self.getWorld()._config._size):
+		for index._x in range(0, self.getWorld()._config._size._x):
+			for index._y in range(0, self.getWorld()._config._size._y):
 				if self.getWorld().getValue("id", index) == self._empireId:
 					self._numRegions += 1
 		#print 'empire: ' + self.id + ' has: ' + str(self._numRegions) + ' regions'
@@ -67,8 +67,8 @@ class Empire(Agent):
 		self._averageAsabiya = 0.0
 
 		index = Point2DInt(0,0)
-		for index._x in range(0, self.getWorld()._config._size):
-			for index._y in range(0, self.getWorld()._config._size):
+		for index._x in range(0, self.getWorld()._config._size._x):
+			for index._y in range(0, self.getWorld()._config._size._y):
 				if self.getWorld().getValue("id", index) == self._empireId:
 					self._averageAsabiya = self._averageAsabiya + float(self.getWorld().getValue("asabiya", index)/1000.0)
 
@@ -80,8 +80,8 @@ class Empire(Agent):
 		centre = Point2DInt(0,0)
 
 		index = Point2DInt(0,0)
-		for index._x in range(0, self.getWorld()._config._size):
-			for index._y in range(0, self.getWorld()._config._size):
+		for index._x in range(0, self.getWorld()._config._size._x):
+			for index._y in range(0, self.getWorld()._config._size._y):
 				if self.getWorld().getValue("id", index) == self._empireId:
 					centre._x = centre._x + index._x
 					centre._y = centre._y + index._y
@@ -164,8 +164,8 @@ class Frontier(World):
 
 	def calculateAsabiya(self):
 		index = Point2DInt(0,0)
-		for index._x in range(0, self._config._size):
-			for index._y in range(0, self._config._size):
+		for index._x in range(0, self._config._size._x):
+			for index._y in range(0, self._config._size._y):
 				if self.isEmpireBoundary(index):
 					self.setValue("boundary", index, 1)
 					asabiya = float(self.getValue("asabiya", index)/1000.0)
@@ -182,16 +182,16 @@ class Frontier(World):
 
 	def cleanEmpireRaster(self, empireId):
 		index = Point2DInt(0,0)
-		for index._x in range(0, self._config._size):
-			for index._y in range(0, self._config._size):
+		for index._x in range(0, self._config._size._x):
+			for index._y in range(0, self._config._size._y):
 				if self.getValue("id", index)==empireId:
 					self.setValue("id", index, 0)
 
 
 	def checkCollapse(self):
 		index = Point2DInt(0,0)
-		for index._x in range(0, self._config._size):
-			for index._y in range(0, self._config._size):
+		for index._x in range(0, self._config._size._x):
+			for index._y in range(0, self._config._size._y):
 				empireIds = self.getAgentIds(index, 'Empire')
 				for empireId in empireIds:
 					empire = self.getAgent(empireId)
@@ -286,8 +286,8 @@ class Frontier(World):
 
 		index = Point2DInt(0,0)
 		potentialAttackers = []
-		for index._x in range(0, self._config._size):
-			for index._y in range(0, self._config._size):
+		for index._x in range(0, self._config._size._x):
+			for index._y in range(0, self._config._size._y):
 				if self.isEmpireBoundary(index):
 					potentialAttackers.append(Point2DInt(index._x, index._y))
 
@@ -303,8 +303,8 @@ class Frontier(World):
 		
 		# clean executed raster
 		index = Point2DInt(0,0)
-		for index._x in range(0, self._config._size):
-			for index._y in range(0, self._config._size):
+		for index._x in range(0, self._config._size._x):
+			for index._y in range(0, self._config._size._y):
 				self.setValue("executed", index, 0)
 	
 	def stepEnvironment(self):

@@ -9,7 +9,7 @@ namespace Gujarat
 {
 
 GujaratConfig::GujaratConfig() 
-	: _size(0), _soilFile("soil file not loaded"), _demFile("dem file not loaded"), _distWaterFile("distance to water file not loaded"), _weightWaterFile("weight to water file not loaded"), _climateSeed(1), _hunterGathererController( "Rule-Based" ), _controllerConfig(0), _numHG(0), _numAP(0)
+	: _size(0,0), _soilFile("soil file not loaded"), _demFile("dem file not loaded"), _distWaterFile("distance to water file not loaded"), _weightWaterFile("weight to water file not loaded"), _climateSeed(1), _hunterGathererController( "Rule-Based" ), _controllerConfig(0), _numHG(0), _numAP(0)
 {
 }
   
@@ -239,10 +239,11 @@ void GujaratConfig::parseSoilInfo( TiXmlElement * element )
 	// TODO use STL
     //*? use SWITCH
 	_soilFile = element->Attribute("fileName"); // path
-	_size = atoi(element->Attribute("size"));
+	_size._x = atoi(element->Attribute("size"));
+	_size._y = atoi(element->Attribute("size"));
 }
 
-const int & GujaratConfig::getSize() const
+const Engine::Point2D<int> & GujaratConfig::getSize() const
 {
 	return _size;
 }

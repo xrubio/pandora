@@ -94,9 +94,14 @@ bool SimulationRecord::loadHDF5( const std::string & fileName, const bool & load
 		return false;
 	}
 
-	attributeId = H5Aopen_name(datasetId, "size");	
-	_size = 0;
-	H5Aread(attributeId, H5T_NATIVE_INT, &_size );
+	_size._x = 0;
+	_size._y = 0;
+	attributeId = H5Aopen_name(datasetId, "width");	
+	H5Aread(attributeId, H5T_NATIVE_INT, &_size._x );
+	H5Aclose(attributeId);
+
+	attributeId = H5Aopen_name(datasetId, "height");	
+	H5Aread(attributeId, H5T_NATIVE_INT, &_size._y );
 	H5Aclose(attributeId);
 
 	H5Dclose(datasetId);
@@ -187,11 +192,11 @@ bool SimulationRecord::loadHDF5( const std::string & fileName, const bool & load
 					H5Dread(dset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, dset_data);
 					H5Dclose(dset_id);
 
-					for(int i=0; i<dims[0]; i++)
+					for(size_t i=0; i<dims[0]; i++)
 					{
-						for(int j=0; j<dims[1]; j++)
+						for(size_t j=0; j<dims[1]; j++)
 						{
-							int index = i+j*dims[0];
+							size_t index = i+j*dims[0];
 							int value = dset_data[index];
 							if(value>raster.getMaxValue())
 							{
@@ -784,7 +789,7 @@ herr_t SimulationRecord::registerAgentStep( hid_t loc_id, const char *name, void
     return 0;
 }
 
-int SimulationRecord::getSize()
+const Engine::Point2D<int> & SimulationRecord::getSize() const
 {
 	return _size;
 }

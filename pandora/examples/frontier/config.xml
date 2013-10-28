@@ -2,8 +2,8 @@
 <config>  
 	<!-- Global simulation parameters -->
 	<output resultsFile="./data/frontier.h5" logsDir="./logs"/>
-	<numSteps value="200" serializeResolution="1"/>
-	<size value="30"/>
+	<numSteps value="1" serializeResolution="1"/>
+	<size width="30" height="30"/>
 	<asabiya increase="0.2" decay="0.1" min="0.0003"/>
 	<conflict distanceSensibility="2" attackThreshold="0.1"/>
 </config>

@@ -90,8 +90,14 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 	H5Aclose(attributeId);
 
 	attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
-	attributeId = H5Acreate(globalDatasetId, "size", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
-	H5Awrite(attributeId, H5T_NATIVE_INT, &simulation.getSize());
+	attributeId = H5Acreate(globalDatasetId, "width", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
+	H5Awrite(attributeId, H5T_NATIVE_INT, &simulation.getSize()._x);
+	H5Sclose(attributeFileSpace);
+	H5Aclose(attributeId);
+
+	attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
+	attributeId = H5Acreate(globalDatasetId, "height", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
+	H5Awrite(attributeId, H5T_NATIVE_INT, &simulation.getSize()._y);
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 
@@ -107,7 +113,7 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 	hid_t rasterNameFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	hid_t rasterNameDatasetId = H5Dcreate(_fileId, "rasters", H5T_NATIVE_INT, rasterNameFileSpace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 	// dynamic raster, store every time step
-	for(int i=0; i<rasters.size(); i++)
+	for(size_t i=0; i<rasters.size(); i++)
 	{
 		if(!rasters.at(i) || !serializeRasters.at(i) || !dynamicRasters.at(i))
 		{
@@ -122,7 +128,7 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 
 	// static raster, store just at the beginning of the simulation
 	rasterNameDatasetId = H5Dcreate(_fileId, "staticRasters", H5T_NATIVE_INT, rasterNameFileSpace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-	for(int i=0; i<rasters.size(); i++)
+	for(size_t i=0; i<rasters.size(); i++)
 	{
 		if(!rasters.at(i) || !serializeRasters.at(i) || dynamicRasters.at(i))
 		{
@@ -141,7 +147,7 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 
 	// color tables
 	hid_t colorTableGroupId = H5Gcreate(_fileId, "colorTables", 0, H5P_DEFAULT, H5P_DEFAULT);
-	for(int i=0; i<rasters.size(); i++)
+	for(size_t i=0; i<rasters.size(); i++)
 	{
 		if(!rasters.at(i) || !serializeRasters.at(i))
 		{
@@ -175,10 +181,10 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 		H5Sselect_hyperslab(fileSpace, H5S_SELECT_SET, offset, stride, count, numEntries);
 		int * data = (int *) malloc(sizeof(int)*numEntries[0]*numEntries[1]);
 
-		for(int z=0; z<numEntries[0]; z++)
+		for(size_t z=0; z<numEntries[0]; z++)
 		{
 			// red
-			int index = z*numEntries[1];
+			size_t index = z*numEntries[1];
 			int value = (int)(rasters.at(i)->getColorEntry(z)._r);
 			data[index] = value;
 
@@ -230,26 +236,23 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 	}
 	*/
 	
-	int localRasterSize = simulation.getSize()/sqrt(simulation.getNumTasks());
-	
 	//the real size of the matrix is sqrt(num simulator)*matrixsize	
 	hsize_t dimensions[2];
-	dimensions[0] = hsize_t(simulation.getSize());
-	dimensions[1] = hsize_t(simulation.getSize());
+	dimensions[0] = hsize_t(simulation.getSize()._x);
+	dimensions[1] = hsize_t(simulation.getSize()._y);
 
 	// we need to specify the size where each computer node will be writing
 	hsize_t chunkDimensions[2];
-	chunkDimensions[0] = localRasterSize/2;
+	chunkDimensions[0] = simulation.getLocalRasterSize()._x/2;
 	chunkDimensions[0] += 2*world.getOverlap();
-	chunkDimensions[1] = localRasterSize/2;
+	chunkDimensions[1] = simulation.getLocalRasterSize()._y/2;
 	chunkDimensions[1] += 2*world.getOverlap();
 	
 	propertyListId = H5Pcreate(H5P_DATASET_CREATE);
 	H5Pset_chunk(propertyListId, 2, chunkDimensions);
 
 	// static rasters	
-	
-	for(int i=0; i<rasters.size(); i++)
+	for(size_t i=0; i<rasters.size(); i++)
 	{
 		if(!rasters.at(i) || !serializeRasters.at(i) || dynamicRasters.at(i))
 		{
@@ -265,7 +268,7 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 	}
 
 	// dynamic rasters
-	for(int i=0; i<rasters.size(); i++)
+	for(size_t i=0; i<rasters.size(); i++)
 	{
 		if(!rasters.at(i) || !serializeRasters.at(i) || !dynamicRasters.at(i))
 		{
@@ -554,12 +557,12 @@ void Serializer::serializeRaster( StaticRaster & raster, World & world, const st
 
 	// if it is not a border, it will copy from overlap
 	hsize_t	offset[2];
-    offset[0] = world.getBoundaries()._origin._y;
-    offset[1] = world.getBoundaries()._origin._x;
+    offset[0] = world.getBoundaries()._origin._x;
+    offset[1] = world.getBoundaries()._origin._y;
  
 	hsize_t	block[2];
-	block[0] = world.getBoundaries()._size._y;
-	block[1] = world.getBoundaries()._size._x;
+	block[0] = world.getBoundaries()._size._x;
+	block[1] = world.getBoundaries()._size._y;
 
 
 	hid_t dataSetId = H5Dopen(_fileId, datasetKey.c_str(), H5P_DEFAULT);
@@ -576,17 +579,16 @@ void Serializer::serializeRaster( StaticRaster & raster, World & world, const st
 	H5Sselect_hyperslab(fileSpace, H5S_SELECT_SET, offset, stride, count, block);
  
 	int * data = (int *) malloc(sizeof(int)*block[0]*block[1]);
-	
 	Point2D<int> overlapDist = world.getBoundaries()._origin-world.getOverlapBoundaries()._origin;
 	log_EDEBUG(logName.str(), "overlap dist: " << overlapDist << "boundaries: " << world.getBoundaries() << " and overlap: " << world.getOverlapBoundaries());
-	for(int i=0; i<block[0]; i++)
+	for(size_t i=0; i<block[0]; i++)
 	{
-		for(int j=0; j<block[1]; j++)
+		for(size_t j=0; j<block[1]; j++)
 		{	
-			int index = i*block[1]+j;
+			size_t index = j*block[0]+i;
 			log_EDEBUG(logName.str(), "index: " << i << "/" << j << " - " << index);
-			log_EDEBUG(logName.str(), "getting value: " << Point2D<int> (j+overlapDist._x,i+overlapDist._y));
-			data[index] = raster.getValue(Point2D<int> (j+overlapDist._x,i+overlapDist._y));
+			log_EDEBUG(logName.str(), "getting value: " << Point2D<int> (i+overlapDist._x,j+overlapDist._y));
+			data[index] = raster.getValue(Point2D<int> (i+overlapDist._x,j+overlapDist._y));
 			log_EDEBUG(logName.str(), "value: " << data[index]);
 		}
 	}

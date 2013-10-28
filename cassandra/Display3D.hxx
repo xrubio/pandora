@@ -119,7 +119,7 @@ private:
 
 	QuadTreeMap _quadTrees;
 	Engine::Point3D<float> _angle;
-	double dist, anterior, posterior, radi, anglecam, ra;
+	double dist, anterior, posterior, _radius, anglecam, ra;
 	// point of view of observer
 	Engine::Point3D<float> _vrp;
 

@@ -229,7 +229,7 @@ public:
 		std::vector<std::string> agentIds;
 		Engine::World::AgentsVector agents = getAgent(position, type);
 		agentIds.resize(agents.size());
-		for(int i=0; i<agents.size(); i++)
+		for(size_t i=0; i<agents.size(); i++)
 		{
 			agentIds.at(i) = agents.at(i)->getId();
 		}
@@ -317,7 +317,7 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("getValue", &Engine::Raster::getValue, &RasterWrap::default_getValue, boost::python::return_value_policy<boost::python::copy_const_reference>())
 	;
 
-	boost::python::class_< Engine::Simulation >("SimulationStub", boost::python::init< const int &, const int &, const int & >() )
+	boost::python::class_< Engine::Simulation >("SimulationStub", boost::python::init< const Engine::Point2D<int> &, const int &, const int & >() )
 	;
 	
 	boost::python::class_< AgentWrap, std::auto_ptr<AgentWrap>, boost::noncopyable >("AgentStub", boost::python::init< const std::string & > () )
