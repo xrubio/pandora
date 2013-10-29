@@ -90,6 +90,8 @@ class GujaratConfig : public Engine::Config
 	//CaloricRequirementsTable* _hgCaloryRequirements;
 	//CaloricRequirementsTable* _apCaloryRequirements;
 
+	int _uctSeed;
+	
 	HunterGathererMDPConfig*	_controllerConfig;
 
 	int _numHG;
@@ -118,6 +120,8 @@ public:
 	}
 	
 	int getLowResolution() {return _lowResolution; }
+	
+	int getUCTSeed() { return _uctSeed; }
 	
 	friend class HunterGatherer;
 	friend class HunterGathererPartialMap;

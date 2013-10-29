@@ -31,6 +31,7 @@ inline void set_seed(int seed) {
     unsigned short useed[3];
 	//*********
 	seed = 1234;
+	std::cout << "UCT SEED " << seed << std::endl;
 	//*? *******
     useed[0] = useed[1] = useed[2] = seed;
     srand48((long int)seed);

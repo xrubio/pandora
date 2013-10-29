@@ -291,6 +291,7 @@ void GujaratConfig::parseHGMDPConfig( TiXmlElement* element )
 		return;
 	}
 	_controllerConfig = new HunterGathererMDPConfig(element);
+	_uctSeed = _controllerConfig->getSeed();
 }
  
 void GujaratConfig::parseSoilInfo( TiXmlElement * element )

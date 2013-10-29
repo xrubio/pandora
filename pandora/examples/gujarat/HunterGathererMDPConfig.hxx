@@ -22,7 +22,8 @@ public:
 	int	getHorizon() const { return _horizon; } 
 	int	getWidth() const { return _width; }
 	float	getExplorationBonus() const { return _explorationBonus; }
-
+	int	getSeed() const { return _uctSeed; }
+	
 	void	dump( std::ostream& os ) const;
 
 private:
@@ -33,7 +34,7 @@ private:
 	int	_horizon;
 	int	_width;
 	float	_explorationBonus;
-
+	int	_uctSeed;
 };
 
 }

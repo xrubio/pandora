@@ -92,6 +92,9 @@ inline void solve(const Problem::problem_t<T> &problem, const Heuristic::heurist
             result_t<T> result;
             result.algorithm_ = index;
             result.algorithm_name_ = algorithm_name[index];
+
+		std::cout << "UCT seed, dispatcher.h, " << seed_ << std:endl;
+
             result.seed_ = parameters.seed_;
             Random::set_seed(parameters.seed_);
 

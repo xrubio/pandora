@@ -6,6 +6,8 @@
 #include <iostream>
 #include <cstdlib>
 
+#include <stdlib.h>
+
 #include <omp.h>
 
 //#include <mcheck.h>
@@ -31,6 +33,10 @@ int main(int argc, char *argv[])
 		std::cout << "Loading config file: " << fileName << std::endl;
 		config.deserialize(fileName);
 
+		srand48(config.getUCTSeed());
+		
+		std::cout << "main: UCT SEED " << config.getUCTSeed() << std::endl;
+		
 		Engine::Simulation gujaratSim(config.getSize(), config.getNumSteps(), config.getSerializeResolution());
 		Gujarat::GujaratWorld world( gujaratSim , config);
 	
