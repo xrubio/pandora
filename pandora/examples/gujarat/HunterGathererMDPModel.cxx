@@ -34,6 +34,7 @@ void	HunterGathererMDPModel::setup( const HunterGathererMDPConfig& cfg )
 {
 	_config = cfg;
 	setHorizon( cfg.getHorizon() );
+	setWidth( cfg.getWidth() );
 }
 
 void	HunterGathererMDPModel::reset( GujaratAgent & agent )
@@ -168,15 +169,39 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		// New containers are created to be filled by updateKnowledge(...) const
 		// HR information remains untouched, not used along MDP
 		HRActionSectors = s.getHRActionSectors();	
-		//HRActionSectors = new std::vector< Sector* >(0);
+
+	//*? ucthack
 		LRActionSectors = new std::vector< Sector* >(0);
-		HRCellPool = s.getHRCellPool();
-		//HRCellPool = new std::vector< Engine::Point2D<int> >;
-		LRCellPool = new std::vector< Engine::Point2D<int> >(0);
+		//s.getLRActionSectors();
+		//new std::vector< Sector* >(0);
+	/*	
+		const std::vector< Sector* > & sourceLRSectors = agentRef().getLRSectors();
+		LRActionSectors = new std::vector< Sector* >(sourceLRSectors.size());
+		std::vector< Sector* >::const_iterator it = sourceLRSectors.begin();
+		int i = 0;
+		while(it!=sourceLRSectors.end())
+		{
+			Sector * se = (Sector*)*it;
+			Sector * r = new Sector(se);
+			r->setMetaInfo(2);
+			// Shallow Copy;
+			(*LRActionSectors)[i] = r;
+			i++;
+			it++;
+		}		
+	*/	
+		HRCellPool = s.getHRCellPool();		
+	
+		LRCellPool = new std::vector< Engine::Point2D<int> >(0);	
+	
 		ownership[0]=false;
+	//*? ucthack
 		ownership[1]=true;
+		//true;
 		ownership[2]=false;
+	
 		ownership[3]=true;
+		
 		
 		//assert(HRActionSectors->size()>0 && HRCellPool->size()>0);
 	}	
@@ -192,7 +217,6 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 			std::cout << " " << sourceLRSectors[i]->_dni;
 		
 		std::cout << std::endl;*/
-		
 		
 		std::vector< Sector* >::const_iterator it = sourceLRSectors.begin();
 		int i = 0;

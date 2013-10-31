@@ -48,6 +48,19 @@ public:
 		_horizon = H;
 	}
 
+	unsigned getWidth() const 
+	{
+		return _width;
+	}
+
+	void	setWidth( unsigned W )
+	{
+		_width = W;
+	}
+
+	
+	
+	
 	// Interface inherited from Problem::problem_t<T>
 	virtual Problem::action_t 		number_actions( const HunterGathererMDPState &s ) const;
 	virtual const HunterGathererMDPState& 	init() const;
@@ -69,6 +82,7 @@ private:
 	HunterGathererMDPState*		_initial;
 	HunterGathererMDPConfig		_config;
 	unsigned			_horizon;
+	unsigned			_width;
 };
 
 }

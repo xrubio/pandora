@@ -27,6 +27,10 @@ void HunterGathererMDPController::selectActions( GujaratAgent & agent, std::list
 	log_DEBUG(agent.getId()+"_controller",  "timestep=" << agent.getWorld()->getCurrentTimeStep());
 	log_DEBUG(agent.getId()+"_controller",  "\tagent.position=" << agent.getPosition());
 
+//*? ucthack
+//int x=0;	
+//while(1)
+//{	
 	_model->reset(agent);
 
 	UCT*	uctPolicy = new UCT( *_uctBasePolicy, 
@@ -38,9 +42,15 @@ void HunterGathererMDPController::selectActions( GujaratAgent & agent, std::list
 	
 	delete uctPolicy;
 
+//delete a;
+//std::cout << "uct loop " << ++x << std::endl;
+//}	
+	
+	
+	
 	log_DEBUG(agent.getId()+"_controller",  "\taction_selected=" << a->describe());
 
-	
+//MDPAction* a;
 	actions.push_back(a);
 	
 }

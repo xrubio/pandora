@@ -54,7 +54,10 @@ void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos
 		
 		
 		//cellPool.resize(GujaratState::HRCellsInHomeRange);
-		cellPool.resize((2*homeRange+1)*(2*homeRange+1));
+		if(0 == cellPool.size())
+		{
+			cellPool.resize((2*homeRange+1)*(2*homeRange+1));
+		}
 		int insertPoint = 0;
 		
 		HRSectors.resize(numSectors);	
@@ -123,10 +126,10 @@ void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos
 
 
 void HGMind::createLRSectors( 	const Engine::Point2D<int>& agentPos, 
-								std::vector< Sector* >& LRSectors,
-							   std::vector< Engine::Point2D<int> >& cellPool
-							) const
+				std::vector< Sector* >& resultLRSectors,
+				std::vector< Engine::Point2D<int> >& cellPool) const
 {
+	std::vector< Sector* > LRSectors;
 	int homeRange  = ((GujaratConfig)_world.getConfig())._homeRange;
 	int numSectors = ((GujaratConfig)_world.getConfig())._numSectors;
 	
@@ -135,9 +138,12 @@ void HGMind::createLRSectors( 	const Engine::Point2D<int>& agentPos,
 	//if(LRSectors.size()==0)
 	//{
 		//cellPool.resize(GujaratState::LRCellsInHomeRange);
-		cellPool.resize((2*lowResHomeRange+1)*(2*lowResHomeRange+1));
+		if(0 == cellPool.size())
+		{
+			cellPool.resize((2*lowResHomeRange+1)*(2*lowResHomeRange+1));
+		}
 		int insertPoint = 0;
-		
+				
 		LRSectors.resize(numSectors);
 		for ( unsigned k = 0; k < numSectors; k++ )
 		{			
@@ -186,24 +192,29 @@ void HGMind::createLRSectors( 	const Engine::Point2D<int>& agentPos,
 				
 				// All four corners of the low res cell must be in the boundaries
 				
-				if(	!_world.getOverlapBoundaries().isInside(corners[0]) ||
-					!_world.getOverlapBoundaries().isInside(corners[1]) ||
-					!_world.getOverlapBoundaries().isInside(corners[2]) ||
-					!_world.getOverlapBoundaries().isInside(corners[3]))	
+				if(	_world.getOverlapBoundaries().isInside(corners[0]) 
+				&&
+				_world.getOverlapBoundaries().isInside(corners[1]) 
+				&&
+				_world.getOverlapBoundaries().isInside(corners[2]) 
+				&&
+				_world.getOverlapBoundaries().isInside(corners[3]))	
 				{
-					continue;
-				}
-				
-				cellPool[insertPoint]=LRxycell;
-				LRSectors[indexSector]->addCell( &cellPool[insertPoint] );
-				insertPoint++;
+					cellPool[insertPoint]=LRxycell;
+					LRSectors[indexSector]->addCell( &cellPool[insertPoint] );
+					insertPoint++;
 				//LRSectors[indexSector]->addCell( LRxycell );
-				
+				}				
 			}//for
 		}//for
 		
 		// Remove empty sectors.
 		// Empty sectors can happen if agent is near enough of a world boundary.
+		
+		
+		// Remove empty sectors
+		//*? ucthack
+		/*
 		unsigned int read  = 0;
 		unsigned int write = 0;
 		while (read<LRSectors.size())
@@ -227,11 +238,25 @@ void HGMind::createLRSectors( 	const Engine::Point2D<int>& agentPos,
 			}
 		}	
 		LRSectors.resize(write);
-		
-		
+		*/
 		for ( unsigned k = 0; k < LRSectors.size(); k++ )
 		{
-			LRSectors[k]->addCell( &cellPool[insertPoint00] );
+			if(LRSectors[k]->cells().size()>0) 
+			{
+				resultLRSectors.push_back(LRSectors[k]);
+				LRSectors[k] = 0;
+			}
+			else
+			{
+				delete LRSectors[k];
+			}			
+		}
+		
+		
+		
+		for ( unsigned k = 0; k < resultLRSectors.size(); k++ )
+		{
+			resultLRSectors[k]->addCell( &cellPool[insertPoint00] );
 		}
 	//}	   
 	
