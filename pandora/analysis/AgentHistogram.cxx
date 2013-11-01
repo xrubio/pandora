@@ -29,7 +29,7 @@ void AgentHistogram::preProcess( const Engine::SimulationRecord & simRecord, con
 void AgentHistogram::computeAgent( const Engine::AgentRecord & agentRecord )
 {
 	int value = agentRecord.getState(_numStep, _attribute);
-	int index = value/_interval;
+	size_t index = value/_interval;
 	if(_histogram.size()<=index)
 	{
 		_histogram.resize(index+1);
@@ -48,7 +48,7 @@ void AgentHistogram::postProcess( const Engine::SimulationRecord & , const std::
 	std::stringstream header;
 	header << "time step: " << _numStep << _separator << _attribute << _separator;
 	file << header.str() << std::endl;
-	for(int i=0; i<_histogram.size(); i++)
+	for(size_t i=0; i<_histogram.size(); i++)
 	{	
 		std::stringstream newLine;
 		newLine << i*_interval << _separator << _histogram.at(i) << _separator;

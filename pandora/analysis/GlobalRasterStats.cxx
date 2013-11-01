@@ -181,7 +181,7 @@ void GlobalRasterStats::writeParams( std::stringstream & line, const std::string
 			std::list<std::string> & paramsList = *it;
 			// backwards iteration, the first element is the attribute
 			std::list<std::string>::reverse_iterator itL=paramsList.rbegin();
-			for(int i=0; i<paramsList.size()-1; i++)
+			for(size_t i=0; i<paramsList.size()-1; i++)
 			{
 				if(!element)
 				{

@@ -32,7 +32,7 @@ class MyWorld(World):
 			self.addAgent(newAgent)
 			newAgent.setRandomPosition()
 
-mySimulation = Simulation(32, 300)
+mySimulation = Simulation(Point2DInt(32,32), 300)
 myWorld = MyWorld(mySimulation)
 myWorld.initialize()
 myWorld.run()

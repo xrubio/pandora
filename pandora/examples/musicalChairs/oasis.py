@@ -18,7 +18,7 @@ terrainTypes = enum(ePastures=0, eFields=1)
 
 class OasisConfig():
 	def __init__(self):
-		self._size = 0
+		self._size = Point2DInt(0,0)
 		self._numSteps = 0
 
 		# farmer config
@@ -36,7 +36,8 @@ class OasisConfig():
 		tree = xml.etree.ElementTree.parse(xmlFile)
 		root = tree.getroot()
 
-		self._size = int(root.find('size').get('value'))
+		self._size._x = int(root.find('size').get('width'))
+		self._size._y = int(root.find('size').get('height'))
 		self._numSteps = int(root.find('numSteps').get('value'))
 
 		agents = root.find('agents')
@@ -91,8 +92,8 @@ class Herder(OasisAgent):
 		self.naturalGrowth()
 
 	def getNewHerderPosition(self):
-		for j in range(self.getWorld()._config._size-1, -1, -1):
-			for i in range(self.getWorld()._config._size-1, -1, -1):
+		for j in range(self.getWorld()._config._size._x-1, -1, -1):
+			for i in range(self.getWorld()._config._size._y-1, -1, -1):
 				possiblePosition = Point2DInt(i,j)
 				if self.getWorld().getValue('herders', possiblePosition)==0:
 					return possiblePosition
@@ -119,8 +120,8 @@ class Farmer(OasisAgent):
 		self.naturalGrowth()
 
 	def getNewFarmerPosition(self):
-		for j in range(0,self.getWorld()._config._size):
-			for i in range(0,self.getWorld()._config._size):
+		for j in range(0,self.getWorld()._config._size._x):
+			for i in range(0,self.getWorld()._config._size._y):
 				possiblePosition = Point2DInt(i,j)
 				if self.getWorld().getValue('farmers', possiblePosition)==0:
 					return possiblePosition
@@ -166,7 +167,7 @@ class Oasis(World):
 			self.addAgent(newAgent)
 			newAgent._naturalGrowth = self._config._farmersGrowthRate
 			newAgent._strength = self._config._farmersStrength
-			newAgent.position = Point2DInt(i%self._config._size,i/self._config._size)
+			newAgent.position = Point2DInt(i%self._config._size._x,i/self._config._size._y)
 			self._numFarmers += 1
 			self.setValue('farmers', newAgent.position, 1) 
 
@@ -175,7 +176,7 @@ class Oasis(World):
 			self.addAgent(newAgent)
 			newAgent._naturalGrowth = self._config._herdersGrowthRate
 			newAgent._strength = self._config._farmersStrength*self._config._herdersRelativeStrength
-			newAgent.position = Point2DInt(self._config._size-1-i%self._config._size,self._config._size-1-i/self._config._size)
+			newAgent.position = Point2DInt(self._config._size._x-1-i%self._config._size._y,self._config._size._x-1-i/self._config._size._y)
 			self._numHerders += 1
 			self.setValue('herders', newAgent.position, 1) 
 	
@@ -193,10 +194,10 @@ class Oasis(World):
 		print 'conflict between herder: '+ herder.id + ' and farmer: ' + farmer.id + ' at pos: ' + str(position._x) + '/' + str(position._y)
 		self.setValue('conflicts', position, self.getValue('conflicts', position)+1)
 
-		indexOfOpportunity = self._numFields / (self._config._size*self._config._size)
+		indexOfOpportunity = self._numFields / (self._config._size._x*self._config._size._y)
 		ratioOfStrengths = herder._strength/(herder._strength+farmer._strength)
 		incentiveForMigration = 1 - ratioOfStrengths*indexOfOpportunity
-		print '\tratio of strength: '+str(ratioOfStrengths) + ' incentive migration: ' + str(incentiveForMigration) + ' index of opportunity: ' + str(indexOfOpportunity) + ' num fields: ' + str(self._numFields) + ' size: ' + str(self._config._size)
+		print '\tratio of strength: '+str(ratioOfStrengths) + ' incentive migration: ' + str(incentiveForMigration) + ' index of opportunity: ' + str(indexOfOpportunity) + ' num fields: ' + str(self._numFields) + ' size: ' + str(self._config._size._x) + '/' + str(self._config._size._y)
 
 		if incentiveForMigration>herder._aggressiveness:
 			print '\therder migrated, removing agent: '+herder.id
@@ -222,8 +223,8 @@ class Oasis(World):
 	
 	def updateNumFields(self):
 		self._numFields = 0
-		for i in range(0,self._config._size):
-			for j in range(0,self._config._size):
+		for i in range(0,self._config._size._x):
+			for j in range(0,self._config._size._y):
 				position = Point2DInt(i,j)
 				if self.getValue('farmers', position)==1 :
 					self._numFields += 1
@@ -232,8 +233,8 @@ class Oasis(World):
 		self._aggressions = 0
 		self._invasions = 0
 		index = Point2DInt(0,0)
-		for index._y in range(0,self._config._size):
-			for index._x in range(0,self._config._size):
+		for index._y in range(0,self._config._size._x):
+			for index._x in range(0,self._config._size._y):
 				if self.getValue('herders', index)==1 and self.getValue('farmers', index)==1:
 					self.resolveConflicts(index)
 	
@@ -241,8 +242,8 @@ class Oasis(World):
 		"""We need to shuffle the positions of the agents before checking conflicts"""
 		listFarmers = []
 		index = Point2DInt(0,0)
-		for index._y in range(0,self._config._size):
-			for index._x in range(0,self._config._size):
+		for index._y in range(0,self._config._size._x):
+			for index._x in range(0,self._config._size._y):
 				if self.getValue('farmers', index)==1:
 					aFarmer = self.getAgent(self.getAgentIds(index, 'Farmer')[0])
 					self.setValue('farmers', index, 0)
@@ -255,7 +256,7 @@ class Oasis(World):
 			aFarmer.position = index
 			self.setValue('farmers', index, 1)
 			# next column
-			if(index._x<(self._config._size-1)):
+			if(index._x<(self._config._size._x-1)):
 				index._x +=1
 			# next row
 			else:
@@ -264,15 +265,15 @@ class Oasis(World):
 	
 		listHerders = []
 		index = Point2DInt(0,0)	
-		for index._y in range(self._config._size-1, -1, -1):
-			for index._x in range(self._config._size-1, -1, -1):
+		for index._y in range(self._config._size._y-1, -1, -1):
+			for index._x in range(self._config._size._x-1, -1, -1):
 				if self.getValue('herders', index)==1:
 					aHerder = self.getAgent(self.getAgentIds(index, 'Herder')[0])
 					self.setValue('herders', index, 0)
 					listHerders.append(aHerder)
 
 		random.shuffle(listHerders)
-		index = Point2DInt(self._config._size-1,self._config._size-1)
+		index = Point2DInt(self._config._size._x-1,self._config._size._y-1)
 		for i in range(0, len(listHerders)):
 			aHerder= listHerders[i]
 			aHerder.position = index
@@ -282,7 +283,7 @@ class Oasis(World):
 				index._x -=1
 			# next row
 			else:
-			 	index._x = self._config._size-1
+			 	index._x = self._config._size._x-1
 			 	index._y -= 1
 
 

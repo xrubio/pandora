@@ -8,6 +8,9 @@ class Point2DInt(libpyPandora.Point2DIntStub):
 	def __init__(self, x, y):
 		libpyPandora.Point2DIntStub.__init__(self, x, y)
 
+	def __str__(self):
+		return str(self._x) + ',' + str(self._y)
+
 class StaticRaster(libpyPandora.StaticRasterStub):
 	def __init__(self):
 		libpyPandora.StaticRasterStub.__init__(self)
@@ -34,40 +37,44 @@ class World(libpyPandora.WorldStub):
 		self._listOfAgents.append(agent)
 
 class SimulationRecord(libpyPandora.SimulationRecordStub):
-	def __init__(self):
-		libpyPandora.SimulationRecordStub.__init__( self )
+	def __init__(self, loadedResolution=1, gui=True):
+		libpyPandora.SimulationRecordStub.__init__( self, loadedResolution, gui )
 
-"""
-class AgentMean(libpyPandora.AgentMeanStub):
-	def __init__(self, attributeName):
-		libpyPandora.AgentMeanStub.__init__( self, attributeName )
-
-class AgentSum(libpyPandora.AgentSumStub):
-	def __init__(self, attributeName):
-		libpyPandora.AgentSumStub.__init__( self, attributeName )
+class GlobalAgentStats(libpyPandora.GlobalAgentsStatsStub):
+	def __init__(self, separator=';'):
+		libpyPandora.GlobalAgentsStatsStub.__init__( self, separator )
+		
+class GlobalRasterStats(libpyPandora.GlobalRasterStatsStub):
+	def __init__(self, separator=';'):
+		libpyPandora.GlobalRasterStatsStub.__init__( self, separator )
 
 class AgentNum(libpyPandora.AgentNumStub):
 	def __init__(self):
-		libpyPandora.AgentNumStub.__init__( self )
+		libpyPandora.AgentNumStub.__init__( self)
+		
+class AgentMean(libpyPandora.AgentMeanStub):
+	def __init__(self, attributeName):
+		libpyPandora.AgentMeanStub.__init__( self, attributeName)
 
-class AgentHDFtoSHP(libpyPandora.AgentHDFtoSHPStub):
-	def __init__(self, fileName, numStep ):
-		libpyPandora.AgentHDFtoSHPStub.__init__( self, fileName, numStep )
+class AgentStdDev(libpyPandora.AgentStdDevStub):
+	def __init__(self, attributeName):
+		libpyPandora.AgentStdDevStub.__init__( self, attributeName)
+
+class AgentSum(libpyPandora.AgentSumStub):
+	def __init__(self, attributeName):
+		libpyPandora.AgentSumStub.__init__( self, attributeName)
 
 class RasterSum(libpyPandora.RasterSumStub):
 	def __init__(self):
-		libpyPandora.RasterSumStub.__init__( self )
+		libpyPandora.RasterSumStub.__init__( self)
 
 class RasterMean(libpyPandora.RasterMeanStub):
 	def __init__(self):
-		libpyPandora.RasterMeanStub.__init__( self )
+		libpyPandora.RasterMeanStub.__init__( self)
 
-class AgentResults(libpyPandora.AgentResultsStub):	
-	def __init__(self, simRecord, outputFile, typeName, separator ):
-		libpyPandora.AgentResultsStub.__init__( self, simRecord, outputFile, typeName, separator )
-
-class RasterResults(libpyPandora.RasterResultsStub):	
-	def __init__(self, simRecord, outputFile, typeName, separator ):
-		libpyPandora.RasterResultsStub.__init__( self, simRecord, outputFile, typeName, separator )
+"""
+class AgentHDFtoSHP(libpyPandora.AgentHDFtoSHPStub):
+	def __init__(self, fileName, numStep ):
+		libpyPandora.AgentHDFtoSHPStub.__init__( self, fileName, numStep )
 """
 

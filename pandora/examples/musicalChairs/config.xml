@@ -2,8 +2,8 @@
 <config>  
 	<!-- Global simulation parameters -->
 	<output resultsFile="./data/oasis.h5" logsDir="./logs"/>
-	<numSteps value="1" serializeResolution="1"/>
-	<size value="10"/>
+	<numSteps value="100" serializeResolution="1"/>
+	<size width="10" height="10"/>
 <!--	<numAgents value="1"/> -->
 	<agents>	
 		<farmers init="1" strength="1" growthRate="0.3" immigrationRate="0.1"/>

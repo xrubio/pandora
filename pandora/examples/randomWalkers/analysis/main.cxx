@@ -23,6 +23,7 @@
 #include <SimulationRecord.hxx>
 
 #include <analysis/GlobalAgentStats.hxx>
+#include <analysis/GlobalRasterStats.hxx>
 #include <analysis/AgentMean.hxx>
 #include <analysis/AgentSum.hxx>
 #include <analysis/RasterMean.hxx>
@@ -53,13 +54,11 @@ int main(int argc, char *argv[])
 
 		agentResults.apply(simRecord, argv[2], "RandomAgent");
 
-		/*
-		Analysis::RasterResults rasterResults(simRecord, argv[3], "resources");
-		rasterResults.addAnalysis(new Analysis::RasterMean());
-		rasterResults.addAnalysis(new Analysis::RasterSum());		
+		PostProcess::GlobalRasterStats rasterResults;
+		rasterResults.addAnalysis(new PostProcess::RasterMean());
+		rasterResults.addAnalysis(new PostProcess::RasterSum());
 
-		rasterResults.apply();
-		*/
+		rasterResults.apply(simRecord, argv[3], "resources");
 	}
 	catch( std::exception & exceptionThrown )
 	{

@@ -124,7 +124,7 @@ void GlobalAgentStats::apply( const Engine::SimulationRecord & simRecord, const 
 	for(int i=0; i<=simRecord.getNumSteps(); i=i+simRecord.getFinalResolution())
 	{
 		std::stringstream newLine;
-		newLine << _separator << i;
+		newLine << i;
 		for(AgentAnalysisList::const_iterator itL=_analysisList.begin(); itL!=_analysisList.end(); itL++)
 		{
 			if((*itL)->writeResults())
@@ -190,7 +190,7 @@ void GlobalAgentStats::writeParams( std::stringstream & line, const std::string 
 			std::list<std::string> & paramsList = *it;
 			// backwards iteration, the first element is the attribute
 			std::list<std::string>::reverse_iterator itL=paramsList.rbegin();
-			for(int i=0; i<paramsList.size()-1; i++)
+			for(size_t i=0; i<paramsList.size()-1; i++)
 			{
 				if(!element)
 				{

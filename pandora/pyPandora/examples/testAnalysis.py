@@ -3,8 +3,7 @@
 import sys, random
 sys.path.append('..')
 sys.path.append('../../')
-from pyPandora import Simulation, Agent, World, Point2DInt, SimulationRecord, AgentResults, AgentMean, AgentSum, AgentNum, AgentHDFtoSHP, RasterMean, RasterSum, RasterResults
-
+from pyPandora import Simulation, Agent, World, Point2DInt, SimulationRecord, GlobalAgentStats, AgentNum, AgentMean, AgentSum, AgentStdDev, GlobalRasterStats, RasterMean, RasterSum
 
 # data generation
 
@@ -39,29 +38,27 @@ class MyWorld(World):
 			newAgent.setRandomPosition()
 			newAgent._value = random.randint(0,10)
 
-mySimulation = Simulation(32, 10)
+mySimulation = Simulation(Point2DInt(32,32), 10)
 myWorld = MyWorld(mySimulation)
 myWorld.initialize()
 myWorld.run()
 
 # analysis
 
-record = SimulationRecord()
-record.loadHDF5('data/results.h5', 1, 1)
+record = SimulationRecord(1, False)
+record.loadHDF5('data/results.h5', True, True)
 
-agentResults = AgentResults(record, 'agents.csv', 'id', ';')
+agentResults = GlobalAgentStats(';')
 agentResults.addAnalysis(AgentNum())
 agentResults.addAnalysis(AgentMean('x'))
 agentResults.addAnalysis(AgentMean('y'))
 agentResults.addAnalysis(AgentMean('value'))
 agentResults.addAnalysis(AgentSum('value'))
-agentResults.addAnalysis(AgentHDFtoSHP('shp/agents.shp', -1))
+agentResults.applyTo(record, 'agents.csv', 'id')
+#agentResults.addAnalysis(AgentHDFtoSHP('shp/agents.shp', -1))
 
-agentResults.apply()
-
-rasterResults = RasterResults(record, 'resources.csv', 'test', ';')
+rasterResults = GlobalRasterStats(';')
 rasterResults.addAnalysis(RasterMean())
 rasterResults.addAnalysis(RasterSum())
-
-rasterResults.apply()
+rasterResults.applyTo(record, 'resources.csv', 'test')
 

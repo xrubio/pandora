@@ -26,7 +26,7 @@ class MyWorld(World):
 				pos = Point2DInt(i,j)
 				raster.setValue(pos, 1+self.currentStep)
 
-mySimulation = Simulation(64, 10)
+mySimulation = Simulation(Point2DInt(64,64), 10)
 myWorld = MyWorld(mySimulation)
 myWorld.initialize()
 myWorld.run()
