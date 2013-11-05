@@ -59,8 +59,7 @@ class HistoricalSettlement():
 			valley.setValue('historical', self._position, 0)
 			return
 
-		# in the netlogo model numHouseHolds = 0 with year = medianDate
-		numHouseHolds = 0 #settlement._baselineHouseholds
+		numHouseHolds = 0
 		if valley._year > self._medianDate:
 			numHouseHolds = math.ceil(float(self._baselineHouseholds) * float(self._endDate - valley._year)/float(self._endDate - self._medianDate))
 			numHouseHolds = max(1.0, numHouseHolds)
@@ -187,16 +186,13 @@ class Household(Agent):
 	def determineBestFarm(self):
 		bestCandidates = []
 
-		#print 'number of potential farms: ',len(self.getWorld()._potentialFarms)
 		for farm in self.getWorld()._potentialFarms:
-			# TODO potential farm can be a target
 			if self.getWorld().getValue('farms', farm)!=0 and (self._bestFarm._x!=farm._x or self._bestFarm._y!=farm._y):
 				continue
 			if self.getWorld().getValue('households', farm)!=0:
 			 	continue
 			bestCandidates.append(farm)
 			 
-		#print 'number of candidates: ',len(bestCandidates)
 		if len(bestCandidates)==0:
 			return False
 
@@ -215,7 +211,6 @@ class Household(Agent):
 		self._bestFarm._y = bestCandidate._y
 		self.getWorld().setValue('farms', self._bestFarm, 1)
 		self.getWorld()._potentialFarms.remove(bestCandidate)
-		#print self,' chose best farm: ',self._bestFarm,' with yield: ',self.getWorld().getValue('yield x100', self._bestFarm)/100.0
 		return True
 	
 	def findHouseholdSpot(self, closeToFarm, lowerYield ):
@@ -253,19 +248,14 @@ class Household(Agent):
 	def findSettlement(self):
 		# first option no farm, close to farm and yield < farm yield
 		if self.findHouseholdSpot(True, True):
-			#print 'household found at first option: ',self
 			return True
 		# second option no farm, close to farm
 		if self.findHouseholdSpot(True, False):
-			#print 'household found at second option: ',self
 			return True
 		# third option, no farm
 		if self.findHouseholdSpot(False, False):
-			#print 'household found at third option: ',self
 			return True
 		# no location, die
-		#print 'agent removed: ' + str(self)
-		self.remove()
 		return False
 
 	def initHousehold(self, isAtInit=False):
@@ -295,7 +285,6 @@ class Household(Agent):
 		self._lastHarvest = self._stock[0]
 		
 	def registerAttributes(self):
-		"""
 		self.registerIntAttribute('age')
 		self.registerIntAttribute('deathAge')
 		self.registerIntAttribute('fertility x100')
@@ -303,11 +292,9 @@ class Household(Agent):
 		self.registerIntAttribute('fertilityEndsAge')
 		self.registerIntAttribute('lastHarvest')
 		self.registerIntAttribute('estimates')
-		"""
 		return
 
 	def serialize(self):
-		"""
 		self.serializeIntAttribute('age', self._age)
 		self.serializeIntAttribute('deathAge', self._deathAge)
 		self.serializeIntAttribute('fertility x100', int(self._fertility*100.0))
@@ -315,31 +302,27 @@ class Household(Agent):
 		self.serializeIntAttribute('fertilityEndsAge', self._fertilityEndsAge)
 		self.serializeIntAttribute('lastHarvest', int(self._lastHarvest))
 		self.serializeIntAttribute('estimates', int(self._lastHarvest))
-		"""
 		return
 
 	def harvestConsumption(self):
 		self._lastHarvest = float(self.getWorld().getValue('yield x100', self._bestFarm))/100.0
-		# ALERT harvestVariance is applied two times to yield
-		# ALERT last harvest can be negative
+		# harvestVariance is applied two times to yield?
 		self._lastHarvest = self._lastHarvest * (1.0+(random.normalvariate(0, 1)*float(self.getWorld()._config._harvestVariance)))
+		# last harvest can be negative in the original model so an additional check has been introduced 
 		if self._lastHarvest<0:
 			self._lastHarvest = 0
 		self._stock[2] = self._stock[1]	
 		self._stock[1] = self._stock[0]
 		self._stock[0] = self._lastHarvest
-		#print self,' at year: ',self.getWorld()._year,' farm: ',self._bestFarm,' harvested: ',self._lastHarvest,'- stock 1st year: ',self._stock[1],' 2nd year:',self._stock[2],' sum:',sum(self._stock)
 
 		covered  = self.getWorld()._config._nutritionNeed
 		for i in xrange(len(self._stock)-1, -1, -1):
 			if self._stock[i] >= covered:
 				self._stock[i] = self._stock[i] - covered
-				#print self,' after consumption, current stock: ',self._stock[0],' stock 1st year: ',self._stock[1],' 2nd year:',self._stock[2],' sum:',sum(self._stock)
 				return
 			else:
 				covered = covered - self._stock[i]
 				self._stock[i] = 0
-		#print self,' after consumption, current stock: ',self._stock[0],' 1st year: ',self._stock[1],' 2nd year:',self._stock[2],' sum:',sum(self._stock)
 	
 	def checkDeath(self):
 		# all stock consumed and still needs not covered
@@ -352,9 +335,7 @@ class Household(Agent):
 	def estimateHarvest(self):
 		self._estimate = self._lastHarvest + self._stock[0] + self._stock[1] # 2nd year if lost
 		if self._estimate < self.getWorld()._config._nutritionNeed:
-			#print 'estimate: ',self._estimate,' bad needed: ',self.getWorld()._config._nutritionNeed
 			return False
-		#print 'estimate: ',self._estimate,' good needed: ',self.getWorld()._config._nutritionNeed
 		return True
 
 	def checkFission(self):	
@@ -374,7 +355,6 @@ class Household(Agent):
 		for i in xrange(0, len(self._stock)):
 			child._stock[i] = self._stock[i]*self.getWorld()._config._maizeToGift
 			self._stock[i] = self._stock[i]-child._stock[i]
-		#print self,' had child: ',child,' remaining:',sum(self._stock),' child stock:',sum(child._stock)
 	
 	def removeAndClean(self):
 		self.getWorld().setValue('farms', self._bestFarm, 0)
@@ -382,7 +362,6 @@ class Household(Agent):
 		self.remove()
 	
 	def updateState(self):
-		#print self,' executing year:',self.getWorld()._year
 		self.harvestConsumption()
 		if self.checkDeath():
 			self.removeAndClean()
@@ -409,7 +388,7 @@ class Valley(World):
 		self._year = 800
 		self._numIds = 0
 
-		# efficiency variables
+		# variables used for efficiency
 		self._locations = []
 		self._potentialFarms = []
 		self._waterSpots = []
@@ -711,11 +690,9 @@ class Valley(World):
 			self._alluviumExist = True
 
 	def stepHistoricalSettlement(self):
-		# clean	
 		[settlement.checkExists(self) for settlement in self._historicalSettlements]
 
 	def stepWater(self):
-		# clean	
 		def resetWater(self, location):
 			landCoverValue = self.getValue('landCover', location)
 			hydroIndex = self.getTerrainFromLandCover(landCoverValue)
@@ -750,7 +727,6 @@ class Valley(World):
 			[setStream(self, location) for location in self._locations]
 
 	def getTerrainFromLandCover( self, value ):
-		# what if value==landCovereNorthDunes or value==landCover.eMidDunes?????
 		if value==landCover.eGeneralValleyFloor:
 			return terrain.eGeneral
 		if value==landCover.eNorthValleyFloor or value==landCover.eNorthDunes:
@@ -773,7 +749,7 @@ class Valley(World):
 				return
 
 			apdsiValue = self._apdsi[self.currentStep][self.getTerrainFromLandCover(landCoverValue)]
-			# if no change use value of last time step
+			# if no change use value of last time step for efficiency
 			if self.currentStep>0 and apdsiValue==self._apdsi[self.currentStep-1][self.getTerrainFromLandCover(landCoverValue)]:
 				return
 			maizeValue = self.getValue('maize', location)
@@ -811,7 +787,6 @@ class Valley(World):
 				return
 			self._potentialFarms.append(Point2DInt(location._x, location._y))
 		[checkPotentialFarm(self, location) for location in self._locations]
-		#print 'number of potential farms in year: ',self._year,' is: ',len(self._potentialFarms)
 
 	def stepEnvironment(self):
 		self._year = self.currentStep+800
@@ -839,7 +814,5 @@ def main():
 	valley.run()
 
 
-#import profile
 if __name__ == "__main__":
-#	profile.run('main()')i
 	main()

@@ -15,16 +15,6 @@
 		<fertilityEndsAge min="34" max="34"/>
 
 		<initialCorn min="2000" max="2400"/>
-	<!--
-		<initialAge min="0" max="29"/>
-		<deathAge min="30" max="36"/>
-		
-		<fertility min="0.125" max="0.125"/>
-		<fertilityAge min="16" max="16"/>
-		<fertilityEndsAge min="30" max="32"/>
-
-		<initialCorn min="2000" max="2400"/>
-	-->
 	</households>
 </config>
 
