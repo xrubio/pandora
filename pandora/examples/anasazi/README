@@ -1,0 +1,10 @@
+This code is a Pandora version of the classical Virtual Anasazi model. It is based on the data, code and ODD published by Marco Janssen's version on Netlogo.
+Original version can be found at: http://www.openabm.org/model/2222/version/2/view
+The code uses pyPandora to implement the ODD, as the original code do not implement some of the checks explained in the ODD to find locations for farms and settlements.
+
+Related works:
+- Janssen, M. (2009) Understanding Artificial Anasazi, Journal of Artificial Societies and Social Simulation 12 (4) 13 http://jasss.soc.surrey.ac.uk/12/4/13.html
+- Dean J S, Gumerman G J, Epstein J M, Axtell R L, Swedlund A C, Parker M T, and McCarroll S. (2000) Understanding Anasazi Culture Change Through Agent Based Modeling in Dynamics in Human and Primate Societies: Agent Based Modeling of Social and Spatial Processes, T. Kohler and G. Gumerman (eds.), Santa Fe Institute. New York & London: Oxford University Press.
+- Diamond , J. (2002) Archaeology: Life with the artificial Anasazi, Nature 419: 567-569.
+- Axtell R L, Epstein J M, Dean J S, Gumerman G J, Swedlund A C, Harburger J, Chakravarty S, Hammond R, Parker J, and Parker M. (2002) Population Growth and Collapse in a Multi-Agent Model of the Kayenta Anasazi in Long House Valley. Proceedings of the National Academy of Sciences 99(3): 7275-7279
+
