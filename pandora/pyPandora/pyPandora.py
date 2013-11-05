@@ -26,6 +26,9 @@ class Simulation(libpyPandora.SimulationStub):
 class Agent(libpyPandora.AgentStub):
 	def __init__(self, id):
 		libpyPandora.AgentStub.__init__( self, id)
+	
+	def __str__(self):
+		return 'Agent: ' + self.id + ' at position: ' + str(self.position._x) + '/' + str(self.position._y)
 
 class World(libpyPandora.WorldStub):
 	_listOfAgents = []
