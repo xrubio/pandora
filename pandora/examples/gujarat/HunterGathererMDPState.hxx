@@ -15,10 +15,19 @@
 
 #include "Sector.hxx"
 
+#include "GujaratWorld.hxx"
+#include "HunterGatherer.hxx"
+#include "GujaratConfig.hxx"
+#include "HunterGathererMDPConfig.hxx"
+#include "MDPAction.hxx"
+#include "ForageAction.hxx"
+#include "MoveHomeAction.hxx"
+#include "DoNothingAction.hxx"
+
 namespace Gujarat
 {
 
-
+//class HunterGatherer;
 	
 class HunterGathererMDPState
 {
@@ -39,13 +48,16 @@ class HunterGathererMDPState
 	
 	
 public:
+	int _numAvailableActionsWhenBorn;
 	int _creator;
 	int _dni;
 	std::string _actionName;
+	HunterGatherer * _agentRef;
+	HunterGathererMDPConfig	* _config;
 	
 protected:	
 	
-	static std::vector< Sector* >				_emptySectorVector;
+	static std::vector< Sector* >	_emptySectorVector;
 	static std::vector< Engine::Point2D<int> >  _emptyCellPool;	
 	
 	std::vector< Sector* > * _HRActionSectors;// High Resolution
@@ -74,18 +86,21 @@ public:
 	
 	
 	// The real one
-	HunterGathererMDPState(	const Engine::Point2D<int> loc
-							, int initialOnHand
-							, Engine::Raster& resourcesRaster
-							, int maxResources
-							, int divider
-							, std::vector< Sector* > * HRActionSectors
-							, std::vector< Sector* > * LRActionSectors
-							, std::vector< Engine::Point2D<int> > * HRCellPool
-							, std::vector< Engine::Point2D<int> > * LRCellPool
-							, std::vector< bool > ownsItems
-							, std::map<long,long> * objectUseCounter
-							, omp_lock_t * mapLock);
+	HunterGathererMDPState(	HunterGatherer * agentRef
+			, HunterGathererMDPConfig * config
+			, const Engine::Point2D<int> loc
+			, int initialOnHand
+			, Engine::Raster& resourcesRaster
+			, int maxResources
+			, int divider
+			, std::vector< Sector* > * HRActionSectors
+			, std::vector< Sector* > * LRActionSectors
+			, std::vector< Engine::Point2D<int> > * HRCellPool
+			, std::vector< Engine::Point2D<int> > * LRCellPool
+			, std::vector< bool > ownsItems
+			, std::map<long,long> * objectUseCounter
+			, omp_lock_t * mapLock
+			, const std::vector<MDPAction *>&  actionList);
 	
 	HunterGathererMDPState( const HunterGathererMDPState& s );
 	
@@ -94,10 +109,9 @@ public:
 							, std::vector< Sector* > * LRActionSectors
 							, std::vector< Engine::Point2D<int> > * HRCellPool
 							, std::vector< Engine::Point2D<int> > * LRCellPool
-							, std::vector< bool > ownsItems );
+							, std::vector< bool > ownsItems
+			                               , const std::vector<MDPAction *>& actionList);
 	
-	
-	const HunterGathererMDPState&	operator=(const HunterGathererMDPState& s );
 	
 	~HunterGathererMDPState();
 
@@ -160,14 +174,17 @@ public:
 	Engine::IncrementalRaster& 			getResourcesRaster() { return _resources; }
 	const Engine::IncrementalRaster& 	getResourcesRaster() const { return _resources; }
 
-	void addAction( MDPAction* a );
 	MDPAction* availableActions( Problem::action_t actIndex ) 
 		{ return _availableActions.at(actIndex); }
 	const MDPAction* availableActions( Problem::action_t actIndex ) const 
 		{ return _availableActions.at(actIndex); }
 
-	unsigned	numAvailableActions() const { return _availableActions.size(); }
+	// unsigned numAvailableActions() const { return _availableActions.size(); }
+	unsigned numAvailableActions() const { return _numAvailableActionsWhenBorn; }
 
+	unsigned numAvailableActionsWhenBorn() const { return _numAvailableActionsWhenBorn; }
+
+	
 	void	computeHash();
 	
 	
@@ -193,21 +210,27 @@ public:
 	void deRegisterFromCounterMapAndDeleteKnowledgeStructures();
 	
 	
-private:
-	
+	//*? ucthack	
+	void makeActionsForState( HunterGatherer * agentRef);
 
+	const HunterGathererMDPState&	operator=(const HunterGathererMDPState& s );	
+	
+	
 private:
-	unsigned					_timeIndex;
-	Engine::Point2D<int>		_mapLocation;
-	int							_onHandResources;
+	unsigned		_timeIndex;
+	Engine::Point2D<int>	_mapLocation;
+	int			_onHandResources;
 	
 	Engine::IncrementalRaster	_resources;
-	Engine::HashKey				_hashKey;
-	std::vector<MDPAction*> 	_availableActions;
-	int							_maxResources;
-	int							_resourcesDivider;
-	int 						_daysStarving;
-	bool						_isCopy;
+	Engine::HashKey		_hashKey;
+	std::vector<MDPAction*> _availableActions;
+	int			_maxResources;
+	int			_resourcesDivider;
+	int 			_daysStarving;
+	bool			_isCopy;
+	
+	
+	void addAction( MDPAction* a );
 };
 
 //std::vector<abc> xyz::myvector;

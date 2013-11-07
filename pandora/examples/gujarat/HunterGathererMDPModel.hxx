@@ -56,25 +56,38 @@ public:
 	void	setWidth( unsigned W )
 	{
 		_width = W;
-	}
-
-	
-	
+	}	
 	
 	// Interface inherited from Problem::problem_t<T>
-	virtual Problem::action_t 		number_actions( const HunterGathererMDPState &s ) const;
-	virtual const HunterGathererMDPState& 	init() const;
-	virtual bool 				terminal( const HunterGathererMDPState &s ) const;
-	virtual bool 				dead_end( const HunterGathererMDPState &s ) const { return false; }
-	virtual bool 				applicable( const HunterGathererMDPState &s, Problem::action_t a ) const;
-	virtual float 				cost( const HunterGathererMDPState &s, Problem::action_t a ) const;
-	virtual void 				next(	const HunterGathererMDPState &s, 
-							Problem::action_t a, 
-							OutcomeVector& outcomes ) const;
-	virtual	void				print( std::ostream& os ) const {}
+	virtual Problem::action_t number_actions( const HunterGathererMDPState &s ) const;
+	virtual const HunterGathererMDPState & init() const;
+	virtual bool terminal( const HunterGathererMDPState &s ) const;
+	virtual bool dead_end( const HunterGathererMDPState &s ) const 
+		{ return false; }
+	virtual bool applicable( const HunterGathererMDPState &s, Problem::action_t a ) const;
+	virtual float cost( const HunterGathererMDPState &s, Problem::action_t a ) const;
+	virtual void next( const HunterGathererMDPState &s
+			, Problem::action_t a
+			, OutcomeVector& outcomes ) const;
+	virtual	void print( std::ostream& os ) const {}
+	
 protected:
 	
-	void	makeActionsForState( HunterGathererMDPState& s ) const;
+  
+        void makeActionsForState( HunterGatherer& parent, std::vector<MDPAction *>&  actionList) const;
+	
+	void makeActionsForState( const HunterGathererMDPState& parent, std::vector<MDPAction *>&  actionList) const;
+	
+	void makeActionsForState(
+			      const Engine::IncrementalRaster & resourcesRaster,
+			      const Engine::Point2D<int> &position,
+			      std::vector< Sector* >& HRActionSectors, 
+			      std::vector< Sector* >& LRActionSectors, 
+			      std::vector< Engine::Point2D<int> >& HRCellPool,
+			      std::vector< Engine::Point2D<int> >& LRCellPool,
+			      std::vector<MDPAction *>&  actionList) const;
+	
+	
 	void	applyFrameEffects( const HunterGathererMDPState& s,  HunterGathererMDPState& sp ) const;
 private:
 

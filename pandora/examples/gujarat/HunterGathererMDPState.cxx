@@ -37,7 +37,10 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 , _LRCellPool(s._LRCellPool)
 , _objectUseCounter(s._objectUseCounter)
 , _mapLock(s._mapLock)
-
+, _agentRef(s._agentRef)
+,_config(s._config)
+,_numAvailableActionsWhenBorn(s._availableActions.size())
+//,_availableActions(s._availableActions)
 {
 	std::stringstream logName;
 	logName << "infoshar";
@@ -53,6 +56,7 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 		//_ownItems[i] = false;
 		_ownItems[i] = s._ownItems[i];
 	}
+	
 	
 	for ( unsigned k = 0; k < s._availableActions.size(); k++ )
 	{
@@ -71,7 +75,8 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 						, std::vector< Sector* > * LRActionSectors
 						, std::vector< Engine::Point2D<int> > * HRCellPool
 						, std::vector< Engine::Point2D<int> > * LRCellPool
-						, std::vector< bool > ownItems )
+						, std::vector< bool > ownItems
+					        , const std::vector<MDPAction *>& actionList)
 : _timeIndex( s._timeIndex )
 , _mapLocation( s._mapLocation )
 , _onHandResources( s._onHandResources )
@@ -87,7 +92,10 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 , _LRCellPool(LRCellPool)
 , _objectUseCounter(s._objectUseCounter)
 , _mapLock(s._mapLock)
-
+, _agentRef(s._agentRef)
+,_config(s._config)
+, _availableActions(actionList)
+, _numAvailableActionsWhenBorn(s._availableActions.size())
 {
 	std::stringstream logName;
 	logName << "infoshar";	
@@ -119,7 +127,9 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 
 
 HunterGathererMDPState::HunterGathererMDPState( 
-			const Engine::Point2D<int> loc
+			HunterGatherer * agentRef
+			, HunterGathererMDPConfig * config
+			, const Engine::Point2D<int> loc
 			, int initResources
 			, Engine::Raster& resourcesRaster
 			, int maxResources
@@ -130,7 +140,8 @@ HunterGathererMDPState::HunterGathererMDPState(
 			, std::vector< Engine::Point2D<int> > * LRCellPool
 			, std::vector< bool > ownItems
 			, std::map<long,long> * objectUseCounter
-			, omp_lock_t * mapLock)
+			, omp_lock_t * mapLock
+			, const std::vector<MDPAction *>&  actionList)
 
 	: _timeIndex(0)
 	, _mapLocation( loc )
@@ -147,7 +158,10 @@ HunterGathererMDPState::HunterGathererMDPState(
 	, _isCopy(false)
 	, _objectUseCounter(objectUseCounter)
 	, _mapLock(mapLock)
-	
+	, _agentRef(agentRef)
+	,_config(config)
+	,_availableActions(actionList)
+	,_numAvailableActionsWhenBorn(actionList.size())
 {
 	std::stringstream logName;
 	logName << "infoshar";	
@@ -247,6 +261,13 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	assert( s._availableActions.size() == _availableActions.size() );
 	
 	registerKnowledgeStructuresAtCounterMap();
+	
+	_numAvailableActionsWhenBorn = _availableActions.size();
+	
+	_agentRef = s._agentRef;
+	
+	_config = s._config;
+	
 	
 	return *this;
 }
@@ -595,6 +616,111 @@ void HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructure
 	{ 
 		//#pragma omp critical(refmap){_objectUseCounter->clear();}
 	}
+	
+	
+	//*? ucthack
+	
+void	HunterGathererMDPState::makeActionsForState( HunterGatherer * agentRef)
+{
+	// Map from "sector memory address" to "sector integer identifier".
+	// After sorting validActionSectors I need to access both the HR and the LR sector
+	std::map<Sector*,int> sectorIdxMap;
+
+	//std::cout << "creating actions for state with time index: " << getTimeIndex() << " and resources: " << getOnHandResources() << std::endl;
+	
+	assert( numAvailableActions() == 0 );
+	
+	// Make Do Nothing
+	//if ( _config->isDoNothingAllowed() )
+	//	addAction( new DoNothingAction() );	
+	
+	std::vector< Sector* > validActionSectors;
+	
+	//for(int i = 0; i < LRActionSectors.size(); i++)
+		//assert(LRActionSectors[i]->cells().size() >0);
+	
+	
+	//TODO watch HRSectors update : BOTTLENECK
+	agentRef->updateKnowledge( getLocation(), getResourcesRaster(), *_HRActionSectors, *_LRActionSectors, *_HRCellPool, *_LRCellPool );
+	
+	// MRJ: Remove empty sectors if any
+	for ( unsigned i = 0; i < _LRActionSectors->size(); i++ )
+	{
+		if ( (*_LRActionSectors)[i]->isEmpty() )
+		{
+			// You can't do that if you do not own it.
+			// Any delete is postponed at the end of lifecycle of the MDPState
+			
+			// delete (*LRActionSectors)[i];
+			// delete (*HRActionSectors)[i];
+			continue;
+		}
+		validActionSectors.push_back( (*_LRActionSectors)[i] );
+		sectorIdxMap[(*_LRActionSectors)[i]] = i;
+	}	
+	//TODO why 2 reorderings??? first random, then according a predicate
+	//std::random_shuffle( validActionSectors.begin(), validActionSectors.end() );
+	std::sort( validActionSectors.begin(), validActionSectors.end(), SectorBestFirstSortPtrVecPredicate() );
+	
+	// Make Forage actions
+	
+	int forageActions = _config->getNumberForageActions();
+	if ( forageActions >= validActionSectors.size() )
+	{
+		for ( unsigned i = 0; i < validActionSectors.size(); i++ )
+		{
+			int sectorIdx = sectorIdxMap[validActionSectors[i]];
+			//s.addAction( new ForageAction( HRActionSectors[sectorIdx], validActionSectors[i], true ) );
+			addAction( new ForageAction( (*_HRActionSectors)[sectorIdx], validActionSectors[i], false ) );	
+		}
+	}
+	else
+	{
+		for ( unsigned i = 0; i < forageActions; i++ )
+			{
+			int sectorIdx = sectorIdxMap[validActionSectors[i]];
+			//s.addAction( new ForageAction( HRActionSectors[sectorIdx],validActionSectors[i], true ) );
+			addAction( new ForageAction( (*_HRActionSectors)[sectorIdx],validActionSectors[i], false ) );
+			}
+		for ( unsigned i = forageActions; i < validActionSectors.size(); i++ )
+			{
+			//int sectorIdx = sectorIdxMap[validActionSectors[i]];
+			
+			// Structures from a MDPState cannot be destroyed till the State disappears
+			// delete validActionSectors[i];
+			// delete HRActionSectors[sectorIdx];
+			// delete LRActionSectors[sectorIdx]; redundancy because validActionSectors[i]==LRActionSectors[sectorIdx]
+			}
+	}
+	//std::cout << "number of valid forage actions: " << s.numAvailableActions() << " for number of valid sectors: " << validActionSectors.size() << std::endl;
+
+	// Make Move Home
+	std::vector< MoveHomeAction* > possibleMoveHomeActions;
+	MoveHomeAction::generatePossibleActions( *agentRef, agentRef->getPosition(), *_HRActionSectors, validActionSectors, possibleMoveHomeActions );
+	int moveHomeActions =  _config->getNumberMoveHomeActions();
+	if (  moveHomeActions >=  possibleMoveHomeActions.size() )
+	{
+		for ( unsigned i = 0; i < possibleMoveHomeActions.size(); i++ )
+			addAction( possibleMoveHomeActions[i] );
+	}
+	else
+	{
+		for ( unsigned i = 0; i <  moveHomeActions; i++ )
+			addAction( possibleMoveHomeActions[i] );
+		for ( unsigned i =  moveHomeActions; i < possibleMoveHomeActions.size(); i++ )
+			delete possibleMoveHomeActions[i];
+	}
+	assert( numAvailableActions() > 0 );
+	sectorIdxMap.clear();
+	possibleMoveHomeActions.clear();
+	validActionSectors.clear();
+	
+	// Reference to structures that could reference structures from a MDPState cannot be destroyed. The MDPState's will destroy the ones created and are owned.	
+	//HRActionSectors.clear();
+	//LRActionSectors.clear();
+	//std::cout << "finished creating actions for state with time index: " << s.getTimeIndex() << " and resources: " << s.getOnHandResources() << std::endl;
+} 
+	
 	
 }
 
