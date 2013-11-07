@@ -1,0 +1,10 @@
+#####################################################
+# Ignore patterns specific to gujarat
+#####################################################
+/data/
+/mpiCode
+/gujarat
+# (Different walking strategies generate different binaries)
+/gujarat_*
+/logs
+
