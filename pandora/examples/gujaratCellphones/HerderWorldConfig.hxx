@@ -2,6 +2,7 @@
 #define __HerderWorldConfig_hxx__
 
 #include <Config.hxx>
+#include <Point2D.hxx>
 
 namespace GujaratCellphones
 {
@@ -9,7 +10,7 @@ namespace GujaratCellphones
 class HerderWorldConfig : public Engine::Config
 {
 	//environment
-	int _size;
+	Engine::Point2D<int> _size;
 	int _averageResources;
 	int _climateSeed;
 	int _daysDrySeason;
@@ -38,7 +39,7 @@ public:
 	HerderWorldConfig();
 	virtual ~HerderWorldConfig();
 	void extractParticularAttribs(TiXmlElement *pRoot);
-	int getSize() const;
+	Engine::Point2D<int> getSize() const;
 	
 	friend class HerderWorld;
 	friend class Climate;
