@@ -324,14 +324,6 @@ void	ForageAction::selectBestNearestLRCell( const GujaratAgent& agent
 	std::vector< Engine::Point2D<int>* > candidates;
 	double minDist = std::numeric_limits<double>::max();
 
-	try{
-	const std::vector< Engine::Point2D<int>* >& sectorCells = _LRForageArea->cells();
-	}catch(const std::exception & e)
-			{
-				std::cout << "EXCP: LRForageArea" << std::endl;
-				
-			}
-			
 	const std::vector< Engine::Point2D<int>* >& sectorCells = _LRForageArea->cells();
 			
 			
