@@ -43,12 +43,12 @@ HGMind::~HGMind()
 }
 
 void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos
-				,std::vector< Sector* >& HRSectors
+				,std::vector< Sector* >& resultHRSectors
 				,std::vector< Engine::Point2D<int> >& cellPool) const
 {
 	int homeRange  = ((GujaratConfig)_world.getConfig())._homeRange;
 	int numSectors = ((GujaratConfig)_world.getConfig())._numSectors;
-	
+	std::vector< Sector* > HRSectors;
 	//if(HRSectors.size()==0)
 	//{
 		
@@ -98,7 +98,7 @@ void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos
 	
 	// Remove empty sectors.
 	// Empty sectors can happen if agent is near enough of a world boundary.
-	unsigned int read  = 0;
+	/*unsigned int read  = 0;
 	unsigned int write = 0;
 	while (read<HRSectors.size())
 	{
@@ -120,7 +120,21 @@ void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos
 			write++;
 		}
 	}	
-	HRSectors.resize(write);
+	HRSectors.resize(write);*/
+	
+	for ( unsigned k = 0; k < HRSectors.size(); k++ )
+	{
+		if(HRSectors[k]->cells().size()>0) 
+		{
+			resultHRSectors.push_back(HRSectors[k]);
+			HRSectors[k] = 0;
+		}
+		else
+		{
+			delete HRSectors[k];
+		}			
+	}
+	
 	
 }
 

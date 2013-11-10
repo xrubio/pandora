@@ -15,10 +15,19 @@
 
 #include "Sector.hxx"
 
+#include "GujaratWorld.hxx"
+#include "HunterGatherer.hxx"
+#include "GujaratConfig.hxx"
+#include "HunterGathererMDPConfig.hxx"
+#include "MDPAction.hxx"
+#include "ForageAction.hxx"
+#include "MoveHomeAction.hxx"
+#include "DoNothingAction.hxx"
+
 namespace Gujarat
 {
 
-
+//class HunterGatherer;
 	
 class HunterGathererMDPState
 {
@@ -39,13 +48,16 @@ class HunterGathererMDPState
 	
 	
 public:
+	int _numAvailableActionsWhenBorn;
 	int _creator;
 	int _dni;
 	std::string _actionName;
+	HunterGatherer * _agentRef;
+	HunterGathererMDPConfig	* _config;
 	
 protected:	
 	
-	static std::vector< Sector* >				_emptySectorVector;
+	static std::vector< Sector* >	_emptySectorVector;
 	static std::vector< Engine::Point2D<int> >  _emptyCellPool;	
 	
 	std::vector< Sector* > * _HRActionSectors;// High Resolution
@@ -74,18 +86,21 @@ public:
 	
 	
 	// The real one
-	HunterGathererMDPState(	const Engine::Point2D<int> loc
-							, int initialOnHand
-							, Engine::Raster& resourcesRaster
-							, int maxResources
-							, int divider
-							, std::vector< Sector* > * HRActionSectors
-							, std::vector< Sector* > * LRActionSectors
-							, std::vector< Engine::Point2D<int> > * HRCellPool
-							, std::vector< Engine::Point2D<int> > * LRCellPool
-							, std::vector< bool > ownsItems
-							, std::map<long,long> * objectUseCounter
-							, omp_lock_t * mapLock);
+	HunterGathererMDPState(	HunterGatherer * agentRef
+			, HunterGathererMDPConfig * config
+			, const Engine::Point2D<int> loc
+			, int initialOnHand
+			, Engine::Raster& resourcesRaster
+			, int maxResources
+			, int divider
+			, std::vector< Sector* > * HRActionSectors
+			, std::vector< Sector* > * LRActionSectors
+			, std::vector< Engine::Point2D<int> > * HRCellPool
+			, std::vector< Engine::Point2D<int> > * LRCellPool
+			, std::vector< bool > ownsItems
+			, std::map<long,long> * objectUseCounter
+			, omp_lock_t * mapLock
+			, const std::vector<MDPAction *>&  actionList);
 	
 	HunterGathererMDPState( const HunterGathererMDPState& s );
 	
@@ -94,7 +109,8 @@ public:
 							, std::vector< Sector* > * LRActionSectors
 							, std::vector< Engine::Point2D<int> > * HRCellPool
 							, std::vector< Engine::Point2D<int> > * LRCellPool
-							, std::vector< bool > ownsItems );
+							, std::vector< bool > ownsItems 
+							, const std::vector<MDPAction *>& actionList);
 	
 	
 	const HunterGathererMDPState&	operator=(const HunterGathererMDPState& s );
@@ -166,10 +182,14 @@ public:
 	const MDPAction* availableActions( Problem::action_t actIndex ) const 
 		{ return _availableActions.at(actIndex); }
 
-	unsigned	numAvailableActions() const { return _availableActions.size(); }
+	//unsigned numAvailableActions() const { return _availableActions.size(); }
 
-	void	computeHash();
+	unsigned numAvailableActionsWhenBorn() const { return _numAvailableActionsWhenBorn; }
+
+	unsigned numAvailableActions() const { return _numAvailableActionsWhenBorn; }
+
 	
+	void	computeHash();
 	
 	std::vector< Sector* > * getHRActionSectors() const { return _HRActionSectors; }
 	std::vector< Sector* > * getLRActionSectors() const { return _LRActionSectors; }
@@ -193,21 +213,22 @@ public:
 	void deRegisterFromCounterMapAndDeleteKnowledgeStructures();
 	
 	
-private:
-	
+	//*? ucthack	
+	void makeActionsForState( HunterGatherer * agentRef);
 
+	
 private:
-	unsigned					_timeIndex;
-	Engine::Point2D<int>		_mapLocation;
-	int							_onHandResources;
+	unsigned		_timeIndex;
+	Engine::Point2D<int>	_mapLocation;
+	int			_onHandResources;
 	
 	Engine::IncrementalRaster	_resources;
-	Engine::HashKey				_hashKey;
-	std::vector<MDPAction*> 	_availableActions;
-	int							_maxResources;
-	int							_resourcesDivider;
-	int 						_daysStarving;
-	bool						_isCopy;
+	Engine::HashKey		_hashKey;
+	std::vector<MDPAction*> _availableActions;
+	int			_maxResources;
+	int			_resourcesDivider;
+	int 			_daysStarving;
+	bool			_isCopy;
 };
 
 //std::vector<abc> xyz::myvector;

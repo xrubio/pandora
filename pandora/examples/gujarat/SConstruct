@@ -20,7 +20,7 @@ mareNostrum = ARGUMENTS.get('mn', 0)
 extremeDebug = ARGUMENTS.get('edebug', 0)
 useMpi = ARGUMENTS.get('mpi', 1)
 
-walkArg = ARGUMENTS.get('walk', 'c')
+walkArg = ARGUMENTS.get('walk', 'tv')
 
 walkFlagsTable={
 	'c'   : 'CLASSICWALK'

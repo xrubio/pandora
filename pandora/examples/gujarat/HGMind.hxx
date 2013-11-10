@@ -44,13 +44,13 @@ namespace Gujarat
 		}
 		
 		void createHRSectors( const Engine::Point2D<int>& agentPos
-							, std::vector< Sector* >& HRSectors
-							, std::vector< Engine::Point2D<int> >& cellPool ) const;
+				, std::vector< Sector* >& resultHRSectors
+				, std::vector< Engine::Point2D<int> >& cellPool ) const;
 										
 		
 		void createLRSectors( 	const Engine::Point2D<int>& agentPos
-							, std::vector< Sector* >& LRSectors
-							, std::vector< Engine::Point2D<int> >& cellPool ) const;
+					, std::vector< Sector* >& resultLRSectors
+					, std::vector< Engine::Point2D<int> >& cellPool ) const;
 		
 		//----------------------------------------------------------------------
 		const std::vector<Sector *> & getHRSectors()const

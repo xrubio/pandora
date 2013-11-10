@@ -194,6 +194,10 @@ template<typename T> class uct_t : public improvement_t<T> {
         if( it == table_.end() ) {
             std::vector<float> values(1 + policy_t<T>::problem().number_actions(s), 0);
             std::vector<int> counts(1 + policy_t<T>::problem().number_actions(s), 0);
+	    
+	    //*? ucthack
+	    //std::cout << "UCT INSERT : " << (long)&s << "," << s.numAvailableActions() << std::endl;
+	    
             table_.insert(std::make_pair(std::make_pair(depth, s), data_t(values, counts)));
             float value = evaluate(s, depth);
 #ifdef DEBUG
@@ -202,7 +206,38 @@ template<typename T> class uct_t : public improvement_t<T> {
             return value;
         } else {
             // select action for this node and increase counts
-	    assert( it->second.counts_.size() == policy_t<T>::problem().number_actions(s)+1 );
+	int ucthack_s = it->second.counts_.size();
+	int ucthack_na = policy_t<T>::problem().number_actions(s)+1;
+	
+	//*?ucthack
+	if(it->second.counts_.size() != policy_t<T>::problem().number_actions(s)+1)
+		std::cout << "UCT COUNTS ASSERT : " 
+			<< s._dni 
+			<< "," 
+			<< s._numAvailableActionsWhenBorn
+			<< "," 
+			<< s.numAvailableActions() 
+			<< ","
+			<< it->second.counts_.size()
+			<< "!="
+			<< policy_t<T>::problem().number_actions(s)+1
+			<< std::endl;
+	
+	if( it->second.values_.size() != policy_t<T>::problem().number_actions(s)+1 )
+		std::cout << "UCT VALUES ASSERT : " 
+			<< s._dni
+			<< "," 
+			<< s._numAvailableActionsWhenBorn
+			<< "," 
+			<< s.numAvailableActions() 
+			<< ","
+			<< it->second.values_.size()
+			<< "!="
+			<< policy_t<T>::problem().number_actions(s)+1
+			<< std::endl;
+	
+	
+	assert( it->second.counts_.size() == policy_t<T>::problem().number_actions(s)+1 );
 	    assert( it->second.values_.size() == policy_t<T>::problem().number_actions(s)+1 );
             Problem::action_t a = select_action(s, it->second, depth, true, random_ties_);
             ++it->second.counts_[0];
