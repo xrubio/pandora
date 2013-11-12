@@ -40,17 +40,19 @@ public:
 	Type _x;
 	Type _y;
 
-	Point2D()
+	Point2D() : _x(0), _y(0)
 	{
-		_x = 0;
-		_y = 0;
 	}
 
-	Point2D( const Type & x, const Type & y )
+	Point2D( const Type & x, const Type & y ) : _x(x), _y(y)
 	{
-		_x = x;
-		_y = y;
 	}
+
+	Point2D<Type> clone() const
+	{
+		return Point2D<Type>(_x, _y);
+	}
+
 	friend std::ostream & operator<<( std::ostream & stream, const Point2D<Type> & point )
 	{
 		return stream << point._x << "/" << point._y;

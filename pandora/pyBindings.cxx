@@ -277,6 +277,24 @@ void passRasterAnalysisOwnership( PostProcess::GlobalRasterStats & results, std:
 	results.addAnalysis(analysisPtr.get());
 	analysisPtr.release();
 }
+
+std::string printPoint( const Point2DInt & point )
+{
+	std::stringstream stream;
+	stream << point;
+	return stream.str();
+}
+
+bool equalsPoint( const Point2DInt & pointA, const Point2DInt & pointB )
+{
+	return pointA==pointB;
+}
+
+bool notEqualsPoint( const Point2DInt & pointA, const Point2DInt & pointB )
+{
+	return pointA!=pointB;
+}
+
 // overloaded methods
 Engine::Raster & (Engine::World::*getDynamicRaster)(const std::string&) = &Engine::World::getDynamicRaster;
 Engine::StaticRaster & (Engine::World::*getStaticRaster)(const std::string&) = &Engine::World::getStaticRaster;
@@ -291,7 +309,11 @@ BOOST_PYTHON_MODULE(libpyPandora)
 	boost::python::class_< Point2DInt >("Point2DIntStub", boost::python::init<const int & , const int & >() )
 		.def_readwrite("_x", &Point2DInt::_x) 
 		.def_readwrite("_y", &Point2DInt::_y) 
-		.def("distance", &Point2DInt::distance) 
+		.def("distance", &Point2DInt::distance)
+		.def("__str__", printPoint)
+		.def("__eq__", equalsPoint)
+		.def("__ne__", notEqualsPoint)
+		.def("clone", &Point2DInt::clone)
 	;	
 	
 	boost::python::class_< StaticRasterWrap, boost::noncopyable >("StaticRasterStub")
