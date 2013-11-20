@@ -225,6 +225,18 @@ public:
 		Engine::World::addAgent(agent, true);
 	}
 
+	std::vector<std::string> getNeighboursIds( Engine::Agent & target, const double & radius, const std::string & type="all" )
+	{
+		std::vector<std::string> agentIds;
+		Engine::World::AgentsVector agents = getNeighbours(&target, radius, type);
+		agentIds.resize(agents.size());
+		for(size_t i=0; i<agents.size(); i++)
+		{
+			agentIds.at(i) = agents.at(i)->getId();
+		}
+		return agentIds;
+	}
+
 	std::vector<std::string> getAgentIds(  const Engine::Point2D<int> & position, const std::string & type="all" )
 	{
 		std::vector<std::string> agentIds;
@@ -366,6 +378,7 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("setValue", setValue)
 		.def("getValue", getValue)
 		.def("getAgentIds", &WorldWrap::getAgentIds)
+		.def("getNeighboursIds", &WorldWrap::getNeighboursIds)
 		.def("getAgent", getAgent, boost::python::return_value_policy<boost::python::reference_existing_object>())
 		.add_property("currentStep", &Engine::World::getCurrentStep)
 	;
