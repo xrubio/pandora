@@ -2,7 +2,7 @@
 <config>  
 	<!-- Global simulation parameters -->
 	<output resultsFile="data/gujarat.h5" logsDir="logs"/>
-	<numSteps value="10" serializeResolution="360"/>
+	<numSteps value="10" serializeResolution="1"/>
 	<!-- g to KJ -->
 	<massToEnergyRate value="20" />
 	<!-- 1 KCal = 4.184 KJ, Conversion Rate = 1/4.184 -->
@@ -39,13 +39,13 @@
 	<!-- * Available Forage Time = # hours a day the forage action takes -->
 	<!-- * forageTimeCost = how much time (in hours) does it cost the agent to exploit a tile resources -->
 	<hunterGatherers
-		num="100" homeRange="299"
+		num="10" homeRange="299"
 		adulthoodAge="15"
 		numSectors="8"
 		walkingSpeedHour="3000"
 		forageTimeCost="0.5"
 		demographicsModel="original"
-		controllerType="DecisionTree" >
+		controllerType="MDP" >
 		<!-- * width = number of trials before selecting an action, the higher the
 		 	the number, the more informed is the action selection and more
 			computation time is required -->
@@ -73,8 +73,8 @@
 	<!-- Raster storage options -->
 	<storeRaster name="soils" value="yes" />
 	<storeRaster name="dem" value="yes" />
-	<storeRaster name="moisture" value="no" />
-	<storeRaster name="resources" value="no" />
+	<storeRaster name="moisture" value="yes" />
+	<storeRaster name="resources" value="yes" />
 	<storeRaster name="forageActivity" value="no" />
 	<storeRaster name="homeActivity" value="no" />
 	<storeRaster name="farmingActivity" value="no" />
