@@ -3,6 +3,7 @@
 #define __BattlefieldConfig_hxx__
 
 #include <Config.hxx>
+#include <Point2D.hxx>
 #include <string>
 
 class TiXmlElement;
@@ -39,7 +40,7 @@ public:
 	int _redReloadingTime;
 	Tactics _redTactics;
 
-	int _size;
+	Engine::Point2D<int> _size;
 	// distance between opponent battle lines at the beginning of the simulation
 	int _initialDistance;
 

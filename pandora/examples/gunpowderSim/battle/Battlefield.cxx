@@ -46,9 +46,9 @@ void Battlefield::createAgents()
 
 	// 50 meters for each side
 	// 12 is 2 * 3 ranks * 2(0.5m)
-	int heightBoundary = _simulation.getSize() - _config._initialDistance- 12;
+	int heightBoundary = _simulation.getSize()._y - _config._initialDistance- 12;
 	heightBoundary /= 2;
-	int widthBoundary = (_simulation.getSize() - std::max(numBlueColumns, numRedColumns)*2)/2;
+	int widthBoundary = (_simulation.getSize()._x - std::max(numBlueColumns, numRedColumns)*2)/2;
 
 	for(int i=0; i<numBlueSoldiers; i++)
 	{
