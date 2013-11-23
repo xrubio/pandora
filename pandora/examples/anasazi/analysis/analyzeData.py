@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3.3
 
 import sys, random
 sys.path.append('/home/xrubio/workspace/pandora/pandora/pyPandora/')

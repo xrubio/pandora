@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3.3
 
 import sys
 import random
@@ -280,7 +280,7 @@ class Household(Agent):
 		if not isAtInit:
 			return
 
-		for i in xrange(0, 3):
+		for i in range(0, 3):
 			self._stock[i] = random.randrange(self.getWorld()._config._minInitialCorn, self.getWorld()._config._maxInitialCorn )
 		self._lastHarvest = self._stock[0]
 		
@@ -316,7 +316,7 @@ class Household(Agent):
 		self._stock[0] = self._lastHarvest
 
 		covered  = self.getWorld()._config._nutritionNeed
-		for i in xrange(len(self._stock)-1, -1, -1):
+		for i in range(len(self._stock)-1, -1, -1):
 			if self._stock[i] >= covered:
 				self._stock[i] = self._stock[i] - covered
 				return
@@ -352,7 +352,7 @@ class Household(Agent):
 		self.getWorld()._numIds = self.getWorld()._numIds + 1
 		self.getWorld().addAgent(child)
 		child.initHousehold(False)
-		for i in xrange(0, len(self._stock)):
+		for i in range(0, len(self._stock)):
 			child._stock[i] = self._stock[i]*self.getWorld()._config._maizeToGift
 			self._stock[i] = self._stock[i]-child._stock[i]
 	
@@ -394,13 +394,13 @@ class Valley(World):
 		self._waterSpots = []
 
 	def loadLandCover(self):
-		print 'loading: ' + self._config._landCover
+		print('loading: ',self._config._landCover)
 		f = open(self._config._landCover, 'r')
 		line = f.readline().split(' ')
 		index = 0
 
-		for i in xrange(0, self._config._size._x):
-			for j in xrange(0, self._config._size._y):
+		for i in range(0, self._config._size._x):
+			for j in range(0, self._config._size._y):
 				value = int(line[index])
 				maizeZone = maize.eEmpty
 				
@@ -448,11 +448,11 @@ class Valley(World):
 		return Point2DInt(xCell, yCell)
 
 	def loadWater(self):
-		print 'loading: ' + self._config._water
+		print('loading: ',self._config._water)
 		f = open(self._config._water, 'r')	
 		line = f.readline().split(' ')
 		index = 0
-		for i in xrange(0, 108):
+		for i in range(0, 108):
 			x = int(line[index+2])
 			y = int(line[index+1])
 
@@ -484,11 +484,11 @@ class Valley(World):
 		self._waterStaticLocations.append(Point2DInt(65, 12))
 	
 	def loadHistoricalSettlements(self):
-		print 'loading: ' + self._config._settlements
+		print('loading: ',self._config._settlements)
 		f = open(self._config._settlements, 'r')
 		line = f.readline().split(' ')
 		index = 0
-		for i in xrange(0, 488):
+		for i in range(0, 488):
 			settlement = HistoricalSettlement()
 			settlement._id = int(line[index])
 			
@@ -526,12 +526,12 @@ class Valley(World):
 		return apdsiValue.eLessMinusThree
 
 	def loadHydro(self):
-		print 'loading: ' + self._config._hydro
+		print('loading: ',self._config._hydro)
 		f = open(self._config._hydro, 'r')
 		line = f.readline().split(' ')
-		for i in xrange(800, 801+self._config._numSteps):
+		for i in range(800, 801+self._config._numSteps):
 			hydroStep = []
-			for j in xrange(0, 6):				
+			for j in range(0, 6):				
 				hydroStep.append(0)
 			index = 15*(i - 382)
 			hydroStep[terrain.eGeneral] = float(line[index+1])
@@ -545,12 +545,12 @@ class Valley(World):
 		f.close()
 	
 	def loadApdsi(self):
-		print 'loading: ' + self._config._apdsi
+		print('loading: ',self._config._apdsi)
 		f = open(self._config._apdsi, 'r')
 		line = f.readline().split(' ')
-		for i in xrange(800, 801+self._config._numSteps):
+		for i in range(800, 801+self._config._numSteps):
 			apdsiStep = []
-			for j in xrange(0, 6):
+			for j in range(0, 6):
 				apdsiStep.append(0)
 			apdsiStep[terrain.eGeneral] = self.getApdsi(float(line[i-200]))
 			apdsiStep[terrain.eNorth] = self.getApdsi(float(line[1100+i]))
@@ -562,9 +562,9 @@ class Valley(World):
 			self._apdsi.append(apdsiStep)
 
 			self._yieldTable = []
-			for i in xrange(0, 1+maize.eYield1):	
+			for i in range(0, 1+maize.eYield1):	
 				yieldEntry = []
-				for j in xrange(0, 1+apdsiValue.eLessMinusThree):
+				for j in range(0, 1+apdsiValue.eLessMinusThree):
 					yieldEntry.append(0)
 				if i==maize.eSandDune:
 				 	yieldEntry[apdsiValue.eThree]=1201
@@ -600,8 +600,8 @@ class Valley(World):
 
 	def loadData(self):
 		
-		for i in xrange(0, self._config._size._x):
-			for j in xrange(0, self._config._size._y):
+		for i in range(0, self._config._size._x):
+			for j in range(0, self._config._size._y):
 				self._locations.append(Point2DInt(i, j))
 
 		[self.fillQuality(location) for location in self._locations]
@@ -652,7 +652,7 @@ class Valley(World):
 		self.loadData()
 
 	def createAgents(self):
-		for i in xrange (1, 1+self._config._initialNumber):
+		for i in range (1, 1+self._config._initialNumber):
 			newAgent = Household('Household_'+str(i), i)
 			self.addAgent(newAgent)
 			newAgent.initHousehold(True)

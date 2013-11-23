@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3.3
 
 import sys
 import random
@@ -61,7 +61,7 @@ class Empire(Agent):
 			for index._y in range(0, self.getWorld()._config._size._y):
 				if self.getWorld().getValue("id", index) == self._empireId:
 					self._numRegions += 1
-		#print 'empire: ' + self.id + ' has: ' + str(self._numRegions) + ' regions'
+		#print('empire: ',self,' has: ',self._numRegions,' regions')
 
 	def calculateAverageAsabiya(self):
 		self._averageAsabiya = 0.0
@@ -73,7 +73,7 @@ class Empire(Agent):
 					self._averageAsabiya = self._averageAsabiya + float(self.getWorld().getValue("asabiya", index)/1000.0)
 
 		self._averageAsabiya = self._averageAsabiya/self._numRegions
-		#print "empire: " + self.id + " has average asabiya: " + str(self._averageAsabiya) + " containing: " + str(self._numRegions) + " regions"
+		#print('empire: ',self,' has average asabiya: ',self._averageAsabiya,' containing: ',self._numRegions,' regions')
 
 
 	def calculateCentre(self):	
@@ -89,7 +89,7 @@ class Empire(Agent):
 		centre._x = centre._x / self._numRegions 
 		centre._y = centre._y / self._numRegions 
 		self.position = centre
-		#print "centre of empire: " + self.id + " is: " +str(centre._x) + '/' + str(centre._y)
+		#print('centre of empire: ',self,' is: ',centre)
 
 	def updateState(self):
 		self.updateNumRegions()
@@ -136,7 +136,7 @@ class Frontier(World):
 
 		# first empire has a 3x3 zone
 		index = Point2DInt(0,0)
-		#print 'centre of empire : ' + str(newEmpire.position._x) + '/' + str(newEmpire.position._y)
+		#print('new empire: ',newEmpire)
 		for index._x in range(newEmpire.position._x-1, newEmpire.position._x+2):
 			for index._y in range(newEmpire.position._y-1, newEmpire.position._y+2):
 				if self.checkPosition(index):
@@ -171,14 +171,14 @@ class Frontier(World):
 					asabiya = float(self.getValue("asabiya", index)/1000.0)
 					newAsabiya = asabiya + self._config._asabiyaIncrease*asabiya*(1.0-asabiya)
 					self.setValue("asabiya", index, int(1000.0*newAsabiya))
-					#print '\tcell: ' + str(index._x) + "/" + str(index._y) + ' boundary had asabiya: ' + str(asabiya) + ' now: ' + str(self.getValue("asabiya", index)/1000.0)
+					#print('\tcell: ',index,' boundary had asabiya: ',asabiya,' now: ','self.getValue("asabiya", index)/1000.0))
 				else:
 					self.setValue("boundary", index, 0)
 					asabiya = float(self.getValue("asabiya", index)/1000.0)
 					newAsabiya = asabiya - self._config._asabiyaDecay*asabiya
 					# value must not be 0
 					self.setValue("asabiya", index, max(1, int(1000.0*newAsabiya)))
-					#print '\tcell: ' + str(index._x) + "/" + str(index._y)+ ' NOT boundary had asabiya: ' + str(asabiya) + ' now: ' + str(self.getValue("asabiya", index)/1000.0)
+					#print('\tcell: ',index,' NOT boundary had asabiya: ',asabiya,' now: ',self.getValue("asabiya", index)/1000.0))
 
 	def cleanEmpireRaster(self, empireId):
 		index = Point2DInt(0,0)
@@ -195,7 +195,7 @@ class Frontier(World):
 				empireIds = self.getAgentIds(index, 'Empire')
 				for empireId in empireIds:
 					empire = self.getAgent(empireId)
-					#print "empire: " + empireId + " has average asabiya: " + str(empire._averageAsabiya)
+					#print('empire: ',empire,' has average asabiya: ',empire._averageAsabiya)
 					"""
 					TODO which option is better?
 					if empire._averageAsabiya<self._config._minAsabiya:
@@ -205,7 +205,7 @@ class Frontier(World):
 						self.removeAgent(empire)
 					"""
 					if empire._numRegions==0:
-						#print "empire: " + empireId + " collapses"
+						#print('empire: ',empire,' collapsed')
 						self.cleanEmpireRaster(empire._empireId)
 						empire._numRegions = 0
 						empire.remove()

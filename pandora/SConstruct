@@ -73,10 +73,10 @@ if int(useMpi) == 1:
 	srcPyFiles.append('build_py/MpiStubCode.cxx')
 
 libsPython = libs
-libsPython += ['boost_python']
-libsPython += ['python2.7']
+libsPython += ['boost_python-py33']
+libsPython += ['python3.3m']
 includeDirsPython = includeDirs
-includeDirsPython += ['/usr/include/python2.7/']
+includeDirsPython += ['/usr/include/python3.3/']
 
 envPython.SharedLibrary(pythonLibraryName, srcPyFiles, CPPPATH=includeDirsPython, LIBS=libsPython, LIBPATH=libDirs )
 

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3.3
 
 import sys
 sys.path.append('..')
@@ -18,7 +18,7 @@ class MyWorld(World):
 		return
 
 	def stepEnvironment(self):
-		print 'executing step environment'
+		print('executing step environment')
 		raster = self.getDynamicRaster("test")
 		size = raster.getSize()
 		for i in range(0, size._x):

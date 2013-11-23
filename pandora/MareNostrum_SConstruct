@@ -39,14 +39,15 @@ for src in srcFiles:
 	srcBaseFiles.append('build/'+src)
 
 includeDirs = Split('. analysis/ /apps/HDF5/1.8.10-mpi/OPENMPI/include')
-includeDirs += ['/apps/BOOST/1_52_0/include/']
+includeDirs += ['/apps/BOOST/1_52_0_py_3.3.0/include/']
 includeDirs += ['/apps/TINYXML/2.6.2/include']
 includeDirs += ['/apps/GDAL/1.9.2/include']
 includeDirs += ['/apps/GRASS/6.4.3RC2/grass-6.4.3RC2/include/']
 
 libDirs = Split('/apps/HDF5/1.8.10-mpi/OPENMPI/lib /apps/GDAL/1.9.2/lib /apps/TINYXML/2.6.2/lib')
-libDirs += ['/apps/BOOST/1_52_0/lib/']
+libDirs += ['/apps/BOOST/1_52_0_py_3.3.0/lib/']
 libDirs += ['/apps/GRASS/6.4.3RC2/grass-6.4.3RC2/lib/']
+libDirs+= ['/apps/PYTHON/3.3.0/lib/']
 
 env.SharedLibrary(libraryName, srcBaseFiles, CPPPATH=includeDirs, LIBS=libs, LIBPATH=libDirs)
 
@@ -79,9 +80,9 @@ if int(useMpi) == 1:
 
 libsPython = libs
 libsPython += ['boost_python']
-libsPython += ['python2.7']
+libsPython += ['python3']
 includeDirsPython = includeDirs
-includeDirsPython += ['/usr/include/python2.7/']
+includeDirsPython += ['/apps/PYTHON/3.3.0/include/python3.3/']
 
 envPython.SharedLibrary(pythonLibraryName, srcPyFiles, CPPPATH=includeDirsPython, LIBS=libsPython, LIBPATH=libDirs )
 
