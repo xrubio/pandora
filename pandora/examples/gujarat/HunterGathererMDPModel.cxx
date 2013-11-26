@@ -351,9 +351,9 @@ void HunterGathererMDPModel::makeActionsForState(
 	agentRef().updateKnowledge( position, resourcesRaster, *HRActionSectors, *LRActionSectors, *HRCellPool, *LRCellPool );
 	
 	// MRJ: Remove empty sectors if any
-	for ( unsigned i = 0; i < LRActionSectors.size(); i++ )
+	for ( unsigned i = 0; i < LRActionSectors->size(); i++ )
 	{
-		if ( LRActionSectors[i]->isEmpty() )
+		if ( (*LRActionSectors)[i]->isEmpty() )
 		{
 			// You can't do that if you do not own it.
 			// Any delete is postponed at the end of lifecycle of the MDPState
@@ -362,8 +362,8 @@ void HunterGathererMDPModel::makeActionsForState(
 			// delete (*HRActionSectors)[i];
 			continue;
 		}
-		validActionSectors.push_back( LRActionSectors[i] );
-		sectorIdxMap[LRActionSectors[i]] = i;
+		validActionSectors.push_back( (*LRActionSectors)[i] );
+		sectorIdxMap[(*LRActionSectors)[i]] = i;
 	}	
 	//TODO why 2 reorderings??? first random, then according a predicate
 	//std::random_shuffle( validActionSectors.begin(), validActionSectors.end() );

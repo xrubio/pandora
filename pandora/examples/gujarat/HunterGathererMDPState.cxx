@@ -186,7 +186,7 @@ HunterGathererMDPState::HunterGathererMDPState(
 	
 }*/
 
-/*
+
 const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGathererMDPState& s )
 {	
 	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
@@ -247,13 +247,9 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	
 	_config = s._config;
 	
-<<<<<<< HEAD
-=======
-	
->>>>>>> 0aa3be22bf17f86e4692c8014542f71155e21823
 	return *this;
 }
-*/
+
 
 
 HunterGathererMDPState::~HunterGathererMDPState()
