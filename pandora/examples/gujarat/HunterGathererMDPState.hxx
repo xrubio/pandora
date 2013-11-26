@@ -128,7 +128,7 @@ public:
 
 	void		increaseTimeIndex() { _timeIndex++; }
 	unsigned	getTimeIndex() const { return _timeIndex; }
-	int			getOnHandResources() const { return _onHandResources; }
+	int		getOnHandResources() const { return _onHandResources; }
 	void addResources( int amt )
 	{
 		_onHandResources += amt;
@@ -172,9 +172,9 @@ public:
 
 	//void					spoilage( float v ) { _onHandResources = (float)_onHandResources * v; }
 	void setLocation( Engine::Point2D<int> newLoc ) { _mapLocation = newLoc; }
-	const Engine::Point2D<int>& 		getLocation() const { return _mapLocation; }
-	Engine::IncrementalRaster& 			getResourcesRaster() { return _resources; }
-	const Engine::IncrementalRaster& 	getResourcesRaster() const { return _resources; }
+	const Engine::Point2D<int>& getLocation() const { return _mapLocation; }
+	Engine::IncrementalRaster& getResourcesRaster() { return _resources; }
+	const Engine::IncrementalRaster& getResourcesRaster() const { return _resources; }
 
 	void addAction( MDPAction* a );
 	MDPAction* availableActions( Problem::action_t actIndex ) 
@@ -188,7 +188,6 @@ public:
 
 	unsigned numAvailableActions() const { return _numAvailableActionsWhenBorn; }
 
-	
 	void	computeHash();
 	
 	std::vector< Sector* > * getHRActionSectors() const { return _HRActionSectors; }

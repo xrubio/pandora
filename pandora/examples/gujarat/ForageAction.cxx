@@ -1036,8 +1036,7 @@ void	ForageAction::doLRVicinityWalk( GujaratAgent& agent, const Engine::Point2D<
 		while ( nonVisited > 0 && (( walkedDist + distHome ) < maxDist) )
 		{
 			Engine::Point2D<int> bestHR;
-			int bestScoreHR = 0;
-			int amtCollected;
+			int bestScoreHR = 0;			
 
 			//**************************************************************
 			
@@ -1123,7 +1122,7 @@ void	ForageAction::doClassicalWalk( GujaratAgent& agent, const Engine::Point2D<i
 	}
 	
 	//std::cout << "res " << collected << " loops " << loops << " wd " << walkedDist << " dH " << distHome << " mD " << maxDist << std::endl;
-	std::cout << "LOOP " << collected << "," << loops << "," << walkedDist << "," << distHome << "," << maxDist << std::endl;
+	//std::cout << "LOOP " << collected << "," << loops << "," << walkedDist << "," << distHome << "," << maxDist << std::endl;
 	
 	// update l'LRraster??? and LRsectors???
 	// One action per timestep -> Next time I need LRraster and LRsectors they will be updated by
@@ -1219,8 +1218,6 @@ void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>
 	int collected = 0;
 
 	doWalk( agent, nearest, maxDist, sp.getResourcesRaster(), collected );
-//*? ucthack
-collected=0;	
 		
 	sp.addResources( agent.convertBiomassToCalories(collected));
 	//std::cout << "executeMDP - time index: " << s.getTimeIndex() << " ForageAction with full pop: " << _useFullPopulation << " from area with max biomass: " << _forageArea->getBiomassAmount() << " loc->resources: " << s.getLocation() << " -> " << s.getOnHandResources() << " to: " << sp.getLocation() << " -> " << sp.getOnHandResources() << " days starving: " << s.getDaysStarving() << std::endl;

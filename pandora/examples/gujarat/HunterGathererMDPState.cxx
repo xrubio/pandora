@@ -13,13 +13,13 @@ namespace Gujarat
 
 /*
 HunterGathererMDPState::HunterGathererMDPState() : _timeIndex(0), _mapLocation(-1,-1), _onHandResources(0), _maxResources(0), _resourcesDivider(1), _daysStarving(0), _isCopy( false)
-, _HRActionSectors( HunterGathererMDPState::_emptySectorVector )
-, _LRActionSectors( HunterGathererMDPState::_emptySectorVector )
-, _HRCellPool( HunterGathererMDPState::_emptyCellPool )
-, _LRCellPool( HunterGathererMDPState::_emptyCellPool )	
+, _HRActionSectors( 0 )
+, _LRActionSectors( 0 )
+, _HRCellPool( 0 )
+, _LRCellPool( 0 )	
 {
-}*/
-
+}
+*/
 
 HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s )
 : _timeIndex( s._timeIndex )
@@ -111,16 +111,6 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 		_ownItems[i] = ownItems[i];
 	}
 	
-//*?
-	/*
-	for ( unsigned k = 0; k < s._availableActions.size(); k++ )
-	{
-		//*?
-		addAction( s._availableActions[k]->copy() );
-		//addAction( s._availableActions[k] );
-	}
-	assert( s._availableActions.size() == _availableActions.size() );
-	*/
 	registerKnowledgeStructuresAtCounterMap();
 	
 }
@@ -196,7 +186,7 @@ HunterGathererMDPState::HunterGathererMDPState(
 	
 }*/
 
-
+/*
 const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGathererMDPState& s )
 {	
 	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
@@ -206,7 +196,6 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	
 	_dni=dniTicket ();
 	
-	//log_INFO(logName.str(),"XXXX CREA 4:" << s._dni << "->" << _dni);
 	_creator=4;
 	
 	_timeIndex 		 = s._timeIndex;
@@ -223,22 +212,8 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	_mapLock = s._mapLock;
 	
 	
-	/*std::cout << "CREA 4 : source "<<s._dni<<" with "<< (long)&s._LRActionSectors <<" has " ;
-	for(int i=0; i <s._LRActionSectors->size(); i++)
-		std::cout << " " << s.(*_LRActionSectors)[i]->_dni;
-	
-	std::cout << std::endl;
-	
-	std::cout << "CREA 4 : receiver "<<_dni<<" with "<< (long)&_LRActionSectors <<" has " ;
-	for(int i=0; i <_LRActionSectors->size(); i++)
-		std::cout << " " << (*_LRActionSectors)[i]->_dni;
-	
-	std::cout << std::endl;
-	*/
-	
 //	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
 	
-
 	_HRActionSectors = s._HRActionSectors;
 	_LRActionSectors = s._LRActionSectors;
 	_HRCellPool = s._HRCellPool;
@@ -274,7 +249,7 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	
 	return *this;
 }
-
+*/
 
 
 HunterGathererMDPState::~HunterGathererMDPState()
