@@ -64,7 +64,6 @@ ProjectConfiguration::~ProjectConfiguration()
 
 void ProjectConfiguration::cleanSimulationRecord()
 {
-	_resolution = 1;	
 	if(_simulationRecord)
 	{
 		delete _simulationRecord;

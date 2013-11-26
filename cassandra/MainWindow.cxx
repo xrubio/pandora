@@ -619,7 +619,7 @@ void MainWindow::loadSimulationFinished( bool correct )
 	}
 }
 
-void MainWindow::show3Dagent(QTreeWidgetItem * item, int i)
+void MainWindow::show3Dagent(QTreeWidgetItem * item, int )
 {
     if (item->child(0) != 0);
     else
