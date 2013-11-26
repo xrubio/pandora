@@ -23,7 +23,6 @@
 #include <AgentRecord.hxx>
 #include <Exceptions.hxx>
 
-#include <iostream>
 #include <sstream>
 
 namespace Engine

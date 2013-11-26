@@ -25,6 +25,7 @@
 #include <GeneralState.hxx>
 #include <RasterLoader.hxx>
 
+#include <mpi.h>
 #include <iostream>
 #include <sstream>
 #include <vector>

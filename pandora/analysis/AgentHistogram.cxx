@@ -2,7 +2,6 @@
 #include <analysis/AgentHistogram.hxx>
 #include <AgentRecord.hxx>
 #include <SimulationRecord.hxx>
-#include <iostream>
 #include <fstream>
 
 namespace PostProcess 

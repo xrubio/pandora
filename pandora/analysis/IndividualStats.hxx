@@ -24,7 +24,6 @@
 
 #include <analysis/Output.hxx>
 #include <list>
-#include <iostream>
 #include <fstream>
 #include <iomanip>
 

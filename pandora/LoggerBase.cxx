@@ -23,7 +23,6 @@
 #include <LoggerBase.hxx>
 
 #include <boost/filesystem.hpp>
-#include <iostream>
 #include <sstream>
 
 namespace Engine

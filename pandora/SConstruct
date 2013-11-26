@@ -73,8 +73,8 @@ if int(useMpi) == 1:
 	srcPyFiles.append('build_py/MpiStubCode.cxx')
 
 libsPython = libs
-libsPython += ['boost_python-py33']
 libsPython += ['python3.3m']
+libsPython += ['boost_python-py33']
 includeDirsPython = includeDirs
 includeDirsPython += ['/usr/include/python3.3/']
 

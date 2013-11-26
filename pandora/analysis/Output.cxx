@@ -25,6 +25,7 @@
 #include <analysis/Analysis.hxx>
 #include <SimulationRecord.hxx>
 
+#include <mpi.h>
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -39,27 +40,6 @@ Output::Output( const std::string & separator ) : _separator(separator)
 Output::~Output()
 {
 }
-
-
-
-/*
-RasterResults::RasterResults( const Engine::SimulationRecord & simRecord, const std::string & outputFile, const std::string & type, const std::string & separator ) : Results(simRecord, outputFile, type, separator)
-{
-}
-
-void RasterResults::concreteApply() const
-{
-	// TODO what about static rasters?
-	const Engine::SimulationRecord::RasterHistory & rasterHistory = _simRecord.getRasterHistory(_type);
-	for(AnalysisList::const_iterator itL=_analysisList.begin(); itL!=_analysisList.end(); itL++)
-	{
-		std::cout << "Computing analysis: " << (*itL)->getName() << "...";
-		RasterAnalysis * analysis = (RasterAnalysis*)(*itL);
-		analysis->computeRaster(rasterHistory);
-		std::cout << " done" << std::endl;
-	}
-}
-*/
 
 void Output::preProcess(  const Engine::SimulationRecord & simRecord, const std::string & outputFile )
 {

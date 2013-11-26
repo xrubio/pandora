@@ -26,7 +26,6 @@
 #include <sstream>
 #include <cmath>
 
-#include <iostream>
 #include <cstdlib>
 
 #include <Interval.hxx> 
@@ -78,8 +77,6 @@ public:
 		// Point2D size = Point2D(iOX._max – iOX._min +1, iOY._max – iOY._min +1);	
 		_size._x = iOX._max - iOX._min +1;
 		_size._y = iOY._max - iOY._min +1;		
-		
-		//std::cout << "intev2Rect:"<<  iOX._min << "," <<  iOY._min << "|" <<  iOX._max << "," <<  iOY._max << std::endl;
 	}	
 	
 	bool intersection(const Rectangle<Type> other, Rectangle<Type> & result)
@@ -92,8 +89,6 @@ public:
 		Interval<Type> R2_OX(other._origin._x,other._origin._x + other._size._x -1);		
 		Interval<Type> R2_OY(other._origin._y,other._origin._y + other._size._y -1);	
 
-//std::cout << R1_OX << R1_OY	<< "&&" <<R2_OX << R2_OY << "?" << std::endl;
-		
 		Interval<Type> Intersection_OX;
 		if (! R1_OX.intersection(R2_OX,Intersection_OX) )
 		{
@@ -106,8 +101,6 @@ public:
 		{
 			return false;
 		}
-		
-//std::cout << Intersection_OX << Intersection_OY << std::endl;
 
 		result.intervals2Rectangle(Intersection_OX,Intersection_OY);
 		

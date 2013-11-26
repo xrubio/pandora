@@ -23,7 +23,6 @@
 #ifndef __Config__hxx__ 
 #define __Config__hxx__
 
-#include <iostream>
 #include <cstdlib>
 #include <tinyxml.h>
 #include <string>

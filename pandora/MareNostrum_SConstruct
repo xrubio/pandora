@@ -15,13 +15,13 @@ env.VariantDir('build', '.')
 libs = Split('pthread gdal hdf5 z tinyxml grass_gis boost_filesystem boost_system gomp')
 
 if int(release) == 0:
-	env['CCFLAGS'] = Split('-g -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG')
+	env['CCFLAGS'] = Split('-g -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG -DMPICH_IGNORE_CXX_SEEK')
 	if int(extremeDebug)==1:
 		env['CCFLAGS'] += ['-DPANDORAEDEBUG']
 	libraryName = 'pandorad'
 	pythonLibraryName = 'pyPandorad'
 else:
-	env['CCFLAGS'] = Split('-O3 -Wall -DTIXML_USE_STL -fopenmp')
+	env['CCFLAGS'] = Split('-O3 -Wall -DTIXML_USE_STL -fopenmp -DMPICH_IGNORE_CXX_SEEK')
 	libraryName = 'pandora'
 	pythonLibraryName = 'pyPandora'
 
@@ -47,7 +47,6 @@ includeDirs += ['/apps/GRASS/6.4.3RC2/grass-6.4.3RC2/include/']
 libDirs = Split('/apps/HDF5/1.8.10-mpi/OPENMPI/lib /apps/GDAL/1.9.2/lib /apps/TINYXML/2.6.2/lib')
 libDirs += ['/apps/BOOST/1_52_0_py_3.3.0/lib/']
 libDirs += ['/apps/GRASS/6.4.3RC2/grass-6.4.3RC2/lib/']
-libDirs+= ['/apps/PYTHON/3.3.0/lib/']
 
 env.SharedLibrary(libraryName, srcBaseFiles, CPPPATH=includeDirs, LIBS=libs, LIBPATH=libDirs)
 
@@ -60,11 +59,11 @@ envPython['LINKFLAGS'] = Split('-Wl,--export-dynamic,-no-undefined')
 envPython.VariantDir('build_py', '.')
 
 if int(release) == 0:
-	envPython['CCFLAGS'] = Split('-g -Wall -DTIXML_USE_STL -DPANDORADEBUG')	
+	envPython['CCFLAGS'] = Split('-g -Wall -DTIXML_USE_STL -DPANDORADEBUG -DMPICH_IGNORE_CXX_SEEK')	
 	if int(extremeDebug)==1:
 		envPython['CCFLAGS'] += ['-DPANDORAEDEBUG']
 else:
-	envPython['CCFLAGS'] = Split('-O3 -Wall -DTIXML_USE_STL')
+	envPython['CCFLAGS'] = Split('-O3 -Wall -DTIXML_USE_STL -DMPICH_IGNORE_CXX_SEEK')
 
 if int(useMpi)==1:
 	envPython['CCFLAGS'] += ['-DPANDORAMPI']
@@ -79,10 +78,13 @@ if int(useMpi) == 1:
 	srcPyFiles.append('build_py/MpiStubCode.cxx')
 
 libsPython = libs
-libsPython += ['boost_python']
-libsPython += ['python3']
+libDirsPython = libDirs
 includeDirsPython = includeDirs
+
+libsPython += ['python3.3m']
+libsPython += ['boost_python3']
+libDirsPython += ['/apps/PYTHON/3.3.0/lib/']
 includeDirsPython += ['/apps/PYTHON/3.3.0/include/python3.3/']
 
-envPython.SharedLibrary(pythonLibraryName, srcPyFiles, CPPPATH=includeDirsPython, LIBS=libsPython, LIBPATH=libDirs )
+envPython.SharedLibrary(pythonLibraryName, srcPyFiles, CPPPATH=includeDirsPython, LIBS=libsPython, LIBPATH=libDirsPython )
 

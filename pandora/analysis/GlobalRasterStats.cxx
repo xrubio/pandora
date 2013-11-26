@@ -21,6 +21,7 @@
 
 #include <analysis/GlobalRasterStats.hxx>
 #include <analysis/Analysis.hxx>
+#include <mpi.h>
 #include <iostream>
 #include <fstream>
 #include <iomanip>

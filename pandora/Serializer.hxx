@@ -27,6 +27,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <mpi.h>
 
 namespace Engine
 {

@@ -34,8 +34,6 @@
 #include <GeneralState.hxx>
 #include <Statistics.hxx>
 
-#include <iostream>
-
 namespace Engine
 {
 

@@ -22,8 +22,6 @@
 #ifndef __INTERVAL_HXX_
 #define __INTERVAL_HXX_
 
-#include <iostream>
-
 namespace Engine
 {
 

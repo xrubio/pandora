@@ -21,7 +21,6 @@
  */
 #include <IncrementalRaster.hxx>
 #include <limits>
-#include <iostream>
 
 namespace Engine 
 {

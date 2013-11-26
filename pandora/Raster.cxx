@@ -25,7 +25,6 @@
 #include <Exceptions.hxx>
 
 #include <sstream>
-#include <iostream>
 #include <limits>
 
 namespace Engine
