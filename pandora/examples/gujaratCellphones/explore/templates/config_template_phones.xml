@@ -5,7 +5,7 @@
 	<output resultsFile="./data/phones.h5" logsDir="./logs"/>
 	<numSteps value="24001" serializeResolution="240"/>
 	<environment>
-		<landscape size="60" averageResources="1000"/>
+		<landscape width="60" height="60" averageResources="1000"/>
 		<climate seed="CLIMATESEED" daysDrySeason="240" meanRain="4643.848" stddev="0.001"/>
 	</environment>
 	<population>

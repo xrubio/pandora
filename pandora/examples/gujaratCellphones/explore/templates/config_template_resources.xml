@@ -4,7 +4,7 @@
         <output resultsFile="/gpfs/projects/bsc21/WORK-RUBIO/gujaratCellphone/resources/data_resourcesRESOURCES_exNUMEXEC/phones.h5" logsDir="/gpfs/projects/bsc21/WORK-RUBIO/gujaratCellphone/resources/logs_resourcesRESOURCES_exNUMEXEC"/>
 	<numSteps value="24001" serializeResolution="240"/>
 	<environment>
-		<landscape size="60" averageResources="1000"/>
+		<landscape width="60" height="60" averageResources="1000"/>
 		<climate seed="CLIMATESEED" daysDrySeason="240" meanRain="4643.848" stddev="1885.18"/>
 	</environment>
 	<population>
