@@ -13,7 +13,6 @@ sys.path.append('../../../scripts/')
 import generateMpi 
 
 release = ARGUMENTS.get('release', 1)
-mareNostrum = ARGUMENTS.get('mn', 0)
 extremeDebug = ARGUMENTS.get('edebug', 0)
 useMpi = ARGUMENTS.get('mpi', 1)
 
@@ -41,24 +40,12 @@ if int(useMpi)==1:
 
 includeDirs = Split('./ ../../../')
 
-if int(mareNostrum)==1:		
-	includeDirs += ['/apps/HDF5/1.8.10-mpi/OPENMPI/include']
-	includeDirs += ['/apps/BOOST/1_52_0/include/']
-	includeDirs += ['/apps/TINYXML/2.6.2/include']
-	includeDirs += ['/apps/GDAL/1.9.2/include']
-	includeDirs += ['/apps/GRASS/6.4.3RC2/grass-6.4.3RC2/include/']
-	libs += ['hdf5','gdal','boost_filesystem','boost_system']
-	libDirs = Split('../../../ /apps/HDF5/1.8.10-mpi/OPENMPI/lib /apps/GDAL/1.9.2/lib /apps/TINYXML/2.6.2/lib')
-	libDirs += ['/apps/BOOST/1_52_0/lib/']
-	libDirs += ['/apps/GRASS/6.4.3RC2/grass-6.4.3RC2/lib/']
-else:
-	includeDirs += ['/usr/lib/grass64/include/','/usr/include/gdal/']
-	libDirs = ['../../../', '/usr/lib/grass64/lib/']
-
-	if int(useMpi)==1:
-		includeDirs += ['/usr/local/hdf5/include']
-		libDirs += ['usr/local/hdf5/lib/']
-	libs += ['mpl']
+includeDirs += ['/usr/lib/grass64/include/','/usr/include/gdal/']
+libDirs = ['../../../', '/usr/lib/grass64/lib/']
+if int(useMpi)==1:
+	includeDirs += ['/usr/local/hdf5/include']
+	libDirs += ['usr/local/hdf5/lib/']
+libs += ['mpl']
 
 # add the list of mpi code that must be generated & compiled
 mpiAgentsSrc = ['mpiCode/FactoryCode.cxx']
