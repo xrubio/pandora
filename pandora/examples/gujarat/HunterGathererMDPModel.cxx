@@ -91,13 +91,12 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 						, agentRef().getOnHandResources()
 						, agentRef().getLRResourcesRaster()
 						, _config.getHorizon()
-					, agentRef().computeConsumedResources(1)
+						, agentRef().computeConsumedResources(1)
 						, &agentRef().getHRSectorsNoConst()
 						, LRActionSectors 
 						, &agentRef().getHRCellPoolNoConst()	, &agentRef().getLRCellPoolNoConst()	, ownsItems
 						, _simAgent->getObjectUseCounter()	, mapLock
 						, actionList);
-						
 											
 	//std::cout << "creat MDPState:" << _initial->_dni << std::endl;
 	
@@ -260,6 +259,7 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		
 	
 	std::vector<MDPAction *>  actionList;
+
 	makeActionsForState(s, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, actionList);
 	
 	//s.initializeSuccessor(sp,ownership);
@@ -272,9 +272,7 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 	act->executeMDP( agentRef(), s, sp );
 	applyFrameEffects( s, sp );
 	sp.computeHash();	
-
 	
-	//assert(sp._numAvailableActionsWhenBorn == sp.numAvailableActions() );
 	outcomes.push_back( std::make_pair(sp, 1.0) );
 }
 
@@ -310,6 +308,7 @@ void HunterGathererMDPModel::makeActionsForState(
 				, std::vector< Engine::Point2D<int> > * HRCellPool
 				, std::vector< Engine::Point2D<int> > * LRCellPool
 				, std::vector<MDPAction *>&  actionList) const
+			     
 {
 	makeActionsForState( 
 			     parent.getResourcesRaster(),
@@ -327,13 +326,13 @@ void HunterGathererMDPModel::makeActionsForState(
  * @param actionList List of executable actions
  */
 void HunterGathererMDPModel::makeActionsForState(
-			      const Engine::IncrementalRaster & resourcesRaster,
-			      const Engine::Point2D<int> &position,
-			       std::vector< Sector* >* HRActionSectors, 
-			       std::vector< Sector* >* LRActionSectors, 
-			       std::vector< Engine::Point2D<int> >* HRCellPool,
-			       std::vector< Engine::Point2D<int> >* LRCellPool,
-			      std::vector<MDPAction *>&  actionList) const
+			      const Engine::IncrementalRaster & resourcesRaster
+			      , const Engine::Point2D<int> &position
+			      , std::vector< Sector* >* HRActionSectors
+			      , std::vector< Sector* >* LRActionSectors
+			      , std::vector< Engine::Point2D<int> >* HRCellPool
+			      , std::vector< Engine::Point2D<int> >* LRCellPool
+			      , std::vector<MDPAction *>&  actionList) const
 {
 	// Map from "sector memory address" to "sector integer identifier".
 	// After sorting validActionSectors I need to access both the HR and the LR sector
@@ -352,9 +351,9 @@ void HunterGathererMDPModel::makeActionsForState(
 	agentRef().updateKnowledge( position, resourcesRaster, *HRActionSectors, *LRActionSectors, *HRCellPool, *LRCellPool );
 	
 	// MRJ: Remove empty sectors if any
-	for ( unsigned i = 0; i < LRActionSectors->size(); i++ )
+	for ( unsigned i = 0; i < LRActionSectors.size(); i++ )
 	{
-		if ( (*LRActionSectors)[i]->isEmpty() )
+		if ( LRActionSectors[i]->isEmpty() )
 		{
 			// You can't do that if you do not own it.
 			// Any delete is postponed at the end of lifecycle of the MDPState
@@ -363,8 +362,8 @@ void HunterGathererMDPModel::makeActionsForState(
 			// delete (*HRActionSectors)[i];
 			continue;
 		}
-		validActionSectors.push_back( (*LRActionSectors)[i] );
-		sectorIdxMap[(*LRActionSectors)[i]] = i;
+		validActionSectors.push_back( LRActionSectors[i] );
+		sectorIdxMap[LRActionSectors[i]] = i;
 	}	
 	//TODO why 2 reorderings??? first random, then according a predicate
 	//std::random_shuffle( validActionSectors.begin(), validActionSectors.end() );
@@ -426,7 +425,9 @@ void HunterGathererMDPModel::makeActionsForState(
 	// Reference to structures that could reference structures from a MDPState cannot be destroyed. The MDPState's will destroy the ones created and are owned.	
 	//HRActionSectors.clear();
 	//LRActionSectors.clear();
-	//std::cout << "finished creating actions for state with time index: " << s.getTimeIndex() << " and resources: " << s.getOnHandResources() << std::endl;
+	//std::cout << "finished creating actions for state with time index: " << parent.getTimeIndex() << " and resources: " << parent.getOnHandResources() << std::endl;
 } 
 
+
+  
 }

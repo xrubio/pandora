@@ -6,3 +6,9 @@ pandora/build_py/
 *.swp
 *.so
 *.pyc
+
+
+# Logs, debug traces, etc.
+*.log
+callgrind.out.*
+*#

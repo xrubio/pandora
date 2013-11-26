@@ -109,12 +109,9 @@ public:
 							, std::vector< Sector* > * LRActionSectors
 							, std::vector< Engine::Point2D<int> > * HRCellPool
 							, std::vector< Engine::Point2D<int> > * LRCellPool
-							, std::vector< bool > ownsItems 
-							, const std::vector<MDPAction *>& actionList);
-	
-	
-	const HunterGathererMDPState&	operator=(const HunterGathererMDPState& s );
-	
+							, std::vector< bool > ownsItems
+			                               , const std::vector<MDPAction *>& actionList);
+		
 	~HunterGathererMDPState();
 
 	//void		initializeSuccessor( HunterGathererMDPState& s, const std::vector< bool > ownership ) const;
@@ -176,18 +173,16 @@ public:
 	Engine::IncrementalRaster& getResourcesRaster() { return _resources; }
 	const Engine::IncrementalRaster& getResourcesRaster() const { return _resources; }
 
-	void addAction( MDPAction* a );
 	MDPAction* availableActions( Problem::action_t actIndex ) 
 		{ return _availableActions.at(actIndex); }
 	const MDPAction* availableActions( Problem::action_t actIndex ) const 
 		{ return _availableActions.at(actIndex); }
 
-	//unsigned numAvailableActions() const { return _availableActions.size(); }
+	unsigned numAvailableActions() const { return _numAvailableActionsWhenBorn; }
 
 	unsigned numAvailableActionsWhenBorn() const { return _numAvailableActionsWhenBorn; }
 
-	unsigned numAvailableActions() const { return _numAvailableActionsWhenBorn; }
-
+	
 	void	computeHash();
 	
 	std::vector< Sector* > * getHRActionSectors() const { return _HRActionSectors; }
@@ -215,7 +210,8 @@ public:
 	//*? ucthack	
 	void makeActionsForState( HunterGatherer * agentRef);
 
-	
+	const HunterGathererMDPState&	operator=(const HunterGathererMDPState& s );	
+		
 private:
 	unsigned		_timeIndex;
 	Engine::Point2D<int>	_mapLocation;
@@ -228,6 +224,9 @@ private:
 	int			_resourcesDivider;
 	int 			_daysStarving;
 	bool			_isCopy;
+	
+	void addAction( MDPAction* a );
+
 };
 
 //std::vector<abc> xyz::myvector;

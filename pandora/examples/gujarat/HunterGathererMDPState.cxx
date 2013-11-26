@@ -40,6 +40,7 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 , _agentRef(s._agentRef)
 ,_config(s._config)
 ,_numAvailableActionsWhenBorn(s._availableActions.size())
+//,_availableActions(s._availableActions)
 {
 	std::stringstream logName;
 	logName << "infoshar";
@@ -56,9 +57,10 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 		_ownItems[i] = s._ownItems[i];
 	}
 	
+	
 	for ( unsigned k = 0; k < s._availableActions.size(); k++ )
 	{
-		//*?
+		// avoiding segm fault through copy
 		addAction( s._availableActions[k]->copy() );
 		//addAction( s._availableActions[k] );
 	}
@@ -76,7 +78,7 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 						, std::vector< Engine::Point2D<int> > * HRCellPool
 						, std::vector< Engine::Point2D<int> > * LRCellPool
 						, std::vector< bool > ownItems
-					      , const std::vector<MDPAction *>& actionList )
+					        , const std::vector<MDPAction *>& actionList)
 : _timeIndex( s._timeIndex )
 , _mapLocation( s._mapLocation )
 , _onHandResources( s._onHandResources )
@@ -134,7 +136,6 @@ HunterGathererMDPState::HunterGathererMDPState(
 			, omp_lock_t * mapLock
 			, const std::vector<MDPAction *>&  actionList)
 
-
 	: _timeIndex(0)
 	, _mapLocation( loc )
 	, _onHandResources( initResources )
@@ -151,10 +152,9 @@ HunterGathererMDPState::HunterGathererMDPState(
 	, _objectUseCounter(objectUseCounter)
 	, _mapLock(mapLock)
 	, _agentRef(agentRef)
-	, _config(config)
+	,_config(config)
 	,_availableActions(actionList)
 	,_numAvailableActionsWhenBorn(actionList.size())
-
 {
 	std::stringstream logName;
 	logName << "infoshar";	
@@ -247,6 +247,10 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	
 	_config = s._config;
 	
+<<<<<<< HEAD
+=======
+	
+>>>>>>> 0aa3be22bf17f86e4692c8014542f71155e21823
 	return *this;
 }
 */

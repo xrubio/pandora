@@ -90,9 +90,7 @@ protected:
 			      , std::vector< Engine::Point2D<int> >* HRCellPool
 			      , std::vector< Engine::Point2D<int> >* LRCellPool
 			      , std::vector<MDPAction *>& actionList) const;
-
-				
-				
+	
 	void	applyFrameEffects( const HunterGathererMDPState& s,  HunterGathererMDPState& sp ) const;
 private:
 
