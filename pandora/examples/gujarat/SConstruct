@@ -89,7 +89,7 @@ else:
 
 	if int(useMpi)==1:
 		includeDirs += ['/usr/local/hdf5/include']
-		libDirs += ['usr/local/hdf5/lib/']
+		libDirs += ['/usr/local/hdf5/lib/']
 	libs += ['mpl']
 
 # add the list of mpi code that must be generated & compiled
