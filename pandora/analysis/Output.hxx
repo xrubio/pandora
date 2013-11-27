@@ -51,26 +51,6 @@ public:
 	virtual std::string getName() const = 0;
 };
 
-/*
-class AgentOutput : public Output
-{
-	void concreteApply() const;
-public:
-	AgentOutput( const Engine::SimulationRecord & simRecord, const std::string & outputFile, const std::string & type, const std::string & separator = ";" );
-	virtual ~AgentOutput(){}
-};
-*/
-
-/*
-class RasterOutput : public Output
-{
-	void concreteApply() const;
-public:
-	RasterOutput( const Engine::SimulationRecord & simRecord, const std::string & outputFile, const std::string & type, const std::string & separator = ";" );
-	virtual ~RasterOutput(){}
-};
-*/
-
 } // namespace PostProcess
 
 #endif // __Output_hxx__

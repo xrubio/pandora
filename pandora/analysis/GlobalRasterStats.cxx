@@ -144,7 +144,7 @@ void GlobalRasterStats::apply( const Engine::SimulationRecord & simRecord, const
 		if(_analysisList.size()==1)
 		{
 			RasterAnalysis * analysis = *(_analysisList.begin());
-			for(int i=0; i<simRecord.getNumSteps(); i+=simRecord.getFinalResolution())
+			for(int i=0; i<simRecord.getNumSteps()/simRecord.getFinalResolution(); i++)
 			{
 				line << _separator << std::setprecision(2) << std::fixed << analysis->getResult(i);
 			}

@@ -153,9 +153,9 @@ void GlobalAgentStats::apply( const Engine::SimulationRecord & simRecord, const 
 		if(_analysisList.size()==1)
 		{
 			AgentAnalysis * analysis = *(_analysisList.begin());
-			for(int i=0; i<simRecord.getNumSteps(); i+=simRecord.getFinalResolution())
+			for(int i=0; i<=simRecord.getNumSteps(); i=i+simRecord.getFinalResolution())
 			{
-				line << _separator << std::setprecision(2) << std::fixed << analysis->getResult(i);
+				line << _separator << std::setprecision(2) << std::fixed << analysis->getResult(i/simRecord.getFinalResolution());
 			}
 		}
 		// outcome at the end of simulation for several attributes
