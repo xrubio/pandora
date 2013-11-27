@@ -34,7 +34,7 @@
 namespace GUI
 {
 
-AnalysisControlThread::AnalysisControlThread( const std::string & baseDir, const std::string & agentType, const std::string & outputDir, int resolution) : _baseDir(baseDir), _agentType(agentType), _outputDir(outputDir), _numberOfSimulations(0), _resolution(resolution)
+AnalysisControlThread::AnalysisControlThread( const std::string & baseDir, const std::string & type, const std::string & outputDir, int resolution, bool isRaster ) : _baseDir(baseDir), _type(type), _outputDir(outputDir), _numberOfSimulations(0), _resolution(resolution), _isRaster(isRaster)
 {
 	// compute number of simulations to analyse
 	for( boost::filesystem::directory_iterator it(_baseDir); it!=boost::filesystem::directory_iterator(); it++ )
@@ -107,13 +107,13 @@ void AnalysisControlThread::analyseSimulation( const std::string & dataFile, con
 {
 	std::cout << "analysing file: " << dataFile << std::endl;
 	Engine::SimulationRecord record(_resolution, true);
-	record.loadHDF5(dataFile, false, true);
+	record.loadHDF5(dataFile, _isRaster, !_isRaster);
 
 	std::stringstream oss;
 	oss << _outputDir << "/" << fileName << ".csv";
 	std::cout << "output to: " << oss.str() << std::endl;
 
-	_output->apply(record, oss.str(), _agentType);
+	_output->apply(record, oss.str(), _type);
 }
 
 void AnalysisControlThread::setOutput( PostProcess::Output * output )

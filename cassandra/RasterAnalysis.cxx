@@ -20,28 +20,29 @@
  * 
  */
 
-#include <AgentAnalysis.hxx>
+#include <RasterAnalysis.hxx>
 #include <boost/filesystem.hpp>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <SimulationRecord.hxx>
 #include <QCheckBox>
 
-#include <TraitAnalysisSelection.hxx>
+#include <RasterAnalysisSelection.hxx>
 #include <RunAnalysis.hxx>
 #include <AnalysisControlThread.hxx>
 
-#include <AgentMean.hxx>
-#include <AgentSum.hxx>
-#include <AgentStdDev.hxx>
+#include <RasterMean.hxx>
+#include <RasterSum.hxx>
+//#include <RasterStdDev.hxx>
+/*
 #include <IndividualStats.hxx>
-#include <AgentHistogram.hxx>
 #include <AgentHDFtoSHP.hxx>
+*/
 
 namespace GUI
 {
 
-AgentAnalysis::AgentAnalysis(QWidget * parent ) : QDialog(parent), _sampleRecord(0), _groups(0)
+RasterAnalysis::RasterAnalysis(QWidget * parent ) : QDialog(parent), _sampleRecord(0), _groups(0)
 {
 	setModal(false);
 	_analysis.setupUi(this);
@@ -69,16 +70,18 @@ AgentAnalysis::AgentAnalysis(QWidget * parent ) : QDialog(parent), _sampleRecord
 	connect(_analysis.lastStep, SIGNAL(stateChanged(int)), this, SLOT(lastStepChanged(int)));
 	// analysis types
 	_analysis.analysisTypes->addItem("Global analysis", eGlobal);
+	/*
 	_analysis.analysisTypes->addItem("Individual agent analysis", eIndividual);
 	_analysis.analysisTypes->addItem("Histogram", eHistogram);
 	_analysis.analysisTypes->addItem("Geospatial reference", eGeospatial);
+	*/
 
 	_analysis.globalStatistics->hide();
 	_analysis.groupParams->hide();
 	_analysis.individualStats->hide();
 }
 
-AgentAnalysis::~AgentAnalysis()
+RasterAnalysis::~RasterAnalysis()
 {
 	if(_sampleRecord)
 	{
@@ -91,7 +94,7 @@ AgentAnalysis::~AgentAnalysis()
 	}
 }
 
-void AgentAnalysis::selectOutput()
+void RasterAnalysis::selectOutput()
 {
 	QString fileName = QFileDialog::getExistingDirectory(this, tr("Select Output dir"), "");
 	if (fileName.isEmpty())
@@ -115,7 +118,7 @@ void AgentAnalysis::selectOutput()
 	_runButton->setEnabled(true);
 }
 
-void AgentAnalysis::selectBaseDir()
+void RasterAnalysis::selectBaseDir()
 {
 	QString fileName = QFileDialog::getExistingDirectory(this, tr("Select Base dir"), "");
 	if (fileName.isEmpty())
@@ -157,7 +160,7 @@ void AgentAnalysis::selectBaseDir()
 	}
 }
 
-void AgentAnalysis::selectBaseConfig()
+void RasterAnalysis::selectBaseConfig()
 {
 	QString fileName = QFileDialog::getExistingDirectory(this, tr("Select simulation to use as template"), "");
 	if (fileName.isEmpty())
@@ -170,7 +173,7 @@ void AgentAnalysis::selectBaseConfig()
 	}
 }
 
-void AgentAnalysis::fillParamsTree()
+void RasterAnalysis::fillParamsTree()
 {
 	_analysis.paramsTree->clear();
 	if(!_sampleRecord)
@@ -215,7 +218,7 @@ void AgentAnalysis::fillParamsTree()
 	updateNumberOfPermutations();
 }
 
-void AgentAnalysis::updateNumberOfPermutations()
+void RasterAnalysis::updateNumberOfPermutations()
 {
 	for( boost::filesystem::directory_iterator it(_baseDir); it!=boost::filesystem::directory_iterator(); it++ )
 	{
@@ -251,7 +254,7 @@ void AgentAnalysis::updateNumberOfPermutations()
 	}
 }
 
-void AgentAnalysis::computePermutations(TiXmlElement * element, QTreeWidgetItem * item)
+void RasterAnalysis::computePermutations(TiXmlElement * element, QTreeWidgetItem * item)
 {
 	for(int i=0; i<item->childCount(); i++)
 	{
@@ -261,30 +264,30 @@ void AgentAnalysis::computePermutations(TiXmlElement * element, QTreeWidgetItem 
 		{
 			continue;
 		}
-		std::string value(element->Attribute(attribute->text(AgentAnalysis::eName).toStdString().c_str()));
+		std::string value(element->Attribute(attribute->text(RasterAnalysis::eName).toStdString().c_str()));
 
 		ValuesMap & values = _permutations.find(attribute)->second;
 		ValuesMap::iterator it = values.find(value);
 		if(it==values.end())
 		{
-			int permutations = attribute->text(AgentAnalysis::ePermutations).toInt();
-			attribute->setText(AgentAnalysis::ePermutations, QString::number(permutations+1));
+			int permutations = attribute->text(RasterAnalysis::ePermutations).toInt();
+			attribute->setText(RasterAnalysis::ePermutations, QString::number(permutations+1));
 			// insert
 			values.insert(std::make_pair(value, 1));
 		}
 	}
 }
 
-void AgentAnalysis::parseAttributes(TiXmlElement * parent, QTreeWidgetItem * parentItem )
+void RasterAnalysis::parseAttributes(TiXmlElement * parent, QTreeWidgetItem * parentItem )
 {
 	TiXmlAttribute * attribute = 0;
 	for(attribute=parent->FirstAttribute(); attribute!=0; attribute=attribute->Next())
 	{
 		QTreeWidgetItem * item = new QTreeWidgetItem(0);
-		item->setText(AgentAnalysis::eName, attribute->Name());
-		item->setText(AgentAnalysis::ePermutations, "0");
-		item->setCheckState(AgentAnalysis::eUse, Qt::Unchecked);
-		item->setText(AgentAnalysis::eField, attribute->Name());
+		item->setText(RasterAnalysis::eName, attribute->Name());
+		item->setText(RasterAnalysis::ePermutations, "0");
+		item->setCheckState(RasterAnalysis::eUse, Qt::Unchecked);
+		item->setText(RasterAnalysis::eField, attribute->Name());
 		_permutations.insert(std::make_pair(item, ValuesMap()));
 		parentItem->addChild(item);
 		item->setExpanded(true);
@@ -292,7 +295,7 @@ void AgentAnalysis::parseAttributes(TiXmlElement * parent, QTreeWidgetItem * par
 	}
 }
 
-void AgentAnalysis::parseLevelPermutations( TiXmlElement * element, QTreeWidgetItem * item)
+void RasterAnalysis::parseLevelPermutations( TiXmlElement * element, QTreeWidgetItem * item)
 {
 	computePermutations(element, item);
 
@@ -307,7 +310,7 @@ void AgentAnalysis::parseLevelPermutations( TiXmlElement * element, QTreeWidgetI
 		}
 	}
 }
-void AgentAnalysis::parseLevel( TiXmlNode * parent, QTreeWidgetItem * parentItem)
+void RasterAnalysis::parseLevel( TiXmlNode * parent, QTreeWidgetItem * parentItem)
 {
 	TiXmlNode * child;
 	int type = parent->Type();
@@ -354,7 +357,7 @@ void AgentAnalysis::parseLevel( TiXmlNode * parent, QTreeWidgetItem * parentItem
 	}
 }
 
-bool AgentAnalysis::loadConfig( const std::string & configDir )
+bool RasterAnalysis::loadConfig( const std::string & configDir )
 {		
 	// look for data file
 	std::stringstream oss;
@@ -380,12 +383,12 @@ bool AgentAnalysis::loadConfig( const std::string & configDir )
 	{
 		delete _sampleRecord;
 	}
-	_analysis.agentTypes->clear();
+	_analysis.rasterTypes->clear();
 	_sampleRecord = new Engine::SimulationRecord(1);
 
-	// TODO load simulations too expensive, it could be faster just checking every data file for agent types
-	if(!_sampleRecord->loadHDF5(dataFile, false, true))
-	{
+	// TODO load simulations too expensive, it could be faster just checking every data file for raster types
+	if(!_sampleRecord->loadHDF5(dataFile, true, false))
+	{	
 		QMessageBox msgBox;
 		msgBox.setText("Unable to open data file for experiment: "+QString(dataFile.c_str()));
 		msgBox.exec();
@@ -393,17 +396,15 @@ bool AgentAnalysis::loadConfig( const std::string & configDir )
 		_sampleRecord = 0;
 		return false;
 	}
-	for(Engine::SimulationRecord::AgentTypesMap::const_iterator itType = _sampleRecord->beginTypes(); itType!=_sampleRecord->endTypes(); itType++)
+
+	QStringList rasters;
+	for(Engine::SimulationRecord::RasterMap::const_iterator it=_sampleRecord->beginRasters(); it!=_sampleRecord->endRasters(); it++)
 	{
-		QString newType(itType->first.c_str());
-		if(_analysis.agentTypes->findText(newType)==-1)
-		{
-			_analysis.agentTypes->addItem(newType, newType);
-		}
+		rasters<< QString(it->first.c_str());
 	}
+	_analysis.rasterTypes->addItems(rasters);
 
-
-	if(_analysis.agentTypes->count()>0)
+	if(_analysis.rasterTypes->count()>0)
 	{
 		_analysis.baseConfigEdit->setText(oss.str().c_str());
 		return true;
@@ -411,7 +412,7 @@ bool AgentAnalysis::loadConfig( const std::string & configDir )
 	return false;
 }
 	
-void AgentAnalysis::loadConfigs()
+void RasterAnalysis::loadConfigs()
 {
 	// take the config of the first simulation
 	boost::filesystem::path basePath(_baseDir);  
@@ -431,7 +432,7 @@ void AgentAnalysis::loadConfigs()
 	}
 }
 
-void AgentAnalysis::removeAnalysis( QWidget * analysis )
+void RasterAnalysis::removeAnalysis( QWidget * analysis )
 {
 	_analysis.globalStatistics->layout()->removeWidget(analysis);
 	delete analysis;
@@ -442,38 +443,39 @@ void AgentAnalysis::removeAnalysis( QWidget * analysis )
 	}
 }
 
-void AgentAnalysis::newAnalysis()
+void RasterAnalysis::newAnalysis()
 {
-	TraitAnalysisSelection * selection = new TraitAnalysisSelection(this, _sampleRecord, _analysis.agentTypes->currentText().toStdString());
+	RasterAnalysisSelection * selection = new RasterAnalysisSelection(this);
 	_analysis.globalStatistics->layout()->addWidget(selection);
 	connect(selection, SIGNAL(removeAnalysis(QWidget *)), this, SLOT(removeAnalysis(QWidget *)));
 }
 
-void AgentAnalysis::addGlobalAnalysis( AnalysisControlThread* thread )
+void RasterAnalysis::addGlobalAnalysis( AnalysisControlThread* thread )
 {
-	PostProcess::GlobalAgentStats * global = new PostProcess::GlobalAgentStats();
+	PostProcess::GlobalRasterStats * global = new PostProcess::GlobalRasterStats();
 	global->setAnalysisOwnership(false);
 	for(int i=0; i<_analysis.globalStatistics->layout()->count(); i++)
 	{
 		QWidget * aWidget = _analysis.globalStatistics->layout()->itemAt(i)->widget();
-		if(aWidget && aWidget->objectName().compare("TraitAnalysisSelection")==0)
+		if(aWidget && aWidget->objectName().compare("RasterAnalysisSelection")==0)
 		{
-			TraitAnalysisSelection * widget = (TraitAnalysisSelection*)aWidget;
-			TraitAnalysisSelection::GlobalAnalysis type = widget->getAnalysis();
-			std::string trait = widget->getTrait();
+			RasterAnalysisSelection * widget = (RasterAnalysisSelection*)aWidget;
+			RasterAnalysisSelection::GlobalAnalysis type = widget->getAnalysis();
 			switch(type)
 			{
-				case TraitAnalysisSelection::eMean:
-					global->addAnalysis(new PostProcess::AgentMean(trait));
+				case RasterAnalysisSelection::eMean:
+					global->addAnalysis(new PostProcess::RasterMean());
 					break;
 				
-				case TraitAnalysisSelection::eSum:
-					global->addAnalysis(new PostProcess::AgentSum(trait));
+				case RasterAnalysisSelection::eSum:
+					global->addAnalysis(new PostProcess::RasterSum());
 					break;
-			
-				case TraitAnalysisSelection::eStandardDeviation:
-					global->addAnalysis(new PostProcess::AgentStdDev(trait));
+		
+					/*
+				case RasterAnalysisSelection::eStandardDeviation:
+					global->addAnalysis(new PostProcess::RasterStdDev(rasterName));
 					break;
+					*/
 
 				default:
 					return;
@@ -488,16 +490,16 @@ void AgentAnalysis::addGlobalAnalysis( AnalysisControlThread* thread )
 	thread->setOutput(global);
 }
 
-void AgentAnalysis::groupGlobalStats( PostProcess::GlobalAgentStats * global )
+void RasterAnalysis::groupGlobalStats( PostProcess::GlobalRasterStats * global )
 {
 	std::list<QTreeWidgetItem * > params;
 	QTreeWidgetItem * item = _analysis.paramsTree->topLevelItem(0);
 	while(item!=0)
 	{
-		int checked = item->checkState(AgentAnalysis::eUse);
+		int checked = item->checkState(RasterAnalysis::eUse);
 		if(checked==Qt::Checked)
 		{
-			std::cout << "group by param: " << item->text(AgentAnalysis::eName).toStdString() << std::endl;
+			std::cout << "group by param: " << item->text(RasterAnalysis::eName).toStdString() << std::endl;
 			params.push_back(item);
 		}
 		item = _analysis.paramsTree->itemBelow(item);
@@ -508,7 +510,7 @@ void AgentAnalysis::groupGlobalStats( PostProcess::GlobalAgentStats * global )
 		delete _groups;
 	}
 
-	_groups = new PostProcess::GlobalAgentStats::Params();
+	_groups = new PostProcess::GlobalRasterStats::Params();
 
 	for(std::list<QTreeWidgetItem * >::iterator it=params.begin(); it!=params.end(); it++)
 	{
@@ -516,15 +518,16 @@ void AgentAnalysis::groupGlobalStats( PostProcess::GlobalAgentStats * global )
 		std::list< std::string > aGrouping;
 		while(item!=0)
 		{			
-			aGrouping.push_back(item->text(AgentAnalysis::eName).toStdString());
+			aGrouping.push_back(item->text(RasterAnalysis::eName).toStdString());
 			item = item->parent();
 		}
 		_groups->push_back(aGrouping);
 	}
 	global->setParams(_groups, _outputDir+"/groupResults.csv", _baseDir, _sampleRecord->getNumSteps(), _sampleRecord->getFinalResolution());
 }
-			
-void AgentAnalysis::addIndividualStats(AnalysisControlThread* thread )
+		
+/*
+void RasterAnalysis::addIndividualStats(AnalysisControlThread* thread )
 {
 	PostProcess::IndividualStats * results = new PostProcess::IndividualStats(_sampleRecord->getNumSteps()/_sampleRecord->getSerializedResolution());
 	for(int i=0; i<_analysis.individualStats->layout()->count(); i++)
@@ -538,28 +541,28 @@ void AgentAnalysis::addIndividualStats(AnalysisControlThread* thread )
 	thread->setOutput(results);
 }
 
-void AgentAnalysis::addHistogram( AnalysisControlThread* thread )
+void RasterAnalysis::addHistogram( AnalysisControlThread* thread )
 {
 	int numStep = _sampleRecord->getNumSteps();
 	if(!_analysis.lastStep->isChecked())
 	{
 		numStep = _analysis.step->value();
 	}
-	PostProcess::AgentHistogram * histogram = new PostProcess::AgentHistogram(_analysis.attributes->currentText().toStdString(), _analysis.interval->value(), numStep);
+	PostProcess::RasterHistogram * histogram = new PostProcess::RasterHistogram(_analysis.attributes->currentText().toStdString(), _analysis.interval->value(), numStep);
 	thread->setOutput(histogram);
 }
 
-void AgentAnalysis::addGeoreference( AnalysisControlThread* thread )
+void RasterAnalysis::addGeoreference( AnalysisControlThread* thread )
 {
-	PostProcess::AgentHDFtoSHP * shp = new PostProcess::AgentHDFtoSHP(Engine::Point2D<int>(_analysis.west->value(), _analysis.north->value()), _analysis.resolution->value(), _analysis.datum->text().toStdString());
+	PostProcess::RasterHDFtoSHP * shp = new PostProcess::RasterHDFtoSHP(Engine::Point2D<int>(_analysis.west->value(), _analysis.north->value()), _analysis.resolution->value(), _analysis.datum->text().toStdString());
 
 	thread->setOutput(shp);
 }
+*/
 
-
-void AgentAnalysis::run()
+void RasterAnalysis::run()
 {
-	AnalysisControlThread * thread = new AnalysisControlThread(_baseDir, _analysis.agentTypes->currentText().toStdString(), _outputDir, _analysis.resolution->value(), false);
+	AnalysisControlThread * thread = new AnalysisControlThread(_baseDir, _analysis.rasterTypes->currentText().toStdString(), _outputDir, _analysis.resolution->value(), true);
 	
 	RunAnalysis * runAnalysis = new RunAnalysis(0);
 	
@@ -572,6 +575,7 @@ void AgentAnalysis::run()
 		case eGlobal:
 			addGlobalAnalysis(thread);
 			break;
+			/*
 		case eIndividual:
 			addIndividualStats(thread);
 			break;
@@ -581,6 +585,7 @@ void AgentAnalysis::run()
 		case eGeospatial:
 			addGeoreference(thread);
 			break;
+			*/
 		default:
 			return;
 	}
@@ -588,15 +593,16 @@ void AgentAnalysis::run()
 	runAnalysis->show();
 	thread->start();
 }
-			
-void AgentAnalysis::fillIndividualStats()
+	
+/*
+void RasterAnalysis::fillIndividualStats()
 {	
 	std::string type = _analysis.agentTypes->currentText().toStdString();
-	Engine::SimulationRecord::AgentRecordsMap::const_iterator it=_sampleRecord->beginAgents(type);
+	Engine::SimulationRecord::RasterRecordsMap::const_iterator it=_sampleRecord->beginRasters(type);
 
 	QVBoxLayout * layout = new QVBoxLayout;
-	Engine::AgentRecord * agentRecord = it->second; 
-	for(Engine::AgentRecord::StatesMap::const_iterator itS=agentRecord->beginStates(); itS!=agentRecord->endStates(); itS++)
+	Engine::RasterRecord * agentRecord = it->second; 
+	for(Engine::RasterRecord::StatesMap::const_iterator itS=agentRecord->beginStates(); itS!=agentRecord->endStates(); itS++)
 	{
 		QCheckBox * box = new QCheckBox(QString(itS->first.c_str()));
 		layout->addWidget(box);
@@ -606,14 +612,14 @@ void AgentAnalysis::fillIndividualStats()
     _analysis.individualStats->setLayout(layout);
 }
 
-void AgentAnalysis::fillHistogram()
+void RasterAnalysis::fillHistogram()
 {
 	std::string type = _analysis.agentTypes->currentText().toStdString();
-	Engine::SimulationRecord::AgentRecordsMap::const_iterator it=_sampleRecord->beginAgents(type);
-	Engine::AgentRecord * agentRecord = it->second;
+	Engine::SimulationRecord::RasterRecordsMap::const_iterator it=_sampleRecord->beginRasters(type);
+	Engine::RasterRecord * agentRecord = it->second;
 	
 	QStringList traits;
-	for(Engine::AgentRecord::StatesMap::const_iterator itS=agentRecord->beginStates(); itS!=agentRecord->endStates(); itS++)
+	for(Engine::RasterRecord::StatesMap::const_iterator itS=agentRecord->beginStates(); itS!=agentRecord->endStates(); itS++)
 	{
 		traits << QString(itS->first.c_str());
 	}
@@ -621,8 +627,9 @@ void AgentAnalysis::fillHistogram()
 	_analysis.attributes->addItems(traits);
 	_analysis.step->setMaximum(_sampleRecord->getNumSteps()-1);
 }
+*/
 
-void AgentAnalysis::analysisTypeChosen( int index )
+void RasterAnalysis::analysisTypeChosen( int index )
 {
 	AnalysisType analysis = (AnalysisType)_analysis.analysisTypes->itemData(index).toInt();
 	switch(analysis)
@@ -634,6 +641,7 @@ void AgentAnalysis::analysisTypeChosen( int index )
 			_analysis.histogram->hide();
 			_analysis.georeference->hide();
 			break;
+			/*
 		case eIndividual:
 			_analysis.globalStatistics->hide();
 			_analysis.groupParams->hide();
@@ -657,13 +665,14 @@ void AgentAnalysis::analysisTypeChosen( int index )
 			_analysis.histogram->hide();
 			_analysis.georeference->show();
 			break;
+			*/
 		default:
 			return;
 	}
 	_analysis.exploreConfig->setCurrentIndex(2);
 }
 
-void AgentAnalysis::lastStepChanged( int checked )
+void RasterAnalysis::lastStepChanged( int checked )
 {
 	if(checked==Qt::Checked)
 	{

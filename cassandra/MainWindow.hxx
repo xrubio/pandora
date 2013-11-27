@@ -53,6 +53,7 @@ class AgentConfiguration;
 class RasterConfiguration;
 class Laboratory;
 class AgentAnalysis;
+class RasterAnalysis;
 class Settings;
 
 class LoadingProgressBar;
@@ -84,6 +85,7 @@ private:
 	QAction * _show3DAction;
 	QAction * _showLabAction;
 	QAction * _agentAnalysisAction;
+	QAction * _rasterAnalysisAction;
 
 	QSpinBox * _stepBox;
 	QLabel * _numStepsLabel;
@@ -97,6 +99,7 @@ private:
 	Settings * _settings;
 	Laboratory * _laboratory;
 	AgentAnalysis * _agentAnalysis;
+	RasterAnalysis * _rasterAnalysis;
 
 	AgentTypeSelection * _agentTypeSelection;
 	AgentTraitSelection * _agentTraitSelection;
@@ -147,6 +150,7 @@ private slots:
 	void show3DWindow();
 	void showLaboratory();
 	void showAgentAnalysis();
+	void showRasterAnalysis();
 
 	void agentConfigured( const std::string & , const AgentConfiguration &); 
 	void rasterConfigured( const std::string & , const RasterConfiguration &); 	

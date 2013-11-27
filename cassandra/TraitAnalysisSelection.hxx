@@ -20,54 +20,50 @@
  * 
  */
 
-#ifndef __AnalysisControlThread_hxx__
-#define __AnalysisControlThread_hxx__
+#ifndef __TraitAnalysisSelection_hxx__
+#define __TraitAnalysisSelection_hxx__
 
-#include <QThread>
+#include <QWidget>
+#include <ui_TraitAnalysisSelection.h>
 
-namespace PostProcess 
+namespace Engine
 {
-	class Output;
+	class SimulationRecord;
 }
 
 namespace GUI
 {
 
-class AnalysisControlThread : public QThread
+class TraitAnalysisSelection : public QWidget
 {
 	Q_OBJECT
 
-	bool _cancelExecution;
-
-	std::string _baseDir;
-	std::string _type;
-	std::string _outputDir;
-
-	int _numberOfSimulations;
-	int _resolution;
-	bool _isRaster;
-
-	PostProcess::Output * _output;
-	void analyseSimulation( const std::string & dataFile, const std::string & fileName);
+	Ui::TraitAnalysisSelection _selection;
 
 public:
-	AnalysisControlThread( const std::string & baseDir, const std::string & type, const std::string & outputDir, int resolution, bool isRaster );
-	virtual ~AnalysisControlThread();
+	enum GlobalAnalysis 
+	{
+		eMean = 0,
+		eSum = 1,
+		eStandardDeviation = 2
+	};
 
-	void run();
-	int getNumberOfSimulations();
-	void setOutput( PostProcess::Output * output);
-
-signals:
-	void nextSimulation();
 
 public slots:
-	void cancelExecution();
-	
+	void analysisSelected( const QString & option);
+	void removeAnalysis();
+
+public:
+	TraitAnalysisSelection( QWidget * parent, Engine::SimulationRecord * record, const std::string & type );
+	virtual ~TraitAnalysisSelection();
+	GlobalAnalysis getAnalysis() const;
+	std::string getTrait() const;
+signals:
+	void removeAnalysis(QWidget *);
 };
 
 
 } // namespace GUI
 
-#endif // __AnalysisControlThread_hxx__
+#endif // __TraitAnalysisSelection_hxx__
 

@@ -38,6 +38,7 @@
 #include <Settings.hxx>
 #include <Laboratory.hxx>
 #include <AgentAnalysis.hxx>
+#include <RasterAnalysis.hxx>
 
 #include <iostream>
 
@@ -90,6 +91,7 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_display3D = new Display3D(0);
 	_laboratory = new Laboratory(this);
 	_agentAnalysis = new AgentAnalysis(this);
+	_rasterAnalysis = new RasterAnalysis(this);
 	_settings = new Settings;
 	
 	_display2D->show();
@@ -204,10 +206,13 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_showLabAction->setStatusTip(tr("Open Laboratory"));
 	connect(_showLabAction, SIGNAL(triggered()), this, SLOT(showLaboratory()));
 
-	_agentAnalysisAction = new QAction(QIcon(":/resources/icons/analysis.png"), tr("&Agent Analysis"), this);
+	_agentAnalysisAction = new QAction(QIcon(":/resources/icons/agentAnalysis.png"), tr("&Agent Analysis"), this);
 	_agentAnalysisAction->setStatusTip(tr("Analyse agent stats"));
 	connect(_agentAnalysisAction, SIGNAL(triggered()), this, SLOT(showAgentAnalysis()));
 
+	_rasterAnalysisAction = new QAction(QIcon(":/resources/icons/rasterAnalysis.png"), tr("&Raster Analysis"), this);
+	_rasterAnalysisAction->setStatusTip(tr("Analyse raster stats"));
+	connect(_rasterAnalysisAction, SIGNAL(triggered()), this, SLOT(showRasterAnalysis()));
 
 	// menus
 	QMenu * fileMenu = menuBar()->addMenu(tr("&File"));
@@ -239,6 +244,7 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	QMenu * analysisMenu = menuBar()->addMenu(tr("&Analysis"));
 	analysisMenu->addSeparator();
 	analysisMenu->addAction(_agentAnalysisAction);
+	analysisMenu->addAction(_rasterAnalysisAction);
 
 	// toolbars
 	QToolBar * fileBar= addToolBar(tr("File"));
@@ -254,6 +260,7 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 
 	QToolBar * analysisBar = addToolBar(tr("Analysis"));
 	analysisBar->addAction(_agentAnalysisAction);
+	analysisBar->addAction(_rasterAnalysisAction);
 	
 	QLabel * label = new QLabel("Step: ");
 	simulationBar->addWidget(label);
@@ -548,6 +555,17 @@ void MainWindow::showAgentAnalysis()
     }
 }
 
+void MainWindow::showRasterAnalysis()
+{
+    if(_rasterAnalysis->isVisible())
+    {
+        _rasterAnalysis->hide();
+    }
+    else
+    {
+        _rasterAnalysis->show();
+    }
+}
 
 void MainWindow::showSettings()
 {

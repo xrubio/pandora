@@ -51,7 +51,11 @@ void SimulationControlThread::run()
 		int pid_ps = fork();
 		if(pid_ps == 0)
 		{
-			execv(_simulationBinary.c_str(), 0);
+			char * argv[2];
+			argv[0] = &(_simulationBinary[0]);
+			argv[1] = 0;
+			std::cout << "sim bin: " << _simulationBinary << " from work: " << workingDirectory.str() << std::endl;
+			execv(_simulationBinary.c_str(), argv); 
 		}
 		else
 		{

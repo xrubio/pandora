@@ -20,54 +20,45 @@
  * 
  */
 
-#ifndef __AnalysisControlThread_hxx__
-#define __AnalysisControlThread_hxx__
+#ifndef __RasterAnalysisSelection_hxx__
+#define __RasterAnalysisSelection_hxx__
 
-#include <QThread>
-
-namespace PostProcess 
-{
-	class Output;
-}
+#include <QWidget>
+#include <ui_RasterAnalysisSelection.h>
 
 namespace GUI
 {
 
-class AnalysisControlThread : public QThread
+class RasterAnalysisSelection : public QWidget
 {
 	Q_OBJECT
 
-	bool _cancelExecution;
-
-	std::string _baseDir;
-	std::string _type;
-	std::string _outputDir;
-
-	int _numberOfSimulations;
-	int _resolution;
-	bool _isRaster;
-
-	PostProcess::Output * _output;
-	void analyseSimulation( const std::string & dataFile, const std::string & fileName);
+	Ui::RasterAnalysisSelection _selection;
 
 public:
-	AnalysisControlThread( const std::string & baseDir, const std::string & type, const std::string & outputDir, int resolution, bool isRaster );
-	virtual ~AnalysisControlThread();
+	enum GlobalAnalysis 
+	{
+		eMean = 0,
+		eSum = 1//,
+	//	eStandardDeviation = 2
+	};
 
-	void run();
-	int getNumberOfSimulations();
-	void setOutput( PostProcess::Output * output);
-
-signals:
-	void nextSimulation();
 
 public slots:
-	void cancelExecution();
-	
+	void analysisSelected( const QString & option);
+	void removeAnalysis();
+
+
+public:
+	RasterAnalysisSelection( QWidget * parent );
+	virtual ~RasterAnalysisSelection();
+	GlobalAnalysis getAnalysis() const;
+signals:
+	void removeAnalysis(QWidget *);
 };
 
 
 } // namespace GUI
 
-#endif // __AnalysisControlThread_hxx__
+#endif // __RasterAnalysisSelection_hxx__
 
