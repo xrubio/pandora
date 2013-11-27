@@ -6,7 +6,6 @@ import os, sys
 from subprocess import call
 
 release = ARGUMENTS.get('release', 1)
-mareNostrum = ARGUMENTS.get('mn', 0)
 extremeDebug = ARGUMENTS.get('edebug', 0)
 useMpi = ARGUMENTS.get('mpi', 1)
 
@@ -32,29 +31,13 @@ if int(useMpi)==1:
 
 includeDirs = Split('./ ../../../')
 
-if int(mareNostrum)==1:	
-	includeDirs += ['/apps/HDF5/1.8.10-mpi/OPENMPI/include']
-	includeDirs += ['/apps/BOOST/1_52_0/include/']
-	includeDirs += ['/apps/TINYXML/2.6.2/include']
-	includeDirs += ['/apps/GDAL/1.9.2/include']
-	includeDirs += ['/apps/GRASS/6.4.3RC2/grass-6.4.3RC2/include/']
-	libs += ['hdf5','gdal','boost_filesystem','boost_system']
-	libDirs = Split('../../../ /apps/HDF5/1.8.10-mpi/OPENMPI/lib /apps/GDAL/1.9.2/lib /apps/TINYXML/2.6.2/lib')
-	libDirs += ['/apps/BOOST/1_52_0/lib/']
-	libDirs += ['/apps/GRASS/6.4.3RC2/grass-6.4.3RC2/lib/']
-	includeDirs += ['/gpfs/apps/HDF5/1.8.9/64/include']
-	includeDirs += ['/gpfs/apps/BOOST/1_48_0/include/']
-	includeDirs += ['/gpfs/apps/TINYXML/2.6.2/64/STL/include']
-	includeDirs += ['/gpfs/apps/GDAL/1.7.1/64/include']	
-	includeDirs += ['/gpfs/apps/GRASS/6.4.2/grass-6.4.2/include/']
-else:	
-	includeDirs += ['/usr/lib/grass64/include/','/usr/include/gdal/']
-	libDirs = ['../../../', '/usr/lib/grass64/lib/']
+includeDirs += ['/usr/lib/grass64/include/','/usr/include/gdal/']
+libDirs = ['../../../', '/usr/lib/grass64/lib/']
 
-	if int(useMpi)==1:
-		includeDirs += ['/usr/local/hdf5/include']
-		libDirs += ['usr/local/hdf5/lib/']
-	libs += ['mpl']
+if int(useMpi)==1:
+	includeDirs += ['/usr/local/hdf5/include']
+	libDirs += ['usr/local/hdf5/lib/']
+libs += ['mpl']
 
 env.Program(nameProgram, srcFiles, CPPPATH=includeDirs, LIBS=libs, LIBPATH=libDirs, LINKFLAGS=linkFlags)
 
