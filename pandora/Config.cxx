@@ -53,7 +53,7 @@ TiXmlElement * Config::openTiXml(const std::string & filename)
 	if (!_doc->LoadFile())
 	{
 		std::stringstream oss;
-		oss << "Exception, error while opening config file " << filename << std::endl;
+		oss << "Exception, error while opening config file: " << filename << std::endl;
 		throw Engine::Exception(oss.str());
 		return 0;
 	}

@@ -21,7 +21,7 @@ if int(release) == 0:
 	libraryName = 'pandorad'
 	pythonLibraryName = 'pyPandorad'
 else:
-	env['CCFLAGS'] = Split('-O3 -Wall -DTIXML_USE_STL -fopenmp')
+	env['CCFLAGS'] = Split('-Ofast -DTIXML_USE_STL -fopenmp')
 	libraryName = 'pandora'
 	pythonLibraryName = 'pyPandora'
 
@@ -58,7 +58,7 @@ if int(release) == 0:
 	if int(extremeDebug)==1:
 		envPython['CCFLAGS'] += ['-DPANDORAEDEBUG']
 else:
-	envPython['CCFLAGS'] = Split('-O3 -Wall -DTIXML_USE_STL')
+	envPython['CCFLAGS'] = Split('-Ofast -DTIXML_USE_STL')
 	
 if int(useMpi)==1:
 	envPython['CCFLAGS'] += ['-DPANDORAMPI']
