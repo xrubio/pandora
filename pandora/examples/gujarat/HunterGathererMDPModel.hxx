@@ -69,6 +69,13 @@ public:
 	virtual void next( const HunterGathererMDPState &s
 			, Problem::action_t a
 			, OutcomeVector& outcomes ) const;
+	
+	virtual void next( const HunterGathererMDPState &s
+			, Problem::action_t a
+			, OutcomeVector& outcomes
+			 , int foo ) const;
+			
+			
 	virtual	void print( std::ostream& os ) const {}
 	
 protected:

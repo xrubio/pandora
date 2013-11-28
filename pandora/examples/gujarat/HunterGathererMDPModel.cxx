@@ -100,16 +100,12 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 											
 	//std::cout << "creat MDPState:" << _initial->_dni << std::endl;
 	
-	
-	//TODO refactor it, instead of passing HR and LR structures pass a HGMind
-	
 	//log_INFO(logName.str(),"MAKE ACTIONS INITIAL");
 	
 	//*? ucthack
 	//makeActionsForState( *_initial );
 	
 	//log_INFO(logName.str(),"MAKE ACTIONS INITIAL AFTER");
-	
 	
 	//std::cout << "Initial state: " << *_initial << std::endl;	
 }
@@ -147,9 +143,61 @@ float HunterGathererMDPModel::cost( const HunterGathererMDPState& s,
 }
 
 
+
 void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s, 
 					action_t a, 
 					OutcomeVector& outcomes ) const
+{
+
+	std::stringstream logName;
+	logName << "infoshar";
+	
+	
+	const MDPAction* act = s.availableActions(a);
+	/*
+	 * Here, where I know whether "act" is ForageAction or MoveHomeAction,
+	 * according to these, what I pass to sp depends on it... copies,refs,
+	 * or new adhoc creation... etc...
+	 */
+	
+	std::vector<bool> ownership(4);
+	//TODO An action should know nothing about ownerships. Refactor the thing.
+	
+	std::vector< Sector* > * HRActionSectors;
+	std::vector< Sector* > * LRActionSectors;
+	std::vector< Engine::Point2D<int> > * HRCellPool;
+	std::vector< Engine::Point2D<int> > * LRCellPool;
+	
+	HRActionSectors = s.getHRActionSectors();
+	LRActionSectors = s.getLRActionSectors();
+	HRCellPool = s.getHRCellPool();
+	LRCellPool = s.getLRCellPool();		
+	
+	ownership[0]=false;	
+	ownership[1]=false;
+	ownership[2]=false;	
+	ownership[3]=false;		
+	
+	std::vector<MDPAction *>  actionList;
+
+	makeActionsForState(s, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, actionList);
+	
+	//s.initializeSuccessor(sp,ownership);
+	HunterGathererMDPState sp(s, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, ownership, actionList);
+	
+	act->executeMDP( agentRef(), s, sp );
+	applyFrameEffects( s, sp );
+	sp.computeHash();	
+	
+	outcomes.push_back( std::make_pair(sp, 1.0) );
+	
+}
+
+
+void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s, 
+					action_t a, 
+					OutcomeVector& outcomes
+					,int foo ) const
 {
 	std::stringstream logName;
 	logName << "infoshar";

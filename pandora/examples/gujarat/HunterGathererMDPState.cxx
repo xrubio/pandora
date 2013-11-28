@@ -189,6 +189,8 @@ HunterGathererMDPState::HunterGathererMDPState(
 
 const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGathererMDPState& s )
 {	
+	return s;
+/*	
 	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
 	
 	std::stringstream logName;
@@ -248,6 +250,8 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	_config = s._config;
 	
 	return *this;
+*/
+	
 }
 
 
@@ -310,6 +314,9 @@ HunterGathererMDPState::~HunterGathererMDPState()
 
 void	HunterGathererMDPState::addAction( MDPAction* a )
 {
+	if(_availableActions.size() >= _numAvailableActionsWhenBorn)
+		std::cout << "VIOLATOR created with :" << _creator << std::endl;
+	assert(_availableActions.size() < _numAvailableActionsWhenBorn);
 	_availableActions.push_back(a);
 }
 

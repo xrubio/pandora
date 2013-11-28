@@ -213,12 +213,10 @@ template<typename T> class uct_t : public improvement_t<T> {
 	if(it->second.counts_.size() != policy_t<T>::problem().number_actions(s)+1)
 		std::cout << "UCT COUNTS ASSERT : " 
 			<< s._dni 
-			<< "," 
-			<< s._numAvailableActionsWhenBorn
-			<< "," 
-			<< s.numAvailableActions() 
-			<< ","
-			<< it->second.counts_.size()
+			<< ","  << s._creator
+			<< "," 	<< s._numAvailableActionsWhenBorn
+			<< "," 	<< s.numAvailableActions() 
+			<< ","	<< it->second.counts_.size()
 			<< "!="
 			<< policy_t<T>::problem().number_actions(s)+1
 			<< std::endl;
@@ -226,12 +224,10 @@ template<typename T> class uct_t : public improvement_t<T> {
 	if( it->second.values_.size() != policy_t<T>::problem().number_actions(s)+1 )
 		std::cout << "UCT VALUES ASSERT : " 
 			<< s._dni
-			<< "," 
-			<< s._numAvailableActionsWhenBorn
-			<< "," 
-			<< s.numAvailableActions() 
-			<< ","
-			<< it->second.values_.size()
+			<< ","  << s._creator
+			<< ","  << s._numAvailableActionsWhenBorn
+			<< "," 	<< s.numAvailableActions() 
+			<< ","	<< it->second.values_.size()
 			<< "!="
 			<< policy_t<T>::problem().number_actions(s)+1
 			<< std::endl;
