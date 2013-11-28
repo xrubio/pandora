@@ -267,48 +267,41 @@ void World::stepSection( const int & sectionIndex )
 	for(size_t i=0; i<agentsToExecute.size(); i++)
 	{
 		Agent * agent = agentsToExecute[i];
-		//Agent * agent = *it;
-		if(_sections[sectionIndex].isInside(agent->getPosition()) && !hasBeenExecuted(agent))
-		{
-			agent->logAgentState();
-			agent->updateKnowledge();
-			agent->selectActions();
-		}
+		agent->logAgentState();
+		agent->updateKnowledge();
+		agent->selectActions();
 	}
 
 	// execute actions
 	for(size_t i=0; i<agentsToExecute.size(); i++)
 	{
 		Agent * agent = agentsToExecute.at(i);
-		if(_sections[sectionIndex].isInside(agent->getPosition()) && !hasBeenExecuted(agent))
-		{
-			log_DEBUG(logName.str(), getWallTime() << " agent: " << agent << " being executed at index: " << sectionIndex << " of task: "<< _simulation.getId() << " in step: " << _step );
-			agent->executeActions();
-			agent->updateState();
-			log_DEBUG(logName.str(), getWallTime() << " agent: " << agent << " has been executed at index: " << sectionIndex << " of task: "<< _simulation.getId() << " in step: " << _step );
+		log_DEBUG(logName.str(), getWallTime() << " agent: " << agent << " being executed at index: " << sectionIndex << " of task: "<< _simulation.getId() << " in step: " << _step );
+		agent->executeActions();
+		agent->updateState();
+		log_DEBUG(logName.str(), getWallTime() << " agent: " << agent << " has been executed at index: " << sectionIndex << " of task: "<< _simulation.getId() << " in step: " << _step );
 
 #ifdef PANDORAMPI
-			if(!_boundaries.isInside(agent->getPosition()) && !willBeRemoved(agent))
-			{
-				log_DEBUG(logName.str(), getWallTime() << " migrating agent: " << agent << " being executed at index: " << sectionIndex << " of task: "<< _simulation.getId() );
-				agentsToSend.push_back(agent);
+		if(!_boundaries.isInside(agent->getPosition()) && !willBeRemoved(agent))
+		{
+			log_DEBUG(logName.str(), getWallTime() << " migrating agent: " << agent << " being executed at index: " << sectionIndex << " of task: "<< _simulation.getId() );
+			agentsToSend.push_back(agent);
 
-				// the agent is no longer property of this world
-				AgentsList::iterator itErase  = getOwnedAgent(agent->getId());
-				// it will be deleted
-				_agents.erase(itErase);
-				_overlapAgents.push_back(agent);
-				log_DEBUG(logName.str(), getWallTime() <<  "putting agent: " << agent << " to overlap");
-			}
-			else
-			{
-				log_DEBUG(logName.str(), getWallTime() << " finished agent: " << agent);
-			}
-#endif
-			_executedAgentsHash.insert(make_pair(agent->getId(), agent));
-			numExecutedAgents++;
-			log_DEBUG(logName.str(), getWallTime()  << " num executed agents: " << numExecutedAgents );
+			// the agent is no longer property of this world
+			AgentsList::iterator itErase  = getOwnedAgent(agent->getId());
+			// it will be deleted
+			_agents.erase(itErase);
+			_overlapAgents.push_back(agent);
+			log_DEBUG(logName.str(), getWallTime() <<  "putting agent: " << agent << " to overlap");
 		}
+		else
+		{
+			log_DEBUG(logName.str(), getWallTime() << " finished agent: " << agent);
+		}
+#endif
+		_executedAgentsHash.insert(make_pair(agent->getId(), agent));
+		numExecutedAgents++;
+		log_DEBUG(logName.str(), getWallTime()  << " num executed agents: " << numExecutedAgents );
 	}
 #ifdef PANDORAMPI
 	log_DEBUG(logName.str(), getWallTime()  << " sending agents in section: " << sectionIndex << " and step: " << _step);
