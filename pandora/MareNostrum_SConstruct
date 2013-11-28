@@ -1,4 +1,6 @@
 
+
+
 import os
 
 release = ARGUMENTS.get('release', 1)
@@ -38,14 +40,14 @@ srcBaseFiles = []
 for src in srcFiles:
 	srcBaseFiles.append('build/'+src)
 
-includeDirs = Split('. analysis/ /apps/HDF5/1.8.10-mpi/OPENMPI/include')
-includeDirs += ['/apps/BOOST/1_52_0_py_3.3.0/include/']
+includeDirs = Split('. analysis/ /apps/HDF5/1.8.10-mpi/OPENMPI/GNU/include')
+includeDirs += ['/apps/BOOST/1_52_0_py_3.3.0/GCC/include/']
 includeDirs += ['/apps/TINYXML/2.6.2/include']
 includeDirs += ['/apps/GDAL/1.9.2/include']
 includeDirs += ['/apps/GRASS/6.4.3RC2/grass-6.4.3RC2/include/']
 
-libDirs = Split('/apps/HDF5/1.8.10-mpi/OPENMPI/lib /apps/GDAL/1.9.2/lib /apps/TINYXML/2.6.2/lib')
-libDirs += ['/apps/BOOST/1_52_0_py_3.3.0/lib/']
+libDirs = Split('/apps/HDF5/1.8.10-mpi/OPENMPI/GNU/lib/ /apps/GDAL/1.9.2/lib /apps/TINYXML/2.6.2/lib')
+libDirs += ['/apps/BOOST/1_52_0_py_3.3.0/GCC/lib/']
 libDirs += ['/apps/GRASS/6.4.3RC2/grass-6.4.3RC2/lib/']
 
 env.SharedLibrary(libraryName, srcBaseFiles, CPPPATH=includeDirs, LIBS=libs, LIBPATH=libDirs)
