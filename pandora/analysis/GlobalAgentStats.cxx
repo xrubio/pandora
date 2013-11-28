@@ -122,7 +122,7 @@ void GlobalAgentStats::apply( const Engine::SimulationRecord & simRecord, const 
 		std::cout << "done" << std::endl;
 	}
 
-	for(int i=0; i<=simRecord.getNumSteps(); i=i+simRecord.getFinalResolution())
+	for(int i=0; i<=1+simRecord.getNumSteps(); i=i+simRecord.getFinalResolution())
 	{
 		std::stringstream newLine;
 		newLine << i;
@@ -257,7 +257,7 @@ void GlobalAgentStats::setParams( Params * params, const std::string & groupFile
 	// results, time series if one attribute
 	if(_analysisList.size()==1)
 	{	
-		for(int i=0; i<numSteps; i+=resolution)
+		for(int i=0; i<=numSteps; i+=resolution)
 		{
 			header << _separator << "step" << i;
 		}
