@@ -134,8 +134,11 @@ void GlobalRasterStats::apply( const Engine::SimulationRecord & simRecord, const
 		std::cout << "grouping by params" << std::endl;
 		groupFile.open(_groupFile.c_str(), std::ios_base::app);
 		std::stringstream line;
-		unsigned pos = outputFile.find_last_of("/");
-		std::string fileName = outputFile.substr(pos+1);
+		// get the text of the folder (between third and second last '/')
+		// i.e. foo/run_001/data/data.h5 would return 'run_001'
+		boost::iterator_range<std::string::const_iterator> initName = boost::algorithm::find_nth(simRecord.getName(), "/", -3);
+		boost::iterator_range<std::string::const_iterator> endName = boost::algorithm::find_nth(simRecord.getName(), "/", -2);
+		std::string fileName = std::string(initName.begin()+1, endName.begin());
 		line << fileName;
 
 		writeParams(line, fileName);
