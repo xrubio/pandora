@@ -173,42 +173,41 @@ void GlobalAgentStats::apply( const Engine::SimulationRecord & simRecord, const 
 
 void GlobalAgentStats::writeParams( std::stringstream & line, const std::string & fileName )
 {
-		std::stringstream configFile;
-		unsigned pos = fileName.find_last_of(".");
-		configFile << _inputDir << "/" << fileName.substr(0,pos) << "/config.xml";
+	std::stringstream configFile;
+	unsigned pos = fileName.find_last_of(".");
+	configFile << _inputDir << "/" << fileName.substr(0,pos) << "/config.xml";
 
-		TiXmlDocument doc(configFile.str().c_str());
-		if (!doc.LoadFile())
-		{
-			return;
-		}
-		TiXmlHandle hDoc(&doc);
-		TiXmlHandle hRoot(0);
+	TiXmlDocument doc(configFile.str().c_str());
+	if (!doc.LoadFile())
+	{
+		return;
+	}
+	TiXmlHandle hDoc(&doc);
+	TiXmlHandle hRoot(0);
 
-		TiXmlElement * element = 0;
-		for(Params::iterator it=_params->begin(); it!=_params->end(); it++)
+	TiXmlElement * element = 0;
+	for(Params::iterator it=_params->begin(); it!=_params->end(); it++)
+	{
+		std::list<std::string> & paramsList = *it;
+		// backwards iteration, the first element is the attribute
+		std::list<std::string>::reverse_iterator itL=paramsList.rbegin();
+		for(size_t i=0; i<paramsList.size()-1; i++)
 		{
-			std::list<std::string> & paramsList = *it;
-			// backwards iteration, the first element is the attribute
-			std::list<std::string>::reverse_iterator itL=paramsList.rbegin();
-			for(size_t i=0; i<paramsList.size()-1; i++)
+			if(!element)
 			{
-				if(!element)
-				{
-					element = doc.FirstChildElement(*itL);
-				}
-				else
-				{
-					element = element->FirstChildElement(*itL);
-				}
-				itL++;
+				element = doc.FirstChildElement(*itL);
 			}
-			TiXmlElement * finalElement = element->ToElement();
-			std::string & attributeName = *(paramsList.begin());
-			line  << _separator << finalElement->Attribute(attributeName.c_str());
-			element = 0;
+			else
+			{
+				element = element->FirstChildElement(*itL);
+			}
+			itL++;
 		}
-
+		TiXmlElement * finalElement = element->ToElement();
+		std::string & attributeName = *(paramsList.begin());
+		line  << _separator << finalElement->Attribute(attributeName.c_str());
+		element = 0;
+	}
 }
 
 
