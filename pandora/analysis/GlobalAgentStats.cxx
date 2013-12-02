@@ -180,7 +180,6 @@ void GlobalAgentStats::writeParams( std::stringstream & line, const std::string 
 	unsigned pos = fileName.find_last_of(".");
 	configFile << _inputDir << "/" << fileName.substr(0,pos) << "/config.xml";
 
-	std::cout << "input dir: " << _inputDir << " line: " << line.str() << " file name: " << fileName << " config file: " << configFile.str() << std::endl;
 	TiXmlDocument doc(configFile.str().c_str());
 	if (!doc.LoadFile())
 	{
