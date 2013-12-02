@@ -123,7 +123,7 @@ void GlobalAgentStats::apply( const Engine::SimulationRecord & simRecord, const 
 		std::cout << "done" << std::endl;
 	}
 
-	for(int i=0; i<=1+simRecord.getNumSteps(); i=i+simRecord.getFinalResolution())
+	for(int i=0; i<=simRecord.getNumSteps(); i=i+simRecord.getFinalResolution())
 	{
 		std::stringstream newLine;
 		newLine << i;
@@ -148,6 +148,13 @@ void GlobalAgentStats::apply( const Engine::SimulationRecord & simRecord, const 
 		boost::iterator_range<std::string::const_iterator> initName = boost::algorithm::find_nth(simRecord.getName(), "/", -3);
 		boost::iterator_range<std::string::const_iterator> endName = boost::algorithm::find_nth(simRecord.getName(), "/", -2);
 		std::string fileName = std::string(initName.begin()+1, endName.begin());
+		// only possible combination that could be wrong
+		if(fileName.compare(".")==0)
+		{
+			initName = boost::algorithm::find_nth(simRecord.getName(), "/", -4);
+			endName = boost::algorithm::find_nth(simRecord.getName(), "/", -3);
+			fileName = std::string(initName.begin()+1, endName.begin());
+		}
 		line << fileName;
 	
 		writeParams(line, fileName);
@@ -176,6 +183,7 @@ void GlobalAgentStats::apply( const Engine::SimulationRecord & simRecord, const 
 
 void GlobalAgentStats::writeParams( std::stringstream & line, const std::string & fileName )
 {
+	std::cout << "line prev: " << line.str() << " file name: " << fileName << " input dir: " << _inputDir << std::endl;
 	std::stringstream configFile;
 	unsigned pos = fileName.find_last_of(".");
 	configFile << _inputDir << "/" << fileName.substr(0,pos) << "/config.xml";

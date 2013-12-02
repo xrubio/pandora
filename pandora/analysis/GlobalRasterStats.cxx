@@ -26,6 +26,7 @@
 #include <fstream>
 #include <iomanip>
 #include <tinyxml.h>
+#include <boost/algorithm/string/find.hpp>
 
 namespace PostProcess
 {
@@ -139,6 +140,13 @@ void GlobalRasterStats::apply( const Engine::SimulationRecord & simRecord, const
 		boost::iterator_range<std::string::const_iterator> initName = boost::algorithm::find_nth(simRecord.getName(), "/", -3);
 		boost::iterator_range<std::string::const_iterator> endName = boost::algorithm::find_nth(simRecord.getName(), "/", -2);
 		std::string fileName = std::string(initName.begin()+1, endName.begin());
+		// only possible combination that could be wrong
+		if(fileName.compare(".")==0)
+		{
+			initName = boost::algorithm::find_nth(simRecord.getName(), "/", -4);
+			endName = boost::algorithm::find_nth(simRecord.getName(), "/", -3);
+			fileName = std::string(initName.begin()+1, endName.begin());
+		}
 		line << fileName;
 
 		writeParams(line, fileName);
