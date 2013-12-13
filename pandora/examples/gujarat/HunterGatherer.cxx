@@ -60,6 +60,9 @@ HunterGatherer::~HunterGatherer()
 {
 	_myHGMind->clearSectorKnowledge();	
 	delete _myHGMind;
+	//omp_destroy_lock(_mapLock);
+	//delete _mapLock;
+	_objectUseCounter.clear();
 }
 
 //************************************************************************
@@ -207,7 +210,7 @@ bool HunterGatherer::cellValid( Engine::Point2D<int>& loc )
 		return true;
 	}
 
-	for(int i=0; i<agents.size(); i++)
+	for(unsigned int i=0; i<agents.size(); i++)
 	{
 		Agent * agent = agents.at(i);
 		if(agent->exists() && agent!=this)
@@ -310,7 +313,7 @@ void HunterGatherer::putInformation(Sector *s, const Engine::Raster & r, const E
 	Engine::Raster & myLRTimeRaster = _myHGMind->getLRTimeStamps();
 	Engine::Raster & myLRResRaster = _myHGMind->getLRResourcesRaster();
 	
-	for(int i = 0; i < cells.size(); i++)
+	for(unsigned int i = 0; i < cells.size(); i++)
 	{	
 		/*
 		int ts_i = ((GujaratWorld*)_world)->getValueLR(t,cells[i]);

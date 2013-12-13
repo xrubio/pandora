@@ -30,7 +30,7 @@ protected:
 	//std::vector<Sector *> _HRSectors;
 	//std::vector<Sector *> _LRSectors;
 	
-	std::map<long,long> _objectUseCounter;
+	std::map<unsigned long,long> _objectUseCounter;
 	omp_lock_t  _mapLock;
 	
 public:
@@ -122,7 +122,7 @@ public:
 	void putInformation(Sector *s, const Engine::Raster & r, const Engine::Raster & t);
 	//********************************
 	
-	std::map<long,long> * getObjectUseCounter() { return &_objectUseCounter; }
+	std::map<unsigned long,long> * getObjectUseCounter() { return &_objectUseCounter; }
 	omp_lock_t * getMapLock(){ return &_mapLock; }
 	
 	////////////////////////////////////////////////

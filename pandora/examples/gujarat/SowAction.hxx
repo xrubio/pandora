@@ -21,6 +21,10 @@ public:
 	// TODO templatitzar classe per agent
 	void execute( Engine::Agent & agent );
 	int getTimeNeeded() const;
+	
+	bool equal(MDPAction * a) { return dynamic_cast<SowAction*>(a); }
+	
+	
 };
 	
 } // namespace Gujarat

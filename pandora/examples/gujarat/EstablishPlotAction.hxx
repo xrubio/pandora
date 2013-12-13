@@ -31,6 +31,8 @@ public:
 private:
 	
 	Engine::Point2D<int>	_plotLocation;
+	
+	bool equal(MDPAction * a) { return dynamic_cast<EstablishPlotAction*>(a) && _plotLocation == ((EstablishPlotAction*)a)->_plotLocation;}
 };
 	
 } // namespace Gujarat

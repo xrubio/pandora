@@ -51,7 +51,7 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 	_creator=1;
 	
 	_ownItems.resize(s._ownItems.size());
-	for(int i = 0; i < _ownItems.size(); i++)
+	for(unsigned int i = 0; i < _ownItems.size(); i++)
 	{
 		//_ownItems[i] = false;
 		_ownItems[i] = s._ownItems[i];
@@ -73,12 +73,12 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 
 
 HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
-						, std::vector< Sector* > * HRActionSectors
-						, std::vector< Sector* > * LRActionSectors
-						, std::vector< Engine::Point2D<int> > * HRCellPool
-						, std::vector< Engine::Point2D<int> > * LRCellPool
-						, std::vector< bool > ownItems
-					        , const std::vector<MDPAction *>& actionList)
+					, std::vector< Sector* > * HRActionSectors
+					, std::vector< Sector* > * LRActionSectors
+					, std::vector< Engine::Point2D<int> > * HRCellPool
+					, std::vector< Engine::Point2D<int> > * LRCellPool
+					, std::vector< bool > ownItems
+				        , const std::vector<MDPAction *>& actionList)
 : _timeIndex( s._timeIndex )
 , _mapLocation( s._mapLocation )
 , _onHandResources( s._onHandResources )
@@ -132,7 +132,7 @@ HunterGathererMDPState::HunterGathererMDPState(
 			, std::vector< Engine::Point2D<int> > * HRCellPool
 			, std::vector< Engine::Point2D<int> > * LRCellPool
 			, std::vector< bool > ownItems
-			, std::map<long,long> * objectUseCounter
+			, std::map<unsigned long,long> * objectUseCounter
 			, omp_lock_t * mapLock
 			, const std::vector<MDPAction *>&  actionList)
 
@@ -177,7 +177,7 @@ HunterGathererMDPState::HunterGathererMDPState(
 
 /*const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGathererMDPState& s )
 {
-	//*? 
+	
 	//TODO MEMORY LEAK !!!
 
 	//return *(new HunterGathererMDPState(s,this));	
@@ -343,24 +343,70 @@ unsigned HunterGathererMDPState::hash() const
 	return _hashKey.code(); 
 }
 
+
+bool HunterGathererMDPState::equalActions(MDPAction *a, MDPAction *b) const
+{
+	if (dynamic_cast<ForageAction*>(a) && dynamic_cast<ForageAction*>(b))
+	{
+		return a->equal(b);		
+	}
+	else if (dynamic_cast<MoveHomeAction*>(a) && dynamic_cast<MoveHomeAction*>(b))
+	{
+		return a->equal(b);		
+	}
+	else if (dynamic_cast<DoNothingAction*>(a) && dynamic_cast<DoNothingAction*>(b))
+	{
+		return a->equal(b);		
+	}
+	
+	return false;
+}
+
+
+
+bool HunterGathererMDPState::EqListMatching(const std::vector<Gujarat::MDPAction*> &v, const std::vector<Gujarat::MDPAction*> &w) const
+{
+	if (v.size() != w.size())
+	{
+		return false;
+	}
+	
+	std::vector<bool> matched(v.size(),false);
+	
+	for(int i=0; i < v.size(); i++)
+	{	
+		int j;
+		for(j=0; j < w.size(); j++)
+		{		
+			//if(v[i]==w[j] && !matched[j])
+			if(v[i]->equal(w[j]) && !matched[j])
+			{
+				matched[j] = true;
+				break;
+			}
+		}
+		if (j == w.size())
+		{
+			return false;
+		}		
+	}
+	
+	return true;	
+}
+
 bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 {
-	return ( _timeIndex == s._timeIndex ) &&
-			( _onHandResources == s._onHandResources ) &&
-			( _mapLocation == s._mapLocation ) &&
-			( _resources == s._resources ) &&
-			( _daysStarving == s._daysStarving );
+	return ( _timeIndex == s._timeIndex ) 
+		&&	( _onHandResources == s._onHandResources ) 
+		&&	( _mapLocation == s._mapLocation ) 
+		&&	( _resources == s._resources ) 
+		&&	( _daysStarving == s._daysStarving ) 
+		;//&&  EqListMatching(_availableActions,s._availableActions);
 }
 
 bool	HunterGathererMDPState::operator!=( const HunterGathererMDPState& s ) const
-{
-	//TODO why AND instead of OR???
-	
-	return ( _timeIndex != s._timeIndex ) &&
-			( _onHandResources != s._onHandResources ) &&
-			( _mapLocation != s._mapLocation ) &&
-			( _resources != s._resources ) &&
-			( _daysStarving != s._daysStarving );
+{	
+	return !(*this==s);
 }
 
 bool	HunterGathererMDPState::operator<( const HunterGathererMDPState& s ) const
@@ -409,130 +455,65 @@ void HunterGathererMDPState::registerKnowledgeStructuresAtCounterMap()
 
 		omp_set_lock(_mapLock);
 			
-		if (_objectUseCounter->count((long)_mapLock) > 0)
+		if (_objectUseCounter->count((unsigned long)_mapLock) > 0)
 		{
-			(*_objectUseCounter)[(long)_mapLock]++;		
-			
+			(*_objectUseCounter)[(unsigned long)_mapLock]++;			
 		}
 		else
 		{
-			(*_objectUseCounter)[(long)_mapLock]=1;		
+			(*_objectUseCounter)[(unsigned long)_mapLock]=1;		
 		}
 		
 		
-		
-		if (_objectUseCounter->count((long)_HRActionSectors) > 0)
-		{
-			(*_objectUseCounter)[(long)_HRActionSectors]++;		
-	
+		if (_objectUseCounter->count((unsigned long)_LRActionSectors) > 0)
+		{			
+			(*_objectUseCounter)[(unsigned long)_LRActionSectors]++;
 		}
 		else
 		{
-			(*_objectUseCounter)[(long)_HRActionSectors]=1;		
+			(*_objectUseCounter)[(unsigned long)_LRActionSectors]=1;
 		}
 		
-		if (_objectUseCounter->count((long)_LRActionSectors) > 0)
+		
+		if (_objectUseCounter->count((unsigned long)_LRCellPool) > 0)
 		{
-			/*long foo = (long)_LRActionSectors;
-			std::cout << "MDPState " << _dni << " increases entry LRActionSectors:" << foo <<std::endl;
-			for(int i=0; i <_LRActionSectors->size(); i++)
-				std::cout << " " << (*_LRActionSectors)[i]->_dni; 
-				
-			std::cout << std::endl;
-			*/
-			
-			
-			(*_objectUseCounter)[(long)_LRActionSectors]++;
+			(*_objectUseCounter)[(unsigned long)_LRCellPool]++;
 		}
 		else
 		{
-			/*long foo = (long)_LRActionSectors;
-			std::cout << "MDPState " << _dni << " registres entry LRActionSectors:" << foo <<std::endl;			
-			for(int i=0; i <_LRActionSectors->size(); i++)
-				std::cout << foo << " has sector " << (*_LRActionSectors)[i]->_dni << std::endl;
-			*/
-			
-			
-			(*_objectUseCounter)[(long)_LRActionSectors]=1;
-		}
-		
-		if (_objectUseCounter->count((long)_HRCellPool) > 0)
-		{
-			(*_objectUseCounter)[(long)_HRCellPool]++;
-		}
-		else
-		{
-			(*_objectUseCounter)[(long)_HRCellPool]=1;
-		}
-		
-		if (_objectUseCounter->count((long)_LRCellPool) > 0)
-		{
-			(*_objectUseCounter)[(long)_LRCellPool]++;
-		}
-		else
-		{
-			(*_objectUseCounter)[(long)_LRCellPool]=1;
+			(*_objectUseCounter)[(unsigned long)_LRCellPool]=1;
 		}
 	
 	
 		omp_unset_lock(_mapLock);
 	
-	
 	}
 	
-	
-	
+
 void HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructures()
 	{
 		
 		//std::cout << "DELETING state. thread [" << omp_get_thread_num() <<"]"<< std::endl;
 		omp_set_lock(_mapLock);
-		
-		if (_objectUseCounter->count((long)_HRActionSectors) > 0)
-		{	
-			(*_objectUseCounter)[(long)_HRActionSectors]--;
-			if ( (*_objectUseCounter)[(long)_HRActionSectors] == 0)
-			{
-			_objectUseCounter->erase((long)_HRActionSectors);	
-			}
-		}
-		
-		if ( (_objectUseCounter->count((long)_HRActionSectors) == 0) && _ownItems[0])
-		{		
-			for(int i=0;i<_HRActionSectors->size();i++)
-			{
-				delete (*_HRActionSectors)[i];
-			}
 			
-			delete _HRActionSectors;
-		}
 	//	}//pragma
 	//	#pragma omp critical(refmap)
 	//	{
 		
-		if (_objectUseCounter->count((long)_LRActionSectors) > 0)
+		if (_objectUseCounter->count((unsigned long)_LRActionSectors) > 0)
 		{
-			(*_objectUseCounter)[(long)_LRActionSectors]--;
-			if((*_objectUseCounter)[(long)_LRActionSectors] == 0)
+			(*_objectUseCounter)[(unsigned long)_LRActionSectors]--;
+			if((*_objectUseCounter)[(unsigned long)_LRActionSectors] == 0)
 			{
-			_objectUseCounter->erase((long)_LRActionSectors);
+			_objectUseCounter->erase((unsigned long)_LRActionSectors);
 			}
 		}
 		
-		if ((_objectUseCounter->count((long)_LRActionSectors) == 0) && _ownItems[1])
-		{		
-			//long foo = (long)_LRActionSectors;
-			//std::cout << "MDPState " << _dni << " erases entry LRActionSectors:" <<  foo << std::endl;
-		
+		if ((_objectUseCounter->count((unsigned long)_LRActionSectors) == 0) && _ownItems[1])
+		{				
 			for(int i=0;i<_LRActionSectors->size();i++)
-			{
-		
-				//std::cout << "MDPState " << _dni << " erases sector " << (*_LRActionSectors)[i]->_dni << std::endl;
-				
-				
-				//(void) sizeof(Sector);
-				delete (*_LRActionSectors)[i];
-		
+			{		
+				delete (*_LRActionSectors)[i];		
 			}			
 		
 			delete _LRActionSectors;
@@ -542,59 +523,44 @@ void HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructure
 	//	#pragma omp critical(refmap)
 	//	{
 			
-		if (_objectUseCounter->count((long)_HRCellPool) > 0)
-		{
-			(*_objectUseCounter)[(long)_HRCellPool]--;
-			if((*_objectUseCounter)[(long)_HRCellPool]==0)
-			{
-				_objectUseCounter->erase((long)_HRCellPool);
-			}		
-		}
-		
-		if ((_objectUseCounter->count((long)_HRCellPool) == 0) && _ownItems[2])
-		{
-			delete _HRCellPool;
-		}
-		
 	//	}//pragma
 	//	#pragma omp critical(refmap)
 	//	{
 		
-		if (_objectUseCounter->count((long)_LRCellPool) > 0)
+		if (_objectUseCounter->count((unsigned long)_LRCellPool) > 0)
 		{
-				(*_objectUseCounter)[(long)_LRCellPool]--;
-				if((*_objectUseCounter)[(long)_LRCellPool] == 0)
+				(*_objectUseCounter)[(unsigned long)_LRCellPool]--;
+				if((*_objectUseCounter)[(unsigned long)_LRCellPool] == 0)
 				{
-					_objectUseCounter->erase((long)_LRCellPool);	
+					_objectUseCounter->erase((unsigned long)_LRCellPool);	
 				}
 		
 		}
 		
-		if ((_objectUseCounter->count((long)_LRCellPool) == 0) && _ownItems[3])
+		if ((_objectUseCounter->count((unsigned long)_LRCellPool) == 0) && _ownItems[3])
 		{
 			delete _LRCellPool;
-		}
+		}		
 		
-		
-		if (_objectUseCounter->count((long)_mapLock) > 0)
+		if (_objectUseCounter->count((unsigned long)_mapLock) > 0)
 		{
-			(*_objectUseCounter)[(long)_mapLock]--;
-			if((*_objectUseCounter)[(long)_mapLock] == 0)
+			(*_objectUseCounter)[(unsigned long)_mapLock]--;
+			if((*_objectUseCounter)[(unsigned long)_mapLock] == 0)
 			{
-				_objectUseCounter->erase((long)_mapLock);	
+				//*?
+		//		_objectUseCounter->erase((unsigned long)_mapLock);	
 			}
 			
 		}
 		
 		omp_unset_lock(_mapLock);
-		if ((_objectUseCounter->count((long)_mapLock) == 0))
+		if ((_objectUseCounter->count((unsigned long)_mapLock) == 0))
 		{
 		//	omp_destroy_lock(_mapLock);
 		//	delete _mapLock;
 		}
 		
-	}
-	
+	}	
 	
 	
 	void HunterGathererMDPState::clearRefCounterMap() 

@@ -33,7 +33,7 @@ class ForageAction : public MDPAction
 	int	_caloriesCollected;
 	bool _useFullPopulation;
 
-							 
+			
 	
 	void selectBestWalk( const GujaratAgent& agent
 			,const Engine::Point2D<int>& n
@@ -187,7 +187,17 @@ public:
 	//**********************
 	//** ownership of sector structures int the MDP tree
 	
-	
+		bool equal(MDPAction * a) { return dynamic_cast<ForageAction*>(a) 
+				&& _ownsForageAreaPointer == ((ForageAction*)a)->_ownsForageAreaPointer
+				&& _biomassCollected == ((ForageAction*)a)->_biomassCollected
+				&& _caloriesCollected == ((ForageAction*)a)->_caloriesCollected
+				&& _useFullPopulation == ((ForageAction*)a)->_useFullPopulation
+				&& _HRForageArea->_dni == ((ForageAction*)a)->_HRForageArea->_dni
+				&& _LRForageArea->_dni == ((ForageAction*)a)->_LRForageArea->_dni;
+				/*&& (unsigned long)_HRForageArea == (unsigned long)((ForageAction*)a)->_HRForageArea
+				&& (unsigned long)_LRForageArea == (unsigned long)((ForageAction*)a)->_LRForageArea;*/
+				}
+
 	
 };
 

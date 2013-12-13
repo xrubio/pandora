@@ -28,6 +28,10 @@ public:
 	virtual int getTimeNeeded() const;
 
 	static void	generatePossibleActions( GujaratAgent& agent, std::vector< APMoveHomeAction* >& actions );
+	
+		
+	bool equal(MDPAction * a) { return dynamic_cast<APMoveHomeAction*>(a) && _newHomeLoc == ((APMoveHomeAction*)a)->_newHomeLoc;}
+	
 };
 	
 } // namespace Gujarat

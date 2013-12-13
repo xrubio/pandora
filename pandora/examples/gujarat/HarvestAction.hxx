@@ -30,6 +30,8 @@ public:
 	
 	virtual void getOwnershipMDPSectorKnowledge(bool v[]) const = 0;
 	
+	bool equal(MDPAction * a) { return dynamic_cast<HarvestAction*>(a); }
+	
 };
 	
 

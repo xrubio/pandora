@@ -66,13 +66,20 @@ template<typename T> struct map_functions_t {
 struct data_t {
     std::vector<float> values_;
     std::vector<int> counts_;
-    data_t(const std::vector<float> &values, const std::vector<int> &counts)
-      : values_(values), counts_(counts) { }
+    unsigned long mdpStateDni_;
+    
+    data_t(const std::vector<float> &values
+	, const std::vector<int> &counts
+	, const unsigned long &dni)
+      : values_(values), counts_(counts) 
+      { mdpStateDni_=dni; }
+      
     data_t(const data_t &data)
-      : values_(data.values_), counts_(data.counts_) { }
+      : values_(data.values_), counts_(data.counts_)  
+      { mdpStateDni_= data.mdpStateDni_; }
 #if 0
     data_t(data_t &&data)
-      : values_(std::move(data.values_)), counts_(std::move(data.counts_)) { }
+      : values_(std::move(data.values_)), counts_(std::move(data.counts_)), mpdStateDni_(std::move(data.mpdStateDni_)) { }
 #endif
 };
 
@@ -198,7 +205,7 @@ template<typename T> class uct_t : public improvement_t<T> {
 	    //*? ucthack
 	    //std::cout << "UCT INSERT : " << (long)&s << "," << s.numAvailableActions() << std::endl;
 	    
-            table_.insert(std::make_pair(std::make_pair(depth, s), data_t(values, counts)));
+            table_.insert(std::make_pair(std::make_pair(depth, s), data_t(values, counts,s._dni)));
             float value = evaluate(s, depth);
 #ifdef DEBUG
             std::cout << " insert in tree w/ value=" << value << std::endl;
@@ -210,9 +217,18 @@ template<typename T> class uct_t : public improvement_t<T> {
 	int ucthack_na = policy_t<T>::problem().number_actions(s)+1;
 	
 	//*?ucthack
+	/*if (s._dni!=it->second.mdpStateDni_)
+		std::cout << "DIFERENTS:" 
+		<< s._dni<<"!="<<it->second.mdpStateDni_ << std::endl;
+	else
+		std::cout << "IGUALS:" 
+		<< s._dni<<"=="<<it->second.mdpStateDni_ << std::endl;
+	*/
 	if(it->second.counts_.size() != policy_t<T>::problem().number_actions(s)+1)
 		std::cout << "UCT COUNTS ASSERT : " 
-			<< s._dni 
+			<< s._dni
+			<< "=?"
+			<< it->second.mdpStateDni_
 			<< ","  << s._creator
 			<< "," 	<< s._numAvailableActionsWhenBorn
 			<< "," 	<< s.numAvailableActions() 
@@ -224,6 +240,8 @@ template<typename T> class uct_t : public improvement_t<T> {
 	if( it->second.values_.size() != policy_t<T>::problem().number_actions(s)+1 )
 		std::cout << "UCT VALUES ASSERT : " 
 			<< s._dni
+			<< "=?"
+			<< it->second.mdpStateDni_
 			<< ","  << s._creator
 			<< ","  << s._numAvailableActionsWhenBorn
 			<< "," 	<< s.numAvailableActions() 
@@ -231,7 +249,6 @@ template<typename T> class uct_t : public improvement_t<T> {
 			<< "!="
 			<< policy_t<T>::problem().number_actions(s)+1
 			<< std::endl;
-	
 	
 	assert( it->second.counts_.size() == policy_t<T>::problem().number_actions(s)+1 );
 	    assert( it->second.values_.size() == policy_t<T>::problem().number_actions(s)+1 );

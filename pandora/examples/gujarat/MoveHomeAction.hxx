@@ -57,7 +57,11 @@ public:
 	/*Sector * getVisitedSector(GujaratAgent & ag) 
 	 * { return ag.getSectorOfLRCell(_newHomeLoc); }
 	 * */
-	
+	bool equal(MDPAction * a) { return dynamic_cast<MoveHomeAction*>(a) 
+							&& _newHomeLoc == ((MoveHomeAction*)a)->_newHomeLoc 
+							&& ((MDPAction*)_forageAction)->equal((MDPAction*)
+								((MoveHomeAction*)a)->_forageAction
+								); }
 	
 };
 	

@@ -85,6 +85,20 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	std::vector<MDPAction *>  actionList;
 	makeActionsForState(agentRef(), actionList);
 	
+	
+	/*?
+	 
+		, int maxResources
+		, int divider 
+		
+		instead of
+		
+		, _config.getHorizon()
+		, agentRef().computeConsumedResources(1)
+		
+	 */
+	
+	
 	_initial = new HunterGathererMDPState(	&agentRef()
 						, &_config
 						, agentRef().getPosition()
@@ -146,7 +160,7 @@ float HunterGathererMDPModel::cost( const HunterGathererMDPState& s,
 
 void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s, 
 					action_t a, 
-					OutcomeVector& outcomes ) const
+					OutcomeVector& outcomes,int foo ) const
 {
 
 	std::stringstream logName;
@@ -197,7 +211,7 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s, 
 					action_t a, 
 					OutcomeVector& outcomes
-					,int foo ) const
+					 ) const
 {
 	std::stringstream logName;
 	logName << "infoshar";
@@ -384,7 +398,7 @@ void HunterGathererMDPModel::makeActionsForState(
 {
 	// Map from "sector memory address" to "sector integer identifier".
 	// After sorting validActionSectors I need to access both the HR and the LR sector
-	std::map<Sector*,int> sectorIdxMap;
+	std::map<unsigned long,int> sectorIdxMap;
 
 	//std::cout << "creating actions for state with time index: " << s.getTimeIndex() << " and resources: " << s.getOnHandResources() << std::endl;
 	// Make Do Nothing	
@@ -411,7 +425,7 @@ void HunterGathererMDPModel::makeActionsForState(
 			continue;
 		}
 		validActionSectors.push_back( (*LRActionSectors)[i] );
-		sectorIdxMap[(*LRActionSectors)[i]] = i;
+		sectorIdxMap[(unsigned long)(*LRActionSectors)[i]] = i;
 	}	
 	//TODO why 2 reorderings??? first random, then according a predicate
 	//std::random_shuffle( validActionSectors.begin(), validActionSectors.end() );
@@ -424,7 +438,7 @@ void HunterGathererMDPModel::makeActionsForState(
 	{
 		for ( unsigned i = 0; i < validActionSectors.size(); i++ )
 		{
-			int sectorIdx = sectorIdxMap[validActionSectors[i]];
+			int sectorIdx = sectorIdxMap[(unsigned long)(validActionSectors[i])];
 			//actionList.push_back( new ForageAction( HRActionSectors[sectorIdx], validActionSectors[i], true ) );
 			actionList.push_back( new ForageAction( (*HRActionSectors)[sectorIdx], validActionSectors[i], false ) );	
 		}
@@ -433,13 +447,13 @@ void HunterGathererMDPModel::makeActionsForState(
 	{
 		for ( unsigned i = 0; i < forageActions; i++ )
 			{
-			int sectorIdx = sectorIdxMap[validActionSectors[i]];
+			int sectorIdx = sectorIdxMap[(unsigned long)(validActionSectors[i])];
 			//actionList.push_back( new ForageAction( HRActionSectors[sectorIdx],validActionSectors[i], true ) );
 			actionList.push_back( new ForageAction( (*HRActionSectors)[sectorIdx],validActionSectors[i], false ) );
 			}
 		for ( unsigned i = forageActions; i < validActionSectors.size(); i++ )
 			{
-			//int sectorIdx = sectorIdxMap[validActionSectors[i]];
+			//int sectorIdx = sectorIdxMap[(unsigned long)(validActionSectors[i])];
 			
 			// Structures from a MDPState cannot be destroyed till the State disappears
 			// delete validActionSectors[i];

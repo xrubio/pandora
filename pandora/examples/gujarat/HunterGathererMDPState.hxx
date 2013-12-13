@@ -35,7 +35,7 @@ class HunterGathererMDPState
 	//static std::vector< std::unordered_map<long,long> > _objectUseCounter;
 	//boost::mutex _mtx;
 	//static 
-	std::map<long,long> * _objectUseCounter;
+	std::map<unsigned long,long> * _objectUseCounter;
 	omp_lock_t * _mapLock;
 	
 	/* There is some posibility of interference between threads and
@@ -50,7 +50,7 @@ class HunterGathererMDPState
 public:
 	int _numAvailableActionsWhenBorn;
 	int _creator;
-	int _dni;
+	unsigned long _dni;
 	std::string _actionName;
 	HunterGatherer * _agentRef;
 	HunterGathererMDPConfig	* _config;
@@ -98,7 +98,7 @@ public:
 			, std::vector< Engine::Point2D<int> > * HRCellPool
 			, std::vector< Engine::Point2D<int> > * LRCellPool
 			, std::vector< bool > ownsItems
-			, std::map<long,long> * objectUseCounter
+			, std::map<unsigned long,long> * objectUseCounter
 			, omp_lock_t * mapLock
 			, const std::vector<MDPAction *>&  actionList);
 	
@@ -115,7 +115,12 @@ public:
 	~HunterGathererMDPState();
 
 	//void		initializeSuccessor( HunterGathererMDPState& s, const std::vector< bool > ownership ) const;
+	
+	bool equalActions(MDPAction *a, MDPAction *b) const;
 
+	bool EqListMatching(const std::vector<Gujarat::MDPAction*> &v, const std::vector<Gujarat::MDPAction*> &w) const;
+		
+	
 	unsigned	hash() const;
 	bool		operator==( const HunterGathererMDPState& s ) const;
 	bool		operator!=( const HunterGathererMDPState& s ) const;
