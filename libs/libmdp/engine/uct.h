@@ -29,7 +29,11 @@
 #include <vector>
 #include <math.h>
 
+#include <map>
+
 //#define DEBUG
+
+class Gujarat::HunterGathererMDPState;
 
 namespace Online {
 
@@ -63,20 +67,22 @@ template<typename T> struct map_functions_t {
     }
 };
 
+
+
 struct data_t {
     std::vector<float> values_;
     std::vector<int> counts_;
-    unsigned long mdpStateDni_;
+    unsigned long mdpStatePoint_;
     
     data_t(const std::vector<float> &values
 	, const std::vector<int> &counts
-	, const unsigned long &dni)
+	, const unsigned long dni)
       : values_(values), counts_(counts) 
-      { mdpStateDni_=dni; }
+      { mdpStatePoint_=dni; }
       
     data_t(const data_t &data)
       : values_(data.values_), counts_(data.counts_)  
-      { mdpStateDni_= data.mdpStateDni_; }
+      { mdpStatePoint_= data.mdpStatePoint_; }
 #if 0
     data_t(data_t &&data)
       : values_(std::move(data.values_)), counts_(std::move(data.counts_)), mpdStateDni_(std::move(data.mpdStateDni_)) { }
@@ -205,7 +211,7 @@ template<typename T> class uct_t : public improvement_t<T> {
 	    //*? ucthack
 	    //std::cout << "UCT INSERT : " << (long)&s << "," << s.numAvailableActions() << std::endl;
 	    
-            table_.insert(std::make_pair(std::make_pair(depth, s), data_t(values, counts,s._dni)));
+            table_.insert(std::make_pair(std::make_pair(depth, s), data_t(values, counts,(unsigned long)&s)));
             float value = evaluate(s, depth);
 #ifdef DEBUG
             std::cout << " insert in tree w/ value=" << value << std::endl;
@@ -217,18 +223,27 @@ template<typename T> class uct_t : public improvement_t<T> {
 	int ucthack_na = policy_t<T>::problem().number_actions(s)+1;
 	
 	//*?ucthack
-	/*if (s._dni!=it->second.mdpStateDni_)
+	/*if (s._dni!=it->second.mdpStatePoint_)
 		std::cout << "DIFERENTS:" 
-		<< s._dni<<"!="<<it->second.mdpStateDni_ << std::endl;
+		<< s._dni<<"!="<<it->second.mdpStatePoint_ << std::endl;
 	else
 		std::cout << "IGUALS:" 
-		<< s._dni<<"=="<<it->second.mdpStateDni_ << std::endl;
+		<< s._dni<<"=="<<it->second.mdpStatePoint_ << std::endl;
 	*/
+	
+	//std::map<int,Gujarat::HunterGathererMDPState*> *hgstmap = s._diccioMDPState;
+	const Gujarat::HunterGathererMDPState * hgms =&s; 
+	
+	/*assert(hgstmap->count(it->second.mdpStatePoint_) > 0);
+	assert(hgstmap->count(it->second.mdpStatePoint_) == 1);
+	hgms = hgstmap->at(it->second.mdpStatePoint_);*/
+	
 	if(it->second.counts_.size() != policy_t<T>::problem().number_actions(s)+1)
+	{	
 		std::cout << "UCT COUNTS ASSERT : " 
 			<< s._dni
 			<< "=?"
-			<< it->second.mdpStateDni_
+			<< it->second.mdpStatePoint_
 			<< ","  << s._creator
 			<< "," 	<< s._numAvailableActionsWhenBorn
 			<< "," 	<< s.numAvailableActions() 
@@ -236,12 +251,18 @@ template<typename T> class uct_t : public improvement_t<T> {
 			<< "!="
 			<< policy_t<T>::problem().number_actions(s)+1
 			<< std::endl;
+		std::cout << s << std::endl;
+		std::cout << "------------------" << std::endl;
+		//std::cout << *it->second.mdpStatePoint_ << std::endl;
+		s.print(it->second.mdpStatePoint_);
+	}
 	
 	if( it->second.values_.size() != policy_t<T>::problem().number_actions(s)+1 )
+	{
 		std::cout << "UCT VALUES ASSERT : " 
 			<< s._dni
 			<< "=?"
-			<< it->second.mdpStateDni_
+			<< it->second.mdpStatePoint_
 			<< ","  << s._creator
 			<< ","  << s._numAvailableActionsWhenBorn
 			<< "," 	<< s.numAvailableActions() 
@@ -249,6 +270,11 @@ template<typename T> class uct_t : public improvement_t<T> {
 			<< "!="
 			<< policy_t<T>::problem().number_actions(s)+1
 			<< std::endl;
+		std::cout << s << std::endl;
+		std::cout << "------------------" << std::endl;
+		//std::cout << *it->second.mdpStatePoint_ << std::endl;
+		s.print(it->second.mdpStatePoint_);
+	}
 	
 	assert( it->second.counts_.size() == policy_t<T>::problem().number_actions(s)+1 );
 	    assert( it->second.values_.size() == policy_t<T>::problem().number_actions(s)+1 );

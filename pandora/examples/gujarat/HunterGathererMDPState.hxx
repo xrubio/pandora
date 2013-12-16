@@ -83,8 +83,6 @@ public:
 
 	//HunterGathererMDPState( HunterGathererMDPState& s, bool ownership[] );
 	
-	
-	
 	// The real one
 	HunterGathererMDPState(	HunterGatherer * agentRef
 			, HunterGathererMDPConfig * config
@@ -115,17 +113,18 @@ public:
 	~HunterGathererMDPState();
 
 	//void		initializeSuccessor( HunterGathererMDPState& s, const std::vector< bool > ownership ) const;
+
 	
 	bool equalActions(MDPAction *a, MDPAction *b) const;
 
-	bool EqListMatching(const std::vector<Gujarat::MDPAction*> &v, const std::vector<Gujarat::MDPAction*> &w) const;
-		
+	bool EqListMatching(const std::vector<Gujarat::MDPAction*> &v, const std::vector<Gujarat::MDPAction*> &w) const;	
 	
 	unsigned	hash() const;
 	bool		operator==( const HunterGathererMDPState& s ) const;
 	bool		operator!=( const HunterGathererMDPState& s ) const;
 	bool		operator<( const HunterGathererMDPState& s ) const;
 
+	void		print( unsigned long x ) const;
 	void		print( std::ostream& os ) const;
 
 	void		increaseTimeIndex() { _timeIndex++; }

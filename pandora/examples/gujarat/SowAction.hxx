@@ -24,7 +24,6 @@ public:
 	
 	bool equal(MDPAction * a) { return dynamic_cast<SowAction*>(a); }
 	
-	
 };
 	
 } // namespace Gujarat

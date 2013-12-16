@@ -21,6 +21,7 @@ HunterGathererMDPState::HunterGathererMDPState() : _timeIndex(0), _mapLocation(-
 }
 */
 
+
 HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s )
 : _timeIndex( s._timeIndex )
 , _mapLocation( s._mapLocation )
@@ -344,25 +345,24 @@ unsigned HunterGathererMDPState::hash() const
 }
 
 
+
 bool HunterGathererMDPState::equalActions(MDPAction *a, MDPAction *b) const
 {
 	if (dynamic_cast<ForageAction*>(a) && dynamic_cast<ForageAction*>(b))
 	{
-		return a->equal(b);		
+		return true;		
 	}
 	else if (dynamic_cast<MoveHomeAction*>(a) && dynamic_cast<MoveHomeAction*>(b))
 	{
-		return a->equal(b);		
+		return true;		
 	}
 	else if (dynamic_cast<DoNothingAction*>(a) && dynamic_cast<DoNothingAction*>(b))
 	{
-		return a->equal(b);		
+		return true;		
 	}
 	
 	return false;
 }
-
-
 
 bool HunterGathererMDPState::EqListMatching(const std::vector<Gujarat::MDPAction*> &v, const std::vector<Gujarat::MDPAction*> &w) const
 {
@@ -378,8 +378,9 @@ bool HunterGathererMDPState::EqListMatching(const std::vector<Gujarat::MDPAction
 		int j;
 		for(j=0; j < w.size(); j++)
 		{		
-			//if(v[i]==w[j] && !matched[j])
+			
 			if(v[i]->equal(w[j]) && !matched[j])
+			//if(equalActions(v[i],w[j]) && !matched[j])
 			{
 				matched[j] = true;
 				break;
@@ -394,19 +395,26 @@ bool HunterGathererMDPState::EqListMatching(const std::vector<Gujarat::MDPAction
 	return true;	
 }
 
+
 bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 {
-	return ( _timeIndex == s._timeIndex ) 
-		&&	( _onHandResources == s._onHandResources ) 
-		&&	( _mapLocation == s._mapLocation ) 
-		&&	( _resources == s._resources ) 
-		&&	( _daysStarving == s._daysStarving ) 
-		;//&&  EqListMatching(_availableActions,s._availableActions);
+	return ( _timeIndex == s._timeIndex ) &&
+			( _onHandResources == s._onHandResources ) &&
+			( _mapLocation == s._mapLocation ) &&
+			( _resources == s._resources ) &&
+			( _daysStarving == s._daysStarving )
+			&&  EqListMatching(_availableActions,s._availableActions);
 }
 
 bool	HunterGathererMDPState::operator!=( const HunterGathererMDPState& s ) const
-{	
-	return !(*this==s);
+{
+	//TODO why AND instead of OR???
+	
+	return ( _timeIndex != s._timeIndex ) &&
+			( _onHandResources != s._onHandResources ) &&
+			( _mapLocation != s._mapLocation ) &&
+			( _resources != s._resources ) &&
+			( _daysStarving != s._daysStarving );
 }
 
 bool	HunterGathererMDPState::operator<( const HunterGathererMDPState& s ) const
@@ -423,13 +431,30 @@ bool	HunterGathererMDPState::operator<( const HunterGathererMDPState& s ) const
 			  ( _daysStarving < s._daysStarving )	);
 }
 
+void	HunterGathererMDPState::print( unsigned long x ) const
+{
+	HunterGathererMDPState * p = (HunterGathererMDPState *)x;
+	std::cout << *p << std::endl;
+}
+
+
+
+
 void	HunterGathererMDPState::print( std::ostream& os ) const
 {
 	os << "<addr = " << this << ", ";
+	os << "dni = " << _dni << ", ";
+	os << "constructor = " << _creator << ", ";
+	os << "numActions = " << _numAvailableActionsWhenBorn << ", ";
 	os << "loc=(" << _mapLocation._x << ", " << _mapLocation._y << "), ";
 	os << "res=" << _onHandResources << ", ";
 	os << "t=" << _timeIndex << ", ";
 	os << "starv=" << _daysStarving << ", ";
+	os << "actions:";
+	for(unsigned int i=0;i<_availableActions.size();i++)
+		os << ": " << _availableActions[i]<<" ";
+	
+	
 	os << "changes=(";
 	for ( Engine::IncrementalRaster::ChangeIterator it = _resources.firstChange();
 		it != _resources.endOfChanges(); it++ )
@@ -453,8 +478,8 @@ void HunterGathererMDPState::registerKnowledgeStructuresAtCounterMap()
 		
 		//static std::map<long,long> _objectUseCounter;
 
-		omp_set_lock(_mapLock);
-			
+		omp_set_lock(_mapLock);		
+		
 		if (_objectUseCounter->count((unsigned long)_mapLock) > 0)
 		{
 			(*_objectUseCounter)[(unsigned long)_mapLock]++;			
@@ -670,6 +695,9 @@ void	HunterGathererMDPState::makeActionsForState( HunterGatherer * agentRef)
 	//HRActionSectors.clear();
 	//LRActionSectors.clear();
 	//std::cout << "finished creating actions for state with time index: " << s.getTimeIndex() << " and resources: " << s.getOnHandResources() << std::endl;
+	
+	
+	
 } 
 	
 	
