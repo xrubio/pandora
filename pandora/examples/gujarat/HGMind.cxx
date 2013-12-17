@@ -87,7 +87,7 @@ void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos
 				}
 				
 				cellPool[insertPoint]=p;
-				HRSectors[indexSector]->addCell( &cellPool[insertPoint] );
+				HRSectors[indexSector]->addCell( &cellPool[insertPoint] );				
 				insertPoint++;
 				//HRSectors[indexSector]->addCell( p );
 				//getWorld()->setValue( "sectors", p, 1 );	
@@ -126,6 +126,7 @@ void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos
 	{
 		if(HRSectors[k]->cells().size()>0) 
 		{
+			HRSectors[k]->setDirection(k);
 			resultHRSectors.push_back(HRSectors[k]);
 			HRSectors[k] = 0;
 		}
@@ -257,6 +258,7 @@ void HGMind::createLRSectors( 	const Engine::Point2D<int>& agentPos,
 		{
 			if(LRSectors[k]->cells().size()>0) 
 			{
+				LRSectors[k]->setDirection(k);
 				resultLRSectors.push_back(LRSectors[k]);
 				LRSectors[k] = 0;
 			}

@@ -192,7 +192,7 @@ public:
 				&& _biomassCollected == ((ForageAction*)a)->_biomassCollected
 				&& _caloriesCollected == ((ForageAction*)a)->_caloriesCollected
 				&& _useFullPopulation == ((ForageAction*)a)->_useFullPopulation			
-				;//&& _LRForageArea->_dni == ((ForageAction*)a)->_LRForageArea->_dni;		
+				&& _LRForageArea->_direction == ((ForageAction*)a)->_LRForageArea->_direction;		
 				}
 	
 };

@@ -49,7 +49,8 @@ class Sector
 	}	
 public:	
 	int _dni;
-	int _metaInfo;
+	int _direction;
+	
 protected:	
 	//const Engine::World & _world; needed change due to use of LR methods for raster access.
 	const GujaratWorld & _world;
@@ -119,7 +120,7 @@ public:
 		target->_biomassAmount = _biomassAmount;
 	}*/
 	
-	void setMetaInfo(int x) {_metaInfo = x;}
+	void setDirection(int x) {_direction = x;}
 	
 };
 

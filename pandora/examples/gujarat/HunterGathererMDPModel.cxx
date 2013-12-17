@@ -266,8 +266,7 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		while(it!=sourceLRSectors.end())
 		{
 			Sector * se = (Sector*)*it;
-			Sector * r = new Sector(se);
-			r->setMetaInfo(2);
+			Sector * r = new Sector(se);			
 			// Shallow Copy;
 			(*LRActionSectors)[i] = r;
 			i++;
