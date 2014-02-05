@@ -103,6 +103,7 @@ The methods are defined in a file called 'MyWorld.cxx':
 #include "MyWorld.hxx"
 
 #include <Simulation.hxx>
+#include <iostream>
 
 namespace Tutorial 
 {
