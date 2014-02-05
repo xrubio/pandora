@@ -114,7 +114,7 @@ void GlobalRasterStats::apply( const Engine::SimulationRecord & simRecord, const
 		std::cout << "done" << std::endl;
 	}
 
-	for(int i=0; i<=1+simRecord.getNumSteps(); i=i+simRecord.getFinalResolution())
+	for(int i=0; i<=simRecord.getNumSteps(); i=i+simRecord.getFinalResolution())
 	{
 		std::stringstream newLine;
 		newLine << i;
