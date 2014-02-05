@@ -1,5 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node1" href="$class_qwt_scale_engine.html" title="Base class for scale engines." alt="" coords="5,31,123,62"/>
-<area shape="rect" id="node3" href="$class_qwt_linear_scale_engine.html" title="A scale engine for linear scales." alt="" coords="171,5,323,35"/>
-<area shape="rect" id="node5" href="$class_qwt_log10_scale_engine.html" title="A scale engine for logarithmic (base 10) scales." alt="" coords="171,58,323,89"/>
-</map>

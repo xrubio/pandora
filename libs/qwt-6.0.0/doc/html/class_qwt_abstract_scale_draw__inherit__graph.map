@@ -1,5 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$class_qwt_round_scale_draw.html" title="A class for drawing round scales." alt="" coords="5,86,147,117"/>
-<area shape="rect" id="node7" href="$class_qwt_scale_draw.html" title="A class for drawing scales." alt="" coords="171,86,277,117"/>
-<area shape="rect" id="node5" href="$class_qwt_dial_scale_draw.html" title="A special scale draw made for QwtDial." alt="" coords="12,166,140,197"/>
-</map>

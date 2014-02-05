@@ -1,9 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node1" href="$class_qwt_picker_machine.html" title="A state machine for QwtPicker selections." alt="" coords="5,138,136,169"/>
-<area shape="rect" id="node3" href="$class_qwt_picker_click_point_machine.html" title="A state machine for point selections." alt="" coords="184,5,373,35"/>
-<area shape="rect" id="node5" href="$class_qwt_picker_click_rect_machine.html" title="A state machine for rectangle selections." alt="" coords="185,58,372,89"/>
-<area shape="rect" id="node7" href="$class_qwt_picker_drag_point_machine.html" title="A state machine for point selections." alt="" coords="185,111,372,142"/>
-<area shape="rect" id="node9" href="$class_qwt_picker_drag_rect_machine.html" title="A state machine for rectangle selections." alt="" coords="187,165,371,195"/>
-<area shape="rect" id="node11" href="$class_qwt_picker_polygon_machine.html" title="A state machine for polygon selections." alt="" coords="191,218,367,249"/>
-<area shape="rect" id="node13" href="$class_qwt_picker_tracker_machine.html" title="A state machine for indicating mouse movements." alt="" coords="192,271,365,302"/>
-</map>

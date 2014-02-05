@@ -1,5 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node1" href="$class_qwt_curve_fitter.html" title="Abstract base class for a curve fitter." alt="" coords="5,31,115,62"/>
-<area shape="rect" id="node3" href="$class_qwt_spline_curve_fitter.html" title="A curve fitter using cubic splines." alt="" coords="171,5,315,35"/>
-<area shape="rect" id="node5" href="$class_qwt_weeding_curve_fitter.html" title="A curve fitter implementing Douglas and Peucker algorithm." alt="" coords="164,58,321,89"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node7" href="$class_qwt_plot_spectrogram.html" title="A plot item, which displays a spectrogram." alt="" coords="16,246,157,277"/>
-<area shape="rect" id="node2" href="$class_qwt_plot_item.html" title="Base class for items on the plot canvas." alt="" coords="40,86,133,117"/>
-<area shape="rect" id="node4" href="$class_qwt_legend_item_manager.html" title="Abstract API to bind plot items to the legend." alt="" coords="5,6,168,37"/>
-</map>
