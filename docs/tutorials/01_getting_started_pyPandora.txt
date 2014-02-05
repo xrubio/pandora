@@ -8,7 +8,7 @@ We will create a simple Agent-Based Model with a basic World and a type of agent
 1) Create a python scripting file. It is recommended to have some basic background on Python programming language (LINK PYTHON).
 First of all, create an empty text file 'tutorial_pandora_01.py' with this header:
 
-#!/usr/bin/python
+#!/usr/bin/python3
 
 This is an execution file, so you will need to grant it execution privileges, from the command console:
 
@@ -44,14 +44,14 @@ Start defining an object MyWorld, child of World:
 class MyWorld(World):
 	def __init__(self, simulation ):
 		World.__init__( self, simulation)
-		print 'constructing MyWorld'
+		print('constructing MyWorld')
 	
 	def createRasters(self):
-		print 'creating rasters'
+		print('creating rasters')
 		return
 
 	def createAgents(self):
-		print 'creating agents'
+		print('creating agents')
 		return
 
 As you can see, we have defined 3 methods:
@@ -64,7 +64,7 @@ Finally, we need to create and configure an instance of MyWorld inside the main 
 def main():	
 	print 'getting started with pyPandora'
 	numTimeSteps = 10
-	worldSize = 64
+	worldSize = Point2DInt(64,64)
 	mySimulation = Simulation(worldSize, numTimeSteps)
 	myWorld = MyWorld(mySimulation)
 	print 'simulation finished'
@@ -79,7 +79,7 @@ NameError: name 'World' is not defined
 
 In order to find World and Simulation, our code must define the place where these classes were defined. We must add these directories to the list of paths defined in Python, at the beginning of our file:
 
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import sys
 sys.path.append('..')
@@ -100,14 +100,14 @@ myWorld.run()
 The first line initialized the simulation (creating the objects defined in createRasters and createAgents). The main method will now look like:
 
 def main():
-	print 'getting started with pyPandora'
+	print('getting started with pyPandora')
 	numTimeSteps = 10
-	worldSize = 64
+	worldSize = Point2DInt(64,64)
 	mySimulation = Simulation(worldSize, numTimeSteps)
 	myWorld = MyWorld(mySimulation)
 	myWorld.initialize()
 	myWorld.run()
-	print 'simulation finished'
+	print('simulation finished')
 
 And the output:
 
@@ -141,13 +141,13 @@ Now that MyWorld is working we will need to define our own MyAgent. Start defini
 class MyAgent(Agent):
 	def __init__(self, id):
 		Agent.__init__( self, id)
-		print 'constructing agent: ' + self.id
+		print('constructing agent: ',self.id)
 	
 	def updateState(self):
-		print 'updating state of: ' + self.id
+		print('updating state of: ',self.id)
 	
 	def serialize(self):
-		print 'serializing MyAgent: ' + self.id
+		print('serializing MyAgent: ',self.id)
 		return
 
 This class will have three methods:
@@ -164,7 +164,7 @@ from pyPandora import Simulation, World, Agent
 We will write some basic code inside updateState to modify its state. For now we will basically move our Agents randomly through the space defined in MyWorld:
 
 def updateState(self):
-	print 'updating state of: ' + self.id
+	print('updating state of: ',self.id)
 	newPosition = self.position
 	newPosition._x = newPosition._x + random.randint(-1,1)
 	newPosition._y = newPosition._y + random.randint(-1,1)
@@ -185,7 +185,7 @@ import sys, random
 We have everything ready for our first Agent-Based Model, but we have to create some instances of our brand new little MyAgent class. As stated before, we will add them in the 'createAgents' method of MyWorld:
 
 def createAgents(self):
-	print 'creating agents'
+	print('creating agents')
 	for i in range (0, 10):
 		newAgent = MyAgent('MyAgent_'+str(i))
 		self.addAgent(newAgent)
@@ -198,7 +198,7 @@ Everything ready! If we execute again tutorial_pyPandora.py we will get a list o
 To finish this tutorial we will modify MyAgent to gather 'resources' from MyWorld, and serialize this value. We go again to the 'updateState' method and add these lines:
 	
 def updateState(self):
-	print 'updating state of: ' + self.id
+	print('updating state of: ',self.id)
 	newPosition = self.position
 	newPosition._x = newPosition._x + random.randint(-1,1)
 	newPosition._y = newPosition._y + random.randint(-1,1)
@@ -217,7 +217,7 @@ class MyAgent(Agent):
 And store the value of gatheredResources  in serialize method:
 
 def serialize(self):
-	print 'serializing MyAgent: ' + self.id
+	print('serializing MyAgent: ',self.id)
 	serializeIntAttribute('resources', self.gatheredResources)
 
 To end the tutorial, an additional method needs to be defined in MyAgent, called registerAttributes. This method, called in initialization time, indicates Pandora which attributes will be stored during execution:

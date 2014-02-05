@@ -4,12 +4,13 @@
 
 #include "MyWorld.hxx"
 #include <Simulation.hxx>
+#include <Point2D.hxx>
 
 int main(int argc, char *argv[])
 {
 	try
 	{	
-		Engine::Simulation myWorldSim(64,10);
+		Engine::Simulation myWorldSim(Engine::Point2D<int>(64,64),10);
 		Tutorial::MyWorld world(myWorldSim);
 		
 		world.init(argc, argv);

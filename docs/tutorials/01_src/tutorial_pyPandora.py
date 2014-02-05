@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import sys, random
 sys.path.append('../../../pandora/pyPandora/')
@@ -10,10 +10,10 @@ class MyAgent(Agent):
 
 	def __init__(self, id):
 		Agent.__init__( self, id)
-		print 'constructing agent: ' + self.id
+		print('constructing agent: ',self.id)
 	
 	def updateState(self):
-		print 'updating state of: ' + self.id
+		print('updating state of: ',self.id)
 		newPosition = self.position
 		newPosition._x = newPosition._x + random.randint(-1,1)
 		newPosition._y = newPosition._y + random.randint(-1,1)
@@ -27,36 +27,36 @@ class MyAgent(Agent):
 		self.registerIntAttribute('resources')
 
 	def serialize(self):
-		print 'serializing MyAgent: ' + self.id
+		print('serializing MyAgent: ',self.id)
 		self.serializeIntAttribute('resources', self.gatheredResources)
 
 class MyWorld(World):
 	def __init__(self, simulation ):
 		World.__init__( self, simulation)
-		print 'constructing MyWorld'
+		print('constructing MyWorld')
 	
 	def createRasters(self):
-		print 'creating rasters'
+		print('creating rasters')
 		self.registerDynamicRaster("resources", 1)
 		self.getDynamicRaster("resources").setInitValues(0, 10, 0)
 		return
 
 	def createAgents(self):	
-		print 'creating agents'
+		print('creating agents')
 		for i in range (0, 10):
 			newAgent = MyAgent('MyAgent_'+str(i))
 			self.addAgent(newAgent)
 			newAgent.setRandomPosition()
 
 def main():
-	print 'getting started with pyPandora'
+	print('getting started with pyPandora')
 	numTimeSteps = 10
-	worldSize = 64
+	worldSize = Point2DInt(64,64)
 	mySimulation = Simulation(worldSize, numTimeSteps)
 	myWorld = MyWorld(mySimulation)
 	myWorld.initialize()
 	myWorld.run()
-	print 'simulation finished'
+	print('simulation finished')
 
 if __name__ == "__main__":
     main()
