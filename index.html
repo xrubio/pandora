@@ -1,57 +1,69 @@
 <!doctype html>
+<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
+<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on http://github.com/jonrohan -->
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Pandora by xrubio</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/respond.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <!--[if lt IE 8]>
-    <link rel="stylesheet" href="stylesheets/ie.css">
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  </head>
-  <body>
-      <div id="header">
-        <nav>
-          <li class="fork"><a href="https://github.com/xrubio/pandora">View On GitHub</a></li>
-          <li class="downloads"><a href="https://github.com/xrubio/pandora/zipball/master">ZIP</a></li>
-          <li class="downloads"><a href="https://github.com/xrubio/pandora/tarball/master">TAR</a></li>
-          <li class="title">DOWNLOADS</li>
-        </nav>
-      </div><!-- end header -->
+  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen"/>
+  <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script type="text/javascript" src="javascripts/script.js"></script>
 
-    <div class="wrapper">
+  <title>Pandora</title>
+  <meta name="description" content="an Agent-Based Modelling framework for large-scale distributed simulations">
 
-      <section>
-        <div id="title">
-          <h1>Pandora</h1>
-          <p>a C++/Python Agent-Based Modelling framework for large-scale distributed simulations</p>
-          <hr>
-          <span class="credits left">Project maintained by <a href="https://github.com/xrubio">xrubio</a></span>
-          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+</head>
+
+<body>
+
+  <div class="wrapper">
+    <header>
+      <h1 class="title">Pandora</h1>
+    </header>
+    <div id="container">
+      <p class="tagline">an Agent-Based Modelling framework for large-scale distributed simulations</p>
+      <div id="main" role="main">
+        <div class="download-bar">
+        <div class="inner">
+          <a href="https://github.com/xrubio/pandora/tarball/master" class="download-button tar"><span>Download</span></a>
+          <a href="https://github.com/xrubio/pandora/zipball/master" class="download-button zip"><span>Download</span></a>
+          <a href="https://github.com/xrubio/pandora" class="code">View Pandora on GitHub</a>
         </div>
+        <span class="blc"></span><span class="trc"></span>
+        </div>
+        <article class="markdown-body">
+          <p>Agent-Based Modelling (ABM) is recognised as one of the techniques with more potential to develop simulations capable of being used in Social Simulation. ABM uses a bottom-up approach to analyse the complexity of human interactions, and understand the emergence of global processes from individuals to the system as a whole. live. ABM is the best tool to simulate the interaction of entities with complex and heterogeneous behaviours within realistic environments. However, these simulations require high computational costs to be effective, and it is difficult to create Agent-Based Models capable of being executed in any type of computer, from laptops to supercomputers.</p>
 
-        <p>Agent-Based Modelling (ABM) is recognised as one of the techniques with more potential to develop simulations capable of being used in Social Simulation. ABM uses a bottom-up approach to analyse the complexity of human interactions, and understand the emergence of global processes from individuals to the system as a whole. live. ABM is the best tool to simulate the interaction of entities with complex and heterogeneous behaviours within realistic environments. However, these simulations require high computational costs to be effective, and it is difficult to create Agent-Based Models capable of being executed in any type of computer, from laptops to supercomputers.</p>
+<p>Pandora is a framework designed to create, execute and analyse agent-based models in high-performance computing environments. It has been programmed to allow the execution of large-scale agent-based simulations, and it is capable of dealing with thousands of agents developing complex actions.</p>
 
-<p>Pandora is a framework designed to create, execute and analyse agent-based models in high-performance computing environments. It has been programmed to allow the execution of large-scale agent-based simulations, and it is capable of dealing with thousands of agents developing complex actions. The users can choose to develop their code in Python (for fast prototyping) or C++ (complex models). Interfaces of both versions are identical, and share the same C++ base code (assuring compatibility and efficiency).</p>
-
-<p>The framework has full Geographical Information System support, to cope with simulations in which spatial coordinates are relevant, both in terms of agent interactions and environment. The library also allows the researcher to design experiments containing thousands of different runs exploring the parameter sweep of the model. This can be done either by code (both C++ and Python), or using Cassandra.</p>
+<p>Pandora has full Geographical Information System support, to cope with simulations in which spatial coordinates are relevant, both in terms of agent interactions and environment. The library also allows the researcher to design experiments containing thousands of different runs exploring the parameter sweep of the model. This can be done either by code (both C++ and Python), or using Cassandra.</p>
 
 <p>Cassandra is a general purpose GUI tool that can be used to analyse the results generated by a simulation created with the library. Cassandra allows the user to plan, execute and visualize the complete execution of simulations using a combination of 2D and 3D graphics, as well as statistical figures.</p>
-
-<p><a href="http://groups.google.com/d/forum/pandora_users">Contact</a></p>
-      </section>
-
+        </article>
+      </div>
     </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-              <script type="text/javascript">
+    <footer>
+      <div class="owner">
+      <p><a href="https://github.com/xrubio" class="avatar"><img src="https://1.gravatar.com/avatar/b7c0855e6b8faa9f6056c612d5ac36bd?d=https%3A%2F%2Fidenticons.github.com%2Fcf06b6b23dd5158c24b2043e8cc811f9.png&amp;r=x&amp;s=60" width="48" height="48"/></a> <a href="https://github.com/xrubio">xrubio</a> maintains <a href="https://github.com/xrubio/pandora">Pandora</a></p>
+
+
+      </div>
+      <div class="creds">
+        <small>This page generated using <a href="http://pages.github.com/">GitHub Pages</a><br/>theme by <a href="https://twitter.com/jonrohan/">Jon Rohan</a></small>
+      </div>
+    </footer>
+  </div>
+  <div class="current-section">
+    <a href="#top">Scroll to top</a>
+    <a href="https://github.com/xrubio/pandora/tarball/master" class="tar">tar</a><a href="https://github.com/xrubio/pandora/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
+    <p class="name"></p>
+  </div>
+
+            <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
@@ -62,5 +74,5 @@
             } catch(err) {}
           </script>
 
-  </body>
+</body>
 </html>
