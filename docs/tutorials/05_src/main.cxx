@@ -21,13 +21,13 @@
 
 #include <SimulationRecord.hxx>
 
-#include <analysis/Results.hxx>
+#include <analysis/GlobalAgentStats.hxx>
+#include <analysis/GlobalRasterStats.hxx>
 #include <analysis/AgentMean.hxx>
 #include <analysis/AgentSum.hxx>
 #include <analysis/RasterMean.hxx>
 #include <analysis/RasterSum.hxx>
 #include <analysis/AgentNum.hxx>
-#include <analysis/AgentHDFtoSHP.hxx>
 #include <iostream>
 
 int main(int argc, char *argv[])
@@ -35,21 +35,19 @@ int main(int argc, char *argv[])
 	Engine::SimulationRecord simRecord( 1, false);
 	simRecord.loadHDF5("data/results.h5", true, true);
 
-	Analysis::AgentResults agentResults(simRecord, "agents.csv", "MyAgent", ";");
-	agentResults.addAnalysis(new Analysis::AgentNum());
-	agentResults.addAnalysis(new Analysis::AgentMean("x"));
-	agentResults.addAnalysis(new Analysis::AgentMean("y"));
-	agentResults.addAnalysis(new Analysis::AgentMean("resources"));
-	agentResults.addAnalysis(new Analysis::AgentSum("resources"));
-	agentResults.addAnalysis(new Analysis::AgentHDFtoSHP( "shp/agents.shp'", -1));
+	PostProcess::GlobalAgentStats agentResults;	
+	agentResults.addAnalysis(new PostProcess::AgentNum());
+	agentResults.addAnalysis(new PostProcess::AgentMean("x"));
+	agentResults.addAnalysis(new PostProcess::AgentMean("y"));
+	agentResults.addAnalysis(new PostProcess::AgentMean("resources"));
+	agentResults.addAnalysis(new PostProcess::AgentSum("resources"));
+	agentResults.apply(simRecord, "agents.csv", "MyAgent");
 
-	agentResults.apply();
+	PostProcess::GlobalRasterStats rasterResults;
+	rasterResults.addAnalysis(new PostProcess::RasterMean());
+	rasterResults.addAnalysis(new PostProcess::RasterSum());
 
-	Analysis::RasterResults rasterResults(simRecord, "rasters.csv", "resources", ";");
-	rasterResults.addAnalysis(new Analysis::RasterMean());
-	rasterResults.addAnalysis(new Analysis::RasterSum());		
-
-	rasterResults.apply();
+	rasterResults.apply(simRecord, "rasters.csv", "resources");
 	return 0;
 }
 

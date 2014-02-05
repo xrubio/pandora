@@ -25,6 +25,7 @@ agentResults = GlobalAgentStats(';')
 rasterResults = GlobalRasterStats(';')
 
 We will add several analysis to both of them. Each analysis is a different class, and has a different set of parameters, for example:
+
 agentResults.addAnalysis(AgentNum())
 agentResults.addAnalysis(AgentMean('x'))
 agentResults.addAnalysis(AgentMean('y'))
@@ -34,7 +35,7 @@ agentResults.addAnalysis(AgentSum('resources'))
 The first analysis stores the number of agents for each time step. The second, third and fourth ones compute the mean of each variable amongst the entire set of agents.
 (TODO The fifth one calculates the sum of values, and finally the last analysis generate a georeferenced file (Shapefile http://www.esri.com/library/whitepapers/pdfs/shapefile.pdf) that can be loaded by any GIS software.)
 
-Regarding rasters, given the fact that each instance of RasterResults is defined for a raster, we can calculate the Mean and Sum of values:
+Regarding rasters, given the fact that each instance of GlobalRasterResults is defined for a raster, we can calculate the Mean and Sum of values:
 rasterResults.addAnalysis(RasterMean())
 rasterResults.addAnalysis(RasterSum())
 
@@ -47,5 +48,5 @@ and apply the results:
 agentResults.applyTo(record, 'agents.csv', 'MyAgent')
 rasterResults.applyTo(record, 'rasters.csv', 'resources')
 
-As you can see the method applyTo receives 3 parameters: the SimulationRecord instance where data was loaded, the output CSV filename and the type of agent or raster name to be analysed. In this way you could apply the same analysis to different types of agents (or diferent rasters), storing the information on CSVs files ready to be loaded in any classical analysis package (i.e. R, LibreOffice Calc, etc.).
+As you can see the method applyTo receives 3 parameters: the SimulationRecord instance where data was loaded, the output CSV filename and the type of agent or raster name to be analysed. In this way you could apply the same analysis to different types of agents (or diferent rasters), storing the information on CSVs files.
 
