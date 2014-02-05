@@ -2,14 +2,15 @@
 #ifndef __NeolithicConfig_hxx__
 #define __NeolithicConfig_hxx__
 
-#include "Config.hxx"
+#include <Config.hxx>
+#include <Point2D.hxx>
 
 namespace Examples
 {
 
 class NeolithicConfig: public Engine::Config
 {
-	int _size;
+	Engine::Point2D<int> _size;
 	bool _mountains;
 	// threshold defining minimum height for a cell to be considered mountain
 	int _heightThreshold;
@@ -33,7 +34,7 @@ public:
 	virtual ~NeolithicConfig();
     
 	void extractParticularAttribs(TiXmlElement *pRoot);
-	int getSize() const;
+	const Engine::Point2D<int> & getSize() const;
 	friend class NeolithicWorld;
 };
 

@@ -4,7 +4,7 @@
 namespace Examples
 {
 
-NeolithicConfig::NeolithicConfig() : _size(0), _mountains(false), _heightThreshold(0), _seaTravel(false), _seaTravelDistance(0), _saturationDensity(0.0f), _reproductiveRate(0.0f), _persistence(0.0f), _demFile(""), _initPopulationFile("")
+NeolithicConfig::NeolithicConfig() : _size(0,0), _mountains(false), _heightThreshold(0), _seaTravel(false), _seaTravelDistance(0), _saturationDensity(0.0f), _reproductiveRate(0.0f), _persistence(0.0f), _demFile(""), _initPopulationFile("")
 {
 }
   
@@ -17,7 +17,8 @@ void NeolithicConfig::extractParticularAttribs(TiXmlElement * root)
 	TiXmlElement * element = root->FirstChildElement("location");
 	float resolution = 0.0f;
 	retrieveAttributeMandatory(element, "resolution", resolution);
-	retrieveAttributeMandatory(element, "size", _size);
+	retrieveAttributeMandatory(element, "width", _size._x);
+	retrieveAttributeMandatory(element, "height", _size._y);
 	retrieveAttributeMandatory(element, "demFile", _demFile);
 	retrieveAttributeMandatory(element, "initPopulationFile", _initPopulationFile);
 
@@ -39,7 +40,7 @@ void NeolithicConfig::extractParticularAttribs(TiXmlElement * root)
 	_saturationDensity = resolution * resolution * saturationDensityConstant;
 }
 	
-int NeolithicConfig::getSize() const
+const Engine::Point2D<int> & NeolithicConfig::getSize() const
 {
 	return _size;
 }

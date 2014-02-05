@@ -2,9 +2,9 @@
 <config>  
 	<!-- Global simulation parameters -->
 	<output  resultsFile="./data/neolithic.h5" logsDir="./logs"/>
-	<numSteps value="100"/>
+	<numSteps value="100" serializeResolution="1"/>
 	<!-- GIS input data -->
-	<location size="120" resolution="50" demFile="resources/europe_dem.tiff" initPopulationFile="resources/init_population_ppnbc_europe.tiff"/>
+	<location width="120" height="120" resolution="50" demFile="resources/europe_dem.tiff" initPopulationFile="resources/init_population_ppnbc_europe.tiff"/>
 	<!-- mountain barriers, minimum threshold in meters -->
 	<mountains active="true" threshold="1750"/>
 	<!-- sea travel, maximum distance in km -->
