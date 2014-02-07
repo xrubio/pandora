@@ -1156,7 +1156,6 @@ void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>
 		walkedDist += agent.getTimeSpentForagingTile() * visitable;
 */		
 		
-		
 		while ( nonVisited > 0 && (( walkedDist + distHome ) < maxDist) )
 		{
 			amtCollected = amtCollected + std::min(cellResources, agent.computeEffectiveBiomassForaged( cellResources/numInterDune ));
