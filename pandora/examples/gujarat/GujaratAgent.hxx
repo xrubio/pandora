@@ -140,6 +140,22 @@ public:
 	void incrementMoveHomeActionsExecuted(){_moveHomeActionsExecuted++;}
 	void incrementForageActionsExecuted(){_forageActionsExecuted++;}
 
+	
+	
+	static int reductionResourcesToCategory(long r)
+	{
+		/*
+			r = #calories or #resources.
+			r/2000 specifies aprox needs per HG per day
+		 */
+		
+		r = r/2000;
+		if (r < 2) return 0;
+		if (r < 15) return 1;
+		if (r < 40) return 2;
+		if (r < 100) return 3;
+		return 4;		
+	}	
 };
 
 } // namespace Gujarat

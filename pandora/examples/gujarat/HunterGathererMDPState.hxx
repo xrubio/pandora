@@ -119,6 +119,30 @@ public:
 
 	bool EqListMatching(const std::vector<Gujarat::MDPAction*> &v, const std::vector<Gujarat::MDPAction*> &w) const;	
 	
+	bool equalIncRastersWithReduct(const Engine::IncrementalRaster  & other)const;
+
+	
+	static int reductionResourcesToCategory(long r)
+	{
+		/*
+			r = #calories or #resources.
+			r/2000 specifies aprox needs per HG per day
+		 */		
+		
+		
+		r = r/2000;
+		if (r < 2) return 0;
+		if (r < 9) return 1;
+		if (r < 21) return 2;
+		if (r < 40) return 3;
+		return 4;		
+		
+		//return GujaratAgent::reductionResourcesToCategory(r);
+	}		
+	
+	
+	
+	
 	unsigned	hash() const;
 	bool		operator==( const HunterGathererMDPState& s ) const;
 	bool		operator!=( const HunterGathererMDPState& s ) const;
@@ -226,12 +250,20 @@ private:
 	std::vector<MDPAction*> _availableActions;
 	int			_maxResources;
 	int			_resourcesDivider;
-	int 			_daysStarving;
-	bool			_isCopy;
+	int 		_daysStarving;
+	bool		_isCopy;
 	
 	void addAction( MDPAction* a );
 
 };
+
+
+static inline int simplifyResourceMeasure(int r, int needs, int bound)
+				{ 
+					int foo = r/needs;
+					return foo>bound?bound:foo;					
+				}
+
 
 //std::vector<abc> xyz::myvector;
 
