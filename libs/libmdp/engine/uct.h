@@ -29,11 +29,7 @@
 #include <vector>
 #include <math.h>
 
-#include <map>
-
 //#define DEBUG
-
-class Gujarat::HunterGathererMDPState;
 
 namespace Online {
 
@@ -67,25 +63,16 @@ template<typename T> struct map_functions_t {
     }
 };
 
-
-
 struct data_t {
     std::vector<float> values_;
     std::vector<int> counts_;
-    unsigned long mdpStatePoint_;
-    
-    data_t(const std::vector<float> &values
-	, const std::vector<int> &counts
-	, const unsigned long dni)
-      : values_(values), counts_(counts) 
-      { mdpStatePoint_=dni; }
-      
+    data_t(const std::vector<float> &values, const std::vector<int> &counts)
+      : values_(values), counts_(counts) { }
     data_t(const data_t &data)
-      : values_(data.values_), counts_(data.counts_)  
-      { mdpStatePoint_= data.mdpStatePoint_; }
+      : values_(data.values_), counts_(data.counts_) { }
 #if 0
     data_t(data_t &&data)
-      : values_(std::move(data.values_)), counts_(std::move(data.counts_)), mpdStateDni_(std::move(data.mpdStateDni_)) { }
+      : values_(std::move(data.values_)), counts_(std::move(data.counts_)) { }
 #endif
 };
 
@@ -207,11 +194,7 @@ template<typename T> class uct_t : public improvement_t<T> {
         if( it == table_.end() ) {
             std::vector<float> values(1 + policy_t<T>::problem().number_actions(s), 0);
             std::vector<int> counts(1 + policy_t<T>::problem().number_actions(s), 0);
-	    
-	    //*? ucthack
-	    //std::cout << "UCT INSERT : " << (long)&s << "," << s.numAvailableActions() << std::endl;
-	    
-            table_.insert(std::make_pair(std::make_pair(depth, s), data_t(values, counts,(unsigned long)&s)));
+            table_.insert(std::make_pair(std::make_pair(depth, s), data_t(values, counts)));
             float value = evaluate(s, depth);
 #ifdef DEBUG
             std::cout << " insert in tree w/ value=" << value << std::endl;
@@ -219,64 +202,7 @@ template<typename T> class uct_t : public improvement_t<T> {
             return value;
         } else {
             // select action for this node and increase counts
-	int ucthack_s = it->second.counts_.size();
-	int ucthack_na = policy_t<T>::problem().number_actions(s)+1;
-	
-	//*?ucthack
-	/*if (s._dni!=it->second.mdpStatePoint_)
-		std::cout << "DIFERENTS:" 
-		<< s._dni<<"!="<<it->second.mdpStatePoint_ << std::endl;
-	else
-		std::cout << "IGUALS:" 
-		<< s._dni<<"=="<<it->second.mdpStatePoint_ << std::endl;
-	*/
-	
-	//std::map<int,Gujarat::HunterGathererMDPState*> *hgstmap = s._diccioMDPState;
-	const Gujarat::HunterGathererMDPState * hgms =&s; 
-	
-	/*assert(hgstmap->count(it->second.mdpStatePoint_) > 0);
-	assert(hgstmap->count(it->second.mdpStatePoint_) == 1);
-	hgms = hgstmap->at(it->second.mdpStatePoint_);*/
-	
-	if(it->second.counts_.size() != policy_t<T>::problem().number_actions(s)+1)
-	{	
-		std::cout << "UCT COUNTS ASSERT : " 
-			<< s._dni
-			<< "=?"
-			<< it->second.mdpStatePoint_
-			<< ","  << s._creator
-			<< "," 	<< s._numAvailableActionsWhenBorn
-			<< "," 	<< s.numAvailableActions() 
-			<< ","	<< it->second.counts_.size()
-			<< "!="
-			<< policy_t<T>::problem().number_actions(s)+1
-			<< std::endl;
-		std::cout << s << std::endl;
-		std::cout << "------------------" << std::endl;
-		//std::cout << *it->second.mdpStatePoint_ << std::endl;
-		s.print(it->second.mdpStatePoint_);
-	}
-	
-	if( it->second.values_.size() != policy_t<T>::problem().number_actions(s)+1 )
-	{
-		std::cout << "UCT VALUES ASSERT : " 
-			<< s._dni
-			<< "=?"
-			<< it->second.mdpStatePoint_
-			<< ","  << s._creator
-			<< ","  << s._numAvailableActionsWhenBorn
-			<< "," 	<< s.numAvailableActions() 
-			<< ","	<< it->second.values_.size()
-			<< "!="
-			<< policy_t<T>::problem().number_actions(s)+1
-			<< std::endl;
-		std::cout << s << std::endl;
-		std::cout << "------------------" << std::endl;
-		//std::cout << *it->second.mdpStatePoint_ << std::endl;
-		s.print(it->second.mdpStatePoint_);
-	}
-	
-	assert( it->second.counts_.size() == policy_t<T>::problem().number_actions(s)+1 );
+	    assert( it->second.counts_.size() == policy_t<T>::problem().number_actions(s)+1 );
 	    assert( it->second.values_.size() == policy_t<T>::problem().number_actions(s)+1 );
             Problem::action_t a = select_action(s, it->second, depth, true, random_ties_);
             ++it->second.counts_[0];
