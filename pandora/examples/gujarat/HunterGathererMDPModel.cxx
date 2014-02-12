@@ -41,7 +41,7 @@ void	HunterGathererMDPModel::setup( const HunterGathererMDPConfig& cfg )
 void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 {
 	std::stringstream logName;
-	logName << "infoshar";
+	logName << "HGMDPModel";
 	
 	if ( _initial != NULL )
 		delete _initial;
@@ -112,7 +112,10 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 						, _simAgent->getObjectUseCounter()	, mapLock
 						, actionList);
 											
-	//std::cout << "creat MDPState:" << _initial->_dni << std::endl;
+	std::cout << "NET: node "
+	//<< agentRef().getWorld()->getCurrentTimeStep() <<"-" << _initial->_dni 
+	<< _initial->_dni
+	<< std::endl;
 	
 	//log_INFO(logName.str(),"MAKE ACTIONS INITIAL");
 	
@@ -214,7 +217,7 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 					 ) const
 {
 	std::stringstream logName;
-	logName << "infoshar";
+	logName << "HGMDPModel";
 	
 	
 	const MDPAction* act = s.availableActions(a);
@@ -326,7 +329,14 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 	//s.initializeSuccessor(sp,ownership);
 	HunterGathererMDPState sp(s, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, ownership, actionList);
 	
-	//std::cout << "creat MDPState:" << sp._dni << std::endl;
+	std::cout << "NET: edge "
+		//<< agentRef().getWorld()->getCurrentTimeStep() <<"-" << s._dni
+		<< s._dni 
+		<< " "
+		//<< agentRef().getWorld()->getCurrentTimeStep() <<"-" << sp._dni
+		<< sp._dni
+		<< " n"
+		<< std::endl;
 	
 	//assert(LRActionSectors->size() > 0);
 	

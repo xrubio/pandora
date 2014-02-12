@@ -220,7 +220,7 @@ public:
 	
 	const std::vector< bool > & getOwnerShip() const { return _ownItems;} 
 	
-	//*?
+	
 	int dniTicket () {
 		static int counter = 0;
 		return counter++;
@@ -257,12 +257,6 @@ private:
 
 };
 
-
-static inline int simplifyResourceMeasure(int r, int needs, int bound)
-				{ 
-					int foo = r/needs;
-					return foo>bound?bound:foo;					
-				}
 
 
 //std::vector<abc> xyz::myvector;

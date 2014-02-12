@@ -186,52 +186,9 @@ public:
 	
 	//**********************
 	//** ownership of sector structures int the MDP tree
+		
+	bool equal(MDPAction * a, const GujaratAgent & gua);
 	
-	
-	static int	convertBiomassToCalories( int biomass )
-	{
-		
-		float massToCaloriesRate = 4.8;//massToEnergyRate * energyToCalRate;
-		
-		float fMass = (float)biomass;
-		return (int)(fMass * massToCaloriesRate);	
-	}
-	
-	static int reductionResourcesToCategory(long r)
-	{
-		/*
-			r = #calories or #resources.
-			r/2000 specifies aprox needs per HG per day
-		 */		
-		//return GujaratAgent::reductionResourcesToCategory(r);
-		
-		r = r/2000;
-		if (r < 2) return 0;
-		if (r < 9) return 1;
-		if (r < 21) return 2;
-		if (r < 40) return 3;
-		return 4;		
-		
-		//return GujaratAgent::reductionResourcesToCategory(r);
-	}		
-	
-	bool equal(MDPAction * a) { 	
-		
-		return dynamic_cast<ForageAction*>(a) 
-			&& 
-				_ownsForageAreaPointer == ((ForageAction*)a)->_ownsForageAreaPointer
-			&& 
-				reductionResourcesToCategory( convertBiomassToCalories(_biomassCollected) )
-				== reductionResourcesToCategory(convertBiomassToCalories(((ForageAction*)a)->_biomassCollected))
-			&& 
-				reductionResourcesToCategory(_caloriesCollected) == reductionResourcesToCategory(((ForageAction*)a)->_caloriesCollected)
-			&& 
-				_useFullPopulation == ((ForageAction*)a)->_useFullPopulation			
-			&& 
-				_LRForageArea->_direction == ((ForageAction*)a)->_LRForageArea->_direction;		
-				
-				
-		}	
 	
 };
 

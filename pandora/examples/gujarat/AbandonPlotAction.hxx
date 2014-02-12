@@ -17,7 +17,7 @@ public:
 	// TODO templatitzar classe per agent
 	void execute( GujaratAgent & agent );
 	int getTimeNeeded();
-	bool equal(MDPAction * a) { return dynamic_cast<AbandonPlotAction*>(act);}
+	bool equal(MDPAction * a, const GujaratAgent & gua) { return dynamic_cast<AbandonPlotAction*>(act);}
 };
 	
 } // namespace Gujarat

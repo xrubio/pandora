@@ -69,6 +69,12 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 	
 	registerKnowledgeStructuresAtCounterMap();
 	
+	std::cout << "NET: edge "	
+		<< s._dni 
+		<< " "
+		<< _dni 
+		<< " a"
+		<< std::endl;
 	
 }
 
@@ -115,6 +121,13 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 	}
 	
 	registerKnowledgeStructuresAtCounterMap();
+	
+	std::cout << "NET: edge "	
+		<< s._dni 
+		<< " "
+		<< _dni 
+		<< " b"
+		<< std::endl;
 	
 }
 
@@ -176,28 +189,32 @@ HunterGathererMDPState::HunterGathererMDPState(
 	
 }
 
-/*const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGathererMDPState& s )
-{
-	
-	//TODO MEMORY LEAK !!!
-
-	//return *(new HunterGathererMDPState(s,this));	
-
-	return *(new HunterGathererMDPState(s));	
-	
-}*/
 
 
 const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGathererMDPState& s )
 {	
-	return s;
-/*	
+	std::cout << "NET: edge "	
+		<< s._dni 
+		<< " "
+		<< _dni 
+		<< " (="
+		<< std::endl;
+	
+	
+	// Needed when an UCT assert was violated
+	//return s;
+	
 	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
 	
-	std::stringstream logName;
-	logName << "infoshar";	
-	
 	_dni=dniTicket ();
+	
+	std::cout << "NET: edge "	
+		<< s._dni 
+		<< " "
+		<< _dni 
+		<< " =)"
+		<< std::endl;
+	
 	
 	_creator=4;
 	
@@ -251,7 +268,6 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	_config = s._config;
 	
 	return *this;
-*/
 	
 }
 
@@ -321,6 +337,8 @@ void	HunterGathererMDPState::addAction( MDPAction* a )
 	_availableActions.push_back(a);
 }
 
+
+#ifdef REDUCC
 void	HunterGathererMDPState::computeHash()
 {
 	_hashKey.add( _timeIndex );
@@ -340,6 +358,31 @@ void	HunterGathererMDPState::computeHash()
 	
 	
 }
+#endif
+
+
+#ifndef REDUCC
+void	HunterGathererMDPState::computeHash()
+{
+	_hashKey.add( _timeIndex );
+	_hashKey.add( _mapLocation._x );
+	_hashKey.add( _mapLocation._y );
+	_hashKey.add( _onHandResources );
+	_hashKey.add( _daysStarving );
+
+	for ( Engine::IncrementalRaster::ChangeIterator it = _resources.firstChange();
+		it != _resources.endOfChanges(); it++ )
+	{
+		const Engine::Point2D<int>& p = it->first;
+		_hashKey.add( p._x );
+		_hashKey.add( p._y );
+		_hashKey.add( it->second );
+	}
+	
+}
+#endif
+
+
 
 unsigned HunterGathererMDPState::hash() const
 {
@@ -362,8 +405,7 @@ bool HunterGathererMDPState::EqListMatching(const std::vector<Gujarat::MDPAction
 		int j;
 		for(j=0; j < w.size(); j++)
 		{			
-			if(v[i]->equal(w[j]) && !matched[j])
-			//if(equalActions(v[i],w[j]) && !matched[j])
+			if(v[i]->equal(w[j],*_agentRef) && !matched[j])
 			{
 				matched[j] = true;
 				break;
@@ -386,33 +428,102 @@ bool HunterGathererMDPState::equalIncRastersWithReduct(const Engine::Incremental
 		Engine::IncrementalRaster::ChangeIterator j = other.getChanges().find( i->first );
 		
 		if ( j == other.endOfChanges() ) return false;
-		if ( _agentRef->reductionResourcesToCategory(_agentRef->convertBiomassToCalories(i->second)) != _agentRef->reductionResourcesToCategory(_agentRef->convertBiomassToCalories(j->second)) ) return false;
+		if ( _agentRef->reductionResourcesToCategory(_agentRef->convertBiomassToCalories(i->second)) 
+			!= 
+			_agentRef->reductionResourcesToCategory(_agentRef->convertBiomassToCalories(j->second)) ) return false;
 	}
 	return true;
 }
 
 
 
-
+#ifdef REDUCC
 bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 {
 	// due to the term condition ( _resources == s._resources ) 			
 	// we need introduce the "reductionResourcesToCategory" to comparison
 	
 	
-	return ( _timeIndex == s._timeIndex ) 
+	bool result = ( _timeIndex == s._timeIndex ) 
 		&&
-			( _agentRef->reductionResourcesToCategory(_onHandResources) == _agentRef->reductionResourcesToCategory(s._onHandResources) ) 
+			( _agentRef->reductionResourcesToCategory(_onHandResources) 
+			== _agentRef->reductionResourcesToCategory(s._onHandResources) ) 
 		&&
 			( _mapLocation == s._mapLocation ) 
 		&&
-			equalIncRastersWithReduct(s._resources)
-			//( _resources == s._resources ) 			
+			equalIncRastersWithReduct(s._resources)			
 		&&
 			( _daysStarving == s._daysStarving )
 		&&  
 			EqListMatching(_availableActions,s._availableActions);
+			
+			
+	if(result) 
+	{
+		std::cout << "REDUCC:" << _dni << "==" << s._dni << std::endl; 
+		
+		std::cout << "NET: edge "
+		//<< agentRef().getWorld()->getCurrentTimeStep() <<"-" << s._dni
+		<< s._dni 
+		<< " "
+		//<< agentRef().getWorld()->getCurrentTimeStep() <<"-" << sp._dni
+		<< _dni
+		<< " =="
+		<< std::endl;
+	}
+	else 
+	{
+		std::cout << "REDUCC:" << _dni << "!=" << s._dni << std::endl;
+	}
+	
+	
+	
+	return result;
 }
+#endif
+
+#ifndef REDUCC
+bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
+{
+	// due to the term condition ( _resources == s._resources ) 			
+	// we need introduce the "reductionResourcesToCategory" to comparison
+
+	bool result =  ( _timeIndex == s._timeIndex ) 
+		&&
+			( _onHandResources == s._onHandResources ) 
+		&&
+			( _mapLocation == s._mapLocation ) 
+		&&	
+			_resources == s._resources
+		&&
+			( _daysStarving == s._daysStarving )
+		&&  
+			EqListMatching(_availableActions,s._availableActions); 
+	
+	if(result)
+	{ 
+		std::cout << "FULL:" << _dni << "==" << s._dni << std::endl; 
+		std::cout << "NET: edge "
+		//<< agentRef().getWorld()->getCurrentTimeStep() <<"-" << s._dni
+		<< s._dni 
+		<< " "
+		//<< agentRef().getWorld()->getCurrentTimeStep() <<"-" << sp._dni
+		<< _dni
+		<< " =="
+		<< std::endl;
+	}
+	else std::cout << "FULL:" << _dni << "!=" << s._dni << std::endl;
+	
+	
+	
+	return result;
+
+			
+}
+#endif
+
+
+
 
 bool	HunterGathererMDPState::operator!=( const HunterGathererMDPState& s ) const
 {
@@ -424,6 +535,8 @@ bool	HunterGathererMDPState::operator!=( const HunterGathererMDPState& s ) const
 			( _resources != s._resources ) 				OR
 			( _daysStarving != s._daysStarving );*/
 }
+
+#ifdef REDUCC
 
 bool	HunterGathererMDPState::operator<( const HunterGathererMDPState& s ) const
 {		
@@ -444,6 +557,34 @@ bool	HunterGathererMDPState::operator<( const HunterGathererMDPState& s ) const
 			( ( _timeIndex == s._timeIndex ) && ( simplOnHandResources == simple_s_onHandResources) && ( _mapLocation == s._mapLocation) 
 			&& ( equalIncRastersWithReduct(s._resources) ) &&  ( _daysStarving < s._daysStarving )	);
 }
+
+#endif
+
+
+#ifndef REDUCC
+
+bool	HunterGathererMDPState::operator<( const HunterGathererMDPState& s ) const
+{		
+	
+	int simplOnHandResources = _onHandResources;
+	int simple_s_onHandResources = s._onHandResources;	
+	
+	
+	std::cout << "evaluating between " << this << " and: " << &s << std::endl;
+	return  ( _timeIndex < s._timeIndex ) 
+			||
+			( ( _timeIndex == s._timeIndex ) && ( simplOnHandResources < simple_s_onHandResources ) ) 
+			||
+			( ( _timeIndex == s._timeIndex ) && ( simplOnHandResources == simple_s_onHandResources) && ( _mapLocation < s._mapLocation) ) 
+			||
+			( ( _timeIndex == s._timeIndex ) && ( simplOnHandResources == simple_s_onHandResources) && ( _mapLocation == s._mapLocation) && ( _resources < s._resources ) ) 
+			||
+			( ( _timeIndex == s._timeIndex ) && ( simplOnHandResources == simple_s_onHandResources) && ( _mapLocation == s._mapLocation) 
+			&& ( _resources == s._resources ) &&  ( _daysStarving < s._daysStarving )	);
+}
+
+#endif
+
 
 void	HunterGathererMDPState::print( unsigned long x ) const
 {

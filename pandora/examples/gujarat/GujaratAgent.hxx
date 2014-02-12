@@ -44,7 +44,7 @@ protected:
 
 	int _homeMobilityRange; // MpiBasicAttribute
 
-	float _massToCaloriesRate; // MpiBasicAttribute
+	float _massToCaloriesRate;	// MpiBasicAttribute
 	//float _surplusSpoilageFactor;
 	
 	//float   _foodNeedsForReproduction;
@@ -142,14 +142,14 @@ public:
 
 	
 	
-	static int reductionResourcesToCategory(long r)
+	int reductionResourcesToCategory(long r) const
 	{
 		/*
 			r = #calories or #resources.
 			r/2000 specifies aprox needs per HG per day
 		 */
 		
-		r = r/2000;
+		r = r/computeConsumedResources(1);
 		if (r < 2) return 0;
 		if (r < 15) return 1;
 		if (r < 40) return 2;

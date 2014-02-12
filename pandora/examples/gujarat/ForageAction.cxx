@@ -1227,4 +1227,53 @@ void ForageAction::setFullPopulation( bool useFullPopulation )
 	_useFullPopulation = useFullPopulation;
 }
 
+
+
+#ifdef REDUCC
+bool ForageAction::equal(MDPAction * a,const GujaratAgent & gua) 
+{ 	
+//return dynamic_cast<ForageAction*>(a);
+	
+		return dynamic_cast<ForageAction*>(a) 
+			&& 
+				_ownsForageAreaPointer == ((ForageAction*)a)->_ownsForageAreaPointer
+			&& 
+				gua.reductionResourcesToCategory( gua.convertBiomassToCalories(_biomassCollected) )
+				== gua.reductionResourcesToCategory(gua.convertBiomassToCalories(((ForageAction*)a)->_biomassCollected))
+			&& 
+				gua.reductionResourcesToCategory(_caloriesCollected) == gua.reductionResourcesToCategory(((ForageAction*)a)->_caloriesCollected)
+			&& 
+				_useFullPopulation == ((ForageAction*)a)->_useFullPopulation			
+			&& 
+				_LRForageArea->_direction == ((ForageAction*)a)->_LRForageArea->_direction;		
+
+		}	
+#endif
+
+#ifndef REDUCC
+bool ForageAction::equal(MDPAction * a,const GujaratAgent & gua) 
+{ 	
+		return dynamic_cast<ForageAction*>(a) 
+			&& 
+				_ownsForageAreaPointer == ((ForageAction*)a)->_ownsForageAreaPointer
+			&& 
+				_biomassCollected == ((ForageAction*)a)->_biomassCollected
+			&& 
+				_caloriesCollected == ((ForageAction*)a)->_caloriesCollected
+			&& 
+				_useFullPopulation == ((ForageAction*)a)->_useFullPopulation			
+			&& 
+				_LRForageArea->_direction == ((ForageAction*)a)->_LRForageArea->_direction;		
+
+		}	
+#endif
+
+
+
+
+
+
+
+
+
 }

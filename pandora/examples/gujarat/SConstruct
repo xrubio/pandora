@@ -38,11 +38,22 @@ walkProgramTable={
 	,'tv'  : 'gujarat_tv'
 	}
 
+
 nameProgram = [walkProgramTable[walkArg]]
 
 walkFlag = '-D ' + walkFlagsTable[walkArg]
 
 print "WALK IS : " + walkFlag + "\n"
+
+## Enable/Disable MDPState Space reduction
+reduccArg = ARGUMENTS.get('rdc','1')
+if int(reduccArg)==1:
+	print "REDUCC ENABLED " + "\n"
+	reduccFlag = '-D ' + 'REDUCC'
+else:
+	reduccFlag = ''
+	print "REDUCC DISABLED " + "\n"
+
 
 if int(useMpi) == 1:
 	env = Environment(ENV=os.environ, CXX='mpicxx')
@@ -51,6 +62,8 @@ else:
 	
 generateMPICodeBuilder = Builder(action=generateMpi.execute)
 env.Append( BUILDERS = {'GenerateMPICode' : generateMPICodeBuilder})
+
+
 
 linkFlags = Split('-fopenmp')
 libs = Split('tinyxml pthread grass_gis grass_datetime')
@@ -70,6 +83,7 @@ env['CCFLAGS'] += ['-std=c++0x']
 
 env['CCFLAGS'] += [walkFlag]
 
+env['CCFLAGS'] += [reduccFlag]
 
 includeDirs = Split('./ ../../ ../../../libs/libmdp/')
 

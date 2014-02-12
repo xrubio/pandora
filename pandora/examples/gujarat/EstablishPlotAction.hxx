@@ -28,7 +28,7 @@ public:
 	static void generatePossibleActions( GujaratAgent& agent,
 	std::vector< EstablishPlotAction* >& actions );
 
-	bool equal(MDPAction * a) { return dynamic_cast<EstablishPlotAction*>(a) && _plotLocation == ((EstablishPlotAction*)a)->_plotLocation;}
+	bool equal(MDPAction * a, const GujaratAgent & gua) { return dynamic_cast<EstablishPlotAction*>(a) && _plotLocation == ((EstablishPlotAction*)a)->_plotLocation;}
 	
 private:
 	
