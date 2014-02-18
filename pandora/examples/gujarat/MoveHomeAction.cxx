@@ -91,6 +91,8 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 	//log_INFO(logName.str(),"agent has many sectors:" << agentConcrete.getSectors().size());
    
 	// Find candidate cells
+	std::vector<int> chosenSects;
+	int sectIdx=0;
 	for(std::vector<Sector *>::const_iterator it=agentConcrete.getLRSectors().begin(); it!=agentConcrete.getLRSectors().end(); it++)
 	{
         if(!(*it)->isEmpty())
@@ -140,12 +142,14 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 						{           
 							scoreBestCell = scoreCell;
 							candidateCells.clear();
+							chosenSects.clear();
 						}
 						candidateCells.push_back(sectCells[cellsIdx]);
+						chosenSects.push_back(sectIdx);
 					}
 				}
 		}
-        
+    sectIdx++;    
 	}
     // Select candidate
    
@@ -153,29 +157,48 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
    
 	if(!candidateCells.empty())
 	{   
+		for(unsigned int ii=0; ii < candidateCells.size();ii++)
+			std::cout << *candidateCells.at(ii) << " in " << chosenSects.at(ii) << std::endl;
+		
+		
 		uint32_t diceSelectOneRandomDune = Engine::GeneralState::statistics().getUniformDistValue(0, candidateCells.size()-1);
 
 		Engine::Point2D<int> newPos = *candidateCells.at(diceSelectOneRandomDune);
 		Engine::Point2D<int> newHome;
 		gw->getHRFreeCell(newPos,newHome);
-/*
+
 #ifdef REDUCC		
 		
 		Engine::Point2D<int> posLR;
-		gw->worldCell2LowResCell(agentPos,posLR);		
+		gw->worldCell2LowResCell(agentPos,posLR);
+		int lowResHomeRange = ((GujaratConfig)((GujaratWorld*)agent.getWorld())->getConfig()).getLowResHomeRange();	
+		int s = GujaratState::sectorsMask( newPos._x-posLR._x+lowResHomeRange
+										, newPos._y-posLR._y+lowResHomeRange
+										, GujaratState::getLRSectorsMask() );
 		
-		int s = GujaratState::sectorsMask( newPos._x-posLR._x, newPos._y-posLR._y,
-										  GujaratState::getLRSectorsMask() );
+		/*unsigned int sectorIdx=0;
+		unsigned int LRActionSectorsSize = LRActionSectors.size();
+		while(sectorIdx < LRActionSectorsSize && LRActionSectors[sectorIdx++]->_direction != s);	
 		
 		MoveHomeAction * mha = new MoveHomeAction( newHome
-									,HRActionSectors[s]
-									,LRActionSectors[s]
+									,HRActionSectors[sectorIdx]
+									,LRActionSectors[sectorIdx]
 									,false );
 		mha->_newHomeLocLR = newPos;
-		actions.push_back( mha );
+		actions.push_back( mha );*/
+		
+		for( int i = 0; i < LRActionSectors.size(); i++)
+		{
+			if(!LRActionSectors[i]->isEmpty() && i==chosenSects[diceSelectOneRandomDune])//&& LRActionSectors[i]->_direction==chosenSects[diceSelectOneRandomDune])
+			{
+				MoveHomeAction * mha = new MoveHomeAction( newHome, HRActionSectors[i],LRActionSectors[i],false );
+				mha->_newHomeLocLR = newPos;
+				actions.push_back( mha );
+			}
+		}	
 #endif		
-*/	
-//#ifndef REDUCC
+
+#ifndef REDUCC
 		for( int i = 0; i < LRActionSectors.size(); i++)
 		{           
 			if(!LRActionSectors[i]->isEmpty())
@@ -185,7 +208,7 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 				actions.push_back( mha );
 			}
 		}	
-//#endif
+#endif
 	}
     
 	candidateCells.clear();

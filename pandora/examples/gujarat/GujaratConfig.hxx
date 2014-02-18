@@ -121,6 +121,8 @@ public:
 	
 	int getLowResolution() {return _lowResolution; }
 	
+	int getLowResHomeRange() {return _lowResHomeRange; }
+	
 	int getUCTSeed() { return _uctSeed; }
 	
 	friend class HunterGatherer;
