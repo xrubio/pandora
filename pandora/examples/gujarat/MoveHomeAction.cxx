@@ -157,9 +157,8 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 
 		Engine::Point2D<int> newPos = *candidateCells.at(diceSelectOneRandomDune);
 		Engine::Point2D<int> newHome;
-		//gw->LowRes2HighResCellCorner(newPos,newHome);
 		gw->getHRFreeCell(newPos,newHome);
-
+/*
 #ifdef REDUCC		
 		
 		Engine::Point2D<int> posLR;
@@ -175,10 +174,9 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 		mha->_newHomeLocLR = newPos;
 		actions.push_back( mha );
 #endif		
-		
-#ifndef REDUCC
+*/	
+//#ifndef REDUCC
 		for( int i = 0; i < LRActionSectors.size(); i++)
-		//for( int i = 0; i < agentConcrete.getLRSectors().size(); i++)
 		{           
 			if(!LRActionSectors[i]->isEmpty())
 			{
@@ -187,7 +185,7 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 				actions.push_back( mha );
 			}
 		}	
-#endif
+//#endif
 	}
     
 	candidateCells.clear();
