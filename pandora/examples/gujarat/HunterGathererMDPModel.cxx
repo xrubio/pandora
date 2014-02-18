@@ -112,10 +112,6 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 						, _simAgent->getObjectUseCounter()	, mapLock
 						, actionList);
 											
-	std::cout << "NET: node "
-	//<< agentRef().getWorld()->getCurrentTimeStep() <<"-" << _initial->_dni 
-	<< _initial->_dni
-	<< std::endl;
 	
 	//log_INFO(logName.str(),"MAKE ACTIONS INITIAL");
 	
@@ -329,11 +325,10 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 	//s.initializeSuccessor(sp,ownership);
 	HunterGathererMDPState sp(s, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, ownership, actionList);
 	
-	std::cout << "NET: edge "
-		//<< agentRef().getWorld()->getCurrentTimeStep() <<"-" << s._dni
+	
+	std::cout << "NET: edge "		
 		<< s._dni 
-		<< " "
-		//<< agentRef().getWorld()->getCurrentTimeStep() <<"-" << sp._dni
+		<< " "		
 		<< sp._dni
 		<< " n"
 		<< std::endl;

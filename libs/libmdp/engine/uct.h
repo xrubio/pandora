@@ -187,7 +187,11 @@ template<typename T> class uct_t : public improvement_t<T> {
 #ifdef DEBUG
         std::cout << std::setw(2*depth) << "" << "search_tree(" << s << "):";
 #endif
-
+		
+		
+		std::cout << "UCT:" << " search " << std::endl;
+		
+		
         if( (depth == horizon_) || policy_t<T>::problem().terminal(s) ) {
 #ifdef DEBUG
             std::cout << " end" << std::endl;
@@ -221,6 +225,11 @@ template<typename T> class uct_t : public improvement_t<T> {
             // select action for this node and increase counts
 	int ucthack_s = it->second.counts_.size();
 	int ucthack_na = policy_t<T>::problem().number_actions(s)+1;
+	
+	std::cout << "NET: edge " << s._dni << " " << it->first.second._dni << " f" << std::endl;
+	
+	std::cout << "UCT:" << " found " << std::endl;
+	
 	
 	//*?ucthack
 	/*if (s._dni!=it->second.mdpStatePoint_)

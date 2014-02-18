@@ -23,6 +23,7 @@ class MoveHomeAction : public MDPAction
 {
 	
 	Engine::Point2D<int>	_newHomeLoc;
+	Engine::Point2D<int>	_newHomeLocLR;
 	// forage with half adult population is executed at the same time than MoveHome
 	ForageAction * _forageAction;     
 public:
@@ -57,12 +58,29 @@ public:
 	/*Sector * getVisitedSector(GujaratAgent & ag) 
 	 * { return ag.getSectorOfLRCell(_newHomeLoc); }
 	 * */
-	bool equal(MDPAction * a, const GujaratAgent & gua) { return dynamic_cast<MoveHomeAction*>(a) 
-							&& _newHomeLoc == ((MoveHomeAction*)a)->_newHomeLoc 
+	
+#ifdef REDUCC	
+	bool equal(MDPAction * a, const GujaratAgent & gua) { return 		
+							dynamic_cast<MoveHomeAction*>(a) 
+							//&& _newHomeLoc == ((MoveHomeAction*)a)->_newHomeLoc
+							&& _newHomeLocLR == ((MoveHomeAction*)a)->_newHomeLocLR 
 							&& ((MDPAction*)_forageAction)->equal(
 									(MDPAction*)((MoveHomeAction*)a)->_forageAction
 									,gua
 								); }
+#endif
+	
+	
+#ifndef REDUCC		
+	bool equal(MDPAction * a, const GujaratAgent & gua) { return 		
+							dynamic_cast<MoveHomeAction*>(a) 
+							&& _newHomeLoc == ((MoveHomeAction*)a)->_newHomeLoc
+							&& ((MDPAction*)_forageAction)->equal(
+									(MDPAction*)((MoveHomeAction*)a)->_forageAction
+									,gua
+								); }
+#endif
+	
 	
 };
 	

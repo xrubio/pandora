@@ -58,7 +58,11 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 		_ownItems[i] = s._ownItems[i];
 	}
 	
-	
+	for ( unsigned k = 0; k < _availableActions.size(); k++ )
+	{
+		delete _availableActions[k];
+	}	
+	_availableActions.clear();
 	for ( unsigned k = 0; k < s._availableActions.size(); k++ )
 	{
 		// avoiding segm fault through copy
@@ -201,9 +205,10 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 		<< std::endl;
 	
 	
-	// Needed when an UCT assert was violated
+//#ifdef REDUCC	
 	//return s;
-	
+//#endif
+		
 	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
 	
 	_dni=dniTicket ();
@@ -252,16 +257,14 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 		delete _availableActions[k];
 	}
 	_availableActions.clear();
-
+	_numAvailableActionsWhenBorn = s._availableActions.size();
 	for ( unsigned k = 0; k < s._availableActions.size(); k++ )
 	{
 		addAction( s._availableActions[k]->copy() );
 	}
 	assert( s._availableActions.size() == _availableActions.size() );
 	
-	registerKnowledgeStructuresAtCounterMap();
-	
-	_numAvailableActionsWhenBorn = _availableActions.size();
+	registerKnowledgeStructuresAtCounterMap();	
 	
 	_agentRef = s._agentRef;
 	
@@ -463,10 +466,10 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 		std::cout << "REDUCC:" << _dni << "==" << s._dni << std::endl; 
 		
 		std::cout << "NET: edge "
-		//<< agentRef().getWorld()->getCurrentTimeStep() <<"-" << s._dni
+	
 		<< s._dni 
 		<< " "
-		//<< agentRef().getWorld()->getCurrentTimeStep() <<"-" << sp._dni
+	
 		<< _dni
 		<< " =="
 		<< std::endl;
@@ -499,15 +502,16 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 			( _daysStarving == s._daysStarving )
 		&&  
 			EqListMatching(_availableActions,s._availableActions); 
-	
+
+			
 	if(result)
 	{ 
 		std::cout << "FULL:" << _dni << "==" << s._dni << std::endl; 
 		std::cout << "NET: edge "
-		//<< agentRef().getWorld()->getCurrentTimeStep() <<"-" << s._dni
+	
 		<< s._dni 
 		<< " "
-		//<< agentRef().getWorld()->getCurrentTimeStep() <<"-" << sp._dni
+	
 		<< _dni
 		<< " =="
 		<< std::endl;

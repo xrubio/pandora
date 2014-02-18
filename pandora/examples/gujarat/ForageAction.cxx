@@ -1237,9 +1237,9 @@ bool ForageAction::equal(MDPAction * a,const GujaratAgent & gua)
 		return dynamic_cast<ForageAction*>(a) 
 			&& 
 				_ownsForageAreaPointer == ((ForageAction*)a)->_ownsForageAreaPointer
-			&& 
-				gua.reductionResourcesToCategory( gua.convertBiomassToCalories(_biomassCollected) )
-				== gua.reductionResourcesToCategory(gua.convertBiomassToCalories(((ForageAction*)a)->_biomassCollected))
+//			&& 
+//				gua.reductionResourcesToCategory( gua.convertBiomassToCalories(_biomassCollected) )
+//				== gua.reductionResourcesToCategory(gua.convertBiomassToCalories(((ForageAction*)a)->_biomassCollected))
 			&& 
 				gua.reductionResourcesToCategory(_caloriesCollected) == gua.reductionResourcesToCategory(((ForageAction*)a)->_caloriesCollected)
 			&& 

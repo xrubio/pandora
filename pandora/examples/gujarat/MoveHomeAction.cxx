@@ -16,9 +16,13 @@
 #include <Sector.hxx>
 #include <ForageAction.hxx>
 
+#include <GujaratState.hxx>
+
 namespace Gujarat
 {
 
+
+	
 MoveHomeAction::MoveHomeAction( const Engine::Point2D<int>& p, Sector * HRSectorToForage, Sector * LRSectorToForage, bool ownsSectorPointer ) : _newHomeLoc( p ), _forageAction(0)
 {
 	assert(LRSectorToForage->cells().size() > 0);
@@ -41,7 +45,11 @@ MoveHomeAction::~MoveHomeAction()
 
 MDPAction * MoveHomeAction::copy() const
 {
-	return new MoveHomeAction( _newHomeLoc, (ForageAction*)_forageAction->copy() );
+	MoveHomeAction * mha = new MoveHomeAction( _newHomeLoc, (ForageAction*)_forageAction->copy() );
+	
+	mha->_newHomeLocLR = _newHomeLocLR;
+	
+	return (mha);
 }
 
 std::string MoveHomeAction::describe() const
@@ -151,15 +159,35 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 		Engine::Point2D<int> newHome;
 		//gw->LowRes2HighResCellCorner(newPos,newHome);
 		gw->getHRFreeCell(newPos,newHome);
+
+#ifdef REDUCC		
 		
+		Engine::Point2D<int> posLR;
+		gw->worldCell2LowResCell(agentPos,posLR);		
+		
+		int s = GujaratState::sectorsMask( newPos._x-posLR._x, newPos._y-posLR._y,
+										  GujaratState::getLRSectorsMask() );
+		
+		MoveHomeAction * mha = new MoveHomeAction( newHome
+									,HRActionSectors[s]
+									,LRActionSectors[s]
+									,false );
+		mha->_newHomeLocLR = newPos;
+		actions.push_back( mha );
+#endif		
+		
+#ifndef REDUCC
 		for( int i = 0; i < LRActionSectors.size(); i++)
 		//for( int i = 0; i < agentConcrete.getLRSectors().size(); i++)
 		{           
 			if(!LRActionSectors[i]->isEmpty())
 			{
-				actions.push_back( new MoveHomeAction( newHome, HRActionSectors[i],LRActionSectors[i],false ) );
+				MoveHomeAction * mha = new MoveHomeAction( newHome, HRActionSectors[i],LRActionSectors[i],false );
+				mha->_newHomeLocLR = newPos;
+				actions.push_back( mha );
 			}
 		}	
+#endif
 	}
     
 	candidateCells.clear();
