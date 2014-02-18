@@ -91,19 +91,21 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 	//log_INFO(logName.str(),"agent has many sectors:" << agentConcrete.getSectors().size());
    
 	// Find candidate cells
-	std::vector<int> chosenSects;
-	int sectIdx=0;
-	for(std::vector<Sector *>::const_iterator it=agentConcrete.getLRSectors().begin(); it!=agentConcrete.getLRSectors().end(); it++)
+	std::vector<int> chosenSects;	
+	//for(std::vector<Sector *>::const_iterator it=agentConcrete.getLRSectors().begin(); it!=agentConcrete.getLRSectors().end(); it++)
+	
+	for(int sectIdx=0;sectIdx < LRActionSectors.size(); sectIdx++)
 	{
-        if(!(*it)->isEmpty())
+        //if(!(*it)->isEmpty())
+		if(!(LRActionSectors[sectIdx]->isEmpty()))
 		{
-				const std::vector< Engine::Point2D<int>* > & sectCells = (*it)->cells();	
+				const std::vector< Engine::Point2D<int>* > & sectCells = LRActionSectors[sectIdx]->cells();//(*it)->cells();	
 				for(int cellsIdx = 0; cellsIdx < sectCells.size(); cellsIdx++)
 				{
                 	int numDunes      = gw->getValueLR(LRCounterSoilDUNE,*sectCells[cellsIdx]);
 					
 					int resourcesCell = gw->getValueLR(eLRResources,*sectCells[cellsIdx]);
-					//TODO usa getBiomassAmount
+					//TODO test a new heuristic based on visitable cells
 					//int resourcesCell = sectCells[cellsIdx]->getBiomassAmount();
 					
 					//int numInterDunes = gw->getValueLR(LRCounterSoilINTERDUNE, 
@@ -112,30 +114,7 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 					
 					int scoreCell = resourcesCell;
 					
-					/*
-					int scoreCell = std::min(visitable,numInterDunes)
-									* (resourcesCell/numInterDunes);
-					//resourcesCell;
-					//std::min(visitable,numInterDunes)
-					//				* (resourcesCell/numInterDunes);
 					
-					assert(0 <= gw->getValueLR(eLRPopulation,sectCells[cellsIdx]) );
-									
-					scoreCell = scoreCell 
-								/
-								(1+gw->getValueLR(eLRPopulation,sectCells[cellsIdx]));
-					*/
-					
-					//scoreCell = (scoreCell * Engine::GeneralState::statistics().getUniformDistValue(70,130))/100;
-								
-										
-					/*if (visitable <= 0)
-						std::cout << "ASSERT! "<< agent.getAvailableTime() 
-						<<"*"<< agent.getForageTimeCost()<<std::endl;
-					assert(visitable > 0);
-					assert(resourcesCell > 0);
-					*/
-
 					if ( numDunes - gw->getValueLR(eLRPopulation,*sectCells[cellsIdx]) > 0 && scoreBestCell <= scoreCell )
 					{
 						if ( scoreBestCell < scoreCell )
@@ -149,7 +128,7 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 					}
 				}
 		}
-    sectIdx++;    
+    //sectIdx++;    
 	}
     // Select candidate
    
@@ -178,24 +157,22 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 		
 		/*unsigned int sectorIdx=0;
 		unsigned int LRActionSectorsSize = LRActionSectors.size();
-		while(sectorIdx < LRActionSectorsSize && LRActionSectors[sectorIdx++]->_direction != s);	
+		while(sectorIdx < LRActionSectorsSize && LRActionSectors[sectorIdx++]->_direction != s);*/	
 		
-		MoveHomeAction * mha = new MoveHomeAction( newHome
-									,HRActionSectors[sectorIdx]
-									,LRActionSectors[sectorIdx]
-									,false );
+		MoveHomeAction * mha = new MoveHomeAction( newHome												, HRActionSectors[chosenSects[diceSelectOneRandomDune]]						, LRActionSectors[chosenSects[diceSelectOneRandomDune]]
+							,false );
 		mha->_newHomeLocLR = newPos;
-		actions.push_back( mha );*/
+		actions.push_back( mha );
 		
-		for( int i = 0; i < LRActionSectors.size(); i++)
+		/*for( int i = 0; i < LRActionSectors.size(); i++)
 		{
-			if(!LRActionSectors[i]->isEmpty() && i==chosenSects[diceSelectOneRandomDune])//&& LRActionSectors[i]->_direction==chosenSects[diceSelectOneRandomDune])
+			if(!LRActionSectors[i]->isEmpty() && LRActionSectors[i]->_direction==s)
 			{
 				MoveHomeAction * mha = new MoveHomeAction( newHome, HRActionSectors[i],LRActionSectors[i],false );
 				mha->_newHomeLocLR = newPos;
 				actions.push_back( mha );
 			}
-		}	
+		}*/	
 #endif		
 
 #ifndef REDUCC
