@@ -457,10 +457,10 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 			equalIncRastersWithReduct(s._resources)			
 		&&
 			( _daysStarving == s._daysStarving )
-		&&  
+		/*&&  
 			EqListMatching(_availableActions,s._availableActions);
-			
-			
+			*/
+		;	
 	if(result) 
 	{
 		std::cout << "REDUCC:" << _dni << "==" << s._dni << std::endl; 
