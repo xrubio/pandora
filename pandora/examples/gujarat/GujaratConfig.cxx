@@ -169,6 +169,7 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 	GujaratState::setDemographics(_demographicsModel);
 
 	retrieveAttributeMandatory( element, "controllerType", _hunterGathererController );
+	// call parseHGMDPConfig after initialization of _numSectors
 	parseHGMDPConfig( element->FirstChildElement("controllerConfig") );
 	GujaratState::setHGController( _hunterGathererController, *_controllerConfig);
 

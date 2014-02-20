@@ -326,14 +326,14 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 	//s.initializeSuccessor(sp,ownership);
 	HunterGathererMDPState sp(s, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, ownership, actionList);
 	
-	/*
+	
 	std::cout << "NET: edge "		
 		<< s._dni 
 		<< " "		
 		<< sp._dni
 		<< " n"
 		<< std::endl;
-	*/
+	
 	//assert(LRActionSectors->size() > 0);
 	
 	act->executeMDP( agentRef(), s, sp );

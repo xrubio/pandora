@@ -71,13 +71,13 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 	
 	registerKnowledgeStructuresAtCounterMap();
 	
-	/*std::cout << "NET: edge "	
+	std::cout << "NET: edge "	
 		<< s._dni 
 		<< " "
 		<< _dni 
 		<< " a"
 		<< std::endl;
-	*/
+	
 }
 
 
@@ -124,13 +124,13 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 	
 	registerKnowledgeStructuresAtCounterMap();
 	
-	/*std::cout << "NET: edge "	
+	std::cout << "NET: edge "	
 		<< s._dni 
 		<< " "
 		<< _dni 
 		<< " b"
 		<< std::endl;
-	*/
+	
 }
 
 
@@ -195,13 +195,13 @@ HunterGathererMDPState::HunterGathererMDPState(
 
 const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGathererMDPState& s )
 {	
-	/*std::cout << "NET: edge "	
+	std::cout << "NET: edge "	
 		<< s._dni 
 		<< " "
 		<< _dni 
 		<< " (="
 		<< std::endl;
-	*/
+	
 	
 //#ifdef REDUCC	
 	//return s;
@@ -211,13 +211,13 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	
 	_dni=dniTicket ();
 	
-	/*std::cout << "NET: edge "	
+	std::cout << "NET: edge "	
 		<< s._dni 
 		<< " "
 		<< _dni 
 		<< " =)"
 		<< std::endl;
-	*/
+	
 	
 	_creator=4;
 	
@@ -464,12 +464,15 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 	{
 		std::stringstream oss;
 		oss << "Incoherence!!! same location, different number of actions:" 
-			<< _availableActions.size() << "!=" << s._availableActions.size();
+			<< _availableActions.size() << "!=" << s._availableActions.size()
+			<< "\n locations : " << _mapLocation << " == " << s._mapLocation 
+			<< "\n dni's :" << _dni << "," << s._dni
+			<< "\n sectors's :" << _LRActionSectors->size() << "," << s._LRActionSectors->size();
 		
 		throw Engine::Exception(oss.str());
 	}
 	
-	/*
+	
 	if(result) 
 	{
 		std::cout << "REDUCC:" << _dni << "==" << s._dni << std::endl; 
@@ -484,7 +487,7 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 	{
 		std::cout << "REDUCC:" << _dni << "!=" << s._dni << std::endl;
 	}
-	*/
+	
 	return result;
 }
 #endif
@@ -507,7 +510,7 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 		&&  
 			EqListMatching(_availableActions,s._availableActions); 
 
-	/*		
+			
 	if(result)
 	{ 
 		std::cout << "FULL:" << _dni << "==" << s._dni << std::endl; 
@@ -521,7 +524,7 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 		<< std::endl;
 	}
 	else std::cout << "FULL:" << _dni << "!=" << s._dni << std::endl;
-	*/
+	
 	
 	
 	return result;
