@@ -9,6 +9,8 @@
 #include <vector>
 #include <list>
 
+#include <assert.h>
+
 namespace Gujarat
 {
 
@@ -148,8 +150,16 @@ public:
 			r = #calories or #resources.
 			r/2000 specifies aprox needs per HG per day
 		 */
+		int c = computeConsumedResources(1); 
 		
-		r = r/computeConsumedResources(1);
+		//assert(c!=0);
+		
+		if (c==0)
+		{
+			return 4;
+		}
+		
+		r = r/c;
 		if (r < 2) return 0;
 		if (r < 15) return 1;
 		if (r < 40) return 2;
