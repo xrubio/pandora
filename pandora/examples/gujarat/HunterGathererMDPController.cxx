@@ -42,6 +42,9 @@ void HunterGathererMDPController::selectActions( GujaratAgent & agent, std::list
 	log_DEBUG(agent.getId()+"_controller",  "\taction_selected=" << a->describe());
 
 	actions.push_back(a);	
+	
+	
+	
 }
 
 }

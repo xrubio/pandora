@@ -44,7 +44,7 @@ int HunterGathererDecisionTreeController::getMaxBiomassSector(  HunterGatherer &
 	
 	// MRJ: Remove empty sectors if any
 	int maxBiomass = -1;
-	for ( int i = 0; i < agent.getLRSectors().size(); i++ )
+	for ( unsigned int i = 0; i < agent.getLRSectors().size(); i++ )
 	{
 		if( !(agent.getLRSectors()[i]->isEmpty()) )
 		{
@@ -143,7 +143,7 @@ MDPAction* HunterGathererDecisionTreeController::shouldMoveHome( HunterGatherer 
 	int idx = Engine::GeneralState::statistics().getUniformDistValue(0,possibleActions.size()-1);
 	chosenAction = possibleActions.at(idx);
 	possibleActions[idx] = 0;
-	for(int i=0; i<possibleActions.size(); i++)
+	for(unsigned int i=0; i<possibleActions.size(); i++)
 	{
 		delete possibleActions.at(i);
 	}		

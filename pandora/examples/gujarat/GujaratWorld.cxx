@@ -861,7 +861,7 @@ void GujaratWorld::updateeSectorUtility(const std::vector< Engine::Point2D<int> 
 {
 	register int C = getConfig()._lowResolution;
 	
-	for(int i = 0; i < cells.size(); i++)
+	for(unsigned int i = 0; i < cells.size(); i++)
 	{
 		Engine::Point2D<int> LRxycell = cells[i];
 		Engine::Point2D<int> paintCell;
@@ -879,7 +879,7 @@ void GujaratWorld::assignResourceFromSectorsToHR(const std::vector< Engine::Poin
 	register int C = getConfig()._lowResolution;
 	
 	// HR assignation
-	for(int i = 0; i < cells.size(); i++)
+	for(unsigned int i = 0; i < cells.size(); i++)
 	{
 		Engine::Point2D<int> LRxycell = cells[i];
 		Engine::Point2D<int> paintCell;
@@ -890,7 +890,7 @@ void GujaratWorld::assignResourceFromSectorsToHR(const std::vector< Engine::Poin
 	
 	// LR assignation
 	HRValToForce = HRValToForce * C * C;
-	for(int i = 0; i < cells.size(); i++)
+	for(unsigned int i = 0; i < cells.size(); i++)
 	{		
 		getDynamicRaster(eLRResources).setValue(cells[i], HRValToForce);
 	}

@@ -86,6 +86,7 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	makeActionsForState(agentRef(), actionList);
 	
 	
+	
 	/*?
 	 
 		, int maxResources
@@ -418,59 +419,27 @@ void HunterGathererMDPModel::makeActionsForState(
 	
 	// MRJ: Remove empty sectors if any
 	for ( unsigned i = 0; i < LRActionSectors->size(); i++ )
-	{
+	{/*
 		if ( (*LRActionSectors)[i]->isEmpty() )
 		{
-			// You can't do that if you do not own it.
-			// Any delete is postponed at the end of lifecycle of the MDPState
-			
-			// delete (*LRActionSectors)[i];
-			// delete (*HRActionSectors)[i];
 			continue;
-		}
+		}*/
 		validActionSectors.push_back( (*LRActionSectors)[i] );
 		sectorIdxMap[(unsigned long)(*LRActionSectors)[i]] = i;
 	}	
-	//TODO why 2 reorderings??? first random, then according a predicate
-	//std::random_shuffle( validActionSectors.begin(), validActionSectors.end() );
 	std::sort( validActionSectors.begin(), validActionSectors.end(), SectorBestFirstSortPtrVecPredicate() );
 	
 	// Make Forage actions
+	for ( unsigned i = 0; i < validActionSectors.size(); i++ )
+	{
+		int sectorIdx = sectorIdxMap[(unsigned long)(validActionSectors[i])];
+		actionList.push_back( new ForageAction( (*HRActionSectors)[sectorIdx], validActionSectors[i], false ) );	
+	}
 	
-	int forageActions = _config.getNumberForageActions();
-	if ( forageActions >= validActionSectors.size() )
-	{
-		for ( unsigned i = 0; i < validActionSectors.size(); i++ )
-		{
-			int sectorIdx = sectorIdxMap[(unsigned long)(validActionSectors[i])];
-			//actionList.push_back( new ForageAction( HRActionSectors[sectorIdx], validActionSectors[i], true ) );
-			actionList.push_back( new ForageAction( (*HRActionSectors)[sectorIdx], validActionSectors[i], false ) );	
-		}
-	}
-	else
-	{
-		for ( unsigned i = 0; i < forageActions; i++ )
-			{
-			int sectorIdx = sectorIdxMap[(unsigned long)(validActionSectors[i])];
-			//actionList.push_back( new ForageAction( HRActionSectors[sectorIdx],validActionSectors[i], true ) );
-			actionList.push_back( new ForageAction( (*HRActionSectors)[sectorIdx],validActionSectors[i], false ) );
-			}
-		for ( unsigned i = forageActions; i < validActionSectors.size(); i++ )
-			{
-			//int sectorIdx = sectorIdxMap[(unsigned long)(validActionSectors[i])];
-			
-			// Structures from a MDPState cannot be destroyed till the State disappears
-			// delete validActionSectors[i];
-			// delete HRActionSectors[sectorIdx];
-			// delete LRActionSectors[sectorIdx]; redundancy because validActionSectors[i]==LRActionSectors[sectorIdx]
-			}
-	}
-	//std::cout << "number of valid forage actions: " << parent.numAvailableActions() << " for number of valid sectors: " << validActionSectors.size() << std::endl;
-
 	// Make Move Home
 	std::vector< MoveHomeAction* > possibleMoveHomeActions;
 	MoveHomeAction::generatePossibleActions( agentRef(), position, *HRActionSectors, validActionSectors, possibleMoveHomeActions );
-	int moveHomeActions =  _config.getNumberMoveHomeActions();
+	unsigned int moveHomeActions =  _config.getNumberMoveHomeActions();
 	if (  moveHomeActions >=  possibleMoveHomeActions.size() )
 	{
 		for ( unsigned i = 0; i < possibleMoveHomeActions.size(); i++ )
@@ -483,6 +452,7 @@ void HunterGathererMDPModel::makeActionsForState(
 		for ( unsigned i =  moveHomeActions; i < possibleMoveHomeActions.size(); i++ )
 			delete possibleMoveHomeActions[i];
 	}
+	
 	assert( actionList.size() > 0 );
 	sectorIdxMap.clear();
 	possibleMoveHomeActions.clear();

@@ -334,7 +334,7 @@ void GujaratState::initializeSectorsMaskTrigonometricaly( int numSectors, int ho
 	
 	// center position + home Range in any direction
 	sm.resize( 1+2*homeRange );
-	for ( unsigned k = 0; k < 1+2*homeRange; k++ )
+	for ( unsigned int k = 0; k < (unsigned int)1+2*homeRange; k++ )
 	{
 		sm.at(k).resize( 1+2*homeRange );
 	}
@@ -401,7 +401,7 @@ void GujaratState::initializeSectorsMask( int numSectors, int homeRange, Sectors
 	sectors.resize( numSectors );
 	// center position + home Range in any direction
 	sm.resize( 1+2*homeRange );
-	for ( unsigned k = 0; k < 1+2*homeRange; k++ )
+	for ( unsigned int k = 0; k < (unsigned int)1+2*homeRange; k++ )
 	{
 		sm.at(k).resize( 1+2*homeRange );
 	}
@@ -429,7 +429,7 @@ void GujaratState::initializeSectorsMask( int numSectors, int homeRange, Sectors
 			}
 			Engine::Point2D<int> p( x, y );
 			sm.at(x+homeRange).at(y+homeRange) = -1;	
-			for ( unsigned k = 0; k < numSectors; k++ )
+			for ( int k = 0; k < numSectors; k++ )
 			{
 				if ( Engine::insideTriangle( p, sectors.at(k).at(0), sectors.at(k).at(1) ) )
 				{

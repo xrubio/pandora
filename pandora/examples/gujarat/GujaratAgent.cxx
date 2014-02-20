@@ -123,7 +123,7 @@ void GujaratAgent::updateState()
 		
 		int numChildren = 0;
 		//std::cout << "agent: " << this << " with male : " << _populationAges.at(0) << " female: " << _populationAges.at(1) << " -- children: ";
-		for(int i=2; i<_populationAges.size(); i++)
+		for(unsigned int i=2; i<_populationAges.size(); i++)
 		{
 			if(_populationAges.at(i)!=-1)
 			{
@@ -185,7 +185,7 @@ float GujaratAgent::computeMaxForagingDistance( bool fullPopulation ) const
 float GujaratAgent::getAvailableTime() const
 {
 	float result = 0.0f;
-	for(int i=0; i<_populationAges.size(); i++)
+	for(unsigned int i=0; i<_populationAges.size(); i++)
 	{
 		if(_populationAges.at(i)==-1)
 		{
@@ -332,7 +332,7 @@ void GujaratAgent::checkReproduction()
 int GujaratAgent::computeConsumedResources( int timeSteps ) const
 {
 	int result = 0;
-	for(int i=0; i<_populationAges.size(); i++)
+	for(unsigned int i=0; i<_populationAges.size(); i++)
 	{
 		if(_populationAges.at(i)==-1)
 		{
@@ -536,7 +536,7 @@ void GujaratAgent::createInitialPopulation( int adulthoodAge )
 	{		
 		GujaratState::demographics().checkReproduction(*this);	
 		GujaratState::demographics().checkMortality(*this);	
-		for(int j=2; j<_populationAges.size(); j++)
+		for(unsigned int j=2; j<_populationAges.size(); j++)
 		{
 			if(_populationAges.at(j) != -1)
 			{

@@ -189,7 +189,7 @@ template<typename T> class uct_t : public improvement_t<T> {
 #endif
 		
 		
-		std::cout << "UCT:" << " search " << std::endl;
+		//std::cout << "UCT:" << " search " << std::endl;
 		
 		
         if( (depth == horizon_) || policy_t<T>::problem().terminal(s) ) {
@@ -226,9 +226,9 @@ template<typename T> class uct_t : public improvement_t<T> {
 	int ucthack_s = it->second.counts_.size();
 	int ucthack_na = policy_t<T>::problem().number_actions(s)+1;
 	
-	std::cout << "NET: edge " << s._dni << " " << it->first.second._dni << " f" << std::endl;
+	//std::cout << "NET: edge " << s._dni << " " << it->first.second._dni << " f" << std::endl;
 	
-	std::cout << "UCT:" << " found " << std::endl;
+	//std::cout << "UCT:" << " found " << std::endl;
 	
 	
 	//*?ucthack
