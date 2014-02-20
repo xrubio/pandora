@@ -3,6 +3,7 @@
 #include <Logger.hxx>
 
 #include <sstream>
+#include <Exceptions.hxx>
 
 //#include <mutex>
 
@@ -11,15 +12,12 @@
 namespace Gujarat
 {
 
-/*
-HunterGathererMDPState::HunterGathererMDPState() : _timeIndex(0), _mapLocation(-1,-1), _onHandResources(0), _maxResources(0), _resourcesDivider(1), _daysStarving(0), _isCopy( false)
-, _HRActionSectors( 0 )
-, _LRActionSectors( 0 )
-, _HRCellPool( 0 )
-, _LRCellPool( 0 )	
+
+HunterGathererMDPState::HunterGathererMDPState()
 {
+	 throw Engine::Exception("Forbidden Constructor HunterGathererMDPState::HunterGathererMDPState() has been called\n");	
 }
-*/
+
 
 
 HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s )
@@ -73,13 +71,13 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 	
 	registerKnowledgeStructuresAtCounterMap();
 	
-	std::cout << "NET: edge "	
+	/*std::cout << "NET: edge "	
 		<< s._dni 
 		<< " "
 		<< _dni 
 		<< " a"
 		<< std::endl;
-	
+	*/
 }
 
 
@@ -126,13 +124,13 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 	
 	registerKnowledgeStructuresAtCounterMap();
 	
-	std::cout << "NET: edge "	
+	/*std::cout << "NET: edge "	
 		<< s._dni 
 		<< " "
 		<< _dni 
 		<< " b"
 		<< std::endl;
-	
+	*/
 }
 
 
@@ -183,7 +181,7 @@ HunterGathererMDPState::HunterGathererMDPState(
 	_creator=3;
 
 	_ownItems.resize(ownItems.size());
-	for(int i = 0; i < ownItems.size(); i++)
+	for(unsigned int i = 0; i < ownItems.size(); i++)
 	{
 		_ownItems[i] = ownItems[i];
 	}
@@ -197,13 +195,13 @@ HunterGathererMDPState::HunterGathererMDPState(
 
 const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGathererMDPState& s )
 {	
-	std::cout << "NET: edge "	
+	/*std::cout << "NET: edge "	
 		<< s._dni 
 		<< " "
 		<< _dni 
 		<< " (="
 		<< std::endl;
-	
+	*/
 	
 //#ifdef REDUCC	
 	//return s;
@@ -213,13 +211,13 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	
 	_dni=dniTicket ();
 	
-	std::cout << "NET: edge "	
+	/*std::cout << "NET: edge "	
 		<< s._dni 
 		<< " "
 		<< _dni 
 		<< " =)"
 		<< std::endl;
-	
+	*/
 	
 	_creator=4;
 	
@@ -246,7 +244,7 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 
 
 	_ownItems.resize(s._ownItems.size());
-	for(int i = 0; i < _ownItems.size(); i++)
+	for(unsigned int i = 0; i < _ownItems.size(); i++)
 	{
 	//	_ownItems[i] = false;
 		_ownItems[i] = s._ownItems[i];
@@ -290,7 +288,7 @@ HunterGathererMDPState::~HunterGathererMDPState()
 									<< _ownItems[2]
 									<< _ownItems[3]);	
 	*/
-	for ( int k = 0; k < _availableActions.size(); k++ )
+	for ( unsigned int k = 0; k < _availableActions.size(); k++ )
 	{
 		delete _availableActions[k];
 	}
@@ -334,9 +332,9 @@ HunterGathererMDPState::~HunterGathererMDPState()
 
 void	HunterGathererMDPState::addAction( MDPAction* a )
 {
-	if(_availableActions.size() >= _numAvailableActionsWhenBorn)
+	if(_availableActions.size() >= (unsigned int)_numAvailableActionsWhenBorn)
 		std::cout << "VIOLATOR created with :" << _creator << std::endl;
-	assert(_availableActions.size() < _numAvailableActionsWhenBorn);
+	assert(_availableActions.size() < (unsigned int)_numAvailableActionsWhenBorn);
 	_availableActions.push_back(a);
 }
 
@@ -403,9 +401,9 @@ bool HunterGathererMDPState::EqListMatching(const std::vector<Gujarat::MDPAction
 	
 	std::vector<bool> matched(v.size(),false);
 	
-	for(int i=0; i < v.size(); i++)
+	for(unsigned int i=0; i < v.size(); i++)
 	{	
-		int j;
+		unsigned int j;
 		for(j=0; j < w.size(); j++)
 		{			
 			if(v[i]->equal(w[j],*_agentRef) && !matched[j])
@@ -457,19 +455,27 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 			equalIncRastersWithReduct(s._resources)			
 		&&
 			( _daysStarving == s._daysStarving )
-		/*&&  
-			EqListMatching(_availableActions,s._availableActions);
-			*/
-		;	
+		//&&  
+			//EqListMatching(_availableActions,s._availableActions);
+			//_availableActions.size()==s._availableActions.size();
+		;
+
+	if(result && _availableActions.size() != s._availableActions.size())
+	{
+		std::stringstream oss;
+		oss << "Incoherence!!! same location, different number of actions:" 
+			<< _availableActions.size() << "!=" << s._availableActions.size();
+		
+		throw Engine::Exception(oss.str());
+	}
+	
+	/*
 	if(result) 
 	{
 		std::cout << "REDUCC:" << _dni << "==" << s._dni << std::endl; 
-		
 		std::cout << "NET: edge "
-	
 		<< s._dni 
 		<< " "
-	
 		<< _dni
 		<< " =="
 		<< std::endl;
@@ -478,9 +484,7 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 	{
 		std::cout << "REDUCC:" << _dni << "!=" << s._dni << std::endl;
 	}
-	
-	
-	
+	*/
 	return result;
 }
 #endif
@@ -503,7 +507,7 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 		&&  
 			EqListMatching(_availableActions,s._availableActions); 
 
-			
+	/*		
 	if(result)
 	{ 
 		std::cout << "FULL:" << _dni << "==" << s._dni << std::endl; 
@@ -517,7 +521,7 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 		<< std::endl;
 	}
 	else std::cout << "FULL:" << _dni << "!=" << s._dni << std::endl;
-	
+	*/
 	
 	
 	return result;
@@ -695,7 +699,7 @@ void HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructure
 		
 		if ((_objectUseCounter->count((unsigned long)_LRActionSectors) == 0) && _ownItems[1])
 		{				
-			for(int i=0;i<_LRActionSectors->size();i++)
+			for(unsigned int i=0;i<_LRActionSectors->size();i++)
 			{		
 				delete (*_LRActionSectors)[i];		
 			}			
@@ -799,7 +803,7 @@ void	HunterGathererMDPState::makeActionsForState( HunterGatherer * agentRef)
 	
 	// Make Forage actions
 	
-	int forageActions = _config->getNumberForageActions();
+	unsigned int forageActions = _config->getNumberForageActions();
 	if ( forageActions >= validActionSectors.size() )
 	{
 		for ( unsigned i = 0; i < validActionSectors.size(); i++ )
@@ -832,7 +836,7 @@ void	HunterGathererMDPState::makeActionsForState( HunterGatherer * agentRef)
 	// Make Move Home
 	std::vector< MoveHomeAction* > possibleMoveHomeActions;
 	MoveHomeAction::generatePossibleActions( *agentRef, agentRef->getPosition(), *_HRActionSectors, validActionSectors, possibleMoveHomeActions );
-	int moveHomeActions =  _config->getNumberMoveHomeActions();
+	unsigned int moveHomeActions =  _config->getNumberMoveHomeActions();
 	if (  moveHomeActions >=  possibleMoveHomeActions.size() )
 	{
 		for ( unsigned i = 0; i < possibleMoveHomeActions.size(); i++ )

@@ -94,15 +94,15 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 	std::vector<int> chosenSects;	
 	//for(std::vector<Sector *>::const_iterator it=agentConcrete.getLRSectors().begin(); it!=agentConcrete.getLRSectors().end(); it++)
 	
-	for(int sectIdx=0;sectIdx < LRActionSectors.size(); sectIdx++)
+	for(unsigned int sectIdx=0;sectIdx < LRActionSectors.size(); sectIdx++)
 	{
         //if(!(*it)->isEmpty())
 		if(!(LRActionSectors[sectIdx]->isEmpty()))
 		{
 				const std::vector< Engine::Point2D<int>* > & sectCells = LRActionSectors[sectIdx]->cells();//(*it)->cells();	
-				for(int cellsIdx = 0; cellsIdx < sectCells.size(); cellsIdx++)
+				for(unsigned int cellsIdx = 0; cellsIdx < sectCells.size(); cellsIdx++)
 				{
-                	int numDunes      = gw->getValueLR(LRCounterSoilDUNE,*sectCells[cellsIdx]);
+                			int numDunes      = gw->getValueLR(LRCounterSoilDUNE,*sectCells[cellsIdx]);
 					
 					int resourcesCell = gw->getValueLR(eLRResources,*sectCells[cellsIdx]);
 					//TODO test a new heuristic based on visitable cells
@@ -136,10 +136,6 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
    
 	if(!candidateCells.empty())
 	{   
-		for(unsigned int ii=0; ii < candidateCells.size();ii++)
-			std::cout << *candidateCells.at(ii) << " in " << chosenSects.at(ii) << std::endl;
-		
-		
 		uint32_t diceSelectOneRandomDune = Engine::GeneralState::statistics().getUniformDistValue(0, candidateCells.size()-1);
 
 		Engine::Point2D<int> newPos = *candidateCells.at(diceSelectOneRandomDune);
@@ -155,24 +151,15 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 										, newPos._y-posLR._y+lowResHomeRange
 										, GujaratState::getLRSectorsMask() );
 		
-		/*unsigned int sectorIdx=0;
-		unsigned int LRActionSectorsSize = LRActionSectors.size();
-		while(sectorIdx < LRActionSectorsSize && LRActionSectors[sectorIdx++]->_direction != s);*/	
 		
-		MoveHomeAction * mha = new MoveHomeAction( newHome												, HRActionSectors[chosenSects[diceSelectOneRandomDune]]						, LRActionSectors[chosenSects[diceSelectOneRandomDune]]
-							,false );
+		MoveHomeAction * mha = new MoveHomeAction( newHome
+							, HRActionSectors[chosenSects[diceSelectOneRandomDune]]
+							, LRActionSectors[chosenSects[diceSelectOneRandomDune]]
+							, false );
 		mha->_newHomeLocLR = newPos;
 		actions.push_back( mha );
 		
-		/*for( int i = 0; i < LRActionSectors.size(); i++)
-		{
-			if(!LRActionSectors[i]->isEmpty() && LRActionSectors[i]->_direction==s)
-			{
-				MoveHomeAction * mha = new MoveHomeAction( newHome, HRActionSectors[i],LRActionSectors[i],false );
-				mha->_newHomeLocLR = newPos;
-				actions.push_back( mha );
-			}
-		}*/	
+		
 #endif		
 
 #ifndef REDUCC
@@ -189,8 +176,9 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 	}
     
 	candidateCells.clear();
-
-	assert( !actions.empty() );
+	chosenSects.clear();
+	
+	assert( actions.size()==1 );
 	
 	//log_DEBUG(logName.str(), "generate possible actions for pos: " << agentPos << " finished");
 	//std::cout << "possible actions for MoveHome: " << actions.size() << std::endl;

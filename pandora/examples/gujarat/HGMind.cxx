@@ -160,7 +160,7 @@ void HGMind::createLRSectors( 	const Engine::Point2D<int>& agentPos,
 		int insertPoint = 0;
 				
 		LRSectors.resize(numSectors);
-		for ( unsigned k = 0; k < numSectors; k++ )
+		for ( int k = 0; k < numSectors; k++ )
 		{			
 			LRSectors[k] = new Sector(_world);	
 		}
@@ -267,8 +267,7 @@ void HGMind::createLRSectors( 	const Engine::Point2D<int>& agentPos,
 				delete LRSectors[k];
 			}			
 		}
-		
-		
+	
 		
 		for ( unsigned k = 0; k < resultLRSectors.size(); k++ )
 		{

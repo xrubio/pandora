@@ -71,7 +71,7 @@ class ForageAction : public MDPAction
 				, Engine::Point2D<int>& HREndPoint
 				, const Engine::Point2D<int>& LREndPoint
 				, Engine::Raster& HRRes
-				, bool wasInsideLR
+				, bool & wasInsideLR
 				, int & bestScoreHR
 				, Engine::Point2D<int>& bestHR );
 

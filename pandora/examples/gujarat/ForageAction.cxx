@@ -166,7 +166,7 @@ void	ForageAction::selectBestWalk( const GujaratAgent& agent
 	// ordering the cells based on the distances from Home
 	//agent.getWorld()->sort(walk.begin(), walk.end(), distance_from_home());
 	
-	for(int i=0; i < walk.size(); i++)
+	for(unsigned int i=0; i < walk.size(); i++)
 	{
 		walk[i] = sectorCells[i];
 	}
@@ -388,7 +388,7 @@ void ForageAction::selectBestNearestHRCellInTrend_ScanFrame(
 				, Engine::Point2D<int>& HREndPoint
 				, const Engine::Point2D<int>& LREndPoint
 				, Engine::Raster& HRRes
-				, bool wasInsideLR
+				, bool & wasInsideLR
 				, int & bestScoreHR
 				, Engine::Point2D<int>& bestHR )
 {

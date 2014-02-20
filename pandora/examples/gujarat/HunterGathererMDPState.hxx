@@ -35,7 +35,7 @@ class HunterGathererMDPState
 	//static std::vector< std::unordered_map<long,long> > _objectUseCounter;
 	//boost::mutex _mtx;
 	//static 
-	std::map<unsigned long,long> * _objectUseCounter;
+	std::map<long unsigned int,long> * _objectUseCounter;
 	omp_lock_t * _mapLock;
 	
 	/* There is some posibility of interference between threads and
@@ -81,6 +81,8 @@ public:
 	// Constructors, I don't want this to be ever invoked
 	//explicit HunterGathererMDPState();
 
+	HunterGathererMDPState();
+	
 	//HunterGathererMDPState( HunterGathererMDPState& s, bool ownership[] );
 	
 	// The real one

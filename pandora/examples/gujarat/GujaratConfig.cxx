@@ -291,7 +291,20 @@ void GujaratConfig::parseHGMDPConfig( TiXmlElement* element )
 		return;
 	}
 	_controllerConfig = new HunterGathererMDPConfig(element);
+	
+	
+	if (_controllerConfig->getNumberForageActions()!=_numSectors)
+	{
+		throw Engine::Exception("_controllerConfig.getNumberForageActions() != _numSectors");
+	}
+	
+	if (_controllerConfig->getNumberMoveHomeActions()!=1)
+	{
+			throw Engine::Exception("_controllerConfig.getNumberMoveHomeActions() != 1");
+	}
+	
 	_uctSeed = _controllerConfig->getSeed();
+	
 }
  
 void GujaratConfig::parseSoilInfo( TiXmlElement * element )

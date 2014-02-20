@@ -99,7 +99,8 @@ void	HunterGatherer::updateKnowledge( const Engine::Point2D<int>& agentPos
 
 
 void HunterGatherer::executeActions()
-{	
+{
+	
 	std::list<Engine::Action *>::iterator it = _actions.begin();
 	while(it!=_actions.end())
 	{
@@ -148,7 +149,7 @@ void HunterGatherer::selectActions()
 	{
 		_actions.push_back((Engine::Action*)(*it));
 		it = actions.erase(it);
-	}
+	}	
 }
 
 GujaratAgent * HunterGatherer::createNewAgent()

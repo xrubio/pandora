@@ -77,10 +77,10 @@ void HGPartialMindMap::knowledgeExpirationDateProcess()
 	
 	// Some sectors where empty at creation and where removed
 	//for ( unsigned k = 0; k < numSectors; k++ )
-	for ( unsigned k = 0; k < _LRSectors.size(); k++ )
+	for ( unsigned int k = 0; k < _LRSectors.size(); k++ )
 	{
 		const std::vector< Engine::Point2D<int>* > & cells = _LRSectors[k]->cells();
-		for( int i = 0; i < cells.size(); i++)
+		for( unsigned int i = 0; i < cells.size(); i++)
 		{
 			int ts = _LRTimeStamps.getValue(*cells[i]);
 			if ( _world.getCurrentTimeStep() - ts 
@@ -124,7 +124,7 @@ void HGPartialMindMap::updateDueToExecuteAction(Sector *s)
 	if (s != 0)
 	{
 		const std::vector< Engine::Point2D<int>* > & cells = s->cells();	
-		for(int i=0; i < cells.size(); i++)
+		for(unsigned int i=0; i < cells.size(); i++)
 		{
 			_LRTimeStamps.setInitValue(*(cells[i]),_world.getCurrentTimeStep());
 			int res = _world.getValueLR(eLRResources,*cells[i]);
