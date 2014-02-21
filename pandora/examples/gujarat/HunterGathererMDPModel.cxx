@@ -160,7 +160,7 @@ float HunterGathererMDPModel::cost( const HunterGathererMDPState& s,
 
 void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s, 
 					action_t a, 
-					OutcomeVector& outcomes,int foo ) const
+					OutcomeVector& outcomes ) const
 {
 
 	std::stringstream logName;
@@ -210,7 +210,7 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 
 void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s, 
 					action_t a, 
-					OutcomeVector& outcomes
+					OutcomeVector& outcomes, int foo
 					 ) const
 {
 	std::stringstream logName;
@@ -326,14 +326,14 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 	//s.initializeSuccessor(sp,ownership);
 	HunterGathererMDPState sp(s, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, ownership, actionList);
 	
-	
+	/*
 	std::cout << "NET: edge "		
 		<< s._dni 
 		<< " "		
 		<< sp._dni
 		<< " n"
 		<< std::endl;
-	
+	*/
 	//assert(LRActionSectors->size() > 0);
 	
 	act->executeMDP( agentRef(), s, sp );

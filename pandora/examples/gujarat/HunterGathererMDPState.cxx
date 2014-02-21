@@ -71,13 +71,16 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 	
 	registerKnowledgeStructuresAtCounterMap();
 	
-	std::cout << "NET: edge "	
+	/*std::cout << "NET: edge "	
 		<< s._dni 
 		<< " "
 		<< _dni 
 		<< " a"
 		<< std::endl;
-	
+	*/
+	std::cout << "herencia1:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors"<< std::endl;
+		
+	assert(_mapLocation == s._mapLocation);
 }
 
 
@@ -124,13 +127,18 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 	
 	registerKnowledgeStructuresAtCounterMap();
 	
-	std::cout << "NET: edge "	
+	computeHash();
+	
+	/*std::cout << "NET: edge "	
 		<< s._dni 
 		<< " "
 		<< _dni 
 		<< " b"
 		<< std::endl;
-	
+*/
+	std::cout << "herencia2:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors"<< std::endl;
+
+		
 }
 
 
@@ -189,19 +197,22 @@ HunterGathererMDPState::HunterGathererMDPState(
 	computeHash();	
 	registerKnowledgeStructuresAtCounterMap();
 	
+	std::cout << "herencia3:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors"<< std::endl;
+
+	
 }
 
 
 
 const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGathererMDPState& s )
 {	
-	std::cout << "NET: edge "	
+	/*std::cout << "NET: edge "	
 		<< s._dni 
 		<< " "
 		<< _dni 
 		<< " (="
 		<< std::endl;
-	
+	*/
 	
 //#ifdef REDUCC	
 	//return s;
@@ -211,13 +222,13 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	
 	_dni=dniTicket ();
 	
-	std::cout << "NET: edge "	
+	/*std::cout << "NET: edge "	
 		<< s._dni 
 		<< " "
 		<< _dni 
 		<< " =)"
 		<< std::endl;
-	
+	*/
 	
 	_creator=4;
 	
@@ -267,6 +278,9 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	_agentRef = s._agentRef;
 	
 	_config = s._config;
+	
+	std::cout << "herencia4:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors"<< std::endl;
+
 	
 	return *this;
 	
@@ -455,12 +469,6 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 			equalIncRastersWithReduct(s._resources)			
 		&&
 			( _daysStarving == s._daysStarving )
-<<<<<<< HEAD
-		&&  
-			EqListMatching(_availableActions,s._availableActions);
-			
-		;	
-=======
 		//&&  
 			//EqListMatching(_availableActions,s._availableActions);
 			//_availableActions.size()==s._availableActions.size();
@@ -478,8 +486,7 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 		throw Engine::Exception(oss.str());
 	}
 	
-	
->>>>>>> a93dd772dfbd914396ae634e6a2516881cc03035
+	/*
 	if(result) 
 	{
 		std::cout << "REDUCC:" << _dni << "==" << s._dni << std::endl; 
@@ -493,7 +500,7 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 	else 
 	{
 		std::cout << "REDUCC:" << _dni << "!=" << s._dni << std::endl;
-	}
+	}*/
 	
 	return result;
 }
@@ -518,7 +525,7 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 			EqListMatching(_availableActions,s._availableActions); 
 
 			
-	if(result)
+	/*if(result)
 	{ 
 		std::cout << "FULL:" << _dni << "==" << s._dni << std::endl; 
 		std::cout << "NET: edge "
@@ -531,7 +538,7 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 		<< std::endl;
 	}
 	else std::cout << "FULL:" << _dni << "!=" << s._dni << std::endl;
-	
+	*/
 	
 	
 	return result;
