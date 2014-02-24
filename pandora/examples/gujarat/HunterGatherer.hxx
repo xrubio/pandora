@@ -99,10 +99,10 @@ public:
 	
 	void updateKnowledge( const Engine::Point2D<int>& agentPos
 						, const Engine::Raster& dataRaster
-						, std::vector< Sector* >& HRSectors
-						, std::vector< Sector* >& LRSectors
-						, std::vector< Engine::Point2D<int> >& HRCellPool
-						, std::vector< Engine::Point2D<int> >& LRCellPool
+						, std::vector< Sector* >* HRSectors
+						, std::vector< Sector* >* LRSectors
+						, std::vector< Engine::Point2D<int> >* HRCellPool
+						, std::vector< Engine::Point2D<int> >* LRCellPool
 						) const;	
 	
 	//virtual void fillKnowledge() = 0;

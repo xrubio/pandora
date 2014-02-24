@@ -1,6 +1,8 @@
 #ifndef __HunterGathererMDPState_hxx__
 #define __HunterGathererMDPState_hxx__
 
+#include <Logger.hxx>
+
 #include <Point2D.hxx>
 #include <IncrementalRaster.hxx>
 #include <HashTable.hxx>
@@ -10,6 +12,7 @@
 #include <map>
 //#include <unordered_map>
 #include <omp.h>
+#include <sstream>
 
 //#include <boost/thread/mutex.hpp>
 
@@ -105,12 +108,13 @@ public:
 	HunterGathererMDPState( const HunterGathererMDPState& s );
 	
 	HunterGathererMDPState( const HunterGathererMDPState& s
+							, const Engine::Point2D<int> loc
 							, std::vector< Sector* > * HRActionSectors
 							, std::vector< Sector* > * LRActionSectors
 							, std::vector< Engine::Point2D<int> > * HRCellPool
 							, std::vector< Engine::Point2D<int> > * LRCellPool
 							, std::vector< bool > ownsItems
-			                               , const std::vector<MDPAction *>& actionList);
+			                , const std::vector<MDPAction *>& actionList);
 		
 	~HunterGathererMDPState();
 
@@ -198,7 +202,14 @@ public:
 	}
 
 	//void					spoilage( float v ) { _onHandResources = (float)_onHandResources * v; }
-	void setLocation( Engine::Point2D<int> newLoc ) { _mapLocation = newLoc; }
+	void setLocation( Engine::Point2D<int> newLoc ) { _mapLocation = newLoc; 
+		
+		std::stringstream logName;
+		logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
+	
+		log_INFO(logName.str(),"XXXX setLocation:" << _dni << "->" << newLoc);
+		
+	}
 	const Engine::Point2D<int>& getLocation() const { return _mapLocation; }
 	Engine::IncrementalRaster& getResourcesRaster() { return _resources; }
 	const Engine::IncrementalRaster& getResourcesRaster() const { return _resources; }

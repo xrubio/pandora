@@ -83,45 +83,26 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	//omp_init_lock(mapLock);
 
 	std::vector<MDPAction *>  actionList;
-	makeActionsForState(agentRef(), actionList);
 	
 	
+	makeActionsForState(*_simAgent, _simAgent->getPosition(),actionList);	
 	
-	/*?
-	 
-		, int maxResources
-		, int divider 
-		
-		instead of
-		
-		, _config.getHorizon()
-		, agentRef().computeConsumedResources(1)
-		
-	 */
-	
-	
-	_initial = new HunterGathererMDPState(	&agentRef()
+	_initial = new HunterGathererMDPState(	_simAgent
 						, &_config
-						, agentRef().getPosition()
-						, agentRef().getOnHandResources()
-						, agentRef().getLRResourcesRaster()
+						, _simAgent->getPosition()
+						, _simAgent->getOnHandResources()
+						, _simAgent->getLRResourcesRaster() //*? incremental?
 						, _config.getHorizon()
-						, agentRef().computeConsumedResources(1)
-						, &agentRef().getHRSectorsNoConst()
+						, _simAgent->computeConsumedResources(1)
+						, &(_simAgent->getHRSectorsNoConst())
 						, LRActionSectors 
-						, &agentRef().getHRCellPoolNoConst()	, &agentRef().getLRCellPoolNoConst()	, ownsItems
-						, _simAgent->getObjectUseCounter()	, mapLock
+						, &(_simAgent->getHRCellPoolNoConst())
+						, &(_simAgent->getLRCellPoolNoConst())
+						, ownsItems
+						, _simAgent->getObjectUseCounter()
+						, mapLock
 						, actionList);
-											
 	
-	//log_INFO(logName.str(),"MAKE ACTIONS INITIAL");
-	
-	//*? ucthack
-	//makeActionsForState( *_initial );
-	
-	//log_INFO(logName.str(),"MAKE ACTIONS INITIAL AFTER");
-	
-	//std::cout << "Initial state: " << *_initial << std::endl;	
 }
 
 action_t HunterGathererMDPModel::number_actions( const HunterGathererMDPState& s ) const
@@ -160,7 +141,7 @@ float HunterGathererMDPModel::cost( const HunterGathererMDPState& s,
 
 void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s, 
 					action_t a, 
-					OutcomeVector& outcomes ) const
+					OutcomeVector& outcomes,int foo ) const
 {
 
 	std::stringstream logName;
@@ -194,10 +175,21 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 	
 	std::vector<MDPAction *>  actionList;
 
-	makeActionsForState(s, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, actionList);
+	Engine::Point2D<int> center;
+	if(dynamic_cast<const MoveHomeAction*>(act))
+	{
+		center = ((MoveHomeAction*)act)->getNewHomeLoc();
+	}
+	else
+	{
+		center = s.getLocation();
+	}
+	
+	
+	makeActionsForState(s, center,HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, actionList);
 	
 	//s.initializeSuccessor(sp,ownership);
-	HunterGathererMDPState sp(s, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, ownership, actionList);
+	HunterGathererMDPState sp(s, center,HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, ownership, actionList);
 	
 	act->executeMDP( agentRef(), s, sp );
 	applyFrameEffects( s, sp );
@@ -210,7 +202,7 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 
 void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s, 
 					action_t a, 
-					OutcomeVector& outcomes, int foo
+					OutcomeVector& outcomes
 					 ) const
 {
 	std::stringstream logName;
@@ -223,6 +215,8 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 	 * according to these, what I pass to sp depends on it... copies,refs,
 	 * or new adhoc creation... etc...
 	 */
+	
+	Engine::Point2D<int> center(s.getLocation());	
 	
 	std::vector<bool> ownership(4);
 	//TODO An action should know nothing about ownerships. Refactor the thing.
@@ -245,6 +239,8 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		ownership[1]=true;
 		ownership[2]=false;	
 		ownership[3]=true;		
+	
+		center = ((MoveHomeAction*)act)->getNewHomeLoc();
 		
 		//assert(HRActionSectors->size()>0 && HRCellPool->size()>0);
 	}	
@@ -307,7 +303,8 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		
 		assert(HRActionSectors->size()>0 && HRCellPool->size()>0);
 	}
-	else{
+	else
+	{
 		/* Should be left this case to a default initialization of sectors and pools?
 		 * It could produce a backdoor effect that would lead to errors when a new
 		 * action is added to the model.
@@ -321,10 +318,10 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 	
 	std::vector<MDPAction *>  actionList;
 
-	makeActionsForState(s, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, actionList);
+	makeActionsForState(s, center, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, actionList);
 	
 	//s.initializeSuccessor(sp,ownership);
-	HunterGathererMDPState sp(s, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, ownership, actionList);
+	HunterGathererMDPState sp(s, center, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, ownership, actionList);
 	
 	/*
 	std::cout << "NET: edge "		
@@ -353,11 +350,11 @@ void	HunterGathererMDPModel::applyFrameEffects( const HunterGathererMDPState& s,
 /**
  * @param actionList List of executable actions
  */
-void HunterGathererMDPModel::makeActionsForState( HunterGatherer& parent, std::vector<MDPAction *>&  actionList) const
+void HunterGathererMDPModel::makeActionsForState( HunterGatherer& parent, const Engine::Point2D<int> &loc, std::vector<MDPAction *>&  actionList) const
 {
 	makeActionsForState(
 			     parent.getLRResourcesRaster(),
-			     parent.getPosition(),
+			     loc,
 			     &parent.getHRSectorsNoConst(),
 			     &parent.getLRSectorsNoConst(),
 			     &parent.getHRCellPoolNoConst(),
@@ -370,6 +367,7 @@ void HunterGathererMDPModel::makeActionsForState( HunterGatherer& parent, std::v
  */
 void HunterGathererMDPModel::makeActionsForState( 
 				const HunterGathererMDPState& parent
+				, const Engine::Point2D<int> &loc
 				, std::vector< Sector* > * HRActionSectors
 				, std::vector< Sector* > * LRActionSectors
 				, std::vector< Engine::Point2D<int> > * HRCellPool
@@ -379,7 +377,7 @@ void HunterGathererMDPModel::makeActionsForState(
 {
 	makeActionsForState( 
 			     parent.getResourcesRaster(),
-			     parent.getLocation(),
+			     loc,
 			     HRActionSectors,
 			     LRActionSectors,
 			     HRCellPool,
@@ -393,7 +391,7 @@ void HunterGathererMDPModel::makeActionsForState(
  * @param actionList List of executable actions
  */
 void HunterGathererMDPModel::makeActionsForState(
-			      const Engine::IncrementalRaster & resourcesRaster
+			      const Engine::IncrementalRaster & resourcesRaster			      
 			      , const Engine::Point2D<int> &position
 			      , std::vector< Sector* >* HRActionSectors
 			      , std::vector< Sector* >* LRActionSectors
@@ -401,6 +399,10 @@ void HunterGathererMDPModel::makeActionsForState(
 			      , std::vector< Engine::Point2D<int> >* LRCellPool
 			      , std::vector<MDPAction *>&  actionList) const
 {
+	std::stringstream logName;
+	logName << "logMDPStates_"	<< _simAgent->getWorld()->getId() << "_" << _simAgent->getId();
+	
+	
 	// Map from "sector memory address" to "sector integer identifier".
 	// After sorting validActionSectors I need to access both the HR and the LR sector
 	std::map<unsigned long,int> sectorIdxMap;
@@ -415,15 +417,19 @@ void HunterGathererMDPModel::makeActionsForState(
 	//for(int i = 0; i < LRActionSectors.size(); i++)
 		//assert(LRActionSectors[i]->cells().size() >0);
 	
-	agentRef().updateKnowledge( position, resourcesRaster, *HRActionSectors, *LRActionSectors, *HRCellPool, *LRCellPool );
+	agentRef().updateKnowledge( position, resourcesRaster, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool );
+	
+	
+	log_INFO(logName.str(),"UPDATED LRSectors at " << position 
+						<< ", amount sectors " << LRActionSectors->size());	
 	
 	// MRJ: Remove empty sectors if any
 	for ( unsigned i = 0; i < LRActionSectors->size(); i++ )
-	{/*
+	{
 		if ( (*LRActionSectors)[i]->isEmpty() )
 		{
 			continue;
-		}*/
+		}
 		validActionSectors.push_back( (*LRActionSectors)[i] );
 		sectorIdxMap[(unsigned long)(*LRActionSectors)[i]] = i;
 	}	
@@ -462,6 +468,12 @@ void HunterGathererMDPModel::makeActionsForState(
 	//HRActionSectors.clear();
 	//LRActionSectors.clear();
 	//std::cout << "finished creating actions for state with time index: " << parent.getTimeIndex() << " and resources: " << parent.getOnHandResources() << std::endl;
+	
+	/*log_INFO(logName.str(),"CREA LRSectors at " << position 
+						<< ", amount sectors " << LRActionSectors->size()
+						<< ", amount actions " << actionList.size()
+				);	*/
+	
 } 
 
 

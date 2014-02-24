@@ -43,8 +43,8 @@ HGMind::~HGMind()
 }
 
 void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos
-				,std::vector< Sector* >& resultHRSectors
-				,std::vector< Engine::Point2D<int> >& cellPool) const
+				,std::vector< Sector* >* resultHRSectors
+				,std::vector< Engine::Point2D<int> >* cellPool) const
 {
 	int homeRange  = ((GujaratConfig)_world.getConfig())._homeRange;
 	int numSectors = ((GujaratConfig)_world.getConfig())._numSectors;
@@ -54,9 +54,9 @@ void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos
 		
 		
 		//cellPool.resize(GujaratState::HRCellsInHomeRange);
-		if(0 == cellPool.size())
+		if(0 == cellPool->size())
 		{
-			cellPool.resize((2*homeRange+1)*(2*homeRange+1));
+			cellPool->resize((2*homeRange+1)*(2*homeRange+1));
 		}
 		int insertPoint = 0;
 		
@@ -86,8 +86,8 @@ void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos
 					continue;
 				}
 				
-				cellPool[insertPoint]=p;
-				HRSectors[indexSector]->addCell( &cellPool[insertPoint] );				
+				(*cellPool)[insertPoint]=p;
+				HRSectors[indexSector]->addCell( &((*cellPool)[insertPoint]) );				
 				insertPoint++;
 				//HRSectors[indexSector]->addCell( p );
 				//getWorld()->setValue( "sectors", p, 1 );	
@@ -127,7 +127,7 @@ void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos
 		if(HRSectors[k]->cells().size()>0) 
 		{
 			HRSectors[k]->setDirection(k);
-			resultHRSectors.push_back(HRSectors[k]);
+			resultHRSectors->push_back(HRSectors[k]);
 			HRSectors[k] = 0;
 		}
 		else
@@ -141,8 +141,8 @@ void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos
 
 
 void HGMind::createLRSectors( 	const Engine::Point2D<int>& agentPos, 
-				std::vector< Sector* >& resultLRSectors,
-				std::vector< Engine::Point2D<int> >& cellPool) const
+				std::vector< Sector* >* resultLRSectors,
+				std::vector< Engine::Point2D<int> >* cellPool) const
 {
 	std::vector< Sector* > LRSectors;
 	int homeRange  = ((GujaratConfig)_world.getConfig())._homeRange;
@@ -153,9 +153,9 @@ void HGMind::createLRSectors( 	const Engine::Point2D<int>& agentPos,
 	//if(LRSectors.size()==0)
 	//{
 		//cellPool.resize(GujaratState::LRCellsInHomeRange);
-		if(0 == cellPool.size())
+		if(0 == cellPool->size())
 		{
-			cellPool.resize((2*lowResHomeRange+1)*(2*lowResHomeRange+1));
+			cellPool->resize((2*lowResHomeRange+1)*(2*lowResHomeRange+1));
 		}
 		int insertPoint = 0;
 				
@@ -215,8 +215,8 @@ void HGMind::createLRSectors( 	const Engine::Point2D<int>& agentPos,
 				&&
 				_world.getOverlapBoundaries().isInside(corners[3]))	
 				{
-					cellPool[insertPoint]=LRxycell;
-					LRSectors[indexSector]->addCell( &cellPool[insertPoint] );
+					(*cellPool)[insertPoint]=LRxycell;
+					LRSectors[indexSector]->addCell( &((*cellPool)[insertPoint]) );
 					insertPoint++;
 				//LRSectors[indexSector]->addCell( LRxycell );
 				}				
@@ -259,7 +259,7 @@ void HGMind::createLRSectors( 	const Engine::Point2D<int>& agentPos,
 			if(LRSectors[k]->cells().size()>0) 
 			{
 				LRSectors[k]->setDirection(k);
-				resultLRSectors.push_back(LRSectors[k]);
+				resultLRSectors->push_back(LRSectors[k]);
 				LRSectors[k] = 0;
 			}
 			else
@@ -269,11 +269,12 @@ void HGMind::createLRSectors( 	const Engine::Point2D<int>& agentPos,
 		}
 	
 		
-		for ( unsigned k = 0; k < resultLRSectors.size(); k++ )
+		for ( unsigned k = 0; k < resultLRSectors->size(); k++ )
 		{
-			resultLRSectors[k]->addCell( &cellPool[insertPoint00] );
+			(*resultLRSectors)[k]->addCell( &((*cellPool)[insertPoint00]) );
 		}
 	//}	   
+	
 	
 }	
 
@@ -287,12 +288,12 @@ void HGMind::updateKnowledge(Engine::Point2D<int> position)
 	
 	if (_HRSectors.size()==0)
 	{
-		createHRSectors( position, _HRSectors, _HRCellPool);
+		createHRSectors( position, &_HRSectors, &_HRCellPool);
 		
 	}
 	if (_LRSectors.size()==0)
 	{
-		createLRSectors( position, _LRSectors, _LRCellPool);
+		createLRSectors( position, &_LRSectors, &_LRCellPool);
 	}
 	
 	for ( unsigned k = 0; k < _LRSectors.size(); k++ )
@@ -305,28 +306,34 @@ void HGMind::updateKnowledge(Engine::Point2D<int> position)
 
 void HGMind::updateKnowledge( const Engine::Point2D<int>& agentPos
 								, const Engine::Raster& dataRaster
-								, std::vector< Sector* >& HRSectors
-								, std::vector< Sector* >& LRSectors
-								, std::vector< Engine::Point2D<int> >& HRCellPool
-								, std::vector< Engine::Point2D<int> >& LRCellPool
+								, std::vector< Sector* >* HRSectors
+								, std::vector< Sector* >* LRSectors
+								, std::vector< Engine::Point2D<int> >* HRCellPool
+								, std::vector< Engine::Point2D<int> >* LRCellPool
 							) const
 {	
-
+	log_INFO(_logName.str(),"HGMind::updateKnowledge receives: " << agentPos 
+						<< ", amount sectors " << LRSectors->size());	
 	
-	if (HRSectors.size()==0)
+	
+	if (HRSectors->size()==0)
 	{
 		createHRSectors(agentPos,HRSectors, HRCellPool);
 	}
 	
-	if (LRSectors.size()==0)
+	if (LRSectors->size()==0)
 	{
 		createLRSectors(agentPos,LRSectors, LRCellPool);
 	}
 	
-	for ( unsigned k = 0; k < LRSectors.size(); k++ )
+	for ( unsigned k = 0; k < LRSectors->size(); k++ )
 	{	
-		LRSectors[k]->updateFeaturesLR(dataRaster);
+		(*LRSectors)[k]->updateFeaturesLR(dataRaster);
 	} 
+	
+	log_INFO(_logName.str(),"HGMind::updateKnowledge ends: " << agentPos 
+						<< ", amount sectors " << LRSectors->size());	
+	
 	
 }
 

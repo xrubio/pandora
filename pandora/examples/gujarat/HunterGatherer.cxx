@@ -19,6 +19,8 @@
 
 #include <MDPAction.hxx>
 
+#include <sstream>
+
 namespace Gujarat
 {
 
@@ -79,6 +81,11 @@ void HunterGatherer::updateKnowledge()
 	std::stringstream logName;
 	logName << "agents_" << _world->getId() << "_" << getId();
 	
+	if(_myHGMind->_logName.str().size() == 0)
+	{
+		_myHGMind->_logName<< "logMDPStates_"	<< getWorld()->getId() << "_" << getId();	 //= logName;
+	}
+	
 	_myHGMind->updateKnowledge(_position);
 
 }
@@ -86,15 +93,27 @@ void HunterGatherer::updateKnowledge()
 
 void	HunterGatherer::updateKnowledge( const Engine::Point2D<int>& agentPos
 										, const Engine::Raster& dataRaster
-										, std::vector< Sector* >& HRSectors
-										, std::vector< Sector* >& LRSectors
-										, std::vector< Engine::Point2D<int> >& HRCellPool
-										, std::vector< Engine::Point2D<int> >& LRCellPool
+										, std::vector< Sector* >* HRSectors
+										, std::vector< Sector* >* LRSectors
+										, std::vector< Engine::Point2D<int> >* HRCellPool
+										, std::vector< Engine::Point2D<int> >* LRCellPool
 									   ) const
 {	
+	std::stringstream logName;
+	//logName << "logMDPStates_"	<< getWorld()->getId() << "_" << getId();	
+	
+	if(_myHGMind->_logName.str().size() == 0)
+	{
+		_myHGMind->_logName << "logMDPStates_"	<< getWorld()->getId() << "_" << getId();	// = logName;
+	}
+	
 	_myHGMind->updateKnowledge(agentPos, dataRaster
 								, HRSectors, LRSectors
 								, HRCellPool, LRCellPool);
+	
+	log_INFO(logName.str(),"after UPDATE LRSectors at " << agentPos 
+						<< ", amount sectors " << LRSectors->size());	
+	
 }
 
 

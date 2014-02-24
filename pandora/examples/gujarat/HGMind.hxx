@@ -3,7 +3,7 @@
 #ifndef __HGMind_hxx__
 #define __HGMind_hxx__
 
-
+#include <sstream>
 //#include <HunterGatherer.hxx>
 //#include <GujaratAgent.hxx>
 #include <vector>
@@ -44,13 +44,13 @@ namespace Gujarat
 		}
 		
 		void createHRSectors( const Engine::Point2D<int>& agentPos
-				, std::vector< Sector* >& resultHRSectors
-				, std::vector< Engine::Point2D<int> >& cellPool ) const;
+				, std::vector< Sector* >* resultHRSectors
+				, std::vector< Engine::Point2D<int> >* cellPool ) const;
 										
 		
 		void createLRSectors( 	const Engine::Point2D<int>& agentPos
-					, std::vector< Sector* >& resultLRSectors
-					, std::vector< Engine::Point2D<int> >& cellPool ) const;
+					, std::vector< Sector* >* resultLRSectors
+					, std::vector< Engine::Point2D<int> >* cellPool ) const;
 		
 		//----------------------------------------------------------------------
 		const std::vector<Sector *> & getHRSectors()const
@@ -78,16 +78,18 @@ namespace Gujarat
 		
 		void	updateKnowledge( const Engine::Point2D<int>& agentPos
 								, const Engine::Raster& dataRaster
-								, std::vector< Sector* >& HRSectors
-								, std::vector< Sector* >& LRSectors
-								, std::vector< Engine::Point2D<int> >& HRCellPool
-								, std::vector< Engine::Point2D<int> >& LRCellPool
+								, std::vector< Sector* >* HRSectors
+								, std::vector< Sector* >* LRSectors
+								, std::vector< Engine::Point2D<int> >* HRCellPool
+								, std::vector< Engine::Point2D<int> >* LRCellPool
    							) const;	
 				
 		void clearSectorKnowledge();
 		
 		virtual void updateDueToExecuteAction(Sector*) = 0;
 	
+	public:
+		std::stringstream _logName;
 };
 }
 

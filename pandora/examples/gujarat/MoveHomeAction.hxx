@@ -60,6 +60,10 @@ public:
 	 * { return ag.getSectorOfLRCell(_newHomeLoc); }
 	 * */
 	
+	Engine::Point2D<int> getNewHomeLoc() const { return _newHomeLoc; }
+	Engine::Point2D<int> getNewHomeLocLR() const { return _newHomeLocLR; }
+	
+	
 #ifdef REDUCC	
 	bool equal(MDPAction * a, const GujaratAgent & gua) { return 		
 							dynamic_cast<MoveHomeAction*>(a) 

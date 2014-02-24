@@ -1,8 +1,8 @@
 
 #include <HunterGathererMDPState.hxx>
-#include <Logger.hxx>
 
-#include <sstream>
+
+
 #include <Exceptions.hxx>
 
 //#include <mutex>
@@ -42,11 +42,10 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 //,_availableActions(s._availableActions)
 {
 	std::stringstream logName;
-	logName << "infoshar";
+	logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
 	
 	_dni=dniTicket ();
 	
-	//log_INFO(logName.str(),"XXXX CREA 1:" << s._dni << "->" << _dni);
 	_creator=1;
 	
 	_ownItems.resize(s._ownItems.size());
@@ -78,13 +77,19 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 		<< " a"
 		<< std::endl;
 	*/
-	std::cout << "herencia1:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors"<< std::endl;
-		
+	//std::cout << "herencia1:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors"<< std::endl;
+	
+	
+	log_INFO(logName.str(),"XXXX CREA 1:" << s._dni << "->" << _dni);
+	log_INFO(logName.str(),"herencia1:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors");
+	
+	
 	assert(_mapLocation == s._mapLocation);
 }
 
 
 HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
+					, const Engine::Point2D<int> loc
 					, std::vector< Sector* > * HRActionSectors
 					, std::vector< Sector* > * LRActionSectors
 					, std::vector< Engine::Point2D<int> > * HRCellPool
@@ -92,7 +97,7 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 					, std::vector< bool > ownItems
 				        , const std::vector<MDPAction *>& actionList)
 : _timeIndex( s._timeIndex )
-, _mapLocation( s._mapLocation )
+, _mapLocation( loc )
 , _onHandResources( s._onHandResources )
 , _resources( s._resources )
 , _hashKey( s._hashKey )
@@ -112,12 +117,11 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 , _numAvailableActionsWhenBorn(actionList.size())
 {
 	std::stringstream logName;
-	logName << "infoshar";	
+	logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
+	
 		
 	_dni=dniTicket ();
 	
-	//log_INFO(logName.str(),"XXXX CREA 2:" << s._dni << "->" << _dni);
-	_creator=2;
 	
 	_ownItems.resize(ownItems.size());
 	for(int i = 0; i < ownItems.size(); i++)
@@ -136,8 +140,12 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 		<< " b"
 		<< std::endl;
 */
-	std::cout << "herencia2:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors"<< std::endl;
+	//std::cout << "herencia2:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors"<< std::endl;
 
+	
+	log_INFO(logName.str(),"XXXX CREA 2:" << s._dni << "->" << _dni);
+	_creator=2;
+	log_INFO(logName.str(),"herencia2:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors");
 		
 }
 
@@ -181,11 +189,11 @@ HunterGathererMDPState::HunterGathererMDPState(
 	,_numAvailableActionsWhenBorn(actionList.size())
 {
 	std::stringstream logName;
-	logName << "infoshar";	
+	logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
+	
 
 	_dni=dniTicket ();
 	
-	//log_INFO(logName.str(),"XXXX CREA 3:" << _dni);
 	_creator=3;
 
 	_ownItems.resize(ownItems.size());
@@ -197,8 +205,11 @@ HunterGathererMDPState::HunterGathererMDPState(
 	computeHash();	
 	registerKnowledgeStructuresAtCounterMap();
 	
-	std::cout << "herencia3:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors"<< std::endl;
+	//std::cout << "herencia3:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors"<< std::endl;
 
+	
+	log_INFO(logName.str(),"XXXX CREA 3:" << _dni);
+	log_INFO(logName.str(),"herencia3:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors");
 	
 }
 
@@ -206,6 +217,11 @@ HunterGathererMDPState::HunterGathererMDPState(
 
 const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGathererMDPState& s )
 {	
+	std::stringstream logName;
+	logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
+	
+	
+	
 	/*std::cout << "NET: edge "	
 		<< s._dni 
 		<< " "
@@ -279,19 +295,22 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	
 	_config = s._config;
 	
-	std::cout << "herencia4:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors"<< std::endl;
-
+	//std::cout << "herencia4:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors"<< std::endl;
+	
+	log_INFO(logName.str(),"XXXX CREA 4:" << s._dni << "->" << _dni);	
+	log_INFO(logName.str(), "herencia4:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors");	
 	
 	return *this;
 	
 }
 
-
+	
 
 HunterGathererMDPState::~HunterGathererMDPState()
 {
 	std::stringstream logName;
-	logName << "infoshar";	
+	logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
+	
 	
 	//std::cout << "destroying MDPState:" << _dni << std::endl;
 	
@@ -347,7 +366,7 @@ HunterGathererMDPState::~HunterGathererMDPState()
 void	HunterGathererMDPState::addAction( MDPAction* a )
 {
 	if(_availableActions.size() >= (unsigned int)_numAvailableActionsWhenBorn)
-		std::cout << "VIOLATOR created with :" << _creator << std::endl;
+		std::cout << "TOO MUCH actions, created with :" << _creator << std::endl;
 	assert(_availableActions.size() < (unsigned int)_numAvailableActionsWhenBorn);
 	_availableActions.push_back(a);
 }
@@ -481,7 +500,10 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 			<< _availableActions.size() << "!=" << s._availableActions.size()
 			<< "\n locations : " << _mapLocation << " == " << s._mapLocation 
 			<< "\n dni's :" << _dni << "," << s._dni
-			<< "\n sectors's :" << _LRActionSectors->size() << "," << s._LRActionSectors->size();
+			<< "\n sectors's :" << _LRActionSectors->size() << "," << s._LRActionSectors->size()
+			<< "\n constructor " << _creator << " for state " << _dni
+			<< "\n constructor " << s._creator << " for state " << s._dni
+			;
 		
 		throw Engine::Exception(oss.str());
 	}
@@ -797,7 +819,7 @@ void	HunterGathererMDPState::makeActionsForState( HunterGatherer * agentRef)
 	
 	
 	//TODO watch HRSectors update : BOTTLENECK
-	agentRef->updateKnowledge( getLocation(), getResourcesRaster(), *_HRActionSectors, *_LRActionSectors, *_HRCellPool, *_LRCellPool );
+	agentRef->updateKnowledge( getLocation(), getResourcesRaster(), _HRActionSectors, _LRActionSectors, _HRCellPool, _LRCellPool );
 	
 	// MRJ: Remove empty sectors if any
 	for ( unsigned i = 0; i < _LRActionSectors->size(); i++ )

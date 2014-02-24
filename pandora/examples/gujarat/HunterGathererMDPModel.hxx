@@ -80,9 +80,10 @@ public:
 	
 protected:
 	
-	void makeActionsForState( HunterGatherer& parent, std::vector<MDPAction *>&  actionList) const;
+	void makeActionsForState( HunterGatherer& parent, const Engine::Point2D<int> &loc, std::vector<MDPAction *>&  actionList) const;
 	void makeActionsForState( 
 				const HunterGathererMDPState& parent
+				, const Engine::Point2D<int> &loc
 				, std::vector< Sector* > * HRActionSectors
 				, std::vector< Sector* > * LRActionSectors
 				, std::vector< Engine::Point2D<int> > * HRCellPool
@@ -90,7 +91,7 @@ protected:
 				, std::vector<MDPAction *>&  actionList) const;
 
 	void makeActionsForState(
-			      const Engine::IncrementalRaster & resourcesRaster
+			      const Engine::IncrementalRaster & resourcesRaster			      
 			      , const Engine::Point2D<int> &position
 			      , std::vector< Sector* >* HRActionSectors
 			      , std::vector< Sector* >* LRActionSectors
