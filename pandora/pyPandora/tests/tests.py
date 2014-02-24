@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 # unit testing of pyPandora
 
@@ -26,6 +26,14 @@ class TestPyPandora(unittest.TestCase):
 
 		point2._y = 100
 		self.assertNotEqual(point1, point2)
+
+	def testSimulationSize(self):
+		mySimulation = Simulation(Point2DInt(10,10), 1)
+		size = Point2DInt(9,10)
+
+		self.assertNotEqual(mySimulation.size, size)
+		size._x = 10
+		self.assertEqual(mySimulation.size, size)
        
 if __name__ == '__main__':
     unittest.main()

@@ -342,7 +342,7 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("getValue", &Engine::Raster::getValue, &RasterWrap::default_getValue, boost::python::return_value_policy<boost::python::copy_const_reference>())
 	;
 
-	boost::python::class_< Engine::Simulation >("SimulationStub", boost::python::init< const Engine::Point2D<int> &, const int &, const int & >() )
+	boost::python::class_< Engine::Simulation >("SimulationStub", boost::python::init< const Engine::Point2D<int> &, const int &, const int & >() )				.add_property("size", boost::python::make_function(&Engine::Simulation::getSize, boost::python::return_value_policy<boost::python::reference_existing_object>()))
 	;
 	
 	boost::python::class_< AgentWrap, std::auto_ptr<AgentWrap>, boost::noncopyable >("AgentStub", boost::python::init< const std::string & > () )
