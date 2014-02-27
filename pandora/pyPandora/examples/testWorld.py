@@ -31,3 +31,6 @@ myWorld = MyWorld(mySimulation)
 myWorld.initialize()
 myWorld.run()
 
+myWorld.initialize()
+myWorld.run()
+

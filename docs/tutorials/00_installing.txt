@@ -36,7 +36,7 @@ scons
 python
 
 You can install all of them with this command:
-$ sudo apt-get install libtinyxml-dev libdevil-dev freeglut3-dev libqwt-dev libqwt6 libqt4-dev libqt4-opengl-dev grass grass-dev libgdal1-dev mpich2 scons build-essential libboost-random-dev libboost-python-dev libboost-filesystem-dev libboost-system-dev libmpich2-dev python3-dev
+$ sudo apt-get install libtinyxml-dev libdevil-dev freeglut3-dev libqwt-dev libqwt6 libqt4-dev libqt4-opengl-dev grass grass-dev libgdal1-dev mpich2 scons build-essential libboost-random-dev libboost-python-dev libboost-filesystem-dev libboost-system-dev libmpich2-dev python3-dev libboost-test-dev libboost-test1.48.0
 
 Python 3 is used by default, but if you want to use python 2.7 this is also possible (just change the installed packages as needed).
 

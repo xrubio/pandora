@@ -4,8 +4,8 @@
 
 import sys, random
 import unittest
-sys.path.append('../')
 sys.path.append('../../')
+sys.path.append('../../pyPandora')
 
 from pyPandora import Simulation, Agent, World, Point2DInt
 
@@ -55,6 +55,14 @@ class TestPyPandora(unittest.TestCase):
 		size._x = 10
 		self.assertEqual(mySimulation.size, size)
 
+	def testExecuteWorldTwice(self):
+		mySimulation = Simulation(Point2DInt(10,10), 1)
+		myWorld = TestWorld(mySimulation)
+		myWorld.initialize()
+		myWorld.run()
+		myWorld.initialize()
+		myWorld.run()
+
 	def testAgentRemovedIsNotExecuted(self):
 		mySimulation = Simulation(Point2DInt(10,10), 1)
 		myWorld = TestWorld(mySimulation)
@@ -67,6 +75,29 @@ class TestPyPandora(unittest.TestCase):
 		myAgent.remove()
 		self.assertEqual(myAgent.exists, False)
 		myWorld.run()
+	
+	def testAgentRemovedIsNotInsideNeighbours(self):
+		mySimulation = Simulation(Point2DInt(10,10), 1)
+		myWorld = TestWorld(mySimulation)
+		myWorld.initialize()
+		myWorld.run()
+
+		myAgent0 = TestAgent('agent_0')
+		myAgent1 = TestAgent('agent_1')
+		myAgent2 = TestAgent('agent_2')
+		myWorld.addAgent(myAgent0)
+		myWorld.addAgent(myAgent1)
+		myWorld.addAgent(myAgent2)
+		myAgent0.setRandomPosition()
+		myAgent1.setRandomPosition()
+		myAgent2.setRandomPosition()
+
+		agentIds = myWorld.getNeighboursIds(myAgent0, 20, 'agent')
+		self.assertEqual(len(agentIds), 2)
+		myAgent2.remove()
+		myAgent3.remove()
+		agentIds = myWorld.getNeighboursIds(myAgent0, 20, 'agent')
+		self.assertEqual(len(agentIds), 0)
        
 if __name__ == '__main__':
     unittest.main()
