@@ -7,8 +7,12 @@
 namespace Test 
 {
 
-TestWorld::TestWorld( Engine::Simulation & simulation) : World(simulation, 1, false, "data/results.h5")
+TestWorld::TestWorld( Engine::Simulation & simulation, bool worldOfLastTest ) : World(simulation, 1, false, "data/results.h5")
 {
+	if(!worldOfLastTest)
+	{
+		setFinalize(false);
+	}
 }
 
 TestWorld::~TestWorld()

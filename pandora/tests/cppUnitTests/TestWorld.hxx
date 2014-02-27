@@ -18,7 +18,8 @@ class TestWorld : public Engine::World
 	void createAgents();
 
 public:
-	TestWorld( Engine::Simulation & simulation );
+	// worldOfLastTest must be true for the last world in test in order to clean up MPI state
+	TestWorld( Engine::Simulation & simulation, bool worldOfLastTest = false );
 	virtual ~TestWorld();
 };
 

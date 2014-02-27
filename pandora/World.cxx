@@ -46,7 +46,7 @@ namespace Engine
 {
 
 World::World( const Simulation & simulation, const int & overlap, const bool & allowMultipleAgentsPerCell, const std::string & fileName ) 
-    : _simulation(simulation), _worldPos(-1,-1), _globalBoundaries(Point2D<int>(0,0) , simulation.getSize()), _allowMultipleAgentsPerCell(allowMultipleAgentsPerCell), _step(0), _overlap(overlap), _searchAgents(true), _initialTime(0.0f)
+    : _simulation(simulation), _worldPos(-1,-1), _globalBoundaries(Point2D<int>(0,0) , simulation.getSize()), _allowMultipleAgentsPerCell(allowMultipleAgentsPerCell), _step(0), _finalize(true), _overlap(overlap), _searchAgents(true), _initialTime(0.0f)
 {
 #ifdef PANDORAMPI
 	GeneralState::serializer().setResultsFile(fileName);
@@ -79,7 +79,12 @@ void World::initialize()
 void World::init( int argc, char *argv[] )
 {
 #ifdef PANDORAMPI
-	MPI_Init(&argc, &argv);
+	int alreadyInitialized;
+	MPI_Initialized(&alreadyInitialized);
+	if(!alreadyInitialized)
+	{
+		MPI_Init(&argc, &argv);
+	}
 #endif
 	_simulation.init();
 	checkOverlapSize();
@@ -1015,8 +1020,16 @@ void World::run()
 #endif
 	log_INFO(logName.str(), getWallTime() << " simulation finished");
 #ifdef PANDORAMPI
-	MPI_Finalize();
+	if(_finalize)
+	{
+		MPI_Finalize();
+	}
 #endif
+}
+
+void World::setFinalize( const bool & finalize )
+{
+	_finalize = finalize;
 }
 
 World::AgentsList::iterator World::getOwnedAgent( const std::string & id )

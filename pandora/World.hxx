@@ -117,6 +117,8 @@ protected:
 
 	//! current simulation step
 	int _step;
+	//! if true will call MPI_Finalize at the end of run (default behavior)
+	bool _finalize;
 
 	//! provides a random valid position inside boundaries
 	Point2D<int> getRandomPosition();
@@ -184,6 +186,7 @@ protected:
 	void setSearchAgents( const bool & searchAgents );
 	//! method interface for attribute _searchAgents. 
 	bool getSearchAgents();
+	void setFinalize( const bool & finalize );
 
 public:
 	//! constructor.
