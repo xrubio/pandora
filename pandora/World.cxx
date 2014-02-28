@@ -98,7 +98,7 @@ void World::init( int argc, char *argv[] )
 	GeneralState::serializer().init(_simulation, _rasters, _dynamicRasters, _serializeRasters, *this);
 	serializeStaticRasters();
 #endif
-#ifdef PANDORAMPI
+#ifdef PANDORAMPI	
 	MpiFactory::instance()->registerTypes();
 #endif
 
@@ -1016,12 +1016,12 @@ void World::run()
 	log_INFO(logName.str(), getWallTime() << " closing files");
 #ifdef PANDORAMPI
 	GeneralState::serializer().finish();
-	MpiFactory::instance()->cleanTypes();
 #endif
 	log_INFO(logName.str(), getWallTime() << " simulation finished");
 #ifdef PANDORAMPI
 	if(_finalize)
 	{
+		MpiFactory::instance()->cleanTypes();
 		MPI_Finalize();
 	}
 #endif
