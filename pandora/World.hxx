@@ -186,7 +186,6 @@ protected:
 	void setSearchAgents( const bool & searchAgents );
 	//! method interface for attribute _searchAgents. 
 	bool getSearchAgents();
-	void setFinalize( const bool & finalize );
 
 public:
 	//! constructor.
@@ -367,6 +366,7 @@ public:
 
 	int	getCurrentTimeStep() const { return _step; }
 	double getWallTime() const;
+	void setFinalize( const bool & finalize );
 };
 
 } // namespace Engine

@@ -14,15 +14,16 @@ class TestAgent(Agent):
 		Agent.__init__( self, id)
 
 	def updateState(self):
-		print(self,'executed')
 		return
 
 	def serialize(self):
 		return
 
 class TestWorld(World):
-	def __init__(self, simulation ):
+	def __init__(self, simulation, worldOfLastTest = False ):
 		World.__init__( self, simulation)
+		if not worldOfLastTest:
+			self.setFinalize(False)
 
 	def createRasters(self):
 		return
@@ -55,14 +56,6 @@ class TestPyPandora(unittest.TestCase):
 		size._x = 10
 		self.assertEqual(mySimulation.size, size)
 
-	def testExecuteWorldTwice(self):
-		mySimulation = Simulation(Point2DInt(10,10), 1)
-		myWorld = TestWorld(mySimulation)
-		myWorld.initialize()
-		myWorld.run()
-		myWorld.initialize()
-		myWorld.run()
-
 	def testAgentRemovedIsNotExecuted(self):
 		mySimulation = Simulation(Point2DInt(10,10), 1)
 		myWorld = TestWorld(mySimulation)
@@ -74,6 +67,15 @@ class TestPyPandora(unittest.TestCase):
 		self.assertEqual(myAgent.exists, True)
 		myAgent.remove()
 		self.assertEqual(myAgent.exists, False)
+		myWorld.run()
+	
+	def testExecuteWorldTwice(self):
+		mySimulation = Simulation(Point2DInt(10,10), 1)
+		myWorld = TestWorld(mySimulation, False)
+		myWorld.initialize()
+		myWorld.run()
+		myWorld.setFinalize(True)
+		myWorld.initialize()
 		myWorld.run()
 	
 	def testAgentRemovedIsNotInsideNeighbours(self):
@@ -94,8 +96,8 @@ class TestPyPandora(unittest.TestCase):
 
 		agentIds = myWorld.getNeighboursIds(myAgent0, 20, 'agent')
 		self.assertEqual(len(agentIds), 2)
+		myAgent1.remove()
 		myAgent2.remove()
-		myAgent3.remove()
 		agentIds = myWorld.getNeighboursIds(myAgent0, 20, 'agent')
 		self.assertEqual(len(agentIds), 0)
        
