@@ -875,8 +875,8 @@ void	ForageAction::doTrendVicinityWalk( GujaratAgent& agent, const Engine::Point
 	Engine::Point2D<int> HRNearest;
 	
 	
-	//*? TODO eLRResources??? what about non omniscience?
-	//std::cout << "1111111:" << LRn <<":"<< HRHome << std::endl;
+	//*? TODO eLRResources??? this is omniscience? should be _hgMind->resourceRaster
+	
 	selectBestNearestLRCell( agent, LRn, gw, agent.getWorld()->getDynamicRaster(eLRResources)
 	, (int)(agent.getAvailableTime() / agent.getForageTimeCost())
 	, bestScore, LRBest );
@@ -1158,7 +1158,9 @@ void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>
 		
 		while ( nonVisited > 0 && (( walkedDist + distHome ) < maxDist) )
 		{
-			amtCollected = amtCollected + std::min(cellResources, agent.computeEffectiveBiomassForaged( cellResources/numInterDune ));
+			amtCollected = amtCollected + std::min(cellResources,
+					agent.computeEffectiveBiomassForagedNoStochastic( cellResources/numInterDune ));
+					//*? agent.computeEffectiveBiomassForaged(...)
 		
 			walkedDist += agent.getTimeSpentForagingTile();
 			

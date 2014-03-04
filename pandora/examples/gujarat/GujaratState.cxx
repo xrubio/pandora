@@ -275,18 +275,7 @@ AgentController & GujaratState::controller()
 	}
 	return *(instance()._hgControllers.at(numThread));
 }
-/*
-int GujaratState::sectorsMask( int i, int j)
-{
-	if(instance()._HRsectorsMask.size()==0)
-	{
-		std::stringstream oss;
-		oss << "GujaratState::sectorsMask() - asking for sectors mask without being initialized";
-		throw Engine::Exception(oss.str());
-	}
-	return instance()._HRsectorsMask.at(i).at(j);
-}
-*/
+
 int GujaratState::sectorsMask( int i, int j, const SectorsMask & sm)
 {
 	if(sm.size()==0)
@@ -385,64 +374,64 @@ void GujaratState::initializeSectorsMaskTrigonometricaly( int numSectors, int ho
 void GujaratState::initializeSectorsMask( int numSectors, int homeRange, SectorsMask & sm )
 {
 	// Use a more elegant way of doing this
-	if(homeRange < 100) 
+	//*? TODO
+	/*if(homeRange < 100) 
 	{
 		initializeSectorsMaskTrigonometricaly(numSectors, homeRange, sm );	
-		exit;
 	}
+	else*/ {
+		std::vector< std::vector< Engine::Point2D<int> > > sectors;
 	
-	std::vector< std::vector< Engine::Point2D<int> > > sectors;
-	
-	float alpha = 360/numSectors;
-	alpha = alpha * M_PI/180.0f;
-	Engine::Point2D<float> b;
-	Engine::Point2D<float> c;
+		float alpha = 360/numSectors;
+		alpha = alpha * M_PI/180.0f;
+		Engine::Point2D<float> b;
+		Engine::Point2D<float> c;
 
-	sectors.resize( numSectors );
-	// center position + home Range in any direction
-	sm.resize( 1+2*homeRange );
-	for ( unsigned int k = 0; k < (unsigned int)1+2*homeRange; k++ )
-	{
-		sm.at(k).resize( 1+2*homeRange );
-	}
-
-	b._x = 0;
-	b._y = - homeRange;
-
-	for(int i=0; i<numSectors; i++)
-	{
-		c._x = b._x*std::cos(alpha) - b._y*std::sin(alpha);
-		c._y = b._x*std::sin(alpha) + b._y*std::cos(alpha);
-		sectors.at(i).push_back( Engine::Point2D<int>( (int)b._x, (int)b._y ) );
-		sectors.at(i).push_back( Engine::Point2D<int>( (int)c._x, (int)c._y ) );
-		b = c;
-	}
-	
-	sm.at(0).at(0) = -1;
-	for ( int x=-homeRange; x<=homeRange; x++ )
-	{
-		for ( int y=-homeRange; y<=homeRange; y++ )
+		sectors.resize( numSectors );
+		// center position + home Range in any direction
+		sm.resize( 1+2*homeRange );
+		for ( unsigned int k = 0; k < (unsigned int)1+2*homeRange; k++ )
 		{
-			if(x==0 && y==0)
-			{
-				continue;
-			}
-			Engine::Point2D<int> p( x, y );
-			sm.at(x+homeRange).at(y+homeRange) = -1;	
-			for ( int k = 0; k < numSectors; k++ )
-			{
-				if ( Engine::insideTriangle( p, sectors.at(k).at(0), sectors.at(k).at(1) ) )
-				{
-					sm.at(x+homeRange).at(y+homeRange) = k;
-					break;
-				}
-			}
-		 
+			sm.at(k).resize( 1+2*homeRange );
 		}
+
+		b._x = 0;
+		b._y = - homeRange;
+
+		for(int i=0; i<numSectors; i++)
+		{
+			c._x = b._x*std::cos(alpha) - b._y*std::sin(alpha);
+			c._y = b._x*std::sin(alpha) + b._y*std::cos(alpha);
+			sectors.at(i).push_back( Engine::Point2D<int>( (int)b._x, (int)b._y ) );
+			sectors.at(i).push_back( Engine::Point2D<int>( (int)c._x, (int)c._y ) );
+			b = c;
+		}
+	
+		sm.at(0).at(0) = -1;
+		for ( int x=-homeRange; x<=homeRange; x++ )
+		{
+			for ( int y=-homeRange; y<=homeRange; y++ )
+			{
+				if(x==0 && y==0)
+				{
+					continue;
+				}
+				Engine::Point2D<int> p( x, y );
+				sm.at(x+homeRange).at(y+homeRange) = -1;	
+				for ( int k = 0; k < numSectors; k++ )
+				{
+					if ( Engine::insideTriangle( p, sectors.at(k).at(0), sectors.at(k).at(1) ) )
+					{
+						sm.at(x+homeRange).at(y+homeRange) = k;
+						break;
+					}
+				}
+		 
+			}
 	 
+		}
+
 	}
-
-
 }
 
 

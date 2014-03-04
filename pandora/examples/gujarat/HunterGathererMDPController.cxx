@@ -39,8 +39,10 @@ void HunterGathererMDPController::selectActions( GujaratAgent & agent, std::list
 	delete uctPolicy;
 
 	
-	log_DEBUG(agent.getId()+"_controller",  "\taction_selected=" << a->describe());
+	//log_DEBUG(agent.getId()+"_controller",  "\taction_selected=" << a->describe());
 
+	//log_INFO(agent.getId()+"_controller",  "\taction_selected=" << a->describe());
+	
 	actions.push_back(a);	
 	
 	

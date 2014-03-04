@@ -80,7 +80,8 @@ public:
 	
 protected:
 	
-	void makeActionsForState( HunterGatherer& parent, const Engine::Point2D<int> &loc, std::vector<MDPAction *>&  actionList) const;
+	//void makeActionsForState( HunterGatherer& parent, const Engine::Point2D<int> &loc, std::vector<MDPAction *>&  actionList) const;
+	
 	void makeActionsForState( 
 				const HunterGathererMDPState& parent
 				, const Engine::Point2D<int> &loc

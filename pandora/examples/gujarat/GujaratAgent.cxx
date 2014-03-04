@@ -351,6 +351,7 @@ void GujaratAgent::checkMortality()
 	GujaratState::demographics().checkMortality(*this);
 }
 
+
 void	GujaratAgent::initializePosition( )
 {
 		
@@ -363,6 +364,8 @@ void	GujaratAgent::initializePosition( )
 		assert(areas.size() > 0);
 		unsigned die = Engine::GeneralState::statistics().getUniformDistValue(0, areas.size()-1);
 		Engine::Rectangle<int> area = areas[die];
+		
+		
 		for ( int x = area._origin._x; x < area._origin._x + area._size._x; x++ )
 		{
 			for ( int y = area._origin._y; y < area._origin._y + area._size._y; y++ )
@@ -374,8 +377,12 @@ void	GujaratAgent::initializePosition( )
 				}
 			}
 		}
+		
 	}
 
+	
+	
+	
 	/*
 	if(dunes.empty())
 	{
@@ -405,6 +412,7 @@ void	GujaratAgent::initializePosition( )
 
 	dunes.clear();
 }
+
 
 int	GujaratAgent::getNrAvailableAdults() const
 {

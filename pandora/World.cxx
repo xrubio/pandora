@@ -1022,13 +1022,6 @@ void World::run()
 #endif
 	for(_step=0; _step<_simulation.getNumSteps(); _step++)
 	{
-		//*?
-		if(_step==360)
-		{
-			std::cout << "going to 360!!!" << std::endl;
-			//_step=361;
-		}
-		
 		step();
 	}
 	// storing last step data
