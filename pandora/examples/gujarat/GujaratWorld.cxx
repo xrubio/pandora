@@ -140,6 +140,16 @@ void GujaratWorld::createRasters()
 	log_DEBUG(logName.str(), getWallTime() << " create rasters done");
 	
 	assert(_settlementAreas.getAreas().size() > 0);
+
+	registerDynamicRaster("counterHRSectors", _config.isStorageRequired("counterHRSectors"), eCounterHRSectors); 
+	getDynamicRaster(eCounterHRSectors).setInitValues(-1, std::numeric_limits<int>::max(), -1);
+	fillIniRaster(eCounterHRSectors,-1);
+
+	registerDynamicRaster("counterLRSectors", _config.isStorageRequired("counterLRSectors"), eCounterLRSectors); 
+	getDynamicRaster(eCounterLRSectors).setInitValues(-1, std::numeric_limits<int>::max(), -1);
+	fillIniRaster(eCounterLRSectors,-1);
+	
+	
 	
 std::cout << "init LR" << std::endl;	
 	

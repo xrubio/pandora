@@ -27,7 +27,7 @@ Sector::Sector( const Sector* other ):
 	_world(other->_world)
 	, _cells(other->_cells)
 	, _biomassAmount(other->_biomassAmount)
-	, _direction(-1)
+	, _direction(other->_direction)
 {
 	//_biomassAmountClass = other._biomassAmountClass;
 	_dni = dniTicket();

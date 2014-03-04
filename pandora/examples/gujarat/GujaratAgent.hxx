@@ -96,6 +96,8 @@ public:
 	// if fullPopulation = false, only half the individuals will contribute to the action (the rest is moving home)
 	float computeMaxForagingDistance( bool fullPopulation = true ) const;
 	int	computeEffectiveBiomassForaged( int nominal ) const;
+	int	computeEffectiveBiomassForagedNoStochastic( int nominal ) const
+		{ return nominal/2; }
 	int	convertBiomassToCalories( int biomass ) const;
 //	bool	starvationLastTimeStep() const { return _starved; }
 

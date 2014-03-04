@@ -44,6 +44,9 @@ enum Rasters
 	
 	eSectorUtility,
 	paintLRResources
+	
+	,eCounterHRSectors
+	,eCounterLRSectors
 };
 
 // id's depends on GIS data

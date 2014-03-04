@@ -34,10 +34,6 @@ namespace Gujarat
 	
 class HunterGathererMDPState
 {
-	//*?
-	//static std::vector< std::unordered_map<long,long> > _objectUseCounter;
-	//boost::mutex _mtx;
-	//static 
 	std::map<long unsigned int,long> * _objectUseCounter;
 	omp_lock_t * _mapLock;
 	
@@ -82,9 +78,7 @@ protected:
 	
 public:
 	// Constructors, I don't want this to be ever invoked
-	//explicit HunterGathererMDPState();
-
-	HunterGathererMDPState();
+	//explicit HunterGathererMDPState();	
 	
 	//HunterGathererMDPState( HunterGathererMDPState& s, bool ownership[] );
 	
@@ -153,7 +147,8 @@ public:
 	bool		operator==( const HunterGathererMDPState& s ) const;
 	bool		operator!=( const HunterGathererMDPState& s ) const;
 	bool		operator<( const HunterGathererMDPState& s ) const;
-
+	const HunterGathererMDPState&	operator=(const HunterGathererMDPState& s );	
+	
 	void		print( unsigned long x ) const;
 	void		print( std::ostream& os ) const;
 
@@ -207,7 +202,7 @@ public:
 		std::stringstream logName;
 		logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
 	
-		log_INFO(logName.str(),"XXXX setLocation:" << _dni << "->" << newLoc);
+		//log_INFO(logName.str(),"XXXX setLocation:" << _dni << "->" << newLoc);
 		
 	}
 	const Engine::Point2D<int>& getLocation() const { return _mapLocation; }
@@ -247,11 +242,7 @@ public:
 	
 	void deRegisterFromCounterMapAndDeleteKnowledgeStructures();
 	
-	
-	//*? ucthack	
-	void makeActionsForState( HunterGatherer * agentRef);
 
-	const HunterGathererMDPState&	operator=(const HunterGathererMDPState& s );	
 		
 private:
 	unsigned		_timeIndex;

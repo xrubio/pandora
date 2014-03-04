@@ -35,6 +35,8 @@ HunterGatherer::HunterGatherer( const std::string & id )
 void HunterGatherer::createMind()
 {
 	_myHGMind = (HGMindFactory::getInstance().getHGMind(*(GujaratWorld*)_world));
+	
+	_myHGMind->_logName << "logMDPStates_"	<< getWorld()->getId() << "_" << getId();
 }
 
 void HunterGatherer::registerAttributes()
@@ -88,6 +90,8 @@ void HunterGatherer::updateKnowledge()
 	
 	_myHGMind->updateKnowledge(_position);
 
+	//_world->setValue(eCounterHRSectors,_position,getHRSectors().size());
+	//_world->setValue(eCounterLRSectors,_position,getLRSectors().size());
 }
 
 
@@ -101,18 +105,63 @@ void	HunterGatherer::updateKnowledge( const Engine::Point2D<int>& agentPos
 {	
 	std::stringstream logName;
 	//logName << "logMDPStates_"	<< getWorld()->getId() << "_" << getId();	
+	logName << "logMDPStates_"	<< getWorld()->getId() << "_" << getId();
 	
 	if(_myHGMind->_logName.str().size() == 0)
 	{
 		_myHGMind->_logName << "logMDPStates_"	<< getWorld()->getId() << "_" << getId();	// = logName;
 	}
 	
+	assert(LRSectors->size()==0);
+	
 	_myHGMind->updateKnowledge(agentPos, dataRaster
 								, HRSectors, LRSectors
 								, HRCellPool, LRCellPool);
 	
-	log_INFO(logName.str(),"after UPDATE LRSectors at " << agentPos 
-						<< ", amount sectors " << LRSectors->size());	
+	//log_INFO(logName.str(),"after HGMind::UPDATE; HRSectors at " << agentPos 
+		//				<< ", amount sectors " << HRSectors->size());		
+	
+	//log_INFO(logName.str(),"after HGMind::UPDATE; LRSectors at " << agentPos 
+		//				<< ", amount sectors " << LRSectors->size());		
+	
+	if(_world->getValue(eCounterHRSectors,agentPos)==-1)
+	{
+		_world->setValue(eCounterHRSectors,agentPos,HRSectors->size());
+		//log_INFO(logName.str(),"after HGMind::UPDATE; INIT HRSectors at " << agentPos << ", amount sectors " << HRSectors->size());	
+	
+	}
+	else
+	{
+		if(_world->getValue(eCounterHRSectors,agentPos)!=HRSectors->size()) 
+		{
+			std::stringstream oss;
+			oss << "HunterGatherer::updateKnowledge: position " << agentPos << ", raster says : " 
+			<< _world->getValue(eCounterHRSectors,agentPos)
+			<< " in the past, but now produces " << HRSectors->size() << " HR sectors";			
+			
+			//std::cout << oss.str() << std::endl;
+			//log_INFO(logName.str(),oss.str());
+			//throw Engine::Exception(oss.str());
+			
+		}
+	}
+	
+	if(_world->getValue(eCounterLRSectors,agentPos)==-1) 
+		_world->setValue(eCounterLRSectors,agentPos,LRSectors->size());
+	else
+	{
+		if(_world->getValue(eCounterLRSectors,agentPos)!=LRSectors->size()) 
+		{
+			std::stringstream oss;
+			oss << "HunterGatherer::updateKnowledge("<< (unsigned long)_myHGMind <<"): position " << agentPos << ", raster says : " 
+			<< _world->getValue(eCounterLRSectors,agentPos)
+			<< " in the past, but now produces " << LRSectors->size() << " LR sectors";
+			
+			//std::cout << oss.str() << std::endl;
+			//throw Engine::Exception(oss.str());
+			//log_INFO(logName.str(),oss.str());
+		}
+	}
 	
 }
 
@@ -162,13 +211,24 @@ void HunterGatherer::selectActions()
 	
 	GujaratState::controller().selectActions(*this, actions);
 	
+	if (actions.size() <= 0)
+	{
+		assert(actions.size() > 0);
+	}
 	
+		
+	try{
 	std::list<MDPAction*>::iterator it=actions.begin();
 	while(it!=actions.end())
 	{
 		_actions.push_back((Engine::Action*)(*it));
 		it = actions.erase(it);
-	}	
+	}
+	} catch (const std::exception& ex) {
+		std::cerr << "HunterGatherer::selectActions : exception caught at copy: " << ex.what() << '\n';
+		assert(0==1);
+	}
+	
 }
 
 GujaratAgent * HunterGatherer::createNewAgent()

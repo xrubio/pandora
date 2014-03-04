@@ -12,11 +12,11 @@
 namespace Gujarat
 {
 
-
+/*
 HunterGathererMDPState::HunterGathererMDPState()
 {
 	 throw Engine::Exception("Forbidden Constructor HunterGathererMDPState::HunterGathererMDPState() has been called\n");	
-}
+}*/
 
 
 
@@ -80,8 +80,8 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 	//std::cout << "herencia1:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors"<< std::endl;
 	
 	
-	log_INFO(logName.str(),"XXXX CREA 1:" << s._dni << "->" << _dni);
-	log_INFO(logName.str(),"herencia1:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors");
+	//log_INFO(logName.str(),"XXXX CREA 1:" << s._dni << "->" << _dni);
+	//log_INFO(logName.str(),"herencia1:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors");
 	
 	
 	assert(_mapLocation == s._mapLocation);
@@ -143,9 +143,9 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 	//std::cout << "herencia2:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors"<< std::endl;
 
 	
-	log_INFO(logName.str(),"XXXX CREA 2:" << s._dni << "->" << _dni);
+	//log_INFO(logName.str(),"XXXX CREA 2:" << s._dni << "->" << _dni);
 	_creator=2;
-	log_INFO(logName.str(),"herencia2:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors");
+	//log_INFO(logName.str(),"herencia2:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors");
 		
 }
 
@@ -208,8 +208,8 @@ HunterGathererMDPState::HunterGathererMDPState(
 	//std::cout << "herencia3:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors"<< std::endl;
 
 	
-	log_INFO(logName.str(),"XXXX CREA 3:" << _dni);
-	log_INFO(logName.str(),"herencia3:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors");
+	//log_INFO(logName.str(),"XXXX CREA 3:" << _dni);
+	//log_INFO(logName.str(),"herencia3:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors");
 	
 }
 
@@ -297,8 +297,8 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	
 	//std::cout << "herencia4:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors"<< std::endl;
 	
-	log_INFO(logName.str(),"XXXX CREA 4:" << s._dni << "->" << _dni);	
-	log_INFO(logName.str(), "herencia4:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors");	
+	//log_INFO(logName.str(),"XXXX CREA 4:" << s._dni << "->" << _dni);	
+	//log_INFO(logName.str(), "herencia4:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors");	
 	
 	return *this;
 	
@@ -329,38 +329,7 @@ HunterGathererMDPState::~HunterGathererMDPState()
 	
 	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
 	
-	/*
-	if (_ownItems[0])
-	{
-		log_INFO(logName.str(),"DELETE HRSectors");
-		// stop before deleting referenced Points, this happens in the
-		// part for Pool deletion if _ownItems allows so.
-		for(int i=0;i<_HRActionSectors.size();i++)
-		{
-			delete _HRActionSectors[i];
-		}
-		delete &_HRActionSectors;
-	}
-	if (_ownItems[1])
-	{
-		log_INFO(logName.str(),"DELETE LRSectors");
-		for(int i=0;i<_LRActionSectors.size();i++)
-		{
-			delete _LRActionSectors[i];
-		}
-		delete &_LRActionSectors;
-	}
-	if (_ownItems[2])
-	{
-		log_INFO(logName.str(),"DELETE HRPool");
-		delete _HRCellPool;
-	}
-	if (_ownItems[3])
-	{
-		log_INFO(logName.str(),"DELETE LRPool");
-		delete _LRCellPool;
-	}
-	*/
+	
 }
 
 void	HunterGathererMDPState::addAction( MDPAction* a )
@@ -376,8 +345,16 @@ void	HunterGathererMDPState::addAction( MDPAction* a )
 void	HunterGathererMDPState::computeHash()
 {
 	_hashKey.add( _timeIndex );
-	_hashKey.add( _mapLocation._x );
-	_hashKey.add( _mapLocation._y );
+	
+	GujaratWorld * gw = (GujaratWorld*)_agentRef->getWorld();	
+	Engine::Point2D<int> mapLocationLR;
+	gw->worldCell2LowResCell(_mapLocation,mapLocationLR);
+	
+	_hashKey.add( mapLocationLR._x );
+	_hashKey.add( mapLocationLR._y );
+	
+	/*_hashKey.add( _mapLocation._x );
+	_hashKey.add( _mapLocation._y );*/
 	_hashKey.add( _agentRef->reductionResourcesToCategory(_onHandResources) );
 	_hashKey.add( _daysStarving );	
 	
@@ -477,13 +454,20 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 	// due to the term condition ( _resources == s._resources ) 			
 	// we need introduce the "reductionResourcesToCategory" to comparison
 	
+	GujaratWorld * gw = (GujaratWorld*)_agentRef->getWorld();
+	
+	Engine::Point2D<int> mapLocationLR;
+	gw->worldCell2LowResCell(_mapLocation,mapLocationLR);
+		
+	Engine::Point2D<int> sMapLocationLR;
+	gw->worldCell2LowResCell(s._mapLocation,sMapLocationLR);	
 	
 	bool result = ( _timeIndex == s._timeIndex ) 
 		&&
 			( _agentRef->reductionResourcesToCategory(_onHandResources) 
 			== _agentRef->reductionResourcesToCategory(s._onHandResources) ) 
 		&&
-			( _mapLocation == s._mapLocation ) 
+			( mapLocationLR == sMapLocationLR ) //*? TODO should be LR
 		&&
 			equalIncRastersWithReduct(s._resources)			
 		&&
@@ -591,17 +575,25 @@ bool	HunterGathererMDPState::operator<( const HunterGathererMDPState& s ) const
 	int simplOnHandResources = _agentRef->reductionResourcesToCategory(_onHandResources);
 	int simple_s_onHandResources = _agentRef->reductionResourcesToCategory(s._onHandResources);	
 	
+	GujaratWorld * gw = (GujaratWorld*)_agentRef->getWorld();	
+	Engine::Point2D<int> mapLocationLR;
+	gw->worldCell2LowResCell(_mapLocation,mapLocationLR);
+	Engine::Point2D<int> sMapLocationLR;
+	gw->worldCell2LowResCell(s._mapLocation,sMapLocationLR);
+	
+	
+	
 	
 	std::cout << "evaluating between " << this << " and: " << &s << std::endl;
 	return  ( _timeIndex < s._timeIndex ) 
 			||
 			( ( _timeIndex == s._timeIndex ) && ( simplOnHandResources < simple_s_onHandResources ) ) 
 			||
-			( ( _timeIndex == s._timeIndex ) && ( simplOnHandResources == simple_s_onHandResources) && ( _mapLocation < s._mapLocation) ) 
+			( ( _timeIndex == s._timeIndex ) && ( simplOnHandResources == simple_s_onHandResources) && ( mapLocationLR < sMapLocationLR) ) 
 			||
-			( ( _timeIndex == s._timeIndex ) && ( simplOnHandResources == simple_s_onHandResources) && ( _mapLocation == s._mapLocation) && ( _resources < s._resources ) ) 
+			( ( _timeIndex == s._timeIndex ) && ( simplOnHandResources == simple_s_onHandResources) && ( mapLocationLR == sMapLocationLR) && ( _resources < s._resources ) ) 
 			||
-			( ( _timeIndex == s._timeIndex ) && ( simplOnHandResources == simple_s_onHandResources) && ( _mapLocation == s._mapLocation) 
+			( ( _timeIndex == s._timeIndex ) && ( simplOnHandResources == simple_s_onHandResources) && ( mapLocationLR == sMapLocationLR) 
 			&& ( equalIncRastersWithReduct(s._resources) ) &&  ( _daysStarving < s._daysStarving )	);
 }
 
@@ -722,52 +714,67 @@ void HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructure
 		
 		//std::cout << "DELETING state. thread [" << omp_get_thread_num() <<"]"<< std::endl;
 		omp_set_lock(_mapLock);
-			
-	//	}//pragma
-	//	#pragma omp critical(refmap)
-	//	{
 		
-		if (_objectUseCounter->count((unsigned long)_LRActionSectors) > 0)
+		
+		//{ PreCondition : reader counter LRActionSector = X && X>0 }
+		
+		if(_objectUseCounter->count((unsigned long)_LRActionSectors) <= 0)
 		{
-			(*_objectUseCounter)[(unsigned long)_LRActionSectors]--;
-			if((*_objectUseCounter)[(unsigned long)_LRActionSectors] == 0)
-			{
+			std::stringstream oss;
+			oss << "HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructures(): "
+			<< " Found wrong counter for a LRActionSectors readers/writers:" 
+			<< _objectUseCounter->count((unsigned long)_LRActionSectors);
+			throw Engine::Exception(oss.str());
+			
+		}
+		
+		//{ holds : reader counter LRActionSector = X && X > 0 }
+		
+		(*_objectUseCounter)[(unsigned long)_LRActionSectors]--;
+			
+		//{ holds : reader counter LRActionSector = X-1 && X >= 0 }
+		
+		if((*_objectUseCounter)[(unsigned long)_LRActionSectors] == 0)
+		{
 			_objectUseCounter->erase((unsigned long)_LRActionSectors);
-			}
-		}
-		
-		if ((_objectUseCounter->count((unsigned long)_LRActionSectors) == 0) && _ownItems[1])
-		{				
-			for(unsigned int i=0;i<_LRActionSectors->size();i++)
-			{		
-				delete (*_LRActionSectors)[i];		
-			}			
-		
-			delete _LRActionSectors;
-		}
-		
-	//	}//pragma
-	//	#pragma omp critical(refmap)
-	//	{
 			
-	//	}//pragma
-	//	#pragma omp critical(refmap)
-	//	{
+			if (_ownItems[1])
+			{				
+				for(unsigned int i=0;i<_LRActionSectors->size();i++)
+				{		
+					delete (*_LRActionSectors)[i];		
+				}			
 		
-		if (_objectUseCounter->count((unsigned long)_LRCellPool) > 0)
-		{
-				(*_objectUseCounter)[(unsigned long)_LRCellPool]--;
-				if((*_objectUseCounter)[(unsigned long)_LRCellPool] == 0)
-				{
-					_objectUseCounter->erase((unsigned long)_LRCellPool);	
-				}
+				delete _LRActionSectors;
+			}
 		
 		}
 		
-		if ((_objectUseCounter->count((unsigned long)_LRCellPool) == 0) && _ownItems[3])
+	
+		//{ holds : reader counter of LRActionSector cell pool = X && X > 0 }
+	
+		if(_objectUseCounter->count((unsigned long)_LRCellPool) <= 0)
 		{
-			delete _LRCellPool;
-		}		
+			std::stringstream oss;
+			oss << "HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructures(): "
+			<< " Found wrong counter for a LRA cell pool readers/writers:" 
+			<< _objectUseCounter->count((unsigned long)_LRCellPool);
+			throw Engine::Exception(oss.str());
+		}	
+	
+		//{ holds : reader counter of LRActionSector cell pool = X && X > 0 }
+		(*_objectUseCounter)[(unsigned long)_LRCellPool]--;
+		//{ holds : reader counter of LRActionSector cell pool = X-1 && X >= 0 }
+		
+		if((*_objectUseCounter)[(unsigned long)_LRCellPool] == 0)
+		{
+			_objectUseCounter->erase((unsigned long)_LRCellPool);	
+			if (_ownItems[3])
+			{
+				delete _LRCellPool;
+			}
+		
+		}
 		
 		if (_objectUseCounter->count((unsigned long)_mapLock) > 0)
 		{
@@ -796,111 +803,6 @@ void HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructure
 	}
 	
 	
-	//*? ucthack
-	
-void	HunterGathererMDPState::makeActionsForState( HunterGatherer * agentRef)
-{
-	// Map from "sector memory address" to "sector integer identifier".
-	// After sorting validActionSectors I need to access both the HR and the LR sector
-	std::map<Sector*,int> sectorIdxMap;
-
-	//std::cout << "creating actions for state with time index: " << getTimeIndex() << " and resources: " << getOnHandResources() << std::endl;
-	
-	assert( numAvailableActions() == 0 );
-	
-	// Make Do Nothing
-	//if ( _config->isDoNothingAllowed() )
-	//	addAction( new DoNothingAction() );	
-	
-	std::vector< Sector* > validActionSectors;
-	
-	//for(int i = 0; i < LRActionSectors.size(); i++)
-		//assert(LRActionSectors[i]->cells().size() >0);
-	
-	
-	//TODO watch HRSectors update : BOTTLENECK
-	agentRef->updateKnowledge( getLocation(), getResourcesRaster(), _HRActionSectors, _LRActionSectors, _HRCellPool, _LRCellPool );
-	
-	// MRJ: Remove empty sectors if any
-	for ( unsigned i = 0; i < _LRActionSectors->size(); i++ )
-	{
-		if ( (*_LRActionSectors)[i]->isEmpty() )
-		{
-			// You can't do that if you do not own it.
-			// Any delete is postponed at the end of lifecycle of the MDPState
-			
-			// delete (*LRActionSectors)[i];
-			// delete (*HRActionSectors)[i];
-			continue;
-		}
-		validActionSectors.push_back( (*_LRActionSectors)[i] );
-		sectorIdxMap[(*_LRActionSectors)[i]] = i;
-	}	
-	//TODO why 2 reorderings??? first random, then according a predicate
-	//std::random_shuffle( validActionSectors.begin(), validActionSectors.end() );
-	std::sort( validActionSectors.begin(), validActionSectors.end(), SectorBestFirstSortPtrVecPredicate() );
-	
-	// Make Forage actions
-	
-	unsigned int forageActions = _config->getNumberForageActions();
-	if ( forageActions >= validActionSectors.size() )
-	{
-		for ( unsigned i = 0; i < validActionSectors.size(); i++ )
-		{
-			int sectorIdx = sectorIdxMap[validActionSectors[i]];
-			//s.addAction( new ForageAction( HRActionSectors[sectorIdx], validActionSectors[i], true ) );
-			addAction( new ForageAction( (*_HRActionSectors)[sectorIdx], validActionSectors[i], false ) );	
-		}
-	}
-	else
-	{
-		for ( unsigned i = 0; i < forageActions; i++ )
-			{
-			int sectorIdx = sectorIdxMap[validActionSectors[i]];
-			//s.addAction( new ForageAction( HRActionSectors[sectorIdx],validActionSectors[i], true ) );
-			addAction( new ForageAction( (*_HRActionSectors)[sectorIdx],validActionSectors[i], false ) );
-			}
-		for ( unsigned i = forageActions; i < validActionSectors.size(); i++ )
-			{
-			//int sectorIdx = sectorIdxMap[validActionSectors[i]];
-			
-			// Structures from a MDPState cannot be destroyed till the State disappears
-			// delete validActionSectors[i];
-			// delete HRActionSectors[sectorIdx];
-			// delete LRActionSectors[sectorIdx]; redundancy because validActionSectors[i]==LRActionSectors[sectorIdx]
-			}
-	}
-	//std::cout << "number of valid forage actions: " << s.numAvailableActions() << " for number of valid sectors: " << validActionSectors.size() << std::endl;
-
-	// Make Move Home
-	std::vector< MoveHomeAction* > possibleMoveHomeActions;
-	MoveHomeAction::generatePossibleActions( *agentRef, agentRef->getPosition(), *_HRActionSectors, validActionSectors, possibleMoveHomeActions );
-	unsigned int moveHomeActions =  _config->getNumberMoveHomeActions();
-	if (  moveHomeActions >=  possibleMoveHomeActions.size() )
-	{
-		for ( unsigned i = 0; i < possibleMoveHomeActions.size(); i++ )
-			addAction( possibleMoveHomeActions[i] );
-	}
-	else
-	{
-		for ( unsigned i = 0; i <  moveHomeActions; i++ )
-			addAction( possibleMoveHomeActions[i] );
-		for ( unsigned i =  moveHomeActions; i < possibleMoveHomeActions.size(); i++ )
-			delete possibleMoveHomeActions[i];
-	}
-	assert( numAvailableActions() > 0 );
-	sectorIdxMap.clear();
-	possibleMoveHomeActions.clear();
-	validActionSectors.clear();
-	
-	// Reference to structures that could reference structures from a MDPState cannot be destroyed. The MDPState's will destroy the ones created and are owned.	
-	//HRActionSectors.clear();
-	//LRActionSectors.clear();
-	//std::cout << "finished creating actions for state with time index: " << s.getTimeIndex() << " and resources: " << s.getOnHandResources() << std::endl;
-	
-	
-	
-} 
 	
 	
 }

@@ -49,6 +49,7 @@ void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos
 	int homeRange  = ((GujaratConfig)_world.getConfig())._homeRange;
 	int numSectors = ((GujaratConfig)_world.getConfig())._numSectors;
 	std::vector< Sector* > HRSectors;
+	
 	//if(HRSectors.size()==0)
 	//{
 		
@@ -167,8 +168,6 @@ void HGMind::createLRSectors( 	const Engine::Point2D<int>& agentPos,
 		
 		//std::cout << "**********************" << std::endl;
 		
-		
-		//TODO Those low resolution calculi should be arranged by the GujaratWorld class
 		register int C = ((GujaratConfig)_world.getConfig())._lowResolution;
 		Engine::Point2D<int> LRpos;
 		_world.worldCell2LowResCell( agentPos, LRpos );
@@ -274,6 +273,8 @@ void HGMind::createLRSectors( 	const Engine::Point2D<int>& agentPos,
 			(*resultLRSectors)[k]->addCell( &((*cellPool)[insertPoint00]) );
 		}
 	//}	   
+	assert(_logName.str().length() >0);
+	//log_INFO(_logName.str(),"CREATE_LR_DBG("<< (unsigned long)this <<"): " << agentPos << " produces " << resultLRSectors->size() );
 	
 	
 }	
@@ -312,8 +313,7 @@ void HGMind::updateKnowledge( const Engine::Point2D<int>& agentPos
 								, std::vector< Engine::Point2D<int> >* LRCellPool
 							) const
 {	
-	log_INFO(_logName.str(),"HGMind::updateKnowledge receives: " << agentPos 
-						<< ", amount sectors " << LRSectors->size());	
+	//log_INFO(_logName.str(),"HGMind::updateKnowledge receives: " << agentPos << ", amount sectors " << LRSectors->size());	
 	
 	
 	if (HRSectors->size()==0)
@@ -326,13 +326,22 @@ void HGMind::updateKnowledge( const Engine::Point2D<int>& agentPos
 		createLRSectors(agentPos,LRSectors, LRCellPool);
 	}
 	
+	assert(_logName.str().length() >0);
+	//log_INFO(_logName.str(),"CREATE_LR_DBG("<< (unsigned long)this <<"): " << agentPos << " after createLRSectors " << LRSectors->size() );
+	
 	for ( unsigned k = 0; k < LRSectors->size(); k++ )
 	{	
 		(*LRSectors)[k]->updateFeaturesLR(dataRaster);
 	} 
 	
-	log_INFO(_logName.str(),"HGMind::updateKnowledge ends: " << agentPos 
-						<< ", amount sectors " << LRSectors->size());	
+	
+	//log_INFO(_logName.str(),"CREATE_LR_DBG("<< (unsigned long)this <<"): " << agentPos << " after update features LRSectors " << LRSectors->size() );
+	
+	
+	//log_INFO(_logName.str(),"CREATE_HR_DBG("<< (unsigned long)this <<"): " << agentPos << " after update features HRSectors " << HRSectors->size() );
+	
+	
+	//log_INFO(_logName.str(),"HGMind::updateKnowledge ends: " << agentPos << ", amount sectors " << LRSectors->size());	
 	
 	
 }
