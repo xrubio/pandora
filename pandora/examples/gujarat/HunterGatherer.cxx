@@ -210,12 +210,7 @@ void HunterGatherer::selectActions()
 	
 	
 	GujaratState::controller().selectActions(*this, actions);
-	
-	if (actions.size() <= 0)
-	{
-		assert(actions.size() > 0);
-	}
-	
+		
 	std::list<MDPAction*>::iterator it=actions.begin();
 	while(it!=actions.end())
 	{
