@@ -151,7 +151,7 @@ MDPAction* HunterGathererDecisionTreeController::shouldMoveHome( HunterGatherer 
 	return chosenAction;
 }
 
-void HunterGathererDecisionTreeController::selectActions( GujaratAgent & agent, std::list<MDPAction*> & actions )
+void HunterGathererDecisionTreeController::selectActions( GujaratAgent & agent, std::list<Engine::Action*> & actions )
 {	
 	HunterGatherer & agentConcrete = dynamic_cast<HunterGatherer&>( agent );
         //Decission Tree: DoNothing --> Forage --> MoveHome
