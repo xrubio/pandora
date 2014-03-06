@@ -208,7 +208,7 @@ void HunterGatherer::selectActions()
 	
 	std::list<MDPAction*> actions;
 	
-	
+/*	
 	GujaratState::controller().selectActions(*this, actions);
 		
 	std::list<MDPAction*>::iterator it=actions.begin();
@@ -219,26 +219,11 @@ void HunterGatherer::selectActions()
 		*it = (MDPAction*)0;
 		++it;
 	}
-
 	
-	/*	
-	try{
-		std::list<MDPAction*>::iterator it=actions.begin();
-		while(it!=actions.end())
-		{
-			//std::cout << "Erasing link container to action " << *it << std::endl;
-			 //log_INFO("agent_"agent.getId()+"_erasingActions","Erasing link container to action " << *it);
-			//*it = (MDPAction*)0;
-			it = actions.erase(it);
-		}
-		
-	} catch (const std::exception& ex) {
-		std::cerr << "HunterGatherer::selectActions : exception caught at copy: " << ex.what() << '\n';
-		assert(0==1);
-	}*/
-	actions.clear();
-	int foo=1;
-	foo++;
+	actions.clear();*/
+	
+	GujaratState::controller().selectActions(*this, _actions);
+	
 }
 
 GujaratAgent * HunterGatherer::createNewAgent()
