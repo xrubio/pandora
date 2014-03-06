@@ -284,7 +284,7 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		ownership[2]=false;
 		ownership[3]=s.getOwnerShip()[3];		
 		
-	}	*/
+	}*/
 	else if(dynamic_cast<const DoNothingAction*>(act))
 	{
 		HRActionSectors = s.getHRActionSectors();

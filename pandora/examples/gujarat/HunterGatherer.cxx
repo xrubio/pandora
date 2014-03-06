@@ -112,7 +112,7 @@ void	HunterGatherer::updateKnowledge( const Engine::Point2D<int>& agentPos
 		_myHGMind->_logName << "logMDPStates_"	<< getWorld()->getId() << "_" << getId();	// = logName;
 	}
 	
-	assert(LRSectors->size()==0);
+	assert(LRSectors->size()==0);	
 	
 	_myHGMind->updateKnowledge(agentPos, dataRaster
 								, HRSectors, LRSectors
@@ -216,19 +216,34 @@ void HunterGatherer::selectActions()
 		assert(actions.size() > 0);
 	}
 	
-		
-	try{
 	std::list<MDPAction*>::iterator it=actions.begin();
 	while(it!=actions.end())
 	{
-		_actions.push_back((Engine::Action*)(*it));
-		it = actions.erase(it);
+		_actions.push_back((Engine::Action*)(*it));		
+		//*?it = actions.erase(it);
+		*it = (MDPAction*)0;
+		++it;
 	}
+
+	
+	/*	
+	try{
+		std::list<MDPAction*>::iterator it=actions.begin();
+		while(it!=actions.end())
+		{
+			//std::cout << "Erasing link container to action " << *it << std::endl;
+			 //log_INFO("agent_"agent.getId()+"_erasingActions","Erasing link container to action " << *it);
+			//*it = (MDPAction*)0;
+			it = actions.erase(it);
+		}
+		
 	} catch (const std::exception& ex) {
 		std::cerr << "HunterGatherer::selectActions : exception caught at copy: " << ex.what() << '\n';
 		assert(0==1);
-	}
-	
+	}*/
+	actions.clear();
+	int foo=1;
+	foo++;
 }
 
 GujaratAgent * HunterGatherer::createNewAgent()
