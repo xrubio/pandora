@@ -3,10 +3,10 @@
 
 #include <list>
 
+namespace Engine { class Action; }  // forward declaration
+
 namespace Gujarat
 {
-
-class MDPAction;
 class GujaratAgent;
 
 class AgentController
@@ -16,7 +16,7 @@ public:
 	AgentController();
 	virtual ~AgentController();
 	
-	virtual void selectActions( GujaratAgent & agent, std::list<MDPAction*> & actions ) = 0;
+	virtual void selectActions( GujaratAgent & agent, std::list<Engine::Action*> & actions ) = 0;
 };
 
 }

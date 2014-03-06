@@ -202,33 +202,7 @@ void HunterGatherer::clearSectorKnowledge()
 	
 void HunterGatherer::selectActions()
 {
-	//*?
-	//std::stringstream logName;
-	//logName << "infoshar";
-	
-	std::list<MDPAction*> actions;
-	
-	
-	GujaratState::controller().selectActions(*this, actions);
-	
-	if (actions.size() <= 0)
-	{
-		assert(actions.size() > 0);
-	}
-	
-		
-	try{
-	std::list<MDPAction*>::iterator it=actions.begin();
-	while(it!=actions.end())
-	{
-		_actions.push_back((Engine::Action*)(*it));
-		it = actions.erase(it);
-	}
-	} catch (const std::exception& ex) {
-		std::cerr << "HunterGatherer::selectActions : exception caught at copy: " << ex.what() << '\n';
-		assert(0==1);
-	}
-	
+	GujaratState::controller().selectActions(*this, _actions);
 }
 
 GujaratAgent * HunterGatherer::createNewAgent()
