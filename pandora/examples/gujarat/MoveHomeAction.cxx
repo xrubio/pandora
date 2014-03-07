@@ -102,7 +102,7 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 				const std::vector< Engine::Point2D<int>* > & sectCells = LRActionSectors[sectIdx]->cells();//(*it)->cells();	
 				for(unsigned int cellsIdx = 0; cellsIdx < sectCells.size(); cellsIdx++)
 				{
-                			int numDunes      = gw->getValueLR(LRCounterSoilDUNE,*sectCells[cellsIdx]);
+                	int numDunes      = gw->getValueLR(LRCounterSoilDUNE,*sectCells[cellsIdx]);
 					
 					int resourcesCell = gw->getValueLR(eLRResources,*sectCells[cellsIdx]);
 					//TODO test a new heuristic based on visitable cells

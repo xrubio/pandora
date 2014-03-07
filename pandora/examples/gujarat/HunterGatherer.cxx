@@ -212,13 +212,29 @@ void HunterGatherer::selectActions()
 	GujaratState::controller().selectActions(*this, actions);
 	
 	assert(actions.size() > 0);
-	
+	//*?
 	std::list<MDPAction*>::iterator it=actions.begin();
 	while(it!=actions.end())
 	{
 		_actions.push_back((Engine::Action*)(*it));
-		it = actions.erase(it);
-	}	
+		//it = actions.erase(it);
+		it++;
+	}
+	
+	
+	try{
+		std::list<MDPAction*>::iterator it=actions.begin();
+		while(it!=actions.end())
+		{
+			//_actions.push_back((Engine::Action*)(*it));
+			it = actions.erase(it);
+		}	
+	} catch (std::exception & exceptionThrown) 
+		{
+			std::cout << exceptionThrown.what() << std::endl;
+			assert(0==1);
+		}
+	
 }
 
 GujaratAgent * HunterGatherer::createNewAgent()
