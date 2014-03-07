@@ -22,7 +22,7 @@ HunterGathererMDPController::~HunterGathererMDPController()
 }
 
 
-void HunterGathererMDPController::selectActions( GujaratAgent & agent, std::list<MDPAction*> & actions )
+void HunterGathererMDPController::selectActions( GujaratAgent & agent, std::list<Engine::Action*> & actions )
 {
 	log_DEBUG(agent.getId()+"_controller",  "timestep=" << agent.getWorld()->getCurrentTimeStep());
 	log_DEBUG(agent.getId()+"_controller",  "\tagent.position=" << agent.getPosition());

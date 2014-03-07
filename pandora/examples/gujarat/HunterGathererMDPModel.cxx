@@ -259,7 +259,9 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		ownership[2]=false;	
 		ownership[3]=true;	
 		
-	}/*
+
+	}
+	/*
 	else if(dynamic_cast<const ForageAction*>(act))
 	{
 		// New Sectors are created to preserve utility markers of parent state.
@@ -283,6 +285,7 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		ownership[2]=false;
 		ownership[3]=s.getOwnerShip()[3];		
 		
+
 	}	*/
 	else if(dynamic_cast<const DoNothingAction*>(act))
 	{

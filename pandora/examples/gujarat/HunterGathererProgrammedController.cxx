@@ -23,7 +23,7 @@ HunterGathererProgrammedController::~HunterGathererProgrammedController()
 {
 }
 
-void HunterGathererProgrammedController::selectActions( GujaratAgent & agent, std::list<MDPAction*> & actions )
+void HunterGathererProgrammedController::selectActions( GujaratAgent & agent, std::list<Engine::Action*> & actions )
 {
 	// TODO: which order must follow the actions? random?
 	// now random

@@ -6,6 +6,7 @@
 namespace Gujarat
 {
 
+class MDPAction;
 class HunterGatherer;
 class GujaratAgent;
 class Sector;
@@ -16,7 +17,7 @@ public:
 	HunterGathererDecisionTreeController();
 	virtual ~HunterGathererDecisionTreeController();
 
-	void selectActions( GujaratAgent & agent, std::list<MDPAction*> & actions );
+	void selectActions( GujaratAgent & agent, std::list<Engine::Action*> & actions );
 	
 	//MDPAction*         shouldDoNothing(  HunterGatherer & agent  );
 	MDPAction*         shouldForage(  HunterGatherer & agent  );

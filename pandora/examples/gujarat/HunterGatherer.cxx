@@ -208,7 +208,7 @@ void HunterGatherer::selectActions()
 	
 	std::list<MDPAction*> actions;
 	
-	
+/*	
 	GujaratState::controller().selectActions(*this, actions);
 	
 	assert(actions.size() > 0);
@@ -234,6 +234,10 @@ void HunterGatherer::selectActions()
 			std::cout << exceptionThrown.what() << std::endl;
 			assert(0==1);
 		}
+*/
+	
+	GujaratState::controller().selectActions(*this, _actions);
+
 	
 }
 
