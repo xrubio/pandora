@@ -184,6 +184,11 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 */
 	}
     
+    for(unsigned int i = 0; i < candidateCells.size(); i++)
+	{
+		candidateCells[i] = (Engine::Point2D<int>*)0;
+	}
+    
 	candidateCells.clear();
 	chosenSects.clear();
 	

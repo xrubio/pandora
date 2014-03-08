@@ -492,7 +492,7 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 		throw Engine::Exception(oss.str());
 	}
 	
-	
+	/*
 	if(result) 
 	{
 		std::cout << "REDUCC:" << _dni << "==" << s._dni << std::endl; 
@@ -506,7 +506,7 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 	else 
 	{
 		std::cout << "REDUCC:" << _dni << "!=" << s._dni << std::endl;
-	}
+	}*/
 	
 	return result;
 }
