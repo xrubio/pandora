@@ -23,23 +23,6 @@
 #ifndef __World_hxx__
 #define __World_hxx__
 
-#ifdef PANDORAMPI
-enum MpiMessageType
-{
-	eNumAgents = 1,
-	eAgent = 2,
-	eNumGhostAgents = 3,
-	eGhostAgent = 4,
-	eRasterData = 5,
-	eRasterMaxData = 6,
-	eVectorAttribute = 7, 	
-	eSizeVector = 8,
-	eNumModifiedAgents = 9,
-	eModifiedAgent = 10
-};
-#include <mpi.h>
-
-#endif
 
 #include <map>
 #include <vector>
@@ -49,121 +32,49 @@ enum MpiMessageType
 #include <Rectangle.hxx>
 #include <Point2D.hxx>
 #include <Simulation.hxx>
+#include <SpacePartition.hxx>
 
 #include <algorithm>
 
 namespace Engine
 {
+class SpacePartition;
 class Agent;
-
-#ifdef PANDORAMPI
-struct MpiOverlap
-{
-	// TODO move from string to index
-	std::string _rasterName;
-	std::vector<int> _data;
-	Rectangle<int> _overlap;
-	MPI_Request _request;
-};
-#endif
 
 class World
 {
+	SpacePartition * _scheduler;
 public:
 	typedef std::map< std::string, int> RasterNameMap;
-
 	typedef std::list< Agent* > AgentsList;
 	typedef std::vector< Agent* > AgentsVector;
 protected:		
 	Simulation _simulation;
 
-	Point2D<int> _worldPos;
-	Rectangle<int> _boundaries;
 	Rectangle<int> _globalBoundaries;
-	//! boundaries of world, with overlaps added
-	Rectangle<int> _overlapBoundaries;
-	//! the four sections into a world is divided
-	std::vector<Rectangle<int> > _sections;
-	std::vector<int> _neighbors;
 
-	//! map of already executed agents
-	std::map<std::string, Agent *> _executedAgentsHash;	
 	//! global list of agents
 	AgentsList _agents;
-	AgentsList _overlapAgents;
-	//! this list has the agents that need to be removed at the end of step.
-	AgentsList _removedAgents;
 
-	//! this method returns true if the agent is already in executedAgents list
-	bool hasBeenExecuted( Agent * agent );
-	//! true if the agent is in the list of agents to remove
-	bool willBeRemoved( Agent * agent );
-
+	
 	//! false if each cell can have just one agent
 	bool _allowMultipleAgentsPerCell;
 
-	//! this method returns true if neighbor is corner of _id
-	bool isCorner(const int & neighbor) const;
-	//! this method returns the general overlap zone between both worlds
-	Rectangle<int> getOverlap(const int & id, const int & sectionIndex ) const;
-	//! this method returns the external part of the strict overlap between World and id, 
-	Rectangle<int> getExternalOverlap(const int & id) const;
-	//! this method returns the internal part of the strict overlap between World and id, 
-	Rectangle<int> getInternalOverlap(const int & id) const;
-	//! returns true if neighbor id must be updated this section index execution
-	bool needsToBeUpdated( const int & id, const int & sectionIndex );
-	//! returns true if neighbor id will send data to _id, according to index execution
-	bool needsToReceiveData( const int & id, const int & sectionIndex );
+
 
 	//! current simulation step
 	int _step;
-	//! if true will call MPI_Finalize at the end of run (default behavior)
-	bool _finalize;
 
-	//! provides a random valid position inside boundaries
-	Point2D<int> getRandomPosition();
-#ifdef PANDORAMPI
-	std::list<MpiOverlap*> _sendRequests;
-	std::list<MpiOverlap*> _receiveRequests;
-	// this method checks whether all the requests in the pool created by MPI_Isend and MPI_Irecv are finished before continuing
-	void clearRequests( bool updateMaxValues );
-#endif
+public: // TODO for refactoring of Scheduler
+	//! true if the agent is in the list of agents to remove
+	bool willBeRemoved( Agent * agent );
 
 private:
-	//! PENDENT amount of width around one boundary considering the side of the World object that owns _overlap
-	int _overlap;
-	
-	// if this variable is set to true, getNeighbours will look through the list of agents instead of searching by position. It is false by default
+	//! if this variable is set to true, getNeighbours will look through the list of agents instead of searching by position. It is false by default
 	bool _searchAgents;
 	
-#ifdef PANDORAMPI
-	// method to send a list of agents to their respective future world
-	void sendAgents( AgentsList & agentsToSend );
-	// Method to send overlap zones in the section we have executed 
-	// if entire overlap is true, the node will send its owned zone in overlap as well as adjacents overlapped zones
-	void sendOverlapZones( const int & sectionIndex, const bool & entireOverlap = true );
-	void sendMaxOverlapZones();
-	// method to copy of agents to neighbours
-	void sendGhostAgents( const int & sectionIndex );
-
-	// add the agent to overlap agents list, and remove previous instances if they exist
-	//void updateOverlapAgent( Agent * agent );
-	void receiveGhostAgents( const int & sectionIndex );
-	// method to receive agents
-	void receiveAgents( const int & sectionIndex );
-	// method to receive overlap zones from neighbors that have executed adjacent sections 
-	// if entire overlap is true, the node will send its owned zone in overlap as well as adjacents overlapped zones
-	void receiveOverlapData( const int & sectionIndex, const bool & entireOverlap = true );
-	void receiveMaxOverlapData();
-#endif
-
 protected:
 	double _initialTime;
-	//! check correct overlap/size relation
-	void checkOverlapSize();
-	//! stablish position of world inside the space of the simulation
-	void stablishPosition();
-
 	// rasters that won't change values during the simulation
 	std::map<std::string, int> _rasterNames;
 	std::vector<StaticRaster * > _rasters;	
@@ -175,12 +86,10 @@ protected:
 	void updateRasterToMaxValues( const std::string & key );
 	void updateRasterToMaxValues( const int & index );
 	
-	//! define original position of world, given overlap, size and id.
-	void stablishWorldPosition();
+
 	//! dumps current state of the simulation. Then applies next simulation step.
 	void step();
-	//! applies next simulation step on the Section of the space identified by parameter 'sectionIndex'.
-	void stepSection( const int & sectionIndex );
+
 		
 	//! method interface for attribute _searchAgents. 
 	void setSearchAgents( const bool & searchAgents );
@@ -201,12 +110,7 @@ public:
 	World( const Simulation & simulation, const int & overlap, const bool & allowMultipleAgentsPerCell, const std::string & fileName );
 	
 	virtual ~World();
-	//! initialization of the object World for the simulation. Required to be called before calling run.
-	/*!
-	The MPI is prepared. The simulation state is initialized, the rasters created and the
-	World filled with agents.
-	*/ 
-	void init( int argc, char *argv[] );
+
 	//! calls init without MPI initialization (used in pyPandora)
 	void initialize();
 	//! Runs the simulation. Performs each step and stores the states. Requires calling 'init' method a-priori.
@@ -215,17 +119,9 @@ public:
 	//! add an agent to the world, and remove it from overlap agents if exist
 	void addAgent( Agent * agent, bool executedAgent = true );
 	
-	void removeAgents();
-	void removeAgent(Agent * agent);
 
-	//! this method will return an agent, both looking at owned and ghost agents
-	Agent * getAgent( const std::string & id );
-	AgentsVector getAgent( const Point2D<int> & position, const std::string & type="all" );
 
-	//! return an agent, if it is in the list of owned
-	AgentsList::iterator getOwnedAgent( const std::string & id );
-	//! return an agent, if it is in the list of ghosts 
-	AgentsList::iterator getGhostAgent( const std::string & id );
+
 
 	// this method returns a list with the list of agents in manhattan distance radius of position. if include center is false, position is not checked
 //	AgentsList getAgentsNear( const Point2D<int> & position, const int & radius, const bool & includeCenter );
@@ -342,19 +238,7 @@ public:
 	//! returns a Rectangle<int> expressing the boundaries of the world
 	const Rectangle<int> & getBoundaries() const;
 	const Rectangle<int>& getGlobalBoundaries() const { return _globalBoundaries; }
-	//! returns the Rectangle the contains the world section boundaries plus the overlap area around that boundaries
-	const Rectangle<int> & getOverlapBoundaries() const;
-	//! returns the id of the section that contains the point 'position' 
-	int getIdFromPosition( const Point2D<int> & position );
-	//! given the id of a section returns that section position 
-	Point2D<int> getPositionFromId( const int & id ) const;
-	//! given the id of a neighbour world section, returns its index, the position in the vector _neighbors
-	int getNeighborIndex( const int & id );
-	//! returns the simulation id where that World is in (??? TODO verifica això)
-	int getId() const;
 
-	//! returns the attribute _overlap
-	const int & getOverlap();
 	
 	// get a raster name from its index
 	const std::string & getRasterName( const int & index ) const;
@@ -366,7 +250,27 @@ public:
 
 	int	getCurrentTimeStep() const { return _step; }
 	double getWallTime() const;
-	void setFinalize( const bool & finalize );
+	//! provides a random valid position inside boundaries
+	Point2D<int> getRandomPosition();
+
+
+// stub methods to scheduler
+public:
+	int getId() const;
+	const Rectangle<int> & getOverlapBoundaries() const;
+	const int & getOverlap();
+	const int & getNumTasks() const;
+	const Point2D<int> & getLocalRasterSize() const;
+// methods that need to be defined for current state of the code
+	const Point2D<int> & getSize() const;
+	AgentsList::iterator beginAgents() { return _agents.begin(); }
+	AgentsList::iterator endAgents() { return _agents.end(); }
+	size_t getNumberOfRasters() const { return _rasters.size(); }
+	StaticRaster * getStaticRasterIndex( size_t index ) { return _rasters.at(index); }
+	bool getDynamicRasterIndex( size_t index ) { return _dynamicRasters.at(index); }
+	void eraseAgent( AgentsList::iterator & it ) { _agents.erase(it); }
+	void removeAgent( Agent * agent );
+
 };
 
 } // namespace Engine

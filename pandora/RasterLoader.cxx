@@ -32,9 +32,7 @@
 #include <vector>
 #include <gdal_priv.h>
 
-#ifdef PANDORAMPI
 #include <hdf5.h>
-#endif
 
 extern "C" 
 {
@@ -55,7 +53,7 @@ RasterLoader::~RasterLoader()
 void RasterLoader::fillGDALRaster( StaticRaster & raster, const std::string & fileName, World * world )
 {
 	std::stringstream logName;
-	logName << "RasterLoader_world_" << world->getSimulation().getId();
+	logName << "RasterLoader_world_" << world->getId();
 	log_DEBUG(logName.str(), "loading file: " << fileName);
 
 	Simulation & simulation(world->getSimulation());
@@ -146,11 +144,10 @@ void RasterLoader::fillGDALRaster( StaticRaster & raster, const std::string & fi
 
 void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fileName, const std::string & rasterName, World * world )
 {
-#ifdef PANDORAMPI
 	std::stringstream logName;
 	if(world)
 	{
-		logName << "RasterLoader_world_" << world->getSimulation().getId();
+		logName << "RasterLoader_world_" << world->getId();
 	}
 	else
 	{
@@ -255,13 +252,12 @@ void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fi
 		dynamicRaster->updateCurrentMinMaxValues();
 	}
 	log_DEBUG(logName.str(), "file: " << fileName << " rasterName: " << rasterName << " loaded");
-#endif
 }
 
 void RasterLoader::fillGrassCellRaster( StaticRaster & raster, const std::string & rasterName, World * world )
 {
 	std::stringstream logName;
-	logName << "RasterLoader_world_" << world->getSimulation().getId();
+	logName << "RasterLoader_world_" << world->getId();
 	log_DEBUG(logName.str(), "loading GRASS raster: " << rasterName);
 	G_gisinit("pandora");
 	std::cout << "loading grass raster from : " << rasterName << " in location: " << G_location() << " and mapset: " << G_mapset() << "...";	

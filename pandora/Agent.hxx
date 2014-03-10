@@ -61,7 +61,7 @@ protected:
 	void serializeAttribute( const std::string & name, const int & value );
 	void serializeAttribute( const std::string & name, const std::string & value );
 	
-	std::list<Engine::Action*> _actions;
+	std::list<Action*> _actions;
 
 public:
 
@@ -119,11 +119,9 @@ public:
 	void executeActions();
 
 	// mpi related
-#ifdef PANDORAMPI
 	virtual void * fillPackage() = 0;
 	virtual void sendVectorAttributes( int target ) = 0;
 	virtual void receiveVectorAttributes(int origin) = 0;
-#endif
 
 	AttributesList::iterator beginStringAttributes(){ return _stringAttributes.begin(); }
 	AttributesList::iterator endStringAttributes(){ return _stringAttributes.end(); }

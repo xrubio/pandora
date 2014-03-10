@@ -64,7 +64,7 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 	hid_t propertyListId = H5Pcreate(H5P_FILE_ACCESS);
 
 	// workaround, it crashes in serial without this clause
-	if(simulation.getNumTasks()>1)		
+	if(world.getNumTasks()>1)		
 	{
 		H5Pset_fapl_mpio(propertyListId, MPI_COMM_WORLD, MPI_INFO_NULL);
 	}
@@ -103,11 +103,11 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 
 	attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	attributeId= H5Acreate(globalDatasetId, "numTasks", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
-	H5Awrite(attributeId, H5T_NATIVE_INT, &simulation.getNumTasks());
+	H5Awrite(attributeId, H5T_NATIVE_INT, &world.getNumTasks());
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 
-	log_INFO(logName.str(), world.getWallTime() << " id: " << simulation.getId() << " size: " << simulation.getSize() << " num tasks: " << simulation.getNumTasks() << " serializer resolution:" << simulation.getSerializerResolution() << " and steps: " << simulation.getNumSteps());
+	log_INFO(logName.str(), world.getWallTime() << " id: " << world.getId() << " size: " << simulation.getSize() << " num tasks: " << world.getNumTasks() << " serializer resolution:" << simulation.getSerializerResolution() << " and steps: " << simulation.getNumSteps());
 
 	// we store the name of the rasters
 	hid_t rasterNameFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
@@ -223,7 +223,7 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 	{
 		oss << path << "/";
 	}
-	oss << "agents-" << simulation.getId() << ".abm";
+	oss << "agents-" << world.getId() << ".abm";
 
 	_agentsFileId = H5Fcreate(oss.str().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 	/*
@@ -243,9 +243,9 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 
 	// we need to specify the size where each computer node will be writing
 	hsize_t chunkDimensions[2];
-	chunkDimensions[0] = simulation.getLocalRasterSize()._x/2;
+	chunkDimensions[0] = world.getLocalRasterSize()._x/2;
 	chunkDimensions[0] += 2*world.getOverlap();
-	chunkDimensions[1] = simulation.getLocalRasterSize()._y/2;
+	chunkDimensions[1] = world.getLocalRasterSize()._y/2;
 	chunkDimensions[1] += 2*world.getOverlap();
 	
 	propertyListId = H5Pcreate(H5P_DATASET_CREATE);
@@ -552,7 +552,7 @@ void Serializer::serializeStaticRaster( const int & index, StaticRaster & raster
 void Serializer::serializeRaster( StaticRaster & raster, World & world, const std::string & datasetKey )
 {
 	std::stringstream logName;
-	logName << "MPI_Serializer_world_" << world.getSimulation().getId();
+	logName << "MPI_Serializer_world_" << world.getId();
 	log_EDEBUG(logName.str(), "serializing raster: " << datasetKey);
 
 	// if it is not a border, it will copy from overlap

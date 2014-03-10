@@ -25,9 +25,7 @@
 #include <Exceptions.hxx>
 #include <World.hxx>
 
-#ifdef PANDORAMPI
 #include <Serializer.hxx>
-#endif
 
 #include <Action.hxx>
 #include <Logger.hxx>
@@ -86,16 +84,12 @@ const Point2D<int> & Agent::getPosition() const
 
 void Agent::serializeAttribute( const std::string & name, const int & value )
 {
-#ifdef PANDORAMPI
 	GeneralState::serializer().addIntAttribute(getType(), name,value);
-#endif
 }
 
 void Agent::serializeAttribute( const std::string & name, const std::string & value)
 {
-#ifdef PANDORAMPI
 	GeneralState::serializer().addStringAttribute(getType(), name,value);
-#endif
 }
 
 const std::string & Agent::getId() const
@@ -184,7 +178,7 @@ void Agent::executeActions()
 		//_spentTime += nextAction->getTimeNeeded();
 		//if(_spentTime<=_availableTime)
 		//{
-		nextAction->execute((Engine::Agent&)(*this));
+		nextAction->execute((Agent&)(*this));
 		log_EDEBUG(logName.str(), "\tagent.action[" << i << "]=" << nextAction->describe());
 		//}
 		it = _actions.erase(it);
@@ -195,26 +189,8 @@ void Agent::executeActions()
 	
 void Agent::setRandomPosition()
 {
-	const Engine::Rectangle<int> & worldBoundaries = _world->getOverlapBoundaries();
-	while(1)
-	{
-		int x = GeneralState::statistics().getUniformDistValue(worldBoundaries._origin._x,worldBoundaries._origin._x+worldBoundaries._size._x);
-		int y = GeneralState::statistics().getUniformDistValue(worldBoundaries._origin._y,worldBoundaries._origin._y+worldBoundaries._size._y);
-		Engine::Point2D<int> position(x,y);
-		if(_world->checkPosition(position))
-		{
-			_position = position;
-			return;
-		}
-	}
+	_position = _world->getRandomPosition();
 }
-
-/*
-void Agent::interactionWithAgent( Agent * agent )
-{
-	_environment->agentModified(agent);
-}
-*/
 
 } // namespace Engine
 
