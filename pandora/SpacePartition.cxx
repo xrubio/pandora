@@ -44,17 +44,6 @@ void SpacePartition::init( int argc, char *argv[] )
 	{
 		MPI_Init(&argc, &argv);
 	}
-	checkOverlapSize();
-}
-
-void SpacePartition::init2()
-{
-	MpiFactory::instance()->registerTypes();
-
-	std::stringstream logName;
-	logName << "simulation_" << _id;
-	log_INFO(logName.str(), "finished init at: "  << _world.getWallTime());
-
 
 	MPI_Comm_size(MPI_COMM_WORLD, &_numTasks);
 	MPI_Comm_rank(MPI_COMM_WORLD,&_id);	
@@ -68,6 +57,17 @@ void SpacePartition::init2()
 		oss << "SpacePartition::init - local raster width and height: " << _localRasterSize << " must be divisible by 2";
 		throw Exception(oss.str());
 	}
+	checkOverlapSize();
+}
+
+void SpacePartition::init2()
+{
+	MpiFactory::instance()->registerTypes();
+
+	std::stringstream logName;
+	logName << "simulation_" << _id;
+	log_INFO(logName.str(), "finished init at: "  << _world.getWallTime());
+
 }
 
 void SpacePartition::checkOverlapSize()
@@ -186,7 +186,7 @@ void SpacePartition::stepSection( const int & sectionIndex )
 		agent->updateState();
 		log_DEBUG(logName.str(), _world.getWallTime() << " agent: " << agent << " has been executed at index: " << sectionIndex << " of task: "<< _id << " in step: " << _step );
 
-		if(!_boundaries.isInside(agent->getPosition()) && !_world.willBeRemoved(agent))
+		if(!_boundaries.isInside(agent->getPosition()) && !willBeRemoved(agent))
 		{
 			log_DEBUG(logName.str(), _world.getWallTime() << " migrating agent: " << agent << " being executed at index: " << sectionIndex << " of task: "<< _id );
 			agentsToSend.push_back(agent);
@@ -400,10 +400,10 @@ void SpacePartition::sendGhostAgents( const int & sectionIndex )
 				Agent * agent = *it;
 				// we check the type. TODO register the type in another string
 				// TODO refactor!!!
-				log_DEBUG(logName.str(),  _world.getWallTime() << " step: " << _step << " agent: " << agent << " of type: " << itType->first << " test will be removed: " << _world.willBeRemoved(agent) << " checking overlap zone: " << overlapZone << " overlap boundaries: " << _overlapBoundaries << " - test is inside zone: " << overlapZone.isInside(agent->getPosition()-_overlapBoundaries._origin));
+				log_DEBUG(logName.str(),  _world.getWallTime() << " step: " << _step << " agent: " << agent << " of type: " << itType->first << " test will be removed: " << willBeRemoved(agent) << " checking overlap zone: " << overlapZone << " overlap boundaries: " << _overlapBoundaries << " - test is inside zone: " << overlapZone.isInside(agent->getPosition()-_overlapBoundaries._origin));
 				if(agent->isType(itType->first))
 				{
-					if((!_world.willBeRemoved(agent)) && (overlapZone.isInside(agent->getPosition()-_overlapBoundaries._origin)))
+					if((!willBeRemoved(agent)) && (overlapZone.isInside(agent->getPosition()-_overlapBoundaries._origin)))
 					{
 						agentsToNeighbors[i].push_back(*it);
 						log_DEBUG(logName.str(),  _world.getWallTime() << " step: " << _step << " sending ghost agent: " << agent << " to: " << neighborsToUpdate[i] << " in section index: " << sectionIndex);
@@ -415,7 +415,7 @@ void SpacePartition::sendGhostAgents( const int & sectionIndex )
 				Agent * agent = *it;	
 				if(agent->isType(itType->first))
 				{
-					if((!_world.willBeRemoved(agent)) && (overlapZone.isInside(agent->getPosition()-_overlapBoundaries._origin)))
+					if((!willBeRemoved(agent)) && (overlapZone.isInside(agent->getPosition()-_overlapBoundaries._origin)))
 					{
 						agentsToNeighbors[i].push_back(*it);
 						log_DEBUG(logName.str(),  _world.getWallTime() << " step: " << _step << " will send modified ghost agent: " << agent << " to: " << neighborsToUpdate[i] << " in section index: " << sectionIndex << " and step: " << _step);
@@ -1538,6 +1538,22 @@ World::AgentsList::iterator SpacePartition::getOwnedAgent( const std::string & i
 	return _world.endAgents();
 }
 
+bool SpacePartition::willBeRemoved( Agent * agent )
+{
+	for(AgentsList::iterator it=_removedAgents.begin(); it!=_removedAgents.end(); it++)
+	{	
+		if((*it)->getId().compare(agent->getId())==0)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+const Rectangle<int> & SpacePartition::getBoundaries() const
+{
+	return _boundaries;
+}
 
 
 } // namespace Engine

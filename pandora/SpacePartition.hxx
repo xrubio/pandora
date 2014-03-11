@@ -82,6 +82,8 @@ public:
 
 	//! returns the Rectangle the contains the world section boundaries plus the overlap area around that boundaries
 	const Rectangle<int> & getOverlapBoundaries() const;
+	//! returns a Rectangle<int> expressing the boundaries of the world
+	const Rectangle<int> & getBoundaries() const;
 
 	//! position of World inside global limits 
 	Point2D<int> _worldPos;
@@ -198,6 +200,10 @@ public:
 
 	//! return an agent, if it is in the list of owned
 	AgentsList::iterator getOwnedAgent( const std::string & id );
+	
+	//! true if the agent is in the list of agents to remove
+	bool willBeRemoved( Agent * agent );
+
 };
 
 } // namespace Engine

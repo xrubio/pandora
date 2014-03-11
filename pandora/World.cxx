@@ -69,9 +69,9 @@ World::~World()
 	}
 }
 
-void World::initialize()
+void World::initialize(int argc, char *argv[])
 {
-	_scheduler->init(0,0);
+	_scheduler->init(argc,argv);
 	_initialTime = getWallTime();
 
 	_scheduler->stablishPosition();
@@ -96,25 +96,13 @@ void World::updateRasterToMaxValues( const int & index )
 	((Raster *)_rasters.at(index))->updateRasterToMaxValues();
 }
 
-bool World::willBeRemoved( Agent * agent )
-{
-	for(AgentsList::iterator it=_removedAgents.begin(); it!=_removedAgents.end(); it++)
-	{	
-		if((*it)->getId().compare(agent->getId())==0)
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
 void World::addAgent( Agent * agent, bool executedAgent )
 {
 	agent->setWorld(this);
-	_agent.push_back(agent);
+	_agents.push_back(agent);
 	if(executedAgent)
 	{
-		_scheduler.agentAdded(agent, executedAgent);
+		_scheduler->agentAdded(agent, executedAgent);
 	}
 	
 	std::stringstream logName;
@@ -166,8 +154,8 @@ void World::step()
 	stepEnvironment();
 	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " has executed step environment");
 	_scheduler->executeAgents();
-	removeAgents();
-	log_INFO(logName.str(), getWallTime() << " - world at pos: " << _worldPos << " finished step: " << _step);
+	_scheduler->removeAgents();
+	log_INFO(logName.str(), getWallTime() << " finished step: " << _step);
 }
 
 void World::run()
@@ -275,7 +263,7 @@ void World::registerDynamicRaster( const std::string & key, const bool & seriali
 		delete _rasters.at(index);
 	}
 	_rasters.at(index) = new Raster();
-	_rasters.at(index)->resize(_overlapBoundaries._size);
+	_rasters.at(index)->resize(_scheduler->getOverlapBoundaries()._size);
 	_serializeRasters.at(index) = serialize;
 }
 
@@ -304,7 +292,7 @@ void World::registerStaticRaster( const std::string & key, const bool & serializ
 		delete _rasters.at(index);
 	}
 	_rasters.at(index) = new StaticRaster();
-	_rasters.at(index)->resize(_overlapBoundaries._size);
+	_rasters.at(index)->resize(_scheduler->getOverlapBoundaries()._size);
 	
 	_dynamicRasters.at(index) = false;
 	_serializeRasters.at(index) = serialize;
@@ -325,7 +313,7 @@ bool World::checkPosition( const Point2D<int> & newPosition )
 	}
 	
 	// checking if it is already occupied
-	std::vector<Agent *> hosts = getAgent(newPosition);
+	std::vector<Agent *> hosts = _scheduler->getAgent(newPosition);
 	if(hosts.size()==0)
 	{
 		return true;
@@ -393,7 +381,7 @@ void World::setValue( const std::string & key, const Point2D<int> & position, in
 
 void World::setValue( const int & index, const Point2D<int> & position, int value )
 {
-	Point2D<int> localPosition(position - _overlapBoundaries._origin);
+	Point2D<int> localPosition(position - _scheduler->getOverlapBoundaries()._origin);
 	((Raster*)_rasters.at(index))->setValue(localPosition, value);
 }
 
@@ -405,7 +393,7 @@ int World::getValue( const std::string & key, const Point2D<int> & position ) co
 
 int World::getValue( const int & index, const Point2D<int> & position ) const
 {
-	Point2D<int> localPosition(position - _overlapBoundaries._origin);
+	Point2D<int> localPosition(position - _scheduler->getOverlapBoundaries()._origin);
 	return _rasters.at(index)->getValue(localPosition);
 }
 
@@ -417,7 +405,7 @@ void World::setMaxValue( const std::string & key, const Point2D<int> & position,
 
 void World::setMaxValue( const int & index, const Point2D<int> & position, int value )
 {
-	Point2D<int> localPosition(position - _overlapBoundaries._origin);
+	Point2D<int> localPosition(position - _scheduler->getOverlapBoundaries()._origin);
 	((Raster*)_rasters.at(index))->setMaxValue(localPosition, value);
 }
 
@@ -431,14 +419,9 @@ int World::getMaxValueAt( const int & index, const Point2D<int> & position )
 {
 	std::stringstream logName;
 	logName << "max_value_" << getId();
-	Point2D<int> localPosition(position - _overlapBoundaries._origin);	
-	log_DEBUG(logName.str(), getWallTime() << " accessing to pos: " << position << " real: " << localPosition << " with overlap: " << _overlapBoundaries << " for index: " << index);
+	Point2D<int> localPosition(position - _scheduler->getOverlapBoundaries()._origin);	
+	log_DEBUG(logName.str(), getWallTime() << " accessing to pos: " << position << " real: " << localPosition << " with overlap: " << _scheduler->getOverlapBoundaries() << " for index: " << index);
 	return ((Raster*)_rasters.at(index))->getMaxValueAt(localPosition);
-}
-
-const Rectangle<int> & World::getBoundaries() const
-{
-	return _boundaries;
 }
 
 void World::setSearchAgents( const bool & searchAgents )
@@ -454,14 +437,14 @@ bool World::getSearchAgents()
 int World::countNeighbours( Agent * target, const double & radius, const std::string & type )
 {
 	int numAgents = for_each(_agents.begin(), _agents.end(), aggregatorCount<Engine::Agent>(radius,*target, type))._count;
-	int numOverlapAgents = for_each(_overlapAgents.begin(), _overlapAgents.end(), aggregatorCount<Engine::Agent>(radius,*target, type))._count;
+	int numOverlapAgents = for_each(_scheduler->_overlapAgents.begin(), _scheduler->_overlapAgents.end(), aggregatorCount<Engine::Agent>(radius,*target, type))._count;
 	return numAgents+numOverlapAgents;
 }
 
 World::AgentsVector World::getNeighbours( Agent * target, const double & radius, const std::string & type )
 {
 	AgentsVector agentsVector = for_each(_agents.begin(), _agents.end(), aggregatorGet<Engine::Agent>(radius,*target, type))._neighbors;
-	AgentsVector overlapAgentsVector =  for_each(_overlapAgents.begin(), _overlapAgents.end(), aggregatorGet<Engine::Agent>(radius,*target, type))._neighbors;
+	AgentsVector overlapAgentsVector =  for_each(_scheduler->_overlapAgents.begin(), _scheduler->_overlapAgents.end(), aggregatorGet<Engine::Agent>(radius,*target, type))._neighbors;
 	std::copy(overlapAgentsVector.begin(), overlapAgentsVector.end(), std::back_inserter(agentsVector));
 	std::random_shuffle(agentsVector.begin(), agentsVector.end());
 	return agentsVector;
@@ -471,9 +454,9 @@ Point2D<int> World::getRandomPosition()
 {
 	while(1)
 	{
-		Engine::Point2D<int> pos(GeneralState::statistics().getUniformDistValue(0,_boundaries._size._x-1), GeneralState::statistics().getUniformDistValue(0,_boundaries._size._y-1));
-		pos += _boundaries._origin;
-		if(checkPosition(pos) && _boundaries.isInside(pos))
+		Engine::Point2D<int> pos(GeneralState::statistics().getUniformDistValue(0,_scheduler->getBoundaries()._size._x-1), GeneralState::statistics().getUniformDistValue(0,_scheduler->getBoundaries()._size._y-1));
+		pos += _scheduler->getBoundaries()._origin;
+		if(checkPosition(pos) && _scheduler->getBoundaries().isInside(pos))
 		{
 			return pos;
 		}
@@ -501,11 +484,15 @@ const std::string & World::getRasterName( const int & index) const
 
 int World::getId() const{ return _scheduler->getId(); }
 const Rectangle<int> & World::getOverlapBoundaries() const{ return _scheduler->getOverlapBoundaries(); }
+const Rectangle<int> & World::getBoundaries() const{ return _scheduler->getBoundaries(); }
 const int & World::getOverlap() { return _scheduler->getOverlap(); }
 const int & World::getNumTasks() const{ return _scheduler->getNumTasks(); }
 const Point2D<int> & World::getLocalRasterSize() const{ return _scheduler->getLocalRasterSize(); }
-const Point2D<int> & getSize() const{ return _simulation.getSize(); }
+const Point2D<int> & World::getSize() const{ return _simulation.getSize(); }
 void World::removeAgent( Agent * agent ) { _scheduler->removeAgent(agent); }
+Agent * World::getAgent( const std::string & id ) { return _scheduler->getAgent(id); }
+World::AgentsVector World::getAgent( const Point2D<int> & position, const std::string & type) { return _scheduler->getAgent(position, type); }
+void World::setFinalize( const bool & finalize ) { _scheduler->setFinalize(finalize); }
 
 } // namespace Engine
 

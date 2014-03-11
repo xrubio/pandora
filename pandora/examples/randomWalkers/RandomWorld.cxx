@@ -25,9 +25,9 @@ void RandomWorld::createRasters()
 	getDynamicRaster("resources").setInitValues(0, 5, 0);
 	
 	Engine::Point2D<int> index(0,0);
-	for(index._x=0; index._x<_overlapBoundaries._size._x; index._x++)
+	for(index._x=0; index._x<getOverlapBoundaries()._size._x; index._x++)
 	{
-		for(index._y=0; index._y<_overlapBoundaries._size._y; index._y++)
+		for(index._y=0; index._y<getOverlapBoundaries()._size._y; index._y++)
 		{
 			int value = Engine::GeneralState::statistics().getUniformDistValue(0,5);
 			getDynamicRaster("resources").setMaxValue(index, value);
@@ -40,7 +40,7 @@ void RandomWorld::createAgents()
 {
 	for(int i=0; i<_config._numAgents; i++)
 	{
-		if((i%_simulation.getNumTasks())==_simulation.getId())
+		if((i%getNumTasks())==getId())
 		{
 			std::ostringstream oss;
 			oss << "RandomAgent_" << i;

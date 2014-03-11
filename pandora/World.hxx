@@ -65,10 +65,6 @@ protected:
 	//! current simulation step
 	int _step;
 
-public: // TODO for refactoring of Scheduler
-	//! true if the agent is in the list of agents to remove
-	bool willBeRemoved( Agent * agent );
-
 private:
 	//! if this variable is set to true, getNeighbours will look through the list of agents instead of searching by position. It is false by default
 	bool _searchAgents;
@@ -112,7 +108,7 @@ public:
 	virtual ~World();
 
 	//! calls init without MPI initialization (used in pyPandora)
-	void initialize();
+	void initialize(int argc, char *argv[]);
 	//! Runs the simulation. Performs each step and stores the states. Requires calling 'init' method a-priori.
 	void run();
 	
@@ -184,8 +180,6 @@ public:
 	int getCurrentStep() const;
 	//! this method can be redefined by the children in order to modify the execution of each step on a given resource field. Default is grow 1 until max
 	virtual void stepEnvironment();
-	//! this method is executed for each section during @stepSection. It is useful in the cases where a Raster is modified following data in adjacent cells.
-	virtual void stepRastersSection(  const int & indexSection, const Rectangle<int> & section );
 	//! dump the rasters through a serializer.
 	void serializeRasters();
 	//! dump the static rasters through a serializer.
@@ -235,8 +229,6 @@ public:
 	//! gets the maximum allowed value of raster "index" in global position "position"
 	int getMaxValueAt( const int & index, const Point2D<int> & position );
 
-	//! returns a Rectangle<int> expressing the boundaries of the world
-	const Rectangle<int> & getBoundaries() const;
 	const Rectangle<int>& getGlobalBoundaries() const { return _globalBoundaries; }
 
 	
@@ -258,6 +250,7 @@ public:
 public:
 	int getId() const;
 	const Rectangle<int> & getOverlapBoundaries() const;
+	const Rectangle<int> & getBoundaries() const;
 	const int & getOverlap();
 	const int & getNumTasks() const;
 	const Point2D<int> & getLocalRasterSize() const;
@@ -270,7 +263,9 @@ public:
 	bool getDynamicRasterIndex( size_t index ) { return _dynamicRasters.at(index); }
 	void eraseAgent( AgentsList::iterator & it ) { _agents.erase(it); }
 	void removeAgent( Agent * agent );
-
+	Agent * getAgent( const std::string & id );
+	AgentsVector getAgent( const Point2D<int> & position, const std::string & type="all" );
+	void setFinalize( const bool & finalize );
 };
 
 } // namespace Engine
