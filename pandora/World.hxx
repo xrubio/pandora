@@ -107,8 +107,7 @@ public:
 	
 	virtual ~World();
 
-	//! calls init without MPI initialization (used in pyPandora)
-	void initialize(int argc, char *argv[]);
+	void initialize(int argc = 0, char *argv[] = 0);
 	//! Runs the simulation. Performs each step and stores the states. Requires calling 'init' method a-priori.
 	void run();
 	

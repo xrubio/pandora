@@ -41,10 +41,10 @@ BOOST_AUTO_TEST_CASE( testExecuteWorldTwice )
 {	
 	Engine::Simulation mySimulation(Engine::Point2D<int>(10,10), 1);
 	TestWorld myWorld(mySimulation);
-	myWorld.init(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
+	myWorld.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
 	myWorld.run();
 
-	myWorld.init(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
+	myWorld.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
 	myWorld.run();
 }
 
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE( testAgentRemovedIsNotExecuted )
 {	
 	Engine::Simulation mySimulation(Engine::Point2D<int>(10,10), 1);
 	TestWorld myWorld(mySimulation);
-	myWorld.init(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
+	myWorld.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
 
 	TestAgent * myAgent = new TestAgent("agent_0");
 	myWorld.addAgent(myAgent);
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE( testAgentRemovedIsNotInInsideNeighbours )
 {
 	Engine::Simulation mySimulation(Engine::Point2D<int>(10,10), 1);
 	TestWorld myWorld(mySimulation);
-	myWorld.init(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
+	myWorld.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
 
 	TestAgent * myAgent0 = new TestAgent("agent_0");
 	TestAgent * myAgent1 = new TestAgent("agent_1");

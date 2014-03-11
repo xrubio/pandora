@@ -248,8 +248,11 @@ public:
 		}
 		return agentIds;
 	}
-
-
+	
+	void initializeNoArguments()
+	{
+		initialize(0,0);
+	}
 };
 
 class AgentAnalysisWrap : public PostProcess::AgentAnalysis, public boost::python::wrapper<PostProcess::AgentAnalysis>
@@ -306,6 +309,7 @@ bool notEqualsPoint( const Point2DInt & pointA, const Point2DInt & pointB )
 {
 	return pointA!=pointB;
 }
+
 
 // overloaded methods
 Engine::Raster & (Engine::World::*getDynamicRaster)(const std::string&) = &Engine::World::getDynamicRaster;
@@ -369,7 +373,7 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("createRasters", boost::python::pure_virtual(&Engine::World::createRasters))
 		.def("createAgents", boost::python::pure_virtual(&Engine::World::createAgents))
 		.def("stepEnvironment", &Engine::World::stepEnvironment, &WorldWrap::default_StepEnvironment)
-		.def("initialize", &Engine::World::initialize)
+		.def("initialize", &WorldWrap::initializeNoArguments)
 		.def("checkPosition", &Engine::World::checkPosition)
 		.def("registerDynamicRaster", &WorldWrap::registerDynamicRasterSimple)	
 		.def("registerStaticRaster", &WorldWrap::registerStaticRasterSimple)	
