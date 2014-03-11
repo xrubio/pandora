@@ -7,7 +7,7 @@ import unittest
 sys.path.append('../../')
 sys.path.append('../../pyPandora')
 
-from pyPandora import Simulation, Agent, World, Point2DInt
+from pyPandora import Simulation, Agent, World, Point2DInt, SizeInt
 
 class TestAgent(Agent):
 	def __init__(self, id):
@@ -49,15 +49,15 @@ class TestPyPandora(unittest.TestCase):
 		self.assertNotEqual(point1, point2)
 
 	def testSimulationSize(self):
-		mySimulation = Simulation(Point2DInt(10,10), 1)
-		size = Point2DInt(9,10)
+		mySimulation = Simulation(SizeInt(10,10), 1)
+		size = SizeInt(9,10)
 
 		self.assertNotEqual(mySimulation.size, size)
-		size._x = 10
+		size._width = 10
 		self.assertEqual(mySimulation.size, size)
 
 	def testAgentRemovedIsNotExecuted(self):
-		mySimulation = Simulation(Point2DInt(10,10), 1)
+		mySimulation = Simulation(SizeInt(10,10), 1)
 		myWorld = TestWorld(mySimulation)
 		myWorld.initialize()
 
@@ -70,7 +70,7 @@ class TestPyPandora(unittest.TestCase):
 		myWorld.run()
 	
 	def testExecuteWorldTwice(self):
-		mySimulation = Simulation(Point2DInt(10,10), 1)
+		mySimulation = Simulation(SizeInt(10,10), 1)
 		myWorld = TestWorld(mySimulation, False)
 		myWorld.initialize()
 		myWorld.run()
@@ -79,7 +79,7 @@ class TestPyPandora(unittest.TestCase):
 		myWorld.run()
 	
 	def testAgentRemovedIsNotInsideNeighbours(self):
-		mySimulation = Simulation(Point2DInt(10,10), 1)
+		mySimulation = Simulation(SizeInt(10,10), 1)
 		myWorld = TestWorld(mySimulation)
 		myWorld.initialize()
 		myWorld.run()

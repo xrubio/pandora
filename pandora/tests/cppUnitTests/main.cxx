@@ -7,6 +7,7 @@
 #include <Simulation.hxx>
 #include <World.hxx>
 #include <Point2D.hxx>
+#include <Size.hxx>
 
 #include <boost/test/unit_test.hpp>
 
@@ -29,17 +30,17 @@ BOOST_AUTO_TEST_CASE( testEqualityPoint )
 
 BOOST_AUTO_TEST_CASE( testSimulationSize ) 
 {	
-	Engine::Simulation mySimulation(Engine::Point2D<int>(10,10), 1);
-	Engine::Point2D<int> size(9,10);
+	Engine::Simulation mySimulation(Engine::Size<int>(10,10), 1);
+	Engine::Size<int> size(9,10);
 	
 	BOOST_CHECK(size!=mySimulation.getSize());
-	size._x = 10;
+	size._width = 10;
 	BOOST_CHECK(size==mySimulation.getSize());
 }
 
 BOOST_AUTO_TEST_CASE( testExecuteWorldTwice ) 
 {	
-	Engine::Simulation mySimulation(Engine::Point2D<int>(10,10), 1);
+	Engine::Simulation mySimulation(Engine::Size<int>(10,10), 1);
 	TestWorld myWorld(mySimulation);
 	myWorld.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
 	myWorld.run();
@@ -50,7 +51,7 @@ BOOST_AUTO_TEST_CASE( testExecuteWorldTwice )
 
 BOOST_AUTO_TEST_CASE( testAgentRemovedIsNotExecuted ) 
 {	
-	Engine::Simulation mySimulation(Engine::Point2D<int>(10,10), 1);
+	Engine::Simulation mySimulation(Engine::Size<int>(10,10), 1);
 	TestWorld myWorld(mySimulation);
 	myWorld.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
 
@@ -65,7 +66,7 @@ BOOST_AUTO_TEST_CASE( testAgentRemovedIsNotExecuted )
 
 BOOST_AUTO_TEST_CASE( testAgentRemovedIsNotInInsideNeighbours ) 
 {
-	Engine::Simulation mySimulation(Engine::Point2D<int>(10,10), 1);
+	Engine::Simulation mySimulation(Engine::Size<int>(10,10), 1);
 	TestWorld myWorld(mySimulation);
 	myWorld.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
 
