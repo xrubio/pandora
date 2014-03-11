@@ -1,0 +1,17 @@
+
+Every simulation is executed in a World of a given size. This is specified in the Simulation instance used to configure World.
+To ask about the legal boundaries of World the getBoundaries method is used. Its value depends on the type of Scheduler, as World acts as a Bridge and asks Scheduler for this Rectangle.
+For sequential schedulers it will go from (0,0) to (size._x, size._y), so it is expressed as global coordinates.
+For spatial schedulers the _boundaries of a World are related to its position inside the whole simulation. For example, if a squared simulation of size=20 is executed in 4 computer nodes with an overlap between them of 2 the method will return:
+
+node 0: from (0,0) to (12,12). This is the top left area of the world size + overlap
+node 1: from (8,0) to (19,12). Top right area
+node 2: from (0,8) to (12, 19). Bottom left area
+node 3: from (8,8) tp (19,19). Botto right area
+
+Internally the Scheduler also keeps track of _ownedArea, which is the zone controlled by every node (i.e. without buffers). Following this example _ownedArea would be:
+node 0: from (0,0) to (9,9)
+node 1: from (10,0) to (19,9)
+node 2: from (0,10) to (9,19)
+node 3: from (10,10) tp (19,19)
+
