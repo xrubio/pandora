@@ -24,6 +24,7 @@
 
 #include <Raster.hxx>
 #include <map>
+#include <Size.hxx>
 
 namespace Engine
 {
@@ -54,26 +55,25 @@ public:
 
 	ChangeIterator		firstChange() const { return _changes.begin(); }
 	ChangeIterator		endOfChanges() const { return _changes.end(); }	
-	Point2D<int> getSize() const;
+	Size<int> getSize() const;
 
-	bool			operator==( const IncrementalRaster& other ) const;
-
-	bool			operator!=( const IncrementalRaster& other ) const
+	bool operator==( const IncrementalRaster& other ) const;
+	bool operator!=( const IncrementalRaster& other ) const
 	{
 		return !(this->operator==( other));
 	}
 
-	bool			operator<( const IncrementalRaster& other ) const
+	bool operator<( const IncrementalRaster& other ) const
 	{
 		return _changes.size() < other._changes.size();
 	}
 
 private:
 
-	ChangeTable		_changes;
-	const Raster*		_baseRaster;
-	int			_currentMinValue;
-	int			_currentMaxValue;
+	ChangeTable _changes;
+	const Raster * _baseRaster;
+	int	_currentMinValue;
+	int	_currentMaxValue;
 };
 
 }

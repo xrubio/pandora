@@ -41,7 +41,7 @@ namespace Engine
 {
 
 World::World( const Simulation & simulation, const int & overlap, const bool & allowMultipleAgentsPerCell, const std::string & fileName ) 
-    : _scheduler(0), _simulation(simulation), _globalBoundaries(Point2D<int>(0,0) , simulation.getSize()), _allowMultipleAgentsPerCell(allowMultipleAgentsPerCell), _step(0), _searchAgents(true), _initialTime(0.0f)
+    : _scheduler(0), _simulation(simulation), _globalBoundaries(Point2D<int>(0,0) , simulation.getSize()), _allowMultipleAgentsPerCell(allowMultipleAgentsPerCell), _step(0), _searchAgents(true)
 {
 	_scheduler = new SpacePartition(simulation, overlap, *this);
 	GeneralState::serializer().setResultsFile(fileName);
@@ -72,9 +72,7 @@ World::~World()
 void World::initialize(int argc, char *argv[])
 {
 	_scheduler->init(argc,argv);
-	_initialTime = getWallTime();
 
-	_scheduler->stablishPosition();
 	createRasters();
 	createAgents();		
 	
@@ -263,7 +261,7 @@ void World::registerDynamicRaster( const std::string & key, const bool & seriali
 		delete _rasters.at(index);
 	}
 	_rasters.at(index) = new Raster();
-	_rasters.at(index)->resize(_scheduler->getRealSize());
+	_rasters.at(index)->resize(_scheduler->getBoundaries()._size);
 	_serializeRasters.at(index) = serialize;
 }
 
@@ -292,7 +290,7 @@ void World::registerStaticRaster( const std::string & key, const bool & serializ
 		delete _rasters.at(index);
 	}
 	_rasters.at(index) = new StaticRaster();
-	_rasters.at(index)->resize(_scheduler->getRealSize());
+	_rasters.at(index)->resize(_scheduler->getBoundaries()._size);
 	
 	_dynamicRasters.at(index) = false;
 	_serializeRasters.at(index) = serialize;
@@ -459,7 +457,7 @@ Point2D<int> World::getRandomPosition()
 
 double World::getWallTime() const
 {
-	return MPI_Wtime() - _initialTime;
+	return _scheduler->getWallTime();
 }
 
 const std::string & World::getRasterName( const int & index) const
@@ -477,12 +475,11 @@ const std::string & World::getRasterName( const int & index) const
 }
 
 int World::getId() const{ return _scheduler->getId(); }
-const Rectangle<int> & World::getOverlapBoundaries() const{ return _scheduler->getOverlapBoundaries(); }
+const Rectangle<int> & World::getBoundaries() const{ return _scheduler->getBoundaries(); }
 const Rectangle<int> & World::getOwnedArea() const{ return _scheduler->getOwnedArea(); }
 const int & World::getOverlap() { return _scheduler->getOverlap(); }
 const int & World::getNumTasks() const{ return _scheduler->getNumTasks(); }
-const Point2D<int> & World::getLocalRasterSize() const{ return _scheduler->getLocalRasterSize(); }
-const Point2D<int> & World::getSize() const{ return _simulation.getSize(); }
+const Size<int> & World::getSize() const{ return _simulation.getSize(); }
 void World::removeAgent( Agent * agent ) { _scheduler->removeAgent(agent); }
 Agent * World::getAgent( const std::string & id ) { return _scheduler->getAgent(id); }
 World::AgentsVector World::getAgent( const Point2D<int> & position, const std::string & type) { return _scheduler->getAgent(position, type); }

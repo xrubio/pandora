@@ -17,11 +17,11 @@ void RandomWorldConfig::extractParticularAttribs(TiXmlElement * root)
 	TiXmlElement * element = root->FirstChildElement("numAgents");
 	retrieveAttributeMandatory( element, "value", _numAgents);
 	element = root->FirstChildElement("size");
-	retrieveAttributeMandatory( element, "width", _size._x);
-	retrieveAttributeMandatory( element, "height", _size._y);
+	retrieveAttributeMandatory( element, "width", _size._width);
+	retrieveAttributeMandatory( element, "height", _size._height);
 }
 	
-const Engine::Point2D<int> & RandomWorldConfig::getSize() const
+const Engine::Size<int> & RandomWorldConfig::getSize() const
 {
 	return _size;
 }

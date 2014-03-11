@@ -25,9 +25,9 @@ void RandomWorld::createRasters()
 	getDynamicRaster("resources").setInitValues(0, 5, 0);
 	
 	Engine::Point2D<int> index(0,0);
-	for(index._x=0; index._x<getOverlapBoundaries()._size._x; index._x++)
+	for(index._x=0; index._x<getBoundaries()._size._width; index._x++)
 	{
-		for(index._y=0; index._y<getOverlapBoundaries()._size._y; index._y++)
+		for(index._y=0; index._y<getBoundaries()._size._height; index._y++)
 		{
 			int value = Engine::GeneralState::statistics().getUniformDistValue(0,5);
 			getDynamicRaster("resources").setMaxValue(index, value);

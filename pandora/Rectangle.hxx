@@ -30,6 +30,7 @@
 
 #include <Interval.hxx> 
 #include <Point2D.hxx>
+#include <Size.hxx>
 
 namespace Engine
 {
@@ -40,13 +41,13 @@ template <typename Type> class Rectangle
 public:
 	// top left point
 	Point2D<Type> _origin;
-	Point2D<Type> _size;
+	Size<Type> _size;
 
 	Rectangle() : _origin(-1,-1), _size(-1,-1)
 	{
 	}
 
-	Rectangle( const Point2D<Type> & origin, const Point2D<Type> & size ) : _origin(origin), _size(size)
+	Rectangle( const Point2D<Type> & origin, const Size<Type> & size ) : _origin(origin), _size(size)
 	{
 	}
 
@@ -57,11 +58,11 @@ public:
 	
 	bool isInside( const Point2D<Type> & point ) const
 	{
-		if(point._x < _origin._x || point._x >= _origin._x+_size._x)
+		if(point._x < _origin._x || point._x >= _origin._x+_size._width)
 		{
 			return false;
 		}
-		if(point._y < _origin._y || point._y >= _origin._y+_size._y)
+		if(point._y < _origin._y || point._y >= _origin._y+_size._height)
 		{
 			return false;
 		}
@@ -75,19 +76,19 @@ public:
 		_origin._y = iOY._min;
 		
 		// Point2D size = Point2D(iOX._max – iOX._min +1, iOY._max – iOY._min +1);	
-		_size._x = iOX._max - iOX._min +1;
-		_size._y = iOY._max - iOY._min +1;		
+		_size._width = iOX._max - iOX._min +1;
+		_size._height = iOY._max - iOY._min +1;		
 	}	
 	
 	bool intersection(const Rectangle<Type> other, Rectangle<Type> & result)
 	{	
 		// Interval caracterization for Rectangle "this"
-		Interval<Type> R1_OX(_origin._x,_origin._x + _size._x -1);		
-		Interval<Type> R1_OY(_origin._y,_origin._y + _size._y -1);
+		Interval<Type> R1_OX(_origin._x,_origin._x + _size._width -1);		
+		Interval<Type> R1_OY(_origin._y,_origin._y + _size._height -1);
 		
 		// Interval caracterization for Rectangle "other"
-		Interval<Type> R2_OX(other._origin._x,other._origin._x + other._size._x -1);		
-		Interval<Type> R2_OY(other._origin._y,other._origin._y + other._size._y -1);	
+		Interval<Type> R2_OX(other._origin._x,other._origin._x + other._size._width -1);		
+		Interval<Type> R2_OY(other._origin._y,other._origin._y + other._size._height -1);	
 
 		Interval<Type> Intersection_OX;
 		if (! R1_OX.intersection(R2_OX,Intersection_OX) )
@@ -110,7 +111,7 @@ public:
 	
 	friend std::ostream & operator<<( std::ostream & stream, const Rectangle<Type> & rectangle )
 	{
-		return stream << "rect:" << rectangle._origin << "->" << rectangle._origin + rectangle._size - 1;
+		return stream << "rect:" << rectangle._origin << "->" << Point2D<Type>(rectangle._origin._x+rectangle._size._width, rectangle._origin._y+rectangle._size._height) - 1;
 	}
 
 	Rectangle<Type> & operator=( const Rectangle<Type> & rectangle)

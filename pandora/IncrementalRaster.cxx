@@ -91,7 +91,7 @@ bool IncrementalRaster::operator==( const IncrementalRaster& other ) const
 	return true;
 }
 
-Point2D<int> IncrementalRaster::getSize() const
+Size<int> IncrementalRaster::getSize() const
 {
 	return _baseRaster->getSize();
 }

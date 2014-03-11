@@ -3,7 +3,7 @@
 #define __RandomWorldConfig_hxx__
 
 #include <Config.hxx>
-#include <Point2D.hxx>
+#include <Size.hxx>
 
 namespace Examples
 {
@@ -11,14 +11,14 @@ namespace Examples
 class RandomWorldConfig : public Engine::Config
 {	
 	int _numAgents;
-	Engine::Point2D<int> _size;
+	Engine::Size<int> _size;
 public:
 	RandomWorldConfig();
 	virtual ~RandomWorldConfig();
 
 	void extractParticularAttribs(TiXmlElement *pRoot);
 
-	const Engine::Point2D<int> & getSize() const;
+	const Engine::Size<int> & getSize() const;
 
 	friend class RandomWorld;
 };

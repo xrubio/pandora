@@ -36,14 +36,12 @@ StaticRaster::~StaticRaster()
 {
 }
 
-void StaticRaster::resize( const Point2D<int> & size )
+void StaticRaster::resize( const Size<int> & size )
 {
-	_values.resize(size._x);
-	// TODO explore how to improve performance with STL algorithms
-	// for_each(_valuesField.begin(),_valuesField.end(),resize(_matrixSize));
-	for(int i=0; i<size._x; i++)
+	_values.resize(size._width);
+	for(int i=0; i<size._width; i++)
 	{
-		_values[i].resize(size._y);
+		_values[i].resize(size._height);
 	}
 }
 
@@ -107,13 +105,13 @@ void StaticRaster::setInitValue( Point2D<int> position, int value )
 	_values[position._x][position._y] = value;
 }
 
-Point2D<int> StaticRaster::getSize() const
+Size<int> StaticRaster::getSize() const
 {
 	if(_values.size()==0)
 	{
-		return Point2D<int>(0,0);
+		return Size<int>(0,0);
 	}
-	return Point2D<int>(_values.size(), _values[0].size());
+	return Size<int>(_values.size(), _values[0].size());
 }
 
 const int & StaticRaster::getMinValue() const

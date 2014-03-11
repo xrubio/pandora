@@ -38,15 +38,13 @@ Raster::~Raster()
 {
 }
 
-void Raster::resize( const Point2D<int> & size )
+void Raster::resize( const Size<int> & size )
 {
 	StaticRaster::resize(size);
-	_maxValues.resize(size._x);
-	// TODO explore how to improve performance with STL algorithms
-	// for_each(_valuesField.begin(),_valuesField.end(),resize(_matrixSize));
-	for(int i=0; i<size._x; i++)
+	_maxValues.resize(size._width);
+	for(int i=0; i<size._width; i++)
 	{
-		_maxValues[i].resize(size._y);
+		_maxValues[i].resize(size._height);
 	}
 }
 

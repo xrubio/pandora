@@ -70,7 +70,6 @@ private:
 	bool _searchAgents;
 	
 protected:
-	double _initialTime;
 	// rasters that won't change values during the simulation
 	std::map<std::string, int> _rasterNames;
 	std::vector<StaticRaster * > _rasters;	
@@ -240,20 +239,23 @@ public:
 	virtual void createRasters() = 0;
 
 	int	getCurrentTimeStep() const { return _step; }
+	//! time from initialization step to the moment the method is executed
 	double getWallTime() const;
 	//! provides a random valid position inside boundaries
 	Point2D<int> getRandomPosition();
 
-
 public:
 	int getId() const;
-	const Rectangle<int> & getOverlapBoundaries() const;
+	/** get the boundaries of the world. For sequential executions it will be the boundaries of the entire simulation,
+	  * but if this is not the case it is the area owned by the instance plus the overlaps
+	  */
+	const Rectangle<int> & getBoundaries() const;
 	const Rectangle<int> & getOwnedArea() const;
 	const int & getOverlap();
 	const int & getNumTasks() const;
-	const Point2D<int> & getLocalRasterSize() const;
-// methods that need to be defined for current state of the code
-	const Point2D<int> & getSize() const;
+
+	// methods that need to be defined for current state of the code
+	const Size<int> & getSize() const;
 	AgentsList::iterator beginAgents() { return _agents.begin(); }
 	AgentsList::iterator endAgents() { return _agents.end(); }
 	size_t getNumberOfRasters() const { return _rasters.size(); }

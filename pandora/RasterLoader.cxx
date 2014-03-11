@@ -67,8 +67,8 @@ void RasterLoader::fillGDALRaster( StaticRaster & raster, const std::string & fi
 		throw Engine::Exception(oss.str());
 	}
 
-	Point2D<int> size = Point2D<int>(dataset->GetRasterXSize(), dataset->GetRasterYSize());
-	if(size._x!=simulation.getSize()._x || size._y!=simulation.getSize()._y)
+	Size<int> size = Size<int>(dataset->GetRasterXSize(), dataset->GetRasterYSize());
+	if(size!=simulation.getSize())
 	{
 		std::stringstream oss;
 		oss << "RasterLoader::fillGDALRaster - file: " << fileName << " with size: " << size << " different from defined size: " << simulation.getSize() << std::endl;
@@ -76,8 +76,8 @@ void RasterLoader::fillGDALRaster( StaticRaster & raster, const std::string & fi
 	}
 	log_DEBUG(logName.str(), "size of raster: " << size);
 
-	raster.resize(world->getOverlapBoundaries()._size);
-	log_DEBUG(logName.str(), "resize done with value: " << world->getOverlapBoundaries()._size);
+	raster.resize(world->getBoundaries()._size);
+	log_DEBUG(logName.str(), "resize done with value: " << world->getBoundaries()._size);
 
 	GDALRasterBand * band = dataset->GetRasterBand(1);
 	double minMaxValues[2];
@@ -89,24 +89,24 @@ void RasterLoader::fillGDALRaster( StaticRaster & raster, const std::string & fi
 		GDALComputeRasterMinMax((GDALRasterBandH)band, TRUE, minMaxValues);
 	}
 	
-	float * pafScanline = (float *)CPLMalloc(sizeof(float)*(world->getOverlapBoundaries()._size._x*world->getOverlapBoundaries()._size._y));
+	float * pafScanline = (float *)CPLMalloc(sizeof(float)*(world->getBoundaries()._size._width*world->getBoundaries()._size._height));
 
-	band->RasterIO( GF_Read, world->getOverlapBoundaries()._origin._x, world->getOverlapBoundaries()._origin._y, world->getOverlapBoundaries()._size._x, world->getOverlapBoundaries()._size._y, pafScanline, world->getOverlapBoundaries()._size._x, world->getOverlapBoundaries()._size._y, GDT_Float32, 0, 0 );
+	band->RasterIO( GF_Read, world->getBoundaries()._origin._x, world->getBoundaries()._origin._y, world->getBoundaries()._size._width, world->getBoundaries()._size._height, pafScanline, world->getBoundaries()._size._width, world->getBoundaries()._size._height, GDT_Float32, 0, 0 );
 
 	log_DEBUG(logName.str(), "raster IO done");
-	const Rectangle<int> & overlapBoundaries = world->getOverlapBoundaries();
-	log_DEBUG(logName.str(), "overlap boundaries of world: " << overlapBoundaries);
+	const Rectangle<int> & boundaries = world->getBoundaries();
+	log_DEBUG(logName.str(), "boundaries of world: " << boundaries);
 
 	Point2D<int> index;
 
-	for(index._x=overlapBoundaries._origin._x; index._x<overlapBoundaries._origin._x+overlapBoundaries._size._x; index._x++)
+	for(index._x=boundaries._origin._x; index._x<boundaries._origin._x+boundaries._size._width; index._x++)
 	{
-		for(index._y=overlapBoundaries._origin._y; index._y<overlapBoundaries._origin._y+overlapBoundaries._size._y; index._y++)
+		for(index._y=boundaries._origin._y; index._y<boundaries._origin._y+boundaries._size._height; index._y++)
 		{
-			Point2D<int> index2(index - overlapBoundaries._origin);
-			log_EDEBUG(logName.str(), "index: " << index << " and index2: " << index2 << " accessing to: " << overlapBoundaries._size._x*index2._y+index2._x);
-			raster._values[index2._x][index2._y] = (int)(pafScanline[overlapBoundaries._size._x*index2._y+index2._x]);
-			log_EDEBUG(logName.str(), "value in index2: " << index2 << " is: " << (int)(pafScanline[overlapBoundaries._size._x*index2._y+index2._x]));
+			Point2D<int> index2(index - boundaries._origin);
+			log_EDEBUG(logName.str(), "index: " << index << " and index2: " << index2 << " accessing to: " << boundaries._size._width*index2._y+index2._x);
+			raster._values[index2._x][index2._y] = (int)(pafScanline[boundaries._size._width*index2._y+index2._x]);
+			log_EDEBUG(logName.str(), "value in index2: " << index2 << " is: " << (int)(pafScanline[boundaries._size._width*index2._y+index2._x]));
 		}
 	}
 
@@ -164,7 +164,7 @@ void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fi
 	H5Sget_simple_extent_dims(dataspaceId, dims, NULL);
 	H5Sclose(dataspaceId);
 	
-	if(world && (dims[0]!=world->getSimulation().getSize()._x || dims[1]!=world->getSimulation().getSize()._y))
+	if(world && (dims[0]!=world->getSimulation().getSize()._width || dims[1]!=world->getSimulation().getSize()._height))
 	{
 		std::stringstream oss;
 		oss << "RasterLoader::fillHDF5Raster - file: " << fileName << " and raster name: " << rasterName << " with size: " << dims[0] << "/" << dims[1] << " different from defined size: " << world->getSimulation().getSize() << std::endl;
@@ -174,14 +174,14 @@ void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fi
 	int * dset_data = 0;
 	if(world)
 	{
-		dset_data = (int*)malloc(sizeof(int)*world->getOverlapBoundaries()._size._x*world->getOverlapBoundaries()._size._y);
-		raster.resize(world->getOverlapBoundaries()._size);
+		dset_data = (int*)malloc(sizeof(int)*world->getBoundaries()._size._width*world->getBoundaries()._size._height);
+		raster.resize(world->getBoundaries()._size);
 	}
 	else
 	{
 		dset_data = (int*)malloc(sizeof(int)*dims[0]*dims[1]);
 		// squared
-		raster.resize(Point2D<int>(dims[0], dims[1]));
+		raster.resize(Size<int>(dims[0], dims[1]));
 	}
 
 	H5Dread(dset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, dset_data);
@@ -189,14 +189,14 @@ void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fi
 
 	if(world)
 	{
-		const Rectangle<int> & overlapBoundaries = world->getOverlapBoundaries();
+		const Rectangle<int> & boundaries = world->getBoundaries();
 		Point2D<int> index;
-		for(index._x=overlapBoundaries._origin._x; index._x<overlapBoundaries._origin._x+overlapBoundaries._size._x; index._x++)
+		for(index._x=boundaries._origin._x; index._x<boundaries._origin._x+boundaries._size._width; index._x++)
 		{
-			for(index._y=overlapBoundaries._origin._y; index._y<overlapBoundaries._origin._y+overlapBoundaries._size._y; index._y++)
+			for(index._y=boundaries._origin._y; index._y<boundaries._origin._y+boundaries._size._height; index._y++)
 			{
-				Point2D<int> index2(index - overlapBoundaries._origin);
-				int index = overlapBoundaries._size._y*index2._y+index2._x;
+				Point2D<int> index2(index - boundaries._origin);
+				int index = boundaries._size._height*index2._y+index2._x;
 				raster._values[index2._x][index2._y] = (int)dset_data[index];
 			}
 		}
@@ -269,7 +269,7 @@ void RasterLoader::fillGrassCellRaster( StaticRaster & raster, const std::string
 		throw Engine::Exception(oss.str());
 		return;
 	}
-	if(world && (G_window_cols()!=world->getSimulation().getSize()._x || G_window_rows()!=world->getSimulation().getSize()._y))
+	if(world && (G_window_cols()!=world->getSimulation().getSize()._width || G_window_rows()!=world->getSimulation().getSize()._height))
 	{
 		std::stringstream oss;
 		oss << "StaticRaster::loadGrassCellRasterFile - Grass raster: " << rasterName << " with size: " << G_window_cols() << "/" << G_window_rows() << " different from defined size: " << world->getSimulation().getSize() << std::endl;
@@ -279,11 +279,11 @@ void RasterLoader::fillGrassCellRaster( StaticRaster & raster, const std::string
 
 	if(world)
 	{
-		raster.resize(world->getOverlapBoundaries()._size);
+		raster.resize(world->getBoundaries()._size);
 	}
 	else
 	{
-		raster.resize(Engine::Point2D<int>(G_window_rows(), G_window_cols()));
+		raster.resize(Engine::Size<int>(G_window_rows(), G_window_cols()));
 	}
 
 	if(world)
@@ -297,9 +297,9 @@ void RasterLoader::fillGrassCellRaster( StaticRaster & raster, const std::string
 			for( int j=0; j<G_window_cols(); j++)
 			{
 				Engine::Point2D<int> cellPosition(j,i);
-				if(world->getOverlapBoundaries().isInside(cellPosition))
+				if(world->getBoundaries().isInside(cellPosition))
 				{
-					Point2D<int> localPosition(cellPosition - world->getOverlapBoundaries()._origin);
+					Point2D<int> localPosition(cellPosition - world->getBoundaries()._origin);
 					raster._values[localPosition._x][localPosition._y] = rowData[j];
 				}
 			}

@@ -2,6 +2,7 @@
 #include <analysis/RasterMean.hxx>
 #include <Raster.hxx>
 #include <Exceptions.hxx>
+#include <Size.hxx>
 
 namespace PostProcess
 {
@@ -23,15 +24,15 @@ void RasterMean::computeRaster( const Engine::SimulationRecord::RasterHistory & 
 			return;
 		}
 		const Engine::Raster & raster = rasterHistory.at(0);
-		_numCells = raster.getSize()._x * raster.getSize()._y;
+		_numCells = raster.getSize()._width * raster.getSize()._height;
 	}
 
 	for(int r=0; r<_results.size(); r++)
 	{
 		const Engine::Raster & raster = rasterHistory.at(r);
-		for(int i=0; i<raster.getSize()._x; i++)
+		for(int i=0; i<raster.getSize()._width; i++)
 		{
-			for(int j=0; j<raster.getSize()._y; j++)
+			for(int j=0; j<raster.getSize()._height; j++)
 			{
 				_results.at(r) += raster.getValue(Engine::Point2D<int>(i,j));
 			}

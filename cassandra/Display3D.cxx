@@ -31,6 +31,7 @@
 #include <SimulationRecord.hxx>
 #include <Model3D.hxx>
 #include <Point2D.hxx>
+#include <Size.hxx>
 #include <QtGui>
 #include <AgentConfiguration.hxx>
 #include <RasterConfiguration.hxx>
@@ -79,7 +80,7 @@ void Display3D::initializeGL()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);   //netejar vista
 	// squared landscapes by now
-	Engine::Point2D<int> maxRasterSize = _simulationRecord->getSize();
+	Engine::Size<int> maxRasterSize = _simulationRecord->getSize();
 
 	// update quadtrees and check for max raster size
 	float maxResolution = 1.0f;
@@ -101,13 +102,13 @@ void Display3D::initializeGL()
 		newQuadTree->initializeChilds();
 		_quadTrees.insert(make_pair(*it, newQuadTree));
 	}
-	maxRasterSize._x *= maxResolution;
-	maxRasterSize._y *= maxResolution;
+	maxRasterSize._width *= maxResolution;
+	maxRasterSize._height *= maxResolution;
 
-	float puntMig = sqrt(maxRasterSize._x*maxRasterSize._x+maxRasterSize._y*maxRasterSize._y);
+	float puntMig = sqrt(maxRasterSize._width*maxRasterSize._width+maxRasterSize._height*maxRasterSize._height);
 	_radius = (puntMig)/2.f; //mida escenari/2
-	_vrp._x = maxRasterSize._x/2.0f;
-	_vrp._y = -maxRasterSize._y/2.0f;
+	_vrp._x = maxRasterSize._width/2.0f;
+	_vrp._y = -maxRasterSize._height/2.0f;
 	_vrp._z = 0;
 
 	std::cout << "Radius = " << _radius<< std::endl;
@@ -286,8 +287,8 @@ void Display3D::paintLandscape()
 		RasterConfiguration * rasterConfig = ProjectConfiguration::instance()->getRasterConfig(*(it));
 		QuadTreeMap::iterator qIt = _quadTrees.find(*it);
 		QuadTree * quadTree = qIt->second;
-		int pot2X = powf(2,ceil(log2(rasterConfig->getCellResolution()*_simulationRecord->getSize()._x)));
-		int pot2Y = powf(2,ceil(log2(rasterConfig->getCellResolution()*_simulationRecord->getSize()._y)));
+		int pot2X = powf(2,ceil(log2(rasterConfig->getCellResolution()*_simulationRecord->getSize()._width)));
+		int pot2Y = powf(2,ceil(log2(rasterConfig->getCellResolution()*_simulationRecord->getSize()._height)));
 		if(rasterConfig->hasElevationRaster())
 		{
         	Engine::StaticRaster & elevationRaster(_simulationRecord->getRasterTmp(rasterConfig->getElevationRaster(), _viewedStep));
@@ -425,11 +426,11 @@ void Display3D::keyPressEvent(QKeyEvent *event)
 {
     if(event->key()==Qt::Key_R)
     {
-        float center = sqrt(_simulationRecord->getSize()._x*_simulationRecord->getSize()._x+_simulationRecord->getSize()._y*_simulationRecord->getSize()._y);
+        float center = sqrt(_simulationRecord->getSize()._width*_simulationRecord->getSize()._width+_simulationRecord->getSize()._height*_simulationRecord->getSize()._height);
 
         _radius = (center)/2.f; //mida escenari/2
-        _vrp._x = _simulationRecord->getSize()._x/2.0f;
-        _vrp._y = -_simulationRecord->getSize()._y/2.0f;
+        _vrp._x = _simulationRecord->getSize()._width/2.0f;
+        _vrp._y = -_simulationRecord->getSize()._height/2.0f;
         _vrp._z = 0;
 
 		std::cout << "Radius = " << _radius<< std::endl;
@@ -524,10 +525,10 @@ void Display3D::pan( const QPoint & eventPos )
 	incY._y = mat[1][1];
 	incY._z = mat[2][1];
 
-	incX = incX * _simulationRecord->getSize()._x * (_clickedPos.x()-eventPos.x());
+	incX = incX * _simulationRecord->getSize()._width * (_clickedPos.x()-eventPos.x());
 	incX = incX/dist;
 	
-	incY = incY * _simulationRecord->getSize()._y * (eventPos.y()-_clickedPos.y());
+	incY = incY * _simulationRecord->getSize()._height * (eventPos.y()-_clickedPos.y());
 	incY = incY/dist;
 
 	_vrp = _vrp + incX;

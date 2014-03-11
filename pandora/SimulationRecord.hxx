@@ -33,6 +33,7 @@
 #include <StaticRaster.hxx>
 #include <AgentRecord.hxx>
 #include <Point2D.hxx>
+#include <Size.hxx>
 
 namespace Engine 
 {
@@ -43,9 +44,9 @@ public:
 	// TODO programar funció d'equivalencia a agent record i convertir en llista
 	typedef std::map<std::string, AgentRecord * > AgentRecordsMap;
 	typedef std::map<std::string, int > ValuesMap;	
-	typedef std::vector<Engine::Raster> RasterHistory;
+	typedef std::vector<Raster> RasterHistory;
 	typedef std::map<std::string, RasterHistory> RasterMap;
-	typedef std::map<std::string, Engine::StaticRaster> StaticRasterMap;
+	typedef std::map<std::string, StaticRaster> StaticRasterMap;
 	typedef std::map<std::string, AgentRecordsMap > AgentTypesMap;
 	typedef std::vector<AgentRecord *> AgentRecordsVector;
 private:
@@ -67,7 +68,7 @@ private:
 	ValuesMap _minAttributeValues;
 	ValuesMap _maxAttributeValues;
 
-	Engine::Point2D<int> _size;
+	Size<int> _size;
 
 	// we need this function in order to be called by H5Giterate. It must be static to match the C call signature
 	static herr_t registerAgentStep( hid_t loc_id, const char *name, void *opdata );
@@ -102,9 +103,9 @@ public:
 	
 	RasterHistory & getRasterHistory( const std::string & key );
 	const RasterHistory & getRasterHistory( const std::string & key ) const;
-	Engine::Raster & getDynamicRaster( const std::string & key, const int & step );
-	Engine::StaticRaster & getStaticRaster( const std::string & key );
-	Engine::StaticRaster & getRasterTmp( const std::string & key, const int & step );
+	Raster & getDynamicRaster( const std::string & key, const int & step );
+	StaticRaster & getStaticRaster( const std::string & key );
+	StaticRaster & getRasterTmp( const std::string & key, const int & step );
 
 	const std::string & getName() const;
 	int getNumSteps() const;
@@ -129,7 +130,7 @@ public:
 	StaticRasterMap::const_iterator beginStaticRasters() const;
 	StaticRasterMap::const_iterator endStaticRasters() const;
 
-	AgentRecordsVector getAgentsAtPosition( int step, const Engine::Point2D<int> & position ) const;
+	AgentRecordsVector getAgentsAtPosition( int step, const Point2D<int> & position ) const;
 	
 	// TODO make a different class
 	double getMean( const std::string & type, const std::string & state, int step );
@@ -137,7 +138,7 @@ public:
 	
 	int getMinValueForState( const std::string & state );
 	int getMaxValueForState( const std::string & state );
-	const Engine::Point2D<int> & getSize() const;
+	const Size<int> & getSize() const;
 	const float & getLoadingPercentageDone() const;
 	const std::string & getLoadingState() const;
 };

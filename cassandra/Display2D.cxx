@@ -72,7 +72,7 @@ void Display2D::setSimulationRecord( Engine::SimulationRecord * simulationRecord
 {
 	resetView();
 	_simulationRecord = simulationRecord;
-	_zoom = 600.0f/float(simulationRecord->getSize()._x);
+	_zoom = 600.0f/float(simulationRecord->getSize()._width);
 	update();
 }
 
@@ -82,7 +82,7 @@ void Display2D::paintEvent(QPaintEvent *event)
 	{
 		return;
 	}
-	QPixmap imageToDraw(_simulationRecord->getSize()._x*_zoom, _simulationRecord->getSize()._y*_zoom);
+	QPixmap imageToDraw(_simulationRecord->getSize()._width*_zoom, _simulationRecord->getSize()._height*_zoom);
 	//QImage imageToDraw(_simulationRecord->getSize()*_zoom, _simulationRecord->getSize()*_zoom, QImage::Format_ARGB32_Premultiplied);
 	QPainter painter(&imageToDraw);
 	QPen pen;
@@ -93,11 +93,11 @@ void Display2D::paintEvent(QPaintEvent *event)
 	if(!_orderedRasters.empty())
 	{
 		Engine::StaticRaster & rasterTmp(_simulationRecord->getRasterTmp(*(_orderedRasters.begin()), _viewedStep));
-		Engine::Point2D<int> size = rasterTmp.getSize();
+		Engine::Size<int> size = rasterTmp.getSize();
 
-		for(int i=0; i<size._x; i++)
+		for(int i=0; i<size._width; i++)
 		{
-			for(int j=0; j<size._y; j++)
+			for(int j=0; j<size._height; j++)
 			{
 				std::list<std::string>::const_iterator it =_orderedRasters.end();
 				while(it!=_orderedRasters.begin())
@@ -419,7 +419,7 @@ bool Display2D::event(QEvent *event)
 		posToolTip << "position: " << position << " zoom: " << _zoom;
 		finalToolTip += posToolTip.str();
 	
-		if(!_simulationRecord || position._x<0 || position._y<0 || position._x>=_simulationRecord->getSize()._x || position._y>=_simulationRecord->getSize()._y)
+		if(!_simulationRecord || position._x<0 || position._y<0 || position._x>=_simulationRecord->getSize()._width || position._y>=_simulationRecord->getSize()._height)
 		{
 			QToolTip::showText(helpEvent->globalPos(), finalToolTip.c_str());
 			return QWidget::event(event);

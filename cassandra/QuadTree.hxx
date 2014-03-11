@@ -3,6 +3,7 @@
 
 #include <Point2D.hxx>
 #include <Point3D.hxx>
+#include <Size.hxx>
 
 namespace Engine
 {
@@ -17,7 +18,7 @@ class ColorSelector;
 
 class QuadTree
 {  
-	Engine::Point2D<int> _size;	
+	Engine::Size <int> _size;	
 	
 	// center points [x,y,z]
 	Engine::Point2D<int> _center;
@@ -45,9 +46,9 @@ class QuadTree
 
 public:
 	// initial QuadTree 
-	QuadTree( const Engine::Point2D<int> & size);
+	QuadTree( const Engine::Size<int> & size);
 	// child QuadTree
-	QuadTree( const Engine::Point2D<int> & size, const Engine::Point2D<int> & center, const Engine::Point2D<int> & prof);
+	QuadTree( const Engine::Size<int> & size, const Engine::Point2D<int> & center, const Engine::Point2D<int> & prof);
 	virtual ~QuadTree();
 
     float _frustum[6][4];

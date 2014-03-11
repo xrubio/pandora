@@ -81,7 +81,7 @@ public:
 	//! map of already executed agents
 	std::map<std::string, Agent *> _executedAgentsHash;	
 
-	const Rectangle<int> & getOverlapBoundaries() const;
+	const Rectangle<int> & getBoundaries() const;
 	const Rectangle<int> & getOwnedArea() const;
 
 	//! position of World inside global limits 
@@ -114,7 +114,7 @@ public:
 	//! id's of neighboring computer nodes
 	std::vector<int> _neighbors;
 	//! boundaries of the particular world, with adjacent overlaps added
-	Rectangle<int> _overlapBoundaries;
+	Rectangle<int> _boundaries;
 	//! area inside boundaries owned by the computer node without overlap
 	Rectangle<int> _ownedArea;
 	//! the four sections into a world is divided
@@ -142,8 +142,8 @@ public:
 	
 	//! check correct overlap/size relation
 	void checkOverlapSize();
-	//! stablish position of world inside the space of the simulation
-	void stablishPosition();
+	//! compute _boundaries based on Size, number of nodes and _overlap
+	void stablishBoundaries();
 	//! define original position of world, given overlap, size and id.
 	void stablishWorldPosition();
 	//! applies next simulation step on the Section of the space identified by parameter 'sectionIndex'.
@@ -181,7 +181,6 @@ public:
 	void finishExecution();
 	const int & getId() const;
 	const int & getNumTasks() const;
-	const Point2D<int> & getLocalRasterSize() const;
 
 	void agentAdded( Agent * agent, bool executedAgent );
 	//! this method returns true if the agent is already in executedAgents list
@@ -204,9 +203,11 @@ public:
 	bool willBeRemoved( Agent * agent );
 	//! transform from global coordinates to real coordinates (in terms of world position)
 	Point2D<int> getRealPosition( const Point2D<int> & globalPosition ) const;
-	const Point2D<int> & getRealSize() const;
 	Point2D<int> getRandomPosition() const;
 
+	double _initialTime;
+	//! MPI version of wall time
+	double getWallTime() const;
 };
 
 } // namespace Engine

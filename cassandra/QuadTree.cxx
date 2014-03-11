@@ -14,10 +14,10 @@
 
 namespace GUI {
 
-QuadTree::QuadTree( const Engine::Point2D<int> & size ) : _size(size), _childNW(0), _childNE(0), _childSE(0), _childSW(0)
+QuadTree::QuadTree( const Engine::Size<int> & size ) : _size(size), _childNW(0), _childNE(0), _childSE(0), _childSW(0)
 {
-	int pot2X = powf(2,ceil(log2(_size._x)));
-	int pot2Y = powf(2,ceil(log2(_size._y)));
+	int pot2X = powf(2,ceil(log2(_size._width)));
+	int pot2Y = powf(2,ceil(log2(_size._height)));
 	_center = Engine::Point2D<int>(pot2X/2, pot2Y/2);
 
 	_NW = Engine::Point2D<int>(0,0);
@@ -31,11 +31,11 @@ QuadTree::QuadTree( const Engine::Point2D<int> & size ) : _size(size), _childNW(
 	_neighW = Engine::Point2D<int>(0,pot2Y/2);
 }
 
-QuadTree::QuadTree( const Engine::Point2D<int> & size, const Engine::Point2D<int> & center, const Engine::Point2D<int> & prof ) : _size(size), _center(center), _childNW(0), _childNE(0), _childSE(0), _childSW(0)
+QuadTree::QuadTree( const Engine::Size<int> & size, const Engine::Point2D<int> & center, const Engine::Point2D<int> & prof ) : _size(size), _center(center), _childNW(0), _childNE(0), _childSE(0), _childSW(0)
 {
 	Engine::Point2D<int> outOfBounds;
-	outOfBounds._x = std::min(_size._x-1, _center._x+prof._x);
-	outOfBounds._y = std::min(_size._y-1, _center._y+prof._y);
+	outOfBounds._x = std::min(_size._width-1, _center._x+prof._x);
+	outOfBounds._y = std::min(_size._height-1, _center._y+prof._y);
 
 	_NW = Engine::Point2D<int>(_center._x-prof._x,_center._y-prof._y);
 	_NE = Engine::Point2D<int>(outOfBounds._x,_center._y-prof._y);
@@ -98,8 +98,8 @@ void QuadTree::setFrustum(float frust[6][4])
 
 void QuadTree::initializeChilds()
 {
-    int pot2X = powf(2,ceil(log2(_size._x)));
-    int pot2Y = powf(2,ceil(log2(_size._y)));
+    int pot2X = powf(2,ceil(log2(_size._width)));
+    int pot2Y = powf(2,ceil(log2(_size._height)));
 
 	Engine::Point2D<int> prof(pot2X/4, pot2Y/4);
 
@@ -130,11 +130,11 @@ QuadTree* QuadTree::initializeChild(int depth, Engine::Point2D<int> center, cons
 void QuadTree::paintTriangle( const Engine::Point2D<int> & point1, const Engine::Point2D<int> & point2, const RasterConfiguration & rasterConfig, const Engine::StaticRaster & DEMRaster, const Engine::StaticRaster & colorRaster, bool randomColor )
 {
 	// size check
-	if(point1._x>=_size._x || point1._y>=_size._y)
+	if(point1._x>=_size._width || point1._y>=_size._height)
 	{
 		return;
 	}
-	if(point2._x>=_size._x || point2._y>=_size._y)
+	if(point2._x>=_size._width || point2._y>=_size._height)
 	{
 		return;
 	}
@@ -151,8 +151,8 @@ void QuadTree::paintTriangle( const Engine::Point2D<int> & point1, const Engine:
 	glBegin(GL_TRIANGLES);
 	
 	Engine::Point2D<float> sizeF;
-	sizeF._x = _size._x;
-	sizeF._y = _size._y;
+	sizeF._x = _size._width;
+	sizeF._y = _size._height;
 
 	setCellColor(colorRaster, rasterConfig.getColorRamp(), _center, randomColor);
 	glTexCoord2f((float)(_center._x)/sizeF._x, (float)(_center._y)/sizeF._y);
@@ -178,12 +178,12 @@ void QuadTree::update( const Engine::Point2D<int> & prof, RasterConfiguration & 
 	Engine::Point3D<float> camara(0,0,0);
 	Engine::Point3D<float> punt(0.0f,0.0f,0.0f);
 
-	if(_center._x < _size._x && _center._y < _size._y )
+	if(_center._x < _size._width && _center._y < _size._height )
 	{
-		punt._x = _size._x*rasterConfig.getOffset()._x + camara1[0] * _center._x + -camara1[4] * _center._y + camara1[8] * DEMRaster.getValue(_center)*rasterConfig.getElevationExaggeration()+camara1[12];
-		punt._y = _size._y*rasterConfig.getOffset()._y + camara1[1] * _center._x + -camara1[5] * _center._y + camara1[9] * DEMRaster.getValue(_center)*rasterConfig.getElevationExaggeration()+camara1[13];
+		punt._x = _size._width*rasterConfig.getOffset()._x + camara1[0] * _center._x + -camara1[4] * _center._y + camara1[8] * DEMRaster.getValue(_center)*rasterConfig.getElevationExaggeration()+camara1[12];
+		punt._y = _size._height*rasterConfig.getOffset()._y + camara1[1] * _center._x + -camara1[5] * _center._y + camara1[9] * DEMRaster.getValue(_center)*rasterConfig.getElevationExaggeration()+camara1[13];
 		// size.z??
-		punt._z = _size._x*rasterConfig.getOffset()._z + camara1[2] * _center._x + -camara1[6] * _center._y + camara1[10]* DEMRaster.getValue(_center)*rasterConfig.getElevationExaggeration()+camara1[14];
+		punt._z = _size._width*rasterConfig.getOffset()._z + camara1[2] * _center._x + -camara1[6] * _center._y + camara1[10]* DEMRaster.getValue(_center)*rasterConfig.getElevationExaggeration()+camara1[14];
 	}
 
 	if(abs(camara.distance(punt))/prof._x < rasterConfig.getLOD() || abs(camara.distance(punt))/prof._y< rasterConfig.getLOD() )
@@ -210,11 +210,11 @@ void QuadTree::update( const Engine::Point2D<int> & prof, RasterConfiguration & 
 	}
 	else
 	{
-		if(_center._x < _size._x && _center._y < _size._x)
+		if(_center._x < _size._width && _center._y < _size._width)
 		{
 			Engine::Point3D<float> offset = rasterConfig.getOffset();
-			offset._x *= _size._x;
-			offset._y *= _size._y;
+			offset._x *= _size._width;
+			offset._y *= _size._height;
 
 			glPushMatrix();
 			glTranslatef(offset._x, offset._y, offset._z);

@@ -95,14 +95,14 @@ bool SimulationRecord::loadHDF5( const std::string & fileName, const bool & load
 		return false;
 	}
 
-	_size._x = 0;
-	_size._y = 0;
+	_size._width = 0;
+	_size._height = 0;
 	attributeId = H5Aopen_name(datasetId, "width");	
-	H5Aread(attributeId, H5T_NATIVE_INT, &_size._x );
+	H5Aread(attributeId, H5T_NATIVE_INT, &_size._width );
 	H5Aclose(attributeId);
 
 	attributeId = H5Aopen_name(datasetId, "height");	
-	H5Aread(attributeId, H5T_NATIVE_INT, &_size._y );
+	H5Aread(attributeId, H5T_NATIVE_INT, &_size._height );
 	H5Aclose(attributeId);
 
 	H5Dclose(datasetId);
@@ -185,8 +185,8 @@ bool SimulationRecord::loadHDF5( const std::string & fileName, const bool & load
 					int * dset_data = (int*)malloc(sizeof(int)*dims[0]*dims[1]);
 					
 					// squared	
-					Engine::Raster & raster = it->second[i/getFinalResolution()];
-					raster.resize(Engine::Point2D<int>(dims[0], dims[1]));
+					Raster & raster = it->second[i/getFinalResolution()];
+					raster.resize(Size<int>(dims[0], dims[1]));
 					// TODO max value!
 					raster.setInitValues(std::numeric_limits<int>::min(),std::numeric_limits<int>::max(), 0);
 
@@ -215,8 +215,8 @@ bool SimulationRecord::loadHDF5( const std::string & fileName, const bool & load
 							{
 								minValue = value;
 							}
-							raster.setMaxValue(Engine::Point2D<int>(i,j), value);
-							raster.setValue(Engine::Point2D<int>(i,j), value); 
+							raster.setMaxValue(Point2D<int>(i,j), value);
+							raster.setValue(Point2D<int>(i,j), value); 
 						}
 					}
 					free(dset_data);
@@ -225,7 +225,7 @@ bool SimulationRecord::loadHDF5( const std::string & fileName, const bool & load
 				// setting max value for the entire simulation
 				for(int i=0; i<=_numSteps; i=i+getFinalResolution())
 				{
-					Engine::Raster & raster = it->second.at(i/getFinalResolution());
+					Raster & raster = it->second.at(i/getFinalResolution());
 					raster.setMaxValue(maxValue);
 					raster.setMinValue(minValue);
 				
@@ -363,13 +363,13 @@ void SimulationRecord::loadAttributes( const hid_t & stepGroup, hssize_t & numEl
 		{
 			std::stringstream oss;
 			oss << "SimulationRecord::loadHDF5 - loading attribute: " << *itA << " of type string, not yet implemented";
-			throw Engine::Exception(oss.str());
+			throw Exception(oss.str());
 		}
 		else
 		{
 			std::stringstream oss;
 			oss << "SimulationRecord::loadHDF5 - loading attribute: " << *itA << " of unknown type";
-			throw Engine::Exception(oss.str());
+			throw Exception(oss.str());
 		}
 		H5Tclose(typeAttribute);
 		H5Dclose(attributeDatasetId);
@@ -456,7 +456,7 @@ SimulationRecord::RasterHistory & SimulationRecord::getRasterHistory( const std:
 	{
 		std::stringstream oss;
 		oss << "SimulationRecord::getRasterHistory - searching for unknown key: " << key << " in resource field histories";
-		throw Engine::Exception(oss.str());
+		throw Exception(oss.str());
 	}
 	return it->second;
 }
@@ -469,12 +469,12 @@ const SimulationRecord::RasterHistory & SimulationRecord::getRasterHistory( cons
 	{
 		std::stringstream oss;
 		oss << "SimulationRecord::getRasterHistory - searching for unknown key: " << key << " in resource field histories";
-		throw Engine::Exception(oss.str());
+		throw Exception(oss.str());
 	}
 	return it->second;
 }
 
-Engine::StaticRaster & SimulationRecord::getRasterTmp( const std::string & key, const int & step )
+StaticRaster & SimulationRecord::getRasterTmp( const std::string & key, const int & step )
 {
 	StaticRasterMap::iterator itS = _staticRasters.find(key);
 	// the key does not exists
@@ -488,13 +488,13 @@ Engine::StaticRaster & SimulationRecord::getRasterTmp( const std::string & key, 
 	{
 		std::stringstream oss;
 		oss << "SimulationRecord::getRasterTmp - asking for key: " << key << " and step: " << step << "out of bounds, having: " << resourceHistory.size()*getFinalResolution()<< " steps";
-		throw Engine::Exception(oss.str());
+		throw Exception(oss.str());
 
 	}
 	return resourceHistory[index];
 }
 
-Engine::Raster & SimulationRecord::getDynamicRaster(  const std::string & key, const int & step )
+Raster & SimulationRecord::getDynamicRaster(  const std::string & key, const int & step )
 {
 	RasterHistory & resourceHistory = getRasterHistory(key);
 	int index = step/getFinalResolution();
@@ -502,13 +502,13 @@ Engine::Raster & SimulationRecord::getDynamicRaster(  const std::string & key, c
 	{
 		std::stringstream oss;
 		oss << "SimulationRecord::getDynamicRaster - asking for key: " << key << " and step: " << step << "out of bounds, having: " << resourceHistory.size()*getFinalResolution()<< " steps";
-		throw Engine::Exception(oss.str());
+		throw Exception(oss.str());
 
 	}
 	return resourceHistory[index];
 }
 
-Engine::StaticRaster & SimulationRecord::getStaticRaster( const std::string & key )
+StaticRaster & SimulationRecord::getStaticRaster( const std::string & key )
 {	
 	StaticRasterMap::iterator it = _staticRasters.find(key);
 	// the key does not exists
@@ -516,7 +516,7 @@ Engine::StaticRaster & SimulationRecord::getStaticRaster( const std::string & ke
 	{
 		std::stringstream oss;
 		oss << "SimulationRecord::getStaticRaster - searching for unknown key: " << key << " in static rasters";
-		throw Engine::Exception(oss.str());
+		throw Exception(oss.str());
 	}
 	return it->second;
 }
@@ -573,7 +573,7 @@ SimulationRecord::AgentRecordsMap::const_iterator SimulationRecord::beginAgents(
 	{	
 		std::stringstream oss;
 		oss << "SimulationRecord::beginAgents - asking for type " << type;
-		throw Engine::Exception(oss.str());
+		throw Exception(oss.str());
 	}	
 	return it->second.begin();
 }
@@ -585,7 +585,7 @@ SimulationRecord::AgentRecordsMap::const_iterator SimulationRecord::endAgents( c
 	{	
 		std::stringstream oss;
 		oss << "SimulationRecord::endAgents- asking for type " << type;
-		throw Engine::Exception(oss.str());
+		throw Exception(oss.str());
 	}	
 	return it->second.end();
 }
@@ -620,7 +620,7 @@ SimulationRecord::StaticRasterMap::const_iterator SimulationRecord::endStaticRas
 	return _staticRasters.end();
 }
 		
-SimulationRecord::AgentRecordsVector SimulationRecord::getAgentsAtPosition( int step, const Engine::Point2D<int> & position ) const	
+SimulationRecord::AgentRecordsVector SimulationRecord::getAgentsAtPosition( int step, const Point2D<int> & position ) const	
 {
 	AgentRecordsVector results;
 	for(AgentTypesMap::const_iterator itType=_types.begin(); itType!=_types.end(); itType++)
@@ -648,7 +648,7 @@ double SimulationRecord::getMean( const std::string & type, const std::string & 
 	{
 		std::stringstream oss;
 		oss << "SimulationRecord::getMean - asking for state: " << state << " in type " << type;
-		throw Engine::Exception(oss.str());
+		throw Exception(oss.str());
 	}
 	AgentRecordsMap agents = itType->second;
 	for(AgentRecordsMap::iterator it=agents.begin(); it!=agents.end(); it++)
@@ -678,7 +678,7 @@ double SimulationRecord::getSum( const std::string & type, const std::string & s
 	{
 		std::stringstream oss;
 		oss << "SimulationRecord::getSum - asking for state: " << state << " in type " << type;
-		throw Engine::Exception(oss.str());
+		throw Exception(oss.str());
 	}
 	AgentRecordsMap agents = itType->second;
 	for(AgentRecordsMap::iterator it=agents.begin(); it!=agents.end(); it++)
@@ -765,7 +765,7 @@ int SimulationRecord::getMinValueForState( const std::string & state )
 	{
 		std::stringstream oss;
 		oss << "SimulationRecord::getMinValueForState - asking for not registered state: " << state;
-		throw Engine::Exception(oss.str());
+		throw Exception(oss.str());
 	}
 	return it->second;
 }
@@ -777,7 +777,7 @@ int SimulationRecord::getMaxValueForState( const std::string & state )
 	{
 		std::stringstream oss;
 		oss << "SimulationRecord::getMaxValueForState - asking for not registered state: " << state;
-		throw Engine::Exception(oss.str());
+		throw Exception(oss.str());
 	}
 	return it->second;
 
@@ -785,12 +785,12 @@ int SimulationRecord::getMaxValueForState( const std::string & state )
 
 herr_t SimulationRecord::registerAgentStep( hid_t loc_id, const char *name, void *opdata )
 {
-	Engine::SimulationRecord * record = (Engine::SimulationRecord*)opdata;
+	SimulationRecord * record = (SimulationRecord*)opdata;
 	record->registerAgent(loc_id, name);
     return 0;
 }
 
-const Engine::Point2D<int> & SimulationRecord::getSize() const
+const Size<int> & SimulationRecord::getSize() const
 {
 	return _size;
 }

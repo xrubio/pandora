@@ -65,8 +65,6 @@ public:
 	*/
 	// 
 	bool isEqual( const Point2D<Type> & point, const double & delta = 0.0001 ) const
-	// if we use epsilon the evaluation will fail for equal double numbers
-	//bool isEqual( const Point2D<Type> & point, const double & delta = std::numeric_limits<double>::epsilon() ) const
 	{
 		return distance(point)<=delta;
 	}

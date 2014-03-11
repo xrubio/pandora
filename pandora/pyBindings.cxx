@@ -24,6 +24,7 @@
 #include <boost/python/object.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <Point2D.hxx>
+#include <Size.hxx>
 #include <StaticRaster.hxx>
 #include <Raster.hxx>
 #include <Simulation.hxx>
@@ -50,11 +51,12 @@
 #include <string>
 
 typedef Engine::Point2D<int> Point2DInt;
+typedef Engine::Size<int> SizeInt;
 
 class StaticRasterWrap : public Engine::StaticRaster, public boost::python::wrapper<Engine::StaticRaster>
 {
 public:
-	void resize( const Point2DInt & size )
+	void resize( const SizeInt & size )
 	{
 		if (boost::python::override resize = this->get_override("resize")(size))			
 		{
@@ -64,7 +66,7 @@ public:
 		Engine::StaticRaster::resize(size);
 	}
 
-	void default_resize( const Point2DInt & size )
+	void default_resize( const SizeInt & size )
 	{
 		Engine::StaticRaster::resize(size);
 	}
@@ -87,7 +89,7 @@ public:
 class RasterWrap : public Engine::Raster, public boost::python::wrapper<Engine::Raster>
 {
 public:
-	void resize( const Point2DInt & size )
+	void resize( const SizeInt & size )
 	{
 		if (boost::python::override resize = this->get_override("resize")(size))			
 		{
@@ -97,7 +99,7 @@ public:
 		Engine::Raster::resize(size);
 	}
 
-	void default_resize( const Point2DInt & size )
+	void default_resize( const SizeInt & size )
 	{
 		Engine::Raster::resize(size);
 	}
@@ -308,8 +310,25 @@ bool equalsPoint( const Point2DInt & pointA, const Point2DInt & pointB )
 bool notEqualsPoint( const Point2DInt & pointA, const Point2DInt & pointB )
 {
 	return pointA!=pointB;
+
 }
 
+std::string printSize( const SizeInt & size )
+{
+	std::stringstream stream;
+	stream << size;
+	return stream.str();
+}
+
+bool equalsSize( const SizeInt & sizeA, const SizeInt & sizeB )
+{
+	return sizeA==sizeB;
+}
+
+bool notEqualsSize( const SizeInt & sizeA, const SizeInt & sizeB )
+{
+	return sizeA!=sizeB;
+}
 
 // overloaded methods
 Engine::Raster & (Engine::World::*getDynamicRaster)(const std::string&) = &Engine::World::getDynamicRaster;
@@ -332,6 +351,15 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("clone", &Point2DInt::clone)
 	;	
 	
+	boost::python::class_< SizeInt>("SizeIntStub", boost::python::init<const int & , const int & >() )
+		.def_readwrite("_width", &SizeInt::_width) 
+		.def_readwrite("_height", &SizeInt::_height) 
+		.def("__str__", printSize)
+		.def("__eq__", equalsSize)
+		.def("__ne__", notEqualsSize)
+		.def("clone", &SizeInt::clone)
+	;	
+	
 	boost::python::class_< StaticRasterWrap, boost::noncopyable >("StaticRasterStub")
 		.def("resize", &Engine::StaticRaster::resize, &StaticRasterWrap::default_resize) 
 		.def("getSize", &Engine::StaticRaster::getSize)
@@ -346,7 +374,7 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("getValue", &Engine::Raster::getValue, &RasterWrap::default_getValue, boost::python::return_value_policy<boost::python::copy_const_reference>())
 	;
 
-	boost::python::class_< Engine::Simulation >("SimulationStub", boost::python::init< const Engine::Point2D<int> &, const int &, const int & >() )	
+	boost::python::class_< Engine::Simulation >("SimulationStub", boost::python::init< const Engine::Size<int> &, const int &, const int & >() )	
 		.add_property("size", boost::python::make_function(&Engine::Simulation::getSize, boost::python::return_value_policy<boost::python::reference_existing_object>()))
 		.add_property("numSteps", boost::python::make_function(&Engine::Simulation::getNumSteps, boost::python::return_value_policy<boost::python::copy_const_reference>()))
 	;

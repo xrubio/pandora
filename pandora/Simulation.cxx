@@ -31,7 +31,7 @@ namespace Engine
 {
 
 
-Simulation::Simulation( const Point2D<int> & size, const int & numSteps, const int & serializerResolution ) : _size(size), _numSteps(numSteps), _serializerResolution(serializerResolution)
+Simulation::Simulation( const Size<int> & size, const int & numSteps, const int & serializerResolution ) : _size(size), _numSteps(numSteps), _serializerResolution(serializerResolution)
 {
 }
 
@@ -39,7 +39,7 @@ Simulation::~Simulation()
 {
 }
 
-const Point2D<int> & Simulation::getSize() const
+const Size<int> & Simulation::getSize() const
 {
 	return _size;
 }

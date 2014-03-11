@@ -24,6 +24,7 @@
 #define __Raster_hxx__
 
 #include <Point2D.hxx>
+#include <Size.hxx>
 #include <StaticRaster.hxx>
 
 namespace Engine
@@ -60,7 +61,7 @@ public:
 	void setMaxValue( const int & maxValue);
 	//! Sets new value for attribute minValue.
 	void setMinValue( const int & minValue);
-	void resize( const Point2D<int> & size );
+	void resize( const Size<int> & size );
 	
 	void updateCurrentMinMaxValues();
 

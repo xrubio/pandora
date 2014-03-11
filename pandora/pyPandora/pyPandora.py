@@ -7,6 +7,10 @@ import libpyPandora
 class Point2DInt(libpyPandora.Point2DIntStub):
 	def __init__(self, x, y):
 		libpyPandora.Point2DIntStub.__init__(self, x, y)
+
+class SizeInt(libpyPandora.SizeIntStub):
+	def __init__(self, width, height):
+		libpyPandora.SizeIntStub.__init__(self, width, height)
 	
 class StaticRaster(libpyPandora.StaticRasterStub):
 	def __init__(self):

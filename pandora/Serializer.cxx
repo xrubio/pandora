@@ -91,13 +91,13 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 
 	attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	attributeId = H5Acreate(globalDatasetId, "width", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
-	H5Awrite(attributeId, H5T_NATIVE_INT, &simulation.getSize()._x);
+	H5Awrite(attributeId, H5T_NATIVE_INT, &simulation.getSize()._width);
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 
 	attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	attributeId = H5Acreate(globalDatasetId, "height", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
-	H5Awrite(attributeId, H5T_NATIVE_INT, &simulation.getSize()._y);
+	H5Awrite(attributeId, H5T_NATIVE_INT, &simulation.getSize()._height);
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 
@@ -238,14 +238,14 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 	
 	//the real size of the matrix is sqrt(num simulator)*matrixsize	
 	hsize_t dimensions[2];
-	dimensions[0] = hsize_t(simulation.getSize()._x);
-	dimensions[1] = hsize_t(simulation.getSize()._y);
+	dimensions[0] = hsize_t(simulation.getSize()._width);
+	dimensions[1] = hsize_t(simulation.getSize()._height);
 
 	// we need to specify the size where each computer node will be writing
 	hsize_t chunkDimensions[2];
-	chunkDimensions[0] = world.getLocalRasterSize()._x/2;
+	chunkDimensions[0] = world.getOwnedArea()._size._width/2;
 	chunkDimensions[0] += 2*world.getOverlap();
-	chunkDimensions[1] = world.getLocalRasterSize()._y/2;
+	chunkDimensions[1] = world.getOwnedArea()._size._height/2;
 	chunkDimensions[1] += 2*world.getOverlap();
 	
 	propertyListId = H5Pcreate(H5P_DATASET_CREATE);
@@ -561,8 +561,8 @@ void Serializer::serializeRaster( StaticRaster & raster, World & world, const st
     offset[1] = world.getOwnedArea()._origin._y;
  
 	hsize_t	block[2];
-	block[0] = world.getOwnedArea()._size._x;
-	block[1] = world.getOwnedArea()._size._y;
+	block[0] = world.getOwnedArea()._size._width;
+	block[1] = world.getOwnedArea()._size._height;
 
 
 	hid_t dataSetId = H5Dopen(_fileId, datasetKey.c_str(), H5P_DEFAULT);
@@ -579,8 +579,8 @@ void Serializer::serializeRaster( StaticRaster & raster, World & world, const st
 	H5Sselect_hyperslab(fileSpace, H5S_SELECT_SET, offset, stride, count, block);
  
 	int * data = (int *) malloc(sizeof(int)*block[0]*block[1]);
-	Point2D<int> overlapDist = world.getOwnedArea()._origin-world.getOverlapBoundaries()._origin;
-	log_EDEBUG(logName.str(), "overlap dist: " << overlapDist << "boundaries: " << world.getOwnedArea() << " and overlap: " << world.getOverlapBoundaries());
+	Point2D<int> overlapDist = world.getOwnedArea()._origin-world.getBoundaries()._origin;
+	log_EDEBUG(logName.str(), "overlap dist: " << overlapDist << "owned area: " << world.getOwnedArea() << " and boundaries: " << world.getBoundaries());
 	for(size_t i=0; i<block[0]; i++)
 	{
 		for(size_t j=0; j<block[1]; j++)
