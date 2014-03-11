@@ -40,8 +40,7 @@
 namespace Engine
 {
 
-World::World( const Simulation & simulation, const int & overlap, const bool & allowMultipleAgentsPerCell, const std::string & fileName ) 
-    : _scheduler(0), _simulation(simulation), _globalBoundaries(Point2D<int>(0,0) , simulation.getSize()), _allowMultipleAgentsPerCell(allowMultipleAgentsPerCell), _step(0), _searchAgents(true)
+World::World( const Simulation & simulation, const int & overlap, const bool & allowMultipleAgentsPerCell, const std::string & fileName ) : _scheduler(0), _simulation(simulation), _globalBoundaries(Point2D<int>(0,0) , simulation.getSize()), _allowMultipleAgentsPerCell(allowMultipleAgentsPerCell), _step(0)
 {
 	_scheduler = new SpacePartition(simulation, overlap, *this);
 	GeneralState::serializer().setResultsFile(fileName);
@@ -415,16 +414,6 @@ int World::getMaxValueAt( const int & index, const Point2D<int> & position )
 	logName << "max_value_" << getId();
 	log_DEBUG(logName.str(), getWallTime() << " accessing to pos: " << position << " real: " << _scheduler->getRealPosition(position) << " for index: " << index);
 	return ((Raster*)_rasters.at(index))->getMaxValueAt(_scheduler->getRealPosition(position));
-}
-
-void World::setSearchAgents( const bool & searchAgents )
-{
-	_searchAgents = searchAgents;
-}
-
-bool World::getSearchAgents()
-{
-	return _searchAgents;
 }
 
 int World::countNeighbours( Agent * target, const double & radius, const std::string & type )

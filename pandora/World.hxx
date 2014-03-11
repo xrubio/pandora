@@ -65,10 +65,6 @@ protected:
 	//! current simulation step
 	int _step;
 
-private:
-	//! if this variable is set to true, getNeighbours will look through the list of agents instead of searching by position. It is false by default
-	bool _searchAgents;
-	
 protected:
 	// rasters that won't change values during the simulation
 	std::map<std::string, int> _rasterNames;
@@ -84,12 +80,6 @@ protected:
 
 	//! dumps current state of the simulation. Then applies next simulation step.
 	void step();
-
-		
-	//! method interface for attribute _searchAgents. 
-	void setSearchAgents( const bool & searchAgents );
-	//! method interface for attribute _searchAgents. 
-	bool getSearchAgents();
 
 public:
 	//! constructor.
