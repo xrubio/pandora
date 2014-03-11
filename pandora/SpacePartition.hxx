@@ -62,6 +62,7 @@ struct MpiOverlap
   * It distributes a Pandora execution in different nodes using spatial partition
   * Each node contains the same amount of space and the agents inside
   * It is efficient for models where a homogeneous density of agents is expected around the whole world
+  * This is an implementation of the Adapter pattern, decoupling agent and position management from World class
   */
 class SpacePartition
 {

@@ -245,7 +245,6 @@ public:
 	Point2D<int> getRandomPosition();
 
 
-// stub methods to scheduler
 public:
 	int getId() const;
 	const Rectangle<int> & getOverlapBoundaries() const;
