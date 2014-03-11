@@ -1,0 +1,27 @@
+To iterate through a raster we have to go use the boundaries defined by the method getBoundaries:
+
+for(size_t x=getBoundaries()._origin._x; x!=getBoundaries()._origin._x+getBoundaries()._size._x; x++)
+{
+	for(size_t y=getBoundaries()._origin._y; y!=getBoundaries()._origin._y+getBoundaries()._size._y; y++)
+	{
+	}
+}
+
+# alternate 1: methods left, top, bottom, right
+
+for(size_t x=getBoundaries().left(); x<=getBoundaries().right(); x++)
+{
+	for(size_t y=getBoundaries().top(); y<=getBoundaries().bottom(); y++)
+	{
+	}
+}
+
+# alternate 2: methods left, top, bottom, right (inside rectangle)
+for(size_t x=getBoundaries().left(); x<=getBoundaries().right(); x++)
+{
+	for(size_t y=getBoundaries().top(); y<=getBoundaries().bottom(); y++)
+	{
+	}
+}
+
+
