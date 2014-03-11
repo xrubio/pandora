@@ -102,43 +102,43 @@ void SpacePartition::stablishPosition()
 	}
 
 	// stablishing boundaries
-	_boundaries._origin = _worldPos*_localRasterSize;
-	_boundaries._size = _localRasterSize; 
+	_ownedArea._origin = _worldPos*_localRasterSize;
+	_ownedArea._size = _localRasterSize; 
 
 	// defining overlap boundaries
-	_overlapBoundaries = _boundaries;
+	_overlapBoundaries = _ownedArea;
 	// west boundary
-	if(_boundaries._origin._x!=_world.getGlobalBoundaries()._origin._x)
+	if(_ownedArea._origin._x!=_world.getGlobalBoundaries()._origin._x)
 	{
 		_overlapBoundaries._origin._x -= _overlap;
 		_overlapBoundaries._size._x += _overlap;
 	}
 	// east boundary
-	if(_boundaries._origin._x!=_world.getGlobalBoundaries()._size._x-_boundaries._size._x)
+	if(_ownedArea._origin._x!=_world.getGlobalBoundaries()._size._x-_ownedArea._size._x)
 	{
 		_overlapBoundaries._size._x += _overlap;
 	}
 	// north boundary
-	if(_boundaries._origin._y!=_world.getGlobalBoundaries()._origin._y)
+	if(_ownedArea._origin._y!=_world.getGlobalBoundaries()._origin._y)
 	{
 		_overlapBoundaries._origin._y -= _overlap;
 		_overlapBoundaries._size._y += _overlap;
 	}
 	// south boundary
-	if(_boundaries._origin._y!=_world.getGlobalBoundaries()._size._y-_boundaries._size._y)
+	if(_ownedArea._origin._y!=_world.getGlobalBoundaries()._size._y-_ownedArea._size._y)
 	{
 		_overlapBoundaries._size._y += _overlap;
 	}
 	// creating sections
 	_sections.resize(4);
-	_sections[0] = Rectangle<int>(_boundaries._origin, _boundaries._size/2);
-	_sections[1] = Rectangle<int>(Point2D<int>(_boundaries._origin._x+_boundaries._size._x/2, _boundaries._origin._y), _boundaries._size/2);
-	_sections[2] = Rectangle<int>(Point2D<int>(_boundaries._origin._x, _boundaries._origin._y+_boundaries._size._y/2), _boundaries._size/2);
-	_sections[3] = Rectangle<int>(Point2D<int>(_boundaries._origin._x+_boundaries._size._x/2, _boundaries._origin._y+_boundaries._size._y/2), _boundaries._size/2);
+	_sections[0] = Rectangle<int>(_ownedArea._origin, _ownedArea._size/2);
+	_sections[1] = Rectangle<int>(Point2D<int>(_ownedArea._origin._x+_ownedArea._size._x/2, _ownedArea._origin._y), _ownedArea._size/2);
+	_sections[2] = Rectangle<int>(Point2D<int>(_ownedArea._origin._x, _ownedArea._origin._y+_ownedArea._size._y/2), _ownedArea._size/2);
+	_sections[3] = Rectangle<int>(Point2D<int>(_ownedArea._origin._x+_ownedArea._size._x/2, _ownedArea._origin._y+_ownedArea._size._y/2), _ownedArea._size/2);
 
 	std::stringstream logName;
 	logName << "simulation_" << _id;
-	log_INFO(logName.str(), _world.getWallTime() << " pos: " << _worldPos << ", global boundaries: " << _world.getGlobalBoundaries() << ", boundaries: " << _boundaries << " and overlapped area: " << _overlapBoundaries << " with size: " << _overlapBoundaries._size );
+	log_INFO(logName.str(), _world.getWallTime() << " pos: " << _worldPos << ", global boundaries: " << _world.getGlobalBoundaries() << ", boundaries: " << _ownedArea << " and overlapped area: " << _overlapBoundaries << " with size: " << _overlapBoundaries._size );
 	log_INFO(logName.str(), _world.getWallTime() << " sections 0: " << _sections[0] << " - 1: " << _sections[1] << " - 2:" << _sections[2] << " - 3: " << _sections[3]);
 }
 
@@ -186,7 +186,7 @@ void SpacePartition::stepSection( const int & sectionIndex )
 		agent->updateState();
 		log_DEBUG(logName.str(), _world.getWallTime() << " agent: " << agent << " has been executed at index: " << sectionIndex << " of task: "<< _id << " in step: " << _step );
 
-		if(!_boundaries.isInside(agent->getPosition()) && !willBeRemoved(agent))
+		if(!_ownedArea.isInside(agent->getPosition()) && !willBeRemoved(agent))
 		{
 			log_DEBUG(logName.str(), _world.getWallTime() << " migrating agent: " << agent << " being executed at index: " << sectionIndex << " of task: "<< _id );
 			agentsToSend.push_back(agent);
@@ -752,7 +752,7 @@ void SpacePartition::clearRequests( bool updateMaxValues )
 
 int SpacePartition::getIdFromPosition( const Point2D<int> & position )
 {
-	Point2D<int> nodePosition = position/_boundaries._size;
+	Point2D<int> nodePosition = position/_ownedArea._size;
 	return nodePosition._y*sqrt(_numTasks)+nodePosition._x;
 }
 
@@ -885,7 +885,7 @@ Rectangle<int> SpacePartition::getInternalOverlap( const int & id ) const
 	// origin
 	if(diff._x==-1)
 	{
-		if(_boundaries._origin._x==0)
+		if(_ownedArea._origin._x==0)
 		{
 			result._origin._x = 0;
 		}
@@ -896,7 +896,7 @@ Rectangle<int> SpacePartition::getInternalOverlap( const int & id ) const
 	}
 	else if(diff._x==0)
 	{
-		if(_boundaries._origin._x==0)
+		if(_ownedArea._origin._x==0)
 		{
 			result._origin._x = 0;
 		}
@@ -908,20 +908,20 @@ Rectangle<int> SpacePartition::getInternalOverlap( const int & id ) const
 	else
 	{
 		// if left border just remove an overlap
-		if(_boundaries._origin._x==0)
+		if(_ownedArea._origin._x==0)
 		{
-			result._origin._x = _boundaries._size._x - _overlap;
+			result._origin._x = _ownedArea._size._x - _overlap;
 		}
 		// else sum and remove an overlap
 		else
 		{
-			result._origin._x = _boundaries._size._x;
+			result._origin._x = _ownedArea._size._x;
 		}
 	}
 	
 	if(diff._y==-1)
 	{
-		if(_boundaries._origin._y==0)
+		if(_ownedArea._origin._y==0)
 		{
 			result._origin._y = 0;
 		}
@@ -932,7 +932,7 @@ Rectangle<int> SpacePartition::getInternalOverlap( const int & id ) const
 	}
 	else if(diff._y==0)
 	{
-		if( _boundaries._origin._y==0)
+		if( _ownedArea._origin._y==0)
 		{
 			result._origin._y = 0;
 		}
@@ -944,14 +944,14 @@ Rectangle<int> SpacePartition::getInternalOverlap( const int & id ) const
 	else
 	{	
 		// if top border just remove an overlap
-		if(_boundaries._origin._y==0)
+		if(_ownedArea._origin._y==0)
 		{
-			result._origin._y = _boundaries._size._y - _overlap;
+			result._origin._y = _ownedArea._size._y - _overlap;
 		}
 		// else sum and remove an overlap
 		else
 		{
-			result._origin._y = _boundaries._size._y;
+			result._origin._y = _ownedArea._size._y;
 		}
 	}
 
@@ -962,7 +962,7 @@ Rectangle<int> SpacePartition::getInternalOverlap( const int & id ) const
 	}
 	else
 	{
-		result._size._x = _boundaries._size._x;
+		result._size._x = _ownedArea._size._x;
 	}
 	
 	if(diff._y!=0)
@@ -971,7 +971,7 @@ Rectangle<int> SpacePartition::getInternalOverlap( const int & id ) const
 	}
 	else
 	{
-		result._size._y = _boundaries._size._y;
+		result._size._y = _ownedArea._size._y;
 	}
 	std::stringstream logName;
 	logName << "MPI_raster_world_" << _id;
@@ -993,7 +993,7 @@ Rectangle<int> SpacePartition::getExternalOverlap( const int & id) const
 	}
 	else if(diff._x==0)
 	{
-		if(_boundaries._origin._x == 0)
+		if(_ownedArea._origin._x == 0)
 		{
 			result._origin._x = 0;
 		}
@@ -1005,14 +1005,14 @@ Rectangle<int> SpacePartition::getExternalOverlap( const int & id) const
 	else
 	{	
 		// if left border it doesn't have a left overlap		
-		if(_boundaries._origin._x==0)
+		if(_ownedArea._origin._x==0)
 		{
-			result._origin._x = _boundaries._size._x;
+			result._origin._x = _ownedArea._size._x;
 		}
 		// else sum an overlap
 		else
 		{
-			result._origin._x = _boundaries._size._x + _overlap;
+			result._origin._x = _ownedArea._size._x + _overlap;
 		}
 	}
 	
@@ -1022,7 +1022,7 @@ Rectangle<int> SpacePartition::getExternalOverlap( const int & id) const
 	}
 	else if(diff._y==0)
 	{
-		if(_boundaries._origin._y == 0)
+		if(_ownedArea._origin._y == 0)
 		{
 			result._origin._y = 0;
 		}
@@ -1034,14 +1034,14 @@ Rectangle<int> SpacePartition::getExternalOverlap( const int & id) const
 	else
 	{	
 		// if left border it doesn't have a left overlap		
-		if(_boundaries._origin._y==0)
+		if(_ownedArea._origin._y==0)
 		{
-			result._origin._y = _boundaries._size._y;
+			result._origin._y = _ownedArea._size._y;
 		}
 		// else sum an overlap
 		else
 		{
-			result._origin._y = _boundaries._size._y + _overlap;
+			result._origin._y = _ownedArea._size._y + _overlap;
 		}
 	}
 
@@ -1052,7 +1052,7 @@ Rectangle<int> SpacePartition::getExternalOverlap( const int & id) const
 	}
 	else
 	{
-		result._size._x = _boundaries._size._x;
+		result._size._x = _ownedArea._size._x;
 	}
 	
 	if(diff._y!=0)
@@ -1061,7 +1061,7 @@ Rectangle<int> SpacePartition::getExternalOverlap( const int & id) const
 	}
 	else
 	{	
-		result._size._y = _boundaries._size._y;
+		result._size._y = _ownedArea._size._y;
 	}
 	
 	std::stringstream logName;
@@ -1090,8 +1090,8 @@ Rectangle<int> SpacePartition::getOverlap( const int & id, const int & sectionIn
 		}
 		else
 		{
-			result._origin._x = _boundaries._size._x/2;	
-			if(_boundaries._origin._x+_boundaries._size._x!=_world.getGlobalBoundaries()._size._x)
+			result._origin._x = _ownedArea._size._x/2;	
+			if(_ownedArea._origin._x+_ownedArea._size._x!=_world.getGlobalBoundaries()._size._x)
 			{
 				result._origin._x -= _overlap;
 			}
@@ -1100,14 +1100,14 @@ Rectangle<int> SpacePartition::getOverlap( const int & id, const int & sectionIn
 	else
 	{
 		// if left border just remove an overlap
-		if(_boundaries._origin._x==0)
+		if(_ownedArea._origin._x==0)
 		{
-			result._origin._x = _boundaries._size._x - _overlap;
+			result._origin._x = _ownedArea._size._x - _overlap;
 		}
 		// else sum and remove an overlap
 		else
 		{
-			result._origin._x = _boundaries._size._x;
+			result._origin._x = _ownedArea._size._x;
 		}
 	}
 	
@@ -1123,8 +1123,8 @@ Rectangle<int> SpacePartition::getOverlap( const int & id, const int & sectionIn
 		}
 		else
 		{
-			result._origin._y = _boundaries._size._y/2;
-			if(_boundaries._origin._y+_boundaries._size._y!=_world.getGlobalBoundaries()._size._y)
+			result._origin._y = _ownedArea._size._y/2;
+			if(_ownedArea._origin._y+_ownedArea._size._y!=_world.getGlobalBoundaries()._size._y)
 			{
 				result._origin._y -= _overlap;
 			}
@@ -1133,14 +1133,14 @@ Rectangle<int> SpacePartition::getOverlap( const int & id, const int & sectionIn
 	else
 	{
 		// if top border just remove an overlap
-		if(_boundaries._origin._y==0)
+		if(_ownedArea._origin._y==0)
 		{
-			result._origin._y = _boundaries._size._y - _overlap;
+			result._origin._y = _ownedArea._size._y - _overlap;
 		}
 		// else sum and remove an overlap
 		else
 		{
-			result._origin._y = _boundaries._size._y;
+			result._origin._y = _ownedArea._size._y;
 		}
 	}
 
@@ -1152,9 +1152,9 @@ Rectangle<int> SpacePartition::getOverlap( const int & id, const int & sectionIn
 	else
 	{
 		// this result is = to boundaries + 1 overlap
-		result._size._x = _boundaries._size._x/2;
+		result._size._x = _ownedArea._size._x/2;
 		// border
-		if(_boundaries._origin._x!=0)
+		if(_ownedArea._origin._x!=0)
 		{
 			result._size._x += _overlap;
 		}
@@ -1166,7 +1166,7 @@ Rectangle<int> SpacePartition::getOverlap( const int & id, const int & sectionIn
 			}
 		}
 
-		if(_boundaries._origin._x+_boundaries._size._x!=_world.getGlobalBoundaries()._size._x)
+		if(_ownedArea._origin._x+_ownedArea._size._x!=_world.getGlobalBoundaries()._size._x)
 		{
 			result._size._x += _overlap;
 		}
@@ -1185,8 +1185,8 @@ Rectangle<int> SpacePartition::getOverlap( const int & id, const int & sectionIn
 	}
 	else
 	{
-		result._size._y = _boundaries._size._y/2;
-		if(_boundaries._origin._y!=0)
+		result._size._y = _ownedArea._size._y/2;
+		if(_ownedArea._origin._y!=0)
 		{
 			result._size._y += _overlap;
 		}
@@ -1198,7 +1198,7 @@ Rectangle<int> SpacePartition::getOverlap( const int & id, const int & sectionIn
 			}
 		}
 
-		if(_boundaries._origin._y+_boundaries._size._y!=_world.getGlobalBoundaries()._size._y)
+		if(_ownedArea._origin._y+_ownedArea._size._y!=_world.getGlobalBoundaries()._size._y)
 		{
 			result._size._y += _overlap;
 		}
@@ -1550,11 +1550,27 @@ bool SpacePartition::willBeRemoved( Agent * agent )
 	return false;
 }
 
-const Rectangle<int> & SpacePartition::getBoundaries() const
+const Rectangle<int> & SpacePartition::getOwnedArea() const
 {
-	return _boundaries;
+	return _ownedArea;
+}
+	
+Point2D<int> SpacePartition::getRealPosition( const Point2D<int> & globalPosition ) const
+{
+	return globalPosition-_overlapBoundaries._origin;
 }
 
+const Point2D<int> & SpacePartition::getRealSize() const
+{
+	return _overlapBoundaries._size;
+}
+
+Point2D<int> SpacePartition::getRandomPosition() const
+{
+	Engine::Point2D<int> pos(GeneralState::statistics().getUniformDistValue(0,_ownedArea._size._x-1), GeneralState::statistics().getUniformDistValue(0,_ownedArea._size._y-1));
+	pos += _ownedArea._origin;
+	return pos;
+}
 
 } // namespace Engine
 

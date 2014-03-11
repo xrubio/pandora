@@ -263,7 +263,7 @@ void World::registerDynamicRaster( const std::string & key, const bool & seriali
 		delete _rasters.at(index);
 	}
 	_rasters.at(index) = new Raster();
-	_rasters.at(index)->resize(_scheduler->getOverlapBoundaries()._size);
+	_rasters.at(index)->resize(_scheduler->getRealSize());
 	_serializeRasters.at(index) = serialize;
 }
 
@@ -292,7 +292,7 @@ void World::registerStaticRaster( const std::string & key, const bool & serializ
 		delete _rasters.at(index);
 	}
 	_rasters.at(index) = new StaticRaster();
-	_rasters.at(index)->resize(_scheduler->getOverlapBoundaries()._size);
+	_rasters.at(index)->resize(_scheduler->getRealSize());
 	
 	_dynamicRasters.at(index) = false;
 	_serializeRasters.at(index) = serialize;
@@ -303,7 +303,6 @@ bool World::checkPosition( const Point2D<int> & newPosition )
 	// checking global boundaries: if environment is a border of the real world
 	if(!_globalBoundaries.isInside(newPosition))
 	{
-		//std::cout << " not valid position: " << newPosition << std::endl;
 		return false;
 	}
 
@@ -381,8 +380,7 @@ void World::setValue( const std::string & key, const Point2D<int> & position, in
 
 void World::setValue( const int & index, const Point2D<int> & position, int value )
 {
-	Point2D<int> localPosition(position - _scheduler->getOverlapBoundaries()._origin);
-	((Raster*)_rasters.at(index))->setValue(localPosition, value);
+	((Raster*)_rasters.at(index))->setValue(_scheduler->getRealPosition(position), value);
 }
 
 int World::getValue( const std::string & key, const Point2D<int> & position ) const
@@ -393,8 +391,7 @@ int World::getValue( const std::string & key, const Point2D<int> & position ) co
 
 int World::getValue( const int & index, const Point2D<int> & position ) const
 {
-	Point2D<int> localPosition(position - _scheduler->getOverlapBoundaries()._origin);
-	return _rasters.at(index)->getValue(localPosition);
+	return _rasters.at(index)->getValue(_scheduler->getRealPosition(position));
 }
 
 void World::setMaxValue( const std::string & key, const Point2D<int> & position, int value )
@@ -405,8 +402,7 @@ void World::setMaxValue( const std::string & key, const Point2D<int> & position,
 
 void World::setMaxValue( const int & index, const Point2D<int> & position, int value )
 {
-	Point2D<int> localPosition(position - _scheduler->getOverlapBoundaries()._origin);
-	((Raster*)_rasters.at(index))->setMaxValue(localPosition, value);
+	((Raster*)_rasters.at(index))->setMaxValue(_scheduler->getRealPosition(position), value);
 }
 
 int World::getMaxValueAt( const std::string & key, const Point2D<int> & position )
@@ -419,9 +415,8 @@ int World::getMaxValueAt( const int & index, const Point2D<int> & position )
 {
 	std::stringstream logName;
 	logName << "max_value_" << getId();
-	Point2D<int> localPosition(position - _scheduler->getOverlapBoundaries()._origin);	
-	log_DEBUG(logName.str(), getWallTime() << " accessing to pos: " << position << " real: " << localPosition << " with overlap: " << _scheduler->getOverlapBoundaries() << " for index: " << index);
-	return ((Raster*)_rasters.at(index))->getMaxValueAt(localPosition);
+	log_DEBUG(logName.str(), getWallTime() << " accessing to pos: " << position << " real: " << _scheduler->getRealPosition(position) << " for index: " << index);
+	return ((Raster*)_rasters.at(index))->getMaxValueAt(_scheduler->getRealPosition(position));
 }
 
 void World::setSearchAgents( const bool & searchAgents )
@@ -454,11 +449,10 @@ Point2D<int> World::getRandomPosition()
 {
 	while(1)
 	{
-		Engine::Point2D<int> pos(GeneralState::statistics().getUniformDistValue(0,_scheduler->getBoundaries()._size._x-1), GeneralState::statistics().getUniformDistValue(0,_scheduler->getBoundaries()._size._y-1));
-		pos += _scheduler->getBoundaries()._origin;
-		if(checkPosition(pos) && _scheduler->getBoundaries().isInside(pos))
+		Point2D<int> position = _scheduler->getRandomPosition();
+		if(checkPosition(position))
 		{
-			return pos;
+			return position;
 		}
 	}
 }
@@ -484,7 +478,7 @@ const std::string & World::getRasterName( const int & index) const
 
 int World::getId() const{ return _scheduler->getId(); }
 const Rectangle<int> & World::getOverlapBoundaries() const{ return _scheduler->getOverlapBoundaries(); }
-const Rectangle<int> & World::getBoundaries() const{ return _scheduler->getBoundaries(); }
+const Rectangle<int> & World::getOwnedArea() const{ return _scheduler->getOwnedArea(); }
 const int & World::getOverlap() { return _scheduler->getOverlap(); }
 const int & World::getNumTasks() const{ return _scheduler->getNumTasks(); }
 const Point2D<int> & World::getLocalRasterSize() const{ return _scheduler->getLocalRasterSize(); }

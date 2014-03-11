@@ -557,12 +557,12 @@ void Serializer::serializeRaster( StaticRaster & raster, World & world, const st
 
 	// if it is not a border, it will copy from overlap
 	hsize_t	offset[2];
-    offset[0] = world.getBoundaries()._origin._x;
-    offset[1] = world.getBoundaries()._origin._y;
+    offset[0] = world.getOwnedArea()._origin._x;
+    offset[1] = world.getOwnedArea()._origin._y;
  
 	hsize_t	block[2];
-	block[0] = world.getBoundaries()._size._x;
-	block[1] = world.getBoundaries()._size._y;
+	block[0] = world.getOwnedArea()._size._x;
+	block[1] = world.getOwnedArea()._size._y;
 
 
 	hid_t dataSetId = H5Dopen(_fileId, datasetKey.c_str(), H5P_DEFAULT);
@@ -579,8 +579,8 @@ void Serializer::serializeRaster( StaticRaster & raster, World & world, const st
 	H5Sselect_hyperslab(fileSpace, H5S_SELECT_SET, offset, stride, count, block);
  
 	int * data = (int *) malloc(sizeof(int)*block[0]*block[1]);
-	Point2D<int> overlapDist = world.getBoundaries()._origin-world.getOverlapBoundaries()._origin;
-	log_EDEBUG(logName.str(), "overlap dist: " << overlapDist << "boundaries: " << world.getBoundaries() << " and overlap: " << world.getOverlapBoundaries());
+	Point2D<int> overlapDist = world.getOwnedArea()._origin-world.getOverlapBoundaries()._origin;
+	log_EDEBUG(logName.str(), "overlap dist: " << overlapDist << "boundaries: " << world.getOwnedArea() << " and overlap: " << world.getOverlapBoundaries());
 	for(size_t i=0; i<block[0]; i++)
 	{
 		for(size_t j=0; j<block[1]; j++)

@@ -248,7 +248,7 @@ public:
 public:
 	int getId() const;
 	const Rectangle<int> & getOverlapBoundaries() const;
-	const Rectangle<int> & getBoundaries() const;
+	const Rectangle<int> & getOwnedArea() const;
 	const int & getOverlap();
 	const int & getNumTasks() const;
 	const Point2D<int> & getLocalRasterSize() const;

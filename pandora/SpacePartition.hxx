@@ -62,7 +62,7 @@ struct MpiOverlap
   * It distributes a Pandora execution in different nodes using spatial partition
   * Each node contains the same amount of space and the agents inside
   * It is efficient for models where a homogeneous density of agents is expected around the whole world
-  * This is an implementation of the Adapter pattern, decoupling agent and position management from World class
+  * This is an implementation of the Bridge pattern, decoupling agent and position management from World class
   */
 class SpacePartition
 {
@@ -81,10 +81,8 @@ public:
 	//! map of already executed agents
 	std::map<std::string, Agent *> _executedAgentsHash;	
 
-	//! returns the Rectangle the contains the world section boundaries plus the overlap area around that boundaries
 	const Rectangle<int> & getOverlapBoundaries() const;
-	//! returns a Rectangle<int> expressing the boundaries of the world
-	const Rectangle<int> & getBoundaries() const;
+	const Rectangle<int> & getOwnedArea() const;
 
 	//! position of World inside global limits 
 	Point2D<int> _worldPos;
@@ -115,10 +113,10 @@ public:
 	
 	//! id's of neighboring computer nodes
 	std::vector<int> _neighbors;
-	//! boundaries of computer nodes, with adjacent overlaps added
+	//! boundaries of the particular world, with adjacent overlaps added
 	Rectangle<int> _overlapBoundaries;
-	//! boundaries of computer node without overlap (i.e. owned area)
-	Rectangle<int> _boundaries;
+	//! area inside boundaries owned by the computer node without overlap
+	Rectangle<int> _ownedArea;
 	//! the four sections into a world is divided
 	std::vector<Rectangle<int> > _sections;
 	
@@ -204,6 +202,10 @@ public:
 	
 	//! true if the agent is in the list of agents to remove
 	bool willBeRemoved( Agent * agent );
+	//! transform from global coordinates to real coordinates (in terms of world position)
+	Point2D<int> getRealPosition( const Point2D<int> & globalPosition ) const;
+	const Point2D<int> & getRealSize() const;
+	Point2D<int> getRandomPosition() const;
 
 };
 
