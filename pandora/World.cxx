@@ -140,9 +140,6 @@ void World::step()
 	serializeAgents();
 	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " has serialized agents");
 	
-	// TODO if we modify agents in this step, they won't be updated in other nodes!
-	stepAgents();
-	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " has executed step agents");
 	// TODO the same with raster modification?
 	stepEnvironment();
 	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " has executed step environment");
@@ -223,10 +220,6 @@ void World::stepEnvironment()
 void World::stepRaster( const int & index  )
 {
 	((Raster*)_rasters.at(index))->updateRasterIncrement();
-}
-
-void World::stepAgents()
-{
 }
 
 void World::registerDynamicRaster( const std::string & key, const bool & serialize, int index )

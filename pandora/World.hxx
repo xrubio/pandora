@@ -162,8 +162,6 @@ public:
 	void serializeAgents();
 	//! the override of this method allows to modify rasters between step executions
 	virtual void stepRaster( const int & index);
-	//! the override of this method allows to modify agents between step executions
-	virtual void stepAgents();
 
 	//! returns raster identified by parameter 'key'.
 	Raster & getDynamicRaster( const size_t & index );
