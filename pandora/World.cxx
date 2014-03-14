@@ -74,7 +74,6 @@ void World::initialize(int argc, char *argv[])
 	createAgents();		
 	
 	_scheduler->init2(_simulation, _rasters, _dynamicRasters, _serializeRasters);
-	serializeStaticRasters();
 }
 
 
@@ -105,42 +104,18 @@ void World::addAgent( Agent * agent, bool executedAgent )
 
 
 
-void World::serializeAgents()
-{
-	if(_step%_simulation.getSerializerResolution()!=0)
-	{
-		return;
-	}
-
-	AgentsList::iterator it=_agents.begin();
-	int i = 0;
-	while(it!=_agents.end())
-	{
-		if((*it)->exists())
-		{
-			_scheduler->serializeAgent((*it), _step, *this, i);
-			i++;
-		}
-		it++;
-	}
-	// serialize remaining agents
-	_scheduler->finishAgentsSerialization(_step, *this);
-}
-
 void World::step()
 {
-
 	std::stringstream logName;
 	logName << "simulation_" << getId();
 	log_INFO(logName.str(), getWallTime() << " executing step: " << _step );
 
-	// actualitzar el món (raster i agents), si s'escau
-	serializeRasters();
-	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " has serialized rasters");
-	serializeAgents();
-	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " has serialized agents");
-	
-	// TODO the same with raster modification?
+	if(_step%_simulation.getSerializerResolution()==0)
+	{
+		_scheduler->serializeRasters(_step);
+		_scheduler->serializeAgents(_step);
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " serialization done");
+	}
 	stepEnvironment();
 	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " has executed step environment");
 	_scheduler->executeAgents();
@@ -161,8 +136,11 @@ void World::run()
 		step();
 	}
 	// storing last step data
-	serializeRasters();
-	serializeAgents();
+	if(_step%_simulation.getSerializerResolution()==0)
+	{
+		_scheduler->serializeRasters(_step);
+		_scheduler->serializeAgents(_step);
+	}
 	
 	log_INFO(logName.str(), getWallTime() << " closing files");
 	_scheduler->finishExecution();
@@ -173,35 +151,6 @@ void World::run()
 int World::getCurrentStep() const
 {
 	return _step;
-}
-
-void World::serializeRasters()
-{
-	if(_step%_simulation.getSerializerResolution()!=0)
-	{
-		return;
-	}
-
-	for(size_t d=0; d<_rasters.size(); d++)
-	{
-		if(!_rasters.at(d) || !_serializeRasters.at(d) || !_dynamicRasters.at(d))
-		{
-			continue;
-		}
-		_scheduler->serializeRaster(d, (Raster&)(*_rasters.at(d)), *this, _step);
-	}
-}
-
-void World::serializeStaticRasters()
-{
-	for(size_t d=0; d<_rasters.size(); d++)
-	{
-		if(!_rasters.at(d) || !_serializeRasters.at(d) || _dynamicRasters.at(d))			
-		{
-			continue;
-		}
-		_scheduler->serializeStaticRaster(d, *_rasters.at(d), *this);
-	}
 }
 
 void World::stepEnvironment()

@@ -208,13 +208,10 @@ public:
 	//! MPI version of wall time
 	double getWallTime() const;
 
-	void serializeAgent( Agent * agent, const int & step, World & world, int index);
-	void serializeRaster( const int & index, Raster & raster, World & world, const int & step );
-	void serializeStaticRaster( const int & index, StaticRaster & raster, World & world );
-	void finishAgentsSerialization( int step, World & world);
-	
 	void addStringAttribute( const std::string & type, const std::string & key, const std::string & value );
 	void addIntAttribute( const std::string & type, const std::string & key, int value );
+	void serializeAgents( const int & step);
+	void serializeRasters( const int & step);
 
 };
 

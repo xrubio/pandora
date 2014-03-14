@@ -32,6 +32,8 @@
 #include <Logger.hxx>
 #include <GeneralState.hxx>
 
+#include <SpacePartition.hxx>
+
 namespace Engine
 {
 
@@ -43,10 +45,18 @@ Serializer::~Serializer()
 {
 }
 
-void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters, World & world )
+void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters, World & world, SpacePartition & scheduler )
 {
+	_id = scheduler.getId();
+	_numTasks = scheduler.getNumTasks();
+	_ownedArea = scheduler.getOwnedArea();
+	_boundaries = scheduler.getBoundaries();
+	_overlap = scheduler.getOverlap();
+	_numSteps = world.getSimulation().getNumSteps();
+	_serializerResolution = world.getSimulation().getSerializerResolution();
+
 	std::stringstream logName;
-	logName << "Serializer_" << world.getId();
+	logName << "Serializer_" << _id;
 	log_DEBUG(logName.str(), " init serializer");
 
 	// check if directory exists
@@ -64,7 +74,7 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 	hid_t propertyListId = H5Pcreate(H5P_FILE_ACCESS);
 
 	// workaround, it crashes in serial without this clause
-	if(world.getNumTasks()>1)		
+	if(_numTasks>1)		
 	{
 		H5Pset_fapl_mpio(propertyListId, MPI_COMM_WORLD, MPI_INFO_NULL);
 	}
@@ -103,11 +113,11 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 
 	attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	attributeId= H5Acreate(globalDatasetId, "numTasks", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
-	H5Awrite(attributeId, H5T_NATIVE_INT, &world.getNumTasks());
+	H5Awrite(attributeId, H5T_NATIVE_INT, &_numTasks);
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 
-	log_INFO(logName.str(), world.getWallTime() << " id: " << world.getId() << " size: " << simulation.getSize() << " num tasks: " << world.getNumTasks() << " serializer resolution:" << simulation.getSerializerResolution() << " and steps: " << simulation.getNumSteps());
+	log_INFO(logName.str(), scheduler.getWallTime() << " id: " << _id << " size: " << simulation.getSize() << " num tasks: " << _numTasks << " serializer resolution:" << simulation.getSerializerResolution() << " and steps: " << simulation.getNumSteps());
 
 	// we store the name of the rasters
 	hid_t rasterNameFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
@@ -223,7 +233,7 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 	{
 		oss << path << "/";
 	}
-	oss << "agents-" << world.getId() << ".abm";
+	oss << "agents-" << _id << ".abm";
 
 	_agentsFileId = H5Fcreate(oss.str().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 	/*
@@ -243,10 +253,10 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 
 	// we need to specify the size where each computer node will be writing
 	hsize_t chunkDimensions[2];
-	chunkDimensions[0] = world.getOwnedArea()._size._width/2;
-	chunkDimensions[0] += 2*world.getOverlap();
-	chunkDimensions[1] = world.getOwnedArea()._size._height/2;
-	chunkDimensions[1] += 2*world.getOverlap();
+	chunkDimensions[0] = _ownedArea._size._width/2;
+	chunkDimensions[0] += 2*_overlap;
+	chunkDimensions[1] = _ownedArea._size._height/2;
+	chunkDimensions[1] += 2*_overlap;
 	
 	propertyListId = H5Pcreate(H5P_DATASET_CREATE);
 	H5Pset_chunk(propertyListId, 2, chunkDimensions);
@@ -292,6 +302,25 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 		H5Gclose(rasterGroupId);
 	}
 	H5Pclose(propertyListId);
+
+	StaticRastersRefMap staticRasters;
+	for(size_t i=0; i<rasters.size(); i++)
+	{
+		if(!rasters.at(i) || !serializeRasters.at(i))
+		{
+			continue;
+		}
+
+		if(!dynamicRasters.at(i))
+		{
+			staticRasters.insert(std::make_pair(world.getRasterName(i), rasters.at(i)));
+		}
+		else
+		{
+			_dynamicRasters.insert(std::make_pair(world.getRasterName(i), rasters.at(i)));
+		}
+	}
+	serializeStaticRasters(staticRasters);
 }
 
 void Serializer::finish()
@@ -300,12 +329,12 @@ void Serializer::finish()
 	H5Fclose(_agentsFileId);
 }
 
-void Serializer::registerType( Agent * agent, World & world  )
+void Serializer::registerType( Agent * agent )
 {
 	std::string type = agent->getType();
 
 	std::stringstream logName;
-	logName << "Serializer_" << world.getId();
+	logName << "Serializer_" << _id;
 
 	log_DEBUG(logName.str(), "registering new type: " << type);
 
@@ -323,9 +352,9 @@ void Serializer::registerType( Agent * agent, World & world  )
 	StringMap * newTypeStringMap = new StringMap;
 
 	// create a dataset for each timestep
-	for(int i=0; i<=world.getSimulation().getNumSteps(); i++)
+	for(int i=0; i<=_numSteps; i++)
 	{
-		if(i%world.getSimulation().getSerializerResolution()!=0)
+		if(i%_serializerResolution!=0)
 		{
 			continue;
 		}
@@ -368,16 +397,16 @@ void Serializer::resetCurrentIndexs()
 	}
 }
 
-void Serializer::finishAgentsSerialization( int step, World & world)
+void Serializer::finishAgentsSerialization( int step)
 {
 	for(StringAttributesMap::iterator it=_stringAttributes.begin(); it!=_stringAttributes.end(); it++)
 	{
-		executeAgentSerialization(it->first, step, world );
+		executeAgentSerialization(it->first, step);
 	}
 	resetCurrentIndexs();
 }
 	
-void Serializer::executeAgentSerialization( const std::string & type, int step, World & world)	
+void Serializer::executeAgentSerialization( const std::string & type, int step)	
 {
 	std::map<std::string, int>::iterator itI = _agentIndexMap.find(type);
 
@@ -496,14 +525,30 @@ int Serializer::getDataSize( const std::string & type )
 	return itS->second->size();
 }
 
-void Serializer::serializeAgent( Agent * agent, const int & step, World & world, int index )
+void Serializer::serializeAgents( const int & step, const AgentsList::const_iterator beginAgents, const AgentsList::const_iterator endAgents )
+{
+	int i=0;
+	for(AgentsList::const_iterator it=beginAgents; it!=endAgents; it++)
+	{
+		if(!(*it)->exists())
+		{
+			continue;
+		}
+		serializeAgent((*it), step, i);
+		i++;
+	}
+	// serialize remaining agents
+	finishAgentsSerialization(step);
+}
+
+void Serializer::serializeAgent( Agent * agent, const int & step, int index )
 {
 	std::string type = agent->getType();
 	// new type, must be in _stringAttributes because at least id attribute must exist
 	if(_stringAttributes.find(type)==_stringAttributes.end())
 	{
 		agent->registerAttributes();
-		registerType(agent, world);
+		registerType(agent);
 	}
 
 	addStringAttribute(type, "id", agent->getId());
@@ -513,7 +558,7 @@ void Serializer::serializeAgent( Agent * agent, const int & step, World & world,
 
 	if(getDataSize(type)>=20000)
 	{
-		executeAgentSerialization(type, step, world);
+		executeAgentSerialization(type, step);
 	}
 }
 
@@ -535,34 +580,20 @@ void Serializer::serializeAttribute( const std::string & name, const int & value
 	H5Sclose(fileSpace);
 }
 
-void Serializer::serializeRaster( const int & index, Raster & raster, World & world, const int & step )
-{
-	std::ostringstream oss;
-	oss << "/" << world.getRasterName(index) << "/step" << step;
-	serializeRaster(raster,world, oss.str());
-}
-
-void Serializer::serializeStaticRaster( const int & index, StaticRaster & raster, World & world )
-{
-	std::ostringstream oss;
-	oss << "/" << world.getRasterName(index) << "/values";
-	serializeRaster(raster, world, oss.str());
-}
-
-void Serializer::serializeRaster( StaticRaster & raster, World & world, const std::string & datasetKey )
+void Serializer::serializeRaster( const StaticRaster & raster, const std::string & datasetKey )
 {
 	std::stringstream logName;
-	logName << "MPI_Serializer_world_" << world.getId();
+	logName << "MPI_Serializer_world_" << _id;
 	log_EDEBUG(logName.str(), "serializing raster: " << datasetKey);
 
 	// if it is not a border, it will copy from overlap
 	hsize_t	offset[2];
-    offset[0] = world.getOwnedArea()._origin._x;
-    offset[1] = world.getOwnedArea()._origin._y;
+    offset[0] = _ownedArea._origin._x;	
+    offset[1] = _ownedArea._origin._y;
  
 	hsize_t	block[2];
-	block[0] = world.getOwnedArea()._size._width;
-	block[1] = world.getOwnedArea()._size._height;
+	block[0] = _ownedArea._size._width;
+	block[1] = _ownedArea._size._height;
 
 
 	hid_t dataSetId = H5Dopen(_fileId, datasetKey.c_str(), H5P_DEFAULT);
@@ -579,8 +610,8 @@ void Serializer::serializeRaster( StaticRaster & raster, World & world, const st
 	H5Sselect_hyperslab(fileSpace, H5S_SELECT_SET, offset, stride, count, block);
  
 	int * data = (int *) malloc(sizeof(int)*block[0]*block[1]);
-	Point2D<int> overlapDist = world.getOwnedArea()._origin-world.getBoundaries()._origin;
-	log_EDEBUG(logName.str(), "overlap dist: " << overlapDist << "owned area: " << world.getOwnedArea() << " and boundaries: " << world.getBoundaries());
+	Point2D<int> overlapDist = _ownedArea._origin-_boundaries._origin;
+	log_EDEBUG(logName.str(), "overlap dist: " << overlapDist << "owned area: " << _ownedArea << " and boundaries: " << _boundaries);
 	for(size_t i=0; i<block[0]; i++)
 	{
 		for(size_t j=0; j<block[1]; j++)
@@ -605,6 +636,28 @@ void Serializer::serializeRaster( StaticRaster & raster, World & world, const st
 	H5Dclose(dataSetId);
 	log_EDEBUG(logName.str(), "serializing raster: " << datasetKey << " done");
 }
+
+void Serializer::serializeRasters(int step)
+{
+	for(StaticRastersRefMap::const_iterator it=_dynamicRasters.begin(); it!=_dynamicRasters.end(); it++)
+	{
+		std::ostringstream oss;
+		oss << "/" << it->first << "/step" << step;
+		serializeRaster(*it->second, oss.str());
+	}
+}
+
+void Serializer::serializeStaticRasters( const StaticRastersRefMap & staticRasters)
+{
+	for(StaticRastersRefMap::const_iterator it=staticRasters.begin(); it!=staticRasters.end(); it++)
+	{
+		std::ostringstream oss;
+		oss << "/" << it->first << "/values";
+		serializeRaster(*it->second, oss.str());
+	}
+}
+
+
 	
 } // namespace Engine
 

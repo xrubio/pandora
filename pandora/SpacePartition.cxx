@@ -56,7 +56,7 @@ void SpacePartition::init( int argc, char *argv[] )
 void SpacePartition::init2( Simulation & simulation, std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters )
 {
 	// serializer init
-	_serializer.init( simulation, rasters, dynamicRasters, serializeRasters, _world);
+	_serializer.init( simulation, rasters, dynamicRasters, serializeRasters, _world, *this);
 
 	// mpi type registering
 	MpiFactory::instance()->registerTypes();
@@ -154,7 +154,7 @@ void SpacePartition::stepSection( const int & sectionIndex )
 	std::stringstream logName;
 	logName << "simulation_" << _id;
 
-	log_DEBUG(logName.str(), getWallTime() << " beginning step: " << _step << " section: " << sectionIndex);
+	log_DEBUG(logName.str(), getWallTime() << " beginning step: " << _world.getCurrentStep() << " section: " << sectionIndex);
 
 	AgentsList::iterator it = _world.beginAgents();
 	std::vector<Agent*> agentsToExecute;
@@ -188,10 +188,10 @@ void SpacePartition::stepSection( const int & sectionIndex )
 	for(size_t i=0; i<agentsToExecute.size(); i++)
 	{
 		Agent * agent = agentsToExecute.at(i);
-		log_DEBUG(logName.str(), getWallTime() << " agent: " << agent << " being executed at index: " << sectionIndex << " of task: "<< _id << " in step: " << _step );
+		log_DEBUG(logName.str(), getWallTime() << " agent: " << agent << " being executed at index: " << sectionIndex << " of task: "<< _id << " in step: " << _world.getCurrentStep() );
 		agent->executeActions();
 		agent->updateState();
-		log_DEBUG(logName.str(), getWallTime() << " agent: " << agent << " has been executed at index: " << sectionIndex << " of task: "<< _id << " in step: " << _step );
+		log_DEBUG(logName.str(), getWallTime() << " agent: " << agent << " has been executed at index: " << sectionIndex << " of task: "<< _id << " in step: " << _world.getCurrentStep() );
 
 		if(!_ownedArea.contains(agent->getPosition()) && !willBeRemoved(agent))
 		{
@@ -213,11 +213,11 @@ void SpacePartition::stepSection( const int & sectionIndex )
 		numExecutedAgents++;
 		log_DEBUG(logName.str(), getWallTime()  << " num executed agents: " << numExecutedAgents );
 	}
-	log_DEBUG(logName.str(), getWallTime()  << " sending agents in section: " << sectionIndex << " and step: " << _step);
+	log_DEBUG(logName.str(), getWallTime()  << " sending agents in section: " << sectionIndex << " and step: " << _world.getCurrentStep());
 	sendAgents(agentsToSend);
-	log_DEBUG(logName.str(), getWallTime() << " has finished section: " << sectionIndex << " and step: " << _step);
+	log_DEBUG(logName.str(), getWallTime() << " has finished section: " << sectionIndex << " and step: " << _world.getCurrentStep());
 	
-	log_DEBUG(logName.str(), getWallTime() << " executed step: " << _step << " section: " << sectionIndex << " in zone: " << _sections[sectionIndex] << " with num executed agents: " << numExecutedAgents << " total agents: " << _agents.size() << " and overlap agents: " << _overlapAgents.size());
+	log_DEBUG(logName.str(), getWallTime() << " executed step: " << _world.getCurrentStep() << " section: " << sectionIndex << " in zone: " << _sections[sectionIndex] << " with num executed agents: " << numExecutedAgents << " total agents: " << std::distance(_world.beginAgents(), _world.endAgents()) << " and overlap agents: " << _overlapAgents.size());
 }
 
 void SpacePartition::sendAgents( AgentsList & agentsToSend )
@@ -228,12 +228,12 @@ void SpacePartition::sendAgents( AgentsList & agentsToSend )
 	}
 	std::stringstream logName;
 	logName << "MPI_agents_world_" << _id;
-	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sendAgent: " << agentsToSend.size() << " agents");
+	log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " sendAgent: " << agentsToSend.size() << " agents");
 
 	// for each neighbor, we send the number of agents to send
 	for(MpiFactory::TypesMap::iterator itType=MpiFactory::instance()->beginTypes(); itType!=MpiFactory::instance()->endTypes(); itType++)
 	{
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sendAgent - checking mpi type: " << itType->first );
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " sendAgent - checking mpi type: " << itType->first );
 		// add each agent to the list of the neighbour where it will be sent
 		std::vector< AgentsList > agentsToNeighbors;
 		agentsToNeighbors.resize(_neighbors.size());
@@ -253,7 +253,7 @@ void SpacePartition::sendAgents( AgentsList & agentsToSend )
 		for(size_t i=0; i<_neighbors.size(); i++)
 		{	
 			int numAgents = agentsToNeighbors[i].size();
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sendAgent - sending num agents: " << numAgents << " to: " << _neighbors[i]);
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " sendAgent - sending num agents: " << numAgents << " to: " << _neighbors[i]);
 			int error = MPI_Send(&numAgents, 1, MPI_INTEGER, _neighbors[i], eNumAgents, MPI_COMM_WORLD);
 			if(error != MPI_SUCCESS)
 			{
@@ -266,7 +266,7 @@ void SpacePartition::sendAgents( AgentsList & agentsToSend )
 			{
 				Agent * agent = *it;
 				void * package = agent->fillPackage();
-				log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sendAgent - sending agent: " << *it << " to: " << _neighbors[i] );
+				log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " sendAgent - sending agent: " << *it << " to: " << _neighbors[i] );
 				error = MPI_Send(package, 1, *agentType, _neighbors[i], eAgent, MPI_COMM_WORLD);
 				delete package;
 				if(error != MPI_SUCCESS)
@@ -281,14 +281,14 @@ void SpacePartition::sendAgents( AgentsList & agentsToSend )
 			}
 		}
 	}
-	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sendAgent -  end checking agents to send: " << agentsToSend.size());
+	log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " sendAgent -  end checking agents to send: " << agentsToSend.size());
 }
 
 void SpacePartition::sendOverlapZones( const int & sectionIndex, const bool & entireOverlap )
 {
 	std::stringstream logName;
 	logName << "MPI_raster_world_" << _id;
-	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " sendOverlapZones");
+	log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << "/" << sectionIndex << " sendOverlapZones");
 	std::vector<int> neighborsToUpdate;
 	
 	for(size_t i=0; i<_neighbors.size(); i++)
@@ -303,47 +303,47 @@ void SpacePartition::sendOverlapZones( const int & sectionIndex, const bool & en
 	{
 		if(!_world.getStaticRasterIndex(d) || !_world.getDynamicRasterIndex(d))
 		{
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " index: " << d << " not sending");
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " index: " << d << " not sending");
 			continue;
 		}
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " sending raster: " << d);
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << "/" << sectionIndex << " sending raster: " << d);
 		for(size_t i=0; i<neighborsToUpdate.size(); i++)
 		{
 			MpiOverlap * send = new MpiOverlap;
 			if(entireOverlap)
 			{
 				send->_overlap= getOverlap(neighborsToUpdate[i], sectionIndex);
-				log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " send entire overlap: " << send->_overlap << " to: " << neighborsToUpdate[i]);
+				log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << "/" << sectionIndex << " send entire overlap: " << send->_overlap << " to: " << neighborsToUpdate[i]);
 			}
 			else
 			{
 				send->_overlap = getInternalOverlap(neighborsToUpdate[i]);
-				log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " send partial overlap: " << send->_overlap << " to: " << neighborsToUpdate[i]);
+				log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << "/" << sectionIndex << " send partial overlap: " << send->_overlap << " to: " << neighborsToUpdate[i]);
 			}
 			const Rectangle<int> & overlapZone = send->_overlap;
 			send->_data.resize(overlapZone._size._width * overlapZone._size._height);
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " will send overlap to: " << neighborsToUpdate[i] << " with size: " << send->_data.size() << " and zone: " << overlapZone);
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << "/" << sectionIndex << " will send overlap to: " << neighborsToUpdate[i] << " with size: " << send->_data.size() << " and zone: " << overlapZone);
 			for(size_t n=0; n<send->_data.size(); n++)
 			{
 				Point2D<int> index(overlapZone._origin._x+n%overlapZone._size._width, overlapZone._origin._y+n/overlapZone._size._width);
 				send->_data.at(n) = _world.getDynamicRaster(d).getValue(index);
-				log_EDEBUG(logName.str(), "\t" << getWallTime() << " step: " << _step << "/" << sectionIndex << " send index: " << index << " in global pos: " << index+_boundaries._origin << " value: " << send->_data.at(n));
+				log_EDEBUG(logName.str(), "\t" << getWallTime() << " step: " << _world.getCurrentStep() << "/" << sectionIndex << " send index: " << index << " in global pos: " << index+_boundaries._origin << " value: " << send->_data.at(n));
 			}
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " raster: " << d << " will be sent");
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " raster: " << d << " will be sent");
 			MPI_Isend(&send->_data[0], send->_data.size(), MPI_INTEGER, neighborsToUpdate[i], eRasterData, MPI_COMM_WORLD, &send->_request);
 			_sendRequests.push_back(send);
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " raster: " << d << " data sent to: " << _neighbors[i]);
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " raster: " << d << " data sent to: " << _neighbors[i]);
 		}
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " raster: " << d << " sent");
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << "/" << sectionIndex << " raster: " << d << " sent");
 	}
-	log_DEBUG(logName.str(), getWallTime() << " step: "  << "/" << sectionIndex << _step << " sendOverlapZones ended");
+	log_DEBUG(logName.str(), getWallTime() << " step: "  << "/" << sectionIndex << _world.getCurrentStep() << " sendOverlapZones ended");
 }
 
 void SpacePartition::sendMaxOverlapZones()
 {
 	std::stringstream logName;
 	logName << "MPI_raster_world_" << _id;
-	log_DEBUG(logName.str(), getWallTime() << " step: "  << _step << " sendMaxOverlapZones");
+	log_DEBUG(logName.str(), getWallTime() << " step: "  << _world.getCurrentStep() << " sendMaxOverlapZones");
 	for(size_t d=0; d<_world.getNumberOfRasters(); d++)
 	{
 		if(!_world.getStaticRasterIndex(d) || !_world.getDynamicRasterIndex(d))
@@ -351,34 +351,34 @@ void SpacePartition::sendMaxOverlapZones()
 			continue;
 		}
 
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sending max raster: " << d);
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " sending max raster: " << d);
 		for(size_t i=0; i<_neighbors.size(); i++)
 		{
 			MpiOverlap * send = new MpiOverlap;
 			send->_overlap = getInternalOverlap(_neighbors[i]);
 			send->_data.resize(send->_overlap._size._width * send->_overlap._size._height);
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " will send max overlap of: " << d << " to: " << _neighbors[i] << " with size: " << send->_data.size() << " and zone: " << send->_overlap << " to " << _neighbors[i]);
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " will send max overlap of: " << d << " to: " << _neighbors[i] << " with size: " << send->_data.size() << " and zone: " << send->_overlap << " to " << _neighbors[i]);
 			const Rectangle<int> & overlapZone = send->_overlap;
 			for(size_t n=0; n<send->_data.size(); n++)
 			{
 				Point2D<int> index(overlapZone._origin._x+n%overlapZone._size._width, overlapZone._origin._y+n/overlapZone._size._width);
 				send->_data.at(n) = _world.getDynamicRaster(d).getMaxValueAt(index);
-				log_EDEBUG(logName.str(), "\t" << getWallTime() << " step: " << _step << " send index: " << index << " in global pos: " << index+_boundaries._origin << " max value: " << send->_data.at(n));
+				log_EDEBUG(logName.str(), "\t" << getWallTime() << " step: " << _world.getCurrentStep() << " send index: " << index << " in global pos: " << index+_boundaries._origin << " max value: " << send->_data.at(n));
 			}
 			MPI_Isend(&send->_data[0], send->_data.size(), MPI_INTEGER, _neighbors[i], eRasterMaxData, MPI_COMM_WORLD, &send->_request);
 			_sendRequests.push_back(send);
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " raster: " << d << " max data sent to: " << _neighbors[i]);
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " raster: " << d << " max data sent to: " << _neighbors[i]);
 		}
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " raster: " << d << " max data sent");
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " raster: " << d << " max data sent");
 	}
-	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sendMaxOverlapZones ended");
+	log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " sendMaxOverlapZones ended");
 }
 
 void SpacePartition::sendGhostAgents( const int & sectionIndex )
 {
 	std::stringstream logName;
 	logName << "MPI_agents_world_" << _id;
-	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " send ghost agents for section index: " << sectionIndex );
+	log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " send ghost agents for section index: " << sectionIndex );
 
 	std::vector<int> neighborsToUpdate;
 	for(size_t i=0; i<_neighbors.size(); i++)
@@ -386,14 +386,14 @@ void SpacePartition::sendGhostAgents( const int & sectionIndex )
 		if(needsToBeUpdated(_neighbors[i], sectionIndex))
 		{
 			neighborsToUpdate.push_back(_neighbors[i]);
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " section index: " << sectionIndex << " will send overlap to: " << _neighbors[i]);
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " section index: " << sectionIndex << " will send overlap to: " << _neighbors[i]);
 		}
 	}
 
 	// for each type of agent we will send the collection of agents of the particular type to neighbors
 	for(MpiFactory::TypesMap::iterator itType=MpiFactory::instance()->beginTypes(); itType!=MpiFactory::instance()->endTypes(); itType++)
 	{
-		log_DEBUG(logName.str(),  getWallTime() << " step: " << _step << " section index: " << sectionIndex << " checking type: " << itType->first );
+		log_DEBUG(logName.str(),  getWallTime() << " step: " << _world.getCurrentStep() << " section index: " << sectionIndex << " checking type: " << itType->first );
 		MPI_Datatype * agentType = itType->second;
 
 		std::vector< AgentsList > agentsToNeighbors;
@@ -407,13 +407,13 @@ void SpacePartition::sendGhostAgents( const int & sectionIndex )
 				Agent * agent = *it;
 				// we check the type. TODO register the type in another string
 				// TODO refactor!!!
-				log_DEBUG(logName.str(),  getWallTime() << " step: " << _step << " agent: " << agent << " of type: " << itType->first << " test will be removed: " << willBeRemoved(agent) << " checking overlap zone: " << overlapZone << " overlap boundaries: " << _boundaries << " - test is inside zone: " << overlapZone.contains(agent->getPosition()-_boundaries._origin));
+				log_DEBUG(logName.str(),  getWallTime() << " step: " << _world.getCurrentStep() << " agent: " << agent << " of type: " << itType->first << " test will be removed: " << willBeRemoved(agent) << " checking overlap zone: " << overlapZone << " overlap boundaries: " << _boundaries << " - test is inside zone: " << overlapZone.contains(agent->getPosition()-_boundaries._origin));
 				if(agent->isType(itType->first))
 				{
 					if((!willBeRemoved(agent)) && (overlapZone.contains(agent->getPosition()-_boundaries._origin)))
 					{
 						agentsToNeighbors[i].push_back(*it);
-						log_DEBUG(logName.str(),  getWallTime() << " step: " << _step << " sending ghost agent: " << agent << " to: " << neighborsToUpdate[i] << " in section index: " << sectionIndex);
+						log_DEBUG(logName.str(),  getWallTime() << " step: " << _world.getCurrentStep() << " sending ghost agent: " << agent << " to: " << neighborsToUpdate[i] << " in section index: " << sectionIndex);
 					}
 				}
 			}
@@ -425,13 +425,13 @@ void SpacePartition::sendGhostAgents( const int & sectionIndex )
 					if((!willBeRemoved(agent)) && (overlapZone.contains(agent->getPosition()-_boundaries._origin)))
 					{
 						agentsToNeighbors[i].push_back(*it);
-						log_DEBUG(logName.str(),  getWallTime() << " step: " << _step << " will send modified ghost agent: " << agent << " to: " << neighborsToUpdate[i] << " in section index: " << sectionIndex << " and step: " << _step);
+						log_DEBUG(logName.str(),  getWallTime() << " step: " << _world.getCurrentStep() << " will send modified ghost agent: " << agent << " to: " << neighborsToUpdate[i] << " in section index: " << sectionIndex << " and step: " << _world.getCurrentStep());
 					}
 				}
 			}
 
 			size_t numAgents = agentsToNeighbors[i].size();
-			log_DEBUG(logName.str(),  getWallTime() << " step: " << _step << " sending num ghost agents: " << numAgents << " to : " << neighborsToUpdate[i] << " in step: " << _step << " and section index: " << sectionIndex );
+			log_DEBUG(logName.str(),  getWallTime() << " step: " << _world.getCurrentStep() << " sending num ghost agents: " << numAgents << " to : " << neighborsToUpdate[i] << " in step: " << _world.getCurrentStep() << " and section index: " << sectionIndex );
 			int error = MPI_Send(&numAgents, 1, MPI_INTEGER, neighborsToUpdate[i], eNumGhostAgents, MPI_COMM_WORLD);
 			if(error != MPI_SUCCESS)
 			{
@@ -443,7 +443,7 @@ void SpacePartition::sendGhostAgents( const int & sectionIndex )
 			{
 				Agent * agent = *it;
 				void * package = agent->fillPackage();
-				log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " sending ghost agent: " << *it << " from: " << _id << " to: " << neighborsToUpdate[i]);
+				log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " sending ghost agent: " << *it << " from: " << _id << " to: " << neighborsToUpdate[i]);
 				error = MPI_Send(package, 1, *agentType, neighborsToUpdate[i], eGhostAgent, MPI_COMM_WORLD);
 				delete package;
 				if(error != MPI_SUCCESS)
@@ -456,14 +456,14 @@ void SpacePartition::sendGhostAgents( const int & sectionIndex )
 			}
 		}
 	}
-	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " send ghost agents for section index: " << sectionIndex << " finished");
+	log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " send ghost agents for section index: " << sectionIndex << " finished");
 }
 
 void SpacePartition::receiveGhostAgents( const int & sectionIndex )
 {
 	std::stringstream logName;
 	logName << "MPI_agents_world_" << _id;
-	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " receive ghost agents for section index: " << sectionIndex );
+	log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " receive ghost agents for section index: " << sectionIndex );
 
 
 	// we need to calculate how many neighbors will send data to this id
@@ -494,7 +494,7 @@ void SpacePartition::receiveGhostAgents( const int & sectionIndex )
 				oss << "SpacePartition::receiveGhostAgents - " << _id << " error in MPI_Recv: " << error;
 				throw Exception(oss.str());
 			}
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " has received message from " << neighborsToUpdate[i] << ", num ghost agents: " << numAgentsToReceive );
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " has received message from " << neighborsToUpdate[i] << ", num ghost agents: " << numAgentsToReceive );
 			for(size_t j=0; j<numAgentsToReceive; j++)
 			{
 				void * package = MpiFactory::instance()->createDefaultPackage(itType->first);
@@ -506,7 +506,7 @@ void SpacePartition::receiveGhostAgents( const int & sectionIndex )
 					throw Exception(oss.str());
 				}
 				Agent * agent = MpiFactory::instance()->createAndFillAgent(itType->first, package);
-				log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " has received ghost agent: " << agent << " number: " << j << " from: " << neighborsToUpdate[i] << " in section index: " << sectionIndex << " and step: " << _step );
+				log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " has received ghost agent: " << agent << " number: " << j << " from: " << neighborsToUpdate[i] << " in section index: " << sectionIndex << " and step: " << _world.getCurrentStep() );
 				delete package;
 				agent->receiveVectorAttributes(neighborsToUpdate[i]);
 
@@ -515,7 +515,7 @@ void SpacePartition::receiveGhostAgents( const int & sectionIndex )
 				AgentsList::iterator it = getOwnedAgent(agent->getId());
 				if(it!=_world.endAgents())
 				{
-					log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " has received update of own agent: " << *it << " in step: " << _step );
+					log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " has received update of own agent: " << *it << " in step: " << _world.getCurrentStep() );
 					_world.eraseAgent(it);
 					_world.addAgent(agent, false);
 					worldOwnsAgent = true;
@@ -525,7 +525,7 @@ void SpacePartition::receiveGhostAgents( const int & sectionIndex )
 					newGhostAgents.push_back(agent);
 				}
 			}
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " num ghost agents sent for neighbor: " << neighborsToUpdate[i] << " in section index: " << sectionIndex << ": " << newGhostAgents.size());
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " num ghost agents sent for neighbor: " << neighborsToUpdate[i] << " in section index: " << sectionIndex << ": " << newGhostAgents.size());
 			// if the agent is in the zone to be updated, remove it
 			Rectangle<int> overlapZone = getOverlap(neighborsToUpdate[i], sectionIndex);
 			AgentsList::iterator it=_overlapAgents.begin();
@@ -537,12 +537,12 @@ void SpacePartition::receiveGhostAgents( const int & sectionIndex )
 					// si l'agent no està en zona que s'ha d'actualitzar, continuar
 					if(overlapZone.contains((*it)->getPosition()-_boundaries._origin))
 					{
-						log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " in section index: " << sectionIndex << " with overlap zone: " << overlapZone << " erasing agent: " << *it);
+						log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " in section index: " << sectionIndex << " with overlap zone: " << overlapZone << " erasing agent: " << *it);
 						it = _overlapAgents.erase(it);
 					}
 					else
 					{
-						log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " in section index: " << sectionIndex <<  " with overlap zone: " << overlapZone << " maintaining agent: " << *it );
+						log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " in section index: " << sectionIndex <<  " with overlap zone: " << overlapZone << " maintaining agent: " << *it );
 						it++;
 					}
 				}
@@ -554,12 +554,12 @@ void SpacePartition::receiveGhostAgents( const int & sectionIndex )
 			// afterwards we will add the new ghost agents
 			for(it=newGhostAgents.begin(); it!=newGhostAgents.end(); it++)
 			{
-				log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " in section index: " << sectionIndex << " adding ghost agent: " << *it );
+				log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " in section index: " << sectionIndex << " adding ghost agent: " << *it );
 				_overlapAgents.push_back(*it);
 			}
 		}
 	}
-	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " receive ghost agents for section index: " << sectionIndex << " finished");
+	log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " receive ghost agents for section index: " << sectionIndex << " finished");
 
 }
 
@@ -567,15 +567,15 @@ void SpacePartition::receiveAgents( const int & sectionIndex )
 {
 	std::stringstream logName;
 	logName << "MPI_agents_world_" << _id;
-	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " receiving agents for section index: " << sectionIndex);
+	log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " receiving agents for section index: " << sectionIndex);
 	for(MpiFactory::TypesMap::iterator itType=MpiFactory::instance()->beginTypes(); itType!=MpiFactory::instance()->endTypes(); itType++)
 	{
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " receiveAgent - checking mpi type: " << itType->first);
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " receiveAgent - checking mpi type: " << itType->first);
 		MPI_Datatype * agentType = itType->second;
 
 		for(size_t i=0; i<_neighbors.size(); i++)
 		{
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " receiveAgent - checking mpi type: " << itType->first << " for neighbor: " << _neighbors[i] );
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " receiveAgent - checking mpi type: " << itType->first << " for neighbor: " << _neighbors[i] );
 
 			size_t numAgentsToReceive;
 			MPI_Status status;
@@ -598,7 +598,7 @@ void SpacePartition::receiveAgents( const int & sectionIndex )
 					throw Exception(oss.str());
 				}
 				Agent * agent = MpiFactory::instance()->createAndFillAgent(itType->first, package);
-				log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " receiveAgents - received agent: " << agent << " number: " << j << " from: " << _neighbors[i]);
+				log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " receiveAgents - received agent: " << agent << " number: " << j << " from: " << _neighbors[i]);
 				delete package;
 				agent->receiveVectorAttributes(_neighbors[i]);
 				_world.addAgent(agent, true);
@@ -611,7 +611,7 @@ void SpacePartition::receiveOverlapData( const int & sectionIndex, const bool & 
 {
 	std::stringstream logName;
 	logName << "MPI_raster_world_" << _id;
-	log_DEBUG(logName.str(), getWallTime() << " step: "  << "/" << sectionIndex << _step << " receiveOverlapData");
+	log_DEBUG(logName.str(), getWallTime() << " step: "  << "/" << sectionIndex << _world.getCurrentStep() << " receiveOverlapData");
 
 	// we need to calculate how many neighbors will send data to this id
 	std::vector<int> neighborsToUpdate;
@@ -631,7 +631,7 @@ void SpacePartition::receiveOverlapData( const int & sectionIndex, const bool & 
 			continue;
 		}
 		
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " receiving raster: " << d);
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << "/" << sectionIndex << " receiving raster: " << d);
 		for(size_t i=0; i<neighborsToUpdate.size(); i++)
 		{
 			MpiOverlap* receive = new MpiOverlap;
@@ -640,29 +640,29 @@ void SpacePartition::receiveOverlapData( const int & sectionIndex, const bool & 
 			if(entireOverlap)
 			{
 				receive->_overlap = getOverlap(neighborsToUpdate[i], sectionIndex);
-				log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " receive entire overlap: " << receive->_overlap << " from " << neighborsToUpdate[i]);
+				log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << "/" << sectionIndex << " receive entire overlap: " << receive->_overlap << " from " << neighborsToUpdate[i]);
 			}
 			else
 			{
 				receive->_overlap = getExternalOverlap(neighborsToUpdate[i]);
-				log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " receive external overlap: " << receive->_overlap << " from " << neighborsToUpdate[i]);
+				log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << "/" << sectionIndex << " receive external overlap: " << receive->_overlap << " from " << neighborsToUpdate[i]);
 			}
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " AAA will receive overlap from: " << neighborsToUpdate[i] << " with size: " << receive->_data.size() << " and zone: " << receive->_overlap );
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << "/" << sectionIndex << " AAA will receive overlap from: " << neighborsToUpdate[i] << " with size: " << receive->_data.size() << " and zone: " << receive->_overlap );
 			receive->_data.resize(receive->_overlap._size._width*receive->_overlap._size._height);
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " will receive overlap from: " << neighborsToUpdate[i] << " with size: " << receive->_data.size() << " and zone: " << receive->_overlap );
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << "/" << sectionIndex << " will receive overlap from: " << neighborsToUpdate[i] << " with size: " << receive->_data.size() << " and zone: " << receive->_overlap );
 			MPI_Irecv(&receive->_data[0], receive->_data.size(), MPI_INTEGER, neighborsToUpdate[i], eRasterData, MPI_COMM_WORLD, &receive->_request);
 			_receiveRequests.push_back(receive);
 		}
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " raster: " << d << " received");
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << "/" << sectionIndex << " raster: " << d << " received");
 	}
-	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << "/" << sectionIndex << " receiveOverlapData ended");
+	log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << "/" << sectionIndex << " receiveOverlapData ended");
 }
 
 void SpacePartition::receiveMaxOverlapData()
 {
 	std::stringstream logName;
 	logName << "MPI_raster_world_" << _id;
-	log_DEBUG(logName.str(), getWallTime() << " step: "  << _step << " receiveMaxOverlapData");
+	log_DEBUG(logName.str(), getWallTime() << " step: "  << _world.getCurrentStep() << " receiveMaxOverlapData");
 	// for each raster, we receive data from all the active neighbors
 	for(size_t d=0; d<_world.getNumberOfRasters(); d++)
 	{
@@ -670,7 +670,7 @@ void SpacePartition::receiveMaxOverlapData()
 		{
 			continue;
 		}
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " receiving max raster: " << d);
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " receiving max raster: " << d);
 		for(size_t i=0; i<_neighbors.size(); i++)			
 		{
 			MpiOverlap* receive = new MpiOverlap;
@@ -678,13 +678,13 @@ void SpacePartition::receiveMaxOverlapData()
 			receive->_overlap = getExternalOverlap(_neighbors[i]);
 			receive->_data.resize(receive->_overlap._size._width*receive->_overlap._size._height);
 
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " will receive max overlap to: " << _neighbors[i] << " with size: " << receive->_data.size() << " and zone: " << receive->_overlap << " from " << _neighbors[i]);
+			log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " will receive max overlap to: " << _neighbors[i] << " with size: " << receive->_data.size() << " and zone: " << receive->_overlap << " from " << _neighbors[i]);
 			MPI_Irecv(&receive->_data[0], receive->_data.size(), MPI_INTEGER, _neighbors[i], eRasterMaxData, MPI_COMM_WORLD, &receive->_request);
 			_receiveRequests.push_back(receive);
 		}
-		log_DEBUG(logName.str(), getWallTime() << " step: " << _step  << " raster: " << d << " max data received");
+		log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep()  << " raster: " << d << " max data received");
 	}
-	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " receiveMaxOverlapData ended");
+	log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " receiveMaxOverlapData ended");
 }
 
 void SpacePartition::clearRequests( bool updateMaxValues )
@@ -732,12 +732,12 @@ void SpacePartition::clearRequests( bool updateMaxValues )
 					Point2D<int> index(overlapZone._origin._x+i%overlapZone._size._width, overlapZone._origin._y+i/overlapZone._size._width);
 					if(updateMaxValues)
 					{
-						log_EDEBUG(logName.str(), "\t" << getWallTime() << " step: " << _step << " receive index: " << index << " max value: " << receive->_data.at(i));
+						log_EDEBUG(logName.str(), "\t" << getWallTime() << " step: " << _world.getCurrentStep() << " receive index: " << index << " max value: " << receive->_data.at(i));
 						_world.getDynamicRaster(receive->_rasterName).setMaxValue(index, receive->_data.at(i));
 					}
 					else
 					{
-						log_EDEBUG(logName.str(), "\t" << getWallTime() << " step: " << _step << " receive index: " << index << " current value: " << receive->_data.at(i));
+						log_EDEBUG(logName.str(), "\t" << getWallTime() << " step: " << _world.getCurrentStep() << " receive index: " << index << " current value: " << receive->_data.at(i));
 						_world.getDynamicRaster(receive->_rasterName).setValue(index, receive->_data.at(i));
 					}
 				}
@@ -793,29 +793,33 @@ void SpacePartition::executeAgents()
 		sendOverlapZones(sectionIndex, false);
 		receiveOverlapData(sectionIndex, false);
 	}
-	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " has executed update overlap");
+	
+	std::stringstream logName;
+	logName << "simulation_" << getId();
+
+	log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " has executed update overlap");
 	_executedAgentsHash.clear();
 
 	std::stringstream logNameMpi;
 	logNameMpi << "simulation_" << _id;
 
-	log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " executing sections");
+	log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " executing sections");
 	for(int sectionIndex=0; sectionIndex<4; sectionIndex++)
 	{
 		stepSection(sectionIndex);
-		log_DEBUG(logNameMpi.str(), getWallTime() << " executing step: " << _step << " and section: " << sectionIndex << " has been executed");
+		log_DEBUG(logNameMpi.str(), getWallTime() << " executing step: " << _world.getCurrentStep() << " and section: " << sectionIndex << " has been executed");
 		receiveAgents(sectionIndex);
-		log_DEBUG(logNameMpi.str(), getWallTime() << " executing step: " << _step << " and section: " << sectionIndex << " has received agents");
+		log_DEBUG(logNameMpi.str(), getWallTime() << " executing step: " << _world.getCurrentStep() << " and section: " << sectionIndex << " has received agents");
 
 		sendGhostAgents(sectionIndex);
-		log_DEBUG(logNameMpi.str(), getWallTime() << " executing step: " << _step << " and section: " << sectionIndex << " sent ghosts");
+		log_DEBUG(logNameMpi.str(), getWallTime() << " executing step: " << _world.getCurrentStep() << " and section: " << sectionIndex << " sent ghosts");
 		receiveGhostAgents(sectionIndex);
-		log_DEBUG(logNameMpi.str(), getWallTime() << " executing step: " << _step << " and section: " << sectionIndex << " received ghosts");
+		log_DEBUG(logNameMpi.str(), getWallTime() << " executing step: " << _world.getCurrentStep() << " and section: " << sectionIndex << " received ghosts");
 
 		sendOverlapZones(sectionIndex);
-		log_DEBUG(logNameMpi.str(), getWallTime() << " executing step: " << _step << " and section: " << sectionIndex << " sent overlap");
+		log_DEBUG(logNameMpi.str(), getWallTime() << " executing step: " << _world.getCurrentStep() << " and section: " << sectionIndex << " sent overlap");
 		receiveOverlapData(sectionIndex);
-		log_DEBUG(logNameMpi.str(), getWallTime() << " executing step: " << _step << " and section: " << sectionIndex << " received overlap" );
+		log_DEBUG(logNameMpi.str(), getWallTime() << " executing step: " << _world.getCurrentStep() << " and section: " << sectionIndex << " received overlap" );
 		MPI_Barrier(MPI_COMM_WORLD);
 	}
 }
@@ -1576,26 +1580,6 @@ double SpacePartition::getWallTime() const
 	return MPI_Wtime() - _initialTime;
 }
 
-void SpacePartition::serializeAgent( Agent * agent, const int & step, World & world, int index)
-{
-	_serializer.serializeAgent(agent, step, world, index);
-}
-
-void SpacePartition::serializeRaster( const int & index, Raster & raster, World & world, const int & step )
-{
-	_serializer.serializeRaster(index, raster, world, step);
-}
-
-void SpacePartition::serializeStaticRaster( const int & index, StaticRaster & raster, World & world )
-{
-	_serializer.serializeStaticRaster(index, raster, world);
-}
-
-void SpacePartition::finishAgentsSerialization( int step, World & world)
-{
-	_serializer.finishAgentsSerialization(step, world);
-}
-
 void SpacePartition::addStringAttribute( const std::string & type, const std::string & key, const std::string & value )
 {
 	_serializer.addStringAttribute(type, key, value);
@@ -1606,6 +1590,15 @@ void SpacePartition::addIntAttribute( const std::string & type, const std::strin
 	_serializer.addIntAttribute(type, key, value);
 }
 
+void SpacePartition::serializeAgents( const int & step )
+{
+	_serializer.serializeAgents(step, _world.beginAgents(), _world.endAgents());
+}
+
+void SpacePartition::serializeRasters( const int & step )
+{
+	_serializer.serializeRasters(step);
+}
 
 } // namespace Engine
 
