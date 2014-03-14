@@ -154,7 +154,7 @@ public:
 	*/ 
 	void init( int argc, char *argv[] );
 	// TODO temporary second init step
-	void init2( Simulation & simulation, std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters );
+	void init2( std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters );
 
 	//! returns the id of the section that contains the point 'position' 
 	int getIdFromPosition( const Point2D<int> & position );
@@ -164,7 +164,7 @@ public:
 	int getNeighborIndex( const int & id );
 
 	//! returns the attribute _overlap
-	const int & getOverlap();
+	const int & getOverlap() const;
 
 	//! if true will call MPI_Finalize at the end of run (default behavior)
 	bool _finalize;
@@ -212,6 +212,9 @@ public:
 	void addIntAttribute( const std::string & type, const std::string & key, int value );
 	void serializeAgents( const int & step);
 	void serializeRasters( const int & step);
+
+	int getNumSteps() const;
+	int getSerializerResolution() const;
 
 };
 

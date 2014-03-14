@@ -111,7 +111,7 @@ std::ostream & operator<<( std::ostream & stream, Agent * agent )
 {
 	if(agent->getWorld())
 	{
-		return stream << "id: " << agent->getId() << " pos: " << agent->getPosition() << " exists: " << agent->exists() << " at world: " << agent->getWorld()->getId();
+		return stream << "id: " << agent->getId() << " pos: " << agent->getPosition() << " exists: " << agent->exists();
 	}
 	else
 	{
@@ -123,7 +123,7 @@ std::ostream & operator<<( std::ostream & stream, Agent & agent )
 {
 	if(agent.getWorld())
 	{
-		return stream << "id: " << agent.getId() << " pos: " << agent.getPosition() << " exists: " << agent.exists() << " at world: " << agent.getWorld()->getId();
+		return stream << "id: " << agent.getId() << " pos: " << agent.getPosition() << " exists: " << agent.exists();
 	}
 	else
 	{
@@ -158,29 +158,14 @@ std::string Agent::getType() const
 	return _id.substr(0,typePos);
 }
 
-void Agent::logAgentState()
-{
-	std::stringstream logName;
-	logName << "agents_" << _world->getId() << "_" << getId();
-	log_EDEBUG(logName.str(), "Agent: " << this << " executing in timestep: " << getWorld()->getCurrentTimeStep());
-}
-
 void Agent::executeActions()
 {
-	std::stringstream logName;
-	logName << "agents_" << _world->getId() << "_" << getId();
-
 	std::list<Action *>::iterator it = _actions.begin();
 	unsigned i = 0;
 	while(it!=_actions.end())
 	{
 		Action * nextAction = *it;
-		//_spentTime += nextAction->getTimeNeeded();
-		//if(_spentTime<=_availableTime)
-		//{
 		nextAction->execute((Agent&)(*this));
-		log_EDEBUG(logName.str(), "\tagent.action[" << i << "]=" << nextAction->describe());
-		//}
 		it = _actions.erase(it);
 		delete nextAction;
 		i++;

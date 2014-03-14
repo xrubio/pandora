@@ -51,11 +51,8 @@ class Serializer
 	typedef std::map< std::string, IntMap * > IntAttributesMap;
 	typedef std::map< std::string, StringMap * > StringAttributesMap;
 
-	int _id;
-	int _numTasks;
-	int _overlap;
-	Rectangle<int> _boundaries;
-	Rectangle<int> _ownedArea;
+	const Simulation & _simulation;
+	const SpacePartition & _scheduler;
 	int _numSteps;
 	int _serializerResolution;
 
@@ -86,10 +83,10 @@ class Serializer
 	void finishAgentsSerialization( int step);
 
 public:
-	Serializer();
+	Serializer( const Simulation & simulation, const SpacePartition & scheduler, const std::string & resultsFile );
 	virtual ~Serializer();
 
-	void init( Simulation & simulation, std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters, World & world, SpacePartition & scheduler );
+	void init( std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters, World & world );
 	void finish();
 
 	void serializeAttribute( const std::string & name, const int & value );
@@ -97,8 +94,6 @@ public:
 	
 	void addStringAttribute( const std::string & type, const std::string & key, const std::string & value );
 	void addIntAttribute( const std::string & type, const std::string & key, int value );
-
-	void setResultsFile( const std::string & resultsFile ) { _resultsFile = resultsFile; }
 
 	void serializeAgents( const int & step, const AgentsList::const_iterator beginAgents, const AgentsList::const_iterator endAgents);
 	void serializeRasters(int step);

@@ -216,14 +216,10 @@ public:
 	Point2D<int> getRandomPosition();
 
 public:
-	int getId() const;
 	/** get the boundaries of the world. For sequential executions it will be the boundaries of the entire simulation,
 	  * but if this is not the case it is the area owned by the instance plus the overlaps
 	  */
 	const Rectangle<int> & getBoundaries() const;
-	const Rectangle<int> & getOwnedArea() const;
-	const int & getOverlap();
-	const int & getNumTasks() const;
 
 	// methods that need to be defined for current state of the code
 	const Size<int> & getSize() const;
@@ -239,7 +235,8 @@ public:
 	void setFinalize( const bool & finalize );
 	void addStringAttribute( const std::string & type, const std::string & key, const std::string & value );
 	void addIntAttribute( const std::string & type, const std::string & key, int value );
-
+	const int & getId() const;
+	const int & getNumTasks() const;
 };
 
 } // namespace Engine

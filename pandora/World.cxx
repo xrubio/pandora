@@ -73,7 +73,7 @@ void World::initialize(int argc, char *argv[])
 	createRasters();
 	createAgents();		
 	
-	_scheduler->init2(_simulation, _rasters, _dynamicRasters, _serializeRasters);
+	_scheduler->init2(_rasters, _dynamicRasters, _serializeRasters);
 }
 
 
@@ -400,11 +400,9 @@ const std::string & World::getRasterName( const int & index) const
 	throw Exception(oss.str());
 }
 
-int World::getId() const{ return _scheduler->getId(); }
+const int & World::getId() const { return _scheduler->getId(); }
+const int & World::getNumTasks() const { return _scheduler->getNumTasks(); }
 const Rectangle<int> & World::getBoundaries() const{ return _scheduler->getBoundaries(); }
-const Rectangle<int> & World::getOwnedArea() const{ return _scheduler->getOwnedArea(); }
-const int & World::getOverlap() { return _scheduler->getOverlap(); }
-const int & World::getNumTasks() const{ return _scheduler->getNumTasks(); }
 const Size<int> & World::getSize() const{ return _simulation.getSize(); }
 void World::removeAgent( Agent * agent ) { _scheduler->removeAgent(agent); }
 Agent * World::getAgent( const std::string & id ) { return _scheduler->getAgent(id); }

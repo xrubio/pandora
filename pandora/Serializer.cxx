@@ -37,7 +37,7 @@
 namespace Engine
 {
 
-Serializer::Serializer() : _resultsFile("data/data.h5"), _agentsFileId(-1), _fileId(-1), _currentAgentDatasetId(-1)
+Serializer::Serializer( const Simulation & simulation, const SpacePartition & scheduler, const std::string & resultsFile ) : _simulation(simulation), _scheduler(scheduler), _resultsFile(resultsFile), _agentsFileId(-1), _fileId(-1), _currentAgentDatasetId(-1)
 {
 }
 
@@ -45,18 +45,10 @@ Serializer::~Serializer()
 {
 }
 
-void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters, World & world, SpacePartition & scheduler )
+void Serializer::init(std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters, World & world )
 {
-	_id = scheduler.getId();
-	_numTasks = scheduler.getNumTasks();
-	_ownedArea = scheduler.getOwnedArea();
-	_boundaries = scheduler.getBoundaries();
-	_overlap = scheduler.getOverlap();
-	_numSteps = world.getSimulation().getNumSteps();
-	_serializerResolution = world.getSimulation().getSerializerResolution();
-
 	std::stringstream logName;
-	logName << "Serializer_" << _id;
+	logName << "Serializer_" << _scheduler.getId();
 	log_DEBUG(logName.str(), " init serializer");
 
 	// check if directory exists
@@ -74,7 +66,7 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 	hid_t propertyListId = H5Pcreate(H5P_FILE_ACCESS);
 
 	// workaround, it crashes in serial without this clause
-	if(_numTasks>1)		
+	if(_scheduler.getNumTasks()>1)		
 	{
 		H5Pset_fapl_mpio(propertyListId, MPI_COMM_WORLD, MPI_INFO_NULL);
 	}
@@ -89,35 +81,35 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 
 	hid_t attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	hid_t attributeId = H5Acreate(globalDatasetId, "numSteps", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
-	H5Awrite(attributeId, H5T_NATIVE_INT, &simulation.getNumSteps());
+	H5Awrite(attributeId, H5T_NATIVE_INT, &_simulation.getNumSteps());
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 	
 	attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	attributeId = H5Acreate(globalDatasetId, "serializerResolution", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
-	H5Awrite(attributeId, H5T_NATIVE_INT, &simulation.getSerializerResolution());
+	H5Awrite(attributeId, H5T_NATIVE_INT, &_simulation.getSerializerResolution());
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 
 	attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	attributeId = H5Acreate(globalDatasetId, "width", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
-	H5Awrite(attributeId, H5T_NATIVE_INT, &simulation.getSize()._width);
+	H5Awrite(attributeId, H5T_NATIVE_INT, &_simulation.getSize()._width);
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 
 	attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	attributeId = H5Acreate(globalDatasetId, "height", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
-	H5Awrite(attributeId, H5T_NATIVE_INT, &simulation.getSize()._height);
+	H5Awrite(attributeId, H5T_NATIVE_INT, &_simulation.getSize()._height);
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 
 	attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	attributeId= H5Acreate(globalDatasetId, "numTasks", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
-	H5Awrite(attributeId, H5T_NATIVE_INT, &_numTasks);
+	H5Awrite(attributeId, H5T_NATIVE_INT, &_scheduler.getNumTasks());
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 
-	log_INFO(logName.str(), scheduler.getWallTime() << " id: " << _id << " size: " << simulation.getSize() << " num tasks: " << _numTasks << " serializer resolution:" << simulation.getSerializerResolution() << " and steps: " << simulation.getNumSteps());
+	log_INFO(logName.str(), _scheduler.getWallTime() << " id: " << _scheduler.getId() << " size: " << _simulation.getSize() << " num tasks: " << _scheduler.getNumTasks() << " serializer resolution:" << _simulation.getSerializerResolution() << " and steps: " << _simulation.getNumSteps());
 
 	// we store the name of the rasters
 	hid_t rasterNameFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
@@ -233,7 +225,7 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 	{
 		oss << path << "/";
 	}
-	oss << "agents-" << _id << ".abm";
+	oss << "agents-" << _scheduler.getId() << ".abm";
 
 	_agentsFileId = H5Fcreate(oss.str().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 	/*
@@ -248,15 +240,15 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 	
 	//the real size of the matrix is sqrt(num simulator)*matrixsize	
 	hsize_t dimensions[2];
-	dimensions[0] = hsize_t(simulation.getSize()._width);
-	dimensions[1] = hsize_t(simulation.getSize()._height);
+	dimensions[0] = hsize_t(_simulation.getSize()._width);
+	dimensions[1] = hsize_t(_simulation.getSize()._height);
 
 	// we need to specify the size where each computer node will be writing
 	hsize_t chunkDimensions[2];
-	chunkDimensions[0] = _ownedArea._size._width/2;
-	chunkDimensions[0] += 2*_overlap;
-	chunkDimensions[1] = _ownedArea._size._height/2;
-	chunkDimensions[1] += 2*_overlap;
+	chunkDimensions[0] = _scheduler.getOwnedArea()._size._width/2;
+	chunkDimensions[0] += 2*_scheduler.getOverlap();
+	chunkDimensions[1] = _scheduler.getOwnedArea()._size._height/2;
+	chunkDimensions[1] += 2*_scheduler.getOverlap();
 	
 	propertyListId = H5Pcreate(H5P_DATASET_CREATE);
 	H5Pset_chunk(propertyListId, 2, chunkDimensions);
@@ -286,9 +278,9 @@ void Serializer::init( Simulation & simulation, std::vector<StaticRaster * > ras
 		}	
 		// TODO 0 o H5P_DEFAULT??
 		hid_t rasterGroupId = H5Gcreate(_fileId, world.getRasterName(i).c_str(), 0, H5P_DEFAULT, H5P_DEFAULT);
-		for(int i=0; i<=simulation.getNumSteps(); i++)
+		for(int i=0; i<=_simulation.getNumSteps(); i++)
 		{  
-			if(i%simulation.getSerializerResolution()!=0)
+			if(i%_simulation.getSerializerResolution()!=0)
 			{
 				continue;
 			}
@@ -334,7 +326,7 @@ void Serializer::registerType( Agent * agent )
 	std::string type = agent->getType();
 
 	std::stringstream logName;
-	logName << "Serializer_" << _id;
+	logName << "Serializer_" << _scheduler.getId();
 
 	log_DEBUG(logName.str(), "registering new type: " << type);
 
@@ -352,9 +344,9 @@ void Serializer::registerType( Agent * agent )
 	StringMap * newTypeStringMap = new StringMap;
 
 	// create a dataset for each timestep
-	for(int i=0; i<=_numSteps; i++)
+	for(int i=0; i<=_simulation.getNumSteps(); i++)
 	{
-		if(i%_serializerResolution!=0)
+		if(i%_simulation.getSerializerResolution()!=0)
 		{
 			continue;
 		}
@@ -583,17 +575,17 @@ void Serializer::serializeAttribute( const std::string & name, const int & value
 void Serializer::serializeRaster( const StaticRaster & raster, const std::string & datasetKey )
 {
 	std::stringstream logName;
-	logName << "MPI_Serializer_world_" << _id;
+	logName << "MPI_Serializer_world_" << _scheduler.getId();
 	log_EDEBUG(logName.str(), "serializing raster: " << datasetKey);
 
 	// if it is not a border, it will copy from overlap
 	hsize_t	offset[2];
-    offset[0] = _ownedArea._origin._x;	
-    offset[1] = _ownedArea._origin._y;
+    offset[0] = _scheduler.getOwnedArea()._origin._x;	
+    offset[1] = _scheduler.getOwnedArea()._origin._y;
  
 	hsize_t	block[2];
-	block[0] = _ownedArea._size._width;
-	block[1] = _ownedArea._size._height;
+	block[0] = _scheduler.getOwnedArea()._size._width;
+	block[1] = _scheduler.getOwnedArea()._size._height;
 
 
 	hid_t dataSetId = H5Dopen(_fileId, datasetKey.c_str(), H5P_DEFAULT);
@@ -610,8 +602,8 @@ void Serializer::serializeRaster( const StaticRaster & raster, const std::string
 	H5Sselect_hyperslab(fileSpace, H5S_SELECT_SET, offset, stride, count, block);
  
 	int * data = (int *) malloc(sizeof(int)*block[0]*block[1]);
-	Point2D<int> overlapDist = _ownedArea._origin-_boundaries._origin;
-	log_EDEBUG(logName.str(), "overlap dist: " << overlapDist << "owned area: " << _ownedArea << " and boundaries: " << _boundaries);
+	Point2D<int> overlapDist = _scheduler.getOwnedArea()._origin-_scheduler.getBoundaries()._origin;
+	log_EDEBUG(logName.str(), "overlap dist: " << overlapDist << "owned area: " << _scheduler.getOwnedArea() << " and boundaries: " << _scheduler.getBoundaries());
 	for(size_t i=0; i<block[0]; i++)
 	{
 		for(size_t j=0; j<block[1]; j++)

@@ -28,9 +28,8 @@
 namespace Engine
 {
 
-SpacePartition::SpacePartition( const Simulation & simulation, const int & overlap, World & world, const std::string & fileName ) : _worldPos(-1,-1), _finalize(true), _overlap(overlap), _world(world), _id(-1), _numTasks(1), _initialTime(0.0f)
+SpacePartition::SpacePartition( const Simulation & simulation, const int & overlap, World & world, const std::string & fileName ) : _worldPos(-1,-1), _finalize(true), _overlap(overlap), _world(world), _id(-1), _numTasks(1), _initialTime(0.0f), _serializer(simulation, *this, fileName)
 {
-	_serializer.setResultsFile(fileName);
 }
 
 SpacePartition::~SpacePartition()
@@ -53,10 +52,10 @@ void SpacePartition::init( int argc, char *argv[] )
 	stablishBoundaries();
 }
 
-void SpacePartition::init2( Simulation & simulation, std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters )
+void SpacePartition::init2( std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters )
 {
 	// serializer init
-	_serializer.init( simulation, rasters, dynamicRasters, serializeRasters, _world, *this);
+	_serializer.init( rasters, dynamicRasters, serializeRasters, _world);
 
 	// mpi type registering
 	MpiFactory::instance()->registerTypes();
@@ -179,7 +178,6 @@ void SpacePartition::stepSection( const int & sectionIndex )
 	for(size_t i=0; i<agentsToExecute.size(); i++)
 	{
 		Agent * agent = agentsToExecute[i];
-		agent->logAgentState();
 		agent->updateKnowledge();
 		agent->selectActions();
 	}
@@ -1399,7 +1397,7 @@ bool SpacePartition::needsToReceiveData( const int & id, const int & sectionInde
 	return false;
 }
 
-const int & SpacePartition::getOverlap()
+const int & SpacePartition::getOverlap() const
 {
 	return _overlap;
 }
@@ -1598,6 +1596,16 @@ void SpacePartition::serializeAgents( const int & step )
 void SpacePartition::serializeRasters( const int & step )
 {
 	_serializer.serializeRasters(step);
+}
+
+int SpacePartition::getNumSteps() const
+{
+	return _world.getSimulation().getNumSteps();
+}
+
+int SpacePartition::getSerializerResolution() const
+{
+	return _world.getSimulation().getSerializerResolution();
 }
 
 } // namespace Engine

@@ -112,7 +112,6 @@ public:
 	// defined in children, it must use serializeAttribute to save valuble data
 	virtual void serialize()=0;
 	
-	virtual void logAgentState();
 	virtual void updateKnowledge(){};
 	virtual void selectActions(){};
 	virtual void updateState(){};
