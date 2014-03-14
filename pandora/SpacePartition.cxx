@@ -52,18 +52,18 @@ void SpacePartition::init( int argc, char *argv[] )
 	stablishBoundaries();
 }
 
-void SpacePartition::init2( std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters )
+void SpacePartition::initData( std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters )
 {
 	// serializer init
 	_serializer.init( rasters, dynamicRasters, serializeRasters, _world);
 
 	// mpi type registering
 	MpiFactory::instance()->registerTypes();
+	initOverlappingData();
 
 	std::stringstream logName;
 	logName << "simulation_" << _id;
 	log_INFO(logName.str(), "finished init at: "  << getWallTime());
-
 }
 
 void SpacePartition::checkOverlapSize()
@@ -822,9 +822,9 @@ void SpacePartition::executeAgents()
 	}
 }
 
-void SpacePartition::initExecution()
+void SpacePartition::initOverlappingData()
 {
-		// we need to send the agents and data in overlap zone to adjacent computer nodes	
+	// we need to send the agents and data in overlap zone to adjacent computer nodes	
 	sendMaxOverlapZones();
 	receiveMaxOverlapData();
 
@@ -850,7 +850,7 @@ void SpacePartition::initExecution()
 
 }
 
-void SpacePartition::finishExecution()
+void SpacePartition::finish()
 {	
 	std::stringstream logName;
 	logName << "simulation_" << _id;
@@ -1598,14 +1598,20 @@ void SpacePartition::serializeRasters( const int & step )
 	_serializer.serializeRasters(step);
 }
 
-int SpacePartition::getNumSteps() const
+int SpacePartition::countNeighbours( Agent * target, const double & radius, const std::string & type )
 {
-	return _world.getSimulation().getNumSteps();
+	int numAgents = for_each(_world.beginAgents(), _world.endAgents(), aggregatorCount<Engine::Agent>(radius,*target, type))._count;
+	int numOverlapAgents = for_each(_overlapAgents.begin(), _overlapAgents.end(), aggregatorCount<Engine::Agent>(radius,*target, type))._count;
+	return numAgents+numOverlapAgents;
 }
 
-int SpacePartition::getSerializerResolution() const
+AgentsVector SpacePartition::getNeighbours( Agent * target, const double & radius, const std::string & type )
 {
-	return _world.getSimulation().getSerializerResolution();
+	AgentsVector agentsVector = for_each(_world.beginAgents(), _world.endAgents(), aggregatorGet<Engine::Agent>(radius,*target, type))._neighbors;
+	AgentsVector overlapAgentsVector =  for_each(_overlapAgents.begin(), _overlapAgents.end(), aggregatorGet<Engine::Agent>(radius,*target, type))._neighbors;
+	std::copy(overlapAgentsVector.begin(), overlapAgentsVector.end(), std::back_inserter(agentsVector));
+	std::random_shuffle(agentsVector.begin(), agentsVector.end());
+	return agentsVector;
 }
 
 } // namespace Engine

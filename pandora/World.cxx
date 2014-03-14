@@ -73,7 +73,7 @@ void World::initialize(int argc, char *argv[])
 	createRasters();
 	createAgents();		
 	
-	_scheduler->init2(_rasters, _dynamicRasters, _serializeRasters);
+	_scheduler->initData(_rasters, _dynamicRasters, _serializeRasters);
 }
 
 
@@ -129,8 +129,6 @@ void World::run()
 	logName << "simulation_" << getId();
 	log_INFO(logName.str(), getWallTime() << " executing " << _simulation.getNumSteps() << " steps...");
 
-	_scheduler->initExecution();
-
 	for(_step=0; _step<_simulation.getNumSteps(); _step++)
 	{
 		step();
@@ -143,7 +141,7 @@ void World::run()
 	}
 	
 	log_INFO(logName.str(), getWallTime() << " closing files");
-	_scheduler->finishExecution();
+	_scheduler->finish();
 }
 
 
@@ -355,18 +353,12 @@ int World::getMaxValueAt( const int & index, const Point2D<int> & position )
 
 int World::countNeighbours( Agent * target, const double & radius, const std::string & type )
 {
-	int numAgents = for_each(_agents.begin(), _agents.end(), aggregatorCount<Engine::Agent>(radius,*target, type))._count;
-	int numOverlapAgents = for_each(_scheduler->_overlapAgents.begin(), _scheduler->_overlapAgents.end(), aggregatorCount<Engine::Agent>(radius,*target, type))._count;
-	return numAgents+numOverlapAgents;
+	return _scheduler->countNeighbours(target, radius, type);
 }
 
 AgentsVector World::getNeighbours( Agent * target, const double & radius, const std::string & type )
 {
-	AgentsVector agentsVector = for_each(_agents.begin(), _agents.end(), aggregatorGet<Engine::Agent>(radius,*target, type))._neighbors;
-	AgentsVector overlapAgentsVector =  for_each(_scheduler->_overlapAgents.begin(), _scheduler->_overlapAgents.end(), aggregatorGet<Engine::Agent>(radius,*target, type))._neighbors;
-	std::copy(overlapAgentsVector.begin(), overlapAgentsVector.end(), std::back_inserter(agentsVector));
-	std::random_shuffle(agentsVector.begin(), agentsVector.end());
-	return agentsVector;
+	return _scheduler->getNeighbours(target, radius, type);
 }
 
 Point2D<int> World::getRandomPosition()

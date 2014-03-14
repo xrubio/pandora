@@ -97,55 +97,6 @@ public:
 	//! add an agent to the world, and remove it from overlap agents if exist
 	void addAgent( Agent * agent, bool executedAgent = true );
 
-	// this method returns a list with the list of agents in manhattan distance radius of position. if include center is false, position is not checked
-	template<class T> struct aggregator : public std::unary_function<T,void>
-	{
-		aggregator(double radius, T &center, const std::string & type ) :  _radius(radius), _center(center), _type(type)
-		{
-			_particularType = _type.compare("all");
-		}
-		virtual ~aggregator(){}
-		void operator()( T * neighbor )
-		{
-			if(neighbor==&_center || !neighbor->exists())
-			{
-				return;
-			}
-			if(_particularType && !neighbor->isType(_type))
-			{
-				return;
-			}
-			if(_center.getPosition().distance(neighbor->getPosition())-_radius<= 0.0001)
-			{
-					execute( *neighbor );
-			}
-		}
-		virtual void execute( T & neighbor )=0;
-		bool _particularType;
-		double _radius;
-		T & _center;
-		std::string _type;
-	};
-
-	template<class T> struct aggregatorCount : public aggregator<T>
-	{
-		aggregatorCount( double radius, T & center, const std::string & type ) : aggregator<T>(radius,center,type), _count(0) {}
-		void execute( T & neighbor )
-		{
-			_count++;
-		}
-		int _count;
-	};
-	template<class T> struct aggregatorGet : public aggregator<T>
-	{
-		aggregatorGet( double radius, T & center, const std::string & type ) : aggregator<T>(radius,center,type) {}
-		void execute( T & neighbor )
-		{
-			_neighbors.push_back(&neighbor);
-		}
-		AgentsVector _neighbors;
-	};
-
 	//! returns the number of neighbours of agent 'target' within the radius 'radius' using Euclidean Distance.
 	int countNeighbours( Agent * target, const double & radius, const std::string & type="all" );
 	//! returns a list with the neighbours of agent 'target' within the radius 'radius' using Euclidean Distance.

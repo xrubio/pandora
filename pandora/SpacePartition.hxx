@@ -67,11 +67,8 @@ struct MpiOverlap
   */
 class SpacePartition
 {
-	Serializer _serializer;
-public:
-	SpacePartition( const Simulation & simulation, const int & overlap, World & world, const std::string & fileName );
-	virtual ~SpacePartition();
-
+	Serializer _serializer;	
+	
 	int _id;
 	int _numTasks;
 	Point2D<int> _localRasterSize;
@@ -79,9 +76,6 @@ public:
 	World & _world;
 	//! map of already executed agents
 	std::map<std::string, Agent *> _executedAgentsHash;	
-
-	const Rectangle<int> & getBoundaries() const;
-	const Rectangle<int> & getOwnedArea() const;
 
 	//! position of World inside global limits 
 	Point2D<int> _worldPos;
@@ -147,14 +141,6 @@ public:
 	void stablishWorldPosition();
 	//! applies next simulation step on the Section of the space identified by parameter 'sectionIndex'.
 	void stepSection( const int & sectionIndex );
-	//! initialization of the object World for the simulation. Required to be called before calling run.
-	/*!
-	The MPI is prepared. The simulation state is initialized, the rasters created and the
-	World filled with agents.
-	*/ 
-	void init( int argc, char *argv[] );
-	// TODO temporary second init step
-	void init2( std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters );
 
 	//! returns the id of the section that contains the point 'position' 
 	int getIdFromPosition( const Point2D<int> & position );
@@ -163,31 +149,51 @@ public:
 	//! given the id of a neighbour world section, returns its index, the position in the vector _neighbors
 	int getNeighborIndex( const int & id );
 
-	//! returns the attribute _overlap
-	const int & getOverlap() const;
-
 	//! if true will call MPI_Finalize at the end of run (default behavior)
 	bool _finalize;
 
-	void setFinalize( const bool & finalize );
-
-	//! responsible for executing the agents and update world 
-	void executeAgents();
-
-	//! prepare everything between init and step execution 
-	void initExecution();
-	//! prepare everything between step execution and end of run
-	void finishExecution();
-	const int & getId() const;
-	const int & getNumTasks() const;
-
-	void agentAdded( Agent * agent, bool executedAgent );
 	//! this method returns true if the agent is already in executedAgents list
 	bool hasBeenExecuted( Agent * agent );
 	//! return an agent, if it is in the list of ghosts 
 	AgentsList::iterator getGhostAgent( const std::string & id );
 	//! this list has the agents that need to be removed at the end of step.
 	AgentsList _removedAgents;
+	//! return an agent, if it is in the list of owned
+	AgentsList::iterator getOwnedAgent( const std::string & id );
+	
+	//! true if the agent is in the list of agents to remove
+	bool willBeRemoved( Agent * agent );
+	double _initialTime;
+	//! send overlapping data to neighbours before run
+	void initOverlappingData();
+
+
+public:
+	SpacePartition( const Simulation & simulation, const int & overlap, World & world, const std::string & fileName );
+	virtual ~SpacePartition();
+
+	void finish();
+
+	const Rectangle<int> & getBoundaries() const;
+	const Rectangle<int> & getOwnedArea() const;
+	//! initialization of the object World for the simulation. Required to be called before calling run.
+
+	//! initializes everything needed before creation of agents and rasters (i.e. sizes)
+	void init( int argc, char *argv[] );
+	// initialize data processes after creation of agents and rasters
+	void initData( std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters );
+	//! responsible for executing the agents and update world 
+	void executeAgents();
+
+
+	//! returns the attribute _overlap
+	const int & getOverlap() const;
+
+	void setFinalize( const bool & finalize );
+	const int & getId() const;
+	const int & getNumTasks() const;
+
+	void agentAdded( Agent * agent, bool executedAgent );
 	void removeAgents();
 	void removeAgent(Agent * agent);
 	
@@ -195,16 +201,10 @@ public:
 	Agent * getAgent( const std::string & id );
 	AgentsVector getAgent( const Point2D<int> & position, const std::string & type="all" );
 
-	//! return an agent, if it is in the list of owned
-	AgentsList::iterator getOwnedAgent( const std::string & id );
-	
-	//! true if the agent is in the list of agents to remove
-	bool willBeRemoved( Agent * agent );
 	//! transform from global coordinates to real coordinates (in terms of world position)
 	Point2D<int> getRealPosition( const Point2D<int> & globalPosition ) const;
 	Point2D<int> getRandomPosition() const;
 
-	double _initialTime;
 	//! MPI version of wall time
 	double getWallTime() const;
 
@@ -212,10 +212,57 @@ public:
 	void addIntAttribute( const std::string & type, const std::string & key, int value );
 	void serializeAgents( const int & step);
 	void serializeRasters( const int & step);
+	int countNeighbours( Agent * target, const double & radius, const std::string & type);
+	AgentsVector getNeighbours( Agent * target, const double & radius, const std::string & type);
+	
+	// this method returns a list with the list of agents in manhattan distance radius of position. if include center is false, position is not checked
+	template<class T> struct aggregator : public std::unary_function<T,void>
+	{
+		aggregator(double radius, T &center, const std::string & type ) :  _radius(radius), _center(center), _type(type)
+		{
+			_particularType = _type.compare("all");
+		}
+		virtual ~aggregator(){}
+		void operator()( T * neighbor )
+		{
+			if(neighbor==&_center || !neighbor->exists())
+			{
+				return;
+			}
+			if(_particularType && !neighbor->isType(_type))
+			{
+				return;
+			}
+			if(_center.getPosition().distance(neighbor->getPosition())-_radius<= 0.0001)
+			{
+					execute( *neighbor );
+			}
+		}
+		virtual void execute( T & neighbor )=0;
+		bool _particularType;
+		double _radius;
+		T & _center;
+		std::string _type;
+	};
 
-	int getNumSteps() const;
-	int getSerializerResolution() const;
-
+	template<class T> struct aggregatorCount : public aggregator<T>
+	{
+		aggregatorCount( double radius, T & center, const std::string & type ) : aggregator<T>(radius,center,type), _count(0) {}
+		void execute( T & neighbor )
+		{
+			_count++;
+		}
+		int _count;
+	};
+	template<class T> struct aggregatorGet : public aggregator<T>
+	{
+		aggregatorGet( double radius, T & center, const std::string & type ) : aggregator<T>(radius,center,type) {}
+		void execute( T & neighbor )
+		{
+			_neighbors.push_back(&neighbor);
+		}
+		AgentsVector _neighbors;
+	};
 };
 
 } // namespace Engine
