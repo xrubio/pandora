@@ -473,7 +473,8 @@ void GujaratWorld::createAgents()
 			agent->setMassToCaloriesRate( _config._massToEnergyRate * _config._energyToCalRate );
 			agent->setNumSectors( _config._numSectors );
 
-			agent->initializePosition();
+			agent->initializePosition();		
+			
 
 			log_DEBUG(logName.str(), getWallTime() << " new HG: " << agent);
 

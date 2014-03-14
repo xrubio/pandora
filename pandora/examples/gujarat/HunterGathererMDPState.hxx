@@ -50,6 +50,7 @@ public:
 	int _numAvailableActionsWhenBorn;
 	int _creator;
 	unsigned long _dni;
+	int _info;
 	std::string _actionName;
 	HunterGatherer * _agentRef;
 	HunterGathererMDPConfig	* _config;

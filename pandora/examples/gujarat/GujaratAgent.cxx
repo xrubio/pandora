@@ -356,8 +356,9 @@ void	GujaratAgent::initializePosition( )
 {
 		
 	// 1. select settlement area
-	GujaratWorld* world = dynamic_cast<GujaratWorld*>(getWorld());
+	GujaratWorld* world = dynamic_cast<GujaratWorld*>(getWorld());	
 	std::vector< Engine::Point2D<int> > dunes;
+	
 	while(dunes.empty())
 	{
 		const  std::vector< Engine::Rectangle<int> >& areas = world->getSettlementAreas()->getAreas();
@@ -378,11 +379,9 @@ void	GujaratAgent::initializePosition( )
 			}
 		}
 		
-	}
-
+	}	
 	
-	
-	
+		
 	/*
 	if(dunes.empty())
 	{

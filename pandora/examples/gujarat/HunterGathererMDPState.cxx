@@ -47,6 +47,7 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 	_dni=dniTicket ();
 	
 	_creator=1;
+	_info = 1;
 	
 	_ownItems.resize(s._ownItems.size());
 	for(unsigned int i = 0; i < _ownItems.size(); i++)
@@ -145,6 +146,7 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 	
 	//log_INFO(logName.str(),"XXXX CREA 2:" << s._dni << "->" << _dni);
 	_creator=2;
+	_info=2;
 	//log_INFO(logName.str(),"herencia2:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors");
 		
 }
@@ -195,6 +197,7 @@ HunterGathererMDPState::HunterGathererMDPState(
 	_dni=dniTicket ();
 	
 	_creator=3;
+	_info=3;
 
 	_ownItems.resize(ownItems.size());
 	for(unsigned int i = 0; i < ownItems.size(); i++)
@@ -247,6 +250,7 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	*/
 	
 	_creator=4;
+	_info=4;
 	
 	_timeIndex 		 = s._timeIndex;
 	_mapLocation 	 = s._mapLocation;
@@ -329,7 +333,11 @@ HunterGathererMDPState::~HunterGathererMDPState()
 	
 	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
 	
-	
+	//*?
+	if(_creator <0 && _info >0)
+	{
+		std::cerr << "CUIDAOO" << std::endl;
+	}
 }
 
 void	HunterGathererMDPState::addAction( MDPAction* a )
