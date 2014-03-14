@@ -40,7 +40,7 @@
 namespace Engine
 {
 
-World::World( const Simulation & simulation, const int & overlap, const bool & allowMultipleAgentsPerCell, const std::string & fileName ) : _scheduler(0), _simulation(simulation), _globalBoundaries(Point2D<int>(0,0) , simulation.getSize()), _allowMultipleAgentsPerCell(allowMultipleAgentsPerCell), _step(0)
+World::World( const Simulation & simulation, const int & overlap, const bool & allowMultipleAgentsPerCell, const std::string & fileName ) : _scheduler(0), _simulation(simulation), _allowMultipleAgentsPerCell(allowMultipleAgentsPerCell), _step(0)
 {
 	_scheduler = new SpacePartition(simulation, overlap, *this);
 	GeneralState::serializer().setResultsFile(fileName);
@@ -297,8 +297,8 @@ void World::registerStaticRaster( const std::string & key, const bool & serializ
 
 bool World::checkPosition( const Point2D<int> & newPosition )
 {
-	// checking global boundaries: if environment is a border of the real world
-	if(!_globalBoundaries.isInside(newPosition))
+	// checking size: if environment is a border of the real world
+	if(!getBoundaries().contains(newPosition))
 	{
 		return false;
 	}

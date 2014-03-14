@@ -7,7 +7,7 @@ import unittest
 sys.path.append('../../')
 sys.path.append('../../pyPandora')
 
-from pyPandora import Simulation, Agent, World, Point2DInt, SizeInt
+from pyPandora import Simulation, Agent, World, Point2DInt, SizeInt, RectangleInt
 
 class TestAgent(Agent):
 	def __init__(self, id):
@@ -100,6 +100,39 @@ class TestPyPandora(unittest.TestCase):
 		myAgent2.remove()
 		agentIds = myWorld.getNeighboursIds(myAgent0, 20, 'agent')
 		self.assertEqual(len(agentIds), 0)
-       
+    	
+	def testRectangleEquals(self):
+		aRectangle = RectangleInt.fromCoordinates(5,10,20,30);
+		bRectangle = RectangleInt(Point2DInt(3,7), SizeInt(1,1))
+
+		self.assertNotEqual(aRectangle, bRectangle)
+
+		bRectangle._origin = Point2DInt(5,10)
+		self.assertNotEqual(aRectangle, bRectangle)
+
+		bRectangle._size = SizeInt(16,21)
+		self.assertEqual(aRectangle, bRectangle)
+
+	def testRectangleContainsPoint(self):
+		aRectangle = RectangleInt.fromCoordinates(0,0,20,10);
+		aPoint = Point2DInt(-1,-1)
+		
+		self.assertFalse(aRectangle.contains(aPoint))
+
+		aPoint._x = 0		
+		self.assertFalse(aRectangle.contains(aPoint))
+
+		aPoint._y = 0
+		self.assertTrue(aRectangle.contains(aPoint))
+
+		aPoint._x = 20
+		self.assertTrue(aRectangle.contains(aPoint))
+
+		aPoint._y = 10
+		self.assertTrue(aRectangle.contains(aPoint))
+
+		aPoint._x = 21
+		self.assertFalse(aRectangle.contains(aPoint))
+   
 if __name__ == '__main__':
     unittest.main()

@@ -103,24 +103,24 @@ void SpacePartition::stablishBoundaries()
 	// defining overlap boundaries
 	_boundaries = _ownedArea;
 	// west boundary
-	if(_ownedArea._origin._x!=_world.getGlobalBoundaries()._origin._x)
+	if(_ownedArea._origin._x!=0)
 	{
 		_boundaries._origin._x -= _overlap;
 		_boundaries._size._width += _overlap;
 	}
 	// east boundary
-	if(_ownedArea._origin._x!=_world.getGlobalBoundaries()._size._width-_ownedArea._size._width)
+	if(_ownedArea._origin._x!=_world.getSize()._width-_ownedArea._size._width)
 	{
 		_boundaries._size._width += _overlap;
 	}
 	// north boundary
-	if(_ownedArea._origin._y!=_world.getGlobalBoundaries()._origin._y)
+	if(_ownedArea._origin._y!=0)
 	{
 		_boundaries._origin._y -= _overlap;
 		_boundaries._size._height += _overlap;
 	}
 	// south boundary
-	if(_ownedArea._origin._y!=_world.getGlobalBoundaries()._size._height-_ownedArea._size._height)
+	if(_ownedArea._origin._y!=_world.getSize()._height-_ownedArea._size._height)
 	{
 		_boundaries._size._height += _overlap;
 	}
@@ -133,7 +133,6 @@ void SpacePartition::stablishBoundaries()
 
 	if(_ownedArea._size._width%2!=0 || _ownedArea._size._height%2!=0)
 	{
-		// TODO fix when matrix not squared
 		std::stringstream oss;
 		oss << "SpacePartition::init - local raster size: " << _ownedArea._size << " must be divisible by 2";
 		throw Exception(oss.str());
@@ -142,7 +141,7 @@ void SpacePartition::stablishBoundaries()
 
 	std::stringstream logName;
 	logName << "simulation_" << _id;
-	log_INFO(logName.str(), getWallTime() << " pos: " << _worldPos << ", global boundaries: " << _world.getGlobalBoundaries() << ", boundaries: " << _boundaries << " and owned area: " << _ownedArea);
+	log_INFO(logName.str(), getWallTime() << " pos: " << _worldPos << ", global size: " << _world.getSize() << ", boundaries: " << _boundaries << " and owned area: " << _ownedArea);
 	log_INFO(logName.str(), getWallTime() << " sections 0: " << _sections[0] << " - 1: " << _sections[1] << " - 2:" << _sections[2] << " - 3: " << _sections[3]);
 }
 
@@ -159,7 +158,7 @@ void SpacePartition::stepSection( const int & sectionIndex )
 	while(it!=_world.endAgents())
 	{
 		Agent * agent = *it;
-		if(_sections[sectionIndex].isInside(agent->getPosition()) && !hasBeenExecuted(agent))
+		if(_sections[sectionIndex].contains(agent->getPosition()) && !hasBeenExecuted(agent))
 		{
 			agentsToExecute.push_back(agent);
 		}
@@ -190,7 +189,7 @@ void SpacePartition::stepSection( const int & sectionIndex )
 		agent->updateState();
 		log_DEBUG(logName.str(), getWallTime() << " agent: " << agent << " has been executed at index: " << sectionIndex << " of task: "<< _id << " in step: " << _step );
 
-		if(!_ownedArea.isInside(agent->getPosition()) && !willBeRemoved(agent))
+		if(!_ownedArea.contains(agent->getPosition()) && !willBeRemoved(agent))
 		{
 			log_DEBUG(logName.str(), getWallTime() << " migrating agent: " << agent << " being executed at index: " << sectionIndex << " of task: "<< _id );
 			agentsToSend.push_back(agent);
@@ -404,10 +403,10 @@ void SpacePartition::sendGhostAgents( const int & sectionIndex )
 				Agent * agent = *it;
 				// we check the type. TODO register the type in another string
 				// TODO refactor!!!
-				log_DEBUG(logName.str(),  getWallTime() << " step: " << _step << " agent: " << agent << " of type: " << itType->first << " test will be removed: " << willBeRemoved(agent) << " checking overlap zone: " << overlapZone << " overlap boundaries: " << _boundaries << " - test is inside zone: " << overlapZone.isInside(agent->getPosition()-_boundaries._origin));
+				log_DEBUG(logName.str(),  getWallTime() << " step: " << _step << " agent: " << agent << " of type: " << itType->first << " test will be removed: " << willBeRemoved(agent) << " checking overlap zone: " << overlapZone << " overlap boundaries: " << _boundaries << " - test is inside zone: " << overlapZone.contains(agent->getPosition()-_boundaries._origin));
 				if(agent->isType(itType->first))
 				{
-					if((!willBeRemoved(agent)) && (overlapZone.isInside(agent->getPosition()-_boundaries._origin)))
+					if((!willBeRemoved(agent)) && (overlapZone.contains(agent->getPosition()-_boundaries._origin)))
 					{
 						agentsToNeighbors[i].push_back(*it);
 						log_DEBUG(logName.str(),  getWallTime() << " step: " << _step << " sending ghost agent: " << agent << " to: " << neighborsToUpdate[i] << " in section index: " << sectionIndex);
@@ -419,7 +418,7 @@ void SpacePartition::sendGhostAgents( const int & sectionIndex )
 				Agent * agent = *it;	
 				if(agent->isType(itType->first))
 				{
-					if((!willBeRemoved(agent)) && (overlapZone.isInside(agent->getPosition()-_boundaries._origin)))
+					if((!willBeRemoved(agent)) && (overlapZone.contains(agent->getPosition()-_boundaries._origin)))
 					{
 						agentsToNeighbors[i].push_back(*it);
 						log_DEBUG(logName.str(),  getWallTime() << " step: " << _step << " will send modified ghost agent: " << agent << " to: " << neighborsToUpdate[i] << " in section index: " << sectionIndex << " and step: " << _step);
@@ -532,7 +531,7 @@ void SpacePartition::receiveGhostAgents( const int & sectionIndex )
 				if(agent->isType(itType->first))
 				{
 					// si l'agent no està en zona que s'ha d'actualitzar, continuar
-					if(overlapZone.isInside((*it)->getPosition()-_boundaries._origin))
+					if(overlapZone.contains((*it)->getPosition()-_boundaries._origin))
 					{
 						log_DEBUG(logName.str(), getWallTime() << " step: " << _step << " in section index: " << sectionIndex << " with overlap zone: " << overlapZone << " erasing agent: " << *it);
 						it = _overlapAgents.erase(it);
@@ -1095,7 +1094,7 @@ Rectangle<int> SpacePartition::getOverlap( const int & id, const int & sectionIn
 		else
 		{
 			result._origin._x = _ownedArea._size._width/2;	
-			if(_ownedArea._origin._x+_ownedArea._size._width!=_world.getGlobalBoundaries()._size._width)
+			if(_ownedArea._origin._x+_ownedArea._size._width!=_world.getSize()._width)
 			{
 				result._origin._x -= _overlap;
 			}
@@ -1128,7 +1127,7 @@ Rectangle<int> SpacePartition::getOverlap( const int & id, const int & sectionIn
 		else
 		{
 			result._origin._y = _ownedArea._size._height/2;
-			if(_ownedArea._origin._y+_ownedArea._size._height!=_world.getGlobalBoundaries()._size._height)
+			if(_ownedArea._origin._y+_ownedArea._size._height!=_world.getSize()._height)
 			{
 				result._origin._y -= _overlap;
 			}
@@ -1170,7 +1169,7 @@ Rectangle<int> SpacePartition::getOverlap( const int & id, const int & sectionIn
 			}
 		}
 
-		if(_ownedArea._origin._x+_ownedArea._size._width!=_world.getGlobalBoundaries()._size._width)
+		if(_ownedArea._origin._x+_ownedArea._size._width!=_world.getSize()._width)
 		{
 			result._size._width += _overlap;
 		}
@@ -1202,7 +1201,7 @@ Rectangle<int> SpacePartition::getOverlap( const int & id, const int & sectionIn
 			}
 		}
 
-		if(_ownedArea._origin._y+_ownedArea._size._height!=_world.getGlobalBoundaries()._size._height)
+		if(_ownedArea._origin._y+_ownedArea._size._height!=_world.getSize()._height)
 		{
 			result._size._height += _overlap;
 		}

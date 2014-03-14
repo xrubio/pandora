@@ -297,7 +297,7 @@ void RasterLoader::fillGrassCellRaster( StaticRaster & raster, const std::string
 			for( int j=0; j<G_window_cols(); j++)
 			{
 				Engine::Point2D<int> cellPosition(j,i);
-				if(world->getBoundaries().isInside(cellPosition))
+				if(world->getBoundaries().contains(cellPosition))
 				{
 					Point2D<int> localPosition(cellPosition - world->getBoundaries()._origin);
 					raster._values[localPosition._x][localPosition._y] = rowData[j];

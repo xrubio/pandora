@@ -51,12 +51,16 @@ public:
 	{
 	}
 
+	Rectangle( const Type & left, const Type & top, const Type & right, const Type & bottom ) : _origin(left, top), _size(1+right-left, 1+bottom-top)
+	{
+	}
+
 	Rectangle( const Interval<Type> & OX, const Interval<Type> & OY)
 	{		
 		this->intervals2Rectangle( OX, OY);		
-	}	
+	}
 	
-	bool isInside( const Point2D<Type> & point ) const
+	bool contains( const Point2D<Type> & point ) const
 	{
 		if(point._x < _origin._x || point._x >= _origin._x+_size._width)
 		{
@@ -119,6 +123,21 @@ public:
 		_origin = rectangle._origin;
 		_size = rectangle._size;
 		return *this;
+	}
+
+	Rectangle<Type> clone() const
+	{
+		return Rectangle<int>(_origin, _size);
+	}
+	
+	bool operator==( const Rectangle<Type> & rectangle ) const
+	{
+		return _origin==rectangle._origin && _size==rectangle._size;
+	}
+	
+	bool operator!=( const Rectangle<Type> & rectangle ) const
+	{
+		return !((*this)==rectangle);
 	}
 };
 

@@ -51,8 +51,6 @@ public:
 protected:		
 	Simulation _simulation;
 
-	Rectangle<int> _globalBoundaries;
-
 	//! global list of agents
 	AgentsList _agents;
 
@@ -217,9 +215,6 @@ public:
 	//! gets the maximum allowed value of raster "index" in global position "position"
 	int getMaxValueAt( const int & index, const Point2D<int> & position );
 
-	const Rectangle<int>& getGlobalBoundaries() const { return _globalBoundaries; }
-
-	
 	// get a raster name from its index
 	const std::string & getRasterName( const int & index ) const;
 public:

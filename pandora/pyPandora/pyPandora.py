@@ -11,7 +11,15 @@ class Point2DInt(libpyPandora.Point2DIntStub):
 class SizeInt(libpyPandora.SizeIntStub):
 	def __init__(self, width, height):
 		libpyPandora.SizeIntStub.__init__(self, width, height)
+
+class RectangleInt(libpyPandora.RectangleIntStub):
+	def __init__(self, origin, size):
+		libpyPandora.RectangleIntStub.__init__(self, origin, size)
 	
+	@classmethod
+	def fromCoordinates(self, left, top, right, bottom):
+		return RectangleInt(Point2DInt(left, top), SizeInt(1+right-left, 1+bottom-top))
+
 class StaticRaster(libpyPandora.StaticRasterStub):
 	def __init__(self):
 		libpyPandora.StaticRasterStub.__init__(self)

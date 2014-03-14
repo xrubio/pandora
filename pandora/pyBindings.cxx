@@ -25,6 +25,7 @@
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <Point2D.hxx>
 #include <Size.hxx>
+#include <Rectangle.hxx>
 #include <StaticRaster.hxx>
 #include <Raster.hxx>
 #include <Simulation.hxx>
@@ -52,6 +53,7 @@
 
 typedef Engine::Point2D<int> Point2DInt;
 typedef Engine::Size<int> SizeInt;
+typedef Engine::Rectangle<int> RectangleInt;
 
 class StaticRasterWrap : public Engine::StaticRaster, public boost::python::wrapper<Engine::StaticRaster>
 {
@@ -330,6 +332,23 @@ bool notEqualsSize( const SizeInt & sizeA, const SizeInt & sizeB )
 	return sizeA!=sizeB;
 }
 
+std::string printRectangle( const RectangleInt & rectangle )
+{
+	std::stringstream stream;
+	stream << rectangle;
+	return stream.str();
+}
+
+bool equalsRectangle( const RectangleInt & rectangleA, const RectangleInt & rectangleB )
+{
+	return rectangleA==rectangleB;
+}
+
+bool notEqualsRectangle( const RectangleInt & rectangleA, const RectangleInt & rectangleB )
+{
+	return rectangleA!=rectangleB;
+}
+
 // overloaded methods
 Engine::Raster & (Engine::World::*getDynamicRaster)(const std::string&) = &Engine::World::getDynamicRaster;
 Engine::StaticRaster & (Engine::World::*getStaticRaster)(const std::string&) = &Engine::World::getStaticRaster;
@@ -359,7 +378,17 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("__ne__", notEqualsSize)
 		.def("clone", &SizeInt::clone)
 	;	
-	
+
+	boost::python::class_< RectangleInt>("RectangleIntStub", boost::python::init<const Point2DInt & , const SizeInt & >() )
+		.def_readwrite("_origin", &RectangleInt::_origin) 
+		.def_readwrite("_size", &RectangleInt::_size) 
+		.def("contains", &RectangleInt::contains) 
+		.def("__str__", printRectangle)
+		.def("__eq__", equalsRectangle)
+		.def("__ne__", notEqualsRectangle)
+		.def("clone", &RectangleInt::clone)
+		;
+
 	boost::python::class_< StaticRasterWrap, boost::noncopyable >("StaticRasterStub")
 		.def("resize", &Engine::StaticRaster::resize, &StaticRasterWrap::default_resize) 
 		.def("getSize", &Engine::StaticRaster::getSize)
