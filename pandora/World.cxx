@@ -25,7 +25,6 @@
 
 #include <GeneralState.hxx>
 
-#include <Serializer.hxx>
 #include <Logger.hxx>
 #include <Statistics.hxx>
 
@@ -42,8 +41,7 @@ namespace Engine
 
 World::World( const Simulation & simulation, const int & overlap, const bool & allowMultipleAgentsPerCell, const std::string & fileName ) : _scheduler(0), _simulation(simulation), _allowMultipleAgentsPerCell(allowMultipleAgentsPerCell), _step(0)
 {
-	_scheduler = new SpacePartition(simulation, overlap, *this);
-	GeneralState::serializer().setResultsFile(fileName);
+	_scheduler = new SpacePartition(simulation, overlap, *this, fileName );
 }
 
 World::~World()
@@ -75,10 +73,8 @@ void World::initialize(int argc, char *argv[])
 	createRasters();
 	createAgents();		
 	
-	GeneralState::serializer().init(_simulation, _rasters, _dynamicRasters, _serializeRasters, *this);
+	_scheduler->init2(_simulation, _rasters, _dynamicRasters, _serializeRasters);
 	serializeStaticRasters();
-
-	_scheduler->init2();
 }
 
 
@@ -122,13 +118,13 @@ void World::serializeAgents()
 	{
 		if((*it)->exists())
 		{
-			GeneralState::serializer().serializeAgent((*it), _step, *this, i);
+			_scheduler->serializeAgent((*it), _step, *this, i);
 			i++;
 		}
 		it++;
 	}
 	// serialize remaining agents
-	GeneralState::serializer().finishAgentsSerialization(_step, *this);
+	_scheduler->finishAgentsSerialization(_step, *this);
 }
 
 void World::step()
@@ -172,7 +168,6 @@ void World::run()
 	serializeAgents();
 	
 	log_INFO(logName.str(), getWallTime() << " closing files");
-	GeneralState::serializer().finish();
 	_scheduler->finishExecution();
 }
 
@@ -196,7 +191,7 @@ void World::serializeRasters()
 		{
 			continue;
 		}
-		GeneralState::serializer().serializeRaster(d, (Raster&)(*_rasters.at(d)), *this, _step);
+		_scheduler->serializeRaster(d, (Raster&)(*_rasters.at(d)), *this, _step);
 	}
 }
 
@@ -208,7 +203,7 @@ void World::serializeStaticRasters()
 		{
 			continue;
 		}
-		GeneralState::serializer().serializeStaticRaster(d, *_rasters.at(d), *this);
+		_scheduler->serializeStaticRaster(d, *_rasters.at(d), *this);
 	}
 }
 
@@ -473,6 +468,8 @@ void World::removeAgent( Agent * agent ) { _scheduler->removeAgent(agent); }
 Agent * World::getAgent( const std::string & id ) { return _scheduler->getAgent(id); }
 AgentsVector World::getAgent( const Point2D<int> & position, const std::string & type) { return _scheduler->getAgent(position, type); }
 void World::setFinalize( const bool & finalize ) { _scheduler->setFinalize(finalize); }
+void World::addStringAttribute( const std::string & type, const std::string & key, const std::string & value ) { _scheduler->addStringAttribute(type, key, value);}
+void World::addIntAttribute( const std::string & type, const std::string & key, int value ) { _scheduler->addIntAttribute(type, key, value); }
 
 } // namespace Engine
 

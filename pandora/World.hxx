@@ -52,12 +52,9 @@ protected:
 
 	//! global list of agents
 	AgentsList _agents;
-
 	
 	//! false if each cell can have just one agent
 	bool _allowMultipleAgentsPerCell;
-
-
 
 	//! current simulation step
 	int _step;
@@ -99,14 +96,8 @@ public:
 	
 	//! add an agent to the world, and remove it from overlap agents if exist
 	void addAgent( Agent * agent, bool executedAgent = true );
-	
-
-
-
 
 	// this method returns a list with the list of agents in manhattan distance radius of position. if include center is false, position is not checked
-//	AgentsList getAgentsNear( const Point2D<int> & position, const int & radius, const bool & includeCenter );
-
 	template<class T> struct aggregator : public std::unary_function<T,void>
 	{
 		aggregator(double radius, T &center, const std::string & type ) :  _radius(radius), _center(center), _type(type)
@@ -124,8 +115,6 @@ public:
 			{
 				return;
 			}
-			// if we use epsilon the evaluation will fail for equal double numbers
-			//if(_center.getPosition().distance(neighbor->getPosition())-_radius<= std::numeric_limits<double>::epsilon())
 			if(_center.getPosition().distance(neighbor->getPosition())-_radius<= 0.0001)
 			{
 					execute( *neighbor );
@@ -250,6 +239,9 @@ public:
 	Agent * getAgent( const std::string & id );
 	AgentsVector getAgent( const Point2D<int> & position, const std::string & type="all" );
 	void setFinalize( const bool & finalize );
+	void addStringAttribute( const std::string & type, const std::string & key, const std::string & value );
+	void addIntAttribute( const std::string & type, const std::string & key, int value );
+
 };
 
 } // namespace Engine

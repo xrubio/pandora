@@ -84,12 +84,12 @@ const Point2D<int> & Agent::getPosition() const
 
 void Agent::serializeAttribute( const std::string & name, const int & value )
 {
-	GeneralState::serializer().addIntAttribute(getType(), name,value);
+	_world->addIntAttribute(getType(), name,value);
 }
 
 void Agent::serializeAttribute( const std::string & name, const std::string & value)
 {
-	GeneralState::serializer().addStringAttribute(getType(), name,value);
+	_world->addStringAttribute(getType(), name,value);
 }
 
 const std::string & Agent::getId() const

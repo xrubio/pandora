@@ -59,8 +59,6 @@ class Serializer
 
 	// register the type of agent into the data structures _agentIndexsMap, _stringAttributes and _intAttributes and create HDF5 structures
 	void registerType( Agent * agent, World & world );
-	// list of agent types registered until this moment
-
 	IntAttributesMap _intAttributes;
 	StringAttributesMap _stringAttributes;
 

@@ -28,9 +28,9 @@
 namespace Engine
 {
 
-SpacePartition::SpacePartition( const Simulation & simulation, const int & overlap, World & world ) : _worldPos(-1,-1), _finalize(true), _overlap(overlap), _world(world), _id(-1), _numTasks(1), _initialTime(0.0f)
-
+SpacePartition::SpacePartition( const Simulation & simulation, const int & overlap, World & world, const std::string & fileName ) : _worldPos(-1,-1), _finalize(true), _overlap(overlap), _world(world), _id(-1), _numTasks(1), _initialTime(0.0f)
 {
+	_serializer.setResultsFile(fileName);
 }
 
 SpacePartition::~SpacePartition()
@@ -53,8 +53,12 @@ void SpacePartition::init( int argc, char *argv[] )
 	stablishBoundaries();
 }
 
-void SpacePartition::init2()
+void SpacePartition::init2( Simulation & simulation, std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters )
 {
+	// serializer init
+	_serializer.init( simulation, rasters, dynamicRasters, serializeRasters, _world);
+
+	// mpi type registering
 	MpiFactory::instance()->registerTypes();
 
 	std::stringstream logName;
@@ -849,6 +853,8 @@ void SpacePartition::finishExecution()
 	std::stringstream logName;
 	logName << "simulation_" << _id;
 
+	_serializer.finish();
+
 	log_INFO(logName.str(), getWallTime() << " simulation finished");
 	if(_finalize)
 	{
@@ -1569,6 +1575,37 @@ double SpacePartition::getWallTime() const
 {
 	return MPI_Wtime() - _initialTime;
 }
+
+void SpacePartition::serializeAgent( Agent * agent, const int & step, World & world, int index)
+{
+	_serializer.serializeAgent(agent, step, world, index);
+}
+
+void SpacePartition::serializeRaster( const int & index, Raster & raster, World & world, const int & step )
+{
+	_serializer.serializeRaster(index, raster, world, step);
+}
+
+void SpacePartition::serializeStaticRaster( const int & index, StaticRaster & raster, World & world )
+{
+	_serializer.serializeStaticRaster(index, raster, world);
+}
+
+void SpacePartition::finishAgentsSerialization( int step, World & world)
+{
+	_serializer.finishAgentsSerialization(step, world);
+}
+
+void SpacePartition::addStringAttribute( const std::string & type, const std::string & key, const std::string & value )
+{
+	_serializer.addStringAttribute(type, key, value);
+}
+
+void SpacePartition::addIntAttribute( const std::string & type, const std::string & key, int value )
+{
+	_serializer.addIntAttribute(type, key, value);
+}
+
 
 } // namespace Engine
 

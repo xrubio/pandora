@@ -26,6 +26,7 @@
 #include <Simulation.hxx>
 #include <World.hxx>
 #include <typedefs.hxx>
+#include <Serializer.hxx>
 #include <list>
 #include <vector>
 
@@ -66,8 +67,9 @@ struct MpiOverlap
   */
 class SpacePartition
 {
+	Serializer _serializer;
 public:
-	SpacePartition( const Simulation & simulation, const int & overlap, World & world );
+	SpacePartition( const Simulation & simulation, const int & overlap, World & world, const std::string & fileName );
 	virtual ~SpacePartition();
 
 	int _id;
@@ -152,7 +154,7 @@ public:
 	*/ 
 	void init( int argc, char *argv[] );
 	// TODO temporary second init step
-	void init2();
+	void init2( Simulation & simulation, std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters );
 
 	//! returns the id of the section that contains the point 'position' 
 	int getIdFromPosition( const Point2D<int> & position );
@@ -205,6 +207,15 @@ public:
 	double _initialTime;
 	//! MPI version of wall time
 	double getWallTime() const;
+
+	void serializeAgent( Agent * agent, const int & step, World & world, int index);
+	void serializeRaster( const int & index, Raster & raster, World & world, const int & step );
+	void serializeStaticRaster( const int & index, StaticRaster & raster, World & world );
+	void finishAgentsSerialization( int step, World & world);
+	
+	void addStringAttribute( const std::string & type, const std::string & key, const std::string & value );
+	void addIntAttribute( const std::string & type, const std::string & key, int value );
+
 };
 
 } // namespace Engine
