@@ -80,11 +80,11 @@ BOOST_AUTO_TEST_CASE( testAgentRemovedIsNotInInsideNeighbours )
 	myAgent1->setRandomPosition();
 	myAgent2->setRandomPosition();
 
-	Engine::World::AgentsVector neighbours = myWorld.getNeighbours(myAgent0, 20);
+	Engine::AgentsVector neighbours = myWorld.getNeighbours(myAgent0, 20);
 	BOOST_CHECK_EQUAL(neighbours.size(), 2);
 	myAgent1->remove();
 	myAgent2->remove();
-	Engine::World::AgentsVector neighbours2 = myWorld.getNeighbours(myAgent0, 20);
+	Engine::AgentsVector neighbours2 = myWorld.getNeighbours(myAgent0, 20);
 	BOOST_CHECK_EQUAL(neighbours2.size(), 0);
 
 }

@@ -423,7 +423,7 @@ int World::countNeighbours( Agent * target, const double & radius, const std::st
 	return numAgents+numOverlapAgents;
 }
 
-World::AgentsVector World::getNeighbours( Agent * target, const double & radius, const std::string & type )
+AgentsVector World::getNeighbours( Agent * target, const double & radius, const std::string & type )
 {
 	AgentsVector agentsVector = for_each(_agents.begin(), _agents.end(), aggregatorGet<Engine::Agent>(radius,*target, type))._neighbors;
 	AgentsVector overlapAgentsVector =  for_each(_scheduler->_overlapAgents.begin(), _scheduler->_overlapAgents.end(), aggregatorGet<Engine::Agent>(radius,*target, type))._neighbors;
@@ -471,7 +471,7 @@ const int & World::getNumTasks() const{ return _scheduler->getNumTasks(); }
 const Size<int> & World::getSize() const{ return _simulation.getSize(); }
 void World::removeAgent( Agent * agent ) { _scheduler->removeAgent(agent); }
 Agent * World::getAgent( const std::string & id ) { return _scheduler->getAgent(id); }
-World::AgentsVector World::getAgent( const Point2D<int> & position, const std::string & type) { return _scheduler->getAgent(position, type); }
+AgentsVector World::getAgent( const Point2D<int> & position, const std::string & type) { return _scheduler->getAgent(position, type); }
 void World::setFinalize( const bool & finalize ) { _scheduler->setFinalize(finalize); }
 
 } // namespace Engine

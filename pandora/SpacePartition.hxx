@@ -25,6 +25,7 @@
 #include <mpi.h>
 #include <Simulation.hxx>
 #include <World.hxx>
+#include <typedefs.hxx>
 #include <list>
 #include <vector>
 
@@ -32,7 +33,6 @@ namespace Engine
 {
 class Agent;
 	
-
 //! List of Mpi messages sent by the scheduler
 enum MpiMessageType
 {
@@ -66,9 +66,6 @@ struct MpiOverlap
   */
 class SpacePartition
 {
-	// TODO duplicated from World
-	typedef std::list< Agent* > AgentsList;
-	typedef std::vector< Agent* > AgentsVector;
 public:
 	SpacePartition( const Simulation & simulation, const int & overlap, World & world );
 	virtual ~SpacePartition();

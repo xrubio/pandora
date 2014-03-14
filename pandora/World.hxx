@@ -27,6 +27,7 @@
 #include <map>
 #include <vector>
 #include <list>
+#include <typedefs.hxx>
 #include <Raster.hxx>
 #include <StaticRaster.hxx>
 #include <Rectangle.hxx>
@@ -46,8 +47,6 @@ class World
 	SpacePartition * _scheduler;
 public:
 	typedef std::map< std::string, int> RasterNameMap;
-	typedef std::list< Agent* > AgentsList;
-	typedef std::vector< Agent* > AgentsVector;
 protected:		
 	Simulation _simulation;
 

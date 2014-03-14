@@ -1428,7 +1428,7 @@ void SpacePartition::agentAdded( Agent * agent, bool executedAgent )
 	_executedAgentsHash.insert(make_pair(agent->getId(), agent));
 }
 
-World::AgentsList::iterator SpacePartition::getGhostAgent( const std::string & id )
+AgentsList::iterator SpacePartition::getGhostAgent( const std::string & id )
 {
 	for(AgentsList::iterator it=_overlapAgents.begin(); it!=_overlapAgents.end(); it++)		
 	{
@@ -1498,7 +1498,7 @@ void SpacePartition::removeAgents()
 	_removedAgents.clear();
 }
 
-World::AgentsVector SpacePartition::getAgent( const Point2D<int> & position, const std::string & type )
+AgentsVector SpacePartition::getAgent( const Point2D<int> & position, const std::string & type )
 {
 	std::vector<Agent *> result;
 	for(AgentsList::iterator it=_world.beginAgents(); it!=_world.endAgents(); it++)
@@ -1524,7 +1524,7 @@ World::AgentsVector SpacePartition::getAgent( const Point2D<int> & position, con
 	return result;
 }
 
-World::AgentsList::iterator SpacePartition::getOwnedAgent( const std::string & id )
+AgentsList::iterator SpacePartition::getOwnedAgent( const std::string & id )
 {
 	for(AgentsList::iterator it=_world.beginAgents(); it!=_world.endAgents(); it++)
 	{

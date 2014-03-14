@@ -23,6 +23,7 @@
 #include <boost/python.hpp>
 #include <boost/python/object.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
+#include <typedefs.hxx>
 #include <Point2D.hxx>
 #include <Size.hxx>
 #include <Rectangle.hxx>
@@ -232,7 +233,7 @@ public:
 	std::vector<std::string> getNeighboursIds( Engine::Agent & target, const double & radius, const std::string & type="all" )
 	{
 		std::vector<std::string> agentIds;
-		Engine::World::AgentsVector agents = getNeighbours(&target, radius, type);
+		Engine::AgentsVector agents = getNeighbours(&target, radius, type);
 		agentIds.resize(agents.size());
 		for(size_t i=0; i<agents.size(); i++)
 		{
@@ -244,7 +245,7 @@ public:
 	std::vector<std::string> getAgentIds(  const Engine::Point2D<int> & position, const std::string & type="all" )
 	{
 		std::vector<std::string> agentIds;
-		Engine::World::AgentsVector agents = getAgent(position, type);
+		Engine::AgentsVector agents = getAgent(position, type);
 		agentIds.resize(agents.size());
 		for(size_t i=0; i<agents.size(); i++)
 		{
