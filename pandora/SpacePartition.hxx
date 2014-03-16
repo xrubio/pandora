@@ -29,6 +29,7 @@
 #include <Serializer.hxx>
 #include <list>
 #include <vector>
+#include <Scheduler.hxx>
 
 namespace Engine
 {
@@ -63,17 +64,13 @@ struct MpiOverlap
   * It distributes a Pandora execution in different nodes using spatial partition
   * Each node contains the same amount of space and the agents inside
   * It is efficient for models where a homogeneous density of agents is expected around the whole world
-  * This is an implementation of the Bridge pattern, decoupling agent and position management from World class
   */
-class SpacePartition
+class SpacePartition : public Scheduler
 {
 	Serializer _serializer;	
 	
-	int _id;
-	int _numTasks;
 	Point2D<int> _localRasterSize;
 
-	World & _world;
 	//! map of already executed agents
 	std::map<std::string, Agent *> _executedAgentsHash;	
 
@@ -167,31 +164,27 @@ class SpacePartition
 	//! send overlapping data to neighbours before run
 	void initOverlappingData();
 
+	const Rectangle<int> & getOwnedArea() const;
+	//! returns the attribute _overlap
+	const int & getOverlap() const;
+	//! transform from global coordinates to real coordinates (in terms of world position)
+	Point2D<int> getRealPosition( const Point2D<int> & globalPosition ) const;
 
 public:
-	SpacePartition( const Simulation & simulation, const int & overlap, World & world, const std::string & fileName );
+	SpacePartition( const Simulation & simulation, const int & overlap, World & world, const std::string & fileName, bool finalize );
 	virtual ~SpacePartition();
 
 	void finish();
 
 	const Rectangle<int> & getBoundaries() const;
-	const Rectangle<int> & getOwnedArea() const;
 	//! initialization of the object World for the simulation. Required to be called before calling run.
 
 	//! initializes everything needed before creation of agents and rasters (i.e. sizes)
 	void init( int argc, char *argv[] );
 	// initialize data processes after creation of agents and rasters
-	void initData( std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters );
+	void initData();
 	//! responsible for executing the agents and update world 
 	void executeAgents();
-
-
-	//! returns the attribute _overlap
-	const int & getOverlap() const;
-
-	void setFinalize( const bool & finalize );
-	const int & getId() const;
-	const int & getNumTasks() const;
 
 	void agentAdded( Agent * agent, bool executedAgent );
 	void removeAgents();
@@ -201,8 +194,6 @@ public:
 	Agent * getAgent( const std::string & id );
 	AgentsVector getAgent( const Point2D<int> & position, const std::string & type="all" );
 
-	//! transform from global coordinates to real coordinates (in terms of world position)
-	Point2D<int> getRealPosition( const Point2D<int> & globalPosition ) const;
 	Point2D<int> getRandomPosition() const;
 
 	//! MPI version of wall time
@@ -263,6 +254,13 @@ public:
 		}
 		AgentsVector _neighbors;
 	};
+
+	void setValue( Raster & raster, const Point2D<int> & position, int value );
+	int getValue( const Raster & raster, const Point2D<int> & position ) const;
+	void setMaxValueAt( Raster & raster, const Point2D<int> & position, int value );
+	int getMaxValueAt( const Raster & raster, const Point2D<int> & position ) const;
+
+	friend class Serializer;
 };
 
 } // namespace Engine

@@ -28,7 +28,7 @@
 namespace Engine
 {
 
-SpacePartition::SpacePartition( const Simulation & simulation, const int & overlap, World & world, const std::string & fileName ) : _worldPos(-1,-1), _finalize(true), _overlap(overlap), _world(world), _id(-1), _numTasks(1), _initialTime(0.0f), _serializer(simulation, *this, fileName)
+SpacePartition::SpacePartition( const Simulation & simulation, const int & overlap, World & world, const std::string & fileName, bool finalize ) : Scheduler(world), _worldPos(-1,-1), _finalize(finalize), _overlap(overlap), _initialTime(0.0f), _serializer(simulation, *this, fileName)
 {
 }
 
@@ -52,10 +52,10 @@ void SpacePartition::init( int argc, char *argv[] )
 	stablishBoundaries();
 }
 
-void SpacePartition::initData( std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters )
+void SpacePartition::initData()
 {
 	// serializer init
-	_serializer.init( rasters, dynamicRasters, serializeRasters, _world);
+	_serializer.init(_world);
 
 	// mpi type registering
 	MpiFactory::instance()->registerTypes();
@@ -73,7 +73,7 @@ void SpacePartition::checkOverlapSize()
 	if(_overlap*2>subfieldSizeX || _overlap*2>subfieldSizeY)
 	{
 		std::stringstream oss;
-		oss << "SpacePartition::checkOverlapSize- subfield sizes: " << subfieldSizeX << "/" << subfieldSizeY << " from global: " << _world.getSize() << " and owned area: " << _ownedArea << " must be at least twice the value of overlap: " << _overlap << " to avoid conflicts between non adjacent subfields";
+		oss << "SpacePartition::checkOverlapSize- subfield sizes: " << subfieldSizeX << "/" << subfieldSizeY << " from global: " << _world.getSimulation().getSize() << " and owned area: " << _ownedArea << " must be at least twice the value of overlap: " << _overlap << " to avoid conflicts between non adjacent subfields";
 		throw Exception(oss.str());
 	}
 }
@@ -98,8 +98,8 @@ void SpacePartition::stablishBoundaries()
 		}
 	}
 	// owned area inside global coordinates, depending on worldPos
-	_ownedArea._size._width = _world.getSize()._width/sqrt(_numTasks);
-	_ownedArea._size._height = _world.getSize()._height/sqrt(_numTasks);
+	_ownedArea._size._width = _world.getSimulation().getSize()._width/sqrt(_numTasks);
+	_ownedArea._size._height = _world.getSimulation().getSize()._height/sqrt(_numTasks);
 	_ownedArea._origin._x = _worldPos._x*_ownedArea._size._width;
 	_ownedArea._origin._y = _worldPos._y*_ownedArea._size._height;
 
@@ -112,7 +112,7 @@ void SpacePartition::stablishBoundaries()
 		_boundaries._size._width += _overlap;
 	}
 	// east boundary
-	if(_ownedArea._origin._x!=_world.getSize()._width-_ownedArea._size._width)
+	if(_ownedArea._origin._x!=_world.getSimulation().getSize()._width-_ownedArea._size._width)
 	{
 		_boundaries._size._width += _overlap;
 	}
@@ -123,7 +123,7 @@ void SpacePartition::stablishBoundaries()
 		_boundaries._size._height += _overlap;
 	}
 	// south boundary
-	if(_ownedArea._origin._y!=_world.getSize()._height-_ownedArea._size._height)
+	if(_ownedArea._origin._y!=_world.getSimulation().getSize()._height-_ownedArea._size._height)
 	{
 		_boundaries._size._height += _overlap;
 	}
@@ -144,7 +144,7 @@ void SpacePartition::stablishBoundaries()
 
 	std::stringstream logName;
 	logName << "simulation_" << _id;
-	log_INFO(logName.str(), getWallTime() << " pos: " << _worldPos << ", global size: " << _world.getSize() << ", boundaries: " << _boundaries << " and owned area: " << _ownedArea);
+	log_INFO(logName.str(), getWallTime() << " pos: " << _worldPos << ", global size: " << _world.getSimulation().getSize() << ", boundaries: " << _boundaries << " and owned area: " << _ownedArea);
 	log_INFO(logName.str(), getWallTime() << " sections 0: " << _sections[0] << " - 1: " << _sections[1] << " - 2:" << _sections[2] << " - 3: " << _sections[3]);
 }
 
@@ -298,8 +298,8 @@ void SpacePartition::sendOverlapZones( const int & sectionIndex, const bool & en
 	}
 
 	for(size_t d=0; d<_world.getNumberOfRasters(); d++)
-	{
-		if(!_world.getStaticRasterIndex(d) || !_world.getDynamicRasterIndex(d))
+	{	
+		if(!_world.rasterExists(d) || !_world.isRasterDynamic(d))
 		{
 			log_DEBUG(logName.str(), getWallTime() << " step: " << _world.getCurrentStep() << " index: " << d << " not sending");
 			continue;
@@ -343,8 +343,8 @@ void SpacePartition::sendMaxOverlapZones()
 	logName << "MPI_raster_world_" << _id;
 	log_DEBUG(logName.str(), getWallTime() << " step: "  << _world.getCurrentStep() << " sendMaxOverlapZones");
 	for(size_t d=0; d<_world.getNumberOfRasters(); d++)
-	{
-		if(!_world.getStaticRasterIndex(d) || !_world.getDynamicRasterIndex(d))
+	{	
+		if(!_world.rasterExists(d) || !_world.isRasterDynamic(d))
 		{
 			continue;
 		}
@@ -624,7 +624,7 @@ void SpacePartition::receiveOverlapData( const int & sectionIndex, const bool & 
 	// for each raster, we receive data from all the active neighbors
 	for(size_t d=0; d<_world.getNumberOfRasters(); d++)
 	{	
-		if(!_world.getStaticRasterIndex(d) || !_world.getDynamicRasterIndex(d))
+		if(!_world.rasterExists(d) || !_world.isRasterDynamic(d))
 		{
 			continue;
 		}
@@ -664,7 +664,7 @@ void SpacePartition::receiveMaxOverlapData()
 	// for each raster, we receive data from all the active neighbors
 	for(size_t d=0; d<_world.getNumberOfRasters(); d++)
 	{
-		if(!_world.getStaticRasterIndex(d) || !_world.getDynamicRasterIndex(d))
+		if(!_world.rasterExists(d) || !_world.isRasterDynamic(d))
 		{
 			continue;
 		}
@@ -863,11 +863,6 @@ void SpacePartition::finish()
 		MpiFactory::instance()->cleanTypes();
 		MPI_Finalize();
 	}
-}
-
-void SpacePartition::setFinalize( const bool & finalize )
-{
-	_finalize = finalize;
 }
 
 const Rectangle<int> & SpacePartition::getBoundaries() const
@@ -1102,7 +1097,7 @@ Rectangle<int> SpacePartition::getOverlap( const int & id, const int & sectionIn
 		else
 		{
 			result._origin._x = _ownedArea._size._width/2;	
-			if(_ownedArea._origin._x+_ownedArea._size._width!=_world.getSize()._width)
+			if(_ownedArea._origin._x+_ownedArea._size._width!=_world.getSimulation().getSize()._width)
 			{
 				result._origin._x -= _overlap;
 			}
@@ -1135,7 +1130,7 @@ Rectangle<int> SpacePartition::getOverlap( const int & id, const int & sectionIn
 		else
 		{
 			result._origin._y = _ownedArea._size._height/2;
-			if(_ownedArea._origin._y+_ownedArea._size._height!=_world.getSize()._height)
+			if(_ownedArea._origin._y+_ownedArea._size._height!=_world.getSimulation().getSize()._height)
 			{
 				result._origin._y -= _overlap;
 			}
@@ -1177,7 +1172,7 @@ Rectangle<int> SpacePartition::getOverlap( const int & id, const int & sectionIn
 			}
 		}
 
-		if(_ownedArea._origin._x+_ownedArea._size._width!=_world.getSize()._width)
+		if(_ownedArea._origin._x+_ownedArea._size._width!=_world.getSimulation().getSize()._width)
 		{
 			result._size._width += _overlap;
 		}
@@ -1209,7 +1204,7 @@ Rectangle<int> SpacePartition::getOverlap( const int & id, const int & sectionIn
 			}
 		}
 
-		if(_ownedArea._origin._y+_ownedArea._size._height!=_world.getSize()._height)
+		if(_ownedArea._origin._y+_ownedArea._size._height!=_world.getSimulation().getSize()._height)
 		{
 			result._size._height += _overlap;
 		}
@@ -1400,16 +1395,6 @@ bool SpacePartition::needsToReceiveData( const int & id, const int & sectionInde
 const int & SpacePartition::getOverlap() const
 {
 	return _overlap;
-}
-
-const int & SpacePartition::getId() const
-{
-	return _id;
-}
-
-const int & SpacePartition::getNumTasks() const
-{
-	return _numTasks;
 }
 
 bool SpacePartition::hasBeenExecuted( Agent * agent )
@@ -1612,6 +1597,26 @@ AgentsVector SpacePartition::getNeighbours( Agent * target, const double & radiu
 	std::copy(overlapAgentsVector.begin(), overlapAgentsVector.end(), std::back_inserter(agentsVector));
 	std::random_shuffle(agentsVector.begin(), agentsVector.end());
 	return agentsVector;
+}
+	
+void SpacePartition::setValue( Raster & raster, const Point2D<int> & position, int value )
+{
+	raster.setValue(getRealPosition(position), value);
+}
+
+int SpacePartition::getValue( const Raster & raster, const Point2D<int> & position ) const
+{
+	return raster.getValue(getRealPosition(position));
+}
+
+void SpacePartition::setMaxValueAt( Raster & raster, const Point2D<int> & position, int value )
+{
+	raster.setMaxValue(getRealPosition(position), value);
+}
+
+int SpacePartition::getMaxValueAt( const Raster & raster, const Point2D<int> & position ) const
+{
+	return raster.getMaxValueAt(getRealPosition(position));
 }
 
 } // namespace Engine

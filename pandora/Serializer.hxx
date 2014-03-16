@@ -86,7 +86,7 @@ public:
 	Serializer( const Simulation & simulation, const SpacePartition & scheduler, const std::string & resultsFile );
 	virtual ~Serializer();
 
-	void init( std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters, World & world );
+	void init(World & world );
 	void finish();
 
 	void serializeAttribute( const std::string & name, const int & value );

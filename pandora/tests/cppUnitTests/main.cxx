@@ -38,15 +38,16 @@ BOOST_AUTO_TEST_CASE( testSimulationSize )
 	BOOST_CHECK(size==mySimulation.getSize());
 }
 
-BOOST_AUTO_TEST_CASE( testExecuteWorldTwice ) 
+BOOST_AUTO_TEST_CASE( testExecuteTwoWorlds ) 
 {	
 	Engine::Simulation mySimulation(Engine::Size<int>(10,10), 1);
 	TestWorld myWorld(mySimulation);
 	myWorld.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
 	myWorld.run();
 
-	myWorld.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
-	myWorld.run();
+	TestWorld myWorld2(mySimulation);
+	myWorld2.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
+	myWorld2.run();
 }
 
 BOOST_AUTO_TEST_CASE( testAgentRemovedIsNotExecuted ) 

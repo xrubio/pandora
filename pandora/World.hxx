@@ -33,18 +33,18 @@
 #include <Rectangle.hxx>
 #include <Point2D.hxx>
 #include <Simulation.hxx>
-#include <SpacePartition.hxx>
+#include <Scheduler.hxx>
 
 #include <algorithm>
 
 namespace Engine
 {
-class SpacePartition;
+class Scheduler;
 class Agent;
 
 class World
 {
-	SpacePartition * _scheduler;
+	Scheduler * _scheduler;
 public:
 	typedef std::map< std::string, int> RasterNameMap;
 protected:		
@@ -86,7 +86,7 @@ public:
 	
 	The parameter 'fileName' references the file where the simulation will be dumped to.
 	*/
-	World( const Simulation & simulation, const int & overlap, const bool & allowMultipleAgentsPerCell, const std::string & fileName );
+	World( const Simulation & simulation, const int & overlap, const bool & allowMultipleAgentsPerCell, const std::string & fileName, bool finalise = true );
 	
 	virtual ~World();
 
@@ -148,9 +148,9 @@ public:
 	void setMaxValue( const int & index, const Point2D<int> & position, int value );
 
 	//! gets the maximum allowed value of raster "key" in global position "position"
-	int getMaxValueAt( const std::string & key, const Point2D<int> & position );
+	int getMaxValueAt( const std::string & key, const Point2D<int> & position ) const;
 	//! gets the maximum allowed value of raster "index" in global position "position"
-	int getMaxValueAt( const int & index, const Point2D<int> & position );
+	int getMaxValueAt( const int & index, const Point2D<int> & position ) const;
 
 	// get a raster name from its index
 	const std::string & getRasterName( const int & index ) const;
@@ -173,21 +173,28 @@ public:
 	const Rectangle<int> & getBoundaries() const;
 
 	// methods that need to be defined for current state of the code
-	const Size<int> & getSize() const;
 	AgentsList::iterator beginAgents() { return _agents.begin(); }
 	AgentsList::iterator endAgents() { return _agents.end(); }
 	size_t getNumberOfRasters() const { return _rasters.size(); }
-	StaticRaster * getStaticRasterIndex( size_t index ) { return _rasters.at(index); }
-	bool getDynamicRasterIndex( size_t index ) { return _dynamicRasters.at(index); }
 	void eraseAgent( AgentsList::iterator & it ) { _agents.erase(it); }
 	void removeAgent( Agent * agent );
 	Agent * getAgent( const std::string & id );
 	AgentsVector getAgent( const Point2D<int> & position, const std::string & type="all" );
-	void setFinalize( const bool & finalize );
 	void addStringAttribute( const std::string & type, const std::string & key, const std::string & value );
 	void addIntAttribute( const std::string & type, const std::string & key, int value );
 	const int & getId() const;
 	const int & getNumTasks() const;
+
+	bool rasterToSerialize( size_t index ) { return _serializeRasters.at(index); }
+	bool isRasterDynamic( size_t index ) { return _dynamicRasters.at(index); }
+	bool rasterExists( size_t index )
+	{
+		if(_rasters.at(index))
+		{
+			return true;
+		}
+		return false;
+	}
 };
 
 } // namespace Engine

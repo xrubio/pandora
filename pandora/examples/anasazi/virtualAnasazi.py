@@ -11,7 +11,7 @@ import time
 sys.path.append('/home/xrubio/workspace/pandora/pandora/pyPandora/')
 sys.path.append('/home/xrubio/workspace/pandora/pandora/')
 
-from pyPandora import Simulation, Agent, World, Point2DInt
+from pyPandora import Simulation, Agent, World, Point2DInt, SizeInt
 
 def enum(**enums):
 	""" converts a sequence of values to an C++ style enum """
@@ -76,7 +76,7 @@ class HistoricalSettlement():
 
 class ValleyConfig():
 	def __init__(self):
-		self._size = Point2DInt(0,0)
+		self._size = SizeInt(0,0)
 		self._numSteps = 0
 
 		self._landCover = 'unknown'
@@ -118,8 +118,8 @@ class ValleyConfig():
 		self._resultsFile = str(root.find('output').get('resultsFile'))
 		self._logsDir = str(root.find('output').get('logsDir'))
 
-		self._size._x = int(root.find('size').get('width'))
-		self._size._y = int(root.find('size').get('height'))
+		self._size._width = int(root.find('size').get('width'))
+		self._size._height = int(root.find('size').get('height'))
 		self._numSteps = int(root.find('numSteps').get('value'))
 		self._serializeResolution = int(root.find('numSteps').get('serializeResolution'))
 
@@ -269,8 +269,8 @@ class Household(Agent):
 		self._fertilityAge = random.randint(self.getWorld()._config._minFertilityAge, self.getWorld()._config._maxFertilityAge)
 		self._fertilityEndsAge = random.randint(self.getWorld()._config._minFertilityEndsAge, self.getWorld()._config._maxFertilityEndsAge)
 
-		self._bestFarm = Point2DInt(random.randint(0, self.getWorld()._config._size._x-1), random.randint(0, self.getWorld()._config._size._y-1))
-		self.position = Point2DInt(random.randint(0, self.getWorld()._config._size._x-1), random.randint(0, self.getWorld()._config._size._y-1))
+		self._bestFarm = Point2DInt(random.randint(0, self.getWorld()._config._size._width-1), random.randint(0, self.getWorld()._config._size._height-1))
+		self.position = Point2DInt(random.randint(0, self.getWorld()._config._size._width-1), random.randint(0, self.getWorld()._config._size._height-1))
 		self.getWorld().setValue('farms', self._bestFarm, 1)
 		self.getWorld().setValue('households', self.position, self.getWorld().getValue('households', self.position)+1)
 			
@@ -399,8 +399,8 @@ class Valley(World):
 		line = f.readline().split(' ')
 		index = 0
 
-		for i in range(0, self._config._size._x):
-			for j in range(0, self._config._size._y):
+		for i in range(0, self._config._size._width):
+			for j in range(0, self._config._size._height):
 				value = int(line[index])
 				maizeZone = maize.eEmpty
 				
@@ -600,8 +600,8 @@ class Valley(World):
 
 	def loadData(self):
 		
-		for i in range(0, self._config._size._x):
-			for j in range(0, self._config._size._y):
+		for i in range(0, self._config._size._width):
+			for j in range(0, self._config._size._height):
 				self._locations.append(Point2DInt(i, j))
 
 		[self.fillQuality(location) for location in self._locations]

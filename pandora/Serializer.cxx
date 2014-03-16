@@ -45,7 +45,7 @@ Serializer::~Serializer()
 {
 }
 
-void Serializer::init(std::vector<StaticRaster * > rasters, std::vector<bool> & dynamicRasters, std::vector<bool> serializeRasters, World & world )
+void Serializer::init(World & world )
 {
 	std::stringstream logName;
 	logName << "Serializer_" << _scheduler.getId();
@@ -115,9 +115,9 @@ void Serializer::init(std::vector<StaticRaster * > rasters, std::vector<bool> & 
 	hid_t rasterNameFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	hid_t rasterNameDatasetId = H5Dcreate(_fileId, "rasters", H5T_NATIVE_INT, rasterNameFileSpace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 	// dynamic raster, store every time step
-	for(size_t i=0; i<rasters.size(); i++)
+	for(size_t i=0; i<world.getNumberOfRasters(); i++)
 	{
-		if(!rasters.at(i) || !serializeRasters.at(i) || !dynamicRasters.at(i))
+		if(!world.rasterExists(i) || !world.rasterToSerialize(i) || !world.isRasterDynamic(i))
 		{
 			continue;
 		}
@@ -130,9 +130,9 @@ void Serializer::init(std::vector<StaticRaster * > rasters, std::vector<bool> & 
 
 	// static raster, store just at the beginning of the simulation
 	rasterNameDatasetId = H5Dcreate(_fileId, "staticRasters", H5T_NATIVE_INT, rasterNameFileSpace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-	for(size_t i=0; i<rasters.size(); i++)
+	for(size_t i=0; i<world.getNumberOfRasters(); i++)
 	{
-		if(!rasters.at(i) || !serializeRasters.at(i) || dynamicRasters.at(i))
+		if(!world.rasterExists(i) || !world.rasterToSerialize(i) || world.isRasterDynamic(i))
 		{
 			continue;
 		}
@@ -149,14 +149,14 @@ void Serializer::init(std::vector<StaticRaster * > rasters, std::vector<bool> & 
 
 	// color tables
 	hid_t colorTableGroupId = H5Gcreate(_fileId, "colorTables", 0, H5P_DEFAULT, H5P_DEFAULT);
-	for(size_t i=0; i<rasters.size(); i++)
+	for(size_t i=0; i<world.getNumberOfRasters(); i++)
 	{
-		if(!rasters.at(i) || !serializeRasters.at(i))
+		if(!world.rasterExists(i) || !world.rasterToSerialize(i))
 		{
 			continue;
 		}
 		hsize_t numEntries[2];
-		numEntries[0] = rasters.at(i)->getNumColorEntries();
+		numEntries[0] = world.getStaticRaster(i).getNumColorEntries();		
 		numEntries[1] = 4; 
 		hid_t fileSpace = H5Screate_simple(2, numEntries, NULL); 
 		
@@ -187,22 +187,22 @@ void Serializer::init(std::vector<StaticRaster * > rasters, std::vector<bool> & 
 		{
 			// red
 			size_t index = z*numEntries[1];
-			int value = (int)(rasters.at(i)->getColorEntry(z)._r);
+			int value = (int)(world.getStaticRaster(i).getColorEntry(z)._r);
 			data[index] = value;
 
 			// green
 			index++;
-			value = (int)(rasters.at(i)->getColorEntry(z)._g);
+			value = (int)(world.getStaticRaster(i).getColorEntry(z)._g);
 			data[index] = value;
 			
 			// blue
 			index++;
-			value = (int)(rasters.at(i)->getColorEntry(z)._b);
+			value = (int)(world.getStaticRaster(i).getColorEntry(z)._b);
 			data[index] = value;
 
 			// alpha
 			index++;
-			value = (int)(rasters.at(i)->getColorEntry(z)._alpha);
+			value = (int)(world.getStaticRaster(i).getColorEntry(z)._alpha);
 			data[index] = value;
 		}
 	    // Create property list for collective dataset write.
@@ -254,9 +254,9 @@ void Serializer::init(std::vector<StaticRaster * > rasters, std::vector<bool> & 
 	H5Pset_chunk(propertyListId, 2, chunkDimensions);
 
 	// static rasters	
-	for(size_t i=0; i<rasters.size(); i++)
+	for(size_t i=0; i<world.getNumberOfRasters(); i++)
 	{
-		if(!rasters.at(i) || !serializeRasters.at(i) || dynamicRasters.at(i))
+		if(!world.rasterExists(i) || !world.rasterToSerialize(i) || world.isRasterDynamic(i))
 		{
 			continue;
 		}
@@ -270,9 +270,9 @@ void Serializer::init(std::vector<StaticRaster * > rasters, std::vector<bool> & 
 	}
 
 	// dynamic rasters
-	for(size_t i=0; i<rasters.size(); i++)
+	for(size_t i=0; i<world.getNumberOfRasters(); i++)
 	{
-		if(!rasters.at(i) || !serializeRasters.at(i) || !dynamicRasters.at(i))
+		if(!world.rasterExists(i) || !world.rasterToSerialize(i) || !world.isRasterDynamic(i))
 		{
 			continue;
 		}	
@@ -296,20 +296,20 @@ void Serializer::init(std::vector<StaticRaster * > rasters, std::vector<bool> & 
 	H5Pclose(propertyListId);
 
 	StaticRastersRefMap staticRasters;
-	for(size_t i=0; i<rasters.size(); i++)
+	for(size_t i=0; i<world.getNumberOfRasters(); i++)
 	{
-		if(!rasters.at(i) || !serializeRasters.at(i))
+		if(!world.rasterExists(i) || !world.rasterToSerialize(i))
 		{
 			continue;
 		}
 
-		if(!dynamicRasters.at(i))
+		if(!world.isRasterDynamic(i))
 		{
-			staticRasters.insert(std::make_pair(world.getRasterName(i), rasters.at(i)));
+			staticRasters.insert(std::make_pair(world.getRasterName(i), &world.getStaticRaster(i)));
 		}
 		else
 		{
-			_dynamicRasters.insert(std::make_pair(world.getRasterName(i), rasters.at(i)));
+			_dynamicRasters.insert(std::make_pair(world.getRasterName(i), &world.getStaticRaster(i)));
 		}
 	}
 	serializeStaticRasters(staticRasters);

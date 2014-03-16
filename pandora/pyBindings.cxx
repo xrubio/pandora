@@ -186,7 +186,7 @@ public:
 class WorldWrap : public Engine::World, public boost::python::wrapper<Engine::World>
 {
 public:
-	WorldWrap( const Engine::Simulation & simulation, const int & overlap, const bool & allowMultipleAgentsPerCell, const std::string & fileName ) : World( simulation, overlap, allowMultipleAgentsPerCell, fileName)
+	WorldWrap( const Engine::Simulation & simulation, const int & overlap, const bool & allowMultipleAgentsPerCell, const std::string & fileName, bool finalise ) : World( simulation, overlap, allowMultipleAgentsPerCell, fileName, finalise)
 	{
 	}
 
@@ -427,7 +427,7 @@ BOOST_PYTHON_MODULE(libpyPandora)
 	boost::python::class_< std::vector<std::string> >("StringVector").def(boost::python::vector_indexing_suite< std::vector<std::string> >());
 	boost::python::class_< std::vector<int> >("IntVector").def(boost::python::vector_indexing_suite< std::vector<int> >());
 	
-	boost::python::class_< WorldWrap, boost::noncopyable >("WorldStub", boost::python::init< const Engine::Simulation & , const int &, const bool &, const std::string & >() )
+	boost::python::class_< WorldWrap, boost::noncopyable >("WorldStub", boost::python::init< const Engine::Simulation & , const int &, const bool &, const std::string &, bool >() )
 		.def("createRasters", boost::python::pure_virtual(&Engine::World::createRasters))
 		.def("createAgents", boost::python::pure_virtual(&Engine::World::createAgents))
 		.def("stepEnvironment", &Engine::World::stepEnvironment, &WorldWrap::default_StepEnvironment)
@@ -440,7 +440,6 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("run", &Engine::World::run)
 		.def("addAgentStub", &WorldWrap::addAgentSimple)
 		.def("setValue", setValue)
-		.def("setFinalize", &Engine::World::setFinalize)
 		.def("getValue", getValue)
 		.def("getAgentIds", &WorldWrap::getAgentIds)
 		.def("getNeighboursIds", &WorldWrap::getNeighboursIds)

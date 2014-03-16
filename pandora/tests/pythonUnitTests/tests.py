@@ -21,9 +21,7 @@ class TestAgent(Agent):
 
 class TestWorld(World):
 	def __init__(self, simulation, worldOfLastTest = False ):
-		World.__init__( self, simulation)
-		if not worldOfLastTest:
-			self.setFinalize(False)
+		World.__init__( self, simulation, 0, True, 'data/results.h5', worldOfLastTest)
 
 	def createRasters(self):
 		return
@@ -69,12 +67,12 @@ class TestPyPandora(unittest.TestCase):
 		self.assertEqual(myAgent.exists, False)
 		myWorld.run()
 	
-	def testExecuteWorldTwice(self):
+	def testExecuteTwoWorlds(self):
 		mySimulation = Simulation(SizeInt(10,10), 1)
-		myWorld = TestWorld(mySimulation, False)
+		myWorld = TestWorld(mySimulation)
 		myWorld.initialize()
 		myWorld.run()
-		myWorld.setFinalize(True)
+		myWorld = TestWorld(mySimulation, True)
 		myWorld.initialize()
 		myWorld.run()
 	

@@ -22,6 +22,7 @@
 #include <World.hxx>
 #include <Agent.hxx>
 #include <Exceptions.hxx>
+#include <SpacePartition.hxx>
 
 #include <GeneralState.hxx>
 
@@ -39,9 +40,9 @@
 namespace Engine
 {
 
-World::World( const Simulation & simulation, const int & overlap, const bool & allowMultipleAgentsPerCell, const std::string & fileName ) : _scheduler(0), _simulation(simulation), _allowMultipleAgentsPerCell(allowMultipleAgentsPerCell), _step(0)
+World::World( const Simulation & simulation, const int & overlap, const bool & allowMultipleAgentsPerCell, const std::string & fileName, bool finalize ) : _scheduler(0), _simulation(simulation), _allowMultipleAgentsPerCell(allowMultipleAgentsPerCell), _step(0)
 {
-	_scheduler = new SpacePartition(simulation, overlap, *this, fileName );
+	_scheduler = new SpacePartition(simulation, overlap, *this, fileName, finalize );
 }
 
 World::~World()
@@ -73,7 +74,7 @@ void World::initialize(int argc, char *argv[])
 	createRasters();
 	createAgents();		
 	
-	_scheduler->initData(_rasters, _dynamicRasters, _serializeRasters);
+	_scheduler->initData();
 }
 
 
@@ -312,7 +313,8 @@ void World::setValue( const std::string & key, const Point2D<int> & position, in
 
 void World::setValue( const int & index, const Point2D<int> & position, int value )
 {
-	((Raster*)_rasters.at(index))->setValue(_scheduler->getRealPosition(position), value);
+	Raster * raster = (Raster*)(_rasters.at(index));
+	_scheduler->setValue(*raster, position, value);
 }
 
 int World::getValue( const std::string & key, const Point2D<int> & position ) const
@@ -323,7 +325,8 @@ int World::getValue( const std::string & key, const Point2D<int> & position ) co
 
 int World::getValue( const int & index, const Point2D<int> & position ) const
 {
-	return _rasters.at(index)->getValue(_scheduler->getRealPosition(position));
+	Raster * raster = (Raster*)(_rasters.at(index));
+	_scheduler->getValue(*raster, position);
 }
 
 void World::setMaxValue( const std::string & key, const Point2D<int> & position, int value )
@@ -334,21 +337,20 @@ void World::setMaxValue( const std::string & key, const Point2D<int> & position,
 
 void World::setMaxValue( const int & index, const Point2D<int> & position, int value )
 {
-	((Raster*)_rasters.at(index))->setMaxValue(_scheduler->getRealPosition(position), value);
+	Raster * raster = (Raster*)(_rasters.at(index));
+	_scheduler->setMaxValueAt(*raster, position, value);
 }
 
-int World::getMaxValueAt( const std::string & key, const Point2D<int> & position )
+int World::getMaxValueAt( const std::string & key, const Point2D<int> & position ) const
 {
 	RasterNameMap::const_iterator it = _rasterNames.find(key);
 	return getMaxValueAt(it->second, position);
 }
 
-int World::getMaxValueAt( const int & index, const Point2D<int> & position )
+int World::getMaxValueAt( const int & index, const Point2D<int> & position ) const
 {
-	std::stringstream logName;
-	logName << "max_value_" << getId();
-	log_DEBUG(logName.str(), getWallTime() << " accessing to pos: " << position << " real: " << _scheduler->getRealPosition(position) << " for index: " << index);
-	return ((Raster*)_rasters.at(index))->getMaxValueAt(_scheduler->getRealPosition(position));
+	Raster * raster = (Raster*)(_rasters.at(index));
+	_scheduler->getMaxValueAt(*raster, position);
 }
 
 int World::countNeighbours( Agent * target, const double & radius, const std::string & type )
@@ -395,11 +397,9 @@ const std::string & World::getRasterName( const int & index) const
 const int & World::getId() const { return _scheduler->getId(); }
 const int & World::getNumTasks() const { return _scheduler->getNumTasks(); }
 const Rectangle<int> & World::getBoundaries() const{ return _scheduler->getBoundaries(); }
-const Size<int> & World::getSize() const{ return _simulation.getSize(); }
 void World::removeAgent( Agent * agent ) { _scheduler->removeAgent(agent); }
 Agent * World::getAgent( const std::string & id ) { return _scheduler->getAgent(id); }
 AgentsVector World::getAgent( const Point2D<int> & position, const std::string & type) { return _scheduler->getAgent(position, type); }
-void World::setFinalize( const bool & finalize ) { _scheduler->setFinalize(finalize); }
 void World::addStringAttribute( const std::string & type, const std::string & key, const std::string & value ) { _scheduler->addStringAttribute(type, key, value);}
 void World::addIntAttribute( const std::string & type, const std::string & key, int value ) { _scheduler->addIntAttribute(type, key, value); }
 
