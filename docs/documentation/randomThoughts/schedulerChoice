@@ -16,7 +16,7 @@ world.run();
 # opció 2: factory method
 
 Engine::Simulation helloWorldSim(config.getSize(), config.getNumSteps(), config.getSerializeResolution());
-Examples::RandomWorld world( Scheduler::createSpacePartition(), helloWorldSim, config);
+Examples::RandomWorld world( createSpacePartition(), helloWorldSim, config);
 world.initialize(argc, argv);
 world.run();
 
