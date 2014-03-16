@@ -24,4 +24,14 @@ for(size_t x=getBoundaries().left(); x<=getBoundaries().right(); x++)
 	}
 }
 
+# alternate 3: based on guillem's idea, use iterators:
+for (Rectangle::iterator it = boundaries.cbegin(); it != boundaries.cend(); ++it) {
+     // *it ...
+}
+
+# alternate 4: c++11 style:
+O, en c++11, encara més maco :o):
+for (auto point:boundaries) {
+
+}
 
