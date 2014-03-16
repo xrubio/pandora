@@ -40,9 +40,13 @@
 namespace Engine
 {
 
-World::World( const Simulation & simulation, const int & overlap, const bool & allowMultipleAgentsPerCell, const std::string & fileName, bool finalize ) : _scheduler(0), _simulation(simulation), _allowMultipleAgentsPerCell(allowMultipleAgentsPerCell), _step(0)
+World::World( const Simulation & simulation, Scheduler * scheduler, const bool & allowMultipleAgentsPerCell) : _simulation(simulation), _allowMultipleAgentsPerCell(allowMultipleAgentsPerCell), _step(0), _scheduler(scheduler)
 {
-	_scheduler = new SpacePartition(simulation, overlap, *this, fileName, finalize );
+	// default Scheduler 
+	if(!_scheduler)
+	{
+		_scheduler = useSpacePartition();
+	}
 }
 
 World::~World()
@@ -392,6 +396,12 @@ const std::string & World::getRasterName( const int & index) const
 	std::stringstream oss;
 	oss << "World::getRasterName - index: " << index << " doest no have a name";
 	throw Exception(oss.str());
+}
+
+
+Scheduler * World::useSpacePartition(const std::string & fileName, int overlap, bool finalize )
+{
+	return new SpacePartition( _simulation, overlap, *this, fileName, finalize);
 }
 
 const int & World::getId() const { return _scheduler->getId(); }
