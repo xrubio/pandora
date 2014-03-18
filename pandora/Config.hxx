@@ -72,6 +72,7 @@ public:
 
 	const int & getNumSteps() const;
 	const int & getSerializeResolution() const;
+	const std::string & getResultsFile() const{return _resultsFile; }
   
 };
 

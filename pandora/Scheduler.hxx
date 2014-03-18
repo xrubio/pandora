@@ -14,6 +14,7 @@ protected:
 	int _id;
 	int _numTasks;
 	World & _world;
+	
 public:
 	Scheduler( World & world ) : _id(0), _numTasks(1), _world(world) { }
 	virtual ~Scheduler() {}

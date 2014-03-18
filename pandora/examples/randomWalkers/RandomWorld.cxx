@@ -11,7 +11,7 @@
 namespace Examples 
 {
 
-RandomWorld::RandomWorld( Engine::Simulation & simulation, const RandomWorldConfig & config ) : World(simulation, 1, false, config._resultsFile), _config(config)
+RandomWorld::RandomWorld(const RandomWorldConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler ) : World(simulation, scheduler, false), _config(config)
 {
 }
 

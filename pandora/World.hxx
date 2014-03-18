@@ -86,7 +86,7 @@ public:
 	
 	The parameter 'fileName' references the file where the simulation will be dumped to.
 	*/
-	World( const Simulation & simulation, const int & overlap, const bool & allowMultipleAgentsPerCell, const std::string & fileName, bool finalise = true );
+	World( const Simulation & simulation, Scheduler * scheduler = 0, const bool & allowMultipleAgentsPerCell = true);
 	
 	virtual ~World();
 
@@ -195,6 +195,9 @@ public:
 		}
 		return false;
 	}
+
+	//! factory method for Scheduler SpacePartition
+	Scheduler * useSpacePartition(const std::string & fileName = "data/results.h5", int overlap = 1, bool finalize = true );
 };
 
 } // namespace Engine

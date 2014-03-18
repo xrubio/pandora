@@ -7,7 +7,7 @@
 namespace Test 
 {
 
-TestWorld::TestWorld( Engine::Simulation & simulation, bool worldOfLastTest ) : World(simulation, 1, false, "data/results.h5", worldOfLastTest)
+TestWorld::TestWorld( Engine::Simulation & simulation, Engine::Scheduler * scheduler) : World(simulation, scheduler, false)
 {
 }
 

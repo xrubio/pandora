@@ -21,7 +21,7 @@ class RandomWorld : public Engine::World
 
 	const RandomWorldConfig & _config;
 public:
-	RandomWorld( Engine::Simulation & simulation, const RandomWorldConfig & config );
+	RandomWorld(const RandomWorldConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0);
 	virtual ~RandomWorld();
 };
 

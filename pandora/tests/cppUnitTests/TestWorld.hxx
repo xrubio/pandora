@@ -19,7 +19,7 @@ class TestWorld : public Engine::World
 
 public:
 	// worldOfLastTest must be true for the last world in test in order to clean up MPI state
-	TestWorld( Engine::Simulation & simulation, bool worldOfLastTest = false );
+	TestWorld( Engine::Simulation & simulation, Engine::Scheduler * scheduler );
 	virtual ~TestWorld();
 };
 

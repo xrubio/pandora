@@ -21,7 +21,8 @@ class TestAgent(Agent):
 
 class TestWorld(World):
 	def __init__(self, simulation, worldOfLastTest = False ):
-		World.__init__( self, simulation, 0, True, 'data/results.h5', worldOfLastTest)
+		foo = self.useSpacePartition('data/results.h5', 1, worldOfLastTest)
+		World.__init__( self, simulation, self.useSpacePartition('data/results.h5', 1, worldOfLastTest))
 
 	def createRasters(self):
 		return
