@@ -32,9 +32,10 @@
 #include <Point2D.hxx>
 #include <Size.hxx>
 
+#include <vector>
+
 namespace Engine
 {
-
 // 2D Rectangle
 template <typename Type> class Rectangle
 {
@@ -47,7 +48,7 @@ public:
 	{
 	}
 
-	Rectangle( const Point2D<Type> & origin, const Size<Type> & size ) : _origin(origin), _size(size)
+	Rectangle( const Size<Type> & size, const Point2D<Type> & origin = Point2D<Type>(0,0)) : _origin(origin), _size(size)
 	{
 	}
 
@@ -138,6 +139,54 @@ public:
 	bool operator!=( const Rectangle<Type> & rectangle ) const
 	{
 		return !((*this)==rectangle);
+	}
+
+public:	
+	class iterator
+	{	
+		int _initialX;
+		Point2D<int> _data;
+		int _width;
+	public:
+		iterator( const Point2D<int> origin, int width ) : _initialX(origin._x), _data(origin), _width(width)
+		{
+			std::cout << "building iterator" << std::endl;
+		}
+		Point2D<int> & operator*()
+		{
+			return _data;
+		}
+
+		iterator operator++()
+		{
+			if(_data._x<(_initialX+_width-1))
+			{
+				_data._x++;
+			}
+			else
+			{
+				_data._x = _initialX;
+				_data._y++;
+			}
+			return *this;
+		}
+
+		bool operator!=( const iterator & other )
+		{
+			return _data != other._data;
+		}
+	};
+
+	std::vector<int> _foo;	
+	
+	iterator begin()
+	{
+		return iterator(_origin, _size._width); 
+	}
+	
+	iterator end()
+	{
+		return iterator(_origin+Point2D<int>(0,_size._height), _size._width); 
 	}
 };
 
