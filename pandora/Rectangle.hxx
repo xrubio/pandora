@@ -150,7 +150,6 @@ public:
 	public:
 		iterator( const Point2D<int> origin, int width ) : _initialX(origin._x), _data(origin), _width(width)
 		{
-			std::cout << "building iterator" << std::endl;
 		}
 		Point2D<int> & operator*()
 		{
