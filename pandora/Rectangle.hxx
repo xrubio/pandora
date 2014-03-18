@@ -32,7 +32,7 @@
 #include <Point2D.hxx>
 #include <Size.hxx>
 
-#include <vector>
+#include <iostream>
 
 namespace Engine
 {
@@ -128,7 +128,7 @@ public:
 
 	Rectangle<Type> clone() const
 	{
-		return Rectangle<int>(_origin, _size);
+		return Rectangle<int>(_size, _origin);
 	}
 	
 	bool operator==( const Rectangle<Type> & rectangle ) const
@@ -148,10 +148,11 @@ public:
 		Point2D<int> _data;
 		int _width;
 	public:
-		iterator( const Point2D<int> origin, int width ) : _initialX(origin._x), _data(origin), _width(width)
+		iterator( const Point2D<int> & origin, const int & width ) : _initialX(origin._x), _data(origin), _width(width)
 		{
+			std::cout << "iterator" << std::endl;
 		}
-		Point2D<int> & operator*()
+		const Point2D<int> & operator*() const
 		{
 			return _data;
 		}
@@ -169,14 +170,61 @@ public:
 			}
 			return *this;
 		}
-
-		bool operator!=( const iterator & other )
+		
+		iterator& operator++(int )
 		{
-			return _data != other._data;
+			iterator tmp(*this);
+			operator++();
+			return tmp;
+		}
+
+		bool operator!=( const iterator & other ) const
+		{
+			return (_initialX!=other._initialX) || (_width!=other._width) || (_data != other._data);
 		}
 	};
+	
+	class const_iterator
+	{	
+		int _initialX;
+		Point2D<int> _data;
+		int _width;
+	public:
+		const_iterator( const Point2D<Type> & origin, const int & width ) : _initialX(origin._x), _data(origin), _width(width)
+		{
+			std::cout << "const iterator" << std::endl;
+		}
+		const Point2D<int> & operator*() const
+		{
+			return _data;
+		}
 
-	std::vector<int> _foo;	
+		const_iterator operator++()
+		{
+			if(_data._x<(_initialX+_width-1))
+			{
+				_data._x++;
+			}
+			else
+			{
+				_data._x = _initialX;
+				_data._y++;
+			}
+			return *this;
+		}
+		
+		const_iterator& operator++(int )
+		{
+			iterator tmp(*this);
+			operator++();
+			return tmp;
+		}
+
+		bool operator!=( const const_iterator & other ) const
+		{
+			return (_initialX!=other._initialX) || (_width!=other._width) || (_data != other._data);
+		}
+	};
 	
 	iterator begin()
 	{
@@ -186,6 +234,16 @@ public:
 	iterator end()
 	{
 		return iterator(_origin+Point2D<int>(0,_size._height), _size._width); 
+	}
+	
+	const_iterator begin() const
+	{
+		return const_iterator(_origin, _size._width); 
+	}
+	
+	const_iterator end() const
+	{
+		return const_iterator(_origin+Point2D<int>(0,_size._height), _size._width); 
 	}
 };
 

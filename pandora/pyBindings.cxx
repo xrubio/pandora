@@ -382,7 +382,7 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("clone", &SizeInt::clone)
 	;	
 
-	boost::python::class_< RectangleInt>("RectangleIntStub", boost::python::init<const Point2DInt & , const SizeInt & >() )
+	boost::python::class_< RectangleInt>("RectangleIntStub", boost::python::init< const SizeInt &, const Point2DInt & >() )
 		.def_readwrite("_origin", &RectangleInt::_origin) 
 		.def_readwrite("_size", &RectangleInt::_size) 
 		.def("contains", &RectangleInt::contains) 

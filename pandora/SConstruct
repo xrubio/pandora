@@ -11,13 +11,13 @@ env.VariantDir('build', '.')
 libs = Split('pthread gdal hdf5 z tinyxml grass_gis boost_filesystem boost_system gomp')
 
 if int(release) == 0:
-	env['CCFLAGS'] = Split('-g -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG')
+	env['CCFLAGS'] = Split('-std=c++0x -g -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG')
 	if int(extremeDebug)==1:
 		env['CCFLAGS'] += ['-DPANDORAEDEBUG']
 	libraryName = 'pandorad'
 	pythonLibraryName = 'pyPandorad'
 else:
-	env['CCFLAGS'] = Split('-Ofast -DTIXML_USE_STL -fopenmp')
+	env['CCFLAGS'] = Split('-Ofast -DTIXML_USE_STL -fopenmp -std=c++0x ')
 	libraryName = 'pandora'
 	pythonLibraryName = 'pyPandora'
 

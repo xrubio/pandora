@@ -129,10 +129,10 @@ void SpacePartition::stablishBoundaries()
 	}
 	// creating sections
 	_sections.resize(4);
-	_sections[0] = Rectangle<int>(_ownedArea._origin, _ownedArea._size/2);
-	_sections[1] = Rectangle<int>(Point2D<int>(_ownedArea._origin._x+_ownedArea._size._width/2, _ownedArea._origin._y), _ownedArea._size/2);
-	_sections[2] = Rectangle<int>(Point2D<int>(_ownedArea._origin._x, _ownedArea._origin._y+_ownedArea._size._height/2), _ownedArea._size/2);
-	_sections[3] = Rectangle<int>(Point2D<int>(_ownedArea._origin._x+_ownedArea._size._width/2, _ownedArea._origin._y+_ownedArea._size._height/2), _ownedArea._size/2);
+	_sections[0] = Rectangle<int>(_ownedArea._size/2, _ownedArea._origin);
+	_sections[1] = Rectangle<int>(_ownedArea._size/2, Point2D<int>(_ownedArea._origin._x+_ownedArea._size._width/2, _ownedArea._origin._y));
+	_sections[2] = Rectangle<int>(_ownedArea._size/2, Point2D<int>(_ownedArea._origin._x, _ownedArea._origin._y+_ownedArea._size._height/2));
+	_sections[3] = Rectangle<int>(_ownedArea._size/2, Point2D<int>(_ownedArea._origin._x+_ownedArea._size._width/2, _ownedArea._origin._y+_ownedArea._size._height/2));
 
 	if(_ownedArea._size._width%2!=0 || _ownedArea._size._height%2!=0)
 	{
