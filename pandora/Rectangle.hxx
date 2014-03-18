@@ -32,8 +32,6 @@
 #include <Point2D.hxx>
 #include <Size.hxx>
 
-#include <iostream>
-
 namespace Engine
 {
 // 2D Rectangle
@@ -150,7 +148,6 @@ public:
 	public:
 		iterator( const Point2D<Type> & origin, const Type & width ) : _initialX(origin._x), _data(origin), _width(width)
 		{
-			std::cout << "iterator" << std::endl;
 		}
 		iterator( const iterator & other ) : _initialX(other._initialX), _data(other._data), _width(other._width)
 		{
@@ -195,7 +192,6 @@ public:
 	public:
 		const_iterator( const Point2D<Type> & origin, const Type & width ) : _initialX(origin._x), _data(origin), _width(width)
 		{
-			std::cout << "const iterator" << std::endl;
 		}
 
 		const_iterator( const const_iterator & other ) : _initialX(other._initialX), _data(other._data), _width(other._width)

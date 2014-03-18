@@ -27,12 +27,12 @@ env.Append( BUILDERS = {'GenerateMPICode' : generateMPICodeBuilder})
 linkFlags = Split('-fopenmp')
 libs = Split('tinyxml pthread grass_gis grass_datetime')
 if int(release) == 0:
-	env['CCFLAGS'] = Split('-g -O0 -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG')
+	env['CCFLAGS'] = Split('-g -O0 -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG -std=c++0x')
 	if int(extremeDebug)==1:
 		env['CCFLAGS'] += ['-DPANDORAEDEBUG']
 	libs += ['pandorad']
 else:
-	env['CCFLAGS'] = Split('-O3 -DTIXML_USE_STL -fopenmp')
+	env['CCFLAGS'] = Split('-O3 -DTIXML_USE_STL -fopenmp -std=c++0x')
 	libs += ['pandora']
 
 if int(useMpi)==1:

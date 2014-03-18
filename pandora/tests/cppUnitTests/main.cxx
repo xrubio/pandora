@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE( testAgentRemovedIsNotInInsideNeighbours )
 BOOST_AUTO_TEST_CASE( testRectangleEquals ) 
 {
 	Engine::Rectangle<int> aRectangle(5,10,20,30);
-	Engine::Rectangle<int> bRectangle(Engine::Point2D<int>(3,7), Engine::Size<int>(1,1));
+	Engine::Rectangle<int> bRectangle(Engine::Size<int>(1,1), Engine::Point2D<int>(3,7));
 
 	BOOST_CHECK(aRectangle!=bRectangle);
 
@@ -127,6 +127,18 @@ BOOST_AUTO_TEST_CASE( testRectangleContainsPoint )
 	BOOST_CHECK_EQUAL(aRectangle.contains(aPoint), false);
 }
 
+BOOST_AUTO_TEST_CASE( testRectangleIterator ) 
+{
+	Engine::Rectangle<int> aRectangle(Engine::Size<int>(5,4), Engine::Point2D<int>(5,7));
+	Engine::Point2D<int> sum(0,0);
+	
+	for(auto coordinate : aRectangle )
+	{
+		sum = sum + coordinate;
+	}
+	BOOST_CHECK_EQUAL(sum._x, 140);
+	BOOST_CHECK_EQUAL(sum._y, 170);
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 
