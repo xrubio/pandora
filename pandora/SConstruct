@@ -54,7 +54,7 @@ srcPyFiles = []
 for src in srcFiles:
 	srcPyFiles.append('build_py/'+src)
 
-srcPyFiles.append('build_py/pyBindings.cxx')
+srcPyFiles.append('build_py/pyPandora/pyBindings.cxx')
 
 srcPyFiles.append('build_py/MpiStubCode.cxx')
 

@@ -13,12 +13,12 @@ class SizeInt(libpyPandora.SizeIntStub):
 		libpyPandora.SizeIntStub.__init__(self, width, height)
 
 class RectangleInt(libpyPandora.RectangleIntStub):
-	def __init__(self, origin, size):
-		libpyPandora.RectangleIntStub.__init__(self, origin, size)
+	def __init__(self, size, origin = Point2DInt(0,0)):
+		libpyPandora.RectangleIntStub.__init__(self, size, origin)
 	
 	@classmethod
 	def fromCoordinates(self, left, top, right, bottom):
-		return RectangleInt(Point2DInt(left, top), SizeInt(1+right-left, 1+bottom-top))
+		return RectangleInt(SizeInt(1+right-left, 1+bottom-top), Point2DInt(left, top))
 
 class StaticRaster(libpyPandora.StaticRasterStub):
 	def __init__(self):
@@ -41,8 +41,8 @@ class Agent(libpyPandora.AgentStub):
 
 class World(libpyPandora.WorldStub):
 	_listOfAgents = []
-	def __init__(self, simulation, overlap=1, allowMultipleAgentsPerCell=0, resultsFile="data/results.h5", finalise = True ):
-		libpyPandora.WorldStub.__init__( self, simulation, overlap, allowMultipleAgentsPerCell, resultsFile, finalise)
+	def __init__(self, simulation, allowMultipleAgentsPerCell = True ):
+		libpyPandora.WorldStub.__init__( self, simulation, allowMultipleAgentsPerCell)
 
 	def addAgent(self, agent):
 		self.addAgentStub(agent)

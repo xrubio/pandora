@@ -20,9 +20,8 @@ class TestAgent(Agent):
 		return
 
 class TestWorld(World):
-	def __init__(self, simulation, worldOfLastTest = False ):
-		foo = self.useSpacePartition('data/results.h5', 1, worldOfLastTest)
-		World.__init__( self, simulation, self.useSpacePartition('data/results.h5', 1, worldOfLastTest))
+	def __init__(self, simulation):
+		World.__init__( self, simulation, True)
 
 	def createRasters(self):
 		return
@@ -102,7 +101,7 @@ class TestPyPandora(unittest.TestCase):
     	
 	def testRectangleEquals(self):
 		aRectangle = RectangleInt.fromCoordinates(5,10,20,30);
-		bRectangle = RectangleInt(Point2DInt(3,7), SizeInt(1,1))
+		bRectangle = RectangleInt(SizeInt(1,1), Point2DInt(3,7))
 
 		self.assertNotEqual(aRectangle, bRectangle)
 

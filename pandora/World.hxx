@@ -23,7 +23,6 @@
 #ifndef __World_hxx__
 #define __World_hxx__
 
-
 #include <map>
 #include <vector>
 #include <list>
@@ -79,12 +78,7 @@ public:
 	//! constructor.
 	/*!
 	The World object is bounded to a Simulation configuration through the parameter 'simulation'.
-	
-	The parameter 'overlap' defines the width of overlapping are between neighbour Sections (world divisions).
-	
 	The parameter 'allowMultipleAgentsPerCell' defines if more than one agent can occupy a cell of the World.
-	
-	The parameter 'fileName' references the file where the simulation will be dumped to.
 	*/
 	World( const Simulation & simulation, Scheduler * scheduler = 0, const bool & allowMultipleAgentsPerCell = true);
 	

@@ -29,7 +29,6 @@
 #include <Rectangle.hxx>
 #include <StaticRaster.hxx>
 #include <Raster.hxx>
-#include <Scheduler.hxx>
 #include <Simulation.hxx>
 #include <World.hxx>
 #include <Agent.hxx>
@@ -188,7 +187,7 @@ class WorldWrap : public Engine::World, public boost::python::wrapper<Engine::Wo
 {
 public:
 	// Scheduler for python is always default
-	WorldWrap( const Engine::Simulation & simulation, const bool & allowMultipleAgentsPerCell = true) : World( simulation, 0, allowMultipleAgentsPerCell )
+	WorldWrap(const Engine::Simulation & simulation, const bool & allowMultipleAgentsPerCell = true) : World( simulation, 0, allowMultipleAgentsPerCell )
 	{
 	}
 
@@ -429,7 +428,7 @@ BOOST_PYTHON_MODULE(libpyPandora)
 	boost::python::class_< std::vector<std::string> >("StringVector").def(boost::python::vector_indexing_suite< std::vector<std::string> >());
 	boost::python::class_< std::vector<int> >("IntVector").def(boost::python::vector_indexing_suite< std::vector<int> >());
 	
-	boost::python::class_< WorldWrap, boost::noncopyable >("WorldStub", boost::python::init< const Engine::Simulation & , const bool & >() )
+	boost::python::class_< WorldWrap, boost::noncopyable >("WorldStub", boost::python::init< const Engine::Simulation &, const bool & >() )
 		.def("createRasters", boost::python::pure_virtual(&Engine::World::createRasters))
 		.def("createAgents", boost::python::pure_virtual(&Engine::World::createAgents))
 		.def("stepEnvironment", &Engine::World::stepEnvironment, &WorldWrap::default_StepEnvironment)
