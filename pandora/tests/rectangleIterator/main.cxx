@@ -15,6 +15,12 @@ int main(int argc, char *argv[])
 	{
 		std::cout << "next pos: " << foo << std::endl;
 	}
+
+	std::cout << "cbegin/cend: " << std::endl;
+	for(auto foo = a.cbegin(); foo!=a.cend(); foo++)
+	{
+		std::cout << "\tconst next pos: " << *foo << std::endl;
+	}
 	return 0;
 }
 

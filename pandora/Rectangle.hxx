@@ -144,15 +144,18 @@ public:
 public:	
 	class iterator
 	{	
-		int _initialX;
-		Point2D<int> _data;
-		int _width;
+		Type _initialX;
+		Point2D<Type> _data;
+		Type _width;
 	public:
-		iterator( const Point2D<int> & origin, const int & width ) : _initialX(origin._x), _data(origin), _width(width)
+		iterator( const Point2D<Type> & origin, const Type & width ) : _initialX(origin._x), _data(origin), _width(width)
 		{
 			std::cout << "iterator" << std::endl;
 		}
-		const Point2D<int> & operator*() const
+		iterator( const iterator & other ) : _initialX(other._initialX), _data(other._data), _width(other._width)
+		{
+		}
+		const Point2D<Type> & operator*() const
 		{
 			return _data;
 		}
@@ -171,7 +174,7 @@ public:
 			return *this;
 		}
 		
-		iterator& operator++(int )
+		iterator operator++(int )
 		{
 			iterator tmp(*this);
 			operator++();
@@ -186,15 +189,19 @@ public:
 	
 	class const_iterator
 	{	
-		int _initialX;
-		Point2D<int> _data;
-		int _width;
+		Type _initialX;
+		Point2D<Type> _data;
+		Type _width;
 	public:
-		const_iterator( const Point2D<Type> & origin, const int & width ) : _initialX(origin._x), _data(origin), _width(width)
+		const_iterator( const Point2D<Type> & origin, const Type & width ) : _initialX(origin._x), _data(origin), _width(width)
 		{
 			std::cout << "const iterator" << std::endl;
 		}
-		const Point2D<int> & operator*() const
+
+		const_iterator( const const_iterator & other ) : _initialX(other._initialX), _data(other._data), _width(other._width)
+		{
+		}
+		const Point2D<Type> & operator*() const
 		{
 			return _data;
 		}
@@ -213,9 +220,9 @@ public:
 			return *this;
 		}
 		
-		const_iterator& operator++(int )
+		const_iterator operator++(int )
 		{
-			iterator tmp(*this);
+			const_iterator tmp(*this);
 			operator++();
 			return tmp;
 		}
@@ -233,9 +240,19 @@ public:
 	
 	iterator end()
 	{
-		return iterator(_origin+Point2D<int>(0,_size._height), _size._width); 
+		return iterator(_origin+Point2D<Type>(0,_size._height), _size._width); 
 	}
 	
+	const_iterator cbegin()
+	{
+		return const_iterator(_origin, _size._width); 
+	}
+	
+	const_iterator cend()
+	{
+		return const_iterator(_origin+Point2D<Type>(0,_size._height), _size._width); 
+	}
+
 	const_iterator begin() const
 	{
 		return const_iterator(_origin, _size._width); 
@@ -243,7 +260,7 @@ public:
 	
 	const_iterator end() const
 	{
-		return const_iterator(_origin+Point2D<int>(0,_size._height), _size._width); 
+		return const_iterator(_origin+Point2D<Type>(0,_size._height), _size._width); 
 	}
 };
 
