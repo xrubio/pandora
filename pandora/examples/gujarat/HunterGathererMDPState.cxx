@@ -344,6 +344,7 @@ HunterGathererMDPState::~HunterGathererMDPState()
 	
 	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
 	
+	
 }
 
 void	HunterGathererMDPState::addAction( MDPAction* a )
