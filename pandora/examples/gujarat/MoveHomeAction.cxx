@@ -134,16 +134,16 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
    
 	assert(!candidateCells.empty());   
    
-	
+	/*
 	if(candidateCells.size() >1)
 	{
 		std::cout << " MoveHome choices : " << candidateCells.size() << std::endl;
 		log_INFO(agent.getId()+"_controller",  "\tMoveHome choices=" << candidateCells.size());
-	}
+	}*/
 	
 	if(!candidateCells.empty())
 	{   
-		uint32_t diceSelectOneRandomDune = 0; //Engine::GeneralState::statistics().getUniformDistValue(0, candidateCells.size()-1);
+		uint32_t diceSelectOneRandomDune = 0;//*? //Engine::GeneralState::statistics().getUniformDistValue(0, candidateCells.size()-1);
 
 		Engine::Point2D<int> newPos = *candidateCells.at(diceSelectOneRandomDune);
 		Engine::Point2D<int> newHome;
@@ -187,8 +187,7 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
     for(unsigned int i = 0; i < candidateCells.size(); i++)
 	{
 		candidateCells[i] = (Engine::Point2D<int>*)0;
-	}
-    
+	}    
 	candidateCells.clear();
 	chosenSects.clear();
 	

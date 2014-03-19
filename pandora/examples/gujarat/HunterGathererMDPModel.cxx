@@ -44,7 +44,10 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	logName << "HGMDPModel";
 	
 	if ( _initial != NULL )
-		delete _initial;
+	{
+		_initial->_info = -_initial->_info;
+		delete _initial;		
+	}
 
 	_simAgent = dynamic_cast<HunterGatherer *>(&agent);
 
@@ -107,6 +110,9 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 						, actionList);
 	
 	_initial->computeHash();
+	
+	//*?
+	_initial->_creator = -_initial->_creator;
 }
 
 action_t HunterGathererMDPModel::number_actions( const HunterGathererMDPState& s ) const

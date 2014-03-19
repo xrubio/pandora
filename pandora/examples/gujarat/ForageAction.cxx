@@ -1,3 +1,5 @@
+#include <stdlib.h>  
+
 #include <ForageAction.hxx>
 #include <Agent.hxx>
 #include <GujaratAgent.hxx>
@@ -375,8 +377,11 @@ void	ForageAction::selectBestNearestLRCell( const GujaratAgent& agent
 	}
 	//TODO cost n, instead: best=candidates[uniformRandom(0,candidates.size()-1)]
 	//std::random_shuffle(candidates.begin(), candidates.end());
-
-	best = *candidates[Engine::GeneralState::statistics().getUniformDistValue(0,candidates.size()-1)];
+	int numCand = candidates.size();
+	int idxCand = rand()%numCand;
+	best = *candidates[idxCand];
+//*?
+//	best = *candidates[Engine::GeneralState::statistics().getUniformDistValue(0,candidates.size()-1)];
 
 	candidates.clear();
 }

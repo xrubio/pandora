@@ -3,6 +3,10 @@
 
 #include <AgentController.hxx>
 
+
+//*?
+#include <string>
+
 namespace Gujarat
 {
 
@@ -13,6 +17,10 @@ public:
 	virtual ~HunterGathererProgrammedController();
 
 	void selectActions( GujaratAgent & agent, std::list<Engine::Action*> & actions );
+
+//*?
+	int getWidth() {return 0;}
+
 };
 
 }

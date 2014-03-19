@@ -1,3 +1,4 @@
+#include <stdlib.h>  
 
 #include <GujaratWorld.hxx>
 
@@ -473,7 +474,8 @@ void GujaratWorld::createAgents()
 			agent->setMassToCaloriesRate( _config._massToEnergyRate * _config._energyToCalRate );
 			agent->setNumSectors( _config._numSectors );
 
-			agent->initializePosition();
+			agent->initializePosition();		
+			
 
 			log_DEBUG(logName.str(), getWallTime() << " new HG: " << agent);
 
@@ -525,9 +527,14 @@ void GujaratWorld::getHRFreeCell(const Engine::Point2D<int> LRpos, Engine::Point
 	cornerLeftUp._y = LRpos._y*C;
 	cornerRightDown._x = LRpos._x*C + C-1;
 	cornerRightDown._y = LRpos._y*C + C-1;
-	HRpos._x =  Engine::GeneralState::statistics().getUniformDistValue(cornerLeftUp._x,cornerRightDown._x);
-	HRpos._y = 
-	Engine::GeneralState::statistics().getUniformDistValue(cornerLeftUp._y,cornerRightDown._y);
+	//*?
+assert(cornerLeftUp._x<=cornerRightDown._x);
+assert(cornerLeftUp._y<=cornerRightDown._y);
+	HRpos._x = cornerLeftUp._x + rand()%(cornerRightDown._x - cornerLeftUp._x+1);
+	HRpos._y = cornerLeftUp._y + rand()%(cornerRightDown._y - cornerLeftUp._y+1);
+	//*?HRpos._x =  Engine::GeneralState::statistics().getUniformDistValue(cornerLeftUp._x,cornerRightDown._x);
+	//*?HRpos._y = 
+	//*?Engine::GeneralState::statistics().getUniformDistValue(cornerLeftUp._y,cornerRightDown._y);
 	//TODO checkPosition expensive??? cost : #agents
 	while( getValue(eSoils,HRpos) != DUNE || ! Engine::World::checkPosition(HRpos))
 	{

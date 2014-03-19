@@ -57,6 +57,13 @@ public:
 	{
 		_width = W;
 	}	
+
+	void clean()
+	{
+		//_simAgent = 0;
+		delete _initial;
+		_initial=NULL;
+	}
 	
 	// Interface inherited from Problem::problem_t<T>
 	virtual Problem::action_t number_actions( const HunterGathererMDPState &s ) const;

@@ -184,6 +184,8 @@ template<typename T> class uct_t : public improvement_t<T> {
     }
 
     float search_tree(const T &s, unsigned depth) const {
+		try{		
+		
 #ifdef DEBUG
         std::cout << std::setw(2*depth) << "" << "search_tree(" << s << "):";
 #endif
@@ -313,6 +315,11 @@ template<typename T> class uct_t : public improvement_t<T> {
 	    it->second.values_.at(1+a) = old_value;
             return old_value;
         }
+	}catch(std::exception e)
+	{
+		std::cerr << "EXCEPTION AT UCT.H: float search_tree(const T &s, unsigned depth) const" << std::endl;
+		assert(0);
+	}
     }
 
     Problem::action_t select_action(const T &state,
@@ -320,6 +327,11 @@ template<typename T> class uct_t : public improvement_t<T> {
                                     int depth,
                                     bool add_bonus,
                                     bool random_ties) const {
+										
+		Problem::action_t result;										
+		try{
+										
+										
         float log_ns = logf(data.counts_[0]);
         std::vector<Problem::action_t> best_actions;
         int nactions = policy_t<T>::problem().number_actions(state);
@@ -352,7 +364,19 @@ template<typename T> class uct_t : public improvement_t<T> {
             }
         }
         assert(!best_actions.empty());
-        return best_actions[Random::uniform(best_actions.size())];
+		
+		int x = best_actions.size();
+		result = best_actions[Random::uniform(x)];
+		
+		
+		}catch(std::exception e){
+			std::cerr << "EXCEPTION AT UCT.H: Problem::action_t select_action(const T &state, const data_t &data,int depth,bool add_bonus,bool random_ties) const {" << std::endl;
+		assert(0);
+		}
+		
+		
+		return result;
+		//return best_actions[Random::uniform(best_actions.size())];
     }
 
     Problem::action_t select_best_action(const T &state,
@@ -360,6 +384,11 @@ template<typename T> class uct_t : public improvement_t<T> {
                                     int depth,
                                     bool add_bonus,
                                     bool random_ties) const {
+		
+		Problem::action_t result;
+										
+		try{
+										
         float log_ns = logf(data.counts_[0]);
         std::vector<Problem::action_t> best_actions;
         int nactions = policy_t<T>::problem().number_actions(state);
@@ -392,13 +421,28 @@ template<typename T> class uct_t : public improvement_t<T> {
         }
 //	std::cout << "Best Action: " << best_actions.size() << " Cost: " << best_value << " Count: " << best_count <<  std::endl;
         assert(!best_actions.empty());
-        return best_actions[Random::uniform(best_actions.size())];
+		
+		int x = best_actions.size();
+		result = best_actions[Random::uniform(x)];		
+		
+		}catch(std::exception e){
+			std::cerr << "EXCEPTION AT UCT.H: Problem::action_t select_best_action(const T &state,const data_t &data,int depth,bool add_bonus,bool random_ties) const" << std::endl;
+			assert(0);
+		}
+		
+		return result;	
+		
+        //return best_actions[Random::uniform(best_actions.size())];
     }
 
 
     float evaluate(const T &s, unsigned depth) const {
+		try{
         return Evaluation::evaluation(improvement_t<T>::base_policy_,
                                       s, 1, horizon_ - depth);
+		}catch(std::exception e){
+			std::cerr << "EXCEPTION AT UCT.H : float evaluate(const T &s, unsigned depth) const" << std::endl;
+		}
     }
 };
 

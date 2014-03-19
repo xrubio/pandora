@@ -175,10 +175,13 @@ void HGMind::createLRSectors( 	const Engine::Point2D<int>& agentPos,
 		for ( int x=-lowResHomeRange; x<=lowResHomeRange; x++ )
 		{
 			for ( int y=-lowResHomeRange; y<=lowResHomeRange; y++ )
-			{				
+			{	
+				Engine::Point2D<int> LRxycell(x+LRpos._x,y+LRpos._y);
+				
 				if (x==0 && y==0)
 				{
 					insertPoint00 = insertPoint;
+					(*cellPool)[insertPoint]=LRxycell;
 					insertPoint++;
 					continue;
 				}
@@ -192,7 +195,6 @@ void HGMind::createLRSectors( 	const Engine::Point2D<int>& agentPos,
 				
 				//std::cout << "CELL:"<< x << "," << y << " at " << indexSector << std::endl;
 				
-				Engine::Point2D<int> LRxycell(x+LRpos._x,y+LRpos._y);
 				
 				Engine::Point2D<int> corners[4]; // 4 corners that bound the world cells belonging to the low res cell
 				corners[0]._x = LRxycell._x*C;

@@ -47,6 +47,9 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 	_dni=dniTicket ();
 	
 	_creator=1;
+	_constructors.push_back(_creator);
+
+	_info = 1;
 	
 	_ownItems.resize(s._ownItems.size());
 	for(unsigned int i = 0; i < _ownItems.size(); i++)
@@ -145,6 +148,9 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 	
 	//log_INFO(logName.str(),"XXXX CREA 2:" << s._dni << "->" << _dni);
 	_creator=2;
+	_constructors.push_back(_creator);
+
+	_info=2;
 	//log_INFO(logName.str(),"herencia2:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors");
 		
 }
@@ -194,7 +200,10 @@ HunterGathererMDPState::HunterGathererMDPState(
 
 	_dni=dniTicket ();
 	
-	_creator=3;
+	_creator=3;	
+	_constructors.push_back(_creator);
+
+	_info=3;
 
 	_ownItems.resize(ownItems.size());
 	for(unsigned int i = 0; i < ownItems.size(); i++)
@@ -247,6 +256,9 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	*/
 	
 	_creator=4;
+	_constructors.push_back(_creator);
+
+	_info=4;
 	
 	_timeIndex 		 = s._timeIndex;
 	_mapLocation 	 = s._mapLocation;
@@ -309,7 +321,8 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 HunterGathererMDPState::~HunterGathererMDPState()
 {
 	std::stringstream logName;
-	logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
+	// look out: if 'this' is an _initial of a HGMDPModel && step==361 && _agentRef killed at 360, then the next line produces segm fault :
+	//logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
 	
 	
 	//std::cout << "destroying MDPState:" << _dni << std::endl;
@@ -321,6 +334,8 @@ HunterGathererMDPState::~HunterGathererMDPState()
 									<< _ownItems[2]
 									<< _ownItems[3]);	
 	*/
+
+
 	for ( unsigned int k = 0; k < _availableActions.size(); k++ )
 	{
 		delete _availableActions[k];
@@ -328,7 +343,6 @@ HunterGathererMDPState::~HunterGathererMDPState()
 	
 	
 	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
-	
 	
 }
 
@@ -723,7 +737,10 @@ void HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructure
 			std::stringstream oss;
 			oss << "HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructures(): "
 			<< " Found wrong counter for a LRActionSectors readers/writers:" 
-			<< _objectUseCounter->count((unsigned long)_LRActionSectors);
+			<< _objectUseCounter->count((unsigned long)_LRActionSectors)
+			<< " ; the state was created with constructor " << _creator
+			<< " ; the state visited as much constructors as "<< _constructors.size() << ":";
+			for(std::vector<int>::iterator it = _constructors.begin(); it !=_constructors.end(); ++it) oss<< _constructors.size();
 			throw Engine::Exception(oss.str());
 			
 		}

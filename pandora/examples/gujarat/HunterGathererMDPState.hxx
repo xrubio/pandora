@@ -49,7 +49,10 @@ class HunterGathererMDPState
 public:
 	int _numAvailableActionsWhenBorn;
 	int _creator;
+	//*? remove vector of constructors id
+	std::vector<int> _constructors;
 	unsigned long _dni;
+	int _info;
 	std::string _actionName;
 	HunterGatherer * _agentRef;
 	HunterGathererMDPConfig	* _config;

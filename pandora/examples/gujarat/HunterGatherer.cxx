@@ -235,8 +235,14 @@ void HunterGatherer::selectActions()
 			assert(0==1);
 		}
 */
-	
-	GujaratState::controller().selectActions(*this, _actions);
+	//*?
+	try{ int w = GujaratState::controller().getWidth();}
+	catch(std::exception e){std::cerr << "EXC:"<<e.what()<<std::endl;}	
+
+
+	try{
+		GujaratState::controller().selectActions(*this, _actions);
+	}catch(std::exception e){std::cerr << "EXC:"<<e.what()<<std::endl;}
 
 	
 }

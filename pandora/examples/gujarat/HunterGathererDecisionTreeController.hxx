@@ -3,6 +3,9 @@
 
 #include <AgentController.hxx>
 
+//*?
+#include <string>
+
 namespace Gujarat
 {
 
@@ -25,6 +28,9 @@ public:
 	
 	int         getMaxBiomassSector( HunterGatherer & agent );
 //	unsigned        getDoNothingDaysCovered() const { return _DoNothingDaysCovered; } 
+
+//*?
+	int getWidth(){return 0;}
 
 private:
 	unsigned                _DoNothingDaysCovered;

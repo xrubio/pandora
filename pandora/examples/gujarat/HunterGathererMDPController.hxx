@@ -22,6 +22,9 @@ public:
 
 	void selectActions( GujaratAgent & agent, std::list<Engine::Action*> & actions );
 
+//*? remove toStrConfig
+	int getWidth() { return _mdpConfig.getWidth(); }
+
 private:
 	typedef		Online::Policy::random_t< HunterGathererMDPState >	BasePolicy;
 	typedef		Online::Policy::UCT::uct_t< HunterGathererMDPState >	UCT;
