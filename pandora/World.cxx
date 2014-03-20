@@ -47,6 +47,7 @@ World::World( const Simulation & simulation, Scheduler * scheduler, const bool &
 	{
 		_scheduler = useSpacePartition();
 	}
+	_scheduler->setWorld(this);
 }
 
 World::~World()
@@ -399,9 +400,10 @@ const std::string & World::getRasterName( const int & index) const
 }
 
 
-Scheduler * World::useSpacePartition(const std::string & fileName, int overlap, bool finalize )
+//Scheduler * World::useSpacePartition(const std::string & fileName, int overlap, bool finalize )
+SpacePartition * World::useSpacePartition(const std::string & fileName, int overlap, bool finalize )
 {
-	return new SpacePartition( _simulation, overlap, *this, fileName, finalize);
+	return new SpacePartition(overlap, fileName, finalize);
 }
 
 const int & World::getId() const { return _scheduler->getId(); }

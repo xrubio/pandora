@@ -39,10 +39,14 @@ class Agent(libpyPandora.AgentStub):
 	def __str__(self):
 		return 'Agent: ' + self.id + ' at position: ' + str(self.position._x) + '/' + str(self.position._y)
 
+class SpacePartition(libpyPandora.SpacePartitionStub):
+	def __init__(self, overlap, fileName, finalise ):
+		libpyPandora.SpacePartitionStub.__init__(self, overlap, fileName, finalise)
+
 class World(libpyPandora.WorldStub):
 	_listOfAgents = []
-	def __init__(self, simulation, allowMultipleAgentsPerCell = True ):
-		libpyPandora.WorldStub.__init__( self, simulation, allowMultipleAgentsPerCell)
+	def __init__(self, simulation, scheduler = None, allowMultipleAgentsPerCell = True ):
+		libpyPandora.WorldStub.__init__( self, simulation, scheduler, allowMultipleAgentsPerCell)
 
 	def addAgent(self, agent):
 		self.addAgentStub(agent)

@@ -49,6 +49,7 @@
 
 #include <analysis/RasterSum.hxx>
 #include <analysis/RasterMean.hxx>
+#include <SpacePartition.hxx>
 
 #include <string>
 
@@ -187,7 +188,7 @@ class WorldWrap : public Engine::World, public boost::python::wrapper<Engine::Wo
 {
 public:
 	// Scheduler for python is always default
-	WorldWrap(const Engine::Simulation & simulation, const bool & allowMultipleAgentsPerCell = true) : World( simulation, 0, allowMultipleAgentsPerCell )
+	WorldWrap(const Engine::Simulation & simulation, Engine::SpacePartition * scheduler = 0, const bool & allowMultipleAgentsPerCell = true) : World( simulation,scheduler,allowMultipleAgentsPerCell )
 	{
 	}
 
@@ -428,7 +429,7 @@ BOOST_PYTHON_MODULE(libpyPandora)
 	boost::python::class_< std::vector<std::string> >("StringVector").def(boost::python::vector_indexing_suite< std::vector<std::string> >());
 	boost::python::class_< std::vector<int> >("IntVector").def(boost::python::vector_indexing_suite< std::vector<int> >());
 	
-	boost::python::class_< WorldWrap, boost::noncopyable >("WorldStub", boost::python::init< const Engine::Simulation &, const bool & >() )
+	boost::python::class_< WorldWrap, boost::noncopyable >("WorldStub", boost::python::init< const Engine::Simulation &, Engine::SpacePartition *, const bool & >()[boost::python::with_custodian_and_ward<1,3>()])
 		.def("createRasters", boost::python::pure_virtual(&Engine::World::createRasters))
 		.def("createAgents", boost::python::pure_virtual(&Engine::World::createAgents))
 		.def("stepEnvironment", &Engine::World::stepEnvironment, &WorldWrap::default_StepEnvironment)
@@ -439,6 +440,8 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("getDynamicRaster", getDynamicRaster, boost::python::return_value_policy<boost::python::reference_existing_object>())
 		.def("getStaticRaster", getStaticRaster, boost::python::return_value_policy<boost::python::reference_existing_object>())
 		.def("run", &Engine::World::run)
+		.def("useSpacePartition", &Engine::World::useSpacePartition, boost::python::return_value_policy<boost::python::reference_existing_object>())
+		.staticmethod("useSpacePartition")
 		.def("addAgentStub", &WorldWrap::addAgentSimple)
 		.def("setValue", setValue)
 		.def("getValue", getValue)
@@ -447,6 +450,9 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("getAgent", getAgent, boost::python::return_value_policy<boost::python::reference_existing_object>())
 		.def("getSimulation", &Engine::World::getSimulation, boost::python::return_value_policy<boost::python::reference_existing_object>())
 		.add_property("currentStep", &Engine::World::getCurrentStep)
+	;	
+	
+	boost::python::class_< Engine::SpacePartition, std::auto_ptr<Engine::SpacePartition> >("SpacePartitionStub", boost::python::init< const int &, const std::string &, bool >())
 	;
 
 	boost::python::class_< Engine::SimulationRecord>("SimulationRecordStub", boost::python::init< int, bool >())

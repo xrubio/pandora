@@ -1,10 +1,10 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import sys, random
 sys.path.append('../')
 sys.path.append('../../')
 
-from pyPandora import Simulation, Agent, World, Point2DInt
+from pyPandora import Simulation, Agent, World, Point2DInt, SizeInt
 
 class MyAgent(Agent):
 	def __init__(self, id):
@@ -32,7 +32,7 @@ class MyWorld(World):
 			self.addAgent(newAgent)
 			newAgent.setRandomPosition()
 
-mySimulation = Simulation(Point2DInt(32,32), 300)
+mySimulation = Simulation(SizeInt(32,32), 300)
 myWorld = MyWorld(mySimulation)
 myWorld.initialize()
 myWorld.run()

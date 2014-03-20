@@ -7,7 +7,7 @@ import unittest
 sys.path.append('../../')
 sys.path.append('../../pyPandora')
 
-from pyPandora import Simulation, Agent, World, Point2DInt, SizeInt, RectangleInt
+from pyPandora import Simulation, Agent, World, Point2DInt, SizeInt, RectangleInt, SpacePartition
 
 class TestAgent(Agent):
 	def __init__(self, id):
@@ -20,8 +20,8 @@ class TestAgent(Agent):
 		return
 
 class TestWorld(World):
-	def __init__(self, simulation):
-		World.__init__( self, simulation, True)
+	def __init__(self, simulation, scheduler):
+		World.__init__( self, simulation, scheduler, False)
 
 	def createRasters(self):
 		return
@@ -56,7 +56,7 @@ class TestPyPandora(unittest.TestCase):
 
 	def testAgentRemovedIsNotExecuted(self):
 		mySimulation = Simulation(SizeInt(10,10), 1)
-		myWorld = TestWorld(mySimulation)
+		myWorld = TestWorld(mySimulation, TestWorld.useSpacePartition('data/results.h5', 1, False))
 		myWorld.initialize()
 
 		myAgent = TestAgent('agent_0')
@@ -66,19 +66,19 @@ class TestPyPandora(unittest.TestCase):
 		myAgent.remove()
 		self.assertEqual(myAgent.exists, False)
 		myWorld.run()
-	
+
 	def testExecuteTwoWorlds(self):
 		mySimulation = Simulation(SizeInt(10,10), 1)
-		myWorld = TestWorld(mySimulation)
+		myWorld = TestWorld(mySimulation, TestWorld.useSpacePartition('data/results.h5', 1, False))
 		myWorld.initialize()
 		myWorld.run()
-		myWorld = TestWorld(mySimulation, True)
+		myWorld = TestWorld(mySimulation, TestWorld.useSpacePartition('data/results.h5', 1, True))
 		myWorld.initialize()
 		myWorld.run()
 	
 	def testAgentRemovedIsNotInsideNeighbours(self):
 		mySimulation = Simulation(SizeInt(10,10), 1)
-		myWorld = TestWorld(mySimulation)
+		myWorld = TestWorld(mySimulation, TestWorld.useSpacePartition('data/results.h5', 1, False))
 		myWorld.initialize()
 		myWorld.run()
 

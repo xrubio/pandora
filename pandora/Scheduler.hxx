@@ -13,10 +13,11 @@ class Scheduler
 protected:
 	int _id;
 	int _numTasks;
-	World & _world;
+	World * _world;
 	
 public:
-	Scheduler( World & world ) : _id(0), _numTasks(1), _world(world) { }
+	Scheduler() : _id(0), _numTasks(1), _world(0) { }
+	void setWorld( World * world ) { _world = world;}
 	virtual ~Scheduler() {}
 
 	//! any initializing procedure BEFORE creating agents/rasters (i.e. init communications and define boundaries for parallel nodes) 

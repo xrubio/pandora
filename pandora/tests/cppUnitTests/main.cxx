@@ -41,11 +41,11 @@ BOOST_AUTO_TEST_CASE( testSimulationSize )
 BOOST_AUTO_TEST_CASE( testExecuteTwoWorlds ) 
 {	
 	Engine::Simulation mySimulation(Engine::Size<int>(10,10), 1);
-	TestWorld myWorld(mySimulation, myWorld.useSpacePartition("data/results.h5", 1, false));
+	TestWorld myWorld(mySimulation, TestWorld::useSpacePartition("data/results.h5", 1, false));
 	myWorld.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
 	myWorld.run();
 
-	TestWorld myWorld2(mySimulation, myWorld.useSpacePartition("data/results.h5", 1, false));
+	TestWorld myWorld2(mySimulation, TestWorld::useSpacePartition("data/results.h5", 1, false));
 	myWorld2.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
 	myWorld2.run();
 }
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE( testExecuteTwoWorlds )
 BOOST_AUTO_TEST_CASE( testAgentRemovedIsNotExecuted ) 
 {	
 	Engine::Simulation mySimulation(Engine::Size<int>(10,10), 1);
-	TestWorld myWorld(mySimulation, myWorld.useSpacePartition("data/results.h5", 1, false));
+	TestWorld myWorld(mySimulation, TestWorld::useSpacePartition("data/results.h5", 1, false));
 	myWorld.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
 
 	TestAgent * myAgent = new TestAgent("agent_0");
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE( testAgentRemovedIsNotExecuted )
 BOOST_AUTO_TEST_CASE( testAgentRemovedIsNotInInsideNeighbours ) 
 {
 	Engine::Simulation mySimulation(Engine::Size<int>(10,10), 1);
-	TestWorld myWorld(mySimulation, myWorld.useSpacePartition("data/results.h5", 1, true));
+	TestWorld myWorld(mySimulation, TestWorld::useSpacePartition("data/results.h5", 1, true));
 	myWorld.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
 
 	TestAgent * myAgent0 = new TestAgent("agent_0");

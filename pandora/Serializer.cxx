@@ -37,7 +37,7 @@
 namespace Engine
 {
 
-Serializer::Serializer( const Simulation & simulation, const SpacePartition & scheduler, const std::string & resultsFile ) : _simulation(simulation), _scheduler(scheduler), _resultsFile(resultsFile), _agentsFileId(-1), _fileId(-1), _currentAgentDatasetId(-1)
+Serializer::Serializer( const SpacePartition & scheduler, const std::string & resultsFile ) : _simulation(0), _scheduler(scheduler), _resultsFile(resultsFile), _agentsFileId(-1), _fileId(-1), _currentAgentDatasetId(-1)
 {
 }
 
@@ -47,6 +47,7 @@ Serializer::~Serializer()
 
 void Serializer::init(World & world )
 {
+	_simulation = &(world.getSimulation());
 	std::stringstream logName;
 	logName << "Serializer_" << _scheduler.getId();
 	log_DEBUG(logName.str(), " init serializer");
@@ -81,25 +82,25 @@ void Serializer::init(World & world )
 
 	hid_t attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	hid_t attributeId = H5Acreate(globalDatasetId, "numSteps", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
-	H5Awrite(attributeId, H5T_NATIVE_INT, &_simulation.getNumSteps());
+	H5Awrite(attributeId, H5T_NATIVE_INT, &_simulation->getNumSteps());
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 	
 	attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	attributeId = H5Acreate(globalDatasetId, "serializerResolution", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
-	H5Awrite(attributeId, H5T_NATIVE_INT, &_simulation.getSerializerResolution());
+	H5Awrite(attributeId, H5T_NATIVE_INT, &_simulation->getSerializerResolution());
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 
 	attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	attributeId = H5Acreate(globalDatasetId, "width", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
-	H5Awrite(attributeId, H5T_NATIVE_INT, &_simulation.getSize()._width);
+	H5Awrite(attributeId, H5T_NATIVE_INT, &_simulation->getSize()._width);
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 
 	attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	attributeId = H5Acreate(globalDatasetId, "height", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
-	H5Awrite(attributeId, H5T_NATIVE_INT, &_simulation.getSize()._height);
+	H5Awrite(attributeId, H5T_NATIVE_INT, &_simulation->getSize()._height);
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 
@@ -109,7 +110,7 @@ void Serializer::init(World & world )
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 
-	log_INFO(logName.str(), _scheduler.getWallTime() << " id: " << _scheduler.getId() << " size: " << _simulation.getSize() << " num tasks: " << _scheduler.getNumTasks() << " serializer resolution:" << _simulation.getSerializerResolution() << " and steps: " << _simulation.getNumSteps());
+	log_INFO(logName.str(), _scheduler.getWallTime() << " id: " << _scheduler.getId() << " size: " << _simulation->getSize() << " num tasks: " << _scheduler.getNumTasks() << " serializer resolution:" << _simulation->getSerializerResolution() << " and steps: " << _simulation->getNumSteps());
 
 	// we store the name of the rasters
 	hid_t rasterNameFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
@@ -240,8 +241,8 @@ void Serializer::init(World & world )
 	
 	//the real size of the matrix is sqrt(num simulator)*matrixsize	
 	hsize_t dimensions[2];
-	dimensions[0] = hsize_t(_simulation.getSize()._width);
-	dimensions[1] = hsize_t(_simulation.getSize()._height);
+	dimensions[0] = hsize_t(_simulation->getSize()._width);
+	dimensions[1] = hsize_t(_simulation->getSize()._height);
 
 	// we need to specify the size where each computer node will be writing
 	hsize_t chunkDimensions[2];
@@ -278,9 +279,9 @@ void Serializer::init(World & world )
 		}	
 		// TODO 0 o H5P_DEFAULT??
 		hid_t rasterGroupId = H5Gcreate(_fileId, world.getRasterName(i).c_str(), 0, H5P_DEFAULT, H5P_DEFAULT);
-		for(int i=0; i<=_simulation.getNumSteps(); i++)
+		for(int i=0; i<=_simulation->getNumSteps(); i++)
 		{  
-			if(i%_simulation.getSerializerResolution()!=0)
+			if(i%_simulation->getSerializerResolution()!=0)
 			{
 				continue;
 			}
@@ -344,9 +345,9 @@ void Serializer::registerType( Agent * agent )
 	StringMap * newTypeStringMap = new StringMap;
 
 	// create a dataset for each timestep
-	for(int i=0; i<=_simulation.getNumSteps(); i++)
+	for(int i=0; i<=_simulation->getNumSteps(); i++)
 	{
-		if(i%_simulation.getSerializerResolution()!=0)
+		if(i%_simulation->getSerializerResolution()!=0)
 		{
 			continue;
 		}

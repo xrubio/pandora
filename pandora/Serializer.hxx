@@ -51,7 +51,7 @@ class Serializer
 	typedef std::map< std::string, IntMap * > IntAttributesMap;
 	typedef std::map< std::string, StringMap * > StringAttributesMap;
 
-	const Simulation & _simulation;
+	const Simulation * _simulation;
 	const SpacePartition & _scheduler;
 	int _numSteps;
 	int _serializerResolution;
@@ -83,7 +83,7 @@ class Serializer
 	void finishAgentsSerialization( int step);
 
 public:
-	Serializer( const Simulation & simulation, const SpacePartition & scheduler, const std::string & resultsFile );
+	Serializer( const SpacePartition & scheduler, const std::string & resultsFile );
 	virtual ~Serializer();
 
 	void init(World & world );

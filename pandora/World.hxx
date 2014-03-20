@@ -33,13 +33,13 @@
 #include <Point2D.hxx>
 #include <Simulation.hxx>
 #include <Scheduler.hxx>
-
 #include <algorithm>
 
 namespace Engine
 {
 class Scheduler;
 class Agent;
+class SpacePartition;
 
 class World
 {
@@ -191,7 +191,8 @@ public:
 	}
 
 	//! factory method for Scheduler SpacePartition
-	Scheduler * useSpacePartition(const std::string & fileName = "data/results.h5", int overlap = 1, bool finalize = true );
+//	static Scheduler * useSpacePartition(const std::string & fileName = "data/results.h5", int overlap = 1, bool finalize = true );
+	static SpacePartition * useSpacePartition(const std::string & fileName = "data/results.h5", int overlap = 1, bool finalize = true );
 };
 
 } // namespace Engine

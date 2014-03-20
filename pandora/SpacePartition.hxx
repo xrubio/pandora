@@ -171,7 +171,7 @@ class SpacePartition : public Scheduler
 	Point2D<int> getRealPosition( const Point2D<int> & globalPosition ) const;
 
 public:
-	SpacePartition( const Simulation & simulation, const int & overlap, World & world, const std::string & fileName, bool finalize );
+	SpacePartition(  const int & overlap, const std::string & fileName, bool finalize );
 	virtual ~SpacePartition();
 
 	void finish();

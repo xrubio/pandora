@@ -3,7 +3,7 @@
 import sys, random
 sys.path.append('..')
 sys.path.append('../../')
-from pyPandora import Simulation, Agent, World, Point2DInt, SimulationRecord, GlobalAgentStats, AgentNum, AgentMean, AgentSum, AgentStdDev, GlobalRasterStats, RasterMean, RasterSum
+from pyPandora import Simulation, Agent, World, Point2DInt, SimulationRecord, GlobalAgentStats, AgentNum, AgentMean, AgentSum, AgentStdDev, GlobalRasterStats, RasterMean, RasterSum, SizeInt
 
 # data generation
 
@@ -38,7 +38,7 @@ class MyWorld(World):
 			newAgent.setRandomPosition()
 			newAgent._value = random.randint(0,10)
 
-mySimulation = Simulation(Point2DInt(32,32), 10)
+mySimulation = Simulation(SizeInt(32,32), 10)
 myWorld = MyWorld(mySimulation)
 myWorld.initialize()
 myWorld.run()
