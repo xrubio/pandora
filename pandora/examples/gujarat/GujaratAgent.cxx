@@ -358,18 +358,18 @@ void	GujaratAgent::initializePosition( const Engine::Point2D<int>& initialPositi
 	Engine::Point2D<int> LRpos;
 	
 	const Engine::Rectangle<int>& _boundaries = getWorld()->getBoundaries();
-	bool found = (getWorld()->getValue(eSoils, index ) == DUNE) && (getWorld()->checkPosition(index));
-	for(index._x=initialPosition._x; !found && index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
+	bool found = false;
+	for(index._x=initialPosition._x; !found && index._x<_boundaries._origin._x+_boundaries._size._x; ++index._x)		
 	{	
-		for(index._y=initialPosition._y; !found && index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)		
-		{			
+		for(index._y=initialPosition._y; !found && index._y<_boundaries._origin._y+_boundaries._size._y; ++index._y)		
+		{
 			found = (getWorld()->getValue(eSoils, index ) == DUNE) && (getWorld()->checkPosition(index));
+			if(found)
+			{
+				setPosition( index );
+			}
 		}
 	}	
-	setPosition( index );
-	// Increase population counter in new LR home cell
-	((GujaratWorld*)_world)->worldCell2LowResCell(getPosition(),LRpos);
-	((GujaratWorld*)_world)->setValueLR(eLRPopulation, LRpos, 1 + ((GujaratWorld*)_world)->getValueLR(eLRPopulation,LRpos));
 	
 }
 
@@ -428,9 +428,6 @@ void	GujaratAgent::initializePosition( )
 	((GujaratWorld*)_world)->setValueLR(eLRPopulation, LRpos, ((GujaratWorld*)_world)->getValueLR(eLRPopulation,LRpos) - 1);	
 	// Change position
 	setPosition( dunes[die2] );
-	// Increase population counter in new LR home cell
-	((GujaratWorld*)_world)->worldCell2LowResCell(getPosition(),LRpos);
-	((GujaratWorld*)_world)->setValueLR(eLRPopulation, LRpos, 1 + ((GujaratWorld*)_world)->getValueLR(eLRPopulation,LRpos));	
 
 	dunes.clear();
 }

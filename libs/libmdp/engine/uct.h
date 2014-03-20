@@ -317,7 +317,7 @@ template<typename T> class uct_t : public improvement_t<T> {
         }
 	}catch(std::exception e)
 	{
-		std::cerr << "EXCEPTION AT UCT.H: float search_tree(const T &s, unsigned depth) const" << std::endl;
+		std::cerr << "EXCEPTION AT UCT.H: float search_tree(const T &s, unsigned depth) const:"<< e.what() << std::endl;
 		assert(0);
 	}
     }

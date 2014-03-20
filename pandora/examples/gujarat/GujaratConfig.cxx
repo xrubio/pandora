@@ -310,7 +310,8 @@ void GujaratConfig::parseHGMDPConfig( TiXmlElement* element )
 	
 	if (_controllerConfig->getNumberMoveHomeActions()!=1)
 	{
-			throw Engine::Exception("_controllerConfig.getNumberMoveHomeActions() != 1");
+			//*?
+			//throw Engine::Exception("_controllerConfig.getNumberMoveHomeActions() != 1");
 	}
 	
 	_uctSeed = _controllerConfig->getSeed();

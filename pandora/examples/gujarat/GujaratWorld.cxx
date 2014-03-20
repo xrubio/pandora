@@ -475,7 +475,15 @@ void GujaratWorld::createAgents()
 			agent->setMassToCaloriesRate( _config._massToEnergyRate * _config._energyToCalRate );
 			agent->setNumSectors( _config._numSectors );
 
-			agent->initializePosition(GujaratState::getInitialPosition() );		
+			
+			if ( GujaratState::getInitialPosition()._x < 0 || GujaratState::getInitialPosition()._y < 0 )
+			{
+				agent->initializePosition();
+			}
+			else
+			{
+				agent->initializePosition(GujaratState::getInitialPosition());			
+			}
 			
 
 			log_DEBUG(logName.str(), getWallTime() << " new HG: " << agent);

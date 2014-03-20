@@ -455,27 +455,29 @@ void ForageAction::selectBestNearestHRCellInTrend_ScanFrame(
 	{
 		cornerLeftUp._x = HRBegin._x - FRAMESIZE;
 		cornerLeftUp._y = HRBegin._y - FRAMESIZE; 
-		
-		if(cornerLeftUp._x < gw->getBoundaries()._origin._x)
+		Engine::Rectangle<int> boundaries = gw->getOverlapBoundaries();	
+
+	
+		if(cornerLeftUp._x < boundaries._origin._x)
 		{
-			cornerLeftUp._x = gw->getBoundaries()._origin._x;
+			cornerLeftUp._x = boundaries._origin._x;
 		}
 
-		if(cornerLeftUp._y < gw->getBoundaries()._origin._y)
+		if(cornerLeftUp._y < boundaries._origin._y)
 		{
-			cornerLeftUp._y = gw->getBoundaries()._origin._y;
+			cornerLeftUp._y = boundaries._origin._y;
 		}
 
 		cornerDownRight._x = HRBegin._x + FRAMESIZE;
 		cornerDownRight._y = HRBegin._y + FRAMESIZE; 
-		if(cornerDownRight._x > gw->getBoundaries()._origin._x + gw->getBoundaries()._size._x -1 )
+		if(cornerDownRight._x > boundaries._origin._x + boundaries._size._x -1 )
 		{
-			cornerDownRight._x = gw->getBoundaries()._origin._x + gw->getBoundaries()._size._x-1;
+			cornerDownRight._x = boundaries._origin._x + boundaries._size._x-1;
 		}
 
-		if(cornerDownRight._y > gw->getBoundaries()._origin._y + gw->getBoundaries()._size._y -1)
+		if(cornerDownRight._y > boundaries._origin._y + boundaries._size._y -1)
 		{
-			cornerDownRight._y = gw->getBoundaries()._origin._y + gw->getBoundaries()._size._y-1;
+			cornerDownRight._y = boundaries._origin._y + boundaries._size._y-1;
 		}
 		
 		// Intersection versus homerange boundaries

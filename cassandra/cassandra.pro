@@ -4,7 +4,7 @@
 
 
 TEMPLATE = app
-TARGET =
+TARGET = cassandra
 FORMS += uis/AgentConfigurator.ui
 FORMS += uis/RasterConfigurator.ui
 FORMS += uis/ColorInterval.ui

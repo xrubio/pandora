@@ -84,6 +84,7 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 
 	int scoreBestCell = 0;
 	std::vector< Engine::Point2D<int>* > candidateCells;
+	std::vector< Engine::Point2D<int>* > candidateCellsFromSector;
    
 	const HunterGatherer & agentConcrete = dynamic_cast< const HunterGatherer & >( agent );
 	GujaratWorld * gw = (GujaratWorld *)agentConcrete.getWorld();
@@ -93,6 +94,8 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 	// Find candidate cells
 	std::vector<int> chosenSects;	
 	//for(std::vector<Sector *>::const_iterator it=agentConcrete.getLRSectors().begin(); it!=agentConcrete.getLRSectors().end(); it++)
+	
+	std::vector<bool> visitedSector(LRActionSectors.size(),false);
 	
 	for(unsigned int sectIdx=0;sectIdx < LRActionSectors.size(); sectIdx++)
 	{
@@ -114,21 +117,38 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 					
 					int scoreCell = resourcesCell;
 					
-					
-					if ( numDunes - gw->getValueLR(eLRPopulation,*sectCells[cellsIdx]) > 0 && scoreBestCell <= scoreCell )
+					if ( numDunes - gw->getValueLR(eLRPopulation,*sectCells[cellsIdx]) > 0 
+						&& scoreBestCell <= scoreCell )
 					{
-						if ( scoreBestCell < scoreCell )
+						if ( scoreBestCell < scoreCell)
 						{           
 							scoreBestCell = scoreCell;
+							candidateCellsFromSector.clear();							
 							candidateCells.clear();
 							chosenSects.clear();
+							candidateCellsFromSector.push_back(sectCells[cellsIdx]);
+							visitedSector[sectIdx] = true;
+							//chosenSects.push_back(sectIdx);
 						}
-						candidateCells.push_back(sectCells[cellsIdx]);
-						chosenSects.push_back(sectIdx);
+						else if (!visitedSector[sectIdx])
+						{
+							candidateCellsFromSector.push_back(sectCells[cellsIdx]);
+							visitedSector[sectIdx] = true;
+							//chosenSects.push_back(sectIdx);
+						}						
 					}
 				}
 		}
     //sectIdx++;    
+    
+		for(std::vector< Engine::Point2D<int> * >::iterator it = candidateCellsFromSector.begin(); it != candidateCellsFromSector.end(); ++it)
+		{
+			candidateCells.push_back(*it);
+			chosenSects.push_back(sectIdx);
+			*it = 0;
+		}
+		candidateCellsFromSector.clear();
+    
 	}
     // Select candidate
    
@@ -194,7 +214,7 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 	assert( actions.size()==1 );
 	
 	//log_DEBUG(logName.str(), "generate possible actions for pos: " << agentPos << " finished");
-	//std::cout << "possible actions for MoveHome: " << actions.size() << std::endl;
+	//std::cout << "possible actions for MoveHome: " << actions.size() << std::endl;	
 }
 
 void MoveHomeAction::execute( Engine::Agent & agent )
@@ -234,7 +254,7 @@ void MoveHomeAction::execute( Engine::Agent & agent )
 
 void MoveHomeAction::executeMDP( const GujaratAgent& agent, const HunterGathererMDPState& s, HunterGathererMDPState& sp ) const
 {
-	//std::cout << "MOVE HOME" << std::endl;
+	
 	_forageAction->executeMDP(agent, s, sp);
 	sp.setLocation( _newHomeLoc );
 	//std::cout << "executeMDP- time index: " << s.getTimeIndex() << " MoveHomeAction from loc->resources: " << s.getLocation() << " -> " << s.getOnHandResources() << " to: " << sp.getLocation() << " -> " << sp.getOnHandResources() << " days starving: " << s.getDaysStarving() << std::endl;
