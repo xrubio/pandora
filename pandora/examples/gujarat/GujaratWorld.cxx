@@ -1,6 +1,7 @@
 #include <stdlib.h>  
 
 #include <GujaratWorld.hxx>
+#include <GujaratState.hxx>
 
 #include <Raster.hxx>
 #include <Point2D.hxx>
@@ -474,7 +475,7 @@ void GujaratWorld::createAgents()
 			agent->setMassToCaloriesRate( _config._massToEnergyRate * _config._energyToCalRate );
 			agent->setNumSectors( _config._numSectors );
 
-			agent->initializePosition();		
+			agent->initializePosition(GujaratState::getInitialPosition() );		
 			
 
 			log_DEBUG(logName.str(), getWallTime() << " new HG: " << agent);

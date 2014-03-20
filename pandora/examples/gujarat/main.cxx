@@ -29,6 +29,12 @@ int main(int argc, char *argv[])
 
 		omp_set_num_threads(4);
 
+
+// Should wire the same CPU to the same threads 
+//export OMP_NUM_THREADS=4
+//export OMP_WAIT_POLICY=ACTIVE
+//export GOMP_CPU_AFFINITY="0-8:2"
+
 		Gujarat::GujaratConfig config;
 		std::cout << "Loading config file: " << fileName << std::endl;
 		config.deserialize(fileName);

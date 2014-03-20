@@ -38,6 +38,8 @@ private:
 	
 	long int HRCellsInHomeRange;
 	long int LRCellsInHomeRange;
+
+	Engine::Point2D<int> _initialPosition;
 	
 protected:
 	GujaratState();
@@ -62,7 +64,13 @@ public:
 	static void initializeSectorsMask( int numSectors, int homeRange, SectorsMask & sm );
 	static void initializeSectorsMaskTrigonometricaly( int numSectors, int homeRange, SectorsMask & sm );
 	
-	
+	static void setInitialPosition(int positionX, int positionY) { 
+		instance()._initialPosition._x = positionX;
+		instance()._initialPosition._y = positionY;
+	 }
+
+	static Engine::Point2D<int> getInitialPosition() { return instance()._initialPosition; }	
+
 	
 	//static int sectorsMask( int i, int j);
 	static int sectorsMask( int i, int j, const SectorsMask & sm );

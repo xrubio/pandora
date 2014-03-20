@@ -352,15 +352,38 @@ void GujaratAgent::checkMortality()
 }
 
 
-void	GujaratAgent::initializePosition( )
+void	GujaratAgent::initializePosition( const Engine::Point2D<int>& initialPosition )
 {
-		
+	Engine::Point2D<int> index;
+	Engine::Point2D<int> LRpos;
+	
+	const Engine::Rectangle<int>& _boundaries = getWorld()->getBoundaries();
+	bool found = (getWorld()->getValue(eSoils, index ) == DUNE) && (getWorld()->checkPosition(index));
+	for(index._x=initialPosition._x; !found && index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
+	{	
+		for(index._y=initialPosition._y; !found && index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)		
+		{			
+			found = (getWorld()->getValue(eSoils, index ) == DUNE) && (getWorld()->checkPosition(index));
+		}
+	}	
+	setPosition( index );
+	// Increase population counter in new LR home cell
+	((GujaratWorld*)_world)->worldCell2LowResCell(getPosition(),LRpos);
+	((GujaratWorld*)_world)->setValueLR(eLRPopulation, LRpos, 1 + ((GujaratWorld*)_world)->getValueLR(eLRPopulation,LRpos));
+	
+}
+
+void	GujaratAgent::initializePosition( )
+{		
 	// 1. select settlement area
 	GujaratWorld* world = dynamic_cast<GujaratWorld*>(getWorld());	
 	std::vector< Engine::Point2D<int> > dunes;
 	
 	while(dunes.empty())
 	{
+		
+		// apply Point2D<int> World::getRandomPosition();
+		
 		const  std::vector< Engine::Rectangle<int> >& areas = world->getSettlementAreas()->getAreas();
 		assert(areas.size() > 0);
 		unsigned die = Engine::GeneralState::statistics().getUniformDistValue(0, areas.size()-1);

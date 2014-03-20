@@ -136,7 +136,7 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 	retrieveAttributeMandatory( element, "adulthoodAge", _adulthoodAge );	
 	
 	retrieveAttributeMandatory( element, "numSectors", _numSectors );
-	
+
 	retrieveAttributeMandatory( element, "hunterGathererInformationCaducityTime", _hunterGathererInformationCaducityTime );
 	
 	// Generate a sector mask of lowrescells for the lowresmap the would overlap the original sector mask.
@@ -200,12 +200,21 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 		throw Engine::Exception(sstr.str());
 	}
 	
+
+	int positionX=-1;
+	int positionY=-1;
+        TiXmlElement * initialPosition = element->FirstChildElement("initialPosition");
+        retrieveAttributeMandatory(initialPosition, "x", positionX);
+	retrieveAttributeMandatory(initialPosition, "y", positionY);
+	GujaratState::setInitialPosition(positionX,positionY);
+
 	
 	float minValue = 0;
 	float adultValue = 0;
 	int minAge = 0;
 	int adultAge = 0;
 	
+
 	TiXmlElement * calories = element->FirstChildElement("calories");
 	retrieveAttributeMandatory(calories, "minValue", minValue);
 	retrieveAttributeMandatory(calories, "adultValue", adultValue);
