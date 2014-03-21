@@ -1,56 +1,31 @@
 
-/*
- * Copyright (c) 2012
- * COMPUTER APPLICATIONS IN SCIENCE & ENGINEERING
- * BARCELONA SUPERCOMPUTING CENTRE - CENTRO NACIONAL DE SUPERCOMPUTACIÓN
- * http://www.bsc.es
-
- * This file is part of Pandora Library. This library is free software; 
- * you can redistribute it and/or modify it under the terms of the
- * GNU General Public License as published by the Free Software Foundation;
- * either version 3.0 of the License, or (at your option) any later version.
- * 
- * Pandora is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public 
- * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
- * 
- */
-
-#include <Serializer.hxx>
-
+#include <SequentialSerializer.hxx>
+#include <boost/filesystem.hpp>
 #include <World.hxx>
-#include <StaticRaster.hxx>
-#include <Raster.hxx>
-#include <Agent.hxx>
 #include <Simulation.hxx>
 #include <Exceptions.hxx>
-#include <boost/filesystem.hpp>
+#include <Agent.hxx>
+#include <Scheduler.hxx>
 #include <Logger.hxx>
-#include <GeneralState.hxx>
-
-#include <SpacePartition.hxx>
+#include <StaticRaster.hxx>
 
 namespace Engine
 {
 
-Serializer::Serializer( const SpacePartition & scheduler, const std::string & resultsFile ) : _simulation(0), _scheduler(scheduler), _resultsFile(resultsFile), _agentsFileId(-1), _fileId(-1), _currentAgentDatasetId(-1)
+SequentialSerializer::SequentialSerializer( const Scheduler & scheduler, const std::string & resultsFile ) : _scheduler(scheduler), _resultsFile(resultsFile)
 {
 }
 
-Serializer::~Serializer()
+SequentialSerializer::~SequentialSerializer()
 {
 }
 
-void Serializer::init(World & world )
+void SequentialSerializer::init( World & world )
 {
 	_simulation = &(world.getSimulation());
 	std::stringstream logName;
-	logName << "Serializer_" << _scheduler.getId();
-	log_DEBUG(logName.str(), " init serializer");
+	logName << "SequentialSerializer_" << _scheduler.getId();
+	log_DEBUG(logName.str(), " init sequential serializer");
 
 	// check if directory exists
 	unsigned int filePos = _resultsFile.find_last_of("/");
@@ -61,19 +36,7 @@ void Serializer::init(World & world )
 	{
 		boost::filesystem::create_directory(path);
 	}
-
-	// creating base file in a parallel environment
-	hid_t propertyListId = H5Pcreate(H5P_FILE_ACCESS);
-
-	// workaround, it crashes in serial without this clause
-	if(_scheduler.getNumTasks()>1)		
-	{
-		H5Pset_fapl_mpio(propertyListId, MPI_COMM_WORLD, MPI_INFO_NULL);
-	}
-
-	_fileId = H5Fcreate(_resultsFile.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, propertyListId);
-	H5Pclose(propertyListId);
-
+	_fileId = H5Fcreate(_resultsFile.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 	// adding a group with global generic data
 	hsize_t simpleDimension = 1;
 	hid_t globalFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
@@ -234,16 +197,6 @@ void Serializer::init(World & world )
 	dimensions[0] = hsize_t(_simulation->getSize()._width);
 	dimensions[1] = hsize_t(_simulation->getSize()._height);
 
-	// we need to specify the size where each computer node will be writing
-	hsize_t chunkDimensions[2];
-	chunkDimensions[0] = _scheduler.getOwnedArea()._size._width/2;
-	chunkDimensions[0] += 2*_scheduler.getOverlap();
-	chunkDimensions[1] = _scheduler.getOwnedArea()._size._height/2;
-	chunkDimensions[1] += 2*_scheduler.getOverlap();
-	
-	propertyListId = H5Pcreate(H5P_DATASET_CREATE);
-	H5Pset_chunk(propertyListId, 2, chunkDimensions);
-
 	// static rasters	
 	for(size_t i=0; i<world.getNumberOfRasters(); i++)
 	{
@@ -254,11 +207,12 @@ void Serializer::init(World & world )
 		// TODO 0 o H5P_DEFAULT??
 		hid_t rasterGroupId = H5Gcreate(_fileId, world.getRasterName(i).c_str(), 0, H5P_DEFAULT, H5P_DEFAULT);
 		hid_t fileSpace = H5Screate_simple(2, dimensions, NULL); 
-		hid_t datasetId = H5Dcreate(rasterGroupId, "values", H5T_NATIVE_INT, fileSpace, H5P_DEFAULT, propertyListId, H5P_DEFAULT);
+		hid_t datasetId = H5Dcreate(rasterGroupId, "values", H5T_NATIVE_INT, fileSpace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 		H5Dclose(datasetId);
 		H5Sclose(fileSpace);
 		H5Gclose(rasterGroupId);
 	}
+	/*
 
 	// dynamic rasters
 	for(size_t i=0; i<world.getNumberOfRasters(); i++)
@@ -285,6 +239,7 @@ void Serializer::init(World & world )
 		H5Gclose(rasterGroupId);
 	}
 	H5Pclose(propertyListId);
+	*/
 
 	StaticRastersRefMap staticRasters;
 	for(size_t i=0; i<world.getNumberOfRasters(); i++)
@@ -306,81 +261,50 @@ void Serializer::init(World & world )
 	serializeStaticRasters(staticRasters);
 }
 
-void Serializer::finish()
+void SequentialSerializer::serializeAgents( const int & step, const AgentsList::const_iterator beginAgents, const AgentsList::const_iterator endAgents )
+{
+	int i=0;
+	for(AgentsList::const_iterator it=beginAgents; it!=endAgents; it++)
+	{
+		if(!(*it)->exists())
+		{
+			continue;
+		}
+		serializeAgent((*it), step, i);
+		i++;
+	}
+	// serialize remaining agents
+	finishAgentsSerialization(step);
+}
+
+void SequentialSerializer::serializeAgent( Agent * agent, const int & step, int index )
+{
+	std::string type = agent->getType();
+	// new type, must be in _stringAttributes because at least id attribute must exist
+	if(_stringAttributes.find(type)==_stringAttributes.end())
+	{
+		agent->registerAttributes();
+		registerType(agent);
+	}
+
+	addStringAttribute(type, "id", agent->getId());
+	addIntAttribute(type, "x", agent->getPosition()._x);
+	addIntAttribute(type, "y", agent->getPosition()._y);
+	agent->serialize();
+
+	if(getDataSize(type)>=20000)
+	{
+		executeAgentSerialization(type, step);
+	}
+}
+
+void SequentialSerializer::finish()
 {
 	H5Fclose(_fileId);
 	H5Fclose(_agentsFileId);
 }
 
-void Serializer::registerType( Agent * agent )
-{
-	std::string type = agent->getType();
-
-	std::stringstream logName;
-	logName << "Serializer_" << _scheduler.getId();
-
-	log_DEBUG(logName.str(), "registering new type: " << type);
-
-	hsize_t simpleDimension = 0;
-	hsize_t maxDims[1];
-	maxDims[0] = H5S_UNLIMITED;
-	hid_t agentFileSpace = H5Screate_simple(1, &simpleDimension, maxDims);
-	hid_t agentTypeGroup = H5Gcreate(_agentsFileId, agent->getType().c_str(),  0, H5P_DEFAULT, H5P_DEFAULT);
-
-	hid_t propertyListId = H5Pcreate(H5P_DATASET_CREATE);
-	hsize_t chunks = 1;
-	H5Pset_chunk(propertyListId, 1, &chunks);
-
-	IntMap * newTypeIntMap = new IntMap;
-	StringMap * newTypeStringMap = new StringMap;
-
-	// create a dataset for each timestep
-	for(int i=0; i<=_simulation->getNumSteps(); i++)
-	{
-		if(i%_simulation->getSerializerResolution()!=0)
-		{
-			continue;
-		}
-
-		std::ostringstream oss;
-		oss<<"step"<<i;
-		hid_t stepGroup = H5Gcreate(agentTypeGroup, oss.str().c_str(),  0, H5P_DEFAULT, H5P_DEFAULT);
-		for(Agent::AttributesList::iterator it=agent->beginIntAttributes(); it!=agent->endIntAttributes(); it++)
-		{	
-			log_DEBUG(logName.str(), "\tnew int attribute: " << *it);
-			newTypeIntMap->insert( make_pair(*it, new std::vector<int>() ));
-			hid_t idDataset= H5Dcreate(stepGroup, (*it).c_str(), H5T_NATIVE_INT, agentFileSpace, H5P_DEFAULT, propertyListId, H5P_DEFAULT);
-			H5Dclose(idDataset);
-		}
-		
-		hid_t idType = H5Tcopy(H5T_C_S1);
-		H5Tset_size (idType, H5T_VARIABLE);
-		for(Agent::AttributesList::iterator it=agent->beginStringAttributes(); it!=agent->endStringAttributes(); it++)
-		{		
-			log_DEBUG(logName.str(), "\tnew string attribute: " << *it);
-			newTypeStringMap->insert( make_pair(*it, new std::vector<std::string>() ));
-			hid_t idDataset= H5Dcreate(stepGroup, (*it).c_str(), idType, agentFileSpace, H5P_DEFAULT, propertyListId, H5P_DEFAULT);
-			H5Dclose(idDataset);
-		}
-		H5Gclose(stepGroup);
-	}
-	H5Gclose(agentTypeGroup);
-	H5Sclose(agentFileSpace);
-
-	_agentIndexMap.insert( make_pair(type, 0) );
-	_intAttributes.insert( make_pair(type, newTypeIntMap));
-	_stringAttributes.insert( make_pair(type, newTypeStringMap));
-}
-
-void Serializer::resetCurrentIndexs()
-{
-	for(std::map<std::string, int>::iterator it=_agentIndexMap.begin(); it!=_agentIndexMap.end(); it++)
-	{
-		it->second = 0;
-	}
-}
-
-void Serializer::finishAgentsSerialization( int step)
+void SequentialSerializer::finishAgentsSerialization( int step)
 {
 	for(StringAttributesMap::iterator it=_stringAttributes.begin(); it!=_stringAttributes.end(); it++)
 	{
@@ -388,8 +312,8 @@ void Serializer::finishAgentsSerialization( int step)
 	}
 	resetCurrentIndexs();
 }
-	
-void Serializer::executeAgentSerialization( const std::string & type, int step)	
+
+void SequentialSerializer::executeAgentSerialization( const std::string & type, int step)	
 {
 	std::map<std::string, int>::iterator itI = _agentIndexMap.find(type);
 
@@ -470,7 +394,7 @@ void Serializer::executeAgentSerialization( const std::string & type, int step)
 	}
 }
 
-void Serializer::addStringAttribute( const std::string & type, const std::string & key, const std::string & value )
+void SequentialSerializer::addStringAttribute( const std::string & type, const std::string & key, const std::string & value )
 {
 	StringAttributesMap::iterator it = _stringAttributes.find(type);
 	StringMap * stringMap = it->second;
@@ -479,13 +403,13 @@ void Serializer::addStringAttribute( const std::string & type, const std::string
 	stringVector->push_back(value);
 }
 	
-void Serializer::addIntAttribute( const std::string & type, const std::string & key, int value )
+void SequentialSerializer::addIntAttribute( const std::string & type, const std::string & key, int value )
 {
 	IntAttributesMap::iterator it = _intAttributes.find(type);
 	if(it==_intAttributes.end())
 	{
 		std::stringstream oss;
-		oss << "Serializer::addIntAttribute - looking for unknown agent type: " << type;
+		oss << "SequentialSerializer::addIntAttribute - looking for unknown agent type: " << type;
 		throw Exception(oss.str());
 	}
 	IntMap * intMap = it->second;
@@ -493,14 +417,74 @@ void Serializer::addIntAttribute( const std::string & type, const std::string & 
 	if(itI==intMap->end())
 	{
 		std::stringstream oss;
-		oss << "Serializer::addIntAttribute - looking for unknown attribute: " << key << " in agent type: " << type;
+		oss << "SequentialSerializer::addIntAttribute - looking for unknown attribute: " << key << " in agent type: " << type;
 		throw Exception(oss.str());
 	}
 	std::vector<int> * intVector = itI->second;
 	intVector->push_back(value);
 }
 
-int Serializer::getDataSize( const std::string & type )
+void SequentialSerializer::registerType( Agent * agent )
+{
+	std::string type = agent->getType();
+
+	std::stringstream logName;
+	logName << "SequentialSerializer_" << _scheduler.getId();
+
+	log_DEBUG(logName.str(), "registering new type: " << type);
+
+	hsize_t simpleDimension = 0;
+	hsize_t maxDims[1];
+	maxDims[0] = H5S_UNLIMITED;
+	hid_t agentFileSpace = H5Screate_simple(1, &simpleDimension, maxDims);
+	hid_t agentTypeGroup = H5Gcreate(_agentsFileId, agent->getType().c_str(),  0, H5P_DEFAULT, H5P_DEFAULT);
+
+	hid_t propertyListId = H5Pcreate(H5P_DATASET_CREATE);
+	hsize_t chunks = 1;
+	H5Pset_chunk(propertyListId, 1, &chunks);
+
+	IntMap * newTypeIntMap = new IntMap;
+	StringMap * newTypeStringMap = new StringMap;
+
+	// create a dataset for each timestep
+	for(int i=0; i<=_simulation->getNumSteps(); i++)
+	{
+		if(i%_simulation->getSerializerResolution()!=0)
+		{
+			continue;
+		}
+
+		std::ostringstream oss;
+		oss<<"step"<<i;
+		hid_t stepGroup = H5Gcreate(agentTypeGroup, oss.str().c_str(),  0, H5P_DEFAULT, H5P_DEFAULT);
+		for(Agent::AttributesList::iterator it=agent->beginIntAttributes(); it!=agent->endIntAttributes(); it++)
+		{	
+			log_DEBUG(logName.str(), "\tnew int attribute: " << *it);
+			newTypeIntMap->insert( make_pair(*it, new std::vector<int>() ));
+			hid_t idDataset= H5Dcreate(stepGroup, (*it).c_str(), H5T_NATIVE_INT, agentFileSpace, H5P_DEFAULT, propertyListId, H5P_DEFAULT);
+			H5Dclose(idDataset);
+		}
+		
+		hid_t idType = H5Tcopy(H5T_C_S1);
+		H5Tset_size (idType, H5T_VARIABLE);
+		for(Agent::AttributesList::iterator it=agent->beginStringAttributes(); it!=agent->endStringAttributes(); it++)
+		{		
+			log_DEBUG(logName.str(), "\tnew string attribute: " << *it);
+			newTypeStringMap->insert( make_pair(*it, new std::vector<std::string>() ));
+			hid_t idDataset= H5Dcreate(stepGroup, (*it).c_str(), idType, agentFileSpace, H5P_DEFAULT, propertyListId, H5P_DEFAULT);
+			H5Dclose(idDataset);
+		}
+		H5Gclose(stepGroup);
+	}
+	H5Gclose(agentTypeGroup);
+	H5Sclose(agentFileSpace);
+
+	_agentIndexMap.insert( make_pair(type, 0) );
+	_intAttributes.insert( make_pair(type, newTypeIntMap));
+	_stringAttributes.insert( make_pair(type, newTypeStringMap));
+}
+
+int SequentialSerializer::getDataSize( const std::string & type )
 {
 	StringAttributesMap::iterator it = _stringAttributes.find(type);
 	StringMap * stringMap = it->second;
@@ -508,101 +492,49 @@ int Serializer::getDataSize( const std::string & type )
 	return itS->second->size();
 }
 
-void Serializer::serializeAgents( const int & step, const AgentsList::const_iterator beginAgents, const AgentsList::const_iterator endAgents )
+void SequentialSerializer::resetCurrentIndexs()
 {
-	int i=0;
-	for(AgentsList::const_iterator it=beginAgents; it!=endAgents; it++)
+	for(std::map<std::string, int>::iterator it=_agentIndexMap.begin(); it!=_agentIndexMap.end(); it++)
 	{
-		if(!(*it)->exists())
-		{
-			continue;
-		}
-		serializeAgent((*it), step, i);
-		i++;
-	}
-	// serialize remaining agents
-	finishAgentsSerialization(step);
-}
-
-void Serializer::serializeAgent( Agent * agent, const int & step, int index )
-{
-	std::string type = agent->getType();
-	// new type, must be in _stringAttributes because at least id attribute must exist
-	if(_stringAttributes.find(type)==_stringAttributes.end())
-	{
-		agent->registerAttributes();
-		registerType(agent);
-	}
-
-	addStringAttribute(type, "id", agent->getId());
-	addIntAttribute(type, "x", agent->getPosition()._x);
-	addIntAttribute(type, "y", agent->getPosition()._y);
-	agent->serialize();
-
-	if(getDataSize(type)>=20000)
-	{
-		executeAgentSerialization(type, step);
+		it->second = 0;
 	}
 }
 
-void Serializer::serializeAttribute( const std::string & name, const int & value )
+void SequentialSerializer::serializeStaticRasters( const StaticRastersRefMap & staticRasters)
 {
-	if(_currentAgentDatasetId==-1)
+	for(StaticRastersRefMap::const_iterator it=staticRasters.begin(); it!=staticRasters.end(); it++)
 	{
-		std::stringstream oss;
-		oss << "Serializer::serializeAttribute - trying to serialize agent state while _currentAgentDatasetId is not initialized.";
-		throw Exception(oss.str());
-		return;
+		std::ostringstream oss;
+		oss << "/" << it->first << "/values";
+		serializeRaster(*it->second, oss.str());
 	}
-	hsize_t simpleDimension = 1;
-	hid_t fileSpace = H5Screate_simple(1, &simpleDimension, NULL);
-	hid_t attributeId = H5Acreate(_currentAgentDatasetId, name.c_str(), H5T_NATIVE_INT, fileSpace, H5P_DEFAULT, H5P_DEFAULT);
-	H5Awrite(attributeId, H5T_NATIVE_INT, &value);
-
-	H5Aclose(attributeId);
-	H5Sclose(fileSpace);
 }
 
-void Serializer::serializeRaster( const StaticRaster & raster, const std::string & datasetKey )
+void SequentialSerializer::serializeRaster( const StaticRaster & raster, const std::string & datasetKey )
 {
 	std::stringstream logName;
-	logName << "MPI_Serializer_world_" << _scheduler.getId();
+	logName << "SequentialSerializer_" << _scheduler.getId();
 	log_EDEBUG(logName.str(), "serializing raster: " << datasetKey);
-
-	// if it is not a border, it will copy from overlap
-	hsize_t	offset[2];
-    offset[0] = _scheduler.getOwnedArea()._origin._x;	
-    offset[1] = _scheduler.getOwnedArea()._origin._y;
- 
-	hsize_t	block[2];
-	block[0] = _scheduler.getOwnedArea()._size._width;
-	block[1] = _scheduler.getOwnedArea()._size._height;
-
 
 	hid_t dataSetId = H5Dopen(_fileId, datasetKey.c_str(), H5P_DEFAULT);
 	hid_t fileSpace = H5Dget_space(dataSetId);
+
+	hsize_t	block[2];
+	block[0] = _scheduler.getBoundaries()._size._width;
+	block[1] = _scheduler.getBoundaries()._size._height;
 	
-	hsize_t	stride[2];
-	stride[0] = 1;
-	stride[1] = 1;
-	
-	hsize_t count[2];
-	count[0] = 1;
-	count[1] = 1;
-	
-	H5Sselect_hyperslab(fileSpace, H5S_SELECT_SET, offset, stride, count, block);
- 
 	int * data = (int *) malloc(sizeof(int)*block[0]*block[1]);
-	Point2D<int> overlapDist = _scheduler.getOwnedArea()._origin-_scheduler.getBoundaries()._origin;
-	log_EDEBUG(logName.str(), "overlap dist: " << overlapDist << "owned area: " << _scheduler.getOwnedArea() << " and boundaries: " << _scheduler.getBoundaries());
 	for(size_t i=0; i<block[0]; i++)
 	{
 		for(size_t j=0; j<block[1]; j++)
 		{	
 			size_t index = j*block[0]+i;
 			log_EDEBUG(logName.str(), "index: " << i << "/" << j << " - " << index);
+			/*
 			log_EDEBUG(logName.str(), "getting value: " << Point2D<int> (i+overlapDist._x,j+overlapDist._y));
 			data[index] = raster.getValue(Point2D<int> (i+overlapDist._x,j+overlapDist._y));
+			*/
+			data[index] = raster.getValue(Point2D<int>(i,j));
 			log_EDEBUG(logName.str(), "value: " << data[index]);
 		}
 	}
@@ -620,7 +552,7 @@ void Serializer::serializeRaster( const StaticRaster & raster, const std::string
 	log_EDEBUG(logName.str(), "serializing raster: " << datasetKey << " done");
 }
 
-void Serializer::serializeRasters(int step)
+void SequentialSerializer::serializeRasters(int step)
 {
 	for(StaticRastersRefMap::const_iterator it=_dynamicRasters.begin(); it!=_dynamicRasters.end(); it++)
 	{
@@ -630,17 +562,5 @@ void Serializer::serializeRasters(int step)
 	}
 }
 
-void Serializer::serializeStaticRasters( const StaticRastersRefMap & staticRasters)
-{
-	for(StaticRastersRefMap::const_iterator it=staticRasters.begin(); it!=staticRasters.end(); it++)
-	{
-		std::ostringstream oss;
-		oss << "/" << it->first << "/values";
-		serializeRaster(*it->second, oss.str());
-	}
-}
-
-
-	
 } // namespace Engine
 

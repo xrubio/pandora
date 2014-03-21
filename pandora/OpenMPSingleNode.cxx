@@ -28,7 +28,7 @@
 namespace Engine
 {
 
-OpenMPSingleNode::OpenMPSingleNode(const std::string & fileName) //: _serializer(*this, fileName)
+OpenMPSingleNode::OpenMPSingleNode(const std::string & fileName) : _serializer(*this, fileName)
 {
 }
 
@@ -47,7 +47,7 @@ void OpenMPSingleNode::init( int argc, char *argv[] )
 void OpenMPSingleNode::initData()
 {
 	// serializer init
-	//_serializer.init(*_world);
+	_serializer.init(*_world);
 	std::stringstream logName;
 	logName << "simulation_" << _id;
 	log_INFO(logName.str(), "finished init at: "  << getWallTime());
@@ -93,7 +93,7 @@ void OpenMPSingleNode::finish()
 	std::stringstream logName;
 	logName << "simulation_" << _id;
 
-	//_serializer.finish();
+	_serializer.finish();
 
 	log_INFO(logName.str(), getWallTime() << " simulation finished");
 	_timer.stop();
@@ -186,22 +186,22 @@ double OpenMPSingleNode::getWallTime() const
 
 void OpenMPSingleNode::addStringAttribute( const std::string & type, const std::string & key, const std::string & value )
 {
-	//_serializer.addStringAttribute(type, key, value);
+	_serializer.addStringAttribute(type, key, value);
 }
 
 void OpenMPSingleNode::addIntAttribute( const std::string & type, const std::string & key, int value )
 {
-	//_serializer.addIntAttribute(type, key, value);
+	_serializer.addIntAttribute(type, key, value);
 }
 
 void OpenMPSingleNode::serializeAgents( const int & step )
 {
-	//_serializer.serializeAgents(step, _world->beginAgents(), _world->endAgents());
+	_serializer.serializeAgents(step, _world->beginAgents(), _world->endAgents());
 }
 
 void OpenMPSingleNode::serializeRasters( const int & step )
 {
-	//_serializer.serializeRasters(step);
+	_serializer.serializeRasters(step);
 }
 
 int OpenMPSingleNode::countNeighbours( Agent * target, const double & radius, const std::string & type )

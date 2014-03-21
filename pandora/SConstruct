@@ -21,7 +21,7 @@ else:
 	libraryName = 'pandora'
 	pythonLibraryName = 'pyPandora'
 
-coreFiles = Split('World.cxx StaticRaster.cxx Raster.cxx Agent.cxx Statistics.cxx SimulationRecord.cxx AgentRecord.cxx Serializer.cxx Simulation.cxx Config.cxx MpiFactory.cxx IncrementalRaster.cxx RasterLoader.cxx Action.cxx LoggerBase.cxx GeneralState.cxx ShpLoader.cxx SpacePartition.cxx OpenMPSingleNode.cxx')
+coreFiles = Split('World.cxx StaticRaster.cxx Raster.cxx Agent.cxx Statistics.cxx SimulationRecord.cxx AgentRecord.cxx Serializer.cxx SequentialSerializer.cxx Simulation.cxx Config.cxx MpiFactory.cxx IncrementalRaster.cxx RasterLoader.cxx Action.cxx LoggerBase.cxx GeneralState.cxx ShpLoader.cxx SpacePartition.cxx OpenMPSingleNode.cxx')
 
 analysisFiles = Split('analysis/Analysis.cxx analysis/AgentMean.cxx analysis/AgentSum.cxx analysis/AgentNum.cxx analysis/Output.cxx analysis/AgentStdDev.cxx analysis/GlobalAgentStats.cxx analysis/IndividualStats.cxx analysis/AgentHistogram.cxx analysis/AgentHDFtoSHP.cxx analysis/GlobalRasterStats.cxx analysis/RasterMean.cxx analysis/RasterSum.cxx')
 

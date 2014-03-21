@@ -1,6 +1,5 @@
-
 /*
- * Copyright (c) 2012
+ * Copyright (c) 2014
  * COMPUTER APPLICATIONS IN SCIENCE & ENGINEERING
  * BARCELONA SUPERCOMPUTING CENTRE - CENTRO NACIONAL DE SUPERCOMPUTACIÓN
  * http://www.bsc.es
@@ -20,81 +19,62 @@
  * 
  */
 
-#ifndef __Serializer_hxx__
-#define __Serializer_hxx__
+#ifndef __SequentialSerializer_hxx__
+#define __SequentialSerializer_hxx__
 
 #include <hdf5.h>
 #include <string>
 #include <map>
-#include <vector>
-#include <mpi.h>
-#include <Rectangle.hxx>
 #include <typedefs.hxx>
 
 namespace Engine
 {
 
-class Simulation;
-class Agent;
-class StaticRaster;
-class Raster;
+class Scheduler;
 class World;
-class SpacePartition;
+class Simulation;
+class StaticRaster;
 
-class Serializer
+/** Serializer class that stores simulation data with standard HDF5 interface 
+  * It can be used for any Scheduler that does not use non-shared memory distribution
+  */
+class SequentialSerializer
 {
-	typedef std::map< std::string, Raster> RastersMap;
 	typedef std::map< std::string, StaticRaster *> StaticRastersRefMap;
-
 	typedef std::map< std::string, std::vector<int> * > IntMap;
 	typedef std::map< std::string, std::vector<std::string> * > StringMap;
 	typedef std::map< std::string, IntMap * > IntAttributesMap;
 	typedef std::map< std::string, StringMap * > StringAttributesMap;
 
-	const Simulation * _simulation;
-	const SpacePartition & _scheduler;
-	int _numSteps;
-	int _serializerResolution;
-
+	const Scheduler & _scheduler;
+	Simulation * _simulation;
+	hid_t _fileId;
+	hid_t _agentsFileId;
+	// basic file where general run info and raster data is stored
 	std::string _resultsFile;
-
 	StaticRastersRefMap _dynamicRasters;
 
-	hid_t _agentsFileId;
-	hid_t _fileId;
-	// this id is used to track the data set of the agent being serialized
-	hid_t _currentAgentDatasetId;
-
-	void serializeRaster( const StaticRaster & raster, const std::string & datasetKey );
-
-	// register the type of agent into the data structures _agentIndexsMap, _stringAttributes and _intAttributes and create HDF5 structures
-	void registerType( Agent * agent);
-	IntAttributesMap _intAttributes;
 	StringAttributesMap _stringAttributes;
-
+	IntAttributesMap _intAttributes;
 	std::map<std::string, int> _agentIndexMap;
-	
+
 	void executeAgentSerialization( const std::string & type, int step);
-	void resetCurrentIndexs();
-
-	int getDataSize( const std::string & type );
-
 	void serializeAgent( Agent * agent, const int & step, int index);
 	void finishAgentsSerialization( int step);
+	// register the type of agent into the data structures _agentIndexsMap, _stringAttributes and _intAttributes and create HDF5 structures
+	void registerType( Agent * agent);
+	int getDataSize( const std::string & type );
+	void resetCurrentIndexs();
+	void serializeRaster( const StaticRaster & raster, const std::string & datasetKey );
 
 public:
-	Serializer( const SpacePartition & scheduler, const std::string & resultsFile );
-	virtual ~Serializer();
-
-	void init(World & world );
+	SequentialSerializer( const Scheduler & scheduler, const std::string & resultsFile );
+	virtual ~SequentialSerializer();
+	void init( World & world );
 	void finish();
-
-	void serializeAttribute( const std::string & name, const int & value );
-
 	
 	void addStringAttribute( const std::string & type, const std::string & key, const std::string & value );
 	void addIntAttribute( const std::string & type, const std::string & key, int value );
-
 	void serializeAgents( const int & step, const AgentsList::const_iterator beginAgents, const AgentsList::const_iterator endAgents);
 	void serializeStaticRasters( const StaticRastersRefMap & staticRasters);
 	void serializeRasters(int step);
@@ -103,5 +83,5 @@ public:
 
 } // namespace Engine
 
-#endif // __Serializer_hxx__
+#endif // __SequentialSerializer_hxx__
 

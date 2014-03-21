@@ -25,7 +25,7 @@
 #include <Simulation.hxx>
 #include <World.hxx>
 #include <typedefs.hxx>
-//#include <Serializer.hxx>
+#include <SequentialSerializer.hxx>
 #include <list>
 #include <vector>
 #include <Scheduler.hxx>
@@ -43,7 +43,7 @@ class OpenMPSingleNode : public Scheduler
 {
 	boost::timer::cpu_timer _timer;
 	// TODO change for sequential hdf5
-	//Serializer _serializer;	
+	SequentialSerializer _serializer;	
 
 	// list of agents that are removed during a time step, and need to be erased by the end of the time step
 	AgentsList _removedAgents;
