@@ -400,8 +400,7 @@ const std::string & World::getRasterName( const int & index) const
 }
 
 
-//Scheduler * World::useSpacePartition(const std::string & fileName, int overlap, bool finalize )
-SpacePartition * World::useSpacePartition(const std::string & fileName, int overlap, bool finalize )
+Scheduler * World::useSpacePartition(const std::string & fileName, int overlap, bool finalize )
 {
 	return new SpacePartition(overlap, fileName, finalize);
 }

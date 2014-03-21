@@ -191,8 +191,7 @@ public:
 	}
 
 	//! factory method for Scheduler SpacePartition
-//	static Scheduler * useSpacePartition(const std::string & fileName = "data/results.h5", int overlap = 1, bool finalize = true );
-	static SpacePartition * useSpacePartition(const std::string & fileName = "data/results.h5", int overlap = 1, bool finalize = true );
+	static Scheduler * useSpacePartition(const std::string & fileName = "data/results.h5", int overlap = 1, bool finalize = true );
 };
 
 } // namespace Engine

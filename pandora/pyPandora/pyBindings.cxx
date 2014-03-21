@@ -50,6 +50,7 @@
 #include <analysis/RasterSum.hxx>
 #include <analysis/RasterMean.hxx>
 #include <SpacePartition.hxx>
+#include <Scheduler.hxx>
 
 #include <string>
 
@@ -188,7 +189,7 @@ class WorldWrap : public Engine::World, public boost::python::wrapper<Engine::Wo
 {
 public:
 	// Scheduler for python is always default
-	WorldWrap(const Engine::Simulation & simulation, Engine::SpacePartition * scheduler = 0, const bool & allowMultipleAgentsPerCell = true) : World( simulation,scheduler,allowMultipleAgentsPerCell )
+	WorldWrap(const Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0, const bool & allowMultipleAgentsPerCell = true) : World( simulation,scheduler,allowMultipleAgentsPerCell )
 	{
 	}
 
@@ -429,7 +430,7 @@ BOOST_PYTHON_MODULE(libpyPandora)
 	boost::python::class_< std::vector<std::string> >("StringVector").def(boost::python::vector_indexing_suite< std::vector<std::string> >());
 	boost::python::class_< std::vector<int> >("IntVector").def(boost::python::vector_indexing_suite< std::vector<int> >());
 	
-	boost::python::class_< WorldWrap, boost::noncopyable >("WorldStub", boost::python::init< const Engine::Simulation &, Engine::SpacePartition *, const bool & >()[boost::python::with_custodian_and_ward<1,3>()])
+	boost::python::class_< WorldWrap, boost::noncopyable >("WorldStub", boost::python::init< const Engine::Simulation &, Engine::Scheduler *, const bool & >()[boost::python::with_custodian_and_ward<1,3>()])
 		.def("createRasters", boost::python::pure_virtual(&Engine::World::createRasters))
 		.def("createAgents", boost::python::pure_virtual(&Engine::World::createAgents))
 		.def("stepEnvironment", &Engine::World::stepEnvironment, &WorldWrap::default_StepEnvironment)
@@ -454,6 +455,8 @@ BOOST_PYTHON_MODULE(libpyPandora)
 	
 	boost::python::class_< Engine::SpacePartition, std::auto_ptr<Engine::SpacePartition> >("SpacePartitionStub", boost::python::init< const int &, const std::string &, bool >())
 	;
+	
+	boost::python::implicitly_convertible< std::auto_ptr< Engine::SpacePartition >, std::auto_ptr< Engine::Scheduler > >();	
 
 	boost::python::class_< Engine::SimulationRecord>("SimulationRecordStub", boost::python::init< int, bool >())
 		.def("loadHDF5", &Engine::SimulationRecord::loadHDF5)
