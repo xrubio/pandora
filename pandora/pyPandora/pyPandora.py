@@ -40,8 +40,12 @@ class Agent(libpyPandora.AgentStub):
 		return 'Agent: ' + self.id + ' at position: ' + str(self.position._x) + '/' + str(self.position._y)
 
 class SpacePartition(libpyPandora.SpacePartitionStub):
-	def __init__(self, overlap, fileName, finalise ):
-		libpyPandora.SpacePartitionStub.__init__(self, overlap, fileName, finalise)
+	def __init__(self, fileName, overlap, finalise ):
+		libpyPandora.SpacePartitionStub.__init__(self, fileName, overlap, finalise)
+
+class OpenMPSingleNode(libpyPandora.OpenMPSingleNodeStub):
+	def __init__(self, fileName ):
+		libpyPandora.OpenMPSingleNodeStub.__init__(self, fileName )
 
 class World(libpyPandora.WorldStub):
 	_listOfAgents = []

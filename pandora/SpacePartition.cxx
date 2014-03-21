@@ -28,7 +28,7 @@
 namespace Engine
 {
 
-SpacePartition::SpacePartition(const int & overlap, const std::string & fileName, bool finalize ) : _worldPos(-1,-1), _finalize(finalize), _overlap(overlap), _initialTime(0.0f), _serializer(*this, fileName)
+SpacePartition::SpacePartition(const std::string & fileName, const int & overlap, bool finalize ) : _worldPos(-1,-1), _finalize(finalize), _overlap(overlap), _initialTime(0.0f), _serializer(*this, fileName)
 {
 }
 
@@ -1493,7 +1493,7 @@ void SpacePartition::removeAgents()
 
 AgentsVector SpacePartition::getAgent( const Point2D<int> & position, const std::string & type )
 {
-	std::vector<Agent *> result;
+	AgentsVector result;
 	for(AgentsList::iterator it=_world->beginAgents(); it!=_world->endAgents(); it++)
 	{
 		if((*it)->getPosition().isEqual(position))

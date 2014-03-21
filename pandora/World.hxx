@@ -32,7 +32,6 @@
 #include <Rectangle.hxx>
 #include <Point2D.hxx>
 #include <Simulation.hxx>
-#include <Scheduler.hxx>
 #include <algorithm>
 
 namespace Engine
@@ -40,6 +39,7 @@ namespace Engine
 class Scheduler;
 class Agent;
 class SpacePartition;
+class OpenMPSingleNode;
 
 class World
 {
@@ -190,8 +190,10 @@ public:
 		return false;
 	}
 
-	//! factory method for Scheduler SpacePartition
+	//! factory method for distributed Scheduler based on spatial distribution of a simulation
 	static Scheduler * useSpacePartition(const std::string & fileName = "data/results.h5", int overlap = 1, bool finalize = true );
+	//! factory method for sequential Scheduler without any non-shared communication mechanism, apt for being executed in a single computer
+	static Scheduler * useOpenMPSingleNode(const std::string & fileName = "data/results.h5");
 };
 
 } // namespace Engine

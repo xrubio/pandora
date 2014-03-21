@@ -8,7 +8,7 @@ env = Environment(ENV=os.environ, CXX='mpicxx')
 
 env.VariantDir('build', '.')
 
-libs = Split('pthread gdal hdf5 z tinyxml grass_gis boost_filesystem boost_system gomp')
+libs = Split('pthread gdal hdf5 z tinyxml grass_gis boost_filesystem boost_system boost_timer boost_chrono gomp')
 
 if int(release) == 0:
 	env['CCFLAGS'] = Split('-std=c++0x -g -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG')
@@ -21,7 +21,7 @@ else:
 	libraryName = 'pandora'
 	pythonLibraryName = 'pyPandora'
 
-coreFiles = Split('World.cxx StaticRaster.cxx Raster.cxx Agent.cxx Statistics.cxx SimulationRecord.cxx AgentRecord.cxx Serializer.cxx Simulation.cxx Config.cxx MpiFactory.cxx IncrementalRaster.cxx RasterLoader.cxx Action.cxx LoggerBase.cxx GeneralState.cxx ShpLoader.cxx SpacePartition.cxx')
+coreFiles = Split('World.cxx StaticRaster.cxx Raster.cxx Agent.cxx Statistics.cxx SimulationRecord.cxx AgentRecord.cxx Serializer.cxx Simulation.cxx Config.cxx MpiFactory.cxx IncrementalRaster.cxx RasterLoader.cxx Action.cxx LoggerBase.cxx GeneralState.cxx ShpLoader.cxx SpacePartition.cxx OpenMPSingleNode.cxx')
 
 analysisFiles = Split('analysis/Analysis.cxx analysis/AgentMean.cxx analysis/AgentSum.cxx analysis/AgentNum.cxx analysis/Output.cxx analysis/AgentStdDev.cxx analysis/GlobalAgentStats.cxx analysis/IndividualStats.cxx analysis/AgentHistogram.cxx analysis/AgentHDFtoSHP.cxx analysis/GlobalRasterStats.cxx analysis/RasterMean.cxx analysis/RasterSum.cxx')
 

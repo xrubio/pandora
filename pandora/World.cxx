@@ -22,7 +22,9 @@
 #include <World.hxx>
 #include <Agent.hxx>
 #include <Exceptions.hxx>
+#include <Scheduler.hxx>
 #include <SpacePartition.hxx>
+#include <OpenMPSingleNode.hxx>
 
 #include <GeneralState.hxx>
 
@@ -35,8 +37,6 @@
 #include <algorithm>
 #include <ctime>
 
-#include <SpacePartition.hxx>
-
 namespace Engine
 {
 
@@ -45,7 +45,7 @@ World::World( const Simulation & simulation, Scheduler * scheduler, const bool &
 	// default Scheduler 
 	if(!_scheduler)
 	{
-		_scheduler = useSpacePartition();
+		_scheduler = useOpenMPSingleNode();
 	}
 	_scheduler->setWorld(this);
 }
@@ -402,8 +402,14 @@ const std::string & World::getRasterName( const int & index) const
 
 Scheduler * World::useSpacePartition(const std::string & fileName, int overlap, bool finalize )
 {
-	return new SpacePartition(overlap, fileName, finalize);
+	return new SpacePartition(fileName, overlap, finalize);
 }
+
+Scheduler * World::useOpenMPSingleNode(const std::string & fileName)
+{
+	return new OpenMPSingleNode(fileName);
+}
+
 
 const int & World::getId() const { return _scheduler->getId(); }
 const int & World::getNumTasks() const { return _scheduler->getNumTasks(); }

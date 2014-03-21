@@ -103,8 +103,6 @@ class SpacePartition : public Scheduler
 	
 	//! id's of neighboring computer nodes
 	std::vector<int> _neighbors;
-	//! boundaries of the particular world, with adjacent overlaps added
-	Rectangle<int> _boundaries;
 	//! area inside boundaries owned by the computer node without overlap
 	Rectangle<int> _ownedArea;
 	//! the four sections into a world is divided
@@ -171,7 +169,7 @@ class SpacePartition : public Scheduler
 	Point2D<int> getRealPosition( const Point2D<int> & globalPosition ) const;
 
 public:
-	SpacePartition(  const int & overlap, const std::string & fileName, bool finalize );
+	SpacePartition( const std::string & fileName, const int & overlap, bool finalize );
 	virtual ~SpacePartition();
 
 	void finish();
@@ -206,55 +204,6 @@ public:
 	int countNeighbours( Agent * target, const double & radius, const std::string & type);
 	AgentsVector getNeighbours( Agent * target, const double & radius, const std::string & type);
 	
-	// this method returns a list with the list of agents in manhattan distance radius of position. if include center is false, position is not checked
-	template<class T> struct aggregator : public std::unary_function<T,void>
-	{
-		aggregator(double radius, T &center, const std::string & type ) :  _radius(radius), _center(center), _type(type)
-		{
-			_particularType = _type.compare("all");
-		}
-		virtual ~aggregator(){}
-		void operator()( T * neighbor )
-		{
-			if(neighbor==&_center || !neighbor->exists())
-			{
-				return;
-			}
-			if(_particularType && !neighbor->isType(_type))
-			{
-				return;
-			}
-			if(_center.getPosition().distance(neighbor->getPosition())-_radius<= 0.0001)
-			{
-					execute( *neighbor );
-			}
-		}
-		virtual void execute( T & neighbor )=0;
-		bool _particularType;
-		double _radius;
-		T & _center;
-		std::string _type;
-	};
-
-	template<class T> struct aggregatorCount : public aggregator<T>
-	{
-		aggregatorCount( double radius, T & center, const std::string & type ) : aggregator<T>(radius,center,type), _count(0) {}
-		void execute( T & neighbor )
-		{
-			_count++;
-		}
-		int _count;
-	};
-	template<class T> struct aggregatorGet : public aggregator<T>
-	{
-		aggregatorGet( double radius, T & center, const std::string & type ) : aggregator<T>(radius,center,type) {}
-		void execute( T & neighbor )
-		{
-			_neighbors.push_back(&neighbor);
-		}
-		AgentsVector _neighbors;
-	};
-
 	void setValue( Raster & raster, const Point2D<int> & position, int value );
 	int getValue( const Raster & raster, const Point2D<int> & position ) const;
 	void setMaxValueAt( Raster & raster, const Point2D<int> & position, int value );

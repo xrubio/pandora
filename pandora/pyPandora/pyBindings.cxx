@@ -50,6 +50,7 @@
 #include <analysis/RasterSum.hxx>
 #include <analysis/RasterMean.hxx>
 #include <SpacePartition.hxx>
+#include <OpenMPSingleNode.hxx>
 #include <Scheduler.hxx>
 
 #include <string>
@@ -443,6 +444,8 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("run", &Engine::World::run)
 		.def("useSpacePartition", &Engine::World::useSpacePartition, boost::python::return_value_policy<boost::python::reference_existing_object>())
 		.staticmethod("useSpacePartition")
+		.def("useOpenMPSingleNode", &Engine::World::useOpenMPSingleNode, boost::python::return_value_policy<boost::python::reference_existing_object>())
+		.staticmethod("useOpenMPSingleNode")
 		.def("addAgentStub", &WorldWrap::addAgentSimple)
 		.def("setValue", setValue)
 		.def("getValue", getValue)
@@ -453,10 +456,16 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.add_property("currentStep", &Engine::World::getCurrentStep)
 	;	
 	
-	boost::python::class_< Engine::SpacePartition, std::auto_ptr<Engine::SpacePartition> >("SpacePartitionStub", boost::python::init< const int &, const std::string &, bool >())
+	boost::python::class_< Engine::SpacePartition, std::auto_ptr<Engine::SpacePartition> >("SpacePartitionStub", boost::python::init< const std::string &, const int &, bool >())
 	;
 	
 	boost::python::implicitly_convertible< std::auto_ptr< Engine::SpacePartition >, std::auto_ptr< Engine::Scheduler > >();	
+
+	boost::python::class_< Engine::OpenMPSingleNode, std::auto_ptr<Engine::OpenMPSingleNode> >("OpenMPSingleNodeStub", boost::python::init< const std::string & >())
+	;
+	
+	boost::python::implicitly_convertible< std::auto_ptr< Engine::OpenMPSingleNode >, std::auto_ptr< Engine::Scheduler > >();	
+
 
 	boost::python::class_< Engine::SimulationRecord>("SimulationRecordStub", boost::python::init< int, bool >())
 		.def("loadHDF5", &Engine::SimulationRecord::loadHDF5)

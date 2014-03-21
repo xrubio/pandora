@@ -13,8 +13,59 @@ class Scheduler
 protected:
 	int _id;
 	int _numTasks;
+	Engine::Rectangle<int> _boundaries;
 	World * _world;
-	
+
+	// this method returns a list with the list of agents in euclidean distance radius of position. if include center is false, position is not checked
+	template<class T> struct aggregator : public std::unary_function<T,void>
+	{
+		aggregator(double radius, T &center, const std::string & type ) :  _radius(radius), _center(center), _type(type)
+		{
+			_particularType = _type.compare("all");
+		}
+		virtual ~aggregator(){}
+		void operator()( T * neighbor )
+		{
+			if(neighbor==&_center || !neighbor->exists())
+			{
+				return;
+			}
+			if(_particularType && !neighbor->isType(_type))
+			{
+				return;
+			}
+			if(_center.getPosition().distance(neighbor->getPosition())-_radius<= 0.0001)
+			{
+					execute( *neighbor );
+			}
+		}
+		virtual void execute( T & neighbor )=0;
+		bool _particularType;
+		double _radius;
+		T & _center;
+		std::string _type;
+	};
+
+	template<class T> struct aggregatorCount : public aggregator<T>
+	{
+		aggregatorCount( double radius, T & center, const std::string & type ) : aggregator<T>(radius,center,type), _count(0) {}
+		void execute( T & neighbor )
+		{
+			_count++;
+		}
+		int _count;
+	};
+	template<class T> struct aggregatorGet : public aggregator<T>
+	{
+		aggregatorGet( double radius, T & center, const std::string & type ) : aggregator<T>(radius,center,type) {}
+		void execute( T & neighbor )
+		{
+			_neighbors.push_back(&neighbor);
+		}
+		AgentsVector _neighbors;
+	};
+
+
 public:
 	Scheduler() : _id(0), _numTasks(1), _world(0) { }
 	void setWorld( World * world ) { _world = world;}
@@ -31,7 +82,7 @@ public:
 	virtual void finish() = 0;
 
 	//! basic method to use while exploring boundaries of World 
-	virtual const Rectangle<int> & getBoundaries() const = 0;
+	virtual const Rectangle<int> & getBoundaries() const { return _boundaries; };
 	virtual Point2D<int> getRandomPosition() const = 0;
 
 	// ids
@@ -43,7 +94,8 @@ public:
 	virtual double getWallTime() const = 0;
 
 	// agent addition, removal and getters
-	virtual void agentAdded( Agent * agent, bool executedAgent ) = 0;
+	//! do anything needed after adding agent to the list of World _agents
+	virtual void agentAdded( Agent * agent, bool executedAgent ){};
 	virtual void removeAgents() = 0;
 	virtual void removeAgent(Agent * agent) = 0;
 	//! this method will return an agent, both looking at owned and ghost agents
