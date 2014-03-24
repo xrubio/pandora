@@ -200,14 +200,14 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 		throw Engine::Exception(sstr.str());
 	}
 	
-
+std::cout << "DBG 1" << std::endl;
 	int positionX=-1;
 	int positionY=-1;
         TiXmlElement * initialPosition = element->FirstChildElement("initialPosition");
         retrieveAttributeMandatory(initialPosition, "x", positionX);
 	retrieveAttributeMandatory(initialPosition, "y", positionY);
 	GujaratState::setInitialPosition(positionX,positionY);
-
+std::cout << "DBG 2" << std::endl;
 	
 	float minValue = 0;
 	float adultValue = 0;

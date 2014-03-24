@@ -127,7 +127,7 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 							candidateCells.clear();
 							chosenSects.clear();
 							candidateCellsFromSector.push_back(sectCells[cellsIdx]);
-							visitedSector[sectIdx] = true;
+							visitedSector[sectIdx] = true;							
 							//chosenSects.push_back(sectIdx);
 						}
 						else if (!visitedSector[sectIdx])
@@ -163,29 +163,28 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 	
 	if(!candidateCells.empty())
 	{   
-		uint32_t diceSelectOneRandomDune = 0;//*? //Engine::GeneralState::statistics().getUniformDistValue(0, candidateCells.size()-1);
-
-		Engine::Point2D<int> newPos = *candidateCells.at(diceSelectOneRandomDune);
-		Engine::Point2D<int> newHome;
-		gw->getHRFreeCell(newPos,newHome);
+		int sectorIdx=0;
+		for(std::vector< Engine::Point2D<int> * >::iterator it = candidateCells.begin(); it != candidateCells.end(); ++it)
+		{
+			Engine::Point2D<int> newPosLR = **it;
+			Engine::Point2D<int> newHome;
+			gw->getHRFreeCell(newPosLR,newHome);
 
 //#ifdef REDUCC		
 		
-		Engine::Point2D<int> posLR;
-		gw->worldCell2LowResCell(agentPos,posLR);
-		int lowResHomeRange = ((GujaratConfig)((GujaratWorld*)agent.getWorld())->getConfig()).getLowResHomeRange();	
-		int s = GujaratState::sectorsMask( newPos._x-posLR._x+lowResHomeRange
-										, newPos._y-posLR._y+lowResHomeRange
-										, GujaratState::getLRSectorsMask() );
+			Engine::Point2D<int> posLR;
+			gw->worldCell2LowResCell(agentPos,posLR);
+			int lowResHomeRange = ((GujaratConfig)((GujaratWorld*)agent.getWorld())->getConfig()).getLowResHomeRange();	
+			/*int s = GujaratState::sectorsMask( newPos._x-posLR._x+lowResHomeRange, newPos._y-posLR._y+lowResHomeRange, GujaratState::getLRSectorsMask() );*/
 		
-		
-		MoveHomeAction * mha = new MoveHomeAction( newHome
-							, HRActionSectors[chosenSects[diceSelectOneRandomDune]]
-							, LRActionSectors[chosenSects[diceSelectOneRandomDune]]
+			MoveHomeAction * mha = new MoveHomeAction( newHome
+							, HRActionSectors[chosenSects[sectorIdx]]
+							, LRActionSectors[chosenSects[sectorIdx]]
 							, false );
-		mha->_newHomeLocLR = newPos;
-		actions.push_back( mha );
-		
+			mha->_newHomeLocLR = newPos;
+			actions.push_back( mha );
+			++sectorIdx;
+		}
 		
 //#endif		
 
@@ -211,7 +210,7 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 	candidateCells.clear();
 	chosenSects.clear();
 	
-	assert( actions.size()==1 );
+	//assert( actions.size()==1 );
 	
 	//log_DEBUG(logName.str(), "generate possible actions for pos: " << agentPos << " finished");
 	//std::cout << "possible actions for MoveHome: " << actions.size() << std::endl;	

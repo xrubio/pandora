@@ -85,7 +85,6 @@ env['CCFLAGS'] += [walkFlag]
 
 env['CCFLAGS'] += [reduccFlag]
 
-
 includeDirs = Split('./ ../../ ../../../libs/libmdp/')
 
 if int(mareNostrum)==1:		
