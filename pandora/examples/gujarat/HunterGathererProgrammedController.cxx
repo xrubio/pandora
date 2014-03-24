@@ -31,7 +31,7 @@ void HunterGathererProgrammedController::selectActions( GujaratAgent & agent, st
 
 	// action pack : move Home, hunting, gathering
 	int dice = Engine::GeneralState::statistics().getUniformDistValue(1,10);
-	if ( dice < 3 ) // p=0.2 agent chooses to move its home
+	if ( dice >= 3 ) // p=0.2 agent chooses to move its home
 	{
 		do
 		{
@@ -58,7 +58,6 @@ void HunterGathererProgrammedController::selectActions( GujaratAgent & agent, st
 			}
 		}
 		actions.push_back(selectedAction);
-		// TODO move/forage
 	}
 }
 
