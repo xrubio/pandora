@@ -212,7 +212,6 @@ void SequentialSerializer::init( World & world )
 		H5Sclose(fileSpace);
 		H5Gclose(rasterGroupId);
 	}
-	/*
 
 	// dynamic rasters
 	for(size_t i=0; i<world.getNumberOfRasters(); i++)
@@ -221,7 +220,6 @@ void SequentialSerializer::init( World & world )
 		{
 			continue;
 		}	
-		// TODO 0 o H5P_DEFAULT??
 		hid_t rasterGroupId = H5Gcreate(_fileId, world.getRasterName(i).c_str(), 0, H5P_DEFAULT, H5P_DEFAULT);
 		for(int i=0; i<=_simulation->getNumSteps(); i++)
 		{  
@@ -232,14 +230,12 @@ void SequentialSerializer::init( World & world )
 			std::ostringstream oss;
 			oss << "step" << i;
 			hid_t stepFileSpace = H5Screate_simple(2, dimensions, NULL); 
-			hid_t stepDatasetId = H5Dcreate(rasterGroupId, oss.str().c_str(), H5T_NATIVE_INT, stepFileSpace, H5P_DEFAULT, propertyListId, H5P_DEFAULT);
+			hid_t stepDatasetId = H5Dcreate(rasterGroupId, oss.str().c_str(), H5T_NATIVE_INT, stepFileSpace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 			H5Dclose(stepDatasetId);
 			H5Sclose(stepFileSpace);
 		}	
 		H5Gclose(rasterGroupId);
 	}
-	H5Pclose(propertyListId);
-	*/
 
 	StaticRastersRefMap staticRasters;
 	for(size_t i=0; i<world.getNumberOfRasters(); i++)
