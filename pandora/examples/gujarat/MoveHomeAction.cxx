@@ -181,7 +181,7 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 							, HRActionSectors[chosenSects[sectorIdx]]
 							, LRActionSectors[chosenSects[sectorIdx]]
 							, false );
-			mha->_newHomeLocLR = newPos;
+			mha->_newHomeLocLR = newPosLR;
 			actions.push_back( mha );
 			++sectorIdx;
 		}
