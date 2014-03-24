@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <config>  
 	<!-- Global simulation parameters -->
-	<output resultsFile="data/gujarat.h5" logsDir="logs"/>
+	<output resultsFile="data_random/gujarat.h5" logsDir="logs_random"/>
 	<numSteps value="361" serializeResolution="1"/>
 	<!-- g to KJ -->
 	<massToEnergyRate value="20" />
@@ -48,7 +48,7 @@
 		forageTimeCost="0.5"
 		demographicsModel="original"
 		hunterGathererInformationCaducityTime="7"
-		controllerType="MDP" 
+		controllerType="Random" 
 		mindType="omniscient"
 		shareInfo="no">
 		<!-- mindType:{omniscient,partial}-->

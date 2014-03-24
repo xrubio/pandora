@@ -492,6 +492,11 @@ void GujaratWorld::createAgents()
 			worldCell2LowResCell(agent->getPosition(),LRpos);
 			setValueLR(eLRPopulation,LRpos,1+getValueLR(eLRPopulation,LRpos));
 
+			std::stringstream logName2;
+			logName2 << "agents_" << getId();
+
+			log_INFO(logName2.str(), "created agent: " << agent << " available time: " << agent->getAvailableTime() << " needed resources: " << agent->computeConsumedResources(1));
+
 		}
 	}
 

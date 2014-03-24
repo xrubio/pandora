@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <config>  
 	<!-- Global simulation parameters -->
-	<output resultsFile="data/gujarat.h5" logsDir="logs"/>
+	<output resultsFile="data_mdp_h5_w2000/gujarat.h5" logsDir="logs_mdp_h5_w2000"/>
 	<numSteps value="361" serializeResolution="1"/>
 	<!-- g to KJ -->
 	<massToEnergyRate value="20" />
@@ -63,8 +63,8 @@
 					nrForageActions="8"
 					nrMoveHomeActions="8"
 					doNothingIsAllowed="false"
-					horizon="3"
-					width="150"
+					horizon="5"
+					width="2000"
 					explorationBonus ="10.0"
 					seed="1234"
 		/>

@@ -47,7 +47,7 @@ void HunterGatherer::registerAttributes()
 	log_DEBUG(logName.str(), "registering attributes for type: " << getType());
 
 	registerIntAttribute("MoveHome actions");
-//	registerIntAttribute("Forage actions");
+	registerIntAttribute("Forage actions");
 	registerIntAttribute("agent age");
 //	registerIntAttribute("male alive");
 //	registerIntAttribute("male age");
@@ -55,8 +55,8 @@ void HunterGatherer::registerAttributes()
 //	registerIntAttribute("female age");
 	registerIntAttribute("children");
 	registerIntAttribute("collected resources");
-	registerIntAttribute("starving %");
-//	registerIntAttribute("starving days x 100");
+//	registerIntAttribute("starving %");
+	registerIntAttribute("starving days x 100");
 	log_DEBUG(logName.str(), "registering attributes for type: " << getType() << " finished");
 }
 
@@ -362,10 +362,10 @@ void HunterGatherer::serialize()
 	}
 	serializeAttribute("children", numChildren);
 	serializeAttribute("collected resources", _collectedResources);
-	serializeAttribute("starving %", getPercentageOfStarvingDays());
-//	serializeAttribute("starving days x 100", _starved*100.0f);
+//	serializeAttribute("starving %", getPercentageOfStarvingDays());
+	serializeAttribute("starving days x 100", _starved*100.0f);
 	serializeAttribute("MoveHome actions", _moveHomeActionsExecuted);
-//	serializeAttribute("Forage actions", _forageActionsExecuted);
+	serializeAttribute("Forage actions", _forageActionsExecuted);
 }
 
 

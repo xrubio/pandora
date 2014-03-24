@@ -79,7 +79,7 @@ void GujaratAgent::logAgentState()
 void GujaratAgent::updateState()
 {
 	std::stringstream logName;
-	logName << "agents_" << _world->getId() << "_" << getId();
+	logName << "agents_" << _world->getId();
 
 //	log_DEBUG( logName.str(), "\tagent.collectedResourcesAfterAction=" << getOnHandResources());
 	int surplus = _collectedResources - computeConsumedResources(1);
@@ -97,7 +97,9 @@ void GujaratAgent::updateState()
 		// Decay factor, modeling spoilage
 		//_collectedResources *= getSurplusSpoilageFactor();
 	}
-	//std::cout << this << " starved: " << _starved << " with available time: " << getAvailableTime() << " collected: " << _collectedResources << " and needed: " << computeConsumedResources(1) << std::endl;
+
+
+	log_INFO(logName.str(), this << " starved: " << _starved << " with available time: " << getAvailableTime() << " collected: " << _collectedResources << " and needed: " << computeConsumedResources(1));
 
 	/*
 	if ( (getWorld()->getCurrentTimeStep() % ((GujaratWorld*)_world)->getConfig()._daysPerSeason == 0) 
@@ -551,7 +553,15 @@ void	GujaratAgent::addNewChild()
 void GujaratAgent::createInitialPopulation( int adulthoodAge )
 {
 	
-	_populationAges.resize(2);
+	_populationAges.resize(6);
+	_populationAges.at(0) = 20;
+	_populationAges.at(1) = 20;
+	_populationAges.at(2) = 5;
+	_populationAges.at(3) = 7;
+	_populationAges.at(4) = 10;
+	_populationAges.at(5) = 15;
+
+	/*
 	_populationAges.at(0) = Engine::GeneralState::statistics().getUniformDistValue(15, 50);
 	_populationAges.at(1) = Engine::GeneralState::statistics().getUniformDistValue(15, 50);
 	int reproductiveYears = std::min(_populationAges.at(0)-adulthoodAge, _populationAges.at(1)-adulthoodAge);
@@ -581,9 +591,7 @@ void GujaratAgent::createInitialPopulation( int adulthoodAge )
 		}
 	}
 	std::cout << "end init pop for agent: " << this << std::endl;
-	
-	
-	
+	*/
 }
 	
 float GujaratAgent::getPercentageOfStarvingDays() const
