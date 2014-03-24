@@ -1,0 +1,5 @@
+This test checks if Raster Serialization is done properly.
+By the end of the simulation every cell must contain a value equal to the multiplication of its coordinates (x*y).
+It proofs that dynamic rasters are correctly serialized both using sequential and parallel schedulers.
+It stores the results in two different folders (parallel and single) that should contain exactly the same progression of raster cell value increases
+
