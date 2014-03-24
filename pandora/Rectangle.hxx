@@ -149,10 +149,12 @@ public:
 	public:
 		const_iterator( const Point2D<Type> & origin, const Type & width ) : _initialX(origin._x), _data(origin), _width(width)
 		{
+			std::cout << "\tparams constructor" << std::endl;
 		}
 
 		const_iterator( const const_iterator & other ) : _initialX(other._initialX), _data(other._data), _width(other._width)
 		{
+			std::cout << "\tcopy constructor" << std::endl;
 		}
 		const Point2D<Type> & operator*() const
 		{
@@ -164,7 +166,7 @@ public:
 			return &_data;
 		}
 
-		const_iterator operator++()
+		const const_iterator & operator++()
 		{
 			if(_data._x<(_initialX+_width-1))
 			{
