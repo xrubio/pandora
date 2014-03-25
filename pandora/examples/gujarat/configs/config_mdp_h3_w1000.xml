@@ -8,7 +8,7 @@
 	<!-- 1 KCal = 4.184 KJ, Conversion Rate = 1/4.184 -->
 	<energyToCaloriesRate value="0.239006" />
 	<!-- Global agent parameters !-->
-	<socialRange value="299" />
+	<socialRange value="50" />
 	<!-- Simulation time scale -->
 	<daysPerSeason value="120" />
 	<daysPerYear value="360" />
@@ -40,7 +40,7 @@
 	<!-- * forageTimeCost = how much time (in hours) does it cost the agent to exploit a tile resources -->
 	<!-- controllerType can be MDP, Random or DecisionTree -->
 	<hunterGatherers
-		num="1" homeRange="299"
+		num="1" homeRange="50"
 		adulthoodAge="15"
 		numSectors="8"
 		lowResolution="160"
