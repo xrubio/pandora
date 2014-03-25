@@ -183,7 +183,7 @@ public:
 			//_onHandResources -= _resourcesDivider;
 			//_daysStarving=0;
 		}
-		//_onHandResources = 0;
+		_onHandResources = 0;
 		/*
 		else
 		{
