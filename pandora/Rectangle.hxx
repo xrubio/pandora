@@ -139,6 +139,11 @@ public:
 		return !((*this)==rectangle);
 	}
 
+	Type left() const{return _origin._x;}
+	Type right() const{return _origin._x+_size._width-1;}
+	Type top() const{return _origin._y;}
+	Type bottom() const{return _origin._y+_size._height-1;}
+
 public:	
 
 	class const_iterator

@@ -391,6 +391,10 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("__str__", printRectangle)
 		.def("__eq__", equalsRectangle)
 		.def("__ne__", notEqualsRectangle)
+		.add_property("left", &RectangleInt::left)
+		.add_property("right", &RectangleInt::right)
+		.add_property("top", &RectangleInt::top)
+		.add_property("bottom", &RectangleInt::bottom)
 		.def("clone", &RectangleInt::clone)
 		;
 

@@ -20,10 +20,8 @@ class MyWorld(World):
 	def stepEnvironment(self):
 		print('executing step environment')
 		raster = self.getDynamicRaster("test")
-		size = self.getBoundaries()._size
-		origin = self.getBoundaries()._origin
-		for i in range(origin._x, origin._x+size._width):
-			for j in range(origin._y, origin._y+size._height):
+		for i in range(self.getBoundaries().left, self.getBoundaries().right+1):
+			for j in range(self.getBoundaries().top, self.getBoundaries().bottom+1):
 				pos = Point2DInt(i,j)
 				raster.setValue(pos, 1+self.currentStep)
 
