@@ -140,50 +140,7 @@ public:
 	}
 
 public:	
-	class iterator
-	{	
-		Type _initialX;
-		Point2D<Type> _data;
-		Type _width;
-	public:
-		iterator( const Point2D<Type> & origin, const Type & width ) : _initialX(origin._x), _data(origin), _width(width)
-		{
-		}
-		iterator( const iterator & other ) : _initialX(other._initialX), _data(other._data), _width(other._width)
-		{
-		}
-		const Point2D<Type> & operator*() const
-		{
-			return _data;
-		}
 
-		iterator operator++()
-		{
-			if(_data._x<(_initialX+_width-1))
-			{
-				_data._x++;
-			}
-			else
-			{
-				_data._x = _initialX;
-				_data._y++;
-			}
-			return *this;
-		}
-		
-		iterator operator++(int )
-		{
-			iterator tmp(*this);
-			operator++();
-			return tmp;
-		}
-
-		bool operator!=( const iterator & other ) const
-		{
-			return (_initialX!=other._initialX) || (_width!=other._width) || (_data != other._data);
-		}
-	};
-	
 	class const_iterator
 	{	
 		Type _initialX;
@@ -201,8 +158,13 @@ public:
 		{
 			return _data;
 		}
+		
+		const Point2D<Type>* operator->() const
+		{ 
+			return &_data;
+		}
 
-		const_iterator operator++()
+		const_iterator & operator++()
 		{
 			if(_data._x<(_initialX+_width-1))
 			{
@@ -228,26 +190,6 @@ public:
 			return (_initialX!=other._initialX) || (_width!=other._width) || (_data != other._data);
 		}
 	};
-	
-	iterator begin()
-	{
-		return iterator(_origin, _size._width); 
-	}
-	
-	iterator end()
-	{
-		return iterator(_origin+Point2D<Type>(0,_size._height), _size._width); 
-	}
-	
-	const_iterator cbegin()
-	{
-		return const_iterator(_origin, _size._width); 
-	}
-	
-	const_iterator cend()
-	{
-		return const_iterator(_origin+Point2D<Type>(0,_size._height), _size._width); 
-	}
 
 	const_iterator begin() const
 	{
