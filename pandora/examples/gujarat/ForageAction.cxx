@@ -925,8 +925,8 @@ void	ForageAction::doTrendVicinityWalk( GujaratAgent& agent, const Engine::Point
 		n = best;
 		distHome = n0.distance(n);
 		int amtCollected = agent.computeEffectiveBiomassForaged( bestScore );
-		//int prevActivity = agent.getWorld()->getValue(eForageActivity, n );
-		//agent.getWorld()->setValue(eForageActivity, n, prevActivity + 1 );
+		int prevActivity = agent.getWorld()->getValue(eForageActivity, n );
+		agent.getWorld()->setValue(eForageActivity, n, prevActivity + 1 );
 		collected += amtCollected;
 
 		// 4. update cell resources & amount collected

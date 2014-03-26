@@ -2,7 +2,7 @@
 <config>  
 	<!-- Global simulation parameters -->
 	<output resultsFile="data_mdp_h3_w300/gujarat.h5" logsDir="logs_mdp_h3_w300"/>
-	<numSteps value="361" serializeResolution="1"/>
+	<numSteps value="359" serializeResolution="1"/>
 	<!-- g to KJ -->
 	<massToEnergyRate value="20" />
 	<!-- 1 KCal = 4.184 KJ, Conversion Rate = 1/4.184 -->
@@ -32,7 +32,7 @@
 	<duneMap fileName="resources/1600/dunes_1600_low.tiff" size="1600"/>
 	<!-- Climatic model parameters -->
 	<climateSeed value="35874"/>
-	<rainHistoricalDistribution mean="500.0" stdev="0.0001"/>
+	<rainHistoricalDistribution mean="100.0" stdev="0.0001"/>
 	<!-- Agents definition -->
 	<!-- overlap will be defined as homeRange + 1. It must be < 1/4 of world size -->
 	<!-- * Walking Speed Hour = # meters traversed per hour -->
