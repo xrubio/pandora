@@ -24,23 +24,11 @@ void RandomWorld::createRasters()
 	registerDynamicRaster("resources", true);
 	getDynamicRaster("resources").setInitValues(0, 5, 0);
 
-	Engine::Point2D<int> index;
-	for(index._x = getBoundaries().left(); index._x<=getBoundaries().right(); index._x++)
-	{
-		for(index._y = getBoundaries().top(); index._y<=getBoundaries().bottom(); index._y++)
-		{
-			int value = Engine::GeneralState::statistics().getUniformDistValue(0,5);
-			getDynamicRaster("resources").setMaxValue(index, value);
-		}
-	}
-
-	/*
 	for(auto index:getBoundaries())
 	{
 		int value = Engine::GeneralState::statistics().getUniformDistValue(0,5);
 		getDynamicRaster("resources").setMaxValue(index, value);
 	}
-	*/
 	updateRasterToMaxValues("resources");
 }
 
