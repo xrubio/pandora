@@ -102,7 +102,7 @@ void OpenMPSingleNode::finish()
 Agent * OpenMPSingleNode::getAgent( const std::string & id )
 {	
 	AgentsList::iterator it = getAgentIterator(id);
-	if(it!=_world->endAgents())
+	if(it!=_world->endAgents() && (*it)->exists())
 	{
 		return *it;
 	}
