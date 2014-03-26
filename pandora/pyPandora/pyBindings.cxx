@@ -453,6 +453,7 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("getNeighboursIds", &WorldWrap::getNeighboursIds)
 		.def("getAgent", getAgent, boost::python::return_value_policy<boost::python::reference_existing_object>())
 		.def("getSimulation", &Engine::World::getSimulation, boost::python::return_value_policy<boost::python::reference_existing_object>())
+		.def("getBoundaries", &Engine::World::getBoundaries, boost::python::return_value_policy<boost::python::reference_existing_object>())
 		.add_property("currentStep", &Engine::World::getCurrentStep)
 	;	
 	
