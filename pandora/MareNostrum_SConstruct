@@ -5,32 +5,25 @@ import os
 
 release = ARGUMENTS.get('release', 1)
 extremeDebug = ARGUMENTS.get('edebug', 0)
-useMpi = ARGUMENTS.get('mpi', 1)
-
-if int(useMpi) == 1:
-	env = Environment(ENV=os.environ, CXX='mpicxx')
-else:
-	env = Environment(ENV=os.environ, CXX='g++')
+	
+env = Environment(ENV=os.environ, CXX='mpicxx')
 
 env.VariantDir('build', '.')
 
-libs = Split('pthread gdal hdf5 z tinyxml grass_gis boost_filesystem boost_system gomp')
+libs = Split('pthread gdal hdf5 z tinyxml grass_gis boost_filesystem boost_system boost_timer boost_chrono gomp')
 
 if int(release) == 0:
-	env['CCFLAGS'] = Split('-g -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG -DMPICH_IGNORE_CXX_SEEK')
+	env['CCFLAGS'] = Split('-std=c++0x -g -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG')
 	if int(extremeDebug)==1:
 		env['CCFLAGS'] += ['-DPANDORAEDEBUG']
 	libraryName = 'pandorad'
 	pythonLibraryName = 'pyPandorad'
 else:
-	env['CCFLAGS'] = Split('-O3 -Wall -DTIXML_USE_STL -fopenmp -DMPICH_IGNORE_CXX_SEEK')
+	env['CCFLAGS'] = Split('-O3 -DTIXML_USE_STL -fopenmp -std=c++0x ')
 	libraryName = 'pandora'
 	pythonLibraryName = 'pyPandora'
 
-if int(useMpi)==1:
-	env['CCFLAGS'] += ['-DPANDORAMPI']
-
-coreFiles = Split('World.cxx StaticRaster.cxx Raster.cxx Agent.cxx Statistics.cxx SimulationRecord.cxx AgentRecord.cxx Serializer.cxx Simulation.cxx Config.cxx MpiFactory.cxx IncrementalRaster.cxx RasterLoader.cxx Action.cxx LoggerBase.cxx GeneralState.cxx ShpLoader.cxx')
+coreFiles = Split('World.cxx StaticRaster.cxx Raster.cxx Agent.cxx Statistics.cxx SimulationRecord.cxx AgentRecord.cxx Serializer.cxx SequentialSerializer.cxx Simulation.cxx Config.cxx MpiFactory.cxx IncrementalRaster.cxx RasterLoader.cxx Action.cxx LoggerBase.cxx GeneralState.cxx ShpLoader.cxx SpacePartition.cxx OpenMPSingleNode.cxx')
 
 analysisFiles = Split('analysis/Analysis.cxx analysis/AgentMean.cxx analysis/AgentSum.cxx analysis/AgentNum.cxx analysis/Output.cxx analysis/AgentStdDev.cxx analysis/GlobalAgentStats.cxx analysis/IndividualStats.cxx analysis/AgentHistogram.cxx analysis/AgentHDFtoSHP.cxx analysis/GlobalRasterStats.cxx analysis/RasterMean.cxx analysis/RasterSum.cxx')
 
@@ -52,32 +45,25 @@ libDirs += ['/apps/GRASS/6.4.3RC2/grass-6.4.3RC2/lib/']
 
 env.SharedLibrary(libraryName, srcBaseFiles, CPPPATH=includeDirs, LIBS=libs, LIBPATH=libDirs)
 
-if int(useMpi) == 1:
-	envPython = Environment(ENV=os.environ, CXX='mpicxx')
-else:
-	envPython = Environment(ENV=os.environ, CXX='g++')
+envPython = Environment(ENV=os.environ, CXX='mpicxx')
 
 envPython['LINKFLAGS'] = Split('-Wl,--export-dynamic,-no-undefined')
 envPython.VariantDir('build_py', '.')
 
 if int(release) == 0:
-	envPython['CCFLAGS'] = Split('-g -Wall -DTIXML_USE_STL -DPANDORADEBUG -DMPICH_IGNORE_CXX_SEEK')	
+	envPython['CCFLAGS'] = Split('-g -Wall -DTIXML_USE_STL -DPANDORADEBUG')	
 	if int(extremeDebug)==1:
 		envPython['CCFLAGS'] += ['-DPANDORAEDEBUG']
 else:
-	envPython['CCFLAGS'] = Split('-O3 -Wall -DTIXML_USE_STL -DMPICH_IGNORE_CXX_SEEK')
+	envPython['CCFLAGS'] = Split('-O3 -DTIXML_USE_STL')
 
-if int(useMpi)==1:
-	envPython['CCFLAGS'] += ['-DPANDORAMPI']
-	
 srcPyFiles = [] 
 for src in srcFiles:
 	srcPyFiles.append('build_py/'+src)
 
-srcPyFiles.append('build_py/pyBindings.cxx')
+srcPyFiles.append('build_py/MpiStubCode.cxx')
 
-if int(useMpi) == 1:
-	srcPyFiles.append('build_py/MpiStubCode.cxx')
+srcPyFiles.append('build_py/pyPandora/pyBindings.cxx')
 
 libsPython = libs
 libDirsPython = libDirs
