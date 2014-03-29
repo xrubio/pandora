@@ -23,8 +23,7 @@ namespace Gujarat
 
 
 	
-MoveHomeAction::MoveHomeAction( const Engine::Point2D<int>& p, const Engine::Point2D<int>& pLR, Sector * HRSectorToForage, Sector * LRSectorToForage, bool ownsSectorPointer ) 
-: _newHomeLoc( p ), _newHomeLocLR(pLR), _forageAction(0)
+MoveHomeAction::MoveHomeAction( const Engine::Point2D<int>& p, Sector * HRSectorToForage, Sector * LRSectorToForage, bool ownsSectorPointer ) : _newHomeLoc( p ), _forageAction(0)
 {
 	assert(LRSectorToForage->cells().size() > 0);
 	
@@ -32,8 +31,7 @@ MoveHomeAction::MoveHomeAction( const Engine::Point2D<int>& p, const Engine::Poi
 	_forageAction->setFullPopulation(false);
 }
 
-MoveHomeAction::MoveHomeAction( const Engine::Point2D<int>& p, const Engine::Point2D<int>& pLR, ForageAction * forageAction ) 
-: _newHomeLoc( p ), _newHomeLocLR(pLR), _forageAction(forageAction)
+MoveHomeAction::MoveHomeAction( const Engine::Point2D<int>& p, ForageAction * forageAction ) : _newHomeLoc( p ), _forageAction(forageAction)
 {
 }
 
@@ -47,7 +45,7 @@ MoveHomeAction::~MoveHomeAction()
 
 MDPAction * MoveHomeAction::copy() const
 {
-	MoveHomeAction * mha = new MoveHomeAction( _newHomeLoc, _newHomeLocLR,(ForageAction*)_forageAction->copy() );
+	MoveHomeAction * mha = new MoveHomeAction( _newHomeLoc, (ForageAction*)_forageAction->copy() );
 	
 	mha->_newHomeLocLR = _newHomeLocLR;
 	
@@ -57,7 +55,7 @@ MDPAction * MoveHomeAction::copy() const
 std::string MoveHomeAction::describe() const
 {
 	std::stringstream logMove;
-	logMove << "move_home( " << _newHomeLoc._x << ", " << _newHomeLoc._y << "|" << _newHomeLocLR._x << ", " << _newHomeLocLR._y << ")";
+	logMove << "move_home( " << _newHomeLoc._x << ", " << _newHomeLoc._y << ")";
 	return logMove.str();
 }
 
@@ -180,11 +178,10 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 			/*int s = GujaratState::sectorsMask( newPos._x-posLR._x+lowResHomeRange, newPos._y-posLR._y+lowResHomeRange, GujaratState::getLRSectorsMask() );*/
 		
 			MoveHomeAction * mha = new MoveHomeAction( newHome
-							, newPosLR
 							, HRActionSectors[chosenSects[sectorIdx]]
 							, LRActionSectors[chosenSects[sectorIdx]]
 							, false );
-			
+			mha->_newHomeLocLR = newPosLR;
 			actions.push_back( mha );
 			++sectorIdx;
 		}

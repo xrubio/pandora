@@ -28,10 +28,10 @@ class MoveHomeAction : public MDPAction
 	// forage with half adult population is executed at the same time than MoveHome
 	ForageAction * _forageAction;     
 public:
-	MoveHomeAction( const Engine::Point2D<int>& p, const Engine::Point2D<int>& pLR, Sector * HRSectorToForage, Sector * LRSectorToForage, bool ownsSectorPointer = false );
+	MoveHomeAction( const Engine::Point2D<int>& p, Sector * HRSectorToForage, Sector * LRSectorToForage, bool ownsSectorPointer = false );
 	
 	// constructor copying forage action
-	MoveHomeAction( const Engine::Point2D<int>& p, const Engine::Point2D<int>& pLR, ForageAction * forageAction );
+	MoveHomeAction( const Engine::Point2D<int>& p, ForageAction * forageAction );
 	virtual ~MoveHomeAction();
 	// TODO templatitzar classe per agent
 	void execute( Engine::Agent & agent );
