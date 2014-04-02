@@ -38,7 +38,7 @@
 	<!-- * Walking Speed Hour = # meters traversed per hour -->
 	<!-- * Available Forage Time = # hours a day the forage action takes -->
 	<!-- * forageTimeCost = how much time (in hours) does it cost the agent to exploit a tile resources -->
-	<!-- controllerType can be MDP, Random or DecisionTree -->
+	<!-- controllerType can be MDP, Random, RandomMDP or DecisionTree -->
 	<hunterGatherers
 		num="1" homeRange="50"
 		adulthoodAge="15"
@@ -48,7 +48,7 @@
 		forageTimeCost="0.5"
 		demographicsModel="original"
 		hunterGathererInformationCaducityTime="7"
-		controllerType="DecisionTree" 
+		controllerType="RandomMDP" 
 		mindType="omniscient"
 		shareInfo="no">
 		<!-- mindType:{omniscient,partial}-->
