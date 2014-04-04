@@ -38,6 +38,21 @@ walkProgramTable={
 	,'tv'  : 'gujarat_tv'
 	}
 
+treeHeurEstim = ARGUMENTS.get('treeHeur','')
+treeHeurFlagsTable = {
+	'walkEstim' : 'WALKESTIM'
+	,'treeIdun' : 'TREEIDUN'
+	}
+
+print "treeHeur :"+treeHeurEstim
+heurFlag = ''
+if(treeHeurEstim!=''):
+	heurFlag = '-D ' + treeHeurFlagsTable[treeHeurEstim]
+	print "heurFlag :"+heurFlag
+
+
+
+
 
 nameProgram = [walkProgramTable[walkArg]]
 
@@ -84,6 +99,8 @@ env['CCFLAGS'] += ['-std=c++0x']
 env['CCFLAGS'] += [walkFlag]
 
 env['CCFLAGS'] += [reduccFlag]
+
+env['CCFLAGS'] += [heurFlag]
 
 includeDirs = Split('./ ../../ ../../../libs/libmdp/')
 

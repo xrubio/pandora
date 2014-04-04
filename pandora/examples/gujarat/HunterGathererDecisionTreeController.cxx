@@ -81,6 +81,55 @@ MDPAction* HunterGathererDecisionTreeController::shouldDoNothing( HunterGatherer
 	}
 }
 */
+
+
+MDPAction* HunterGathererDecisionTreeController::shouldForageWithWalkEstimation( HunterGatherer & agent )
+{	
+	//Sector * maxSector = getMaxBiomassSector(agent);
+	int maxSectorIdx = getMaxBiomassSector(agent);
+
+	if(maxSectorIdx < 0) 
+	{
+		return 0;
+	}
+
+	assert(agent.getHRSectors()[maxSectorIdx]->_direction == agent.getLRSectors()[maxSectorIdx]->_direction);
+	
+	ForageAction * f = new	ForageAction(agent.getHRSectors()[maxSectorIdx],agent.getLRSectors()[maxSectorIdx], false);
+	
+	bool useFullPopulation = true; // we are not in a half-forage
+	double  maxDist= agent.computeMaxForagingDistance(useFullPopulation);
+	unsigned long sum = 0;
+	int walkReward = 0;
+	float meanReward = 0.0f;
+	int i = 0;
+	while(i<10)
+	{
+		f->doTrendVicinityWalkForRewardEstimation( agent
+							, agent.getPosition()
+							, maxDist
+							, agent.getWorld()->getDynamicRaster(eResources)
+							, walkReward );
+		sum = sum + walkReward;
+		walkReward = 0;
+		++i;
+	}	
+	meanReward = agent.convertBiomassToCalories( sum/(float)i );	
+	
+	if( 0.5*meanReward >= agent.computeConsumedResources(1) )
+	{
+		return f;
+	}
+	else
+	{
+		delete f;
+	}
+	//std::cout << "maxSector: " << maxSector << std::endl;
+	//delete maxSector;
+	return 0;
+}
+
+
 MDPAction* HunterGathererDecisionTreeController::shouldForage( HunterGatherer & agent )
 {	
 	//Sector * maxSector = getMaxBiomassSector(agent);
@@ -94,8 +143,17 @@ MDPAction* HunterGathererDecisionTreeController::shouldForage( HunterGatherer & 
 	int biomass = agent.getLRSectors()[maxSectorIdx]->getBiomassAmount();
 
 	// thinking that the agent will forage at most 9 cells
-	int numCells = agent.getHRSectors()[maxSectorIdx]->numCells();
 
+#ifndef TREEIDUN
+	int numCells = agent.getHRSectors()[maxSectorIdx]->numCells();
+#endif
+
+#ifdef TREEIDUN
+	int numCells = agent.getHRSectors()[maxSectorIdx]->_numInterDunes;
+#endif
+	assert(agent.getHRSectors()[maxSectorIdx]->_direction == agent.getLRSectors()[maxSectorIdx]->_direction);
+	
+	
 	float maxNumCells = agent.getNrAvailableAdults()*agent.getAvailableTime()/agent.getForageTimeCost();
 	float percentageOfCells = maxNumCells/numCells;
 
@@ -167,7 +225,14 @@ void HunterGathererDecisionTreeController::selectActions( GujaratAgent & agent, 
 	}
 	*/
 
+#ifndef WALKESTIM
 	MDPAction * selectedAction = shouldForage(agentConcrete);
+#endif	
+	
+#ifdef WALKESTIM
+	MDPAction * selectedAction = shouldForageWithWalkEstimation(agentConcrete);
+#endif	
+	
 	if(selectedAction!=0)
 	{
 		actions.push_back(selectedAction);

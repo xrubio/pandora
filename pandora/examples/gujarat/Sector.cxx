@@ -15,7 +15,7 @@ namespace Gujarat
 	int Sector::pop = 0;
 	
 Sector::Sector( const GujaratWorld & world ) 
-	: _world(world), _biomassAmount(0), _direction(-1)
+	: _world(world), _biomassAmount(0), _direction(-1),_numInterDunes(0)
 {
 	_dni = dniTicket();
 	
@@ -28,6 +28,7 @@ Sector::Sector( const Sector* other ):
 	, _cells(other->_cells)
 	, _biomassAmount(other->_biomassAmount)
 	, _direction(other->_direction)
+	, _numInterDunes(other->_numInterDunes)
 {
 	//_biomassAmountClass = other._biomassAmountClass;
 	_dni = dniTicket();
