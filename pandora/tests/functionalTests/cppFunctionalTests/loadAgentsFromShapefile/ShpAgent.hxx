@@ -7,7 +7,7 @@
 
 #include <string>
 
-namespace Examples
+namespace Test
 {
 
 class ShpAgent : public Engine::Agent
@@ -33,7 +33,6 @@ public:
 	int getIntValue();
 	float getFloatValue();
 
-
 	////////////////////////////////////////////////
 	// This code has been automatically generated //
 	/////// Please do not modify it ////////////////
@@ -50,7 +49,7 @@ public:
 
 };
 
-} // namespace Examples
+} // namespace Test
 
 #endif // __ShpAgent_hxx__
 

@@ -9,7 +9,7 @@ srcFiles = Split('main.cxx TestWorld.cxx')
 import os, sys
 from subprocess import call
 
-sys.path.append('../../../scripts/')
+sys.path.append('../../../../scripts/')
 import generateMpi 
 
 release = ARGUMENTS.get('release', 1)
@@ -38,10 +38,10 @@ else:
 if int(useMpi)==1:
 	env['CCFLAGS'] += ['-DPANDORAMPI']
 
-includeDirs = Split('./ ../../../')
+includeDirs = Split('./ ../../../../')
 
 includeDirs += ['/usr/local/include','/usr/local/hdf5/include','/usr/lib/grass64/include/','/usr/include/gdal/']
-libDirs = Split('../../../ /usr/local/lib /usr/local/hdf5/lib/ /usr/lib/grass64/lib/')
+libDirs = Split('../../../../ /usr/local/lib /usr/local/hdf5/lib/ /usr/lib/grass64/lib/')
 libs += ['mpl']
 
 # add the list of mpi code that must be generated & compiled

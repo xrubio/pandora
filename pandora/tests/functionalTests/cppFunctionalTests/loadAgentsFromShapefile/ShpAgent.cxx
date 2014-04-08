@@ -1,7 +1,7 @@
 
 #include <ShpAgent.hxx>
 
-namespace Examples
+namespace Test
 {
 
 ShpAgent::ShpAgent( const std::string & id ) : Agent(id), _label("label not loaded"), _intValue(0), _floatValue(0.0f)
@@ -59,5 +59,5 @@ float ShpAgent::getFloatValue()
 	return _floatValue;
 }
 
-} // namespace Examples
+} // namespace Test
 

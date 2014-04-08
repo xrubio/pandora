@@ -9,7 +9,7 @@ namespace Engine
 	class Simulation;
 }
 
-namespace Examples 
+namespace Test 
 {
 
 class ShpWorld : public Engine::World
@@ -19,11 +19,11 @@ class ShpWorld : public Engine::World
 	std::string _shpFile;
 
 public:
-	ShpWorld( const Engine::Simulation & simulation, const std::string & shpFile );
+	ShpWorld( const Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0, const std::string & shpFile = "no file");
 	virtual ~ShpWorld();
 };
 
-} // namespace Examples 
+} // namespace Test 
 
 #endif // __ShpWorld_hxx
 

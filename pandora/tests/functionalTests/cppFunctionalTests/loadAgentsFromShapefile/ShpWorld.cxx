@@ -6,10 +6,10 @@
 #include <GeneralState.cxx>
 #include <Simulation.hxx>
 
-namespace Examples 
+namespace Test 
 {
 
-ShpWorld::ShpWorld( const Engine::Simulation & simulation, const std::string & shpFile ) : World(simulation, 1, false, "data/shp.h5"), _shpFile(shpFile)
+ShpWorld::ShpWorld( const Engine::Simulation & simulation, Engine::Scheduler * scheduler, const std::string & shpFile ) : World(simulation, scheduler), _shpFile(shpFile)
 {
 }
 
@@ -35,7 +35,11 @@ void ShpWorld::createAgents()
 		ShpAgent * newAgent = new ShpAgent(oss.str());
 		Engine::Point2D<int> position = loader.getPosition(i);
 		// we reverse y position, that in GIS usually works from max (North) to min (South)
-		position._y = getSimulation().getSize() - position._y;
+		position._y = getBoundaries()._size._height - position._y;
+        if(!getBoundaries().contains(position))
+        {
+            continue;
+        }
 		newAgent->setPosition(position);
 		newAgent->setLabel( loader.getFieldAsString(i, "label"));
 		newAgent->setIntValue( loader.getFieldAsInt(i, "intValue"));
@@ -46,5 +50,5 @@ void ShpWorld::createAgents()
 	}
 }
 
-} // namespace Examples
+} // namespace Test
 
