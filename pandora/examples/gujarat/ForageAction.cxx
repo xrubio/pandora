@@ -861,6 +861,92 @@ void	ForageAction::doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0,
 	
 }
 
+void	ForageAction::doTrendVicinityWalkForRewardEstimation( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& source_r, int & collected ) 
+{
+	Engine::IncrementalRaster r(source_r);
+    
+	double walkedDist 	= 0.0;
+	Engine::Point2D<int> n 	= n0;
+	double distHome 	= 0.0;
+	Engine::Point2D<int> best;
+	int bestScore 		= 0;
+	
+	std::stringstream logName;
+	logName << agent.getWorld()->getId() << "_" << agent.getId();
+	
+	GujaratWorld * gw = (GujaratWorld *)agent.getWorld();
+	
+	Engine::Point2D<int> HRHome(agent.getPosition());
+	Engine::Point2D<int> LRHome;
+        gw->worldCell2LowResCell( agent.getPosition(), LRHome);
+	Engine::Point2D<int> LRn    = LRHome;
+	Engine::Point2D<int> LRBest;	
+	Engine::Point2D<int> HRNearest;
+	
+	
+	//*? TODO eLRResources??? this is omniscience? should be _hgMind->resourceRaster
+	
+	selectBestNearestLRCell( agent, LRn, gw, agent.getWorld()->getDynamicRaster(eLRResources)
+	, (int)(agent.getAvailableTime() / agent.getForageTimeCost())
+	, bestScore, LRBest );
+	//std::cout << "2222222" << std::endl;
+	// find endpoint
+	int lowResolution = ((GujaratConfig)gw->getConfig()).getLowResolution();
+	Engine::Point2D<int> HREndPoint= LRBest*lowResolution;
+	if (HREndPoint._x >= HRHome._x )
+	{
+		HREndPoint._x = HREndPoint._x + lowResolution -1;
+	}
+	if (HREndPoint._y >= HRHome._y )
+	{
+		HREndPoint._y = HREndPoint._y + lowResolution -1;
+	}	
+	bool wasInsideLR;
+	
+	while ( ( walkedDist + distHome ) < maxDist )
+	{	
+	
+		
+		//std::cout << "walked dist: " << walkedDist << " dist home: " << distHome << " max dist: " << maxDist << " biomass collected: " << collected << " calories: " << agent.convertBiomassToCalories(collected) << std::endl;
+		selectBestNearestHRCellInTrend_ScanFrame( 
+			(GujaratWorld*)(agent.getWorld())
+			,agent
+			, n
+			, HREndPoint
+			, LRBest
+			, r
+			, wasInsideLR
+			, bestScore
+			, best );		
+		//std::cout << "444444444" << std::endl;
+		//bestScore = r.getValue(best - agent.getWorld()->getOverlapBoundaries()._origin); 
+
+		// 2. update walk distance
+		walkedDist += agent.getTimeSpentForagingTile();
+		walkedDist += best.distance(n);
+		n = best;
+		distHome = n0.distance(n);
+		int amtCollected = agent.computeEffectiveBiomassForaged( bestScore );
+		int prevActivity = agent.getWorld()->getValue(eForageActivity, n );
+		agent.getWorld()->setValue(eForageActivity, n, prevActivity + 1 );
+		collected += amtCollected;
+
+		// 4. update cell resources & amount collected
+		int prevValue = r.getValue(n - agent.getWorld()->getOverlapBoundaries()._origin); 
+		r.setValue( n - agent.getWorld()->getOverlapBoundaries()._origin, prevValue - amtCollected );
+
+		//w++;
+	}
+	
+	//std::cout << "res " << collected << " loops " << loops << " wd " << walkedDist << " dH " << distHome << " mD " << maxDist << " foraging dist: " << agent.getTimeSpentForagingTile() << " fm " << agent.getPopulationSize() << std::endl;
+	//std::cout << "LOOP " << collected << "," << loops << "," << walkedDist << "," << distHome << "," << maxDist << std::endl;
+	
+	// update l'LRraster??? and LRsectors???
+	// One action per timestep -> Next time I need LRraster and LRsectors they will be updated by
+	// nextstep method in world -> do not update LRraster, LRsectors
+}
+
+
 void	ForageAction::doTrendVicinityWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int & collected ) 
 {
 	double walkedDist 	= 0.0;
@@ -925,8 +1011,8 @@ void	ForageAction::doTrendVicinityWalk( GujaratAgent& agent, const Engine::Point
 		n = best;
 		distHome = n0.distance(n);
 		int amtCollected = agent.computeEffectiveBiomassForaged( bestScore );
-		//int prevActivity = agent.getWorld()->getValue(eForageActivity, n );
-		//agent.getWorld()->setValue(eForageActivity, n, prevActivity + 1 );
+		int prevActivity = agent.getWorld()->getValue(eForageActivity, n );
+		agent.getWorld()->setValue(eForageActivity, n, prevActivity + 1 );
 		collected += amtCollected;
 
 		// 4. update cell resources & amount collected
@@ -943,7 +1029,6 @@ void	ForageAction::doTrendVicinityWalk( GujaratAgent& agent, const Engine::Point
 	// One action per timestep -> Next time I need LRraster and LRsectors they will be updated by
 	// nextstep method in world -> do not update LRraster, LRsectors
 }
-
 
 
 void	ForageAction::doVicinityWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int & collected ) 

@@ -87,9 +87,15 @@ void HGMind::createHRSectors( 	const Engine::Point2D<int>& agentPos
 					continue;
 				}
 				
-				(*cellPool)[insertPoint]=p;
+				(*cellPool)[insertPoint]=p;				
 				HRSectors[indexSector]->addCell( &((*cellPool)[insertPoint]) );				
 				insertPoint++;
+				
+				if (_world.getValue(eSoils,p) == INTERDUNE)
+				{
+					HRSectors[indexSector]->_numInterDunes++;
+				}
+				
 				//HRSectors[indexSector]->addCell( p );
 				//getWorld()->setValue( "sectors", p, 1 );	
 			}
