@@ -19,6 +19,8 @@ class HunterGathererMDPConfig;
 
 class GujaratConfig : public Engine::Config
 { 
+	float _alphaDecTree;
+	
 	int 			_size;		
 	std::string 	_soilFile;
 	std::string 	_demFile;
@@ -124,6 +126,8 @@ public:
 	int getLowResHomeRange() {return _lowResHomeRange; }
 	
 	int getUCTSeed() { return _uctSeed; }
+	
+	float getAlphaDecTree() { return _alphaDecTree; }
 	
 	friend class HunterGatherer;
 	friend class HunterGathererPartialMap;

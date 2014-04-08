@@ -16,7 +16,7 @@
 #include <HunterGathererDecisionTreeController.hxx>
 #include <HunterGathererProgrammedController.hxx>
 #include <HunterGathererMDPController.hxx>
-#include <HunterGathererRandomMDPPolicyController.hxx>
+//#include <HunterGathererRandomMDPPolicyController.hxx>
 
 #include <math.h> 
 
@@ -260,7 +260,7 @@ void GujaratState::setHGController( const std::string & type, const HunterGather
 	{	
 		for(int i=0; i<instance()._hgControllers.size(); i++)
 		{
-			instance()._hgControllers.at(i) = new HunterGathererRandomMDPPolicyController(config);
+			//instance()._hgControllers.at(i) = new HunterGathererRandomMDPPolicyController(config);
 		}
 		return;
 	}	

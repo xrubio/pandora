@@ -50,6 +50,8 @@ int main(int argc, char *argv[])
 		agentResults.addAnalysis(new Analysis::AgentMean("children"));
 		agentResults.addAnalysis(new Analysis::AgentSum("children"));
 		agentResults.addAnalysis(new Analysis::AgentMean("collected resources"));
+		agentResults.addAnalysis(new Analysis::AgentMean("resource prediction"));
+		agentResults.addAnalysis(new Analysis::AgentMean("resource prediction ratio"));
 //		agentResults.addAnalysis(new Analysis::AgentMean("starving %"));
 		agentResults.addAnalysis(new Analysis::AgentMean("starving days x 100"));
 		agentResults.addAnalysis(new Analysis::AgentMean("Forage actions"));

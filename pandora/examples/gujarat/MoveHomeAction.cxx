@@ -73,10 +73,10 @@ void	MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 }
 
 void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
-											, const Engine::Point2D<int> & agentPos
-											, const std::vector< Sector* > & HRActionSectors
-											, const std::vector< Sector* > & LRActionSectors
-											, std::vector< MoveHomeAction* > & actions )
+				, const Engine::Point2D<int> & agentPos
+				, const std::vector< Sector* > & HRActionSectors
+				, const std::vector< Sector* > & LRActionSectors
+				, std::vector< MoveHomeAction* > & actions )
 {
 	std::stringstream logName;
 	logName << "agents_" << agent.getWorld()->getId() << "_" << agent.getId();
@@ -107,7 +107,7 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 				const std::vector< Engine::Point2D<int>* > & sectCells = LRActionSectors[sectIdx]->cells();//(*it)->cells();	
 				for(unsigned int cellsIdx = 0; cellsIdx < sectCells.size(); cellsIdx++)
 				{
-                	int numDunes      = gw->getValueLR(LRCounterSoilDUNE,*sectCells[cellsIdx]);
+					int numDunes      = gw->getValueLR(LRCounterSoilDUNE,*sectCells[cellsIdx]);
 					
 					int resourcesCell = gw->getValueLR(eLRResources,*sectCells[cellsIdx]);
 					//TODO test a new heuristic based on visitable cells
@@ -125,16 +125,14 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 						if ( scoreBestCell < scoreCell)
 						{           
 							scoreBestCell = scoreCell;
-							candidateCellsFromSector.clear();							
+							candidateCellsFromSector.clear();	
 							candidateCells.clear();
-							chosenSects.clear();
-							candidateCellsFromSector.push_back(sectCells[cellsIdx]);
+							chosenSects.clear();			candidateCellsFromSector.push_back(sectCells[cellsIdx]);
 							visitedSector[sectIdx] = true;							
 							//chosenSects.push_back(sectIdx);
 						}
 						else if (!visitedSector[sectIdx])
-						{
-							candidateCellsFromSector.push_back(sectCells[cellsIdx]);
+						{								candidateCellsFromSector.push_back(sectCells[cellsIdx]);
 							visitedSector[sectIdx] = true;
 							//chosenSects.push_back(sectIdx);
 						}						
