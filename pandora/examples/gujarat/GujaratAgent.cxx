@@ -9,6 +9,7 @@
 #include <GeneralState.hxx>
 #include <GujaratState.hxx>
 #include <sstream>
+#include <Exceptions.hxx>
 
 namespace Gujarat
 {
@@ -86,7 +87,16 @@ void GujaratAgent::updateState()
 //	log_DEBUG( logName.str(), "\tagent.collectedResourcesAfterConsumption=" << surplus);
 	if ( surplus < 0 )
 	{
-		_starved += 1.0f-((float)_collectedResources/(float)(computeConsumedResources(1)));
+        float starvedIncrease = 1.0f-((float)_collectedResources/(float)(computeConsumedResources(1)));
+        if(starvedIncrease<0.0f)
+        {
+			std::stringstream oss;
+			oss << "GujaratAgent::updateState - starved increase: " << starvedIncrease << " is negative, collected: " << _collectedResources << " needed: " << computeConsumedResources(1);
+			throw Engine::Exception(oss.str());
+            return;
+        }
+		_starved += starvedIncrease;
+
 		//_emigrationProbability += 1.0f/(float)(((GujaratWorld*)_world)->getConfig()._daysPerSeason);
 		//log_DEBUG( logName.str(),  "\tagent.isStarving=yes");
 	}
