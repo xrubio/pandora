@@ -2,8 +2,8 @@
 #include <ShpWorld.hxx>
 #include <ShpAgent.hxx>
 
-#include <ShpLoader.cxx>
-#include <GeneralState.cxx>
+#include <ShpLoader.hxx>
+#include <GeneralState.hxx>
 #include <Simulation.hxx>
 
 namespace Test 

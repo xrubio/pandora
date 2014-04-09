@@ -8,6 +8,8 @@
 #include <World.hxx>
 #include <Point2D.hxx>
 #include <Size.hxx>
+#include <ShpLoader.hxx>
+#include <GeneralState.hxx>
 
 #include <boost/test/unit_test.hpp>
 
@@ -139,6 +141,20 @@ BOOST_AUTO_TEST_CASE( testRectangleIterator )
 	BOOST_CHECK_EQUAL(sum._x, 140);
 	BOOST_CHECK_EQUAL(sum._y, 170);
 }
+
+BOOST_AUTO_TEST_CASE( testLoadShapefile ) 
+{      
+    Engine::ShpLoader & loader = Engine::GeneralState::shpLoader();
+    loader.open("resources/test.shp");
+    loader.setActiveLayer(0);
+
+    BOOST_CHECK_EQUAL(4, loader.getNumFeatures());
+    BOOST_CHECK_EQUAL(Engine::Point2D<int>(32,22), loader.getPosition(3));
+    BOOST_CHECK_EQUAL("label d", loader.getFieldAsString(3,"label"));
+    BOOST_CHECK_EQUAL(4, loader.getFieldAsInt(3,"intValue"));
+    BOOST_CHECK_CLOSE(4.5f,loader.getFieldAsFloat(3,"floatValue"), 0.00001f);
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
 
