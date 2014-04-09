@@ -37,7 +37,7 @@ protected:
 	int _availableTime; // MpiBasicAttribute
 	int _spentTime; // MpiBasicAttribute
 	int _collectedResources; // MpiBasicAttribute
-
+	int _resourcePrediction; // MpiBasicAttribute
 	// age of the agent in num steps (years*3)
 	int _age; // MpiBasicAttribute
 
@@ -180,6 +180,9 @@ public:
 
 		return 4;		
 	}	
+	
+	void setResourcePrediction(float x) { _resourcePrediction = x;}
+	float getResourcePrediction() const { return _resourcePrediction;}	
 };
 
 } // namespace Gujarat

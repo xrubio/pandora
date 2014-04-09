@@ -106,9 +106,11 @@ class ForageAction : public MDPAction
 	void doVicinityWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected );	
 	
 	void doTrendVicinityWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected );	
+
+public:	
+	void doTrendVicinityWalkForRewardEstimation( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected );	
 	
-	
-public:
+
 	ForageAction( Sector* HRLoc, Sector* LRLoc, bool ownsPointer = false );
 	virtual ~ForageAction();
 

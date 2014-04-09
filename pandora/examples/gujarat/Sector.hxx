@@ -50,7 +50,7 @@ class Sector
 public:	
 	int _dni;
 	int _direction;
-	
+	int _numInterDunes;
 protected:	
 	//const Engine::World & _world; needed change due to use of LR methods for raster access.
 	const GujaratWorld & _world;

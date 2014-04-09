@@ -2,7 +2,7 @@
 <config>  
 	<!-- Global simulation parameters -->
 	<output resultsFile="data/gujarat.h5" logsDir="logs"/>
-	<numSteps value="10" serializeResolution="1"/>
+	<numSteps value="1" serializeResolution="1"/>
 	<!-- g to KJ -->
 	<massToEnergyRate value="20" />
 	<!-- 1 KCal = 4.184 KJ, Conversion Rate = 1/4.184 -->
@@ -40,7 +40,7 @@
 	<!-- * forageTimeCost = how much time (in hours) does it cost the agent to exploit a tile resources -->
 	<!-- controllerType can be MDP, Random or DecisionTree -->
 	<hunterGatherers
-		num="1" homeRange="50"
+		num="1" homeRange="299"
 		adulthoodAge="15"
 		numSectors="8"
 		lowResolution="160"
@@ -50,6 +50,7 @@
 		hunterGathererInformationCaducityTime="7"
 		controllerType="DecisionTree" 
 		mindType="omniscient"
+		alphaDecTree="0.3"
 		shareInfo="no">
 		<!-- mindType:{omniscient,partial}-->
 		<!-- * width = number of trials before selecting an action, the higher the
@@ -68,7 +69,10 @@
 					explorationBonus ="10.0"
 					seed="1234"
 		/>
-		<initialPosition x="0" y="0" />
+		<controllerConfig       type="DecisionTree" 
+                                        alpha="0.9"
+                />
+		<initialPosition x="-1" y="0" />
 		<calories minValue="600" adultValue="2200" minAge="0" adultAge="15"/>
 		<availableForageTime minValue="0" adultValue="4.5" minAge="5" adultAge="15"/>
 	</hunterGatherers>
