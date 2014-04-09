@@ -29,8 +29,8 @@ class ShpWorld(World):
         return
 
     def createAgents(self):
-        loader = self.getLoader()
-        loader.openFile(self._shpFileName)
+        loader = self.getShpLoader()
+        loader.open(self._shpFileName)
         loader.setActiveLayer(0)
         for i in range(0, loader.getNumFeatures()):
             print('creating agent:',loader.getFieldAsString(i,'name'))
@@ -38,7 +38,7 @@ class ShpWorld(World):
 
 
 def main():
-    shpFileName = 'resources/test.shp'
+    shpFileName = '../../../resources/test.shp'
     simulation = Simulation(SizeInt(64,64), 1)
 
     shpWorld = ShpWorld(simulation, ShpWorld.useOpenMPSingleNode('data/shp.h5'), shpFileName)

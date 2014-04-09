@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE( testRectangleIterator )
 BOOST_AUTO_TEST_CASE( testLoadShapefile ) 
 {      
     Engine::ShpLoader & loader = Engine::GeneralState::shpLoader();
-    loader.open("resources/test.shp");
+    loader.open("../../resources/test.shp");
     loader.setActiveLayer(0);
 
     BOOST_CHECK_EQUAL(4, loader.getNumFeatures());
