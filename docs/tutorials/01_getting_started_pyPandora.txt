@@ -19,8 +19,8 @@ chmod +x tutorial_pyPandora.py
 Next step is to create a 'main' function. This is the code that will be executed once we invoke the python interpreter, and the starting point for our model. Add these lines to your file:
 
 def main():
-	print 'getting started with pyPandora'
-	print 'simulation finished'
+	print('getting started with pyPandora')
+	print('simulation finished')
 
 if __name__ == "__main__":
     main()
@@ -62,12 +62,12 @@ As you can see, we have defined 3 methods:
 Finally, we need to create and configure an instance of MyWorld inside the main method, that now will have this code:
 
 def main():	
-	print 'getting started with pyPandora'
+	print('getting started with pyPandora')
 	numTimeSteps = 10
 	worldSize = Point2DInt(64,64)
 	mySimulation = Simulation(worldSize, numTimeSteps)
 	myWorld = MyWorld(mySimulation)
-	print 'simulation finished'
+	print('simulation finished')
 
 We create an instance of Simulation class called mySimulation. It contains two parameters needed to execute our model: the number of time steps that the simulation will last, and the size of our world. mySimulations is passed to the constructor of MyWorld, and that's it.
 Let's try to execute this code. It will throw a critical error!
