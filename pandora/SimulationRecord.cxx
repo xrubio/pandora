@@ -361,10 +361,13 @@ void SimulationRecord::loadAttributes( const hid_t & stepGroup, hssize_t & numEl
 		}
 		else if(typeClass== H5T_STRING)
 		{
-			std::stringstream oss;
-			oss << "SimulationRecord::loadHDF5 - loading attribute: " << *itA << " of type string, not yet implemented";
-			throw Exception(oss.str());
+            std::cout << "SimulationRecord::loadHDF5 - loading attribute: " << *itA << " of type string, not yet implemented" << std::endl;
 		}
+        else if(typeClass== H5T_FLOAT)
+		{
+            std::cout << "SimulationRecord::loadHDF5 - loading attribute: " << *itA << " of type float, not yet implemented" << std::endl;
+		}
+
 		else
 		{
 			std::stringstream oss;

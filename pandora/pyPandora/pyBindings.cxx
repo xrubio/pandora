@@ -52,6 +52,8 @@
 #include <SpacePartition.hxx>
 #include <OpenMPSingleNode.hxx>
 #include <Scheduler.hxx>
+#include <GeneralState.hxx>
+#include <ShpLoader.hxx>
 
 #include <string>
 
@@ -169,6 +171,11 @@ public:
 	{
 		serializeAttribute(key, value);
 	}
+
+    void serializeStringAttribute( const std::string & key, const std::string & value )
+    {
+        serializeAttribute(key,value);
+    }
 	
 	void registerAttributes()
 	{
@@ -416,7 +423,25 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.add_property("size", boost::python::make_function(&Engine::Simulation::getSize, boost::python::return_value_policy<boost::python::reference_existing_object>()))
 		.add_property("numSteps", boost::python::make_function(&Engine::Simulation::getNumSteps, boost::python::return_value_policy<boost::python::copy_const_reference>()))
 	;
-	
+
+	boost::python::class_< Engine::ShpLoader>("ShpLoaderStub")
+		.def("open", &Engine::ShpLoader::open)	
+		.def("getNumLayers", &Engine::ShpLoader::getNumLayers)	
+		.def("setActiveLayer", &Engine::ShpLoader::setActiveLayer)	
+		.def("getNumFeatures", &Engine::ShpLoader::getNumFeatures)	
+		.def("getPosition", &Engine::ShpLoader::getPosition)	
+		.def("getFieldAsString", &Engine::ShpLoader::getFieldAsString)	
+		.def("getFieldAsInt", &Engine::ShpLoader::getFieldAsInt)	
+		.def("getFieldAsFloat", &Engine::ShpLoader::getFieldAsFloat)	
+	;
+
+
+    
+    boost::python::class_< Engine::GeneralState, boost::shared_ptr<Engine::GeneralState>, boost::noncopyable>("GeneralStateStub", boost::python::no_init)
+		.add_property("instance", boost::python::make_function(&Engine::GeneralState::instance, boost::python::return_value_policy<boost::python::reference_existing_object>()))
+		.def("shpLoader", boost::python::make_function(&Engine::GeneralState::shpLoader, boost::python::return_value_policy<boost::python::reference_existing_object>()))
+    ;
+
 	boost::python::class_< AgentWrap, std::auto_ptr<AgentWrap>, boost::noncopyable >("AgentStub", boost::python::init< const std::string & > () )
 		.def("updateState", &Engine::Agent::updateState, &AgentWrap::default_UpdateState)
 		.def("registerAttributes", &Engine::Agent::registerAttributes, &AgentWrap::default_RegisterAttributes)
@@ -424,6 +449,8 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("serialize", boost::python::pure_virtual(&Engine::Agent::serialize))
 		.def("registerIntAttribute", &Engine::Agent::registerIntAttribute)
 		.def("serializeIntAttribute", &AgentWrap::serializeIntAttribute)
+        .def("registerStringAttribute", &Engine::Agent::registerStringAttribute)
+		.def("serializeStringAttribute", &AgentWrap::serializeStringAttribute)
 		.def("remove", &Engine::Agent::remove)
 		.def("setRandomPosition", &Engine::Agent::setRandomPosition)
 		.add_property("id", boost::python::make_function(&Engine::Agent::getId, boost::python::return_value_policy<boost::python::copy_const_reference>()))

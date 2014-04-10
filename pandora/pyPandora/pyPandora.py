@@ -92,6 +92,14 @@ class RasterMean(libpyPandora.RasterMeanStub):
 	def __init__(self):
 		libpyPandora.RasterMeanStub.__init__( self)
 
+class GeneralState(libpyPandora.GeneralStateStub):
+    def __init__(self):
+        libpyPandora.GeneralStateStub.__init__(self)
+
+class ShpLoader(libpyPandora.ShpLoaderStub):
+    def __init__(self):
+        libpyPandora.ShpLoaderStub.__init__(self)
+
 """
 class AgentHDFtoSHP(libpyPandora.AgentHDFtoSHPStub):
 	def __init__(self, fileName, numStep ):

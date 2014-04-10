@@ -133,13 +133,12 @@ class TestPyPandora(unittest.TestCase):
         self.assertFalse(aRectangle.contains(aPoint))
 
     def testLoadShapefile(self):
-        loader = GeneralState.getShpLoader()
+        loader = GeneralState.shpLoader()
         loader.open('../../resources/test.shp')
-        loader.setActiveLayer(0)
 
         self.assertEqual(4,loader.getNumFeatures())
-        self.assertEqual(Point2DInt(32,21), loader.getPosition(3))
-        self.assertEqual('label d', loader.getFieldAsFloat(3, 'label'))
+        self.assertEqual(Point2DInt(32,22), loader.getPosition(3))
+        self.assertEqual('label d', loader.getFieldAsString(3, 'label'))
         self.assertEqual(4, loader.getFieldAsInt(3, 'intValue'))
         self.assertAlmostEqual(4.5, loader.getFieldAsFloat(3, 'floatValue'))
    

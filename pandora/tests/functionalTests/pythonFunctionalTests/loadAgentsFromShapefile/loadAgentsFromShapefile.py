@@ -2,22 +2,36 @@
 
 import sys, random
 
-pandoraDir = '/home/xrubio/workspace/pandoraMaster/'
+pandoraDir = '/home/xrubio/workspace/pandora/'
 
 sys.path.append(pandoraDir+'/pandora/')
 sys.path.append(pandoraDir+'/pandora/pyPandora/')
 
-from pyPandora import Simulation, Agent, World, Point2DInt, SizeInt, RectangleInt, SpacePartition
+from pyPandora import Simulation, Agent, World, Point2DInt, SizeInt, RectangleInt, SpacePartition, GeneralState, ShpLoader
 
 class ShpAgent(Agent):
-	def __init__(self, id):
-		Agent.__init__( self, id)
+    _label = ''
+    _intValue = 0
+    _floatValue = 0.1
+    def __init__(self, id):
+        Agent.__init__( self, id)
 
-	def updateState(self):
-		return
+    def registerAttributes(self):
+        self.registerIntAttribute('intValue')
+        self.registerIntAttribute('floatValue')
+        self.registerStringAttribute('label')
 
-	def serialize(self):
-		return
+    def updateState(self):
+        return
+
+    def serialize(self):
+        self.serializeIntAttribute('intValue', self._intValue)
+        self.serializeIntAttribute('floatValue', int(self._floatValue))
+        self.serializeStringAttribute('label', self._label)
+        return
+
+    def __str__(self):
+        return 'agent: '+self.id+' pos: '+str(self.position)+' label: '+self._label+' int value: '+str(self._intValue)+' float value: '+str(self._floatValue)
 
 class ShpWorld(World):
     _shpFileName = 'no file'
@@ -29,13 +43,20 @@ class ShpWorld(World):
         return
 
     def createAgents(self):
-        loader = self.getShpLoader()
+        loader = GeneralState.shpLoader()
         loader.open(self._shpFileName)
-        loader.setActiveLayer(0)
         for i in range(0, loader.getNumFeatures()):
-            print('creating agent:',loader.getFieldAsString(i,'name'))
-        #newAgent = ShpAgent('ShpAgent_',loader.getFieldAsString(i, 'name'))
-
+            newAgent = ShpAgent('ShpAgent_'+loader.getFieldAsString(i, 'name'))
+            position = loader.getPosition(i)
+            position._y = self.getBoundaries()._size._height - position._y
+            if not self.getBoundaries().contains(position):
+                continue
+            newAgent.position = position
+            newAgent._label = loader.getFieldAsString(i, 'label')
+            newAgent._intValue = loader.getFieldAsInt(i, 'intValue')
+            newAgent._floatValue = loader.getFieldAsFloat(i, 'floatValue')
+            print('loading agent num:',i,'-',newAgent)
+            self.addAgent(newAgent)
 
 def main():
     shpFileName = '../../../resources/test.shp'

@@ -26,7 +26,6 @@ void ShpWorld::createAgents()
 	Engine::ShpLoader & loader = Engine::GeneralState::shpLoader();
 	loader.open(_shpFile);
 	std::cout << "selecting layer 0 from: " << loader.getNumLayers() << std::endl;;
-	loader.setActiveLayer(0);
 
 	for(int i=0; i<loader.getNumFeatures(); i++)
 	{
