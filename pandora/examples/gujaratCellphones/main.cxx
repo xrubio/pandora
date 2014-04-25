@@ -5,18 +5,27 @@
 #include <Simulation.hxx>
 #include <Exceptions.hxx>
 
-int main(int argc, char *argv[]) {
-	try {	
-		if(argc>2) throw Engine::Exception("USAGE: gujaratCellphones [config file]");	
+int main(int argc, char *argv[])
+{
+	try
+    {	
+		if(argc>2)
+        {
+            throw Engine::Exception("USAGE: gujaratCellphones [config file]");
+            return -1;
+        }
 		std::string fileName("config.xml");
-		if(argc!=1) fileName = argv[1];
+		if(argc!=1)
+        {
+            fileName = argv[1];
+        }
 		GujaratCellphones::HerderWorldConfig config;
 		config.deserialize(fileName);
 
 		Engine::Simulation myWorldSim(config.getSize(),config.getNumSteps(), config.getSerializeResolution());
 		GujaratCellphones::HerderWorld world(myWorldSim, config);
 
-		world.init(argc, argv);
+		world.initialize();
 		world.run();
 	}
 	catch( std::exception & exceptionThrown ) {

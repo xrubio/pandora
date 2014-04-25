@@ -27,7 +27,7 @@ MoveAction * MoveAction::copy() const
 void MoveAction::executeMDP( const Herder & agent, const HerderState & state, HerderState & stateNext ) const
 {
 	stateNext.setPosition(_newPosition);
-	Engine::Point2D<int> localPos = agent.getPosition() - agent.getWorld()->getOverlapBoundaries()._origin;
+	Engine::Point2D<int> localPos = agent.getPosition() - agent.getWorld()->getBoundaries()._origin;
 	int collected = std::min(agent.getNeededResources(), state.getResourcesMap().getValue(localPos));
 	stateNext.setResources(collected);
 //	std::cout << "executing from state: " << state << " to: " << stateNext << " getting value: " << state.getRasterResources().getValue(localPos) << " size of inc. raster: " << state.getRasterResources().getSize() << std::endl;

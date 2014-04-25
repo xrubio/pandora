@@ -4,7 +4,7 @@
 namespace GujaratCellphones
 {
 
-HerderWorld::HerderWorld(Engine::Simulation &simulation, HerderWorldConfig &config) : World(simulation, 1, true, config._resultsFile), _climate(config)
+HerderWorld::HerderWorld(Engine::Simulation &simulation, HerderWorldConfig &config) : World(simulation, HerderWorld::useOpenMPSingleNode(config._resultsFile), true), _climate(config)
 {
 	_config = config;
 	_maxResources.resize(11);
@@ -18,8 +18,7 @@ void HerderWorld::createAgents()
 {
 	for(int i=0; i<_config._numVillages; i++)
 	{
-		//Engine::Point2D<int> villageLocation(Engine::GeneralState::statistics().getUniformDistValue(0, _config._size-1),Engine::GeneralState::statistics().getUniformDistValue(0, _config._size-1));
-		Engine::Point2D<int> villageLocation(30,20);
+		Engine::Point2D<int> villageLocation(_config._size._width/2,_config._size._height/2);
 		std::ostringstream oss;
 		oss << "Village_" << i;
 		Village * newVillage = new Village(oss.str(), i);
@@ -81,102 +80,18 @@ void HerderWorld::createRasters()
 	registerDynamicRaster("soil quality", true, eSoilQuality);
 	getDynamicRaster(eSoilQuality).setInitValues(0, 10, 0);
 
-	Engine::Point2D<int> index(0,0);
-	for(index._x=0; index._x<_overlapBoundaries._size._x; index._x++)
-	{
-		for(index._y=0; index._y<_overlapBoundaries._size._y; index._y++)
-		{
-			/*
-			int value = 0;
-			if(index._x>50)
-			{
-				value = 10;
-			}
-			*/
-			int value = index._y*10/_overlapBoundaries._size._y;
-			//int value = Engine::GeneralState::statistics().getNormalDistValue(0,10);
-			getDynamicRaster(eSoilQuality).setMaxValue(index, value);
-		}
+    float cellIncrease = 10.0f/float(getBoundaries()._size._height);
+
+    for(auto index : getBoundaries())
+    {
+		int value = (cellIncrease*index._y);
+		getDynamicRaster(eSoilQuality).setMaxValue(index, value);
 	}
 	updateRasterToMaxValues(eSoilQuality);	
 	
 	// we need to keep track of resource fractions
 	registerDynamicRaster("resourcesFraction", false, eResourcesFraction);
 	getDynamicRaster(eResourcesFraction).setInitValues(0, 100, 0);
-	/*
-
-	registerDynamicRaster("Herder_0_vil0_resources", true);
-	registerDynamicRaster("Herder_1_vil0_resources", true);
-	registerDynamicRaster("Herder_2_vil0_resources", true);
-	registerDynamicRaster("Herder_3_vil0_resources", true);
-	registerDynamicRaster("Herder_4_vil0_resources", true);
-	*/
-	/*
-	registerDynamicRaster("Herder_5_vil0_resources", true);
-	registerDynamicRaster("Herder_6_vil0_resources", true);
-	registerDynamicRaster("Herder_7_vil0_resources", true);
-	registerDynamicRaster("Herder_8_vil0_resources", true);
-	registerDynamicRaster("Herder_9_vil0_resources", true);
-	registerDynamicRaster("Herder_10_vil0_resources", true);
-	registerDynamicRaster("Herder_11_vil0_resources", true);
-	registerDynamicRaster("Herder_12_vil0_resources", true);
-
-	registerDynamicRaster("Herder_0_vil0_knowledge", true);
-	registerDynamicRaster("Herder_1_vil0_knowledge", true);
-	registerDynamicRaster("Herder_2_vil0_knowledge", true);
-	registerDynamicRaster("Herder_3_vil0_knowledge", true);
-	registerDynamicRaster("Herder_4_vil0_knowledge", true);
-	*/
-	/*
-	registerDynamicRaster("Herder_5_vil0_knowledge", true);
-	registerDynamicRaster("Herder_6_vil0_knowledge", true);
-	registerDynamicRaster("Herder_7_vil0_knowledge", true);
-	registerDynamicRaster("Herder_8_vil0_knowledge", true);
-	registerDynamicRaster("Herder_9_vil0_knowledge", true);
-	registerDynamicRaster("Herder_10_vil0_knowledge", true);
-	registerDynamicRaster("Herder_11_vil0_knowledge", true);
-	registerDynamicRaster("Herder_12_vil0_knowledge", true);
-	*/
-
-	/*
-	registerDynamicRaster("Herder_0_vil1_resources", true);
-	registerDynamicRaster("Herder_1_vil1_resources", true);
-	registerDynamicRaster("Herder_2_vil1_resources", true);
-	registerDynamicRaster("Herder_3_vil1_resources", true);
-	registerDynamicRaster("Herder_4_vil1_resources", true);
-	*/
-	/*
-	registerDynamicRaster("Herder_5_vil1_resources", true);
-	registerDynamicRaster("Herder_6_vil1_resources", true);
-	registerDynamicRaster("Herder_7_vil1_resources", true);
-	registerDynamicRaster("Herder_8_vil1_resources", true);
-	registerDynamicRaster("Herder_9_vil1_resources", true);
-	registerDynamicRaster("Herder_10_vil1_resources", true);
-	registerDynamicRaster("Herder_11_vil1_resources", true);
-	registerDynamicRaster("Herder_12_vil1_resources", true);
-	*/
-
-	/*
-	registerDynamicRaster("Herder_0_vil1_knowledge", true);
-	registerDynamicRaster("Herder_1_vil1_knowledge", true);
-	registerDynamicRaster("Herder_2_vil1_knowledge", true);
-	registerDynamicRaster("Herder_3_vil1_knowledge", true);
-	registerDynamicRaster("Herder_4_vil1_knowledge", true);
-	*/
-	/*
-	registerDynamicRaster("Herder_5_vil1_knowledge", true);
-	registerDynamicRaster("Herder_6_vil1_knowledge", true);
-	registerDynamicRaster("Herder_7_vil1_knowledge", true);
-	registerDynamicRaster("Herder_8_vil1_knowledge", true);
-	registerDynamicRaster("Herder_9_vil1_knowledge", true);
-	registerDynamicRaster("Herder_10_vil1_knowledge", true);
-	registerDynamicRaster("Herder_11_vil1_knowledge", true);
-	registerDynamicRaster("Herder_12_vil1_knowledge", true);
-	*/
-	/*
-	registerDynamicRaster("gathered", true);
-	getDynamicRasterStr("gathered").setInitValues(0, std::numeric_limits<int>::max(), 0);
-	*/
 }
 
 void HerderWorld::recomputeYearlyBiomass()
@@ -192,12 +107,9 @@ void HerderWorld::recomputeYearlyBiomass()
 
 	}
 
-	for(index._x = _overlapBoundaries._origin._x; index._x < _overlapBoundaries._origin._x + _overlapBoundaries._size._x; index._x++ )                
-	{
-		for( index._y = _overlapBoundaries._origin._y; index._y < _overlapBoundaries._origin._y + _overlapBoundaries._size._y; index._y++ )
-		{
-			setValue(eResources, index, _maxResources.at(getValue(eSoilQuality, index)));
-		}
+    for(auto index : getBoundaries())
+    {
+		setValue(eResources, index, _maxResources.at(getValue(eSoilQuality, index)));
 	}
 }
 

@@ -17,12 +17,11 @@ void HerderWorldConfig::extractParticularAttribs(TiXmlElement * root)
 	//environment
 	element = root->FirstChildElement("environment");
 	child = element->FirstChildElement("landscape");
-	retrieveAttributeMandatory(child, "width", _size._x);
-	retrieveAttributeMandatory(child, "height", _size._y);
+	retrieveAttributeMandatory(child, "width", _size._width);
+	retrieveAttributeMandatory(child, "height", _size._height);
 	retrieveAttributeMandatory(child, "averageResources", _averageResources);
 
 	child = element->FirstChildElement("climate");
-	retrieveAttributeMandatory(child, "seed", _climateSeed);
 	retrieveAttributeMandatory(child, "daysDrySeason", _daysDrySeason);
 	retrieveAttributeMandatory(child, "meanRain", _rainHistoricalDistribMean);
 	retrieveAttributeMandatory(child, "stddev", _rainHistoricalDistribStdDev);
@@ -54,7 +53,7 @@ void HerderWorldConfig::extractParticularAttribs(TiXmlElement * root)
 	retrieveAttributeMandatory(child, "fixedValue", _outVillageTransmissionValue);
 }
 
-Engine::Point2D<int> HerderWorldConfig::getSize() const
+Engine::Size<int> HerderWorldConfig::getSize() const
 {
 	return _size;
 }

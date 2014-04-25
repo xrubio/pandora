@@ -92,17 +92,12 @@ void Herder::updateKnowledge()
 		int maxValue =  _world->getDynamicRaster(eResources).getCurrentMaxValue();
 		// tentative value = 1/3
 		int averageValue = maxValue/3;
-		//std::cout << "min: " << minValue << " max: " << maxValue << " average: " << averageValue << std::endl;
 
-		Engine::Point2D<int> index(0,0);
-		for(index._x=0; index._x<_world->getOverlapBoundaries()._size._x; index._x++)
-		{
-			for(index._y=0; index._y<_world->getOverlapBoundaries()._size._y; index._y++)
-			{
-				knowledge.setValue(index, -1);
-				resources.setMaxValue(index, averageValue);
-				resources.setValue(index, averageValue);
-			}
+        for(auto index: _world->getBoundaries())
+        {
+			knowledge.setValue(index, -1);
+			resources.setMaxValue(index, averageValue);
+			resources.setValue(index, averageValue);
 		}
 		return;
 	}
@@ -111,20 +106,15 @@ void Herder::updateKnowledge()
 	{
 		return;
 	}
-	// info is one year old
-		Engine::Point2D<int> index(0,0);
-//		Engine::Raster & knowledge = _world->getDynamicRaster(_knowledgeMap);
-		for(index._x=0; index._x<_world->getOverlapBoundaries()._size._x; index._x++)
-		{
-			for(index._y=0; index._y<_world->getOverlapBoundaries()._size._y; index._y++)
-			{
-				// if it has been explored
-				if(knowledge.getValue(index)!=-1)
-				{
-					knowledge.setValue(index, knowledge.getValue(index)+1);
-				}
-			}
-		}
+	// info is one year old 
+    for(auto index: _world->getBoundaries())
+    {
+        // if it has been explored
+        if(knowledge.getValue(index)!=-1)
+        {
+            knowledge.setValue(index, knowledge.getValue(index)+1);
+        }
+    }
 	// current resource values must be updated to max value
 	resources.updateRasterToMaxValues();
 }
@@ -141,7 +131,6 @@ void Herder::outVillageKnowledgeTransmission() const
 
 void Herder::knowledgeTransmission( int frequency ) const
 {
-	//std::cout << "checking knowledge for: " << this << " with frequency: " << frequency << std::endl;
 	for(std::list<Herder*>::const_iterator it=_village->beginHerders(); it!=_village->endHerders(); it++)
 	{
 		int value = Engine::GeneralState::statistics().getUniformDistValue(0, 100);
@@ -151,19 +140,6 @@ void Herder::knowledgeTransmission( int frequency ) const
 		}
 	}
 }
-
-/*void Herder::printRaster(Engine::Raster & raster) {
-	Engine::Point2D<int> index(0,0);
-	for(index._x=0; index._x<_world->getOverlapBoundaries()._size._x; index._x++)
-	{
-		for(index._y=0; index._y<_world->getOverlapBoundaries()._size._y; index._y++)
-		{
-			std::cout << raster.getValue(index) << " ";
-		}
-		std::cout << std::endl;
-	}
-	std::cout << std::endl;
-}*/
 
 void Herder::copyValue( const Herder & origin, const Herder & target, const Engine::Point2D<int> & index ) const
 {
@@ -181,60 +157,26 @@ void Herder::copyValue( const Herder & origin, const Herder & target, const Engi
 void Herder::shareCell( const Herder & herderA, const Herder & herderB, const Engine::Point2D<int> & index ) const
 {
 	Engine::Raster & knowledgeA = _world->getDynamicRaster(herderA.getKnowledgeMap());
-	Engine::Raster & resourcesA = _world->getDynamicRaster(herderA.getResourcesMap());
-
 	Engine::Raster & knowledgeB = _world->getDynamicRaster(herderB.getKnowledgeMap());
-	Engine::Raster & resourcesB = _world->getDynamicRaster(herderB.getResourcesMap());
 
-	if(knowledgeA.getValue(index)>knowledgeB.getValue(index))
+    // agent B did not visit the cell
+	if(knowledgeA.getValue(index)>=knowledgeB.getValue(index) && knowledgeB.getValue(index)==-1)
 	{
-		// agent B did not visit the cell
-		if(knowledgeB.getValue(index)==-1)
-		{
-			copyValue(herderA, herderB, index);
-			return;
-		}
-		// agent B has more recent information
-		//copyValue(herderB, herderA, index);
-		return;
-	}
-	if(knowledgeA.getValue(index)<knowledgeB.getValue(index))
-	{
-		// agent A did not visit the cell
-		if(knowledgeA.getValue(index)==-1)
-		{
-			//copyValue(herderB, herderA, index);
-			return;
-		}
-		// agent A has more recent information
 		copyValue(herderA, herderB, index);
-		return;
 	}
-
-	/*
-	if(knowledgeA.getValue(index)==knowledgeB.getValue(index))
-	{
-		if(Engine::GeneralState::statistics().getUniformDistValue(0,1)==0)
-		{
-			copyValue(herderA, herderB, index);
-		}
-		else
-		{
-			copyValue(herderB, herderA, index);
-		}
+	// agent A has more recent information
+    else if(knowledgeA.getValue(index)<knowledgeB.getValue(index))
+    {
+		copyValue(herderA, herderB, index);
 	}
-	*/
 }
 
 void Herder::shareKnowledge(Herder & herder) const
 {
-	Engine::Point2D<int> index(0,0);
-	for(index._x=0; index._x<_world->getOverlapBoundaries()._size._x; index._x++)
-	{
-		for(index._y=0; index._y<_world->getOverlapBoundaries()._size._y; index._y++)
-		{
-			shareCell(*this, herder, index );
-		}
+    for(auto index : _world->getBoundaries())
+    {
+        // give knowledge to other agent
+	    shareCell(*this, herder, index );
 	}
 }
 
@@ -263,55 +205,33 @@ void Herder::selectActions()
 	{
 		return;
 	}
-	//std::cout << this << " selecting actions for time step: " << _world->getCurrentStep() << " days until wet: " << world.daysUntilWetSeason() << std::endl;
 	_model->reset(*this, world.daysUntilWetSeason(), _horizon);
-	//std::cout << "mdp config, width: " << _width << " horizon: " << std::min(_horizon, world.daysUntilWetSeason()) << " bonus: " << _explorationBonus << std::endl;
 	UCT * uctPolicy = new UCT(*_uctBasePolicy, _width, std::min(_horizon, world.daysUntilWetSeason()), _explorationBonus, false);
 	Problem::action_t index = (*uctPolicy)(_model->init());
 	MoveAction * action = _model->init().getAvailableAction(index).copy();
 
-	/*
-	for(int i=0; i<_model->init().getNumAvailableActions(); i++)
-	{
-		std::cout << "possible action: " << i << " moving from: " << _model->init().getPosition()  << " to: " << _model->init().getAvailableAction(i).getNewPosition() << " would have cost: "<< _model->cost( _model->init(), i) << std::endl;
-	}
-	std::cout << "action chosen for step: " << _world->getCurrentStep() << " with index: " << index << " is moving from: " << _position << " to: " << action->getNewPosition() << std::endl;
-	*/
 	delete uctPolicy;
 	_actions.push_back(action);
-	//std::cout << this << "end selecting actions for time step: " << _world->getCurrentStep() << std::endl;
 }
 
 void Herder::updateState()
 {
-	HerderWorld & world = (HerderWorld &)*_world;
-	const HerderWorldConfig & config = world.getConfig();
+    HerderWorld & world = (HerderWorld &)*_world;
 	if(world.getCurrentStep()==0)
 	{
 		return;
 	}
-	if(world.daysUntilWetSeason()==0)
-	{
-		//std::cout << "dry season, herder: " << this << std::endl;
-		// animals death by starvation
-		int oldHerdSize = _herdSize;
-		int newHerdSize = (int)(float)(_herdSize) * (1.0f-(_starvationDays/(float)config._daysDrySeason));
 
+    // in village activities
+	if(world.daysUntilWetSeason()==0)
+	{	
+    	const HerderWorldConfig & config = world.getConfig();
+		
+        // animals death by starvation
+		int newHerdSize = (int)(float)(_herdSize) * (1.0f-(_starvationDays/(float)config._daysDrySeason));
 		// 10% reproduction
 		_herdSize = (int)((float)newHerdSize*1.1f);
-		/*
-		for(int i=0; i<oldHerdSize; i++)
-		{
-			int die = Engine::GeneralState::statistics().getUniformDistValue(0,100);
-			if(die<int((100.0f*_starvationDays)/(float)config._daysDrySeason))
-			{
-				_herdSize = std::max(0, _herdSize-1);
-			}
-		}
-		*/
-		std::cout << this << " starvation: " << _starvationDays << " percentage removed: " <<  100.0f*_starvationDays/(float)config._daysDrySeason << " old herd size: " << oldHerdSize << " to: " << newHerdSize << " final: " << _herdSize << std::endl;
-		_starvationDays = 0.0f;
-		// no animals, remove agent
+        // if no herd, die
 		if(_herdSize==0)
 		{
 			_village->removeHerder(this);
@@ -323,44 +243,28 @@ void Herder::updateState()
 		{
 			_village->fission(*this);
 		}
+
+		_starvationDays = 0.0f;
 		setPosition(_village->getPosition());		
 
 		if(config._inVillageTransmission)
 		{
 			inVillageKnowledgeTransmission();
 		}
-		
-		/*
-		// info is one year old
-		Engine::Point2D<int> index(0,0);
-		Engine::Raster & knowledge = _world->getDynamicRaster(_knowledgeMap);
-		for(index._x=0; index._x<_world->getOverlapBoundaries()._size._x; index._x++)
-		{
-			for(index._y=0; index._y<_world->getOverlapBoundaries()._size._y; index._y++)
-			{
-				// if it has been explored
-				if(knowledge.getValue(index)!=-1)
-				{
-					knowledge.setValue(index, knowledge.getValue(index)+1);
-					std::cout << "setting knowledge value: " << knowledge.getValue(index) << std::endl;
-				}
-			}
-		}
-		*/
 		return;
 	}
-	
-	
+
+    // out of village activities
+    /*
 	if(config._outVillageTransmission)
 	{
 		outVillageKnowledgeTransmission();
 	}
-
+    */
 	if(_resources<getNeededResources())
 	{
 		_starvationDays += 1.0f - float(_resources)/float(getNeededResources());
 	}
-	//std::cout << " needed: " << getNeededResources() << " resources: " << _resources << " starvation acc: " << _starvationDays << std::endl;
 	_resources = 0;
 }
 

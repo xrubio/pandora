@@ -3,7 +3,7 @@
 
 namespace GujaratCellphones {
 
-Climate::Climate(const HerderWorldConfig & config ) : _randomGenerator((long int)config._climateSeed), _currentRain(0.0f), _uniformDistribution(_randomGenerator, boost::uniform_real <> (0,1))
+Climate::Climate(const HerderWorldConfig & config ) : _currentRain(0.0f)
 {
 	float mean = config._rainHistoricalDistribMean;
 	float stddev = config._rainHistoricalDistribStdDev;

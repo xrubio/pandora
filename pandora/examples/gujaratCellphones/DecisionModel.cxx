@@ -28,8 +28,6 @@ void DecisionModel::reset( Herder & agent, int daysUntilWetSeason, int horizon)
 {
 	_daysUntilWetSeason = daysUntilWetSeason;
 	_horizon = horizon;
-//	std::cout << "reset size: " << agent.getWorld()->getDynamicRaster(eResources).getSize() << std::endl;
-//	std::cout << "reset model for agent: " << agent << " days until wet: " << _daysUntilWetSeason << std::endl;
 	if(_initial)
 	{
 		delete _initial;
@@ -38,7 +36,6 @@ void DecisionModel::reset( Herder & agent, int daysUntilWetSeason, int horizon)
 	_agent= &agent;
 	_initial = new HerderState(agent.getPosition(), agent.getVillage().getPosition(), agent.getResources(), agent.getWorld()->getDynamicRaster(agent.getKnowledgeMap()), agent.getWorld()->getDynamicRaster(agent.getResourcesMap()), agent.getNeededResources(), _daysUntilWetSeason);
 	makeActionsForState(*_initial);
-//	std::cout << "end reset model for agent: " << agent << std::endl;
 }
 
 action_t DecisionModel::number_actions( const HerderState & state ) const
@@ -61,7 +58,6 @@ bool DecisionModel::terminal( const HerderState & state ) const
 	}
 	if(state.getTimeStep()<(_daysUntilWetSeason-currentHorizon))
 	{
-//		std::cout << "state: " << state << " is terminal due to be lesser than " << _daysUntilWetSeason << " less: " << currentHorizon << std::endl;
 		return true;
 	}
 	return false;
@@ -91,9 +87,8 @@ float DecisionModel::cost( const HerderState & state, action_t action ) const
 	{
 		cost += (neededResources-resourcesToCollect)/neededResources;
 	}
-//	std::cout << "action: " << action << " from state: " << state << " moving to: " << state.getAvailableAction(action).getNewPosition() << " is getting: " << resourcesToCollect << " resources needed: " << neededResources << " base cost: " << cost<< std::endl;
 
-	int maxDist = state.getResourcesMap().getSize()._x;
+	int maxDist = state.getResourcesMap().getSize()._width;
 	if(state.getTimeStep()<maxDist)
 	{
 		float firstDistance = state.getPosition().distance(state.getVillagePosition());
@@ -101,34 +96,14 @@ float DecisionModel::cost( const HerderState & state, action_t action ) const
 		if(secondDistance>=firstDistance)
 		{
 			cost += (maxDist-state.getTimeStep());
-//			std::cout << "new cost: " << cost << " due to distance: " << secondDistance << " - " << firstDistance << " weight: " <<25-state.getTimeStep() << std::endl;
 		}
 	}
 
-	/*
-	// knowledge penalisation if the zone is not explored (increased risk)
-	int knowledge = state.getKnowledgeMap().getValue(state.getAvailableAction(action).getNewPosition());
-	if(knowledge>=2 && knowledge <10)
-	{
-		cost += (float)(knowledge)/(10.0f*2.0f);
-	}
-	else if(knowledge>=0 && knowledge <2)
-	{
-	}
-	// now known or really old
-	else
-	{
-		cost += Engine::GeneralState::statistics().getUniformDistValue(0.0f,1.0f);
-	}
-	*/
-//	std::cout << "added cost for risk: " << cost << " knowledge: " << knowledge << std::endl;
-//	std::cout << " new cost: " << cost << std::endl;
 	return cost;
 }
 
 void DecisionModel::next( const HerderState & state, action_t index, OutcomeVector & outcomes ) const
 {
-//	std::cout << "creating next state" << std::endl;
 	HerderState stateNext(state);
 	const MoveAction & moveAction = state.getAvailableAction(index);
 	moveAction.executeMDP( *_agent, state, stateNext );
@@ -136,7 +111,6 @@ void DecisionModel::next( const HerderState & state, action_t index, OutcomeVect
 	stateNext.computeHash();	
 	makeActionsForState(stateNext);
 	outcomes.push_back(std::make_pair(stateNext, 1.0));
-//	std::cout << "end creating next state" << std::endl;
 }
 
 void DecisionModel::applyFrameEffects( const HerderState & state,  HerderState & stateNext ) const
@@ -150,7 +124,6 @@ void DecisionModel::makeActionsForState( HerderState & state ) const
 	state.clearActions();
 	assert(state.getNumAvailableActions()==0);
 	//is it necessary?
-	//_agentSim->updateKnowledge(state.getPosition(), s.getResources());
 	for(int i=state.getPosition()._x-1; i<=state.getPosition()._x+1; i++)
 	{
 		for(int j=state.getPosition()._y-1; j<=state.getPosition()._y+1; j++)
@@ -158,12 +131,9 @@ void DecisionModel::makeActionsForState( HerderState & state ) const
 			Engine::Point2D<int> newPosition(i,j);
 			if(!_agent->getWorld()->checkPosition(newPosition))
 			{
-	//			std::cout << "from position: " << state.getPosition() << " discarding position: " << newPosition << std::endl;
 				continue;
 			}
-	//		std::cout << "from position: " << state.getPosition() << " creating new at: " << newPosition << std::endl;
 			MoveAction * newAction = new MoveAction(newPosition);
-	//		std::cout << "creating new action: " << newAction << std::endl;
 			state.addAction(newAction);
 		}
 	}

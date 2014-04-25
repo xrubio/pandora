@@ -15,8 +15,6 @@ class Climate
 	float _currentRain; // mm on heigth of rain
 	float _alphaRain;
 	float _betaRain;
-
-	boost::variate_generator< RandomEngine, boost::uniform_real<> > _uniformDistribution;
 public:
 	Climate(const HerderWorldConfig &config);
 	virtual ~Climate();

@@ -106,16 +106,13 @@ void Village::serialize()
 
 		int herderKnownCells = 0;
 		Engine::Point2D<int> index(0,0);
-		for(index._x=0; index._x<_world->getOverlapBoundaries()._size._x; index._x++)
+        for(auto index : _world->getBoundaries())
 		{
-			for(index._y=0; index._y<_world->getOverlapBoundaries()._size._y; index._y++)
+			int value = knowledge.getValue(index);
+			if(value>-1 && value<3)
 			{
-				int value = knowledge.getValue(index);
-				if(value>-1 && value<3)
-				{
-					//std::cout << "\t\tindex : " << index << " value: " << value << std::endl;
-					herderKnownCells++;
-				}
+				//std::cout << "\t\tindex : " << index << " value: " << value << std::endl;
+				herderKnownCells++;
 			}
 		}
 		//std::cout << "\therder: " << herder << " with raster: " << herder.getKnowledgeMap() << " knows: " << herderKnownCells << std::endl;
