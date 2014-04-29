@@ -24,8 +24,6 @@ namespace Gujarat
 {
 
 GujaratState * GujaratState::_instance = 0;
-//CaloricRequirementsTable * GujaratState::_hgCaloricRequirements = 0;
-//CaloricRequirementsTable * GujaratState::_apCaloricRequirements = 0;
 GujaratDemographics * GujaratState::_demographics = 0;
 
 GujaratState & GujaratState::instance()
@@ -43,13 +41,6 @@ GujaratState::GujaratState()
 
 GujaratState::~GujaratState()
 {
-	/*
-	if( _apCaloricRequirements )
-	{
-		delete _apCaloricRequirements;
-		_apCaloricRequirements = 0;
-	}
-	*/
 	if(_demographics)
 	{
 		delete _demographics;
@@ -123,18 +114,6 @@ int GujaratState::caloricRequirements( const std::string & type, int age )
 			return instance()._hgCaloricRequirements.at(instance()._hgCaloricRequirements.size()-1);
 		}
 	}
-	/*
-	else if(type.compare("AgroPastoralist")==0)
-	{
-		if(!_apCaloricRequirements)
-		{
-			std::stringstream oss;
-			oss << "GujaratState::caloricRequirements() - ap table not initialized";
-			throw Engine::Exception(oss.str());
-		}
-		return *(instance()._apCaloricRequirements);
-	}
-	*/
 	std::stringstream oss;
 	oss << "GujaratState::caloricRequirements() - asking for needs with unknown type: " << type;
 	throw Engine::Exception(oss.str());
@@ -161,18 +140,6 @@ float GujaratState::availableForageTime( const std::string & type, int age )
 			return instance()._hgAvailableForageTime.at(instance()._hgAvailableForageTime.size()-1);
 		}
 	}
-	/*
-	else if(type.compare("AgroPastoralist")==0)
-	{
-		if(!_apCaloricRequirements)
-		{
-			std::stringstream oss;
-			oss << "GujaratState::caloricRequirements() - ap table not initialized";
-			throw Engine::Exception(oss.str());
-		}
-		return *(instance()._apCaloricRequirements);
-	}
-	*/
 	std::stringstream oss;
 	oss << "GujaratState::caloricRequirements() - asking for forage time with unknown type: " << type;
 	throw Engine::Exception(oss.str());
@@ -187,29 +154,6 @@ void GujaratState::setDemographics( const std::string & model )
 	}
 	_demographics = new OriginalDemographics;
 
-	/*
-	if(model.compare("original")==0)
-	{
-		_demographics = new OriginalDemographics;
-		return;
-	}
-	else if(model.compare("ramirez")==0)
-	{
-		_demographics = new RamirezDemographics;
-		return;
-	}
-	else if(model.compare("alexis")==0)
-	{
-		_demographics = new AlexisDemographics;
-		return;
-	}
-	*/
-
-	/*
-	std::stringstream oss;
-	oss << "GujaratState::setDemographics() - unknown model: " << model;
-	throw Engine::Exception(oss.str());
-	*/
 }
 
 GujaratDemographics & GujaratState::demographics()
@@ -260,7 +204,7 @@ void GujaratState::setHGController( const std::string & type, const HunterGather
 	{	
 		for(int i=0; i<instance()._hgControllers.size(); i++)
 		{
-			//instance()._hgControllers.at(i) = new HunterGathererRandomMDPPolicyController(config);
+			instance()._hgControllers.at(i) = new HunterGathererRandomMDPPolicyController(config);
 		}
 		return;
 	}	
@@ -357,10 +301,7 @@ void GujaratState::initializeSectorsMaskTrigonometricaly( int numSectors, int ho
 				float angle = getAngle(fX,fY);
 				sm.at(x+homeRange).at(y+homeRange) =  (angle/alpha);	
 				
-				//std::cout <<"GNUPLOT "<< x <<"\t"<<y<<"\t"<< sm.at(x+homeRange).at(y+homeRange) << std::endl;
 			}
-			// show points from gnuplot :
-			// plot "./data.csv" u 1:2:3 with points pointtype 7 palette
 			
 		}
 	}
