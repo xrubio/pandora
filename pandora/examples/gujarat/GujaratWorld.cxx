@@ -458,7 +458,9 @@ void GujaratWorld::createAgents()
 			agent->createMind();
 			
 			
-			agent->createInitialPopulation(_config._adulthoodAge);
+			//agent->createInitialPopulation(_config._adulthoodAge);
+			// create a family of 6 individuals
+			agent->createInitialPopulation();
 
 			agent->setSocialRange( _config._socialRange );
 			agent->setHomeMobilityRange( _config._homeRange );

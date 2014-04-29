@@ -149,14 +149,15 @@ public:
 	
 	int reductionResourcesToCategory(long r) const
 	{
-		/*
-			r = #calories or #resources.
+		/**
+		 * 	r = #calories .
 			r/2000 specifies aprox needs per HG per day
 		 */
 		int c = computeConsumedResources(1);
 		
 		if(c==0)
 		{
+			// r = r/c = r/0 = inf
 			return 4;
 		}
 		

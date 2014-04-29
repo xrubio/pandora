@@ -54,11 +54,9 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 	if(option)
 	{
 		retrieveAttributeMandatory(option, "weightFile", _weightWaterFile);
-		retrieveAttributeMandatory(option, "sumWeights", sumWeights);
-		// numCells = numRows*numColumns
+		retrieveAttributeMandatory(option, "sumWeights", sumWeights);		
 		numCells *= numCells;
-		_waterDistConstant = (double)numCells/(double)sumWeights;
-		//std::cout << "type: " << _biomassDistribution << " sum weight: " << sumWeights << " constant: " << _waterDistConstant << std::endl;
+		_waterDistConstant = (double)numCells/(double)sumWeights;		
 	}
 
 	element = root->FirstChildElement("rainHistoricalDistribution");
@@ -127,11 +125,6 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 	element = root->FirstChildElement("hunterGatherers");
 	retrieveAttributeMandatory( element, "num", _numHG );
 	retrieveAttributeMandatory( element, "homeRange", _homeRange );
-//	retrieveAttributeMandatory( element, "surplusForReproductionThreshold", _surplusForReproductionThreshold );
-//	retrieveAttributeMandatory( element, "surplusWanted", _surplusWanted );
-//	retrieveAttributeMandatory( element, "surplusSpoilage", _surplusSpoilage );
-	
-//	retrieveAttributeMandatory( element, "foodNeedsForReproduction", _hgFoodNeedsForReproduction );
 	
 	retrieveAttributeMandatory( element, "adulthoodAge", _adulthoodAge );	
 	
@@ -145,9 +138,11 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 	// The difference of areas between both sectors must be minimized. 
 	int r_down    = _homeRange / _lowResolution;
 	int r_up      = 1 + r_down;
+	
 	int loss_down = abs(_homeRange*_homeRange 
 						- 
 						r_down*r_down*_lowResolution*_lowResolution); 
+	
 	int loss_up   = abs(_homeRange*_homeRange 
 						- 
 						r_up*r_up*_lowResolution*_lowResolution); 
@@ -202,14 +197,13 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 		throw Engine::Exception(sstr.str());
 	}
 	
-std::cout << "DBG 1" << std::endl;
+
 	int positionX=-1;
 	int positionY=-1;
-        TiXmlElement * initialPosition = element->FirstChildElement("initialPosition");
-        retrieveAttributeMandatory(initialPosition, "x", positionX);
+	TiXmlElement * initialPosition = element->FirstChildElement("initialPosition");
+	retrieveAttributeMandatory(initialPosition, "x", positionX);
 	retrieveAttributeMandatory(initialPosition, "y", positionY);
 	GujaratState::setInitialPosition(positionX,positionY);
-std::cout << "DBG 2" << std::endl;
 	
 	float minValue = 0;
 	float adultValue = 0;
@@ -230,64 +224,7 @@ std::cout << "DBG 2" << std::endl;
 	retrieveAttributeMandatory(workTime, "minAge", minAge);
 	retrieveAttributeMandatory(workTime, "adultAge", adultAge);
 	GujaratState::setHGAvailableForageTime(minAge, adultAge, minValue, adultValue);
-/*
-	TiXmlElement* calTable = element->FirstChildElement( "caloriesTable" );
-	if ( calTable == NULL )	
-	{
-		std::stringstream sstr;
-		sstr << "[CONFIG]: ERROR: No caloriesTable element found for Hunter Gatherers in Config" << std::endl;
-		throw Engine::Exception(sstr.str());
-	}
-	*/
-	/*
-	TiXmlElement* initializerElem = element->FirstChildElement( "initialization" );
-	if ( initializerElem == NULL )	
-	{
-		std::stringstream sstr;
-		sstr << "[CONFIG]: ERROR: No <initialization> element found for Hunter Gatherers in Config" << std::endl;
-		throw Engine::Exception(sstr.str());
-	}
-//	GujaratState::setHGCaloricRequirements(calTable);
 
-	// MRJ: Loading agro pastoralists attributes	
-	element = root->FirstChildElement("agroPastoralists");
-
-	calTable = element->FirstChildElement( "caloriesTable" );
-	if ( calTable == NULL )	
-	{
-		std::stringstream sstr;
-		sstr << "[CONFIG]: ERROR: No caloriesTable element found for AgroPastoralists in Config" << std::endl;
-		throw Engine::Exception(sstr.str());
-	}
-*/
-	/*
-	initializerElem = element->FirstChildElement( "initialization" );
-	if ( initializerElem == NULL )	
-	{
-		std::stringstream sstr;
-		sstr << "[CONFIG]: ERROR: No <initialization> element found for Agro Pastoralists in Config" << std::endl;
-		throw Engine::Exception(sstr.str());
-	}
-	*/
-
-//	GujaratState::setAPCaloricRequirements(calTable);
-	
-//	retrieveAttributeMandatory( element, "num", _numAP );
-//	retrieveAttributeMandatory( element, "maxCropHomeDistance", _maxCropHomeDistance );
-
-	/*
-	std::cout << "[CONFIG]: Mass To Energy Rate: " << _massToEnergyRate << std::endl;
-	std::cout << "[CONFIG]: Energy To Calories Rate: " << _energyToCalRate << std::endl;
-	std::cout << "[CONFIG]: Dune Cell: Biomass: Mass: " << _duneBiomass << std::endl;
-	std::cout << "[CONFIG]: Dune Cell: Biomass: Std. Dev: " << _duneBiomassStdDev << std::endl;
-	std::cout << "[CONFIG]: Dune Cell: Biomass: Efficiency: " << _duneEfficiency << std::endl;
-	std::cout << "[CONFIG]: Interdune Cell: Biomass: Mass: " << _interduneBiomass << std::endl;
-	std::cout << "[CONFIG]: Interdune Cell: Biomass: Std. Dev: " << _interduneBiomassStdDev << std::endl;
-	std::cout << "[CONFIG]: Interdune Cell: Biomass: Efficiency: " << _interduneEfficiency << std::endl;
-	std::cout << "[CONFIG]: Hunter Gatherer Controller: " << _hunterGathererController << std::endl;
-	if ( _controllerConfig != NULL )
-		_controllerConfig->dump( std::cout ); 
-	*/
 }
  
 void GujaratConfig::parseHGMDPConfig( TiXmlElement* element )
@@ -308,13 +245,7 @@ void GujaratConfig::parseHGMDPConfig( TiXmlElement* element )
 	if (_controllerConfig->getNumberForageActions()!=_numSectors)
 	{
 		throw Engine::Exception("_controllerConfig.getNumberForageActions() != _numSectors");
-	}
-	
-	if (_controllerConfig->getNumberMoveHomeActions()!=1)
-	{
-			//*?
-			//throw Engine::Exception("_controllerConfig.getNumberMoveHomeActions() != 1");
-	}
+	}	
 	
 	_uctSeed = _controllerConfig->getSeed();
 	
@@ -322,8 +253,6 @@ void GujaratConfig::parseHGMDPConfig( TiXmlElement* element )
  
 void GujaratConfig::parseSoilInfo( TiXmlElement * element )
 {    
-	// TODO use STL
-    //*? use SWITCH
 	_soilFile = element->Attribute("fileName"); // path
 	_size = atoi(element->Attribute("size"));
 }

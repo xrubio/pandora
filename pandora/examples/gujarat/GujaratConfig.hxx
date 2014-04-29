@@ -47,7 +47,8 @@ class GujaratConfig : public Engine::Config
 	int		_surplusForReproductionThreshold;
 	int		_surplusWanted;	
 	//float   _hgFoodNeedsForReproduction;
-	//float   _hgSpoilageFoodFactor;	
+	//float   _hgSpoilageFoodFactor;
+	// An agents with an age >= _adulthoodAge will be considered adult.
 	int		_adulthoodAge;
 	float	_walkingSpeedHour;
 	float	_forageTimeCost;
@@ -89,9 +90,6 @@ class GujaratConfig : public Engine::Config
 	
 	bool _shareInfo;
 	
-	//CaloricRequirementsTable* _hgCaloryRequirements;
-	//CaloricRequirementsTable* _apCaloryRequirements;
-
 	int _uctSeed;
 	
 	HunterGathererMDPConfig*	_controllerConfig;

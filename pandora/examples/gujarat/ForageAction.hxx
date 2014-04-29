@@ -102,13 +102,7 @@ public:
 		int    expectedExploredCells      = std::min((int)n,explorableCells);
 		float  expectedRetrievedResources = meanRes * expectedExploredCells;		
 		int    score                      = expectedRetrievedResources;
-	/*std::cout << "score heuristic:" << n 
-					<< "," << res
-					<< "," << meanRes
-					<< "," << expectedExploredCells
-					<< "," << expectedRetrievedResources
-					<< "," << score << std::endl;*/
-
+	
 	return score;
 	}
 

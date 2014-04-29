@@ -382,13 +382,11 @@ void GujaratState::initializeSectorsMaskTrigonometricaly( int numSectors, int ho
 
 void GujaratState::initializeSectorsMask( int numSectors, int homeRange, SectorsMask & sm )
 {
-	// Use a more elegant way of doing this
-	//*? TODO
-	/*if(homeRange < 100) 
+	if(homeRange < 10) 
 	{
 		initializeSectorsMaskTrigonometricaly(numSectors, homeRange, sm );	
 	}
-	else*/ {
+	else {
 		std::vector< std::vector< Engine::Point2D<int> > > sectors;
 	
 		float alpha = 360/numSectors;

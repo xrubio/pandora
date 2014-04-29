@@ -45,12 +45,9 @@ MDPAction*	ForageAction::copy() const
 {
 	ForageAction * newAction = 0;
 	
-	//*?
-	//* According to the strategy of sharing sector structures
-	// between MDP states, no MDPAction owns its ForageArea, so it
-	// can not do any delete nor creation.
 	
-	/*
+	/**
+	 Holds:
 	 Copy Method is not a deep copy.
 	 Forage are passed as pointers.	 
 	 */
@@ -58,6 +55,13 @@ MDPAction*	ForageAction::copy() const
 	
 	assert(_LRForageArea->cells().size() >0);
 	
+	
+	/**
+	// Require:
+	// In case of applying shared sector structures between MDP states, 
+	// no MDPAction owns its ForageArea, so it can not do any delete 
+	// nor creation. The "ownsPointer" must be false.
+	*/
 	newAction = new ForageAction(_HRForageArea, _LRForageArea, false);
 	
 	newAction->setFullPopulation(_useFullPopulation);
@@ -133,7 +137,7 @@ void	ForageAction::selectBestNearestLRCell( const GujaratAgent& agent
 	for ( unsigned k = 0; k < _LRForageArea->numCells(); k++ )
 	{	
 		
-		/* Rationale for score function :
+		/* Unfold of score function :
 		 *
 		 *			// before calling selectBest...
 		 *			t = free time
@@ -173,8 +177,6 @@ void	ForageAction::selectBestNearestLRCell( const GujaratAgent& agent
 			}
 		}
 	}
-	//TODO cost n, instead: best=candidates[uniformRandom(0,candidates.size()-1)]
-	//std::random_shuffle(candidates.begin(), candidates.end());
 	int numCand = candidates.size();
 	int idxCand = rand()%numCand;
 	best = *candidates[idxCand];
@@ -201,20 +203,14 @@ void ForageAction::selectBestNearestHRCellInTrend_ScanFrame(
 	Engine::Point2D<int> cornerDownRight;
 	int lowResolution = ((GujaratConfig)gw->getConfig()).getLowResolution();
 	
-	//if(!wasInsideLR)
-	//{
-		// update "wasInsideLR". Once you enter the LR cell you
-		// do not come out. So once "wasInsideLR" becomes true it
-		// will be true always. Do not check re-update when it is true.
 	wasInsideLR = 	HRBegin._x >= (LREndPoint._x*lowResolution) &&
 			HRBegin._x < ((LREndPoint._x+1)*lowResolution) &&
 			HRBegin._y >= (LREndPoint._y*lowResolution) &&
 			HRBegin._y < ((LREndPoint._y+1)*lowResolution);
-	//}
 	
 	if(wasInsideLR)
 	{
-				
+		/*? review		
 		/*cornerLeftUp._x = (LREndPoint._x*lowResolution)
 		cornerLeftUp._y = (LREndPoint._y*lowResolution)
 		cornerDownRight._x = cornerLeftUp._x + lowResolution;
@@ -299,10 +295,6 @@ void ForageAction::selectBestNearestHRCellInTrend_ScanFrame(
 		
 	}
 	
-	/*
-	std::cout << "*******BEGIN: " << HRBegin <<" * " << home << std::endl;
-	std::cout << "*******BEGIN2: " << (HRBegin - home) << std::endl;*/
-
 	
 	bestScoreHR = -1;
 	long bestDistanceHR = cornerLeftUp.distanceSQ(cornerDownRight);
@@ -323,11 +315,6 @@ void ForageAction::selectBestNearestHRCellInTrend_ScanFrame(
 		for(int j = jInit; j <= jBound; j++)
 		{
 			curr._y = j;
-		/*
-			std::cout << "*******SECTOR: " << curr <<" * " << home << std::endl;
-			std::cout << "*******SECTOR2: " << (curr - home) << std::endl;
-		*/
-			//std::cout << "CURRENT " << curr << " LOWRES=" << lowResolution << std::endl;
 
 			int currRes = HRRes.getValue(curr - gw->getOverlapBoundaries()._origin);
 
@@ -387,8 +374,6 @@ void ForageAction::selectBestNearestHRCellInLRCell_ScanAllLRCell(
 	
 	gw->LowRes2HighResCellCorner(LRn, corner);
 	
-	//std::cout << "CORNER:" << LRn << " --> " << curr << std::endl;
-	
 	bestScoreHR = -1;
 	long bestDistanceHR = gw->getOverlapBoundaries()._origin.distanceSQ(gw->getOverlapBoundaries()._origin + gw->getOverlapBoundaries()._size);
 	
@@ -403,8 +388,6 @@ void ForageAction::selectBestNearestHRCellInLRCell_ScanAllLRCell(
 		for(int j = 0; j < lowResolution; j++)
 		{	
 			curr._y = corner._y + j;
-			
-			//std::cout << "CURRENT " << curr << " LOWRES=" << lowResolution << std::endl;
 			
 			int currRes = HRRes.getValue(curr - gw->getOverlapBoundaries()._origin);
 			
@@ -471,12 +454,15 @@ void	ForageAction::doWalkForRewardEstimation( GujaratAgent& agent, const Engine:
 	Engine::Point2D<int> HRNearest;
 	
 	
-	//*? TODO eLRResources??? this is omniscience? should be _hgMind->resourceRaster
-	
-	selectBestNearestLRCell( agent, LRn, gw, agent.getWorld()->getDynamicRaster(eLRResources)
+	//* why not eLRResources??? it is about the omniscience feature
+	// HGMind must be taken into account
+	// change agent.getWorld()->getDynamicRaster(eLRResources)
+	// by
+	// agent.getLRResourcesRaster()	
+	selectBestNearestLRCell( agent, LRn, gw, agent.getLRResourcesRaster()
 	, (int)(agent.getAvailableTime() / agent.getForageTimeCost())
 	, bestScore, LRBest );
-	//std::cout << "2222222" << std::endl;
+
 	// find endpoint
 	int lowResolution = ((GujaratConfig)gw->getConfig()).getLowResolution();
 	Engine::Point2D<int> HREndPoint= LRBest*lowResolution;
@@ -492,7 +478,7 @@ void	ForageAction::doWalkForRewardEstimation( GujaratAgent& agent, const Engine:
 	
 	while ( ( walkedDist + distHome ) < maxDist )
 	{	
-		//std::cout << "walked dist: " << walkedDist << " dist home: " << distHome << " max dist: " << maxDist << " biomass collected: " << collected << " calories: " << agent.convertBiomassToCalories(collected) << std::endl;
+		
 		selectBestNearestHRCellInTrend_ScanFrame( 
 			(GujaratWorld*)(agent.getWorld())
 			,agent
@@ -503,9 +489,7 @@ void	ForageAction::doWalkForRewardEstimation( GujaratAgent& agent, const Engine:
 			, wasInsideLR
 			, bestScore
 			, best );		
-		//std::cout << "444444444" << std::endl;
-		//bestScore = r.getValue(best - agent.getWorld()->getOverlapBoundaries()._origin); 
-
+		
 		// 2. update walk distance
 		walkedDist += agent.getTimeSpentForagingTile();
 		walkedDist += best.distance(n);
@@ -520,15 +504,13 @@ void	ForageAction::doWalkForRewardEstimation( GujaratAgent& agent, const Engine:
 		int prevValue = r.getValue(n - agent.getWorld()->getOverlapBoundaries()._origin); 
 		r.setValue( n - agent.getWorld()->getOverlapBoundaries()._origin, prevValue - amtCollected );
 
-		//w++;
 	}
 	
-	//std::cout << "res " << collected << " loops " << loops << " wd " << walkedDist << " dH " << distHome << " mD " << maxDist << " foraging dist: " << agent.getTimeSpentForagingTile() << " fm " << agent.getPopulationSize() << std::endl;
-	//std::cout << "LOOP " << collected << "," << loops << "," << walkedDist << "," << distHome << "," << maxDist << std::endl;
 	
-	// update l'LRraster??? and LRsectors???
+	// Is it needed to update utility in LRraster and LRsectors?
 	// One action per timestep -> Next time I need LRraster and LRsectors they will be updated by
 	// nextstep method in world -> do not update LRraster, LRsectors
+	
 }
 
 
@@ -555,9 +537,12 @@ void	ForageAction::doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, 
 	Engine::Point2D<int> HRNearest;
 	
 	
-	//*? TODO eLRResources??? this is omniscience? should be _hgMind->resourceRaster
-	
-	selectBestNearestLRCell( agent, LRn, gw, agent.getWorld()->getDynamicRaster(eLRResources)
+	//* why not eLRResources??? it is about the omniscience feature
+	// HGMind must be taken into account
+	// change agent.getWorld()->getDynamicRaster(eLRResources)
+	// by
+	// agent.getLRResourcesRaster()
+	selectBestNearestLRCell( agent, LRn, gw, agent.getLRResourcesRaster()
 	, (int)(agent.getAvailableTime() / agent.getForageTimeCost())
 	, bestScore, LRBest );
 	
@@ -587,7 +572,6 @@ void	ForageAction::doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, 
 			, wasInsideLR
 			, bestScore
 			, best );		
-		//bestScore = r.getValue(best - agent.getWorld()->getOverlapBoundaries()._origin); 
 
 		// 2. update walk distance
 		walkedDist += agent.getTimeSpentForagingTile();
@@ -602,12 +586,10 @@ void	ForageAction::doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, 
 		// 4. update cell resources & amount collected
 		int prevValue = r.getValue(n - agent.getWorld()->getOverlapBoundaries()._origin); 
 		r.setValue( n - agent.getWorld()->getOverlapBoundaries()._origin, prevValue - amtCollected );
-
-		//w++;
+		
 	}
 	
-	
-	// Is it needed to update l'LRraster??? and LRsectors???
+	// Is it needed to update utility in LRraster and LRsectors?
 	// One action per timestep -> Next time I need LRraster and LRsectors they will be updated by
 	// nextstep method in world -> do not update LRraster, LRsectors
 }
@@ -667,16 +649,14 @@ void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>
 		
 	}while ( ( walkedDist + distHome ) < maxDist && (bestScore > 0));
 	
-	//TODO
-	// update l'LRraster??? done a few lines below with setValueLR
-	// update LRSectors??? (utility attribute) 
-	
+	// Is it needed to update utility in LRraster and LRsectors?
+	// One action per timestep -> Next time I need LRraster and LRsectors they will be updated by
+	// nextstep method in world -> do not update LRraster, LRsectors
 }
 
 
  void ForageAction::executeMDP( const GujaratAgent& agent, const HunterGathererMDPState& s, HunterGathererMDPState& sp ) const
-{
-	
+{	
 	assert(_LRForageArea->cells().size() >0);
 	
 	double  maxDist= agent.computeMaxForagingDistance(_useFullPopulation);
@@ -686,7 +666,6 @@ void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>
 	Engine::Point2D<int> nearest = LRlocation;
 	
 	assert(_LRForageArea->cells().size() > 0);
-	
 	
 	int collected = 0;
 
