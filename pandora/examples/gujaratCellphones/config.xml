@@ -2,19 +2,19 @@
 <config> 
 	<!-- simulation config -->
 	<output resultsFile="./data/phones.h5" logsDir="./logs"/>
-	<numSteps value="500" serializeResolution="1"/>
+	<numSteps value="250" serializeResolution="1"/>
 	<environment>
-		<landscape width="20" height="20" averageResources="500"/>
-		<climate daysDrySeason="20" meanRain="468.0" stddev="103.4"/>
+		<landscape width="20" height="20" averageResources="20"/>
         <!--
-		<climate daysDrySeason="20" meanRain="468.0" stddev="0.001"/>
+		<climate daysDrySeason="10" meanRain="468.0" stddev="103.4"/>
         -->
+		<climate daysDrySeason="50" meanRain="468.0" stddev="103.4"/>
 	</environment>
 	<population>
-		<villages num="1" agentsPerVillage="1"/>
-		<animals numPerHerder="20" resourcesPerDay="5"/>
+		<villages num="1" agentsPerVillage="10"/>
+		<animals numPerHerder="5" resourcesPerDay="1"/>
 	</population>
-	<mdp horizon="20" width="500" explorationBonus="0"/>
+	<mdp horizon="4" width="100" explorationBonus="0"/>
 	<knowledgeTransmission>
 		<!-- if fixed value = -1 a random value will be defined for each village -->
 		<inVillage active="yes" fixedValue="100"/>		

@@ -5,15 +5,13 @@
 namespace GujaratCellphones
 {
 
-HerderState::HerderState(const Engine::Point2D<int> & position, const Engine::Point2D<int> & villagePosition,  int resources, const Engine::Raster & knowledgeMap, const Engine::Raster & resourcesMap, int resourcesToEat, int timeStep) : _timeStep(timeStep), _position(position), _villagePosition(villagePosition), _resources(resources), _starvationDays(0.0f), _knowledgeMap(knowledgeMap), _resourcesMap(resourcesMap), _hashKey(0), _resourcesToEat(resourcesToEat), _isCopy(false)
+HerderState::HerderState(const Engine::Point2D<int> & position, const Engine::Raster & knowledgeMap, const Engine::Raster & resourcesMap, int resourcesToEat) : _position(position), _knowledgeMap(knowledgeMap), _resourcesMap(resourcesMap), _hashKey(0), _resourcesToEat(resourcesToEat), _isCopy(false)
 {
-//	std::cout << "creating state by params: " << _rasterResources.getSize() << " original: " << resourcesRaster.getSize() << std::endl;
 	computeHash();
 }
 
-HerderState::HerderState::HerderState( const HerderState & state ) : _timeStep(state._timeStep), _position(state._position), _villagePosition(state._villagePosition), _resources(state._resources), _starvationDays(state._starvationDays), _knowledgeMap(state._knowledgeMap), _resourcesMap(state._resourcesMap), _hashKey(0), _resourcesToEat(state._resourcesToEat), _isCopy(true)
+HerderState::HerderState::HerderState( const HerderState & state ) : _position(state._position), _knowledgeMap(state._knowledgeMap), _resourcesMap(state._resourcesMap), _hashKey(0), _resourcesToEat(state._resourcesToEat), _isCopy(true)
 {
-//	std::cout << "creating state by copy with size: " << _rasterResources.getSize() << " from: " << state._rasterResources.getSize() << std::endl;
 	for (int i=0; i<state.getNumAvailableActions(); i++)
 	{
 		addAction(state.getAvailableAction(i).copy());
@@ -42,16 +40,12 @@ unsigned int HerderState::hash() const
 
 bool HerderState::operator==( const HerderState & state ) const
 {
-	return (_timeStep == state._timeStep) && (_resourcesMap==state._resourcesMap) &&  (_knowledgeMap==state._knowledgeMap) && (_starvationDays==state._starvationDays) && (_position==state._position) && (_villagePosition==state._villagePosition) && (_resources==state._resources) && (_resourcesToEat==state._resourcesToEat);
+	return (_resourcesMap==state._resourcesMap) &&  (_knowledgeMap==state._knowledgeMap) && (_position==state._position) && (_resourcesToEat==state._resourcesToEat);
 }
 
 const HerderState & HerderState::operator=(const HerderState & state )
 {
-	_timeStep = state._timeStep;
 	_position = state._position;
-	_villagePosition = state._villagePosition;
-	_resources = state._resources;
-	_starvationDays = state._starvationDays;
 	_resourcesMap = state._resourcesMap;
 	_knowledgeMap = state._knowledgeMap;
 	_resourcesToEat = state._resourcesToEat;
@@ -73,16 +67,6 @@ const HerderState & HerderState::operator=(const HerderState & state )
 	return *this;
 }
 
-void HerderState::increaseTimeStep()
-{
-	_timeStep--;
-}
-
-int HerderState::getTimeStep() const
-{
-	return _timeStep;
-}
-
 int HerderState::getNumAvailableActions() const
 {
 	return _availableActions.size();
@@ -98,12 +82,6 @@ const MoveAction & HerderState::getAvailableAction(Problem::action_t index) cons
 	return *_availableActions.at(index);
 }
 
-void HerderState::eat()
-{
-	_starvationDays += (1.0f - float(_resources)/float(_resourcesToEat));
-	_resources = 0;
-}
-
 void HerderState::computeHash()
 {
 	if(_hashKey)
@@ -112,13 +90,8 @@ void HerderState::computeHash()
 	}
 	_hashKey = new Engine::HashKey();
 	int foo = hash();
-	_hashKey->add(_timeStep);
 	_hashKey->add(_position._x);
 	_hashKey->add(_position._y);
-	_hashKey->add(_villagePosition._x);
-	_hashKey->add(_villagePosition._y);
-	_hashKey->add(_resources);
-	_hashKey->add(_starvationDays);
 	_hashKey->add(_resourcesToEat);
 	
 	for ( Engine::IncrementalRaster::ChangeIterator it = _resourcesMap.firstChange(); it != _resourcesMap.endOfChanges(); it++ )
@@ -143,29 +116,9 @@ const Engine::Point2D<int> & HerderState::getPosition() const
 	return _position;
 }
 
-const Engine::Point2D<int> & HerderState::getVillagePosition() const
-{
-	return _villagePosition;
-}
-	
 void HerderState::setPosition( const Engine::Point2D<int> & position )
 {
 	_position = position;
-}
-
-int HerderState::getResources() const
-{
-	return _resources;
-}
-
-int HerderState::getResourcesToEat() const
-{
-	return _resourcesToEat;
-}
-
-void HerderState::setResources( int resources )
-{
-	_resources = resources;
 }
 
 Engine::IncrementalRaster & HerderState::getResourcesMap()
@@ -189,19 +142,14 @@ void HerderState::randomizeActions()
 	std::random_shuffle(_availableActions.begin(), _availableActions.end());
 }
 
-float HerderState::getStarvationDays() const
-{
-	return _starvationDays;
-}
-
 std::ostream & operator<<( std::ostream & stream, HerderState & state )
 {
-	return stream << " State - position: " << state._position << " resources: " << state._resources << " starvation: " << state._starvationDays << " time step: " << state._timeStep << " num. available actions " << state.getNumAvailableActions();
+	return stream << " State - position: " << state._position << " num. available actions " << state.getNumAvailableActions();
 }
 
 std::ostream & operator<<( std::ostream & stream, const HerderState & state )
 {
-	return stream << " State - position: " << state._position << " resources: " << state._resources << " starvation: " << state._starvationDays << " time step: " << state._timeStep << " num. available actions " << state.getNumAvailableActions();
+	return stream << " State - position: " << state._position << " num. available actions " << state.getNumAvailableActions();
 }
 
 void HerderState::clearActions()

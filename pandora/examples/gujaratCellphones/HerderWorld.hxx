@@ -20,7 +20,6 @@ enum Rasters
 	// quality of soil, between 0 and 10 (being 5 the standard)
 	eSoilQuality,
 	eResources,
-	eResourcesFraction
 };
 
 class Herder;

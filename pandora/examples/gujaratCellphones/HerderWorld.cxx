@@ -87,11 +87,7 @@ void HerderWorld::createRasters()
 		int value = (cellIncrease*index._y);
 		getDynamicRaster(eSoilQuality).setMaxValue(index, value);
 	}
-	updateRasterToMaxValues(eSoilQuality);	
-	
-	// we need to keep track of resource fractions
-	registerDynamicRaster("resourcesFraction", false, eResourcesFraction);
-	getDynamicRaster(eResourcesFraction).setInitValues(0, 100, 0);
+	updateRasterToMaxValues(eSoilQuality);
 }
 
 void HerderWorld::recomputeYearlyBiomass()

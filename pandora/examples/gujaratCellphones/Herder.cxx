@@ -217,20 +217,37 @@ void Herder::selectActions()
 void Herder::updateState()
 {
     HerderWorld & world = (HerderWorld &)*_world;
-	if(world.getCurrentStep()==0)
-	{
-		return;
-	}
-
+    const HerderWorldConfig & config = world.getConfig();
     // in village activities
 	if(world.daysUntilWetSeason()==0)
 	{	
-    	const HerderWorldConfig & config = world.getConfig();
-		
+        int percentage = 100*(int)_starvationDays/config._daysDrySeason;
+        std::cout << this << " starvation: " << _starvationDays << " of: " << config._daysDrySeason << " precentage: " <<percentage <<" old herd: " << _herdSize;
+        int newHerdSize = 0;
+        for(int i=0; i<_herdSize; i++)
+        {
+            int value = Engine::GeneralState::statistics().getUniformDistValue(0, 100);
+            if(value>=percentage)
+            {
+                newHerdSize++;
+            }
+        }
         // animals death by starvation
-		int newHerdSize = (int)(float)(_herdSize) * (1.0f-(_starvationDays/(float)config._daysDrySeason));
-		// 10% reproduction
-		_herdSize = (int)((float)newHerdSize*1.1f);
+		//int newHerdSize = (int)(float)(_herdSize) * (1.0f-(_starvationDays/(float)config._daysDrySeason));
+
+        std::cout << " new herd: " << newHerdSize;
+        _herdSize = newHerdSize;
+		// 20% reproduction
+        for(int i=0; i<newHerdSize; i++)
+        {
+            int value = Engine::GeneralState::statistics().getUniformDistValue(0, 9);
+            if(value<2)
+            {
+                _herdSize++;
+            }
+
+        }
+        std::cout << " after breeding: " << _herdSize << std::endl;
         // if no herd, die
 		if(_herdSize==0)
 		{
@@ -255,17 +272,14 @@ void Herder::updateState()
 	}
 
     // out of village activities
-    /*
 	if(config._outVillageTransmission)
 	{
 		outVillageKnowledgeTransmission();
 	}
-    */
 	if(_resources<getNeededResources())
 	{
 		_starvationDays += 1.0f - float(_resources)/float(getNeededResources());
 	}
-	_resources = 0;
 }
 
 void Herder::registerAttributes()
@@ -273,6 +287,7 @@ void Herder::registerAttributes()
 	registerIntAttribute("starvation x100");
 	registerIntAttribute("herd size");
 	registerIntAttribute("needed resources");
+	registerIntAttribute("collected");
 	registerIntAttribute("village");
 }
 
@@ -281,6 +296,7 @@ void Herder::serialize()
 	serializeAttribute("starvation x100", (int)(_starvationDays*100.0f));
 	serializeAttribute("herd size", _herdSize);
 	serializeAttribute("needed resources", getNeededResources());
+	serializeAttribute("collected", _resources);
 	serializeAttribute("village", _village->getIndex());
 }
 

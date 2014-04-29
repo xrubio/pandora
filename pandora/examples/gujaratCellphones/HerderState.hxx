@@ -16,7 +16,7 @@ class MoveAction;
 class HerderState
 {
 public:
-	HerderState(const Engine::Point2D<int> & position, const Engine::Point2D<int> & villagePosition, int resources, const Engine::Raster& knowledgeMap, const Engine::Raster& resourcesMap, int resourcesToEat, int timeStep);
+	HerderState(const Engine::Point2D<int> & position, const Engine::Raster& knowledgeMap, const Engine::Raster& resourcesMap, int resourcesToEat );
 	HerderState( const HerderState & state);
 	virtual ~HerderState();
 
@@ -25,8 +25,6 @@ public:
 	const HerderState & operator=(const HerderState & state );
 	bool operator==( const HerderState & state ) const;
 	
-	void increaseTimeStep();
-	int getTimeStep() const;
 	int getNumAvailableActions() const;
 	const Engine::Point2D<int> & getPosition() const;
 	const Engine::Point2D<int> & getVillagePosition() const;
@@ -34,13 +32,8 @@ public:
 
 	void addAction( MoveAction * action );
 	const MoveAction & getAvailableAction(Problem::action_t index) const;
-	void eat();
 	void computeHash();
 
-	int getResources() const;
-	int getResourcesToEat() const;
-	void setResources( int value );
-	float getStarvationDays() const;
 //	const Engine::IncrementalRaster & getRasterResources() const;
 //	Engine::IncrementalRaster & getRasterResources();
 	const Engine::IncrementalRaster & getKnowledgeMap() const;
@@ -50,12 +43,8 @@ public:
 	void randomizeActions();
 	void clearActions();
 private:
-	// time step where the state is created
-	int _timeStep;
 	Engine::Point2D<int> _position;
 	Engine::Point2D<int> _villagePosition;
-	int _resources;
-	float _starvationDays;
 
 	Engine::IncrementalRaster _resourcesMap;
 	Engine::IncrementalRaster _knowledgeMap;

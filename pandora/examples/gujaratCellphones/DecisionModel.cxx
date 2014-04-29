@@ -34,7 +34,7 @@ void DecisionModel::reset( Herder & agent, int daysUntilWetSeason, int horizon)
 		_initial = 0;
 	}
 	_agent= &agent;
-	_initial = new HerderState(agent.getPosition(), agent.getVillage().getPosition(), agent.getResources(), agent.getWorld()->getDynamicRaster(agent.getKnowledgeMap()), agent.getWorld()->getDynamicRaster(agent.getResourcesMap()), agent.getNeededResources(), _daysUntilWetSeason);
+	_initial = new HerderState(agent.getPosition(), agent.getWorld()->getDynamicRaster(agent.getKnowledgeMap()), agent.getWorld()->getDynamicRaster(agent.getResourcesMap()), agent.getNeededResources());
 	makeActionsForState(*_initial);
 }
 
@@ -50,17 +50,7 @@ const HerderState & DecisionModel::init() const
 
 bool DecisionModel::terminal( const HerderState & state ) const
 {
-	int currentHorizon = std::min(_horizon, (int)_daysUntilWetSeason);
-	// end of dry season
-	if(state.getTimeStep()==0)
-	{
-		return true;
-	}
-	if(state.getTimeStep()<(_daysUntilWetSeason-currentHorizon))
-	{
-		return true;
-	}
-	return false;
+    return false;
 }
 	
 bool DecisionModel::dead_end( const HerderState & state ) const
@@ -75,30 +65,8 @@ bool DecisionModel::applicable( const HerderState & state, action_t action) cons
 
 float DecisionModel::cost( const HerderState & state, action_t action ) const
 {
-	// last day and next move is not into village, maximum cost
-	if(state.getTimeStep()==1)
-	{
-		return 0.0f;
-	}
-	float cost = 0.0f;
 	float resourcesToCollect = state.getResourcesMap().getValue(state.getAvailableAction(action).getNewPosition());
-	float neededResources = state.getResourcesToEat();
-	if(resourcesToCollect<neededResources)
-	{
-		cost += (neededResources-resourcesToCollect)/neededResources;
-	}
-
-	int maxDist = state.getResourcesMap().getSize()._width;
-	if(state.getTimeStep()<maxDist)
-	{
-		float firstDistance = state.getPosition().distance(state.getVillagePosition());
-		float secondDistance = state.getAvailableAction(action).getNewPosition().distance(state.getVillagePosition());
-		if(secondDistance>=firstDistance)
-		{
-			cost += (maxDist-state.getTimeStep());
-		}
-	}
-
+    float cost =  0.0f - resourcesToCollect;
 	return cost;
 }
 
@@ -115,15 +83,12 @@ void DecisionModel::next( const HerderState & state, action_t index, OutcomeVect
 
 void DecisionModel::applyFrameEffects( const HerderState & state,  HerderState & stateNext ) const
 {
-	stateNext.eat();
-	stateNext.increaseTimeStep();
 }
 
 void DecisionModel::makeActionsForState( HerderState & state ) const
 {
 	state.clearActions();
 	assert(state.getNumAvailableActions()==0);
-	//is it necessary?
 	for(int i=state.getPosition()._x-1; i<=state.getPosition()._x+1; i++)
 	{
 		for(int j=state.getPosition()._y-1; j<=state.getPosition()._y+1; j++)
@@ -137,14 +102,8 @@ void DecisionModel::makeActionsForState( HerderState & state ) const
 			state.addAction(newAction);
 		}
 	}
-	state.randomizeActions();
-
-	for(int i=0; i<state.getNumAvailableActions(); i++)
-	{
-		const MoveAction & action = state.getAvailableAction(i);
-
-	}
 	assert(state.getNumAvailableActions()>0);
+	state.randomizeActions();
 }
 
 } // namespace GujaratCellphones
