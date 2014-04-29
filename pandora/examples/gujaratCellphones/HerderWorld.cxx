@@ -80,11 +80,11 @@ void HerderWorld::createRasters()
 	registerDynamicRaster("soil quality", true, eSoilQuality);
 	getDynamicRaster(eSoilQuality).setInitValues(0, 10, 0);
 
-    float cellIncrease = 10.0f/float(getBoundaries()._size._height);
+//    float cellIncrease = 10.0f/float(getBoundaries()._size._height);
 
     for(auto index : getBoundaries())
     {
-		int value = (cellIncrease*index._y);
+		int value = Engine::GeneralState::statistics().getUniformDistValue(0, 10);
 		getDynamicRaster(eSoilQuality).setMaxValue(index, value);
 	}
 	updateRasterToMaxValues(eSoilQuality);

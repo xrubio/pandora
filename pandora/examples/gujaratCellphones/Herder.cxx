@@ -233,8 +233,6 @@ void Herder::updateState()
             }
         }
         // animals death by starvation
-		//int newHerdSize = (int)(float)(_herdSize) * (1.0f-(_starvationDays/(float)config._daysDrySeason));
-
         std::cout << " new herd: " << newHerdSize;
         _herdSize = newHerdSize;
 		// 20% reproduction

@@ -4,14 +4,14 @@
 	<output resultsFile="./data/phones.h5" logsDir="./logs"/>
 	<numSteps value="250" serializeResolution="1"/>
 	<environment>
-		<landscape width="20" height="20" averageResources="20"/>
+		<landscape width="20" height="20" averageResources="5"/>
         <!--
 		<climate daysDrySeason="10" meanRain="468.0" stddev="103.4"/>
         -->
 		<climate daysDrySeason="50" meanRain="468.0" stddev="103.4"/>
 	</environment>
 	<population>
-		<villages num="1" agentsPerVillage="10"/>
+		<villages num="1" agentsPerVillage="1"/>
 		<animals numPerHerder="5" resourcesPerDay="1"/>
 	</population>
 	<mdp horizon="4" width="100" explorationBonus="0"/>
