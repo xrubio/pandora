@@ -26,7 +26,6 @@ public:
 	
 	virtual Sector * getVisitedSector() = 0;
 	
-	virtual bool equal(MDPAction* a, const GujaratAgent & gua) = 0;
 	
 	friend class GujaratAgent;
 	

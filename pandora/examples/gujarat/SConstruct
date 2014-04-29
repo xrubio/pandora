@@ -19,25 +19,9 @@ import generateMpi
 release = ARGUMENTS.get('release', 1)
 mareNostrum = ARGUMENTS.get('mn', 0)
 extremeDebug = ARGUMENTS.get('edebug', 0)
+gprof = ARGUMENTS.get('prof',0)
 useMpi = ARGUMENTS.get('mpi', 1)
 
-walkArg = ARGUMENTS.get('walk', 'tv')
-
-walkFlagsTable={
-	'c'   : 'CLASSICWALK'
-	,'lrc' : 'LRCLASSICWALK'
-	,'lrv' : 'LRVICINITYWALK'
-	,'v'   : 'VICINITYWALK'
-	,'tv'  : 'TRENDVICINITYWALK'
-	}
-
-walkProgramTable={
-	'c'   : 'gujarat_c'
-	,'lrc' : 'gujarat_lrc'
-	,'lrv' : 'gujarat_lrv'
-	,'v'   : 'gujarat_v'
-	,'tv'  : 'gujarat_tv'
-	}
 
 treeHeurEstim = ARGUMENTS.get('treeHeur','')
 treeHeurFlagsTable = {
@@ -52,14 +36,7 @@ if(treeHeurEstim!=''):
 	print "heurFlag :"+heurFlag
 
 
-
-
-
-nameProgram = [walkProgramTable[walkArg]]
-
-walkFlag = '-D ' + walkFlagsTable[walkArg]
-
-print "WALK IS : " + walkFlag + "\n"
+nameProgram = 'gujarat'
 
 ## Enable/Disable MDPState Space reduction
 reduccArg = ARGUMENTS.get('rdc','1')
@@ -80,7 +57,6 @@ generateMPICodeBuilder = Builder(action=generateMpi.execute)
 env.Append( BUILDERS = {'GenerateMPICode' : generateMPICodeBuilder})
 
 
-
 linkFlags = Split('-fopenmp')
 libs = Split('tinyxml pthread grass_gis grass_datetime')
 if int(release) == 0:
@@ -88,6 +64,10 @@ if int(release) == 0:
 	if int(extremeDebug)==1:
 		env['CCFLAGS'] += ['-DPANDORAEDEBUG']
 	libs += ['pandorad']
+	if int(gprof)==1:
+                env['CCFLAGS'] += ['-pg']
+		
+	
 else:
 	env['CCFLAGS'] = Split('-O3 -DTIXML_USE_STL -fopenmp')
 	libs += ['pandora']
@@ -96,8 +76,6 @@ if int(useMpi)==1:
 	env['CCFLAGS'] += ['-DPANDORAMPI']
 
 env['CCFLAGS'] += ['-std=c++0x']
-
-env['CCFLAGS'] += [walkFlag]
 
 env['CCFLAGS'] += [reduccFlag]
 

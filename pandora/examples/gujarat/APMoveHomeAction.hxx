@@ -29,7 +29,6 @@ public:
 
 	static void	generatePossibleActions( GujaratAgent& agent, std::vector< APMoveHomeAction* >& actions );
 	
-	bool equal(MDPAction * a,const GujaratAgent & gua) { return dynamic_cast<APMoveHomeAction*>(a) && _newHomeLoc == ((APMoveHomeAction*)a)->_newHomeLoc;}
 };
 	
 } // namespace Gujarat

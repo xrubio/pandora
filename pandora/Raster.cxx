@@ -53,7 +53,7 @@ void Raster::resize( const Point2D<int> & size )
 
 void Raster::updateRasterIncrement()
 {
-	for(int i=0; i<_values.size(); i++)
+	for(unsigned int i=0; i<_values.size(); i++)
 	{
 		for(int j=0; j<_values[i].size(); j++)
 		{

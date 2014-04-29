@@ -34,7 +34,6 @@ protected:
 	
 	Sector * getVisitedSector() { return 0; };
 	
-	bool equal(MDPAction * a, const GujaratAgent & gua) { return dynamic_cast<DoNothingAction*>(a);}	
 };
 
 

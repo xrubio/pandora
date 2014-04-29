@@ -118,7 +118,7 @@ MDPAction* HunterGathererDecisionTreeController::shouldForageWithWalkEstimation(
 	int i = 0;
 	while(i<10)
 	{
-		f->doTrendVicinityWalkForRewardEstimation( agent
+		f->doWalkForRewardEstimation( agent
 							, agent.getPosition()
 							, maxDist
 							, agent.getWorld()->getDynamicRaster(eResources)

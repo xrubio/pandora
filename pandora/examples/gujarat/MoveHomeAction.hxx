@@ -64,29 +64,6 @@ public:
 	Engine::Point2D<int> getNewHomeLocLR() const { return _newHomeLocLR; }
 	
 	
-#ifdef REDUCC	
-	bool equal(MDPAction * a, const GujaratAgent & gua) { return 		
-							dynamic_cast<MoveHomeAction*>(a) 
-							//&& _newHomeLoc == ((MoveHomeAction*)a)->_newHomeLoc
-							&& _newHomeLocLR == ((MoveHomeAction*)a)->_newHomeLocLR 
-							&& ((MDPAction*)_forageAction)->equal(
-									(MDPAction*)((MoveHomeAction*)a)->_forageAction
-									,gua
-								); }
-#endif
-	
-	
-#ifndef REDUCC		
-	bool equal(MDPAction * a, const GujaratAgent & gua) { return 		
-							dynamic_cast<MoveHomeAction*>(a) 
-							&& _newHomeLoc == ((MoveHomeAction*)a)->_newHomeLoc
-							&& ((MDPAction*)_forageAction)->equal(
-									(MDPAction*)((MoveHomeAction*)a)->_forageAction
-									,gua
-								); }
-#endif
-	
-	
 };
 	
 

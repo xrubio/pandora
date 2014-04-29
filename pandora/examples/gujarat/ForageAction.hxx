@@ -35,27 +35,6 @@ class ForageAction : public MDPAction
 
 							 
 	
-	void selectBestWalk( const GujaratAgent& agent
-			,const Engine::Point2D<int>& n
-			,const Engine::Raster& r
-			,int maxDistAgentWalk
-			,std::vector< Engine::Point2D<int>* > & walk );
-
-	void selectBestNearestHRCell( GujaratAgent& agent
-				,const Engine::Point2D<int>& n
-				,const Engine::Raster& r
-				,int& bestScore
-				,Engine::Point2D<int>& best ) const;
-
-
-	void selectBestNearestHRCellInLRCell_ScanFrame( const GujaratWorld * gw
-					, GujaratAgent&  agent
-					, const Engine::Point2D<int>& LRn
-					, const Engine::Point2D<int>& HRNearest
-					, Engine::Raster& HRRes
-					, int & bestScoreHR
-					, Engine::Point2D<int>& bestHR );
-
 	
 	void selectBestNearestLRCell( const GujaratAgent& agent
 					,const Engine::Point2D<int>& n
@@ -74,15 +53,6 @@ class ForageAction : public MDPAction
 				, bool & wasInsideLR
 				, int & bestScoreHR
 				, Engine::Point2D<int>& bestHR );
-
-	
-	void selectBestNearestHRCellInSector_ScanFrame(const GujaratWorld * gw
-				, GujaratAgent&  agent
-				, const Engine::Point2D<int>& HRBegin
-				, Engine::Raster& HRRes	
-				, int & bestScoreHR
-				, Engine::Point2D<int>& bestHR );
-
 					
 	
 	void selectBestNearestHRCellInLRCell_ScanAllLRCell( const GujaratWorld * gw
@@ -97,18 +67,10 @@ class ForageAction : public MDPAction
 	void doWalk( const GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected ) const;
 	void doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected );
 
-	void doClassicalWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected );
-
-	//void doLRClassicWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected );
-
-	void doLRVicinityWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected );
-
-	void doVicinityWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected );	
 	
-	void doTrendVicinityWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected );	
 
 public:	
-	void doTrendVicinityWalkForRewardEstimation( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected );	
+	void doWalkForRewardEstimation( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected );	
 	
 
 	ForageAction( Sector* HRLoc, Sector* LRLoc, bool ownsPointer = false );
@@ -152,44 +114,6 @@ public:
 
 	Sector * getVisitedSector() { return _LRForageArea; }
 	
-	//******************
-	//** Add-ons for doWalk efficiency
-	
-	struct distance_from_home : public std::binary_function<Engine::Point2D<int>*,Engine::Point2D<int>*,bool>
-	{
-		Engine::Point2D<int> _homeCell;
-		
-		inline bool operator() (const Engine::Point2D<int> * p1, const Engine::Point2D<int> * p2) 
-		{
-			return ( _homeCell.distanceSQ(*p1) < _homeCell.distanceSQ(*p2) );
-			//return ( r.getValue( struct1 ) < r.getValue( struct2 ));
-		}
-	};
-	
-
-	struct less_than : public std::binary_function<Engine::Point2D<int>*,Engine::Point2D<int>*,bool>
-	{		
-		const Engine::Raster * _workingRaster;
-		GujaratWorld * _workingWorld;
-	
-		//add inline keyword
-		inline bool operator() (const Engine::Point2D<int> * p1, const Engine::Point2D<int> * p2) 
-		{
-			return ( _workingWorld->getValueGW(*_workingRaster, *p1 ) 
-			< _workingWorld->getValueGW(*_workingRaster, *p2 ));
-			/*return ( _workingWorld->World::getValue(eResources, p1 ) 
-			< _workingWorld->World::getValue(eResources, p2 ));*/
-		}
-	};
-	
-	//Gujarat::GujaratWorld::getValue(Engine::Raster&, const Engine::Point2D<int>&)
-	
-	//int Engine::World::getValue(const int&, const Engine::Point2D<int>&) const
-	
-	//**********************
-	//** ownership of sector structures int the MDP tree
-		
-	bool equal(MDPAction * a, const GujaratAgent & gua);
 	
 	
 };

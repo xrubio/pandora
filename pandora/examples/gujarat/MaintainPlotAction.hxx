@@ -23,7 +23,6 @@ public:
 	void execute( Engine::Agent & agent );
 	int getTimeNeeded() const;
 	
-	bool equal(MDPAction * a, const GujaratAgent & gua) { return dynamic_cast<MaintainPlotAction*>(a);}
 	
 };
 	

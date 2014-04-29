@@ -115,12 +115,8 @@ public:
 		
 	~HunterGathererMDPState();
 
-	//void		initializeSuccessor( HunterGathererMDPState& s, const std::vector< bool > ownership ) const;
-
 	
 	bool equalActions(MDPAction *a, MDPAction *b) const;
-
-	bool EqListMatching(const std::vector<Gujarat::MDPAction*> &v, const std::vector<Gujarat::MDPAction*> &w) const;	
 	
 	bool equalIncRastersWithReduct(const Engine::IncrementalRaster  & other)const;
 
