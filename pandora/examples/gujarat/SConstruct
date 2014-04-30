@@ -13,7 +13,7 @@ srcFiles = Split("main.cxx GujaratWorld.cxx GujaratConfig.cxx Climate.cxx Gujara
 				  " HunterGathererMDPConfig.cxx HunterGathererMDPState.cxx HunterGathererMDPModel.cxx "
 				  " DoNothingAction.cxx AgentController.cxx HunterGathererProgrammedController.cxx HunterGathererDecisionTreeController.cxx "
 				  " HunterGathererMDPController.cxx GujaratDemographics.cxx OriginalDemographics.cxx CaloricRequirementsTable.cxx GujaratState.cxx "
-				  " HGMind.cxx HGOmniMindMap.cxx HGPartialMindMap.cxx HGMindFactory.cxx ")
+				  " HGMind.cxx HGOmniMindMap.cxx HGPartialMindMap.cxx HGMindFactory.cxx HunterGathererRandomMDPPolicyController.cxx ")
 
 
 release = ARGUMENTS.get('release', 1)
