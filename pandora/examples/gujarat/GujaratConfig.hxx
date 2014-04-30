@@ -125,7 +125,7 @@ public:
 	
 	int getUCTSeed() { return _uctSeed; }
 	
-	float getAlphaDecTree() { return _alphaDecTree; }
+	float getAlphaDecTree() { return 0.5; }
 	
 	friend class HunterGatherer;
 	friend class HunterGathererPartialMap;
