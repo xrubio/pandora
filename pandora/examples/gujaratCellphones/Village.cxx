@@ -6,7 +6,7 @@
 namespace GujaratCellphones
 {
 
-Village::Village(const std::string & id, int index) : Agent(id), _inVillageTransmission(0), _outVillageTransmission(0), _index(index)
+Village::Village(const std::string & id, int index) : Agent(id), _inVillageTransmission(0), _outVillageTransmission(0), _index(index), _agentKey(0)
 													  
 {
 }
@@ -128,7 +128,7 @@ void Village::fission( Herder & original )
 	const HerderWorldConfig & config = world.getConfig();
 
 	std::ostringstream ossH;
-	ossH << "Herder_"<<_herders.size()<<"_vil" << _index;
+	ossH << "Herder_"<<getNewKey()<<"_vil" << _index;
 	int numAnimals = original.getHerdSize()/2;
 	
 	Herder * newHerder = new Herder(ossH.str(), numAnimals, config._resourcesNeededPerAnimal, *this);
@@ -138,7 +138,13 @@ void Village::fission( Herder & original )
 	newHerder->createKnowledge();
 	newHerder->shareKnowledge(original);
 	original.setHerdSize(original.getHerdSize()-numAnimals);
-}
 
 }
+
+long int Village::getNewKey()
+{
+	return _agentKey++;
+}
+
+} // namespace GujaratCellphones
 

@@ -20,11 +20,27 @@ void HerderWorldConfig::extractParticularAttribs(TiXmlElement * root)
 	retrieveAttributeMandatory(child, "width", _size._width);
 	retrieveAttributeMandatory(child, "height", _size._height);
 	retrieveAttributeMandatory(child, "averageResources", _averageResources);
+    std::string distribution;
+	retrieveAttributeMandatory(child, "distribution", distribution);
+    if(distribution=="distance")
+    {
+        _randomDistribution = eDistance;
+    }
+    else if(distribution=="increase")
+    {
+        _randomDistribution = eIncrease;
+    }
+    else
+    {
+        _randomDistribution = eRandom;
+    }
 
 	child = element->FirstChildElement("climate");
 	retrieveAttributeMandatory(child, "daysDrySeason", _daysDrySeason);
 	retrieveAttributeMandatory(child, "meanRain", _rainHistoricalDistribMean);
 	retrieveAttributeMandatory(child, "stddev", _rainHistoricalDistribStdDev);
+
+
 
 	//population
 	element = root->FirstChildElement("population");

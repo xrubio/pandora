@@ -16,7 +16,7 @@ class Village : public Engine::Agent
 	int _inVillageTransmission; // MpiBasicAttribute 
 	int _outVillageTransmission;  // MpiBasicAttribute 
 	int _index; // MpiBasicAttribute
-
+	long int _agentKey;
 public:
 	Village(const std::string & id, int inedx);
 	virtual ~Village();
@@ -36,6 +36,7 @@ public:
 
 	void registerAttributes();
 	void serialize();
+	long int getNewKey();
 
 	int getIndex() const;
 	void fission( Herder & original );

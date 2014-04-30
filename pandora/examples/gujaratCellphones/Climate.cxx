@@ -3,13 +3,14 @@
 
 namespace GujaratCellphones {
 
-Climate::Climate(const HerderWorldConfig & config ) : _currentRain(0.0f)
+Climate::Climate(const HerderWorldConfig & config )
 {
 	float mean = config._rainHistoricalDistribMean;
 	float stddev = config._rainHistoricalDistribStdDev;
 
 	_alphaRain = (mean*mean)/(stddev*stddev);
 	_betaRain = mean/(stddev*stddev);
+    _currentRain = mean;
 }
 
 Climate::~Climate() {

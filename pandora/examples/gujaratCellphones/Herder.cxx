@@ -90,8 +90,9 @@ void Herder::updateKnowledge()
 		_world->getDynamicRaster(eResources).updateCurrentMinMaxValues();
 		int minValue =  _world->getDynamicRaster(eResources).getCurrentMinValue();
 		int maxValue =  _world->getDynamicRaster(eResources).getCurrentMaxValue();
-		// tentative value = 1/3
-		int averageValue = maxValue/3;
+		int averageValue = (maxValue-minValue)/2;
+		// tentative value = 0.5 of mean
+        averageValue /= 2;
 
         for(auto index: _world->getBoundaries())
         {
@@ -216,6 +217,11 @@ void Herder::selectActions()
 
 void Herder::updateState()
 {
+    if(!_exists || _world->getCurrentStep()==0)
+    {
+        return;
+    }
+
     HerderWorld & world = (HerderWorld &)*_world;
     const HerderWorldConfig & config = world.getConfig();
     // in village activities

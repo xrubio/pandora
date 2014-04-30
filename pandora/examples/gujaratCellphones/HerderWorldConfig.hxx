@@ -7,9 +7,17 @@
 namespace GujaratCellphones
 {
 
+enum ResourceDistribution
+{
+    eRandom = 0,
+    eIncrease = 1,
+    eDistance = 2
+};
+
 class HerderWorldConfig : public Engine::Config
 {
 	//environment
+    ResourceDistribution _randomDistribution;
 	Engine::Size<int> _size;
 	int _averageResources;
 	int _daysDrySeason;

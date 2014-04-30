@@ -62,7 +62,7 @@ void HerderWorld::createAgents()
 		for(int j=0; j< _config._numAgentsPerVillage; j++)
 		{
 			std::ostringstream ossH;
-			ossH << "Herder_"<<j<<"_vil" << i;
+			ossH << "Herder_"<<newVillage->getNewKey()<<"_vil" << i;
 			Herder * newHerder = new Herder(ossH.str(), _config._animalsPerHerder, _config._resourcesNeededPerAnimal, *newVillage);
 			newHerder->configureMDP(_config._horizon, _config._width, _config._explorationBonus);			
 
@@ -80,14 +80,33 @@ void HerderWorld::createRasters()
 	registerDynamicRaster("soil quality", true, eSoilQuality);
 	getDynamicRaster(eSoilQuality).setInitValues(0, 10, 0);
 
-//    float cellIncrease = 10.0f/float(getBoundaries()._size._height);
 
+    int totalValue = 0;
+    float cellIncrease = 10.0f/float(getBoundaries()._size._height);
     for(auto index : getBoundaries())
     {
-		int value = Engine::GeneralState::statistics().getUniformDistValue(0, 10);
+        int value = 0;
+        if(_config._randomDistribution == eIncrease)
+        {
+            value = (cellIncrease*index._y);
+        }
+        else if(_config._randomDistribution == eDistance)
+        {
+            Engine::Point2D<int> center(getBoundaries()._size._width/2, getBoundaries()._size._height/2);
+            // half is a random value + half is based on distance
+		    value = Engine::GeneralState::statistics().getUniformDistValue(0, 5);
+            value += cellIncrease*(center.distance(index))/2.0f;
+        }
+        else
+        {
+		    value = Engine::GeneralState::statistics().getUniformDistValue(0, 10);
+        }
+        totalValue += value;
 		getDynamicRaster(eSoilQuality).setMaxValue(index, value);
 	}
+    std::cout << "total value: " << totalValue << std::endl;
 	updateRasterToMaxValues(eSoilQuality);
+    recomputeYearlyBiomass();
 }
 
 void HerderWorld::recomputeYearlyBiomass()

@@ -2,17 +2,18 @@
 <config> 
 	<!-- simulation config -->
 	<output resultsFile="./data/phones.h5" logsDir="./logs"/>
-	<numSteps value="250" serializeResolution="1"/>
+	<numSteps value="5000" serializeResolution="500"/>
 	<environment>
-		<landscape width="20" height="20" averageResources="5"/>
+        <!-- distribution can be "increase" (following y), "random" or "distance" -->
+		<landscape width="20" height="20" averageResources="20" distribution="increase"/>
         <!--
 		<climate daysDrySeason="10" meanRain="468.0" stddev="103.4"/>
         -->
 		<climate daysDrySeason="50" meanRain="468.0" stddev="103.4"/>
 	</environment>
 	<population>
-		<villages num="1" agentsPerVillage="1"/>
-		<animals numPerHerder="5" resourcesPerDay="1"/>
+		<villages num="1" agentsPerVillage="5"/>
+		<animals numPerHerder="20" resourcesPerDay="1"/>
 	</population>
 	<mdp horizon="4" width="100" explorationBonus="0"/>
 	<knowledgeTransmission>
