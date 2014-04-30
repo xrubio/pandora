@@ -46,8 +46,10 @@ public:
 			, omp_lock_t * mapLock
 			, const std::vector<MDPAction *>&  actionList);
 	
+	//! Copy constructor
 	HunterGathererMDPState( const HunterGathererMDPState& s );
 	
+	//! Pseudo-copy constructor: uses some information from previous states.
 	HunterGathererMDPState( const HunterGathererMDPState& s
 							, const Engine::Point2D<int> loc
 							, std::vector< Sector* > * HRActionSectors
@@ -60,26 +62,8 @@ public:
 	~HunterGathererMDPState();
 
 	
-	bool equalActions(MDPAction *a, MDPAction *b) const;
-	
 	bool equalIncRastersWithReduct(const Engine::IncrementalRaster  & other)const;
 
-	
-	static int reductionResourcesToCategory(long r)
-	{
-		/*
-			r = #calories or #resources.
-			r/2000 specifies aprox needs per HG per day
-		 */		
-		r = r/2000;
-		if (r < 2) return 0;
-		if (r < 9) return 1;
-		if (r < 21) return 2;
-		if (r < 40) return 3;
-		return 4;		
-		
-		//return GujaratAgent::reductionResourcesToCategory(r);
-	}		
 	
 	unsigned	hash() const;
 	bool		operator==( const HunterGathererMDPState& s ) const;
@@ -106,7 +90,7 @@ public:
 	float getDaysStarving() const { return (float)_daysStarving/1000.0f; }
 
 	const Engine::Point2D<int>& getLocation() const { return _mapLocation; }
-	void setLocation( Engine::Point2D<int> newLoc ) { _mapLocation = newLoc; }
+	void setLocation(const Engine::Point2D<int>& newLoc ) { _mapLocation = newLoc; }
 	
 	Engine::IncrementalRaster& getResourcesRaster() { return _resources; }
 	const Engine::IncrementalRaster& getResourcesRaster() const { return _resources; }
@@ -133,11 +117,10 @@ public:
 	
 
 	
-public:
+protected:
 	HunterGatherer * _agentRef;
 	HunterGathererMDPConfig	* _config;
 	
-protected:	
 	std::vector< Sector* > * _HRActionSectors;// High Resolution
 	std::vector< Sector* > * _LRActionSectors;// Low Resolution
 	std::vector< Engine::Point2D<int> > * _HRCellPool;
@@ -174,6 +157,8 @@ protected:
 	int			_maxResources;
 	int			_resourcesDivider;
 	int 		_daysStarving;
+	
+	void clearAvailableActions();
 };
 
 
