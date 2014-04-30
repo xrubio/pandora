@@ -10,11 +10,8 @@
 #include <engine/problem.h>
 
 #include <map>
-//#include <unordered_map>
 #include <omp.h>
 #include <sstream>
-
-//#include <boost/thread/mutex.hpp>
 
 #include "Sector.hxx"
 
@@ -30,8 +27,6 @@
 namespace Gujarat
 {
 
-//class HunterGatherer;
-	
 class HunterGathererMDPState
 {
 	std::map<long unsigned int,long> * _objectUseCounter;
@@ -47,13 +42,6 @@ class HunterGathererMDPState
 	
 	
 public:
-	int _numAvailableActionsWhenBorn;
-	int _creator;
-	//*? remove vector of constructors id
-	std::vector<int> _constructors;
-	unsigned long _dni;
-	int _info;
-	std::string _actionName;
 	HunterGatherer * _agentRef;
 	HunterGathererMDPConfig	* _config;
 	
@@ -80,12 +68,6 @@ protected:
 	*/
 	
 public:
-	// Constructors, I don't want this to be ever invoked
-	//explicit HunterGathererMDPState();	
-	
-	//HunterGathererMDPState( HunterGathererMDPState& s, bool ownership[] );
-	
-	// The real one
 	HunterGathererMDPState(	HunterGatherer * agentRef
 			, HunterGathererMDPConfig * config
 			, const Engine::Point2D<int> loc
@@ -145,48 +127,23 @@ public:
 	unsigned	hash() const;
 	bool		operator==( const HunterGathererMDPState& s ) const;
 	bool		operator!=( const HunterGathererMDPState& s ) const;
-	bool		operator<( const HunterGathererMDPState& s ) const;
+	
 	const HunterGathererMDPState&	operator=(const HunterGathererMDPState& s );	
 	
-	void		print( unsigned long x ) const;
 	void		print( std::ostream& os ) const;
 
 	void		increaseTimeIndex() { _timeIndex++; }
 	unsigned	getTimeIndex() const { return _timeIndex; }
 	int		getOnHandResources() const { return _onHandResources; }
-	void addResources( int amt )
-	{
-		_onHandResources += amt;
-		/*
-		if(_onHandResources > _resourcesDivider*_maxResources)
-		{
-			_onHandResources = _resourcesDivider*_maxResources;
-		}
-		*/
-		/*
-		_onHandResources = _onHandResources + (amt / _resourcesDivider); 
-		if ( _onHandResources > _maxResources )
-			_onHandResources = _maxResources;
-			*/
-	}
+	void addResources( int amt ) { _onHandResources += amt; }
 
 	void consume() 
 	{ 
-		if( _onHandResources < _resourcesDivider )
-		{
+		if( _onHandResources < _resourcesDivider ) {
 			_daysStarving += 1000.0f*(1.0f-((float)_onHandResources/(float)_resourcesDivider));
 			//std::cout << "consume of this: " << this << " with days starving: " << _daysStarving << std::endl;
-			//_onHandResources -= _resourcesDivider;
-			//_daysStarving=0;
 		}
 		_onHandResources = 0;
-		/*
-		else
-		{
-			_onHandResources = 0;
-			_daysStarving++;
-		}
-		*/
 	}
 	
 	float getDaysStarving() const
@@ -195,28 +152,20 @@ public:
 		return (float)_daysStarving/1000.0f;
 	}
 
-	//void					spoilage( float v ) { _onHandResources = (float)_onHandResources * v; }
 	void setLocation( Engine::Point2D<int> newLoc ) { _mapLocation = newLoc; 
 		
 		std::stringstream logName;
 		logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
-	
-		//log_INFO(logName.str(),"XXXX setLocation:" << _dni << "->" << newLoc);
 		
 	}
 	const Engine::Point2D<int>& getLocation() const { return _mapLocation; }
 	Engine::IncrementalRaster& getResourcesRaster() { return _resources; }
 	const Engine::IncrementalRaster& getResourcesRaster() const { return _resources; }
 
-	MDPAction* availableActions( Problem::action_t actIndex ) 
-		{ return _availableActions.at(actIndex); }
-	const MDPAction* availableActions( Problem::action_t actIndex ) const 
-		{ return _availableActions.at(actIndex); }
+	MDPAction* availableActions( Problem::action_t actIndex )  { return _availableActions.at(actIndex); }
+	const MDPAction* availableActions( Problem::action_t actIndex ) const  { return _availableActions.at(actIndex); }
 
-	unsigned numAvailableActions() const { return _numAvailableActionsWhenBorn; }
-
-	unsigned numAvailableActionsWhenBorn() const { return _numAvailableActionsWhenBorn; }
-
+	unsigned numAvailableActions() const { return _availableActions.size(); }
 	
 	void	computeHash();
 	
@@ -226,14 +175,6 @@ public:
 	std::vector< Engine::Point2D<int> > * getLRCellPool() const { return _LRCellPool; }	
 	
 	const std::vector< bool > & getOwnerShip() const { return _ownItems;} 
-	
-	
-	int dniTicket () {
-		static int counter = 0;
-		return counter++;
-	}
-	
-	//static void resetTicket() { HunterGathererMDPState::counter = 0; }
 	
 	static void clearRefCounterMap();
 	
@@ -254,15 +195,12 @@ private:
 	int			_maxResources;
 	int			_resourcesDivider;
 	int 		_daysStarving;
-	bool		_isCopy;
 	
 	void addAction( MDPAction* a );
 
 };
 
 
-
-//std::vector<abc> xyz::myvector;
 
 inline std::ostream& operator<<( std::ostream& os, const HunterGathererMDPState& s )
 {

@@ -45,7 +45,6 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	
 	if ( _initial != NULL )
 	{
-		_initial->_info = -_initial->_info;
 		delete _initial;		
 	}
 
@@ -110,9 +109,6 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 						, actionList);
 	
 	_initial->computeHash();
-	
-	//*?
-	_initial->_creator = -_initial->_creator;
 }
 
 action_t HunterGathererMDPModel::number_actions( const HunterGathererMDPState& s ) const
@@ -325,16 +321,6 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 	makeActionsForState(s, center, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, actionList);
 	
 	HunterGathererMDPState sp(s, center, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, ownership, actionList);
-	
-	/*
-	std::cout << "NET: edge "		
-		<< s._dni 
-		<< " "		
-		<< sp._dni
-		<< " n"
-		<< std::endl;
-	*/
-	//assert(LRActionSectors->size() > 0);
 	
 	act->executeMDP( agentRef(), s, sp );
 	applyFrameEffects( s, sp );

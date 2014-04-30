@@ -170,8 +170,6 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 			Engine::Point2D<int> newHome;
 			gw->getHRFreeCell(newPosLR,newHome);
 
-//#ifdef REDUCC		
-		
 			Engine::Point2D<int> posLR;
 			gw->worldCell2LowResCell(agentPos,posLR);
 			int lowResHomeRange = ((GujaratConfig)((GujaratWorld*)agent.getWorld())->getConfig()).getLowResHomeRange();	
@@ -186,22 +184,6 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent & agent
 			actions.push_back( mha );
 			++sectorIdx;
 		}
-		
-//#endif		
-
-/*		
-#ifndef REDUCC
-		for( int i = 0; i < LRActionSectors.size(); i++)
-		{           
-			if(!LRActionSectors[i]->isEmpty())
-			{
-				MoveHomeAction * mha = new MoveHomeAction( newHome, HRActionSectors[i],LRActionSectors[i],false );
-				mha->_newHomeLocLR = newPos;
-				actions.push_back( mha );
-			}
-		}	
-#endif
-*/
 	}
     
     for(unsigned int i = 0; i < candidateCells.size(); i++)

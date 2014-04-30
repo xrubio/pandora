@@ -26,8 +26,6 @@ public:
 
 	void selectActions( GujaratAgent & agent, std::list<Engine::Action*> & actions );
 	
-	int getWidth(){return 0;}
-	
 private:
 	typedef Online::Policy::random_t< HunterGathererMDPState > RandomPolicy;
 	HunterGathererMDPModel _model;

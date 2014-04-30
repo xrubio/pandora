@@ -6,9 +6,6 @@
 #include <AgentController.hxx>
 #include <GujaratConfig.hxx>
 
-//*?
-#include <string>
-
 namespace Gujarat
 {
 
@@ -34,14 +31,11 @@ public:
 	int         getMaxBiomassSector( HunterGatherer & agent );
 //	unsigned        getDoNothingDaysCovered() const { return _DoNothingDaysCovered; } 
 
-//*?
-	int getWidth(){return 0;}
-	
 	int getSectorIdxMatchingDirection( const HunterGatherer & agent, const std::vector<Sector *> & sectors, const int direction  ) const;
 
 
 private:
-	unsigned                _DoNothingDaysCovered;
+	unsigned _DoNothingDaysCovered;
 };
 
 }

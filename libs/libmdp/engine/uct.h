@@ -29,11 +29,7 @@
 #include <vector>
 #include <math.h>
 
-#include <map>
-
 //#define DEBUG
-
-class Gujarat::HunterGathererMDPState;
 
 namespace Online {
 
@@ -67,25 +63,16 @@ template<typename T> struct map_functions_t {
     }
 };
 
-
-
 struct data_t {
     std::vector<float> values_;
     std::vector<int> counts_;
-    unsigned long mdpStatePoint_;
-    
-    data_t(const std::vector<float> &values
-	, const std::vector<int> &counts
-	, const unsigned long dni)
-      : values_(values), counts_(counts) 
-      { mdpStatePoint_=dni; }
-      
+    data_t(const std::vector<float> &values, const std::vector<int> &counts)
+      : values_(values), counts_(counts) { }
     data_t(const data_t &data)
-      : values_(data.values_), counts_(data.counts_)  
-      { mdpStatePoint_= data.mdpStatePoint_; }
+      : values_(data.values_), counts_(data.counts_) { }
 #if 0
     data_t(data_t &&data)
-      : values_(std::move(data.values_)), counts_(std::move(data.counts_)), mpdStateDni_(std::move(data.mpdStateDni_)) { }
+      : values_(std::move(data.values_)), counts_(std::move(data.counts_)) { }
 #endif
 };
 
@@ -184,16 +171,10 @@ template<typename T> class uct_t : public improvement_t<T> {
     }
 
     float search_tree(const T &s, unsigned depth) const {
-		try{		
-		
 #ifdef DEBUG
         std::cout << std::setw(2*depth) << "" << "search_tree(" << s << "):";
 #endif
-		
-		
-		//std::cout << "UCT:" << " search " << std::endl;
-		
-		
+
         if( (depth == horizon_) || policy_t<T>::problem().terminal(s) ) {
 #ifdef DEBUG
             std::cout << " end" << std::endl;
@@ -213,11 +194,7 @@ template<typename T> class uct_t : public improvement_t<T> {
         if( it == table_.end() ) {
             std::vector<float> values(1 + policy_t<T>::problem().number_actions(s), 0);
             std::vector<int> counts(1 + policy_t<T>::problem().number_actions(s), 0);
-	    
-	    //*? ucthack
-	    //std::cout << "UCT INSERT : " << (long)&s << "," << s.numAvailableActions() << std::endl;
-	    
-            table_.insert(std::make_pair(std::make_pair(depth, s), data_t(values, counts,(unsigned long)&s)));
+            table_.insert(std::make_pair(std::make_pair(depth, s), data_t(values, counts)));
             float value = evaluate(s, depth);
 #ifdef DEBUG
             std::cout << " insert in tree w/ value=" << value << std::endl;
@@ -225,69 +202,7 @@ template<typename T> class uct_t : public improvement_t<T> {
             return value;
         } else {
             // select action for this node and increase counts
-	int ucthack_s = it->second.counts_.size();
-	int ucthack_na = policy_t<T>::problem().number_actions(s)+1;
-	
-	//std::cout << "NET: edge " << s._dni << " " << it->first.second._dni << " f" << std::endl;
-	
-	//std::cout << "UCT:" << " found " << std::endl;
-	
-	
-	//*?ucthack
-	/*if (s._dni!=it->second.mdpStatePoint_)
-		std::cout << "DIFERENTS:" 
-		<< s._dni<<"!="<<it->second.mdpStatePoint_ << std::endl;
-	else
-		std::cout << "IGUALS:" 
-		<< s._dni<<"=="<<it->second.mdpStatePoint_ << std::endl;
-	*/
-	
-	//std::map<int,Gujarat::HunterGathererMDPState*> *hgstmap = s._diccioMDPState;
-	const Gujarat::HunterGathererMDPState * hgms =&s; 
-	
-	/*assert(hgstmap->count(it->second.mdpStatePoint_) > 0);
-	assert(hgstmap->count(it->second.mdpStatePoint_) == 1);
-	hgms = hgstmap->at(it->second.mdpStatePoint_);*/
-	
-	if(it->second.counts_.size() != policy_t<T>::problem().number_actions(s)+1)
-	{	
-		std::cout << "UCT COUNTS ASSERT : " 
-			<< s._dni
-			<< "=?"
-			<< it->second.mdpStatePoint_
-			<< ","  << s._creator
-			<< "," 	<< s._numAvailableActionsWhenBorn
-			<< "," 	<< s.numAvailableActions() 
-			<< ","	<< it->second.counts_.size()
-			<< "!="
-			<< policy_t<T>::problem().number_actions(s)+1
-			<< std::endl;
-		std::cout << s << std::endl;
-		std::cout << "------------------" << std::endl;
-		//std::cout << *it->second.mdpStatePoint_ << std::endl;
-		s.print(it->second.mdpStatePoint_);
-	}
-	
-	if( it->second.values_.size() != policy_t<T>::problem().number_actions(s)+1 )
-	{
-		std::cout << "UCT VALUES ASSERT : " 
-			<< s._dni
-			<< "=?"
-			<< it->second.mdpStatePoint_
-			<< ","  << s._creator
-			<< ","  << s._numAvailableActionsWhenBorn
-			<< "," 	<< s.numAvailableActions() 
-			<< ","	<< it->second.values_.size()
-			<< "!="
-			<< policy_t<T>::problem().number_actions(s)+1
-			<< std::endl;
-		std::cout << s << std::endl;
-		std::cout << "------------------" << std::endl;
-		//std::cout << *it->second.mdpStatePoint_ << std::endl;
-		s.print(it->second.mdpStatePoint_);
-	}
-	
-	assert( it->second.counts_.size() == policy_t<T>::problem().number_actions(s)+1 );
+	    assert( it->second.counts_.size() == policy_t<T>::problem().number_actions(s)+1 );
 	    assert( it->second.values_.size() == policy_t<T>::problem().number_actions(s)+1 );
             Problem::action_t a = select_action(s, it->second, depth, true, random_ties_);
             ++it->second.counts_[0];
@@ -315,11 +230,6 @@ template<typename T> class uct_t : public improvement_t<T> {
 	    it->second.values_.at(1+a) = old_value;
             return old_value;
         }
-	}catch(std::exception e)
-	{
-		std::cerr << "EXCEPTION AT UCT.H: float search_tree(const T &s, unsigned depth) const:"<< e.what() << std::endl;
-		assert(0);
-	}
     }
 
     Problem::action_t select_action(const T &state,
@@ -327,11 +237,6 @@ template<typename T> class uct_t : public improvement_t<T> {
                                     int depth,
                                     bool add_bonus,
                                     bool random_ties) const {
-										
-		Problem::action_t result;										
-		try{
-										
-										
         float log_ns = logf(data.counts_[0]);
         std::vector<Problem::action_t> best_actions;
         int nactions = policy_t<T>::problem().number_actions(state);
@@ -364,19 +269,7 @@ template<typename T> class uct_t : public improvement_t<T> {
             }
         }
         assert(!best_actions.empty());
-		
-		int x = best_actions.size();
-		result = best_actions[Random::uniform(x)];
-		
-		
-		}catch(std::exception e){
-			std::cerr << "EXCEPTION AT UCT.H: Problem::action_t select_action(const T &state, const data_t &data,int depth,bool add_bonus,bool random_ties) const {" << std::endl;
-		assert(0);
-		}
-		
-		
-		return result;
-		//return best_actions[Random::uniform(best_actions.size())];
+        return best_actions[Random::uniform(best_actions.size())];
     }
 
     Problem::action_t select_best_action(const T &state,
@@ -384,11 +277,6 @@ template<typename T> class uct_t : public improvement_t<T> {
                                     int depth,
                                     bool add_bonus,
                                     bool random_ties) const {
-		
-		Problem::action_t result;
-										
-		try{
-										
         float log_ns = logf(data.counts_[0]);
         std::vector<Problem::action_t> best_actions;
         int nactions = policy_t<T>::problem().number_actions(state);
@@ -421,28 +309,13 @@ template<typename T> class uct_t : public improvement_t<T> {
         }
 //	std::cout << "Best Action: " << best_actions.size() << " Cost: " << best_value << " Count: " << best_count <<  std::endl;
         assert(!best_actions.empty());
-		
-		int x = best_actions.size();
-		result = best_actions[Random::uniform(x)];		
-		
-		}catch(std::exception e){
-			std::cerr << "EXCEPTION AT UCT.H: Problem::action_t select_best_action(const T &state,const data_t &data,int depth,bool add_bonus,bool random_ties) const" << std::endl;
-			assert(0);
-		}
-		
-		return result;	
-		
-        //return best_actions[Random::uniform(best_actions.size())];
+        return best_actions[Random::uniform(best_actions.size())];
     }
 
 
     float evaluate(const T &s, unsigned depth) const {
-		try{
         return Evaluation::evaluation(improvement_t<T>::base_policy_,
                                       s, 1, horizon_ - depth);
-		}catch(std::exception e){
-			std::cerr << "EXCEPTION AT UCT.H : float evaluate(const T &s, unsigned depth) const" << std::endl;
-		}
     }
 };
 
@@ -464,4 +337,3 @@ inline const policy_t<T>* make_uct(const policy_t<T> &base_policy,
 #undef DEBUG
 
 #endif
-

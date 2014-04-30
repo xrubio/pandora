@@ -16,7 +16,7 @@
 #include <HunterGathererDecisionTreeController.hxx>
 #include <HunterGathererProgrammedController.hxx>
 #include <HunterGathererMDPController.hxx>
-//#include <HunterGathererRandomMDPPolicyController.hxx>
+#include <HunterGathererRandomMDPPolicyController.hxx>
 
 #include <math.h> 
 
@@ -306,7 +306,7 @@ void GujaratState::initializeSectorsMaskTrigonometricaly( int numSectors, int ho
 		}
 	}
 
-	
+/*	
 	std::cout << "SectorMask Homerange =" << homeRange << std::endl;		
 	for ( int x=-homeRange; x<=homeRange; x++ )
 	{
@@ -315,7 +315,7 @@ void GujaratState::initializeSectorsMaskTrigonometricaly( int numSectors, int ho
 			std::cout << 1+sm.at(x+homeRange).at(y+homeRange);		
 		}
 		std::cout << std::endl;		
-	}
+	}*/
 	
 }
 
