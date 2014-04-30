@@ -69,19 +69,7 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	std::vector< Engine::Point2D<int> > * LRCellPool = new std::vector< Engine::Point2D<int> >(0);
 	//&(_simAgent->getLRCellPoolNoConst());//new std::vector< Engine::Point2D<int> >(0);
 
-	
-	std::vector< bool > ownsItems(4);
-	ownsItems[0]=false;	
-	ownsItems[1]=false;
-	ownsItems[2]=false;	
-	ownsItems[3]=false;		
-		
 	// Build initial state from current state in the simulation
-	
-	omp_lock_t * mapLock = _simAgent->getMapLock();
-	//new omp_lock_t();
-	//omp_init_lock(mapLock);
-
 	std::vector<MDPAction *>  actionList;	
 
 	makeActionsForState(_simAgent->getLRResourcesRaster()      
@@ -92,20 +80,13 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 				, LRCellPool
 				, actionList);	
 	
-	_initial = new HunterGathererMDPState( _simAgent
+	_initial = new HunterGathererMDPState(
+						_simAgent
 						, &_config
-						, _simAgent->getPosition()
-						, _simAgent->getOnHandResources()
-						, _simAgent->getLRResourcesRaster() //*? incremental?
-						, _config.getHorizon()
-						, _simAgent->computeConsumedResources(1)
 						, HRActionSectors
 						, LRActionSectors 
 						, HRCellPool
 						, LRCellPool
-						, ownsItems
-						, _simAgent->getObjectUseCounter()
-						, mapLock
 						, actionList);
 	
 	_initial->computeHash();
@@ -149,20 +130,12 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 					action_t a, 
 					OutcomeVector& outcomes,int foo ) const
 {
-
-	std::stringstream logName;
-	logName << "infoshar";
-	
-	
 	const MDPAction* act = s.availableActions(a);
 	/*
 	 * Here, where I know whether "act" is ForageAction or MoveHomeAction,
 	 * according to these, what I pass to sp depends on it... copies,refs,
 	 * or new adhoc creation... etc...
 	 */
-	
-	std::vector<bool> ownership(4);
-	//TODO An action should know nothing about ownerships. Refactor the thing.
 	
 	std::vector< Sector* > * HRActionSectors;
 	std::vector< Sector* > * LRActionSectors;
@@ -174,27 +147,17 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 	HRCellPool = s.getHRCellPool();
 	LRCellPool = s.getLRCellPool();		
 	
-	ownership[0]=false;	
-	ownership[1]=false;
-	ownership[2]=false;	
-	ownership[3]=false;		
-	
-	std::vector<MDPAction *>  actionList;
-
 	Engine::Point2D<int> center;
-	if(dynamic_cast<const MoveHomeAction*>(act))
-	{
-		center = ((MoveHomeAction*)act)->getNewHomeLoc();
-	}
-	else
-	{
+	if( const MoveHomeAction* castedAction = dynamic_cast<const MoveHomeAction*>(act)) {
+		center = castedAction->getNewHomeLoc();
+	} else {
 		center = s.getLocation();
 	}
 	
-	
+	std::vector<MDPAction *>  actionList;
 	makeActionsForState(s, center,HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, actionList);
 	
-	//s.initializeSuccessor(sp,ownership);
+	std::vector<bool> ownership(4, false); //TODO An action should know nothing about ownerships. Refactor the thing.
 	HunterGathererMDPState sp(s, center,HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, ownership, actionList);
 	
 	act->executeMDP( agentRef(), s, sp );
@@ -317,7 +280,6 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		
 	
 	std::vector<MDPAction *>  actionList;
-
 	makeActionsForState(s, center, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, actionList);
 	
 	HunterGathererMDPState sp(s, center, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, ownership, actionList);

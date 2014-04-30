@@ -7,6 +7,37 @@
 namespace Gujarat
 {
 
+//! Main constructor
+HunterGathererMDPState::HunterGathererMDPState( 
+			HunterGatherer * agent
+			, HunterGathererMDPConfig * config
+			, std::vector< Sector* > * HRActionSectors
+			, std::vector< Sector* > * LRActionSectors
+			, std::vector< Engine::Point2D<int> > * HRCellPool
+			, std::vector< Engine::Point2D<int> > * LRCellPool
+			, const std::vector<MDPAction *>&  actionList)
+
+	: _timeIndex(0)
+	, _mapLocation( agent->getPosition() )
+	, _onHandResources( agent->getOnHandResources() )
+	, _resources( agent->getLRResourcesRaster() )
+	, _resourcesDivider( agent->computeConsumedResources(1) )
+	, _HRActionSectors( HRActionSectors )
+	, _LRActionSectors( LRActionSectors )	
+	, _HRCellPool( HRCellPool )
+	, _LRCellPool( LRCellPool )
+	, _ownItems( 4, false )
+	, _daysStarving( 0 )
+	, _objectUseCounter(agent->getObjectUseCounter())
+	, _mapLock(agent->getMapLock())
+	, _agentRef(agent)
+	,_config(config)
+	,_availableActions(actionList)
+{
+	computeHash();
+	registerKnowledgeStructuresAtCounterMap();
+}
+
 //! Copy constructor
 HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s )
 : _timeIndex( s._timeIndex )
@@ -14,39 +45,29 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 , _onHandResources( s._onHandResources )
 , _resources( s._resources )
 , _hashKey( s._hashKey )
-, _maxResources( s._maxResources)
 , _resourcesDivider( s._resourcesDivider )
 , _daysStarving( s._daysStarving )
 , _HRActionSectors(s._HRActionSectors)
 , _LRActionSectors(s._LRActionSectors)
 , _HRCellPool(s._HRCellPool)
 , _LRCellPool(s._LRCellPool)
+, _ownItems(s._ownItems)
 , _objectUseCounter(s._objectUseCounter)
 , _mapLock(s._mapLock)
 , _agentRef(s._agentRef)
 ,_config(s._config)
+,_availableActions(0)
 {
-	std::stringstream logName;
-	logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
-	
-	_ownItems.resize(s._ownItems.size());
-	for(unsigned int i = 0; i < _ownItems.size(); i++)
-	{
-		_ownItems[i] = s._ownItems[i];
-	}
-	
-	for ( unsigned k = 0; k < s._availableActions.size(); k++ )
-	{
+	for ( unsigned k = 0; k < s._availableActions.size(); k++ ) {
 		_availableActions.push_back( s._availableActions[k]->copy() ); // avoiding segm fault through copy
 	}
-	assert( s._availableActions.size() == _availableActions.size() );
 	
 	registerKnowledgeStructuresAtCounterMap();
 }
 
-
+//! Pseudo-copy constructor: uses some information from previous state.
 HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
-					, const Engine::Point2D<int> loc
+					, const Engine::Point2D<int>& loc
 					, std::vector< Sector* > * HRActionSectors
 					, std::vector< Sector* > * LRActionSectors
 					, std::vector< Engine::Point2D<int> > * HRCellPool
@@ -58,82 +79,22 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 , _onHandResources( s._onHandResources )
 , _resources( s._resources )
 , _hashKey( s._hashKey )
-, _maxResources( s._maxResources)
 , _resourcesDivider( s._resourcesDivider )
 , _daysStarving( s._daysStarving )
 , _HRActionSectors(HRActionSectors)
 , _LRActionSectors(LRActionSectors)
 , _HRCellPool(HRCellPool)
 , _LRCellPool(LRCellPool)
+, _ownItems(ownItems)
 , _objectUseCounter(s._objectUseCounter)
 , _mapLock(s._mapLock)
 , _agentRef(s._agentRef)
 , _config(s._config)
 , _availableActions(actionList)
 {
-	std::stringstream logName;
-	logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
-	
-	_ownItems.resize(ownItems.size());
-	for(int i = 0; i < ownItems.size(); i++) {
-		_ownItems[i] = ownItems[i];
-	}
-	
-	registerKnowledgeStructuresAtCounterMap();
-	
 	computeHash();
-}
-
-
-
-HunterGathererMDPState::HunterGathererMDPState( 
-			HunterGatherer * agentRef
-			, HunterGathererMDPConfig * config
-			, const Engine::Point2D<int> loc
-			, int initResources
-			, Engine::Raster& resourcesRaster
-			, int maxResources
-			, int divider 
-			, std::vector< Sector* > * HRActionSectors
-			, std::vector< Sector* > * LRActionSectors
-			, std::vector< Engine::Point2D<int> > * HRCellPool
-			, std::vector< Engine::Point2D<int> > * LRCellPool
-			, std::vector< bool > ownItems
-			, std::map<unsigned long,long> * objectUseCounter
-			, omp_lock_t * mapLock
-			, const std::vector<MDPAction *>&  actionList)
-
-	: _timeIndex(0)
-	, _mapLocation( loc )
-	, _onHandResources( initResources )
-	, _resources( resourcesRaster )
-	, _maxResources( maxResources )
-	, _resourcesDivider( divider )
-	, _HRActionSectors( HRActionSectors )
-	, _LRActionSectors( LRActionSectors )	
-	, _HRCellPool( HRCellPool )
-	, _LRCellPool( LRCellPool )
-	, _ownItems( ownItems )
-	, _daysStarving( 0 )
-	, _objectUseCounter(objectUseCounter)
-	, _mapLock(mapLock)
-	, _agentRef(agentRef)
-	,_config(config)
-	,_availableActions(actionList)
-{
-	std::stringstream logName;
-	logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
-
-	_ownItems.resize(ownItems.size());
-	for(unsigned int i = 0; i < ownItems.size(); i++)
-	{
-		_ownItems[i] = ownItems[i];
-	}
-	
-	computeHash();	
 	registerKnowledgeStructuresAtCounterMap();
 }
-
 
 
 const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGathererMDPState& s )
@@ -149,7 +110,6 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	_onHandResources = s._onHandResources;
 	_resources 		 = s._resources;
 	_hashKey 		 = s._hashKey;
-	_maxResources 	 = s._maxResources;
 	_resourcesDivider = s._resourcesDivider;
 	_daysStarving 	 = s._daysStarving;
 
@@ -218,8 +178,6 @@ void	HunterGathererMDPState::computeHash()
 		_hashKey.add( p._y );
 		_hashKey.add( _agentRef->reductionResourcesToCategory(_agentRef->convertBiomassToCalories(it->second)) );
 	}
-	
-	
 }
 
 unsigned HunterGathererMDPState::hash() const

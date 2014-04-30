@@ -30,28 +30,21 @@ namespace Gujarat
 class HunterGathererMDPState
 {
 public:
+	//! Main constructor
 	HunterGathererMDPState(	HunterGatherer * agentRef
 			, HunterGathererMDPConfig * config
-			, const Engine::Point2D<int> loc
-			, int initialOnHand
-			, Engine::Raster& resourcesRaster
-			, int maxResources
-			, int divider
 			, std::vector< Sector* > * HRActionSectors
 			, std::vector< Sector* > * LRActionSectors
 			, std::vector< Engine::Point2D<int> > * HRCellPool
 			, std::vector< Engine::Point2D<int> > * LRCellPool
-			, std::vector< bool > ownsItems
-			, std::map<unsigned long,long> * objectUseCounter
-			, omp_lock_t * mapLock
 			, const std::vector<MDPAction *>&  actionList);
 	
 	//! Copy constructor
 	HunterGathererMDPState( const HunterGathererMDPState& s );
 	
-	//! Pseudo-copy constructor: uses some information from previous states.
+	//! Pseudo-copy constructor: uses some information from previous state.
 	HunterGathererMDPState( const HunterGathererMDPState& s
-							, const Engine::Point2D<int> loc
+							, const Engine::Point2D<int>& loc
 							, std::vector< Sector* > * HRActionSectors
 							, std::vector< Sector* > * LRActionSectors
 							, std::vector< Engine::Point2D<int> > * HRCellPool
@@ -154,7 +147,6 @@ protected:
 	Engine::IncrementalRaster	_resources;
 	Engine::HashKey		_hashKey;
 	std::vector<MDPAction*> _availableActions;
-	int			_maxResources;
 	int			_resourcesDivider;
 	int 		_daysStarving;
 	
