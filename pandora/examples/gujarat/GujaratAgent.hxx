@@ -139,6 +139,9 @@ public:
 	// in particular, both parents will have ages between 15 and 50
 	// taking into account the minimum age of parents a set of children is generated following the rules of the system
 	void createInitialPopulation( int adulthoodAge );
+	
+	void createInitialPopulation();
+	
 	float getPercentageOfStarvingDays() const;
 	int getStarved() const {return _starved;}
 	
