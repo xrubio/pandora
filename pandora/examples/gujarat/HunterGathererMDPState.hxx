@@ -10,11 +10,8 @@
 #include <engine/problem.h>
 
 #include <map>
-//#include <unordered_map>
 #include <omp.h>
 #include <sstream>
-
-//#include <boost/thread/mutex.hpp>
 
 #include "Sector.hxx"
 
@@ -30,8 +27,6 @@
 namespace Gujarat
 {
 
-//class HunterGatherer;
-	
 class HunterGathererMDPState
 {
 	std::map<long unsigned int,long> * _objectUseCounter;
@@ -80,12 +75,6 @@ protected:
 	*/
 	
 public:
-	// Constructors, I don't want this to be ever invoked
-	//explicit HunterGathererMDPState();	
-	
-	//HunterGathererMDPState( HunterGathererMDPState& s, bool ownership[] );
-	
-	// The real one
 	HunterGathererMDPState(	HunterGatherer * agentRef
 			, HunterGathererMDPConfig * config
 			, const Engine::Point2D<int> loc
@@ -153,39 +142,15 @@ public:
 	void		increaseTimeIndex() { _timeIndex++; }
 	unsigned	getTimeIndex() const { return _timeIndex; }
 	int		getOnHandResources() const { return _onHandResources; }
-	void addResources( int amt )
-	{
-		_onHandResources += amt;
-		/*
-		if(_onHandResources > _resourcesDivider*_maxResources)
-		{
-			_onHandResources = _resourcesDivider*_maxResources;
-		}
-		*/
-		/*
-		_onHandResources = _onHandResources + (amt / _resourcesDivider); 
-		if ( _onHandResources > _maxResources )
-			_onHandResources = _maxResources;
-			*/
-	}
+	void addResources( int amt ) { _onHandResources += amt; }
 
 	void consume() 
 	{ 
-		if( _onHandResources < _resourcesDivider )
-		{
+		if( _onHandResources < _resourcesDivider ) {
 			_daysStarving += 1000.0f*(1.0f-((float)_onHandResources/(float)_resourcesDivider));
 			//std::cout << "consume of this: " << this << " with days starving: " << _daysStarving << std::endl;
-			//_onHandResources -= _resourcesDivider;
-			//_daysStarving=0;
 		}
 		_onHandResources = 0;
-		/*
-		else
-		{
-			_onHandResources = 0;
-			_daysStarving++;
-		}
-		*/
 	}
 	
 	float getDaysStarving() const
@@ -194,7 +159,6 @@ public:
 		return (float)_daysStarving/1000.0f;
 	}
 
-	//void					spoilage( float v ) { _onHandResources = (float)_onHandResources * v; }
 	void setLocation( Engine::Point2D<int> newLoc ) { _mapLocation = newLoc; 
 		
 		std::stringstream logName;
@@ -260,8 +224,6 @@ private:
 };
 
 
-
-//std::vector<abc> xyz::myvector;
 
 inline std::ostream& operator<<( std::ostream& os, const HunterGathererMDPState& s )
 {

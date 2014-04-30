@@ -1,23 +1,11 @@
 
-#include <HunterGathererMDPState.hxx>
-
-
-
 #include <Exceptions.hxx>
-
-//#include <mutex>
-
 #include <omp.h>
+
+#include <HunterGathererMDPState.hxx>
 
 namespace Gujarat
 {
-
-/*
-HunterGathererMDPState::HunterGathererMDPState()
-{
-	 throw Engine::Exception("Forbidden Constructor HunterGathererMDPState::HunterGathererMDPState() has been called\n");	
-}*/
-
 
 
 HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s )
@@ -39,7 +27,6 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 , _agentRef(s._agentRef)
 ,_config(s._config)
 ,_numAvailableActionsWhenBorn(s._availableActions.size())
-//,_availableActions(s._availableActions)
 {
 	std::stringstream logName;
 	logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
@@ -54,7 +41,6 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 	_ownItems.resize(s._ownItems.size());
 	for(unsigned int i = 0; i < _ownItems.size(); i++)
 	{
-		//_ownItems[i] = false;
 		_ownItems[i] = s._ownItems[i];
 	}
 	
@@ -65,29 +51,11 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 	_availableActions.clear();
 	for ( unsigned k = 0; k < s._availableActions.size(); k++ )
 	{
-		// avoiding segm fault through copy
-		addAction( s._availableActions[k]->copy() );
-		//addAction( s._availableActions[k] );
+		addAction( s._availableActions[k]->copy() ); // avoiding segm fault through copy
 	}
 	assert( s._availableActions.size() == _availableActions.size() );
 	
 	registerKnowledgeStructuresAtCounterMap();
-	
-	/*std::cout << "NET: edge "	
-		<< s._dni 
-		<< " "
-		<< _dni 
-		<< " a"
-		<< std::endl;
-	*/
-	//std::cout << "herencia1:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors"<< std::endl;
-	
-	
-	//log_INFO(logName.str(),"XXXX CREA 1:" << s._dni << "->" << _dni);
-	//log_INFO(logName.str(),"herencia1:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors");
-	
-	
-	assert(_mapLocation == s._mapLocation);
 }
 
 
@@ -136,23 +104,10 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 	
 	computeHash();
 	
-	/*std::cout << "NET: edge "	
-		<< s._dni 
-		<< " "
-		<< _dni 
-		<< " b"
-		<< std::endl;
-*/
-	//std::cout << "herencia2:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors"<< std::endl;
-
-	
-	//log_INFO(logName.str(),"XXXX CREA 2:" << s._dni << "->" << _dni);
 	_creator=2;
 	_constructors.push_back(_creator);
 
 	_info=2;
-	//log_INFO(logName.str(),"herencia2:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors");
-		
 }
 
 
@@ -213,13 +168,6 @@ HunterGathererMDPState::HunterGathererMDPState(
 	
 	computeHash();	
 	registerKnowledgeStructuresAtCounterMap();
-	
-	//std::cout << "herencia3:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors"<< std::endl;
-
-	
-	//log_INFO(logName.str(),"XXXX CREA 3:" << _dni);
-	//log_INFO(logName.str(),"herencia3:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors");
-	
 }
 
 
@@ -233,14 +181,6 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
 	
 	_dni=dniTicket ();
-	
-	/*std::cout << "NET: edge "	
-		<< s._dni 
-		<< " "
-		<< _dni 
-		<< " =)"
-		<< std::endl;
-	*/
 	
 	_creator=4;
 	_constructors.push_back(_creator);
@@ -260,9 +200,6 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	_objectUseCounter = s._objectUseCounter;
 	_mapLock = s._mapLock;
 	
-	
-//	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
-	
 	_HRActionSectors = s._HRActionSectors;
 	_LRActionSectors = s._LRActionSectors;
 	_HRCellPool = s._HRCellPool;
@@ -272,7 +209,6 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	_ownItems.resize(s._ownItems.size());
 	for(unsigned int i = 0; i < _ownItems.size(); i++)
 	{
-	//	_ownItems[i] = false;
 		_ownItems[i] = s._ownItems[i];
 	}
 	
@@ -294,13 +230,7 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	
 	_config = s._config;
 	
-	//std::cout << "herencia4:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors"<< std::endl;
-	
-	//log_INFO(logName.str(),"XXXX CREA 4:" << s._dni << "->" << _dni);	
-	//log_INFO(logName.str(), "herencia4:" << _dni << " at " <<  _mapLocation << " receives " << _LRActionSectors->size() << " sectors");	
-	
 	return *this;
-	
 }
 
 	
@@ -311,18 +241,6 @@ HunterGathererMDPState::~HunterGathererMDPState()
 	// look out: if 'this' is an _initial of a HGMDPModel && step==361 && _agentRef killed at 360, then the next line produces segm fault :
 	//logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
 	
-	
-	//std::cout << "destroying MDPState:" << _dni << std::endl;
-	
-	/*log_INFO(logName.str(),"DELETE "<< _dni 
-					<<" , CREATED WITH:" << _creator 
-					<< " , owns:" 	<< _ownItems[0]
-									<< _ownItems[1]
-									<< _ownItems[2]
-									<< _ownItems[3]);	
-	*/
-
-
 	for ( unsigned int k = 0; k < _availableActions.size(); k++ )
 	{
 		delete _availableActions[k];
@@ -330,7 +248,6 @@ HunterGathererMDPState::~HunterGathererMDPState()
 	
 	
 	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
-	
 }
 
 void	HunterGathererMDPState::addAction( MDPAction* a )
@@ -471,11 +388,7 @@ void	HunterGathererMDPState::print( std::ostream& os ) const
 
 
 void HunterGathererMDPState::registerKnowledgeStructuresAtCounterMap()
-	{		
-		//std::cout << "SIZE OF MAP " << _objectUseCounter->size() << std::endl;
-		
-		//static std::map<long,long> _objectUseCounter;
-
+{		
 		omp_set_lock(_mapLock);		
 		
 		if (_objectUseCounter->count((unsigned long)_mapLock) > 0)
@@ -509,8 +422,7 @@ void HunterGathererMDPState::registerKnowledgeStructuresAtCounterMap()
 	
 	
 		omp_unset_lock(_mapLock);
-	
-	}
+}
 	
 
 void HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructures()
