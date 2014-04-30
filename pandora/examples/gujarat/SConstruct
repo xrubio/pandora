@@ -36,16 +36,6 @@ if(treeHeurEstim!=''):
 	print "heurFlag :"+heurFlag
 
 
-## Enable/Disable MDPState Space reduction
-reduccArg = ARGUMENTS.get('rdc','1')
-if int(reduccArg)==1:
-	print "REDUCC ENABLED " + "\n"
-	reduccFlag = '-D ' + 'REDUCC'
-else:
-	reduccFlag = ''
-	print "REDUCC DISABLED " + "\n"
-
-
 if int(useMpi) == 1:
 	env = Environment(ENV=os.environ, CXX='mpicxx')
 else:
@@ -74,8 +64,6 @@ if int(useMpi)==1:
 	env['CCFLAGS'] += ['-DPANDORAMPI']
 
 env['CCFLAGS'] += ['-std=c++0x']
-
-env['CCFLAGS'] += [reduccFlag]
 
 env['CCFLAGS'] += [heurFlag]
 

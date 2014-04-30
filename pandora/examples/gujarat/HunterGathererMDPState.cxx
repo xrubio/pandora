@@ -229,20 +229,7 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	std::stringstream logName;
 	logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
 	
-	
-	
-	/*std::cout << "NET: edge "	
-		<< s._dni 
-		<< " "
-		<< _dni 
-		<< " (="
-		<< std::endl;
-	*/
-	
-//#ifdef REDUCC	
-	//return s;
-//#endif
-		
+
 	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
 	
 	_dni=dniTicket ();
@@ -355,7 +342,6 @@ void	HunterGathererMDPState::addAction( MDPAction* a )
 }
 
 
-#ifdef REDUCC
 void	HunterGathererMDPState::computeHash()
 {
 	_hashKey.add( _timeIndex );
@@ -383,31 +369,6 @@ void	HunterGathererMDPState::computeHash()
 	
 	
 }
-#endif
-
-
-#ifndef REDUCC
-void	HunterGathererMDPState::computeHash()
-{
-	_hashKey.add( _timeIndex );
-	_hashKey.add( _mapLocation._x );
-	_hashKey.add( _mapLocation._y );
-	_hashKey.add( _onHandResources );
-	_hashKey.add( _daysStarving );
-
-	for ( Engine::IncrementalRaster::ChangeIterator it = _resources.firstChange();
-		it != _resources.endOfChanges(); it++ )
-	{
-		const Engine::Point2D<int>& p = it->first;
-		_hashKey.add( p._x );
-		_hashKey.add( p._y );
-		_hashKey.add( it->second );
-	}
-	
-}
-#endif
-
-
 
 unsigned HunterGathererMDPState::hash() const
 {
@@ -475,18 +436,7 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 	return result;
 }
 
-
-bool	HunterGathererMDPState::operator!=( const HunterGathererMDPState& s ) const
-{
-	
-	return !(*this == s);
-	/*return ( _timeIndex != s._timeIndex ) 				OR
-			( _onHandResources != s._onHandResources ) 	OR
-			( _mapLocation != s._mapLocation ) 			OR
-			( _resources != s._resources ) 				OR
-			( _daysStarving != s._daysStarving );*/
-}
-
+bool	HunterGathererMDPState::operator!=( const HunterGathererMDPState& s ) const { return !(*this == s); }
 
 bool	HunterGathererMDPState::operator<( const HunterGathererMDPState& s ) const
 {		
