@@ -438,13 +438,6 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 
 bool	HunterGathererMDPState::operator!=( const HunterGathererMDPState& s ) const { return !(*this == s); }
 
-
-void	HunterGathererMDPState::print( unsigned long x ) const
-{
-	HunterGathererMDPState * p = (HunterGathererMDPState *)x;
-	std::cout << *p << std::endl;
-}
-
 void	HunterGathererMDPState::print( std::ostream& os ) const
 {
 	os << "<addr = " << this << ", ";

@@ -148,7 +148,6 @@ public:
 	
 	const HunterGathererMDPState&	operator=(const HunterGathererMDPState& s );	
 	
-	void		print( unsigned long x ) const;
 	void		print( std::ostream& os ) const;
 
 	void		increaseTimeIndex() { _timeIndex++; }
