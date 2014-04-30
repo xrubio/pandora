@@ -34,8 +34,6 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 	
 	_creator=1;
 	_constructors.push_back(_creator);
-
-	_info = 1;
 	
 	_ownItems.resize(s._ownItems.size());
 	for(unsigned int i = 0; i < _ownItems.size(); i++)
@@ -104,8 +102,6 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 	
 	_creator=2;
 	_constructors.push_back(_creator);
-
-	_info=2;
 }
 
 
@@ -155,8 +151,6 @@ HunterGathererMDPState::HunterGathererMDPState(
 	_creator=3;	
 	_constructors.push_back(_creator);
 
-	_info=3;
-
 	_ownItems.resize(ownItems.size());
 	for(unsigned int i = 0; i < ownItems.size(); i++)
 	{
@@ -181,8 +175,6 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	
 	_creator=4;
 	_constructors.push_back(_creator);
-
-	_info=4;
 	
 	_timeIndex 		 = s._timeIndex;
 	_mapLocation 	 = s._mapLocation;
@@ -377,7 +369,12 @@ void	HunterGathererMDPState::print( std::ostream& os ) const
 	}
 
 	os << "), ";
-	os << "A(s)=" << _availableActions.size() << std::endl;	
+	
+	os << "actions (total: " << _availableActions.size() << "):";
+  	for(unsigned i = 0; i < _availableActions.size(); ++i)
+  		os << ": " << _availableActions[i]->describe() <<" ";
+
+	os << std::endl;	
 }
 
 

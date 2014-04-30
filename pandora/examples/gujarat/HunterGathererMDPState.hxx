@@ -47,7 +47,6 @@ public:
 	//*? remove vector of constructors id
 	std::vector<int> _constructors;
 	unsigned long _dni;
-	int _info;
 	std::string _actionName;
 	HunterGatherer * _agentRef;
 	HunterGathererMDPConfig	* _config;
@@ -196,8 +195,6 @@ public:
 		return counter++;
 	}
 	
-	//static void resetTicket() { HunterGathererMDPState::counter = 0; }
-	
 	static void clearRefCounterMap();
 	
 	void registerKnowledgeStructuresAtCounterMap();
@@ -217,7 +214,6 @@ private:
 	int			_maxResources;
 	int			_resourcesDivider;
 	int 		_daysStarving;
-	bool		_isCopy;
 	
 	void addAction( MDPAction* a );
 

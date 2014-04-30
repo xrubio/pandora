@@ -45,7 +45,6 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	
 	if ( _initial != NULL )
 	{
-		_initial->_info = -_initial->_info;
 		delete _initial;		
 	}
 
