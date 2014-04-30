@@ -145,7 +145,7 @@ public:
 	unsigned	hash() const;
 	bool		operator==( const HunterGathererMDPState& s ) const;
 	bool		operator!=( const HunterGathererMDPState& s ) const;
-	bool		operator<( const HunterGathererMDPState& s ) const;
+	
 	const HunterGathererMDPState&	operator=(const HunterGathererMDPState& s );	
 	
 	void		print( unsigned long x ) const;

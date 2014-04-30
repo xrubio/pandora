@@ -438,37 +438,6 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 
 bool	HunterGathererMDPState::operator!=( const HunterGathererMDPState& s ) const { return !(*this == s); }
 
-bool	HunterGathererMDPState::operator<( const HunterGathererMDPState& s ) const
-{		
-	
-	int simplOnHandResources = _agentRef->reductionResourcesToCategory(_onHandResources);
-	int simple_s_onHandResources = _agentRef->reductionResourcesToCategory(s._onHandResources);	
-	
-	GujaratWorld * gw = (GujaratWorld*)_agentRef->getWorld();	
-	Engine::Point2D<int> mapLocationLR;
-	gw->worldCell2LowResCell(_mapLocation,mapLocationLR);
-	Engine::Point2D<int> sMapLocationLR;
-	gw->worldCell2LowResCell(s._mapLocation,sMapLocationLR);
-	
-	
-	
-	
-	std::cout << "evaluating between " << this << " and: " << &s << std::endl;
-	return  ( _timeIndex < s._timeIndex ) 
-			||
-			( ( _timeIndex == s._timeIndex ) && ( simplOnHandResources < simple_s_onHandResources ) ) 
-			||
-			( ( _timeIndex == s._timeIndex ) && ( simplOnHandResources == simple_s_onHandResources) && ( mapLocationLR < sMapLocationLR) ) 
-			||
-			( ( _timeIndex == s._timeIndex ) && ( simplOnHandResources == simple_s_onHandResources) && ( mapLocationLR == sMapLocationLR) && ( _resources < s._resources ) ) 
-			||
-			( ( _timeIndex == s._timeIndex ) && ( simplOnHandResources == simple_s_onHandResources) && ( mapLocationLR == sMapLocationLR) 
-			&& ( equalIncRastersWithReduct(s._resources) ) &&  ( _daysStarving < s._daysStarving )	);
-}
-
-
-
-
 
 void	HunterGathererMDPState::print( unsigned long x ) const
 {
