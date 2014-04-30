@@ -17,7 +17,6 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 , _maxResources( s._maxResources)
 , _resourcesDivider( s._resourcesDivider )
 , _daysStarving( s._daysStarving )
-, _isCopy(true)
 , _HRActionSectors(s._HRActionSectors)
 , _LRActionSectors(s._LRActionSectors)
 , _HRCellPool(s._HRCellPool)
@@ -75,7 +74,6 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 , _maxResources( s._maxResources)
 , _resourcesDivider( s._resourcesDivider )
 , _daysStarving( s._daysStarving )
-, _isCopy(true)
 , _HRActionSectors(HRActionSectors)
 , _LRActionSectors(LRActionSectors)
 , _HRCellPool(HRCellPool)
@@ -141,7 +139,6 @@ HunterGathererMDPState::HunterGathererMDPState(
 	, _LRCellPool( LRCellPool )
 	, _ownItems( ownItems )
 	, _daysStarving( 0 )
-	, _isCopy(false)
 	, _objectUseCounter(objectUseCounter)
 	, _mapLock(mapLock)
 	, _agentRef(agentRef)
@@ -195,7 +192,6 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	_maxResources 	 = s._maxResources;
 	_resourcesDivider = s._resourcesDivider;
 	_daysStarving 	 = s._daysStarving;
-	_isCopy 		 = true;	
 
 	_objectUseCounter = s._objectUseCounter;
 	_mapLock = s._mapLock;
@@ -381,8 +377,7 @@ void	HunterGathererMDPState::print( std::ostream& os ) const
 	}
 
 	os << "), ";
-	os << "A(s)=" << _availableActions.size() << ", ";
-	os << "copy?=" << ( _isCopy ? "yes" : "no" ) <<  ">" << std::endl;	
+	os << "A(s)=" << _availableActions.size() << std::endl;	
 }
 
 
