@@ -128,7 +128,7 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 	
 	retrieveAttributeMandatory( element, "adulthoodAge", _adulthoodAge );	
 	
-// 	retrieveAttributeMandatory( element, "alphaDecTree", _alphaDecTree );	
+ 	retrieveAttributeMandatory( element, "alphaDecTree", _alphaDecTree );	
 	
 	retrieveAttributeMandatory( element, "numSectors", _numSectors );
 
