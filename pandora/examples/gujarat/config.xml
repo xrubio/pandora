@@ -2,7 +2,7 @@
 <config>  
 	<!-- Global simulation parameters -->
 	<output resultsFile="data/gujarat.h5" logsDir="logs"/>
-	<numSteps value="10" serializeResolution="1"/>
+	<numSteps value="361" serializeResolution="1"/>
 	<!-- g to KJ -->
 	<massToEnergyRate value="20" />
 	<!-- 1 KCal = 4.184 KJ, Conversion Rate = 1/4.184 -->
@@ -31,25 +31,27 @@
 	<dem fileName="resources/1600/dem_1600.tiff" size="1600"/>
 	<duneMap fileName="resources/1600/dunes_1600_low.tiff" size="1600"/>
 	<!-- Climatic model parameters -->
-	<climateSeed value="35874"/>
-	<rainHistoricalDistribution mean="500.0" stdev="0.0001"/>
+	<climateSeed value="73554"/>
+	<rainHistoricalDistribution mean="2000.0" stdev="1.0"/>
 	<!-- Agents definition -->
 	<!-- overlap will be defined as homeRange + 1. It must be < 1/4 of world size -->
 	<!-- * Walking Speed Hour = # meters traversed per hour -->
 	<!-- * Available Forage Time = # hours a day the forage action takes -->
 	<!-- * forageTimeCost = how much time (in hours) does it cost the agent to exploit a tile resources -->
-	<!-- controllerType can be MDP, Random, RandomMDP or DecisionTree -->
+	<!-- controllerType can be MDP, Random or DecisionTree -->
 	<hunterGatherers
-		num="1" homeRange="50"
+		num="100" homeRange="50"
 		adulthoodAge="15"
 		numSectors="8"
-		lowResolution="160"
+		lowResolution="25"
 		walkingSpeedHour="3000"
 		forageTimeCost="0.5"
 		demographicsModel="original"
 		hunterGathererInformationCaducityTime="7"
-		controllerType="RandomMDP" 
+		controllerType="DecisionTree" 
 		mindType="omniscient"
+		applyNeighboursDepletion="true"
+		alphaDecTree="0.5"
 		shareInfo="no">
 		<!-- mindType:{omniscient,partial}-->
 		<!-- * width = number of trials before selecting an action, the higher the
@@ -63,12 +65,12 @@
 					nrForageActions="8"
 					nrMoveHomeActions="8"
 					doNothingIsAllowed="false"
-					horizon="3"
-					width="150"
+					horizon="6"
+					width="500"
 					explorationBonus ="10.0"
 					seed="1234"
 		/>
-		<initialPosition x="0" y="0" />
+		<initialPosition x="-1" y="0" />
 		<calories minValue="600" adultValue="2200" minAge="0" adultAge="15"/>
 		<availableForageTime minValue="0" adultValue="4.5" minAge="5" adultAge="15"/>
 	</hunterGatherers>
@@ -82,7 +84,7 @@
 	<storeRaster name="soils" value="yes" />
 	<storeRaster name="dem" value="no" />
 	<storeRaster name="moisture" value="no" />
-	<storeRaster name="resources" value="yes" />
+	<storeRaster name="resources" value="no" />
 	<storeRaster name="forageActivity" value="no" />
 	<storeRaster name="homeActivity" value="no" />
 	<storeRaster name="farmingActivity" value="no" />
