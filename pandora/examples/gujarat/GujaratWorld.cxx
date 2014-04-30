@@ -424,11 +424,11 @@ void GujaratWorld::getHRFreeCell(const Engine::Point2D<int> LRpos, Engine::Point
 	cornerRightDown._y = LRpos._y*C + C-1;
 
 	//*? use Engine::GeneralState::statistics().getUniformDistValue instead of rand
-	HRpos._x = cornerLeftUp._x + rand()%(cornerRightDown._x - cornerLeftUp._x+1);
-	HRpos._y = cornerLeftUp._y + rand()%(cornerRightDown._y - cornerLeftUp._y+1);
-	//*?HRpos._x =  Engine::GeneralState::statistics().getUniformDistValue(cornerLeftUp._x,cornerRightDown._x);
-	//*?HRpos._y = 
-	//*?Engine::GeneralState::statistics().getUniformDistValue(cornerLeftUp._y,cornerRightDown._y);
+	HRpos._x = cornerLeftUp._x + Engine::GeneralState::statistics().getUniformDistValue(0,cornerRightDown._x - cornerLeftUp._x);
+	//+ rand()%(cornerRightDown._x - cornerLeftUp._x+1);
+	HRpos._y = cornerLeftUp._y + Engine::GeneralState::statistics().getUniformDistValue(0,cornerRightDown._y - cornerLeftUp._y);
+	//+ rand()%(cornerRightDown._y - cornerLeftUp._y+1);
+	
 	//TODO checkPosition expensive??? cost : #agents
 	while( getValue(eSoils,HRpos) != DUNE || ! Engine::World::checkPosition(HRpos))
 	{
@@ -516,35 +516,11 @@ void GujaratWorld::updateSoilCondition()
 }
 
 
-//void GujaratWorld::updateResourcesFOO()
-//{
-	
-	/*
-	if(vFOO.size()==0)
-		{
-			vFOO.resize(_boundaries._size._x * _boundaries._size._y);
-		}
-
-	for(int i = 0; i < _boundaries._size._x * _boundaries._size._y; i++)
-	{
-		vFOO[i]=2000;
-	}
-	*/
-	
-//	for(int i = 0; i < _boundaries._size._x * _boundaries._size._y; i++)
-//	{
-//		_vFOO[i]=2000;
-//	}
-	
-//}
-
 void GujaratWorld::updateResources()
 {
 	std::stringstream logName;
 	logName << "updateResources_" << _simulation.getId();
 	log_DEBUG(logName.str(), getWallTime() << " initiating");
-
-	//unsigned long sumRes = 0;
 	
 	Seasons season = _climate.getSeason();
 	bool wetSeason = false;
@@ -556,31 +532,26 @@ void GujaratWorld::updateResources()
 	for( index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++ )		
 	{
 		for( index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++ )
-		{
-			//log_DEBUG(logName.str(), getWallTime() << " index: " << index << " with boundaries: " << _boundaries);
-			// 3. Increment or Decrement cell biomass depending on yearly biomass
-			//    figures and current timestep
+		{			
+			// Increment or Decrement cell biomass depending on yearly biomass
+			// figures and current timestep
 			int currentValue = getValue(eResources, index);
 			float currentFraction = (float)getValue(eResourcesFraction, index)/100.0f;
 			Soils cellSoil = (Soils)getValue(eSoils, index);
-			//log_DEBUG(logName.str(), getWallTime() << " index: " << index << " current: " << currentValue << " fraction: " << currentFraction << " cell soil: " << cellSoil);
+			
 			if(cellSoil!=WATER)
 			{
 				float newValue = std::max(0.0f, currentValue+currentFraction+getBiomassVariation(wetSeason, cellSoil, index));
 				currentValue = newValue;
-				float fraction = 100.0f*(newValue  - currentValue);
-				//log_DEBUG(logName.str(), getWallTime() << " newValue: " << currentValue << " fraction: " << fraction);
+				float fraction = 100.0f*(newValue  - currentValue);	
 				
 				setValue(eResources, index, currentValue);
-				setValue(eResourcesFraction, index, (int)fraction);
+				setValue(eResourcesFraction, index, (int)fraction);	
 				
-				//sumRes += currentValue;
 			}
 		}
 	}
-	log_DEBUG(logName.str(), getWallTime() << " end of updateResources");
-	
-	//std::cout << "sumres: " << sumRes << std::endl;
+	log_DEBUG(logName.str(), getWallTime() << " end of updateResources");	
 }
 
 void GujaratWorld::recomputeYearlyBiomass()
@@ -612,7 +583,6 @@ void GujaratWorld::recomputeYearlyBiomass()
 	_yearlyBiomass[DUNE] = areaOfCell*_config._duneBiomass * raininessFactor * _config._duneEfficiency;
 	_yearlyBiomass[INTERDUNE] = areaOfCell*_config._interduneBiomass * _config._interduneEfficiency * raininessFactor;
 	
-	//std::cout << std::setprecision(2) << std::fixed << "area of cell: " << areaOfCell << " interdune biomass: " << _config._interduneBiomass << " efficiency: " << _config._interduneEfficiency << " raininess factor: " << raininessFactor << " yearly biomass: " << _yearlyBiomass[INTERDUNE] << std::endl;
 	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " rain: " << _climate.getRain() << " with mean: " << _climate.getMeanAnnualRain());
 	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " yearly biomass of dune: " << _yearlyBiomass[DUNE] << " and interdune: " << _yearlyBiomass[INTERDUNE]);
 
@@ -641,40 +611,27 @@ void GujaratWorld::recomputeYearlyBiomass()
 	_dailyDrySeasonBiomassDecrease[WATER] = 0.0f;
 	_remainingBiomass[WATER] = 0.0f;
 	
-	//std::cout << "rem: " << _remainingBiomass[DUNE] << " " << _remainingBiomass[INTERDUNE] << " " << _remainingBiomass[WATER] << std::endl;
-	/*
-	std::cout << "increase: " << _dailyRainSeasonBiomassIncrease[DUNE] << " " 
-				<< _dailyRainSeasonBiomassIncrease[INTERDUNE] << " " 
-				<< _dailyRainSeasonBiomassIncrease[WATER] << std::endl;
-	
-	std::cout << "decrease: " << _dailyDrySeasonBiomassDecrease[DUNE] << " " 
-				<< _dailyDrySeasonBiomassDecrease[INTERDUNE] << " " 
-				<< _dailyDrySeasonBiomassDecrease[WATER] << std::endl;
-	*/
 }
 
 
 void GujaratWorld::updateResourcesLowResMap()
 {
 	fillLRRaster(eLRResources,0);
-	// eResources --> eLRResources
+	
 	LowResRasterCountsHighResRaster(eLRResources, eResources);
-	// eLRResources --> paintLRResources
-	//fillHRRasterWithLRRaster(eLRResources, paintLRResources);
 	// Dont you add the Fraction Raster of resources?? 
 	// LR rasters are used in decision-making, maybe such precission is unneeded.
 }
 
 
 void GujaratWorld::stepEnvironment()
-{
-	// at the end of simulation
+{	
 	_climate.advanceSeason();
 
 	std::stringstream logName;
 	logName << "World_" << _simulation.getId();
 
-	// if this is the first step of a wet season, rainfall and biomass are calculated for the entire year
+	// if the simulatio is at the first step of a wet season, rainfall and biomass are calculated for the entire year
 	if ( _climate.rainSeasonStarted() )
 	{
 		log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " num agents: " << _agents.size());
@@ -719,7 +676,7 @@ float GujaratWorld::getBiomassVariation( bool wetSeason, Soils & cellSoil, const
 	else if(_config._biomassDistribution.compare("linDecayFromWater")==0 || _config._biomassDistribution.compare("logDecayFromWater")==0)
 	{
 		variation = _config._waterDistConstant*getValue(eWeightWater, index);
-		//variation = 1600.0f*1600.0f*float(getValue("weightWater", index))/16423239174.0f;
+		
 		if(wetSeason)
 		{
 			variation *= (float)_dailyRainSeasonBiomassIncrease.at(cellSoil);			
@@ -728,8 +685,8 @@ float GujaratWorld::getBiomassVariation( bool wetSeason, Soils & cellSoil, const
 		{
 			variation *= -1.0f*(float)_dailyDrySeasonBiomassDecrease.at(cellSoil);
 		}
-		//std::cout << "variation: " << variation << " constant: " << _config._waterDistConstant << " weight: " << getValue("weightWater", index) << " increase: " <<_dailyRainSeasonBiomassIncrease.at(cellSoil) << " dist to water: " << getValue("distWater", index) << std::endl;
-		//variation /= 100.0f;
+		
+		
 	}
 	else
 	{
@@ -737,9 +694,7 @@ float GujaratWorld::getBiomassVariation( bool wetSeason, Soils & cellSoil, const
 		oss << "GujaratWorld::getBiomassVariation - unknown biomass distribution: " << _config._biomassDistribution;
 		throw Engine::Exception(oss.str());
 
-	}
-	
-	//std::cout << "variation: " << variation << std::endl;
+	}	
 	
 	return variation;
 }
@@ -777,10 +732,12 @@ void GujaratWorld::updateeSectorUtility(const std::vector< Engine::Point2D<int> 
 		Engine::Point2D<int> LRxycell = cells[i];
 		Engine::Point2D<int> paintCell;
 		for(paintCell._x = LRxycell._x*C; paintCell._x < LRxycell._x*C + C; paintCell._x++)	
+		{
 			for(paintCell._y = LRxycell._y*C; paintCell._y < LRxycell._y*C + C; paintCell._y++)	
+			{
 				getDynamicRaster(eSectorUtility).setValue(paintCell, val);
-				
-			
+			}
+		}
 	}
 	
 }
