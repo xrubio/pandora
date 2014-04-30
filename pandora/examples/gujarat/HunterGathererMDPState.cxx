@@ -42,7 +42,7 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 	_availableActions.clear();
 	for ( unsigned k = 0; k < s._availableActions.size(); k++ )
 	{
-		addAction( s._availableActions[k]->copy() ); // avoiding segm fault through copy
+		_availableActions.push_back( s._availableActions[k]->copy() ); // avoiding segm fault through copy
 	}
 	assert( s._availableActions.size() == _availableActions.size() );
 	
@@ -180,7 +180,7 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	_availableActions.clear();
 	for ( unsigned k = 0; k < s._availableActions.size(); k++ )
 	{
-		addAction( s._availableActions[k]->copy() );
+		_availableActions.push_back( s._availableActions[k]->copy() );
 	}
 	assert( s._availableActions.size() == _availableActions.size() );
 	
@@ -209,12 +209,6 @@ HunterGathererMDPState::~HunterGathererMDPState()
 	
 	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
 }
-
-void	HunterGathererMDPState::addAction( MDPAction* a )
-{
-	_availableActions.push_back(a);
-}
-
 
 void	HunterGathererMDPState::computeHash()
 {

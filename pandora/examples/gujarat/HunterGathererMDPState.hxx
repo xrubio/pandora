@@ -29,44 +29,6 @@ namespace Gujarat
 
 class HunterGathererMDPState
 {
-	std::map<long unsigned int,long> * _objectUseCounter;
-	omp_lock_t * _mapLock;
-	
-	/* There is some posibility of interference between threads and
-	 * data corruption in _objecUseCounter? RACE CONDITIONS?
-	 * Threads belong to a same process, they share same space address
-	 * Each threads registers different objects here. Each object with a
-	 * different memory address. Will two different threads use the same
-	 * address from a MDPState object? I dont think so. 
-	 */
-	
-	
-public:
-	HunterGatherer * _agentRef;
-	HunterGathererMDPConfig	* _config;
-	
-protected:	
-	
-	static std::vector< Sector* >	_emptySectorVector;
-	static std::vector< Engine::Point2D<int> >  _emptyCellPool;	
-	
-	std::vector< Sector* > * _HRActionSectors;// High Resolution
-	std::vector< Sector* > * _LRActionSectors;// Low Resolution
-	std::vector< Engine::Point2D<int> > * _HRCellPool;
-	std::vector< Engine::Point2D<int> > * _LRCellPool;
-	std::vector< bool > _ownItems;
-	
-	/* _ownItems SEMANTICS 
-		if (_ownsItems[0])
-			delete _HRActionSectors;;
-		if (_ownsItems[1])
-			delete _LRActionSectors;;
-		if (_ownsItems[2])
-			delete _HRCellPool;;
-		if (_ownsItems[3])
-			delete _LRCellPool;;
-	*/
-	
 public:
 	HunterGathererMDPState(	HunterGatherer * agentRef
 			, HunterGathererMDPConfig * config
@@ -109,8 +71,6 @@ public:
 			r = #calories or #resources.
 			r/2000 specifies aprox needs per HG per day
 		 */		
-		
-		
 		r = r/2000;
 		if (r < 2) return 0;
 		if (r < 9) return 1;
@@ -120,9 +80,6 @@ public:
 		
 		//return GujaratAgent::reductionResourcesToCategory(r);
 	}		
-	
-	
-	
 	
 	unsigned	hash() const;
 	bool		operator==( const HunterGathererMDPState& s ) const;
@@ -146,19 +103,11 @@ public:
 		_onHandResources = 0;
 	}
 	
-	float getDaysStarving() const
-	{
-		//std::cout << "getDaysStarving for: " << this << " days starving: " << _daysStarving << " fraction: " << (float)_daysStarving/1000.0f << std::endl;
-		return (float)_daysStarving/1000.0f;
-	}
+	float getDaysStarving() const { return (float)_daysStarving/1000.0f; }
 
-	void setLocation( Engine::Point2D<int> newLoc ) { _mapLocation = newLoc; 
-		
-		std::stringstream logName;
-		logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
-		
-	}
 	const Engine::Point2D<int>& getLocation() const { return _mapLocation; }
+	void setLocation( Engine::Point2D<int> newLoc ) { _mapLocation = newLoc; }
+	
 	Engine::IncrementalRaster& getResourcesRaster() { return _resources; }
 	const Engine::IncrementalRaster& getResourcesRaster() const { return _resources; }
 
@@ -183,8 +132,38 @@ public:
 	void deRegisterFromCounterMapAndDeleteKnowledgeStructures();
 	
 
-		
-private:
+	
+public:
+	HunterGatherer * _agentRef;
+	HunterGathererMDPConfig	* _config;
+	
+protected:	
+	std::vector< Sector* > * _HRActionSectors;// High Resolution
+	std::vector< Sector* > * _LRActionSectors;// Low Resolution
+	std::vector< Engine::Point2D<int> > * _HRCellPool;
+	std::vector< Engine::Point2D<int> > * _LRCellPool;
+	/* _ownItems SEMANTICS 
+		if (_ownsItems[0])
+			delete _HRActionSectors;;
+		if (_ownsItems[1])
+			delete _LRActionSectors;;
+		if (_ownsItems[2])
+			delete _HRCellPool;;
+		if (_ownsItems[3])
+			delete _LRCellPool;;
+	*/
+	std::vector< bool > _ownItems;
+
+	/* There is some posibility of interference between threads and
+	 * data corruption in _objecUseCounter? RACE CONDITIONS?
+	 * Threads belong to a same process, they share same space address
+	 * Each threads registers different objects here. Each object with a
+	 * different memory address. Will two different threads use the same
+	 * address from a MDPState object? I dont think so. 
+	 */
+	std::map<long unsigned int,long> * _objectUseCounter;
+	omp_lock_t * _mapLock;
+	
 	unsigned		_timeIndex;
 	Engine::Point2D<int>	_mapLocation;
 	int			_onHandResources;
@@ -195,9 +174,6 @@ private:
 	int			_maxResources;
 	int			_resourcesDivider;
 	int 		_daysStarving;
-	
-	void addAction( MDPAction* a );
-
 };
 
 
