@@ -152,9 +152,6 @@ void GujaratWorld::createRasters()
 	fillIniRaster(eCounterLRSectors,-1);
 	
 	
-	
-std::cout << "init LR" << std::endl;	
-	
 	// Low Ressolution Rasters
 	int LowResRasterSideSize = getLowResMapsSideSize();
 	Engine::Point2D<int> lowResSize2D( LowResRasterSideSize, LowResRasterSideSize);
@@ -192,22 +189,15 @@ std::cout << "init LR" << std::endl;
 	getDynamicRaster(eLRMoisture).setInitValues(0, std::numeric_limits<int>::max(), 0);
 	*/
 	// Low Ressolution Soil Counters
-	
-std::cout << "init LR dune" << std::endl;		
-
-std::cout << "max "<< _config._lowResolution*_config._lowResolution << std::endl;		
 
 	registerStaticRaster("LRCounterSoilDUNE", false, LRCounterSoilDUNE, lowResSize2D );
 	getStaticRaster(LRCounterSoilDUNE).setDefaultInitValues(0, _config._lowResolution*_config._lowResolution, 0);	
 	fillLowResCounterRaster(LRCounterSoilDUNE,eSoils,DUNE);
 	
-std::cout << "init LR interdune" << std::endl;		
 	
 	registerStaticRaster("LRCounterSoilINTERDUNE", false, LRCounterSoilINTERDUNE, lowResSize2D);
 	getStaticRaster(LRCounterSoilINTERDUNE).setDefaultInitValues(0, _config._lowResolution*_config._lowResolution, 0);
 	fillLowResCounterRaster(LRCounterSoilINTERDUNE,eSoils,INTERDUNE);
-	
-std::cout << "init LR water" << std::endl;		
 	
 
 	if(_config._biomassDistribution.compare("linDecayFromWater")==0 || _config._biomassDistribution.compare("logDecayFromWater")==0)
@@ -217,14 +207,10 @@ std::cout << "init LR water" << std::endl;
 		getStaticRaster(LRCounterSoilWATER).setDefaultInitValues(0, _config._lowResolution*_config._lowResolution, 0);
 		fillLowResCounterRaster(LRCounterSoilWATER,eSoils,WATER);
 
-		std::cout << "init LR weightwater" << std::endl;		
-	
 		registerStaticRaster("eLRWeightWater", false, eLRWeightWater, lowResSize2D);
 		getStaticRaster(eLRWeightWater).setDefaultInitValues(0, std::numeric_limits<int>::max(), 0);
 		fillLowResMeanRaster(eLRWeightWater,eWeightWater);
 	}
-std::cout << "end init LR" << std::endl;	
-
  
 }
 

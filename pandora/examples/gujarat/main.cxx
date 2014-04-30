@@ -36,12 +36,9 @@ int main(int argc, char *argv[])
 //export GOMP_CPU_AFFINITY="0-8:2"
 
 		Gujarat::GujaratConfig config;
-		std::cout << "Loading config file: " << fileName << std::endl;
 		config.deserialize(fileName);
 
 		srand48(config.getUCTSeed());
-		
-		std::cout << "main: UCT SEED " << config.getUCTSeed() << std::endl;
 		
 		Engine::Simulation gujaratSim(config.getSize(), config.getNumSteps(), config.getSerializeResolution());
 		Gujarat::GujaratWorld world( gujaratSim , config);
