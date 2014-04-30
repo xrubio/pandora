@@ -196,55 +196,13 @@ void HunterGatherer::executeActions()
 }
 
 void HunterGatherer::clearSectorKnowledge() 
-	{ 
+{ 
 		_myHGMind->clearSectorKnowledge();
-	}	
+}	
 	
 void HunterGatherer::selectActions()
 {
-	//*?
-	//std::stringstream logName;
-	//logName << "infoshar";
-	
-	std::list<MDPAction*> actions;
-	
-/*	
-	GujaratState::controller().selectActions(*this, actions);
-	
-	assert(actions.size() > 0);
-	//*?
-	std::list<MDPAction*>::iterator it=actions.begin();
-	while(it!=actions.end())
-	{
-		_actions.push_back((Engine::Action*)(*it));
-		//it = actions.erase(it);
-		it++;
-	}
-	
-	
-	try{
-		std::list<MDPAction*>::iterator it=actions.begin();
-		while(it!=actions.end())
-		{
-			//_actions.push_back((Engine::Action*)(*it));
-			it = actions.erase(it);
-		}	
-	} catch (std::exception & exceptionThrown) 
-		{
-			std::cout << exceptionThrown.what() << std::endl;
-			assert(0==1);
-		}
-*/
-	//*?
-	try{ int w = GujaratState::controller().getWidth();}
-	catch(std::exception e){std::cerr << "EXC:"<<e.what()<<std::endl;}	
-
-
-	try{
-		GujaratState::controller().selectActions(*this, _actions);
-	}catch(std::exception e){std::cerr << "EXC:"<<e.what()<<std::endl;}
-
-	
+	GujaratState::controller().selectActions(*this, _actions);
 }
 
 GujaratAgent * HunterGatherer::createNewAgent()
