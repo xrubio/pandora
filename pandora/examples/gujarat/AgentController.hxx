@@ -19,9 +19,6 @@ public:
 	virtual ~AgentController();
 	
 	virtual void selectActions( GujaratAgent & agent, std::list<Engine::Action*> & actions ) = 0;
-
-	//*?
-	virtual  int getWidth() = 0;
 };
 
 }

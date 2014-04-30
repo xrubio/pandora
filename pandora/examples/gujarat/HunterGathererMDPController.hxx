@@ -11,6 +11,10 @@
 namespace Gujarat
 {
 
+/**
+ * A controller that makes decisions by casting the decision problem as an MDP
+ * and computing the optimal decision to a certain horizon by applying the UCT algorithm.
+ */
 class HunterGathererMDPController : public AgentController
 {
 
@@ -19,11 +23,7 @@ public:
 	HunterGathererMDPController( const HunterGathererMDPConfig& cfg );
 	virtual ~HunterGathererMDPController();
 
-
 	void selectActions( GujaratAgent & agent, std::list<Engine::Action*> & actions );
-
-//*? remove toStrConfig
-	int getWidth() { return _mdpConfig.getWidth(); }
 
 private:
 	typedef		Online::Policy::random_t< HunterGathererMDPState >	BasePolicy;

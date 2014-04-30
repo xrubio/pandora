@@ -24,13 +24,6 @@ public:
 	
 	MDPAction*         shouldForage(  HunterGatherer & agent  );
 	MDPAction*         shouldMoveHome(  HunterGatherer & agent  );
-	
-
-
-
-//*?
-	int getWidth(){return 0;}
-
 };
 
 }
