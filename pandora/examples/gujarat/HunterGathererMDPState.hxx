@@ -42,9 +42,6 @@ class HunterGathererMDPState
 	
 	
 public:
-	int _creator;
-	//*? remove vector of constructors id
-	std::vector<int> _constructors;
 	unsigned long _dni;
 	std::string _actionName;
 	HunterGatherer * _agentRef;

@@ -109,9 +109,6 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 						, actionList);
 	
 	_initial->computeHash();
-	
-	//*?
-	_initial->_creator = -_initial->_creator;
 }
 
 action_t HunterGathererMDPModel::number_actions( const HunterGathererMDPState& s ) const

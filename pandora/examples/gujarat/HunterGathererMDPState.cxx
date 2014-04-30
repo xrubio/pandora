@@ -31,9 +31,6 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 	
 	_dni=dniTicket ();
 	
-	_creator=1;
-	_constructors.push_back(_creator);
-	
 	_ownItems.resize(s._ownItems.size());
 	for(unsigned int i = 0; i < _ownItems.size(); i++)
 	{
@@ -97,9 +94,6 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 	registerKnowledgeStructuresAtCounterMap();
 	
 	computeHash();
-	
-	_creator=2;
-	_constructors.push_back(_creator);
 }
 
 
@@ -144,9 +138,6 @@ HunterGathererMDPState::HunterGathererMDPState(
 	
 
 	_dni=dniTicket ();
-	
-	_creator=3;	
-	_constructors.push_back(_creator);
 
 	_ownItems.resize(ownItems.size());
 	for(unsigned int i = 0; i < ownItems.size(); i++)
@@ -169,9 +160,6 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
 	
 	_dni=dniTicket ();
-	
-	_creator=4;
-	_constructors.push_back(_creator);
 	
 	_timeIndex 		 = s._timeIndex;
 	_mapLocation 	 = s._mapLocation;
@@ -323,8 +311,6 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 			<< "\n locations : " << _mapLocation << " == " << s._mapLocation 
 			<< "\n dni's :" << _dni << "," << s._dni
 			<< "\n sectors's :" << _LRActionSectors->size() << "," << s._LRActionSectors->size()
-			<< "\n constructor " << _creator << " for state " << _dni
-			<< "\n constructor " << s._creator << " for state " << s._dni
 			;
 		
 		throw Engine::Exception(oss.str());
@@ -340,7 +326,6 @@ void	HunterGathererMDPState::print( std::ostream& os ) const
 {
 	os << "<addr = " << this << ", ";
 	os << "dni = " << _dni << ", ";
-	os << "constructor = " << _creator << ", ";
 	os << "loc=(" << _mapLocation._x << ", " << _mapLocation._y << "), ";
 	os << "res=" << _onHandResources << ", ";
 	os << "t=" << _timeIndex << ", ";
@@ -418,10 +403,7 @@ void HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructure
 			std::stringstream oss;
 			oss << "HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructures(): "
 			<< " Found wrong counter for a LRActionSectors readers/writers:" 
-			<< _objectUseCounter->count((unsigned long)_LRActionSectors)
-			<< " ; the state was created with constructor " << _creator
-			<< " ; the state visited as much constructors as "<< _constructors.size() << ":";
-			for(std::vector<int>::iterator it = _constructors.begin(); it !=_constructors.end(); ++it) oss<< _constructors.size();
+			<< _objectUseCounter->count((unsigned long)_LRActionSectors);
 			throw Engine::Exception(oss.str());
 			
 		}
