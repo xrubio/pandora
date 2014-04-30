@@ -2,8 +2,6 @@
 #define __AGENT_CONTROLLER__
 
 #include <list>
-//*?
-#include <string>
 
 namespace Engine { class Action; }  // forward declaration
 

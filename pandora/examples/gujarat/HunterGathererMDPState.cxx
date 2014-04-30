@@ -7,7 +7,7 @@
 namespace Gujarat
 {
 
-
+//! Copy constructor
 HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s )
 : _timeIndex( s._timeIndex )
 , _mapLocation( s._mapLocation )
@@ -35,11 +35,6 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 		_ownItems[i] = s._ownItems[i];
 	}
 	
-	for ( unsigned k = 0; k < _availableActions.size(); k++ )
-	{
-		delete _availableActions[k];
-	}	
-	_availableActions.clear();
 	for ( unsigned k = 0; k < s._availableActions.size(); k++ )
 	{
 		_availableActions.push_back( s._availableActions[k]->copy() ); // avoiding segm fault through copy
@@ -57,7 +52,7 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 					, std::vector< Engine::Point2D<int> > * HRCellPool
 					, std::vector< Engine::Point2D<int> > * LRCellPool
 					, std::vector< bool > ownItems
-				        , const std::vector<MDPAction *>& actionList)
+					, const std::vector<MDPAction *>& actionList)
 : _timeIndex( s._timeIndex )
 , _mapLocation( loc )
 , _onHandResources( s._onHandResources )
@@ -173,11 +168,8 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 		_ownItems[i] = s._ownItems[i];
 	}
 	
-	for ( unsigned k = 0; k < _availableActions.size(); k++ )
-	{
-		delete _availableActions[k];
-	}
-	_availableActions.clear();
+	clearAvailableActions();
+	
 	for ( unsigned k = 0; k < s._availableActions.size(); k++ )
 	{
 		_availableActions.push_back( s._availableActions[k]->copy() );
@@ -193,19 +185,13 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	return *this;
 }
 
-	
-
 HunterGathererMDPState::~HunterGathererMDPState()
 {
-	std::stringstream logName;
+	// std::stringstream logName;
 	// look out: if 'this' is an _initial of a HGMDPModel && step==361 && _agentRef killed at 360, then the next line produces segm fault :
 	//logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
 	
-	for ( unsigned int k = 0; k < _availableActions.size(); k++ )
-	{
-		delete _availableActions[k];
-	}
-	
+	clearAvailableActions();
 	
 	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
 }
@@ -221,8 +207,6 @@ void	HunterGathererMDPState::computeHash()
 	_hashKey.add( mapLocationLR._x );
 	_hashKey.add( mapLocationLR._y );
 	
-	/*_hashKey.add( _mapLocation._x );
-	_hashKey.add( _mapLocation._y );*/
 	_hashKey.add( _agentRef->reductionResourcesToCategory(_onHandResources) );
 	_hashKey.add( _daysStarving );	
 	
@@ -462,8 +446,12 @@ void HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructure
 		//#pragma omp critical(refmap){_objectUseCounter->clear();}
 	}
 	
-	
-	
-	
+	//! Clear and free the vector of available actions
+	void HunterGathererMDPState::clearAvailableActions() {
+		for ( unsigned k = 0; k < _availableActions.size(); ++k ) {
+			delete _availableActions[k];
+		}
+		_availableActions.clear();
+	}	
 }
 

@@ -149,39 +149,21 @@ public:
 	void incrementForageActionsExecuted(){_forageActionsExecuted++;}
 
 	
-	
-	int reductionResourcesToCategory(long r) const
+	/**
+	 * Discretizes the given number of calories.
+	 */	
+	int reductionResourcesToCategory(long calories) const
 	{
-		/**
-		 * 	r = #calories .
-			r/2000 specifies aprox needs per HG per day
-		 */
-		int c = computeConsumedResources(1);
+		int consumed = computeConsumedResources(1);
 		
-		if(c==0)
-		{
-			// r = r/c = r/0 = inf
-			return 4;
+		if(consumed != 0) { // Avoid division by 0
+			calories = calories/consumed;
+			if (calories < 2)   return 0;
+			if (calories < 15)  return 1;
+			if (calories < 40)  return 2;
+			if (calories < 100) return 3;
 		}
 		
-		r = r/c;
-		if (r < 2)
-		{
-			return 0;
-		}
-		if (r < 15)
-		{
-			return 1;
-		}
-		if (r < 40) 
-		{
-			return 2;
-		}
-		if (r < 100) 
-		{
-			return 3;
-		}
-
 		return 4;		
 	}	
 };
