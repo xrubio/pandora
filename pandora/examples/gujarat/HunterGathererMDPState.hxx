@@ -42,7 +42,6 @@ class HunterGathererMDPState
 	
 	
 public:
-	int _numAvailableActionsWhenBorn;
 	int _creator;
 	//*? remove vector of constructors id
 	std::vector<int> _constructors;
@@ -170,15 +169,10 @@ public:
 	Engine::IncrementalRaster& getResourcesRaster() { return _resources; }
 	const Engine::IncrementalRaster& getResourcesRaster() const { return _resources; }
 
-	MDPAction* availableActions( Problem::action_t actIndex ) 
-		{ return _availableActions.at(actIndex); }
-	const MDPAction* availableActions( Problem::action_t actIndex ) const 
-		{ return _availableActions.at(actIndex); }
+	MDPAction* availableActions( Problem::action_t actIndex )  { return _availableActions.at(actIndex); }
+	const MDPAction* availableActions( Problem::action_t actIndex ) const  { return _availableActions.at(actIndex); }
 
-	unsigned numAvailableActions() const { return _numAvailableActionsWhenBorn; }
-
-	unsigned numAvailableActionsWhenBorn() const { return _numAvailableActionsWhenBorn; }
-
+	unsigned numAvailableActions() const { return _availableActions.size(); }
 	
 	void	computeHash();
 	

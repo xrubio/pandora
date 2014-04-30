@@ -25,7 +25,6 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 , _mapLock(s._mapLock)
 , _agentRef(s._agentRef)
 ,_config(s._config)
-,_numAvailableActionsWhenBorn(s._availableActions.size())
 {
 	std::stringstream logName;
 	logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
@@ -81,7 +80,6 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 , _agentRef(s._agentRef)
 , _config(s._config)
 , _availableActions(actionList)
-, _numAvailableActionsWhenBorn(actionList.size())
 {
 	std::stringstream logName;
 	logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
@@ -140,7 +138,6 @@ HunterGathererMDPState::HunterGathererMDPState(
 	, _agentRef(agentRef)
 	,_config(config)
 	,_availableActions(actionList)
-	,_numAvailableActionsWhenBorn(actionList.size())
 {
 	std::stringstream logName;
 	logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
@@ -205,7 +202,6 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 		delete _availableActions[k];
 	}
 	_availableActions.clear();
-	_numAvailableActionsWhenBorn = s._availableActions.size();
 	for ( unsigned k = 0; k < s._availableActions.size(); k++ )
 	{
 		addAction( s._availableActions[k]->copy() );
@@ -240,9 +236,6 @@ HunterGathererMDPState::~HunterGathererMDPState()
 
 void	HunterGathererMDPState::addAction( MDPAction* a )
 {
-	if(_availableActions.size() >= (unsigned int)_numAvailableActionsWhenBorn)
-		std::cout << "TOO MUCH actions, created with :" << _creator << std::endl;
-	assert(_availableActions.size() < (unsigned int)_numAvailableActionsWhenBorn);
 	_availableActions.push_back(a);
 }
 
@@ -348,15 +341,10 @@ void	HunterGathererMDPState::print( std::ostream& os ) const
 	os << "<addr = " << this << ", ";
 	os << "dni = " << _dni << ", ";
 	os << "constructor = " << _creator << ", ";
-	os << "numActions = " << _numAvailableActionsWhenBorn << ", ";
 	os << "loc=(" << _mapLocation._x << ", " << _mapLocation._y << "), ";
 	os << "res=" << _onHandResources << ", ";
 	os << "t=" << _timeIndex << ", ";
 	os << "starv=" << _daysStarving << ", ";
-	os << "actions:";
-	for(unsigned int i=0;i<_availableActions.size();i++)
-		os << ": " << _availableActions[i]<<" ";
-	
 	
 	os << "changes=(";
 	for ( Engine::IncrementalRaster::ChangeIterator it = _resources.firstChange();
@@ -369,7 +357,6 @@ void	HunterGathererMDPState::print( std::ostream& os ) const
 	}
 
 	os << "), ";
-	
 	os << "actions (total: " << _availableActions.size() << "):";
   	for(unsigned i = 0; i < _availableActions.size(); ++i)
   		os << ": " << _availableActions[i]->describe() <<" ";
