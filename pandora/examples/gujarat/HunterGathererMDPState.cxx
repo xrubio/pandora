@@ -29,8 +29,6 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 	std::stringstream logName;
 	logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
 	
-	_dni=dniTicket ();
-	
 	_ownItems.resize(s._ownItems.size());
 	for(unsigned int i = 0; i < _ownItems.size(); i++)
 	{
@@ -81,13 +79,8 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 	std::stringstream logName;
 	logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
 	
-		
-	_dni=dniTicket ();
-	
-	
 	_ownItems.resize(ownItems.size());
-	for(int i = 0; i < ownItems.size(); i++)
-	{
+	for(int i = 0; i < ownItems.size(); i++) {
 		_ownItems[i] = ownItems[i];
 	}
 	
@@ -135,9 +128,6 @@ HunterGathererMDPState::HunterGathererMDPState(
 {
 	std::stringstream logName;
 	logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
-	
-
-	_dni=dniTicket ();
 
 	_ownItems.resize(ownItems.size());
 	for(unsigned int i = 0; i < ownItems.size(); i++)
@@ -158,8 +148,6 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	
 
 	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
-	
-	_dni=dniTicket ();
 	
 	_timeIndex 		 = s._timeIndex;
 	_mapLocation 	 = s._mapLocation;
@@ -309,7 +297,6 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 		oss << "Incoherence!!! same location, different number of actions:" 
 			<< _availableActions.size() << "!=" << s._availableActions.size()
 			<< "\n locations : " << _mapLocation << " == " << s._mapLocation 
-			<< "\n dni's :" << _dni << "," << s._dni
 			<< "\n sectors's :" << _LRActionSectors->size() << "," << s._LRActionSectors->size()
 			;
 		
@@ -325,7 +312,6 @@ bool	HunterGathererMDPState::operator!=( const HunterGathererMDPState& s ) const
 void	HunterGathererMDPState::print( std::ostream& os ) const
 {
 	os << "<addr = " << this << ", ";
-	os << "dni = " << _dni << ", ";
 	os << "loc=(" << _mapLocation._x << ", " << _mapLocation._y << "), ";
 	os << "res=" << _onHandResources << ", ";
 	os << "t=" << _timeIndex << ", ";

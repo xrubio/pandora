@@ -322,16 +322,6 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 	
 	HunterGathererMDPState sp(s, center, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, ownership, actionList);
 	
-	/*
-	std::cout << "NET: edge "		
-		<< s._dni 
-		<< " "		
-		<< sp._dni
-		<< " n"
-		<< std::endl;
-	*/
-	//assert(LRActionSectors->size() > 0);
-	
 	act->executeMDP( agentRef(), s, sp );
 	applyFrameEffects( s, sp );
 	sp.computeHash();	

@@ -42,8 +42,6 @@ class HunterGathererMDPState
 	
 	
 public:
-	unsigned long _dni;
-	std::string _actionName;
 	HunterGatherer * _agentRef;
 	HunterGathererMDPConfig	* _config;
 	
@@ -158,8 +156,6 @@ public:
 		
 		std::stringstream logName;
 		logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
-	
-		//log_INFO(logName.str(),"XXXX setLocation:" << _dni << "->" << newLoc);
 		
 	}
 	const Engine::Point2D<int>& getLocation() const { return _mapLocation; }
@@ -179,12 +175,6 @@ public:
 	std::vector< Engine::Point2D<int> > * getLRCellPool() const { return _LRCellPool; }	
 	
 	const std::vector< bool > & getOwnerShip() const { return _ownItems;} 
-	
-	
-	int dniTicket () {
-		static int counter = 0;
-		return counter++;
-	}
 	
 	static void clearRefCounterMap();
 	
