@@ -31,26 +31,24 @@ class HunterGathererMDPState
 {
 public:
 	//! Main constructor
-	HunterGathererMDPState(	HunterGatherer * agentRef
-			, HunterGathererMDPConfig * config
+	HunterGathererMDPState(	HunterGatherer* agent
+			, HunterGathererMDPConfig* config
 			, std::vector< Sector* > * HRActionSectors
 			, std::vector< Sector* > * LRActionSectors
 			, std::vector< Engine::Point2D<int> > * HRCellPool
-			, std::vector< Engine::Point2D<int> > * LRCellPool
-			, const std::vector<MDPAction *>&  actionList);
+			, std::vector< Engine::Point2D<int> > * LRCellPool);
 	
 	//! Copy constructor
 	HunterGathererMDPState( const HunterGathererMDPState& s );
 	
 	//! Pseudo-copy constructor: uses some information from previous state.
 	HunterGathererMDPState( const HunterGathererMDPState& s
-							, const Engine::Point2D<int>& loc
+							, const Engine::Point2D<int>& location
 							, std::vector< Sector* > * HRActionSectors
 							, std::vector< Sector* > * LRActionSectors
 							, std::vector< Engine::Point2D<int> > * HRCellPool
 							, std::vector< Engine::Point2D<int> > * LRCellPool
-							, std::vector< bool > ownsItems
-			                , const std::vector<MDPAction *>& actionList);
+							, std::vector< bool > ownsItems);
 		
 	~HunterGathererMDPState();
 
@@ -151,6 +149,15 @@ protected:
 	int 		_daysStarving;
 	
 	void clearAvailableActions();
+	
+	
+	void generateActions(
+			      const Engine::IncrementalRaster & resourcesRaster			      
+			      , const Engine::Point2D<int> &position
+			      , std::vector< Sector* >* HRActionSectors
+			      , std::vector< Sector* >* LRActionSectors
+			      , std::vector< Engine::Point2D<int> >* HRCellPool
+			      , std::vector< Engine::Point2D<int> >* LRCellPool);	
 };
 
 

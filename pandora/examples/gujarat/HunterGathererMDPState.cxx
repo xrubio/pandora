@@ -9,13 +9,12 @@ namespace Gujarat
 
 //! Main constructor
 HunterGathererMDPState::HunterGathererMDPState( 
-			HunterGatherer * agent
+			HunterGatherer* agent
 			, HunterGathererMDPConfig * config
 			, std::vector< Sector* > * HRActionSectors
 			, std::vector< Sector* > * LRActionSectors
 			, std::vector< Engine::Point2D<int> > * HRCellPool
-			, std::vector< Engine::Point2D<int> > * LRCellPool
-			, const std::vector<MDPAction *>&  actionList)
+			, std::vector< Engine::Point2D<int> > * LRCellPool)
 
 	: _timeIndex(0)
 	, _mapLocation( agent->getPosition() )
@@ -32,8 +31,9 @@ HunterGathererMDPState::HunterGathererMDPState(
 	, _mapLock(agent->getMapLock())
 	, _agentRef(agent)
 	,_config(config)
-	,_availableActions(actionList)
+	,_availableActions(0)
 {
+	generateActions(agent->getLRResourcesRaster(), agent->getPosition(), HRActionSectors, LRActionSectors, HRCellPool, LRCellPool);
 	computeHash();
 	registerKnowledgeStructuresAtCounterMap();
 }
@@ -67,15 +67,14 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 
 //! Pseudo-copy constructor: uses some information from previous state.
 HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
-					, const Engine::Point2D<int>& loc
+					, const Engine::Point2D<int>& location
 					, std::vector< Sector* > * HRActionSectors
 					, std::vector< Sector* > * LRActionSectors
 					, std::vector< Engine::Point2D<int> > * HRCellPool
 					, std::vector< Engine::Point2D<int> > * LRCellPool
-					, std::vector< bool > ownItems
-					, const std::vector<MDPAction *>& actionList)
+					, std::vector< bool > ownItems)
 : _timeIndex( s._timeIndex )
-, _mapLocation( loc )
+, _mapLocation( location )
 , _onHandResources( s._onHandResources )
 , _resources( s._resources )
 , _hashKey( s._hashKey )
@@ -90,8 +89,9 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 , _mapLock(s._mapLock)
 , _agentRef(s._agentRef)
 , _config(s._config)
-, _availableActions(actionList)
+, _availableActions(0)
 {
+	generateActions(s.getResourcesRaster(), location, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool);
 	computeHash();
 	registerKnowledgeStructuresAtCounterMap();
 }
@@ -411,5 +411,83 @@ void HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructure
 		}
 		_availableActions.clear();
 	}	
-}
 
+
+/**
+ * 
+ */
+void HunterGathererMDPState::generateActions(
+			      const Engine::IncrementalRaster & resourcesRaster			      
+			      , const Engine::Point2D<int> &position
+			      , std::vector< Sector* >* HRActionSectors
+			      , std::vector< Sector* >* LRActionSectors
+			      , std::vector< Engine::Point2D<int> >* HRCellPool
+			      , std::vector< Engine::Point2D<int> >* LRCellPool)
+{
+	std::stringstream logName;
+	logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
+	
+	// Map from "sector memory address" to "sector integer identifier".
+	// After sorting validActionSectors I need to access both the HR and the LR sector
+	std::map<unsigned long,int> sectorIdxMap;
+
+	//std::cout << "creating actions for state with time index: " << s.getTimeIndex() << " and resources: " << s.getOnHandResources() << std::endl;
+	// Make Do Nothing	
+	if ( _config->isDoNothingAllowed() )
+		_availableActions.push_back( new DoNothingAction() );	
+
+	std::vector< Sector* > validActionSectors;
+
+	_agentRef->updateKnowledge( position, resourcesRaster, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool );
+	
+	
+	// MRJ: Remove empty sectors if any
+	for ( unsigned i = 0; i < LRActionSectors->size(); i++ )
+	{
+		if ( (*LRActionSectors)[i]->isEmpty() )
+		{
+			continue;
+		}
+		validActionSectors.push_back( (*LRActionSectors)[i] );
+		sectorIdxMap[(unsigned long)(*LRActionSectors)[i]] = i;
+	}	
+	std::sort( validActionSectors.begin(), validActionSectors.end(), SectorBestFirstSortPtrVecPredicate() );
+	
+	// Make Forage actions
+	for ( unsigned i = 0; i < validActionSectors.size(); i++ )
+	{
+		int sectorIdx = sectorIdxMap[(unsigned long)(validActionSectors[i])];
+		_availableActions.push_back( new ForageAction( (*HRActionSectors)[sectorIdx], validActionSectors[i], false ) );	
+	}
+	
+	// Make Move Home
+	std::vector< MoveHomeAction* > possibleMoveHomeActions;
+	MoveHomeAction::generatePossibleActions( *_agentRef, position, *HRActionSectors, validActionSectors, possibleMoveHomeActions );
+	unsigned int moveHomeActions = _config->getNumberMoveHomeActions();
+	if (  moveHomeActions >=  possibleMoveHomeActions.size() )
+	{
+		for ( unsigned i = 0; i < possibleMoveHomeActions.size(); i++ )
+			_availableActions.push_back( possibleMoveHomeActions[i] );
+	}
+	else
+	{
+		for ( unsigned i = 0; i <  moveHomeActions; i++ )
+			_availableActions.push_back( possibleMoveHomeActions[i] );
+		for ( unsigned i =  moveHomeActions; i < possibleMoveHomeActions.size(); i++ )
+			delete possibleMoveHomeActions[i];
+	}
+	
+	assert( _availableActions.size() > 0 );
+	sectorIdxMap.clear();
+	possibleMoveHomeActions.clear();
+	validActionSectors.clear();
+	
+	// Reference to structures that could reference structures from a MDPState cannot be destroyed. The MDPState's will destroy the ones created and are owned.	
+	//HRActionSectors.clear();
+	//LRActionSectors.clear();
+	//std::cout << "finished creating actions for state with time index: " << parent.getTimeIndex() << " and resources: " << parent.getOnHandResources() << std::endl;
+} 
+
+
+
+} // namespace

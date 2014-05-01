@@ -70,24 +70,13 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	//&(_simAgent->getLRCellPoolNoConst());//new std::vector< Engine::Point2D<int> >(0);
 
 	// Build initial state from current state in the simulation
-	std::vector<MDPAction *>  actionList;	
-
-	makeActionsForState(_simAgent->getLRResourcesRaster()      
-				, _simAgent->getPosition()
-				, HRActionSectors
-				, LRActionSectors
-				, HRCellPool
-				, LRCellPool
-				, actionList);	
-	
 	_initial = new HunterGathererMDPState(
 						_simAgent
 						, &_config
 						, HRActionSectors
 						, LRActionSectors 
 						, HRCellPool
-						, LRCellPool
-						, actionList);
+						, LRCellPool);
 	
 	_initial->computeHash();
 }
@@ -188,14 +177,10 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,  action_t a
 	else {
 		throw Engine::Exception("Unrecognized action type");
 	}
-		
+
+	HunterGathererMDPState sp(s, center, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, ownership);
 	
-	std::vector<MDPAction *>  actionList;
-	makeActionsForState(s, center, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, actionList);
-	
-	HunterGathererMDPState sp(s, center, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, ownership, actionList);
-	
-	act->executeMDP( agentRef(), s, sp );
+	act->executeMDP( *_simAgent, s, sp );
 	applyFrameEffects( s, sp );
 	sp.computeHash();	
 	
@@ -205,118 +190,7 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,  action_t a
 void	HunterGathererMDPModel::applyFrameEffects( const HunterGathererMDPState& s,  HunterGathererMDPState& sp ) const
 {
 	sp.consume();
-	//sp.spoilage( agentRef().getSurplusSpoilageFactor() );
 	sp.increaseTimeIndex();
 }
-
-
-/**
- * @param actionList List of executable actions
- */
-void HunterGathererMDPModel::makeActionsForState( 
-				const HunterGathererMDPState& parent
-				, const Engine::Point2D<int> &loc
-				, std::vector< Sector* > * HRActionSectors
-				, std::vector< Sector* > * LRActionSectors
-				, std::vector< Engine::Point2D<int> > * HRCellPool
-				, std::vector< Engine::Point2D<int> > * LRCellPool
-				, std::vector<MDPAction *>&  actionList) const
-			     
-{
-	makeActionsForState( 
-			     parent.getResourcesRaster(),
-			     loc,
-			     HRActionSectors,
-			     LRActionSectors,
-			     HRCellPool,
-			     LRCellPool,
-			     actionList);
-} 
-
-
-
-/**
- * @param actionList List of executable actions
- */
-void HunterGathererMDPModel::makeActionsForState(
-			      const Engine::IncrementalRaster & resourcesRaster			      
-			      , const Engine::Point2D<int> &position
-			      , std::vector< Sector* >* HRActionSectors
-			      , std::vector< Sector* >* LRActionSectors
-			      , std::vector< Engine::Point2D<int> >* HRCellPool
-			      , std::vector< Engine::Point2D<int> >* LRCellPool
-			      , std::vector<MDPAction *>&  actionList) const
-{
-	std::stringstream logName;
-	logName << "logMDPStates_"	<< _simAgent->getWorld()->getId() << "_" << _simAgent->getId();
-	
-	// Map from "sector memory address" to "sector integer identifier".
-	// After sorting validActionSectors I need to access both the HR and the LR sector
-	std::map<unsigned long,int> sectorIdxMap;
-
-	//std::cout << "creating actions for state with time index: " << s.getTimeIndex() << " and resources: " << s.getOnHandResources() << std::endl;
-	// Make Do Nothing	
-	if ( _config.isDoNothingAllowed() )
-		actionList.push_back( new DoNothingAction() );	
-
-	std::vector< Sector* > validActionSectors;
-
-	agentRef().updateKnowledge( position, resourcesRaster, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool );
-	
-	
-	// MRJ: Remove empty sectors if any
-	for ( unsigned i = 0; i < LRActionSectors->size(); i++ )
-	{
-		if ( (*LRActionSectors)[i]->isEmpty() )
-		{
-			continue;
-		}
-		validActionSectors.push_back( (*LRActionSectors)[i] );
-		sectorIdxMap[(unsigned long)(*LRActionSectors)[i]] = i;
-	}	
-	std::sort( validActionSectors.begin(), validActionSectors.end(), SectorBestFirstSortPtrVecPredicate() );
-	
-	// Make Forage actions
-	for ( unsigned i = 0; i < validActionSectors.size(); i++ )
-	{
-		int sectorIdx = sectorIdxMap[(unsigned long)(validActionSectors[i])];
-		actionList.push_back( new ForageAction( (*HRActionSectors)[sectorIdx], validActionSectors[i], false ) );	
-	}
-	
-	// Make Move Home
-	std::vector< MoveHomeAction* > possibleMoveHomeActions;
-	MoveHomeAction::generatePossibleActions( agentRef(), position, *HRActionSectors, validActionSectors, possibleMoveHomeActions );
-	unsigned int moveHomeActions = _config.getNumberMoveHomeActions();
-	if (  moveHomeActions >=  possibleMoveHomeActions.size() )
-	{
-		for ( unsigned i = 0; i < possibleMoveHomeActions.size(); i++ )
-			actionList.push_back( possibleMoveHomeActions[i] );
-	}
-	else
-	{
-		for ( unsigned i = 0; i <  moveHomeActions; i++ )
-			actionList.push_back( possibleMoveHomeActions[i] );
-		for ( unsigned i =  moveHomeActions; i < possibleMoveHomeActions.size(); i++ )
-			delete possibleMoveHomeActions[i];
-	}
-	
-	assert( actionList.size() > 0 );
-	sectorIdxMap.clear();
-	possibleMoveHomeActions.clear();
-	validActionSectors.clear();
-	
-	// Reference to structures that could reference structures from a MDPState cannot be destroyed. The MDPState's will destroy the ones created and are owned.	
-	//HRActionSectors.clear();
-	//LRActionSectors.clear();
-	//std::cout << "finished creating actions for state with time index: " << parent.getTimeIndex() << " and resources: " << parent.getOnHandResources() << std::endl;
-	
-	/*log_INFO(logName.str(),"CREA LRSectors at " << position 
-						<< ", amount sectors " << LRActionSectors->size()
-						<< ", amount actions " << actionList.size()
-				);	*/
-	
-} 
-
-
   
 }

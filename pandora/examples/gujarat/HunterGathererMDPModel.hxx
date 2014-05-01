@@ -10,11 +10,7 @@
 namespace Gujarat
 {
 
-class ForageAction;
-class MoveHomeAction;
-class DoNothingAction;
 class HunterGatherer;
-class HunterGathererMDPConfig;
 
 typedef std::vector< std::pair< HunterGathererMDPState, float > >	OutcomeVector; 
 
@@ -27,16 +23,6 @@ public:
 
 	void 	setup( const HunterGathererMDPConfig& cfg );
 	void	reset( GujaratAgent & agent );
-
-	HunterGatherer& 	agentRef()
-	{
-		return *(_simAgent);
-	}
-
-	const HunterGatherer& 	agentRef() const
-	{
-		return *(_simAgent);
-	}
 
 	unsigned getHorizon() const 
 	{
@@ -77,29 +63,7 @@ public:
 	virtual	void print( std::ostream& os ) const {}
 	
 protected:
-	
-	//void makeActionsForState( HunterGatherer& parent, const Engine::Point2D<int> &loc, std::vector<MDPAction *>&  actionList) const;
-	
-	void makeActionsForState( 
-				const HunterGathererMDPState& parent
-				, const Engine::Point2D<int> &loc
-				, std::vector< Sector* > * HRActionSectors
-				, std::vector< Sector* > * LRActionSectors
-				, std::vector< Engine::Point2D<int> > * HRCellPool
-				, std::vector< Engine::Point2D<int> > * LRCellPool
-				, std::vector<MDPAction *>&  actionList) const;
-
-	void makeActionsForState(
-			      const Engine::IncrementalRaster & resourcesRaster			      
-			      , const Engine::Point2D<int> &position
-			      , std::vector< Sector* >* HRActionSectors
-			      , std::vector< Sector* >* LRActionSectors
-			      , std::vector< Engine::Point2D<int> >* HRCellPool
-			      , std::vector< Engine::Point2D<int> >* LRCellPool
-			      , std::vector<MDPAction *>& actionList) const;
-	
 	void	applyFrameEffects( const HunterGathererMDPState& s,  HunterGathererMDPState& sp ) const;
-private:
 
 	HunterGatherer*			_simAgent;
 	HunterGathererMDPState*		_initial;
