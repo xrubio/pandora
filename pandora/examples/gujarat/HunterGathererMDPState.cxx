@@ -29,11 +29,11 @@ HunterGathererMDPState::HunterGathererMDPState(
 	, _daysStarving( 0 )
 	, _objectUseCounter(agent->getObjectUseCounter())
 	, _mapLock(agent->getMapLock())
-	, _agentRef(agent)
+	, _agent(agent)
 	,_config(config)
 	,_availableActions(0)
 {
-	generateActions(agent->getLRResourcesRaster(), agent->getPosition(), HRActionSectors, LRActionSectors, HRCellPool, LRCellPool);
+	generateActions(agent->getLRResourcesRaster(), agent->getPosition());
 	computeHash();
 	registerKnowledgeStructuresAtCounterMap();
 }
@@ -54,7 +54,7 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 , _ownItems(s._ownItems)
 , _objectUseCounter(s._objectUseCounter)
 , _mapLock(s._mapLock)
-, _agentRef(s._agentRef)
+, _agent(s._agent)
 ,_config(s._config)
 ,_availableActions(0)
 {
@@ -87,11 +87,11 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 , _ownItems(ownItems)
 , _objectUseCounter(s._objectUseCounter)
 , _mapLock(s._mapLock)
-, _agentRef(s._agentRef)
+, _agent(s._agent)
 , _config(s._config)
 , _availableActions(0)
 {
-	generateActions(s.getResourcesRaster(), location, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool);
+	generateActions(s.getResourcesRaster(), location);
 	computeHash();
 	registerKnowledgeStructuresAtCounterMap();
 }
@@ -100,7 +100,7 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGathererMDPState& s )
 {	
 	std::stringstream logName;
-	logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
+	logName << "logMDPStates_"	<< _agent->getWorld()->getId() << "_" << _agent->getId();
 	
 
 	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
@@ -138,7 +138,7 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	
 	registerKnowledgeStructuresAtCounterMap();	
 	
-	_agentRef = s._agentRef;
+	_agent = s._agent;
 	
 	_config = s._config;
 	
@@ -148,8 +148,8 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 HunterGathererMDPState::~HunterGathererMDPState()
 {
 	// std::stringstream logName;
-	// look out: if 'this' is an _initial of a HGMDPModel && step==361 && _agentRef killed at 360, then the next line produces segm fault :
-	//logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
+	// look out: if 'this' is an _initial of a HGMDPModel && step==361 && _agent killed at 360, then the next line produces segm fault :
+	//logName << "logMDPStates_"	<< _agent->getWorld()->getId() << "_" << _agent->getId();
 	
 	clearAvailableActions();
 	
@@ -160,14 +160,14 @@ void	HunterGathererMDPState::computeHash()
 {
 	_hashKey.add( _timeIndex );
 	
-	GujaratWorld * gw = (GujaratWorld*)_agentRef->getWorld();	
+	GujaratWorld * gw = (GujaratWorld*)_agent->getWorld();	
 	Engine::Point2D<int> mapLocationLR;
 	gw->worldCell2LowResCell(_mapLocation,mapLocationLR);
 	
 	_hashKey.add( mapLocationLR._x );
 	_hashKey.add( mapLocationLR._y );
 	
-	_hashKey.add( _agentRef->reductionResourcesToCategory(_onHandResources) );
+	_hashKey.add( _agent->reductionResourcesToCategory(_onHandResources) );
 	_hashKey.add( _daysStarving );	
 	
 	for ( Engine::IncrementalRaster::ChangeIterator it = _resources.firstChange();
@@ -176,7 +176,7 @@ void	HunterGathererMDPState::computeHash()
 		const Engine::Point2D<int>& p = it->first;
 		_hashKey.add( p._x );
 		_hashKey.add( p._y );
-		_hashKey.add( _agentRef->reductionResourcesToCategory(_agentRef->convertBiomassToCalories(it->second)) );
+		_hashKey.add( _agent->reductionResourcesToCategory(_agent->convertBiomassToCalories(it->second)) );
 	}
 }
 
@@ -194,9 +194,9 @@ bool HunterGathererMDPState::equalIncRastersWithReduct(const Engine::Incremental
 		Engine::IncrementalRaster::ChangeIterator j = other.getChanges().find( i->first );
 		
 		if ( j == other.endOfChanges() ) return false;
-		if ( _agentRef->reductionResourcesToCategory(_agentRef->convertBiomassToCalories(i->second)) 
+		if ( _agent->reductionResourcesToCategory(_agent->convertBiomassToCalories(i->second)) 
 			!= 
-			_agentRef->reductionResourcesToCategory(_agentRef->convertBiomassToCalories(j->second)) ) return false;
+			_agent->reductionResourcesToCategory(_agent->convertBiomassToCalories(j->second)) ) return false;
 	}
 	return true;
 }
@@ -207,7 +207,7 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 	// due to the term condition ( _resources == s._resources ) 			
 	// we need introduce the "reductionResourcesToCategory" to comparison
 	
-	GujaratWorld * gw = (GujaratWorld*)_agentRef->getWorld();
+	GujaratWorld * gw = (GujaratWorld*)_agent->getWorld();
 	
 	Engine::Point2D<int> mapLocationLR;
 	gw->worldCell2LowResCell(_mapLocation,mapLocationLR);
@@ -217,8 +217,8 @@ bool	HunterGathererMDPState::operator==( const HunterGathererMDPState& s ) const
 	
 	bool result = ( _timeIndex == s._timeIndex ) 
 		&&
-			( _agentRef->reductionResourcesToCategory(_onHandResources) 
-			== _agentRef->reductionResourcesToCategory(s._onHandResources) ) 
+			( _agent->reductionResourcesToCategory(_onHandResources) 
+			== _agent->reductionResourcesToCategory(s._onHandResources) ) 
 		&&
 			( mapLocationLR == sMapLocationLR ) //*? TODO should be LR
 		&&
@@ -416,16 +416,10 @@ void HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructure
 /**
  * 
  */
-void HunterGathererMDPState::generateActions(
-			      const Engine::IncrementalRaster & resourcesRaster			      
-			      , const Engine::Point2D<int> &position
-			      , std::vector< Sector* >* HRActionSectors
-			      , std::vector< Sector* >* LRActionSectors
-			      , std::vector< Engine::Point2D<int> >* HRCellPool
-			      , std::vector< Engine::Point2D<int> >* LRCellPool)
+void HunterGathererMDPState::generateActions(const Engine::IncrementalRaster& resourcesRaster, const Engine::Point2D<int>& position)
 {
 	std::stringstream logName;
-	logName << "logMDPStates_"	<< _agentRef->getWorld()->getId() << "_" << _agentRef->getId();
+	logName << "logMDPStates_"	<< _agent->getWorld()->getId() << "_" << _agent->getId();
 	
 	// Map from "sector memory address" to "sector integer identifier".
 	// After sorting validActionSectors I need to access both the HR and the LR sector
@@ -438,18 +432,18 @@ void HunterGathererMDPState::generateActions(
 
 	std::vector< Sector* > validActionSectors;
 
-	_agentRef->updateKnowledge( position, resourcesRaster, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool );
+	_agent->updateKnowledge( position, resourcesRaster, _HRActionSectors, _LRActionSectors, _HRCellPool, _LRCellPool );
 	
 	
 	// MRJ: Remove empty sectors if any
-	for ( unsigned i = 0; i < LRActionSectors->size(); i++ )
+	for ( unsigned i = 0; i < _LRActionSectors->size(); i++ )
 	{
-		if ( (*LRActionSectors)[i]->isEmpty() )
+		if ( (*_LRActionSectors)[i]->isEmpty() )
 		{
 			continue;
 		}
-		validActionSectors.push_back( (*LRActionSectors)[i] );
-		sectorIdxMap[(unsigned long)(*LRActionSectors)[i]] = i;
+		validActionSectors.push_back( (*_LRActionSectors)[i] );
+		sectorIdxMap[(unsigned long)(*_LRActionSectors)[i]] = i;
 	}	
 	std::sort( validActionSectors.begin(), validActionSectors.end(), SectorBestFirstSortPtrVecPredicate() );
 	
@@ -457,12 +451,12 @@ void HunterGathererMDPState::generateActions(
 	for ( unsigned i = 0; i < validActionSectors.size(); i++ )
 	{
 		int sectorIdx = sectorIdxMap[(unsigned long)(validActionSectors[i])];
-		_availableActions.push_back( new ForageAction( (*HRActionSectors)[sectorIdx], validActionSectors[i], false ) );	
+		_availableActions.push_back( new ForageAction( (*_HRActionSectors)[sectorIdx], validActionSectors[i], false ) );	
 	}
 	
 	// Make Move Home
 	std::vector< MoveHomeAction* > possibleMoveHomeActions;
-	MoveHomeAction::generatePossibleActions( *_agentRef, position, *HRActionSectors, validActionSectors, possibleMoveHomeActions );
+	MoveHomeAction::generatePossibleActions( *_agent, position, *_HRActionSectors, validActionSectors, possibleMoveHomeActions );
 	unsigned int moveHomeActions = _config->getNumberMoveHomeActions();
 	if (  moveHomeActions >=  possibleMoveHomeActions.size() )
 	{
@@ -483,7 +477,7 @@ void HunterGathererMDPState::generateActions(
 	validActionSectors.clear();
 	
 	// Reference to structures that could reference structures from a MDPState cannot be destroyed. The MDPState's will destroy the ones created and are owned.	
-	//HRActionSectors.clear();
+	//_HRActionSectors.clear();
 	//LRActionSectors.clear();
 	//std::cout << "finished creating actions for state with time index: " << parent.getTimeIndex() << " and resources: " << parent.getOnHandResources() << std::endl;
 } 

@@ -109,7 +109,7 @@ public:
 
 	
 protected:
-	HunterGatherer * _agentRef;
+	HunterGatherer * _agent;
 	HunterGathererMDPConfig	* _config;
 	
 	std::vector< Sector* > * _HRActionSectors;// High Resolution
@@ -150,14 +150,7 @@ protected:
 	
 	void clearAvailableActions();
 	
-	
-	void generateActions(
-			      const Engine::IncrementalRaster & resourcesRaster			      
-			      , const Engine::Point2D<int> &position
-			      , std::vector< Sector* >* HRActionSectors
-			      , std::vector< Sector* >* LRActionSectors
-			      , std::vector< Engine::Point2D<int> >* HRCellPool
-			      , std::vector< Engine::Point2D<int> >* LRCellPool);	
+	void generateActions(const Engine::IncrementalRaster& resourcesRaster, const Engine::Point2D<int>& position);	
 };
 
 
