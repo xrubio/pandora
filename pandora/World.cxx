@@ -280,7 +280,7 @@ void World::stepSection( const int & sectionIndex )
 		//Agent * agent = *it;
 		if(_sections[sectionIndex].isInside(agent->getPosition()) && !hasBeenExecuted(agent))
 		{
-			agent->logAgentState();
+// 			agent->logAgentState();
 			agent->updateKnowledge();
 			agent->selectActions();
 		}
