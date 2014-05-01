@@ -69,12 +69,14 @@ public:
 	int		getOnHandResources() const { return _onHandResources; }
 	void addResources( int amt ) { _onHandResources += amt; }
 
+	//! Updates the starvation factor and amount of resources available to the agent at the end of a time step.
 	void consume() 
 	{ 
 		if( _onHandResources < _resourcesDivider ) {
+			// If the available resources are less than those that the agent needs, the starvation factor increases.
 			_daysStarving += 1000.0f*(1.0f-((float)_onHandResources/(float)_resourcesDivider));
-			//std::cout << "consume of this: " << this << " with days starving: " << _daysStarving << std::endl;
 		}
+		// At the end of the day, all the resources that have not been consumed are lost.
 		_onHandResources = 0;
 	}
 	
