@@ -41,39 +41,6 @@ GujaratWorld::~GujaratWorld()
 {
 }    
 
-/*
-Engine::Point2D<int> GujaratWorld::findNearestWater( const Engine::Point2D<int> & point )
-{
-	Engine::Point2D<int> nearestWater(-1,-1);
-	float bestDist = std::numeric_limits<float>::max();
-	Engine::Point2D<int> index;
-	bool found = false;
-	int nextDist = 1;
-	while(!found)
-	{
-		for(index._x=point._x-nextDist; index._x<point._x+nextDist; index._x++)
-		{
-			for(index._y=point._y-nextDist; index._y<point._y+nextDist; index._y++)
-			{
-				if(_overlapBoundaries.isInside(index) && getValue("soils", index)==WATER)
-				{
-					found = true;
-					float dist = index.distance(point);
-					if(dist<bestDist)
-					{
-						bestDist = dist;
-						nearestWater = index;
-					}
-				}
-
-			}
-		}		
-		nextDist++;
-	}
-	//std::cout << "final dist: " << nextDist << std::endl;
-	return nearestWater;
-}
-*/
 
 void GujaratWorld::createRasters()
 {
@@ -145,7 +112,7 @@ void GujaratWorld::createRasters()
 	
 	assert(_settlementAreas.getAreas().size() > 0);
 	
-std::cout << "init LR" << std::endl;	
+
 	
 	// Low Ressolution Rasters
 	int LowResRasterSideSize = getLowResMapsSideSize();
@@ -185,21 +152,21 @@ std::cout << "init LR" << std::endl;
 	*/
 	// Low Ressolution Soil Counters
 	
-std::cout << "init LR dune" << std::endl;		
 
-std::cout << "max "<< _config._lowResolution*_config._lowResolution << std::endl;		
+
+
 
 	registerStaticRaster("LRCounterSoilDUNE", false, LRCounterSoilDUNE, lowResSize2D );
 	getStaticRaster(LRCounterSoilDUNE).setDefaultInitValues(0, _config._lowResolution*_config._lowResolution, 0);	
 	fillLowResCounterRaster(LRCounterSoilDUNE,eSoils,DUNE);
 	
-std::cout << "init LR interdune" << std::endl;		
+
 	
 	registerStaticRaster("LRCounterSoilINTERDUNE", false, LRCounterSoilINTERDUNE, lowResSize2D);
 	getStaticRaster(LRCounterSoilINTERDUNE).setDefaultInitValues(0, _config._lowResolution*_config._lowResolution, 0);
 	fillLowResCounterRaster(LRCounterSoilINTERDUNE,eSoils,INTERDUNE);
 	
-std::cout << "init LR water" << std::endl;		
+
 	
 
 	if(_config._biomassDistribution.compare("linDecayFromWater")==0 || _config._biomassDistribution.compare("logDecayFromWater")==0)
@@ -208,14 +175,13 @@ std::cout << "init LR water" << std::endl;
 		registerStaticRaster("LRCounterSoilWATER", false, LRCounterSoilWATER, lowResSize2D);
 		getStaticRaster(LRCounterSoilWATER).setDefaultInitValues(0, _config._lowResolution*_config._lowResolution, 0);
 		fillLowResCounterRaster(LRCounterSoilWATER,eSoils,WATER);
-
-		std::cout << "init LR weightwater" << std::endl;		
+		
 	
 		registerStaticRaster("eLRWeightWater", false, eLRWeightWater, lowResSize2D);
 		getStaticRaster(eLRWeightWater).setDefaultInitValues(0, std::numeric_limits<int>::max(), 0);
 		fillLowResMeanRaster(eLRWeightWater,eWeightWater);
 	}
-std::cout << "end init LR" << std::endl;	
+
 
  
 }
@@ -360,7 +326,7 @@ void GujaratWorld::fillLowResMeanRaster(enum Rasters idRasterCounter, enum Raste
 			 index._y<(_boundaries._origin._y+_boundaries._size._y)/_config._lowResolution; 
 			 index._y++)		
 		{				
-//			std::cout << "get value at " << index << std::endl;
+
 			int count = getValueLR(idRasterCounter,index);
 			setInitValueLR(idRasterCounter
 						,index						,count/(_config._lowResolution*_config._lowResolution));
@@ -494,28 +460,6 @@ void GujaratWorld::createAgents()
 		}
 	}
 
-	/*	
-	for(int i=0; i<_config._numAP; i++)
-	{ 
-		if((i%_simulation.getNumTasks())==_simulation.getId())
-		{
-			std::ostringstream oss;
- 			oss << "AgroPastoralist_" << i;
-			AgroPastoralist * agent = new AgroPastoralist(oss.str());
-			addAgent(agent); 
-			_config._apInitializer->initialize(agent);
-			agent->setSocialRange( _config._socialRange );
-			//agent->setSurplusSpoilageFactor( _config._surplusSpoilage );
-			agent->setHomeMobilityRange( _config._socialRange );
-			agent->setMaxCropHomeDistance( _config._maxCropHomeDistance );
-			agent->setMassToCaloriesRate( _config._massToEnergyRate * _config._energyToCalRate );
-
-			agent->initializePosition();
-			std::cout << _simulation.getId() << " new AgroPastoralist: " << agent << std::endl;
-		}
-	}
-	*/
-
 
 	
 }
@@ -536,11 +480,11 @@ void GujaratWorld::getHRFreeCell(const Engine::Point2D<int> LRpos, Engine::Point
 	cornerRightDown._x = LRpos._x*C + C-1;
 	cornerRightDown._y = LRpos._y*C + C-1;
 
-	//*? use Engine::GeneralState::statistics().getUniformDistValue instead of rand
+
 	HRpos._x = cornerLeftUp._x + Engine::GeneralState::statistics().getUniformDistValue(0,cornerRightDown._x - cornerLeftUp._x);
-	//+ rand()%(cornerRightDown._x - cornerLeftUp._x+1);
+
 	HRpos._y = cornerLeftUp._y + Engine::GeneralState::statistics().getUniformDistValue(0,cornerRightDown._y - cornerLeftUp._y);
-	//+ rand()%(cornerRightDown._y - cornerLeftUp._y+1);
+
 	
 	//TODO checkPosition expensive??? cost : #agents
 	while( getValue(eSoils,HRpos) != DUNE || ! Engine::World::checkPosition(HRpos))
@@ -721,7 +665,6 @@ void GujaratWorld::recomputeYearlyBiomass()
 	_yearlyBiomass[DUNE] = areaOfCell*_config._duneBiomass * raininessFactor * _config._duneEfficiency;
 	_yearlyBiomass[INTERDUNE] = areaOfCell*_config._interduneBiomass * _config._interduneEfficiency * raininessFactor;
 	
-	//std::cout << std::setprecision(2) << std::fixed << "area of cell: " << areaOfCell << " interdune biomass: " << _config._interduneBiomass << " efficiency: " << _config._interduneEfficiency << " raininess factor: " << raininessFactor << " yearly biomass: " << _yearlyBiomass[INTERDUNE] << std::endl;
 	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " rain: " << _climate.getRain() << " with mean: " << _climate.getMeanAnnualRain());
 	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " yearly biomass of dune: " << _yearlyBiomass[DUNE] << " and interdune: " << _yearlyBiomass[INTERDUNE]);
 
@@ -750,16 +693,7 @@ void GujaratWorld::recomputeYearlyBiomass()
 	_dailyDrySeasonBiomassDecrease[WATER] = 0.0f;
 	_remainingBiomass[WATER] = 0.0f;
 	
-	//std::cout << "rem: " << _remainingBiomass[DUNE] << " " << _remainingBiomass[INTERDUNE] << " " << _remainingBiomass[WATER] << std::endl;
-	/*
-	std::cout << "increase: " << _dailyRainSeasonBiomassIncrease[DUNE] << " " 
-				<< _dailyRainSeasonBiomassIncrease[INTERDUNE] << " " 
-				<< _dailyRainSeasonBiomassIncrease[WATER] << std::endl;
 	
-	std::cout << "decrease: " << _dailyDrySeasonBiomassDecrease[DUNE] << " " 
-				<< _dailyDrySeasonBiomassDecrease[INTERDUNE] << " " 
-				<< _dailyDrySeasonBiomassDecrease[WATER] << std::endl;
-	*/
 }
 
 
