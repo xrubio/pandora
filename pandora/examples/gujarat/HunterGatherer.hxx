@@ -39,7 +39,10 @@ public:
 
 	void createMind();
 	
-	void setPosition(Engine::Point2D<int> p) { 	GujaratAgent::setPosition(p); _myHGMind->clearSectorKnowledge(); }
+	void setPosition(const Engine::Point2D<int>& position) {
+		GujaratAgent::setPosition(position);
+		_myHGMind->clearSectorKnowledge();
+	}
 	
 	void setHomeRange( int v ) { _homeRange = v; }
 	int  getHomeRange() const { return _homeRange; }
