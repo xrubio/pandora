@@ -69,20 +69,11 @@ public:
 	virtual Problem::action_t number_actions( const HunterGathererMDPState &s ) const;
 	virtual const HunterGathererMDPState & init() const;
 	virtual bool terminal( const HunterGathererMDPState &s ) const;
-	virtual bool dead_end( const HunterGathererMDPState &s ) const 
-		{ return false; }
+	virtual bool dead_end( const HunterGathererMDPState &s ) const { return false; }
 	virtual bool applicable( const HunterGathererMDPState &s, Problem::action_t a ) const;
 	virtual float cost( const HunterGathererMDPState &s, Problem::action_t a ) const;
-	virtual void next( const HunterGathererMDPState &s
-			, Problem::action_t a
-			, OutcomeVector& outcomes ) const;
+	virtual void next( const HunterGathererMDPState &s, Problem::action_t a, OutcomeVector& outcomes ) const;
 	
-	virtual void next( const HunterGathererMDPState &s
-			, Problem::action_t a
-			, OutcomeVector& outcomes
-			 , int foo ) const;
-			
-			
 	virtual	void print( std::ostream& os ) const {}
 	
 protected:

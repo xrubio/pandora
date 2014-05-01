@@ -107,8 +107,7 @@ bool HunterGathererMDPModel::terminal( const HunterGathererMDPState& s ) const
 	return s.getTimeIndex() == getHorizon();
 }
 
-bool HunterGathererMDPModel::applicable( const HunterGathererMDPState& s,
-						action_t a ) const
+bool HunterGathererMDPModel::applicable( const HunterGathererMDPState& s, action_t a ) const
 {
 	return true;
 }
@@ -125,59 +124,8 @@ float HunterGathererMDPModel::cost( const HunterGathererMDPState& s,
 }
 
 
-
-void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s, 
-					action_t a, 
-					OutcomeVector& outcomes,int foo ) const
+void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,  action_t a, OutcomeVector& outcomes) const
 {
-	const MDPAction* act = s.availableActions(a);
-	/*
-	 * Here, where I know whether "act" is ForageAction or MoveHomeAction,
-	 * according to these, what I pass to sp depends on it... copies,refs,
-	 * or new adhoc creation... etc...
-	 */
-	
-	std::vector< Sector* > * HRActionSectors;
-	std::vector< Sector* > * LRActionSectors;
-	std::vector< Engine::Point2D<int> > * HRCellPool;
-	std::vector< Engine::Point2D<int> > * LRCellPool;
-	
-	HRActionSectors = s.getHRActionSectors();
-	LRActionSectors = s.getLRActionSectors();
-	HRCellPool = s.getHRCellPool();
-	LRCellPool = s.getLRCellPool();		
-	
-	Engine::Point2D<int> center;
-	if( const MoveHomeAction* castedAction = dynamic_cast<const MoveHomeAction*>(act)) {
-		center = castedAction->getNewHomeLoc();
-	} else {
-		center = s.getLocation();
-	}
-	
-	std::vector<MDPAction *>  actionList;
-	makeActionsForState(s, center,HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, actionList);
-	
-	std::vector<bool> ownership(4, false); //TODO An action should know nothing about ownerships. Refactor the thing.
-	HunterGathererMDPState sp(s, center,HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, ownership, actionList);
-	
-	act->executeMDP( agentRef(), s, sp );
-	applyFrameEffects( s, sp );
-	sp.computeHash();	
-	
-	outcomes.push_back( std::make_pair(sp, 1.0) ); //*? TODO why 1.0, justify it
-	
-}
-
-
-void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s, 
-					action_t a, 
-					OutcomeVector& outcomes
-					 ) const
-{
-	std::stringstream logName;
-	logName << "HGMDPModel";
-	
-	
 	const MDPAction* act = s.availableActions(a);
 	/*
 	 * Here, where I know whether "act" is ForageAction or MoveHomeAction,
@@ -210,7 +158,6 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		ownership[3]=true;		
 	
 		center = ((MoveHomeAction*)act)->getNewHomeLoc();
-		
 	}	
 	else if(dynamic_cast<const ForageAction*>(act))
 	{
@@ -223,35 +170,7 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		ownership[1]=true;
 		ownership[2]=false;	
 		ownership[3]=true;	
-		
-
 	}
-	/*
-	else if(dynamic_cast<const ForageAction*>(act))
-	{
-		// New Sectors are created to preserve utility markers of parent state.
-		// But the same cell pools are used.
-		const std::vector< Sector* > & sourceLRSectors = agentRef().getLRSectors();
-		LRActionSectors = new std::vector< Sector* >(sourceLRSectors.size());
-
-		for(unsigned int i=0; i<sourceLRSectors.size(); i++)
-		{
-			Sector * se = sourceLRSectors[i];
-			Sector * r = new Sector(se);
-			(*LRActionSectors)[i] = r;
-		}
-		
-		HRActionSectors = s.getHRActionSectors();
-		HRCellPool = s.getHRCellPool();
-		LRCellPool = s.getLRCellPool();
-		
-		ownership[0]=false;
-		ownership[1]=true;
-		ownership[2]=false;
-		ownership[3]=s.getOwnerShip()[3];		
-		
-
-	}	*/
 	else if(dynamic_cast<const DoNothingAction*>(act))
 	{
 		HRActionSectors = s.getHRActionSectors();
@@ -266,16 +185,8 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,
 		ownership[3]=s.getOwnerShip()[3];
 		
 	}
-	else
-	{
-		/* Should be left this case to a default initialization of sectors and pools?
-		 * It could produce a backdoor effect that would lead to errors when a new
-		 * action is added to the model.
-		 */		
-		
-		std::stringstream oss;
-		oss << "HunterGathererMDPModel::next() - Action is of not recognized type.";
-		throw Engine::Exception(oss.str());
+	else {
+		throw Engine::Exception("Unrecognized action type");
 	}
 		
 	
@@ -298,20 +209,6 @@ void	HunterGathererMDPModel::applyFrameEffects( const HunterGathererMDPState& s,
 	sp.increaseTimeIndex();
 }
 
-/**
- * @param actionList List of executable actions
- *//*
-void HunterGathererMDPModel::makeActionsForState( HunterGatherer& parent, const Engine::Point2D<int> &loc, std::vector<MDPAction *>&  actionList) const
-{
-	makeActionsForState(
-			     parent.getLRResourcesRaster(),
-			     loc,
-			     &parent.getHRSectorsNoConst(),
-			     &parent.getLRSectorsNoConst(),
-			     &parent.getHRCellPoolNoConst(),
-			     &parent.getLRCellPoolNoConst(),
-			     actionList);
-}*/
 
 /**
  * @param actionList List of executable actions
@@ -353,7 +250,6 @@ void HunterGathererMDPModel::makeActionsForState(
 	std::stringstream logName;
 	logName << "logMDPStates_"	<< _simAgent->getWorld()->getId() << "_" << _simAgent->getId();
 	
-	
 	// Map from "sector memory address" to "sector integer identifier".
 	// After sorting validActionSectors I need to access both the HR and the LR sector
 	std::map<unsigned long,int> sectorIdxMap;
@@ -365,22 +261,8 @@ void HunterGathererMDPModel::makeActionsForState(
 
 	std::vector< Sector* > validActionSectors;
 
-	//for(int i = 0; i < LRActionSectors.size(); i++)
-		//assert(LRActionSectors[i]->cells().size() >0);
-	
-	/*if(LRActionSectors->size()==0)
-	{
-		log_INFO(logName.str(),"PREUPDATE LRSectors at " << position << ", amount sectors " << LRActionSectors->size());	
-	}
-	else
-	{
-		log_INFO(logName.str(),"PREUPDATE LRSectors at " << position << ", amount sectors " << LRActionSectors->size());	
-	}*/
-		
 	agentRef().updateKnowledge( position, resourcesRaster, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool );
 	
-	
-	//log_INFO(logName.str(),"UPDATED LRSectors at " << position << ", amount sectors " << LRActionSectors->size());	
 	
 	// MRJ: Remove empty sectors if any
 	for ( unsigned i = 0; i < LRActionSectors->size(); i++ )
