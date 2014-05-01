@@ -7,7 +7,7 @@
 #include <GujaratDemographics.hxx>
 //#include <RamirezDemographics.hxx>
 //#include <AlexisDemographics.hxx>
-#include <OriginalDemographics.hxx>
+#include <GujaratDemographics.hxx>
 #include <AgentController.hxx>
 #include <Geometry.hxx>
 
@@ -152,7 +152,7 @@ void GujaratState::setDemographics( const std::string & model )
 	{
 		delete _demographics;
 	}
-	_demographics = new OriginalDemographics;
+	_demographics = new GujaratDemographics;
 
 }
 

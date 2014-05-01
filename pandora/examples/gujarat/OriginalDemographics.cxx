@@ -1,5 +1,5 @@
 
-#include <OriginalDemographics.hxx>
+#include <GujaratDemographics.hxx>
 
 #include <Statistics.hxx>
 #include <GeneralState.hxx>
@@ -10,20 +10,20 @@
 namespace Gujarat
 {
 
-OriginalDemographics::OriginalDemographics()
+GujaratDemographics::GujaratDemographics()
 {
 }
 
-OriginalDemographics::~OriginalDemographics()
+GujaratDemographics::~GujaratDemographics()
 {
 }
 
-bool	OriginalDemographics::checkEmigration(  GujaratAgent& agent )
+bool	GujaratDemographics::checkEmigration(  GujaratAgent& agent )
 {
 	return false;
 }
 
-void	OriginalDemographics::checkMortality( GujaratAgent& agent )
+void	GujaratDemographics::checkMortality( GujaratAgent& agent )
 {
 
 	/*
@@ -62,7 +62,7 @@ void	OriginalDemographics::checkMortality( GujaratAgent& agent )
 	//agent.checkDeathByAging( 50 );
 }
 
-void	OriginalDemographics::checkReproduction( GujaratAgent& agent )
+void	GujaratDemographics::checkReproduction( GujaratAgent& agent )
 {
 	if (!agent.canReproduce()) return;
 	

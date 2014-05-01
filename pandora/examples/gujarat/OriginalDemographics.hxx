@@ -1,5 +1,5 @@
-#ifndef __ORIGINAL_DEMOGRAPHICS__
-#define __ORIGINAL_DEMOGRAPHICS__
+#ifndef __GUJARAT_DEMOGRAPHICS__
+#define __GUJARAT_DEMOGRAPHICS__
 
 #include <GujaratDemographics.hxx>
 
@@ -7,12 +7,12 @@ namespace Gujarat
 {
 class GujaratAgent;
 
-class OriginalDemographics : public GujaratDemographics
+class GujaratDemographics 
 {
 public:
 
-	OriginalDemographics();
-	virtual	~OriginalDemographics();
+	GujaratDemographics();
+	virtual	~GujaratDemographics();
 	
 	virtual bool checkEmigration( GujaratAgent& agent );
 	virtual void checkMortality( GujaratAgent& agent );
@@ -21,4 +21,4 @@ public:
 
 }
 
-#endif // OriginalDemographics.hxx
+#endif // GujaratDemographics.hxx

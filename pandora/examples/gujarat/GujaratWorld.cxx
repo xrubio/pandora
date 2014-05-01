@@ -10,7 +10,7 @@
 //#include <AgroPastoralist.hxx>
 #include <Exceptions.hxx>
 #include <GujaratConfig.hxx>
-#include <OriginalDemographics.hxx>
+#include <GujaratDemographics.hxx>
 
 #include <GeneralState.hxx>
 

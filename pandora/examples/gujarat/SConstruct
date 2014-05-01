@@ -12,7 +12,7 @@ srcFiles = Split("main.cxx GujaratWorld.cxx GujaratConfig.cxx Climate.cxx Gujara
 				  " MDPAction.cxx MoveHomeAction.cxx Sector.cxx ForageAction.cxx SettlementAreas.cxx "
 				  " HunterGathererMDPConfig.cxx HunterGathererMDPState.cxx HunterGathererMDPModel.cxx "
 				  " DoNothingAction.cxx AgentController.cxx HunterGathererProgrammedController.cxx HunterGathererDecisionTreeController.cxx "
-				  " HunterGathererMDPController.cxx GujaratDemographics.cxx OriginalDemographics.cxx CaloricRequirementsTable.cxx GujaratState.cxx "
+				  " HunterGathererMDPController.cxx GujaratDemographics.cxx CaloricRequirementsTable.cxx GujaratState.cxx "
 				  " HGMind.cxx HGOmniMindMap.cxx HGPartialMindMap.cxx HGMindFactory.cxx HunterGathererRandomMDPPolicyController.cxx ")
 
 
