@@ -70,16 +70,7 @@ public:
 	void addResources( int amt ) { _onHandResources += amt; }
 
 	//! Updates the starvation factor and amount of resources available to the agent at the end of a time step.
-	void consume() 
-	{
-		int consumed = _agent->computeConsumedResources(1);
-		if( _onHandResources < consumed ) {
-			// If the available resources are less than those that the agent needs, the starvation factor increases.
-			_daysStarving += 1000.0f * (1.0f - ((float) _onHandResources / (float) consumed));
-		}
-		// At the end of the day, all the resources that have not been consumed are lost.
-		_onHandResources = 0;
-	}
+	void consume();
 	
 	float getDaysStarving() const { return (float)_daysStarving/1000.0f; }
 
@@ -112,8 +103,16 @@ public:
 
 	
 protected:
-	HunterGatherer * _agent;
-	HunterGathererMDPConfig	* _config;
+	unsigned		_timeIndex;
+	Engine::Point2D<int>	_mapLocation;
+	int			_onHandResources;
+	
+	Engine::IncrementalRaster	_resources;
+	Engine::HashKey		_hashKey;
+	std::vector<MDPAction*> _availableActions;
+	int 		_daysStarving;	
+	HunterGatherer* _agent;
+	HunterGathererMDPConfig* _config;
 	
 	std::vector< Sector* > * _HRActionSectors;// High Resolution
 	std::vector< Sector* > * _LRActionSectors;// Low Resolution
@@ -141,18 +140,12 @@ protected:
 	std::map<long unsigned int,long> * _objectUseCounter;
 	omp_lock_t * _mapLock;
 	
-	unsigned		_timeIndex;
-	Engine::Point2D<int>	_mapLocation;
-	int			_onHandResources;
-	
-	Engine::IncrementalRaster	_resources;
-	Engine::HashKey		_hashKey;
-	std::vector<MDPAction*> _availableActions;
-	int 		_daysStarving;
 	
 	void clearAvailableActions();
 	
-	void generateActions(const Engine::IncrementalRaster& resourcesRaster, const Engine::Point2D<int>& position);	
+	//! Generates all the actions that are possible for the current state, and stores
+	//! them in the _availableActions attribute.
+	void generateActions();
 };
 
 

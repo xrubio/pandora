@@ -15,24 +15,23 @@ HunterGathererMDPState::HunterGathererMDPState(
 			, std::vector< Sector* > * LRActionSectors
 			, std::vector< Engine::Point2D<int> > * HRCellPool
 			, std::vector< Engine::Point2D<int> > * LRCellPool)
-
 	: _timeIndex(0)
 	, _mapLocation( agent->getPosition() )
 	, _onHandResources( agent->getOnHandResources() )
 	, _resources( agent->getLRResourcesRaster() )
+	, _availableActions(0)
+	, _daysStarving( 0 )
+	, _agent(agent)
+	, _config(config)
 	, _HRActionSectors( HRActionSectors )
 	, _LRActionSectors( LRActionSectors )	
 	, _HRCellPool( HRCellPool )
 	, _LRCellPool( LRCellPool )
 	, _ownItems( 4, false )
-	, _daysStarving( 0 )
 	, _objectUseCounter(agent->getObjectUseCounter())
 	, _mapLock(agent->getMapLock())
-	, _agent(agent)
-	,_config(config)
-	,_availableActions(0)
 {
-	generateActions(agent->getLRResourcesRaster(), agent->getPosition());
+	generateActions();
 	computeHash();
 	registerKnowledgeStructuresAtCounterMap();
 }
@@ -44,7 +43,10 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 , _onHandResources( s._onHandResources )
 , _resources( s._resources )
 , _hashKey( s._hashKey )
+, _availableActions(0)
 , _daysStarving( s._daysStarving )
+, _agent(s._agent)
+, _config(s._config)
 , _HRActionSectors(s._HRActionSectors)
 , _LRActionSectors(s._LRActionSectors)
 , _HRCellPool(s._HRCellPool)
@@ -52,9 +54,6 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 , _ownItems(s._ownItems)
 , _objectUseCounter(s._objectUseCounter)
 , _mapLock(s._mapLock)
-, _agent(s._agent)
-,_config(s._config)
-,_availableActions(0)
 {
 	for ( unsigned k = 0; k < s._availableActions.size(); k++ ) {
 		_availableActions.push_back( s._availableActions[k]->copy() ); // avoiding segm fault through copy
@@ -76,7 +75,10 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 , _onHandResources( s._onHandResources )
 , _resources( s._resources )
 , _hashKey( s._hashKey )
+, _availableActions(0)
 , _daysStarving( s._daysStarving )
+, _agent(s._agent)
+, _config(s._config)
 , _HRActionSectors(HRActionSectors)
 , _LRActionSectors(LRActionSectors)
 , _HRCellPool(HRCellPool)
@@ -84,11 +86,8 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 , _ownItems(ownItems)
 , _objectUseCounter(s._objectUseCounter)
 , _mapLock(s._mapLock)
-, _agent(s._agent)
-, _config(s._config)
-, _availableActions(0)
 {
-	generateActions(s.getResourcesRaster(), location);
+	generateActions();
 	computeHash();
 	registerKnowledgeStructuresAtCounterMap();
 }
@@ -390,7 +389,7 @@ void HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructure
 	}	
 	
 	
-	void HunterGathererMDPState::clearRefCounterMap() 
+	void HunterGathererMDPState::clearRefCounterMap()
 	{ 
 		//#pragma omp critical(refmap){_objectUseCounter->clear();}
 	}
@@ -404,11 +403,7 @@ void HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructure
 	}	
 
 
-/**
- * 
- */
-void HunterGathererMDPState::generateActions(const Engine::IncrementalRaster& resourcesRaster, const Engine::Point2D<int>& position)
-{
+void HunterGathererMDPState::generateActions() {
 	// Map from "sector memory address" to "sector integer identifier".
 	// After sorting validActionSectors I need to access both the HR and the LR sector
 	std::map<unsigned long,int> sectorIdxMap;
@@ -420,7 +415,7 @@ void HunterGathererMDPState::generateActions(const Engine::IncrementalRaster& re
 
 	std::vector< Sector* > validActionSectors;
 
-	_agent->updateKnowledge( position, resourcesRaster, _HRActionSectors, _LRActionSectors, _HRCellPool, _LRCellPool );
+	_agent->updateKnowledge( _mapLocation, _resources, _HRActionSectors, _LRActionSectors, _HRCellPool, _LRCellPool );
 	
 	
 	// MRJ: Remove empty sectors if any
@@ -444,7 +439,7 @@ void HunterGathererMDPState::generateActions(const Engine::IncrementalRaster& re
 	
 	// Make Move Home
 	std::vector< MoveHomeAction* > possibleMoveHomeActions;
-	MoveHomeAction::generatePossibleActions( *_agent, position, *_HRActionSectors, validActionSectors, possibleMoveHomeActions );
+	MoveHomeAction::generatePossibleActions( *_agent, _mapLocation, *_HRActionSectors, validActionSectors, possibleMoveHomeActions );
 	unsigned int moveHomeActions = _config->getNumberMoveHomeActions();
 	if (  moveHomeActions >=  possibleMoveHomeActions.size() )
 	{
@@ -470,6 +465,15 @@ void HunterGathererMDPState::generateActions(const Engine::IncrementalRaster& re
 	//std::cout << "finished creating actions for state with time index: " << parent.getTimeIndex() << " and resources: " << parent.getOnHandResources() << std::endl;
 } 
 
+void HunterGathererMDPState::consume() {
+	int consumed = _agent->computeConsumedResources(1);
+	if( _onHandResources < consumed ) {
+		// If the available resources are less than those that the agent needs, the starvation factor increases.
+		_daysStarving += 1000.0f * (1.0f - ((float) _onHandResources / (float) consumed));
+	}
+	// At the end of the day, all the resources that have not been consumed are lost.
+	_onHandResources = 0;
+}
 
 
 } // namespace
