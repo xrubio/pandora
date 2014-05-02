@@ -18,13 +18,10 @@ namespace Gujarat
 {
 
 HunterGathererDecisionTreeController::HunterGathererDecisionTreeController()
-{
-//	_DoNothingDaysCovered = 1; 
-}
+{}
 
 HunterGathererDecisionTreeController::~HunterGathererDecisionTreeController()
-{
-}
+{}
 
 int HunterGathererDecisionTreeController::getSectorIdxMatchingDirection( const HunterGatherer & agent, const std::vector<Sector *> & sectors, const int direction  ) const
 {
@@ -78,21 +75,6 @@ int HunterGathererDecisionTreeController::getMaxBiomassSector(  HunterGatherer &
 	validActionSectorsIdx.clear();
 	return result;
 }
-
-/*
-MDPAction* HunterGathererDecisionTreeController::shouldDoNothing( HunterGatherer & agent )
-{	
-	// CollectedResources > ConsumedResourcesByAgent * #days
-	if( agent.getOnHandResources() > agent.computeConsumedResources( getDoNothingDaysCovered() ) )
-	{
-		return new DoNothingAction();
-	}
-	else
-	{
-		return NULL;
-	}
-}
-*/
 
 
 MDPAction* HunterGathererDecisionTreeController::shouldForageWithWalkEstimation( HunterGatherer & agent )
