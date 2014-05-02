@@ -8,7 +8,7 @@ namespace Gujarat
 {
 
 //! Main constructor
-HunterGathererMDPState::HunterGathererMDPState( 
+HunterGathererMDPState::HunterGathererMDPState(
 			HunterGatherer* agent
 			, HunterGathererMDPConfig * config
 			, std::vector< Sector* > * HRActionSectors
@@ -20,7 +20,6 @@ HunterGathererMDPState::HunterGathererMDPState(
 	, _mapLocation( agent->getPosition() )
 	, _onHandResources( agent->getOnHandResources() )
 	, _resources( agent->getLRResourcesRaster() )
-	, _resourcesDivider( agent->computeConsumedResources(1) )
 	, _HRActionSectors( HRActionSectors )
 	, _LRActionSectors( LRActionSectors )	
 	, _HRCellPool( HRCellPool )
@@ -45,7 +44,6 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s 
 , _onHandResources( s._onHandResources )
 , _resources( s._resources )
 , _hashKey( s._hashKey )
-, _resourcesDivider( s._resourcesDivider )
 , _daysStarving( s._daysStarving )
 , _HRActionSectors(s._HRActionSectors)
 , _LRActionSectors(s._LRActionSectors)
@@ -78,7 +76,6 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 , _onHandResources( s._onHandResources )
 , _resources( s._resources )
 , _hashKey( s._hashKey )
-, _resourcesDivider( s._resourcesDivider )
 , _daysStarving( s._daysStarving )
 , _HRActionSectors(HRActionSectors)
 , _LRActionSectors(LRActionSectors)
@@ -99,10 +96,6 @@ HunterGathererMDPState::HunterGathererMDPState( const HunterGathererMDPState& s
 
 const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGathererMDPState& s )
 {	
-	std::stringstream logName;
-	logName << "logMDPStates_"	<< _agent->getWorld()->getId() << "_" << _agent->getId();
-	
-
 	deRegisterFromCounterMapAndDeleteKnowledgeStructures();
 	
 	_timeIndex 		 = s._timeIndex;
@@ -110,7 +103,6 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	_onHandResources = s._onHandResources;
 	_resources 		 = s._resources;
 	_hashKey 		 = s._hashKey;
-	_resourcesDivider = s._resourcesDivider;
 	_daysStarving 	 = s._daysStarving;
 
 	_objectUseCounter = s._objectUseCounter;
@@ -139,7 +131,6 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	registerKnowledgeStructuresAtCounterMap();	
 	
 	_agent = s._agent;
-	
 	_config = s._config;
 	
 	return *this;
@@ -418,9 +409,6 @@ void HunterGathererMDPState::deRegisterFromCounterMapAndDeleteKnowledgeStructure
  */
 void HunterGathererMDPState::generateActions(const Engine::IncrementalRaster& resourcesRaster, const Engine::Point2D<int>& position)
 {
-	std::stringstream logName;
-	logName << "logMDPStates_"	<< _agent->getWorld()->getId() << "_" << _agent->getId();
-	
 	// Map from "sector memory address" to "sector integer identifier".
 	// After sorting validActionSectors I need to access both the HR and the LR sector
 	std::map<unsigned long,int> sectorIdxMap;

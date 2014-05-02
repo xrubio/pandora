@@ -71,10 +71,11 @@ public:
 
 	//! Updates the starvation factor and amount of resources available to the agent at the end of a time step.
 	void consume() 
-	{ 
-		if( _onHandResources < _resourcesDivider ) {
+	{
+		int consumed = _agent->computeConsumedResources(1);
+		if( _onHandResources < consumed ) {
 			// If the available resources are less than those that the agent needs, the starvation factor increases.
-			_daysStarving += 1000.0f*(1.0f-((float)_onHandResources/(float)_resourcesDivider));
+			_daysStarving += 1000.0f * (1.0f - ((float) _onHandResources / (float) consumed));
 		}
 		// At the end of the day, all the resources that have not been consumed are lost.
 		_onHandResources = 0;
@@ -147,7 +148,6 @@ protected:
 	Engine::IncrementalRaster	_resources;
 	Engine::HashKey		_hashKey;
 	std::vector<MDPAction*> _availableActions;
-	int			_resourcesDivider;
 	int 		_daysStarving;
 	
 	void clearAvailableActions();
