@@ -47,7 +47,7 @@ GujaratState::~GujaratState()
 		_demographics = 0;
 	}
 	
-	for(int i=0; i<_hgControllers.size(); i++)
+	for(unsigned i=0; i<_hgControllers.size(); i++)
 	{
 		delete _hgControllers.at(i);
 		_hgControllers.at(i) = 0;
@@ -169,7 +169,7 @@ GujaratDemographics & GujaratState::demographics()
 
 void GujaratState::setHGController( const std::string & type, const HunterGathererMDPConfig & config )
 {
-	for(int i=0; i<instance()._hgControllers.size(); i++)
+	for(unsigned i=0; i<instance()._hgControllers.size(); i++)
 	{
 		delete instance()._hgControllers.at(i);
 	}
@@ -178,7 +178,7 @@ void GujaratState::setHGController( const std::string & type, const HunterGather
 
 	if( type.compare("MDP")==0)
 	{
-		for(int i=0; i<instance()._hgControllers.size(); i++)
+		for(unsigned i=0; i<instance()._hgControllers.size(); i++)
 		{
 			instance()._hgControllers.at(i) = new HunterGathererMDPController( config );	
 		}	
@@ -186,7 +186,7 @@ void GujaratState::setHGController( const std::string & type, const HunterGather
 	}
 	else if(type.compare("Random")==0)
 	{	
-		for(int i=0; i<instance()._hgControllers.size(); i++)
+		for(unsigned i=0; i<instance()._hgControllers.size(); i++)
 		{
 			instance()._hgControllers.at(i) = new HunterGathererProgrammedController();
 		}
@@ -194,7 +194,7 @@ void GujaratState::setHGController( const std::string & type, const HunterGather
 	}
 	else if(type.compare("DecisionTree")==0)
 	{	
-		for(int i=0; i<instance()._hgControllers.size(); i++)
+		for(unsigned i=0; i<instance()._hgControllers.size(); i++)
 		{
 			instance()._hgControllers.at(i) = new HunterGathererDecisionTreeController();
 		}
@@ -202,7 +202,7 @@ void GujaratState::setHGController( const std::string & type, const HunterGather
 	}
 	else if(type.compare("RandomMDP")==0)
 	{	
-		for(int i=0; i<instance()._hgControllers.size(); i++)
+		for(unsigned i=0; i<instance()._hgControllers.size(); i++)
 		{
 			instance()._hgControllers.at(i) = new HunterGathererRandomMDPPolicyController(config);
 		}
