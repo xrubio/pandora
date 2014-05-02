@@ -2,23 +2,23 @@
 <config> 
 	<!-- simulation config -->
 	<output resultsFile="./data/phones.h5" logsDir="./logs"/>
-	<numSteps value="5000" serializeResolution="500"/>
+	<numSteps value="2400" serializeResolution="1"/>
 	<environment>
         <!-- distribution can be "increase" (following y), "random" or "distance" -->
-		<landscape width="20" height="20" averageResources="20" distribution="increase"/>
+		<landscape width="60" height="60" averageResources="1000" distribution="increase"/>
         <!--
 		<climate daysDrySeason="10" meanRain="468.0" stddev="103.4"/>
         -->
-		<climate daysDrySeason="50" meanRain="468.0" stddev="103.4"/>
+		<climate daysDrySeason="240" meanRain="468.0" stddev="0.01"/>
 	</environment>
 	<population>
-		<villages num="1" agentsPerVillage="5"/>
-		<animals numPerHerder="20" resourcesPerDay="1"/>
+		<villages num="1" agentsPerVillage="10"/>
+		<animals numPerHerder="50" resourcesPerDay="5"/>
 	</population>
-	<mdp horizon="4" width="100" explorationBonus="0"/>
+	<mdp horizon="10" width="200" explorationBonus="0"/>
 	<knowledgeTransmission>
 		<!-- if fixed value = -1 a random value will be defined for each village -->
-		<inVillage active="yes" fixedValue="100"/>		
+		<inVillage active="yes" fixedValue="0"/>		
 		<outVillage active="no" fixedValue="1"/>
 	</knowledgeTransmission>
 </config>
