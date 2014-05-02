@@ -17,10 +17,9 @@ using Problem::action_t;
 namespace Gujarat
 {
 
-HunterGathererMDPModel::HunterGathererMDPModel()
-	: _simAgent(0), _initial( NULL )
-{
-}
+HunterGathererMDPModel::HunterGathererMDPModel(const HunterGathererMDPConfig& cfg)
+	: _agent(0), _initial( NULL ), _config(cfg)
+{}
 
 HunterGathererMDPModel::~HunterGathererMDPModel()
 {	
@@ -30,25 +29,11 @@ HunterGathererMDPModel::~HunterGathererMDPModel()
 	}
 }
 
-void	HunterGathererMDPModel::setup( const HunterGathererMDPConfig& cfg )
-{
-	_config = cfg;
-	setHorizon( cfg.getHorizon() );
-	//*?
-	//setWidth( cfg.getWidth() );
-}
-
 void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 {
-	std::stringstream logName;
-	logName << "HGMDPModel";
-	
-	if ( _initial != NULL )
-	{
-		delete _initial;		
-	}
+	delete _initial;
 
-	_simAgent = dynamic_cast<HunterGatherer *>(&agent);
+	_agent = dynamic_cast<HunterGatherer *>(&agent);
 
 	// Copy of the Sector & Pool structures.
 	// If we pass ones owned by the agent, even if we protect them
@@ -62,22 +47,15 @@ void	HunterGathererMDPModel::reset( GujaratAgent & agent )
 	
 	// The main matter : do not alter Sector's utility -->
 	// --> Sector duplication
-	std::vector< Sector* > * HRActionSectors = &(_simAgent->getHRSectorsNoConst());
+	std::vector< Sector* > * HRActionSectors = &(_agent->getHRSectorsNoConst());
 	std::vector< Sector* > * LRActionSectors = new std::vector< Sector* >(0);
-	//&(_simAgent->getLRSectorsNoConst());//new std::vector< Sector* >(0);
-	std::vector< Engine::Point2D<int> > * HRCellPool = &(_simAgent->getHRCellPoolNoConst());
+	//&(_agent->getLRSectorsNoConst());//new std::vector< Sector* >(0);
+	std::vector< Engine::Point2D<int> > * HRCellPool = &(_agent->getHRCellPoolNoConst());
 	std::vector< Engine::Point2D<int> > * LRCellPool = new std::vector< Engine::Point2D<int> >(0);
-	//&(_simAgent->getLRCellPoolNoConst());//new std::vector< Engine::Point2D<int> >(0);
+	//&(_agent->getLRCellPoolNoConst());//new std::vector< Engine::Point2D<int> >(0);
 
 	// Build initial state from current state in the simulation
-	_initial = new HunterGathererMDPState(
-						_simAgent
-						, &_config
-						, HRActionSectors
-						, LRActionSectors 
-						, HRCellPool
-						, LRCellPool);
-	
+	_initial = new HunterGathererMDPState(_agent, _config, HRActionSectors, LRActionSectors , HRCellPool, LRCellPool);
 	_initial->computeHash();
 }
 
@@ -93,7 +71,7 @@ const HunterGathererMDPState& HunterGathererMDPModel::init() const
 
 bool HunterGathererMDPModel::terminal( const HunterGathererMDPState& s ) const
 {
-	return s.getTimeIndex() == getHorizon();
+	return s.getTimeIndex() == (unsigned) _config.getHorizon();
 }
 
 bool HunterGathererMDPModel::applicable( const HunterGathererMDPState& s, action_t a ) const
@@ -180,7 +158,7 @@ void HunterGathererMDPModel::next( 	const HunterGathererMDPState &s,  action_t a
 
 	HunterGathererMDPState sp(s, center, HRActionSectors, LRActionSectors, HRCellPool, LRCellPool, ownership);
 	
-	act->executeMDP( *_simAgent, s, sp );
+	act->executeMDP( *_agent, s, sp );
 	applyFrameEffects( s, sp );
 	sp.computeHash();	
 	

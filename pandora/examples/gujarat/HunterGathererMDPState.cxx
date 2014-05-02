@@ -10,7 +10,7 @@ namespace Gujarat
 //! Main constructor
 HunterGathererMDPState::HunterGathererMDPState(
 			HunterGatherer* agent
-			, HunterGathererMDPConfig * config
+			, const HunterGathererMDPConfig& config
 			, std::vector< Sector* > * HRActionSectors
 			, std::vector< Sector* > * LRActionSectors
 			, std::vector< Engine::Point2D<int> > * HRCellPool
@@ -130,7 +130,7 @@ const HunterGathererMDPState& HunterGathererMDPState::operator=( const HunterGat
 	registerKnowledgeStructuresAtCounterMap();	
 	
 	_agent = s._agent;
-	_config = s._config;
+	// _config = s._config; // There is only one single config object
 	
 	return *this;
 }
@@ -410,7 +410,7 @@ void HunterGathererMDPState::generateActions() {
 
 	//std::cout << "creating actions for state with time index: " << s.getTimeIndex() << " and resources: " << s.getOnHandResources() << std::endl;
 	// Make Do Nothing	
-	if ( _config->isDoNothingAllowed() )
+	if ( _config.isDoNothingAllowed() )
 		_availableActions.push_back( new DoNothingAction() );	
 
 	std::vector< Sector* > validActionSectors;
@@ -440,7 +440,7 @@ void HunterGathererMDPState::generateActions() {
 	// Make Move Home
 	std::vector< MoveHomeAction* > possibleMoveHomeActions;
 	MoveHomeAction::generatePossibleActions( *_agent, _mapLocation, *_HRActionSectors, validActionSectors, possibleMoveHomeActions );
-	unsigned int moveHomeActions = _config->getNumberMoveHomeActions();
+	unsigned int moveHomeActions = _config.getNumberMoveHomeActions();
 	if (  moveHomeActions >=  possibleMoveHomeActions.size() )
 	{
 		for ( unsigned i = 0; i < possibleMoveHomeActions.size(); i++ )

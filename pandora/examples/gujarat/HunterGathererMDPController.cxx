@@ -3,35 +3,27 @@
 #include <HunterGatherer.hxx>
 
 #include <Logger.hxx>
-#include <GeneralState.hxx>
 
 namespace Gujarat
 {
 
-HunterGathererMDPController::HunterGathererMDPController( const HunterGathererMDPConfig& cfg ) : _mdpConfig( cfg ), _model(0), _uctBasePolicy(0)
-{
-	_model = new HunterGathererMDPModel();
-	_model->setup( cfg );
-	_uctBasePolicy = new BasePolicy( *_model ); 
-}
+HunterGathererMDPController::HunterGathererMDPController( const HunterGathererMDPConfig& cfg )
+	: _mdpConfig( cfg ), _model(cfg), _uctBasePolicy(_model)
+{}
 
 HunterGathererMDPController::~HunterGathererMDPController()
-{
-	delete _uctBasePolicy;
-	delete _model;
-}
+{}
 
 
 void HunterGathererMDPController::selectActions( GujaratAgent & agent, std::list<Engine::Action*> & actions )
 {
-	_model->reset(agent);
-	
-	auto s = _model->init();
-	log_DEBUG(agent.getId() + "_controller",  "Starting UCT run on seed state: " << s);
+	_model.reset(agent);
+	auto state = _model.init();
+	log_DEBUG(agent.getId() + "_controller",  "Starting UCT run on seed state: " << state);
 
-	UCT* uctPolicy = new UCT( *_uctBasePolicy, (unsigned)_mdpConfig.getWidth(), (unsigned)_mdpConfig.getHorizon(), _mdpConfig.getExplorationBonus(), false );
-	Problem::action_t aIndex = (*uctPolicy)( _model->init() );
-	MDPAction* a = _model->init().availableActions(aIndex)->copy();
+	UCT* uctPolicy = new UCT( _uctBasePolicy, (unsigned)_mdpConfig.getWidth(), (unsigned)_mdpConfig.getHorizon(), _mdpConfig.getExplorationBonus(), false );
+	Problem::action_t aIndex = (*uctPolicy)(state);
+	MDPAction* a = state.availableActions(aIndex)->copy();
 	delete uctPolicy;
 	actions.push_back(a);
 

@@ -32,7 +32,7 @@ class HunterGathererMDPState
 public:
 	//! Main constructor
 	HunterGathererMDPState(	HunterGatherer* agent
-			, HunterGathererMDPConfig* config
+			, const HunterGathererMDPConfig& config
 			, std::vector< Sector* > * HRActionSectors
 			, std::vector< Sector* > * LRActionSectors
 			, std::vector< Engine::Point2D<int> > * HRCellPool
@@ -112,7 +112,7 @@ protected:
 	std::vector<MDPAction*> _availableActions;
 	int 		_daysStarving;	
 	HunterGatherer* _agent;
-	HunterGathererMDPConfig* _config;
+	const HunterGathererMDPConfig& _config;
 	
 	std::vector< Sector* > * _HRActionSectors;// High Resolution
 	std::vector< Sector* > * _LRActionSectors;// Low Resolution

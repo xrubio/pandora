@@ -4,7 +4,6 @@
 #include <HunterGatherer.hxx>
 
 #include <Logger.hxx>
-#include <GeneralState.hxx>
 
 namespace Gujarat
 {
@@ -12,10 +11,8 @@ namespace Gujarat
 // 	HunterGathererMDPController::HunterGathererMDPController( const HunterGathererMDPConfig& cfg ) : _mdpConfig( cfg ), _model(0), _uctBasePolicy(0)
 	
 HunterGathererRandomMDPPolicyController::HunterGathererRandomMDPPolicyController(const HunterGathererMDPConfig& cfg) :
-	_model()
-{
-	_model.setup( cfg );
-}
+	_model(cfg)
+{}
 
 HunterGathererRandomMDPPolicyController::~HunterGathererRandomMDPPolicyController() { }
 	

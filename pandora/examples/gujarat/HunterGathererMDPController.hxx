@@ -26,12 +26,12 @@ public:
 	void selectActions( GujaratAgent & agent, std::list<Engine::Action*> & actions );
 
 private:
-	typedef		Online::Policy::random_t< HunterGathererMDPState >	BasePolicy;
-	typedef		Online::Policy::UCT::uct_t< HunterGathererMDPState >	UCT;
+	typedef Online::Policy::random_t< HunterGathererMDPState >	RandomPolicy;
+	typedef Online::Policy::UCT::uct_t< HunterGathererMDPState >	UCT;
 
-	HunterGathererMDPConfig						_mdpConfig;
-	HunterGathererMDPModel*						_model;
-	Online::Policy::random_t< HunterGathererMDPState >*		_uctBasePolicy;	
+	HunterGathererMDPConfig _mdpConfig;
+	HunterGathererMDPModel _model;
+	RandomPolicy _uctBasePolicy;	
 };
 
 }
