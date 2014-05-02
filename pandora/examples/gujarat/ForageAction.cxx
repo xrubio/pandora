@@ -43,18 +43,12 @@ ForageAction::~ForageAction()
 
 MDPAction*	ForageAction::copy() const
 {
-	ForageAction * newAction = 0;
-	
-	
 	/**
 	 Holds:
 	 Copy Method is not a deep copy.
 	 Forage are passed as pointers.	 
 	 */
-	
-	
 	assert(_LRForageArea->cells().size() >0);
-	
 	
 	/**
 	// Require:
@@ -62,8 +56,7 @@ MDPAction*	ForageAction::copy() const
 	// no MDPAction owns its ForageArea, so it can not do any delete 
 	// nor creation. The "ownsPointer" must be false.
 	*/
-	newAction = new ForageAction(_HRForageArea, _LRForageArea, false);
-	
+	ForageAction* newAction = new ForageAction(_HRForageArea, _LRForageArea, false);
 	newAction->setFullPopulation(_useFullPopulation);
 	return newAction;
 }
@@ -93,10 +86,7 @@ void ForageAction::execute( Engine::Agent & a )
 	Engine::Point2D<int> nearest = *_HRForageArea->getNearestTo( agent.getPosition() );
 
 	// 3. execute walk
-	_biomassCollected = 0;
-	doWalk( (GujaratAgent&)a, nearest, maxDistAgentWalk, agent.getWorld()->getDynamicRaster(eResources), _biomassCollected );	
-
-
+	_biomassCollected = doWalk( (GujaratAgent&)a, nearest, maxDistAgentWalk, agent.getWorld()->getDynamicRaster(eResources));
 	_caloriesCollected = agent.convertBiomassToCalories( _biomassCollected );
 	agent.updateResources( _caloriesCollected );
 	
@@ -429,94 +419,15 @@ void ForageAction::selectBestNearestHRCellInLRCell_ScanAllLRCell(
 }
 
 
-void	ForageAction::doWalkForRewardEstimation( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& source_r, int & collected ) 
-{
-	// TrendVicinityWalk
-	
-	Engine::IncrementalRaster r(source_r);
-    
-	double walkedDist 	= 0.0;
-	Engine::Point2D<int> n 	= n0;
-	double distHome 	= 0.0;
-	Engine::Point2D<int> best;
-	int bestScore 		= 0;
-	
-	std::stringstream logName;
-	logName << agent.getWorld()->getId() << "_" << agent.getId();
-	
-	GujaratWorld * gw = (GujaratWorld *)agent.getWorld();
-	
-	Engine::Point2D<int> HRHome(agent.getPosition());
-	Engine::Point2D<int> LRHome;
-        gw->worldCell2LowResCell( agent.getPosition(), LRHome);
-	Engine::Point2D<int> LRn    = LRHome;
-	Engine::Point2D<int> LRBest;	
-	Engine::Point2D<int> HRNearest;
-	
-	
-	//* why not eLRResources??? it is about the omniscience feature
-	// HGMind must be taken into account
-	// change agent.getWorld()->getDynamicRaster(eLRResources)
-	// by
-	// agent.getLRResourcesRaster()	
-	selectBestNearestLRCell( agent, LRn, gw, agent.getLRResourcesRaster()
-	, (int)(agent.getAvailableTime() / agent.getForageTimeCost())
-	, bestScore, LRBest );
-
-	// find endpoint
-	int lowResolution = ((GujaratConfig)gw->getConfig()).getLowResolution();
-	Engine::Point2D<int> HREndPoint= LRBest*lowResolution;
-	if (HREndPoint._x >= HRHome._x )
-	{
-		HREndPoint._x = HREndPoint._x + lowResolution -1;
-	}
-	if (HREndPoint._y >= HRHome._y )
-	{
-		HREndPoint._y = HREndPoint._y + lowResolution -1;
-	}	
-	bool wasInsideLR;
-	
-	while ( ( walkedDist + distHome ) < maxDist )
-	{	
-		
-		selectBestNearestHRCellInTrend_ScanFrame( 
-			(GujaratWorld*)(agent.getWorld())
-			,agent
-			, n
-			, HREndPoint
-			, LRBest
-			, r
-			, wasInsideLR
-			, bestScore
-			, best );		
-		
-		// 2. update walk distance
-		walkedDist += agent.getTimeSpentForagingTile();
-		walkedDist += best.distance(n);
-		n = best;
-		distHome = n0.distance(n);
-		int amtCollected = agent.computeEffectiveBiomassForaged( bestScore );
-		int prevActivity = agent.getWorld()->getValue(eForageActivity, n );
-		agent.getWorld()->setValue(eForageActivity, n, prevActivity + 1 );
-		collected += amtCollected;
-
-		// 4. update cell resources & amount collected
-		int prevValue = r.getValue(n - agent.getWorld()->getOverlapBoundaries()._origin); 
-		r.setValue( n - agent.getWorld()->getOverlapBoundaries()._origin, prevValue - amtCollected );
-
-	}
-	
-	
-	// Is it needed to update utility in LRraster and LRsectors?
-	// One action per timestep -> Next time I need LRraster and LRsectors they will be updated by
-	// nextstep method in world -> do not update LRraster, LRsectors
-	
+int ForageAction::doWalkForRewardEstimation( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, const Engine::Raster& r) {
+	Engine::IncrementalRaster rasterCopy(r);
+	return doWalk(agent, n0, maxDist, rasterCopy);
 }
 
 
-void	ForageAction::doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int & collected ) 
+int ForageAction::doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r) 
 {
-	// TrendVicinityWalk
+	int collected = 0;
 	
 	double walkedDist 	= 0.0;
 	Engine::Point2D<int> n 	= n0;
@@ -586,8 +497,8 @@ void	ForageAction::doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, 
 		// 4. update cell resources & amount collected
 		int prevValue = r.getValue(n - agent.getWorld()->getOverlapBoundaries()._origin); 
 		r.setValue( n - agent.getWorld()->getOverlapBoundaries()._origin, prevValue - amtCollected );
-		
 	}
+	return collected;
 	
 	// Is it needed to update utility in LRraster and LRsectors?
 	// One action per timestep -> Next time I need LRraster and LRsectors they will be updated by
@@ -595,9 +506,10 @@ void	ForageAction::doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, 
 }
 
 
-void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected ) const
+int ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r) const
 {
 	// To be called from UCT part
+	int collected = 0;
 	
 	std::stringstream logName;
 	logName << agent.getWorld()->getId() << "_" << agent.getId();
@@ -647,7 +559,8 @@ void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>
 					, bestScore
 					, best );
 		
-	}while ( ( walkedDist + distHome ) < maxDist && (bestScore > 0));
+	} while ( ( walkedDist + distHome ) < maxDist && (bestScore > 0));
+	return collected;
 	
 	// Is it needed to update utility in LRraster and LRsectors?
 	// One action per timestep -> Next time I need LRraster and LRsectors they will be updated by
@@ -667,12 +580,8 @@ void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>
 	
 	assert(_LRForageArea->cells().size() > 0);
 	
-	int collected = 0;
-
-	doWalk( agent, nearest, maxDist, sp.getResourcesRaster(), collected );
-		
+	int collected = doWalk( agent, nearest, maxDist, sp.getResourcesRaster());
 	sp.addResources( agent.convertBiomassToCalories(collected));
-	
 }
 
 void ForageAction::setFullPopulation( bool useFullPopulation )

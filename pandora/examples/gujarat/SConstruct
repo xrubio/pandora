@@ -22,20 +22,6 @@ extremeDebug = ARGUMENTS.get('edebug', 0)
 gprof = ARGUMENTS.get('prof',0)
 useMpi = ARGUMENTS.get('mpi', 1)
 
-
-treeHeurEstim = ARGUMENTS.get('treeHeur','')
-treeHeurFlagsTable = {
-	'walkEstim' : 'WALKESTIM'
-	,'treeIdun' : 'TREEIDUN'
-	}
-
-print "treeHeur :"+treeHeurEstim
-heurFlag = ''
-if(treeHeurEstim!=''):
-	heurFlag = '-D ' + treeHeurFlagsTable[treeHeurEstim]
-	print "heurFlag :"+heurFlag
-
-
 if int(useMpi) == 1:
 	env = Environment(ENV=os.environ, CXX='mpicxx')
 else:
@@ -44,28 +30,25 @@ else:
 generateMPICodeBuilder = Builder(action=generateMpi.execute)
 env.Append( BUILDERS = {'GenerateMPICode' : generateMPICodeBuilder})
 
-
 linkFlags = Split('-fopenmp')
 libs = Split('tinyxml pthread grass_gis grass_datetime')
+
+# Common compilation flags
+env['CCFLAGS'] += Split('-std=c++0x -DTIXML_USE_STL -fopenmp')
+
 if int(release) == 0:
-	env['CCFLAGS'] = Split(' -g -O0 -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG')
+	env['CCFLAGS'] += Split('-g -O0 -Wall -DPANDORADEBUG')
 	if int(extremeDebug)==1:
 		env['CCFLAGS'] += ['-DPANDORAEDEBUG']
 	libs += ['pandorad']
 	if int(gprof)==1:
-                env['CCFLAGS'] += ['-pg']
-		
-	
+		env['CCFLAGS'] += ['-pg']
 else:
-	env['CCFLAGS'] = Split('-O3 -DTIXML_USE_STL -fopenmp')
+	env['CCFLAGS'] += ['-O3']
 	libs += ['pandora']
 
 if int(useMpi)==1:
 	env['CCFLAGS'] += ['-DPANDORAMPI']
-
-env['CCFLAGS'] += ['-std=c++0x']
-
-env['CCFLAGS'] += [heurFlag]
 
 includeDirs = Split('./ ../../ ../../../libs/libmdp/')
 

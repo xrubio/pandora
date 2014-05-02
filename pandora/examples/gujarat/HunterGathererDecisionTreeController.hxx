@@ -9,33 +9,29 @@
 namespace Gujarat
 {
 
-class MDPAction;
-class HunterGatherer;
-class GujaratAgent;
-class Sector;
-
+class MDPAction; class HunterGatherer; class GujaratAgent; class Sector;
 
 class HunterGathererDecisionTreeController : public AgentController
 {
 public:
+	
+	//! Number of iterations used to estimate the (stochastic) reward that can be obtained 
+	const unsigned BIOMASS_ESTIMATION_ITERATIONS = 10;
+	
 	HunterGathererDecisionTreeController();
 	virtual ~HunterGathererDecisionTreeController();
 
 	void selectActions( GujaratAgent & agent, std::list<Engine::Action*> & actions );
-	
-	//MDPAction*         shouldDoNothing(  HunterGatherer & agent  );
+
+	//! Decides whether the agent should forage on the current sector based on an estimation of the possible biomass
+	//! that can be obtained by doing so, and on the caloric needs of the agent.
 	MDPAction*	shouldForage(  HunterGatherer & agent  );
-	MDPAction*	shouldForageWithWalkEstimation( HunterGatherer & agent );
+	
 	MDPAction*	shouldMoveHome(  HunterGatherer & agent  );
 	
 	int         getMaxBiomassSector( HunterGatherer & agent );
-//	unsigned        getDoNothingDaysCovered() const { return _DoNothingDaysCovered; } 
 
 	int getSectorIdxMatchingDirection( const HunterGatherer & agent, const std::vector<Sector *> & sectors, const int direction  ) const;
-
-
-private:
-	unsigned _DoNothingDaysCovered;
 };
 
 }

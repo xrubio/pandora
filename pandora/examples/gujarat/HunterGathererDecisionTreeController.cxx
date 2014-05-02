@@ -25,14 +25,10 @@ HunterGathererDecisionTreeController::~HunterGathererDecisionTreeController()
 
 int HunterGathererDecisionTreeController::getSectorIdxMatchingDirection( const HunterGatherer & agent, const std::vector<Sector *> & sectors, const int direction  ) const
 {
-	int i = 0;
-	while(i < sectors.size())
-	{
-		if (sectors[i]->_direction == direction)
-		{
+	for(unsigned i = 0; i < sectors.size(); ++i) {
+		if (sectors[i]->_direction == direction) {
 			return i;
 		}
-		i++;
 	}
 	return -1;
 }
@@ -77,105 +73,30 @@ int HunterGathererDecisionTreeController::getMaxBiomassSector(  HunterGatherer &
 }
 
 
-MDPAction* HunterGathererDecisionTreeController::shouldForageWithWalkEstimation( HunterGatherer & agent )
-{	
-	//Sector * maxSector = getMaxBiomassSector(agent);
-	int maxSectorLRIdx = getMaxBiomassSector(agent);
-
-	if(maxSectorLRIdx < 0) 
-	{
-		return 0;
-	}
-	
-	int maxSectorHRIdx = getSectorIdxMatchingDirection( agent, agent.getHRSectors(), agent.getLRSectors()[maxSectorLRIdx]->_direction );
-	assert(agent.getHRSectors()[maxSectorHRIdx]->_direction == agent.getLRSectors()[maxSectorLRIdx]->_direction);
-	
-	ForageAction * f = new	ForageAction(agent.getHRSectors()[maxSectorHRIdx],agent.getLRSectors()[maxSectorLRIdx], false);
-	
-	bool useFullPopulation = true; // we are not in a half-forage
-	double  maxDist= agent.computeMaxForagingDistance(useFullPopulation);
-	unsigned long sum = 0;
-	int walkReward = 0;
-	float meanReward = 0.0f;
-	int i = 0;
-	while(i<10)
-	{
-		f->doWalkForRewardEstimation( agent
-							, agent.getPosition()
-							, maxDist
-							, agent.getWorld()->getDynamicRaster(eResources)
-							, walkReward );
-		sum = sum + walkReward;
-		walkReward = 0;
-		++i;
-	}	
-	meanReward = agent.convertBiomassToCalories( sum/(float)i );	
-	
-	float alpha = ((GujaratConfig)((GujaratWorld*)agent.getWorld())->getConfig()).getAlphaDecTree();
-	if(  alpha*meanReward >= agent.computeConsumedResources(1) )
-	{
-		return f;
-	}
-	else
-	{
-		delete f;
-	}
-	//std::cout << "maxSector: " << maxSector << std::endl;
-	//delete maxSector;
-	return 0;
-}
-
-
 MDPAction* HunterGathererDecisionTreeController::shouldForage( HunterGatherer & agent )
 {	
 	//Sector * maxSector = getMaxBiomassSector(agent);
 	int maxSectorLRIdx = getMaxBiomassSector(agent);
-
-	if(maxSectorLRIdx < 0) 
-	{
-		return 0;
-	}
-
+	if(maxSectorLRIdx < 0) return 0;
+	
 	int maxSectorHRIdx = getSectorIdxMatchingDirection( agent, agent.getHRSectors(), agent.getLRSectors()[maxSectorLRIdx]->_direction );
 	assert(agent.getHRSectors()[maxSectorHRIdx]->_direction == agent.getLRSectors()[maxSectorLRIdx]->_direction);
 	
+	ForageAction * f = new ForageAction(agent.getHRSectors()[maxSectorHRIdx],agent.getLRSectors()[maxSectorLRIdx], false);
 	
-	int biomass = agent.getLRSectors()[maxSectorLRIdx]->getBiomassAmount();
-
-	// thinking that the agent will forage at most 9 cells
-
-#ifndef TREEIDUN
-	int numCells = agent.getHRSectors()[maxSectorHRIdx]->numCells();
-#endif
-
-#ifdef TREEIDUN
-	int numCells = agent.getHRSectors()[maxSectorHRIdx]->_numInterDunes;
-#endif
-	assert(agent.getHRSectors()[maxSectorHRIdx]->_direction == agent.getLRSectors()[maxSectorLRIdx]->_direction);
-	
-	
-	float maxNumCells = agent.getNrAvailableAdults()*agent.getAvailableTime()/agent.getForageTimeCost();
-	float percentageOfCells = maxNumCells/numCells;
-
-	/*std::cout 	<< "avail time:" 		<< agent.getAvailableTime()
-				<< ",forage time cost:"	<< agent.getForageTimeCost()
-				<< ",maxNumCells:" 		<< maxNumCells 
-				<< std::endl;*/
-	
-	/*
-	std::cout << agent << " required needs: " << agent.computeConsumedResources(1) << " max biomass: " << biomass << " potential calories: " << agent.convertBiomassToCalories(biomass) << " adults: " << agent.getNrAvailableAdults() << " max num cells: " << maxNumCells << " of: " << numCells  << " percentage: " << percentageOfCells << " estimation: " <<  0.5*percentageOfCells*(agent.convertBiomassToCalories(biomass)) << std::endl;	
-	*/
-	// we check if, collecting 50% of real biomass, needs will be arrived.
-	// ISSUE : the condition say : everybody eats or I do not go out to forage
-	// You should go and forage something, at least for the couple.
+	double  maxDist= agent.computeMaxForagingDistance(true); // we are not in a half-forage
+	unsigned long sum = 0;
+	for(unsigned i = 0; i < BIOMASS_ESTIMATION_ITERATIONS; ++i) {
+		sum += f->doWalkForRewardEstimation(agent, agent.getPosition(), maxDist, agent.getWorld()->getDynamicRaster(eResources));
+	}
+	float meanReward = agent.convertBiomassToCalories( sum / (float) BIOMASS_ESTIMATION_ITERATIONS );	
 	
 	float alpha = ((GujaratConfig)((GujaratWorld*)agent.getWorld())->getConfig()).getAlphaDecTree();
-	if( alpha*percentageOfCells*(agent.convertBiomassToCalories(biomass)) >= agent.computeConsumedResources(1) )
-	{
-		return new ForageAction(agent.getHRSectors()[maxSectorHRIdx],agent.getLRSectors()[maxSectorLRIdx], false);
+	if(  alpha*meanReward >= agent.computeConsumedResources(1) ) {
+		return f;
 	}
-	//std::cout << "maxSector: " << maxSector << std::endl;
-	//delete maxSector;
+	
+	delete f;
 	return 0;
 }
 
@@ -214,26 +135,8 @@ MDPAction* HunterGathererDecisionTreeController::shouldMoveHome( HunterGatherer 
 void HunterGathererDecisionTreeController::selectActions( GujaratAgent & agent, std::list<Engine::Action*> & actions )
 {	
 	HunterGatherer & agentConcrete = dynamic_cast<HunterGatherer&>( agent );
-        //Decission Tree: DoNothing --> Forage --> MoveHome
 
-	/*
-	MDPAction * selectedAction = 0;
-	selectedAction = shouldDoNothing(agentConcrete);
-	if(selectedAction)
-	{
-		actions.push_back(selectedAction);
-		log_INFO(logName.str(), "timestep: " << agent.getWorld()->getCurrentTimeStep() << " agent: " << agent << " will do nothing");
-		return actions;
-	}
-	*/
-
-#ifndef WALKESTIM
 	MDPAction * selectedAction = shouldForage(agentConcrete);
-#endif	
-	
-#ifdef WALKESTIM
-	MDPAction * selectedAction = shouldForageWithWalkEstimation(agentConcrete);
-#endif	
 	
 	if(selectedAction!=0)
 	{

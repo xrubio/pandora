@@ -62,13 +62,12 @@ class ForageAction : public MDPAction
 					, Engine::Point2D<int>& bestHR );
 
 	
-	void doWalk( const GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected ) const;
-	void doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected );
+	int doWalk( const GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r) const;
+	int doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r);
 
-	
-
-public:	
-	void doWalkForRewardEstimation( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected );	
+public:
+	//! Estimate the possible biomass obtained without actually modifying the raster data.
+	int doWalkForRewardEstimation( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, const Engine::Raster& r);	
 	
 
 	ForageAction( Sector* HRLoc, Sector* LRLoc, bool ownsPointer = false );
