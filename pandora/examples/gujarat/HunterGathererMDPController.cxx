@@ -21,10 +21,10 @@ void HunterGathererMDPController::selectActions( GujaratAgent & agent, std::list
 	auto state = _model.init();
 	log_DEBUG(agent.getId() + "_controller",  "Starting UCT run on seed state: " << state);
 
-	UCT* uctPolicy = new UCT( _uctBasePolicy, (unsigned)_mdpConfig.getWidth(), (unsigned)_mdpConfig.getHorizon(), _mdpConfig.getExplorationBonus(), false );
-	Problem::action_t aIndex = (*uctPolicy)(state);
+	UCT uctPolicy( _uctBasePolicy, (unsigned)_mdpConfig.getWidth(), (unsigned)_mdpConfig.getHorizon(), _mdpConfig.getExplorationBonus(), false );
+	Problem::action_t aIndex = uctPolicy(state);
+
 	MDPAction* a = state.availableActions(aIndex)->copy();
-	delete uctPolicy;
 	actions.push_back(a);
 
 	log_DEBUG(agent.getId() + "_controller",  "Action selected:" << a->describe());
