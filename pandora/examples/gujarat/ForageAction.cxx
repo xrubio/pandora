@@ -2,7 +2,7 @@
 
 #include <ForageAction.hxx>
 #include <Agent.hxx>
-#include <GujaratAgent.hxx>
+#include <HunterGatherer.hxx>
 #include <HunterGatherer.hxx>
 #include <GujaratConfig.hxx>
 #include <HunterGathererMDPState.hxx>
@@ -86,7 +86,7 @@ void ForageAction::execute( Engine::Agent & a )
 	Engine::Point2D<int> nearest = *_HRForageArea->getNearestTo( agent.getPosition() );
 
 	// 3. execute walk
-	_biomassCollected = doWalk( (GujaratAgent&)a, nearest, maxDistAgentWalk, agent.getWorld()->getDynamicRaster(eResources));
+	_biomassCollected = doWalk( (HunterGatherer&)a, nearest, maxDistAgentWalk, agent.getWorld()->getDynamicRaster(eResources));
 	_caloriesCollected = agent.convertBiomassToCalories( _biomassCollected );
 	agent.updateResources( _caloriesCollected );
 	
@@ -106,7 +106,7 @@ void ForageAction::execute( Engine::Agent & a )
 
 
 
-void	ForageAction::selectBestNearestLRCell( const GujaratAgent& agent
+void	ForageAction::selectBestNearestLRCell( const HunterGatherer& agent
 					,const Engine::Point2D<int>& n
 					,const GujaratWorld *gw
 					,Engine::Raster& resourceRaster
@@ -176,7 +176,7 @@ void	ForageAction::selectBestNearestLRCell( const GujaratAgent& agent
 
 void ForageAction::selectBestNearestHRCellInTrend_ScanFrame(
 				const GujaratWorld * gw
-				, GujaratAgent&  agent
+				, HunterGatherer&  agent
 				, const Engine::Point2D<int>& HRBegin
 				, Engine::Point2D<int>& HREndPoint
 				, const Engine::Point2D<int>& LREndPoint
@@ -352,7 +352,7 @@ void ForageAction::selectBestNearestHRCellInTrend_ScanFrame(
 
 void ForageAction::selectBestNearestHRCellInLRCell_ScanAllLRCell( 
 					const GujaratWorld * gw
-					, GujaratAgent&  agent
+					, HunterGatherer&  agent
 					, const Engine::Point2D<int>& LRn
 					, const Engine::Point2D<int>& HRNearest
 					, Engine::Raster& HRRes
@@ -419,14 +419,20 @@ void ForageAction::selectBestNearestHRCellInLRCell_ScanAllLRCell(
 }
 
 
-int ForageAction::doWalkForRewardEstimation( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, const Engine::Raster& r) {
+int ForageAction::doWalkForRewardEstimation( HunterGatherer& agent, const Engine::Point2D<int>& n0, double maxDist, const Engine::Raster& r) {
 	Engine::IncrementalRaster rasterCopy(r);
 	return doWalk(agent, n0, maxDist, rasterCopy);
 }
 
 
-int ForageAction::doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r) 
+int ForageAction::doWalk( HunterGatherer& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r) 
 {
+	
+	
+/* Description : Walk part of the Forage Action. The agent traverses a set of cells that
+ * belong to the sector to be exploited (_HRForageArea). The effect of the walk changes 
+ * the state of the world and the state of the agent.
+*/		
 	int collected = 0;
 	
 	double walkedDist 	= 0.0;
@@ -506,8 +512,17 @@ int ForageAction::doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, d
 }
 
 
-int ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r) const
+int ForageAction::doWalk( const HunterGatherer& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r) const
 {
+	
+/* Description : This method is the walk part when a Forage Action is tested in the
+ * Hypothetical Reasoning part of the decision process. The agent traverses a set of 
+ * cells that belong to the mind map of the agent and stimates the depletion and reward. 
+ * The effect of the walk changes the states explored in the virtual world represented 
+ * inside the MDP/UCT part.
+*/	
+	
+	
 	// To be called from UCT part
 	int collected = 0;
 	
@@ -568,7 +583,7 @@ int ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>&
 }
 
 
- void ForageAction::executeMDP( const GujaratAgent& agent, const HunterGathererMDPState& s, HunterGathererMDPState& sp ) const
+ void ForageAction::executeMDP( const HunterGatherer& agent, const HunterGathererMDPState& s, HunterGathererMDPState& sp ) const
 {	
 	assert(_LRForageArea->cells().size() >0);
 	

@@ -18,7 +18,7 @@ namespace Engine
 namespace Gujarat
 {
 	
-class GujaratAgent;
+class HunterGatherer;
 
 
 class ForageAction : public MDPAction
@@ -34,7 +34,7 @@ class ForageAction : public MDPAction
 							 
 	
 	
-	void selectBestNearestLRCell( const GujaratAgent& agent
+	void selectBestNearestLRCell( const HunterGatherer& agent
 					,const Engine::Point2D<int>& n
 					,const GujaratWorld *gw
 					,Engine::Raster& resourceRaster
@@ -43,7 +43,7 @@ class ForageAction : public MDPAction
 					,Engine::Point2D<int>& best ) const;
 
 	void selectBestNearestHRCellInTrend_ScanFrame( const GujaratWorld * gw
-				, GujaratAgent&  agent
+				, HunterGatherer&  agent
 				, const Engine::Point2D<int>& HRBegin
 				, Engine::Point2D<int>& HREndPoint
 				, const Engine::Point2D<int>& LREndPoint
@@ -54,7 +54,7 @@ class ForageAction : public MDPAction
 					
 	
 	void selectBestNearestHRCellInLRCell_ScanAllLRCell( const GujaratWorld * gw
-					, GujaratAgent&  agent
+					, HunterGatherer&  agent
 					, const Engine::Point2D<int>& LRn
 					, const Engine::Point2D<int>& HRNearest
 					, Engine::Raster& HRRes
@@ -62,12 +62,12 @@ class ForageAction : public MDPAction
 					, Engine::Point2D<int>& bestHR );
 
 	
-	int doWalk( const GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r) const;
-	int doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r);
+	int doWalk( const HunterGatherer& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r) const;
+	int doWalk( HunterGatherer& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r);
 
 public:
 	//! Estimate the possible biomass obtained without actually modifying the raster data.
-	int doWalkForRewardEstimation( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, const Engine::Raster& r);	
+	int doWalkForRewardEstimation( HunterGatherer& agent, const Engine::Point2D<int>& n0, double maxDist, const Engine::Raster& r);	
 	
 
 	ForageAction( Sector* HRLoc, Sector* LRLoc, bool ownsPointer = false );
@@ -75,7 +75,7 @@ public:
 
 	// if fullPopulation = false, only half the individuals will contribute to the action (the rest is moving home)
 	void execute( Engine::Agent& agent);
-	virtual void executeMDP( const GujaratAgent& agent, const HunterGathererMDPState& s, HunterGathererMDPState& sp ) const;
+	virtual void executeMDP( const HunterGatherer& agent, const HunterGathererMDPState& s, HunterGathererMDPState& sp ) const;
 
 	int	getTimeNeeded() const { return 1; }
 	virtual MDPAction* copy() const;
