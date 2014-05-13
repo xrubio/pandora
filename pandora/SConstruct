@@ -41,6 +41,10 @@ env.SharedLibrary(libraryName, srcBaseFiles, CPPPATH=includeDirs, LIBS=libs, LIB
 envPython = Environment(ENV=os.environ, CXX='mpicxx')
 
 envPython['LINKFLAGS'] = Split('-Wl,--export-dynamic,-no-undefined')
+envPython['LIBPATH'] = libDirs
+envPython['LIBPATH'] += ['/usr/lib/python3.3/config-3.3m-x86_64-linux-gnu/']
+
+Split('-Wl,--export-dynamic,-no-undefined')
 envPython.VariantDir('build_py', '.')
 
 if int(release) == 0:
@@ -78,5 +82,5 @@ else:
 
 includeDirsPython += includeDirs
 envPython = conf.Finish()
-envPython.SharedLibrary(pythonLibraryName, srcPyFiles, CPPPATH=includeDirsPython, LIBS=libsPython, LIBPATH=libDirs )
+envPython.SharedLibrary(pythonLibraryName, srcPyFiles, CPPPATH=includeDirsPython, LIBS=libsPython)
 
