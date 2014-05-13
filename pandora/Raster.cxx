@@ -22,7 +22,7 @@
 
 #include <Raster.hxx>
 #include <RasterLoader.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 
 #include <sstream>
 #include <limits>

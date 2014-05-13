@@ -1,6 +1,6 @@
 #include <GujaratConfig.hxx>
 #include <sstream>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <HunterGathererMDPConfig.hxx>
 
 #include <GujaratState.hxx>

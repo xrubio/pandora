@@ -1,9 +1,9 @@
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <iostream>
 #include "HerderWorld.hxx"
 #include "HerderWorldConfig.hxx"
 #include <Simulation.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 
 int main(int argc, char *argv[])
 {

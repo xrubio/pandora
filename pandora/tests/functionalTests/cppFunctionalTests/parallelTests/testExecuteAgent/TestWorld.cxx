@@ -21,7 +21,7 @@
 #include <TestWorld.hxx>
 
 #include <Point2D.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 
 #include <TestAgent.hxx>
 

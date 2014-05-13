@@ -5,7 +5,7 @@
 #include "HerderWorld.hxx"
 #include "MoveAction.hxx"
 
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 
 using Problem::action_t;
 

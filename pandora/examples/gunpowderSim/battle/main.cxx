@@ -1,6 +1,6 @@
 
 #include "Battlefield.hxx"
-#include "Exceptions.hxx"
+#include "Exception.hxx"
 
 #include <iostream>
 #include <cstdlib>

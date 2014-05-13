@@ -6,7 +6,7 @@
 #include <ForageAction.hxx>
 #include <MoveHomeAction.hxx>
 #include <DoNothingAction.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <typeinfo>
 
 using Problem::action_t;

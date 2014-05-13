@@ -3,7 +3,7 @@
 #include <boost/filesystem.hpp>
 #include <World.hxx>
 #include <Simulation.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <Agent.hxx>
 #include <Scheduler.hxx>
 #include <Logger.hxx>

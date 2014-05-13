@@ -1,10 +1,10 @@
 
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <iostream>
 #include "QuantumWorld.hxx"
 #include "QuantumWorldConfig.hxx"
 #include <Simulation.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 
 int main(int argc, char *argv[]) {
 	try {	

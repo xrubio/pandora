@@ -20,8 +20,8 @@
  * 
  */
 
-#ifndef __Exceptions_hxx__
-#define __Exceptions_hxx__
+#ifndef __Exception_hxx__
+#define __Exception_hxx__
 
 #include <exception>
 #include <string>
@@ -44,5 +44,5 @@ public:
 
 } // namespace Engine 
 
-#endif // __Exceptions_hxx__
+#endif // __Exception_hxx__
 

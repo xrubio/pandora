@@ -1,7 +1,7 @@
 #include <iostream>
 #include <Sector.hxx>
 #include <World.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 
 #include <GujaratWorld.hxx>
 #include <cassert>

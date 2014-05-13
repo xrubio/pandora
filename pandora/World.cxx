@@ -21,7 +21,7 @@
 
 #include <World.hxx>
 #include <Agent.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <Scheduler.hxx>
 #include <SpacePartition.hxx>
 #include <OpenMPSingleNode.hxx>

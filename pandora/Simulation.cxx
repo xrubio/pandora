@@ -23,7 +23,7 @@
 #include <Simulation.hxx>
 #include <mpi.h>
 #include <iostream>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <cmath>
 #include <sstream>
 

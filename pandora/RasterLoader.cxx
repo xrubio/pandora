@@ -24,7 +24,7 @@
 #include <StaticRaster.hxx>
 #include <Raster.hxx>
 #include <World.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 
 #include <GeneralState.hxx>
 #include <Logger.hxx>

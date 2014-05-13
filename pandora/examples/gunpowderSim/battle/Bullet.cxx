@@ -3,7 +3,7 @@
 #include "Soldier.hxx"
 #include "Battlefield.hxx"
 
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <World.hxx>
 #include <cstring>
 #include <Statistics.hxx>

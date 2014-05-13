@@ -5,7 +5,7 @@
 #include <GeneralState.hxx>
 /*
 #include "Raster.hxx"
-#include "Exceptions.hxx"
+#include "Exception.hxx"
 #include "Statistics.hxx"
 #include "gdal_priv.h"
 */

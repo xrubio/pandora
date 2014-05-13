@@ -1,6 +1,6 @@
 
 #include <ShpLoader.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 
 #include <ogrsf_frmts.h>
 

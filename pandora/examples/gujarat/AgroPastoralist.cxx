@@ -2,7 +2,7 @@
 #include <AgroPastoralist.hxx>
 #include <GujaratWorld.hxx>
 #include <CultivatedField.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 
 #include <APMoveHomeAction.hxx>
 #include <AbandonPlotAction.hxx>

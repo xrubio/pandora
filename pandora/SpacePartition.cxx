@@ -23,7 +23,7 @@
 #include <Agent.hxx>
 #include <MpiFactory.hxx>
 #include <Logger.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 
 namespace Engine
 {

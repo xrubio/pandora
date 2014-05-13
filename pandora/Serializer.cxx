@@ -27,7 +27,7 @@
 #include <Raster.hxx>
 #include <Agent.hxx>
 #include <Simulation.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <boost/filesystem.hpp>
 #include <Logger.hxx>
 #include <GeneralState.hxx>

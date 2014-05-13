@@ -21,7 +21,7 @@
  */
 
 #include <SimulationRecord.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <GeneralState.hxx>
 #include <RasterLoader.hxx>
 

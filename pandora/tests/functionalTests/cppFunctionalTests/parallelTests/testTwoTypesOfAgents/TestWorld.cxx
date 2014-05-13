@@ -23,7 +23,7 @@
 
 #include <Raster.hxx>
 #include <Point2D.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 
 #include <TestAgentA.hxx>
 #include <TestAgentB.hxx>

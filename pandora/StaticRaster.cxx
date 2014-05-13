@@ -21,7 +21,7 @@
  */
 
 #include <StaticRaster.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <World.hxx>
 #include <limits>
 

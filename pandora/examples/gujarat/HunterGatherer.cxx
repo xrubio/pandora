@@ -1,7 +1,7 @@
 
 #include <HunterGatherer.hxx>
 #include <GujaratWorld.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <Action.hxx>
 #include <Sector.hxx>
 #include <cmath>

@@ -2,7 +2,7 @@
 #include "Soldier.hxx"
 #include "Bullet.hxx"
 
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <World.hxx>
 #include <cstring>
 #include <Statistics.hxx>

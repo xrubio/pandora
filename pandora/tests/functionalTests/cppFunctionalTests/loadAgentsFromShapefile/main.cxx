@@ -1,6 +1,6 @@
 
 #include <ShpWorld.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <Simulation.hxx>
 #include <Size.hxx>
 

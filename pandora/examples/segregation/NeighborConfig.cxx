@@ -1,6 +1,6 @@
 #include "NeighborConfig.hxx"
 #include <sstream>
-#include "Exceptions.hxx"
+#include "Exception.hxx"
 
 namespace Segregation 
 {

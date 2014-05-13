@@ -21,7 +21,7 @@
 
 #include <TestAgent.hxx>
 #include <World.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <Statistics.hxx>
 #include <cstring>
 

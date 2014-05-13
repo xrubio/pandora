@@ -1,7 +1,7 @@
 
 #include "Archaeologist.hxx"
 
-#include "Exceptions.hxx"
+#include "Exception.hxx"
 #include "Statistics.hxx"
 #include "World.hxx"
 #include <cstring>

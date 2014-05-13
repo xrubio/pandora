@@ -2,7 +2,7 @@
 #include <analysis/IndividualStats.hxx>
 
 #include <AgentRecord.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <SimulationRecord.hxx>
 #include <sstream>
 #include <boost/filesystem.hpp>

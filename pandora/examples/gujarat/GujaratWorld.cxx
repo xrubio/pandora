@@ -5,7 +5,7 @@
 #include <Point2D.hxx>
 #include <HunterGatherer.hxx>
 //#include <AgroPastoralist.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <GujaratConfig.hxx>
 #include <OriginalDemographics.hxx>
 

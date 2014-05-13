@@ -22,7 +22,7 @@
 #include <OpenMPSingleNode.hxx>
 #include <Agent.hxx>
 #include <Logger.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <boost/chrono.hpp>
 
 namespace Engine

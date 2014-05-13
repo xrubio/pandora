@@ -3,7 +3,7 @@
 #include <AgentRecord.hxx>
 #include <SimulationRecord.hxx>
 #include <ogrsf_frmts.h>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <sstream>
 #include <boost/filesystem.hpp>
 #include <iomanip>

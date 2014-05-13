@@ -21,7 +21,7 @@
 
 #include <TestWorld.hxx>
 
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <TestAgent.hxx>
 #include <assert.h>
 #include <sstream>

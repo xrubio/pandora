@@ -21,7 +21,7 @@
  */
 
 #include <AgentRecord.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 
 #include <sstream>
 

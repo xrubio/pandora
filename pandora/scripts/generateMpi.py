@@ -138,7 +138,7 @@ def createFactoryMethods( listAgents, factoryFile, namespaces, listAttributesMap
 	f.write('\n')
 	f.write('#ifdef PANDORAMPI\n')	
 	f.write('#include <MpiFactory.hxx>\n')
-	f.write('#include <Exceptions.hxx>\n')
+	f.write('#include <Exception.hxx>\n')
 	f.write('#include <sstream>\n')
 	f.write('\n')
 	for i in range(0, len(listAgents)):

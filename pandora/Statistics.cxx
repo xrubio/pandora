@@ -21,7 +21,7 @@
  */
 
 #include <Statistics.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 
 #include <limits>
 #include <sstream>

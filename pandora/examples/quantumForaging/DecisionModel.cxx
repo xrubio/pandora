@@ -7,7 +7,7 @@
 #include "MoveAction.hxx"
 #include "ForageAction.hxx"
 
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 
 using Problem::action_t;
 

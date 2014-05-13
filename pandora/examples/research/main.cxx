@@ -1,7 +1,7 @@
 
 #include <Academia.hxx>
 #include <AcademiaConfig.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <Simulation.hxx>
 
 #include <iostream>

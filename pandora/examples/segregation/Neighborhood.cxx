@@ -2,7 +2,7 @@
 #include "Neighborhood.hxx"
 
 #include <Raster.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include "Neighbor.hxx"
 #include "NeighborConfig.hxx"
 

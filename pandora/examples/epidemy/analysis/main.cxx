@@ -19,7 +19,7 @@
  * 
  */
 
-#include "Exceptions.hxx"
+#include "Exception.hxx"
 #include "SimulationRecord.hxx"
 
 #include "analysis/Results.hxx"
