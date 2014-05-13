@@ -2,7 +2,7 @@
 #ifndef __MDPAgentState_hxx__
 #define __MDPAgentState_hxx__
 
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <IncrementalRaster.hxx>
 #include <Point2D.hxx>
 #include <HashTable.hxx>
@@ -17,7 +17,7 @@ class MDPAgentState
 {
 public:
 	explicit MDPAgentState();
-	MDPAgentState(const Engine::Point2D<int> & position, int resources, const Engine::Raster& resourcesRaster, unsigned int horizon, int resourcesToEat);
+	MDPAgentState(const Engine::Point2D<int> & position, int resources, const Engine::DynamicRaster& resourcesRaster, unsigned int horizon, int resourcesToEat);
 	MDPAgentState( const MDPAgentState & state );
 	virtual ~MDPAgentState();
 

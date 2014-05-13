@@ -69,8 +69,8 @@ void Forager::createKnowledge()
 
 void Forager::updateKnowledge()
 {
-	Engine::Raster & knowledge = _world->getDynamicRaster(_knowledgeMap);
-	Engine::Raster & resources = _world->getDynamicRaster(_resourcesMap);
+	Engine::DynamicRaster & knowledge = _world->getDynamicRaster(_knowledgeMap);
+	Engine::DynamicRaster & resources = _world->getDynamicRaster(_resourcesMap);
 
 	// first step, init environment
 	if(_world->getCurrentStep()==0)

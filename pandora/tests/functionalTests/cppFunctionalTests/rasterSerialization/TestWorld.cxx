@@ -2,7 +2,7 @@
 #include <TestWorld.hxx>
 
 #include <Simulation.hxx>
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <Point2D.hxx>
 
 namespace Test 

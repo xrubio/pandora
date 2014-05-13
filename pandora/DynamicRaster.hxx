@@ -20,8 +20,8 @@
  * 
  */
 
-#ifndef __Raster_hxx__
-#define __Raster_hxx__
+#ifndef __DynamicRaster_hxx__
+#define __DynamicRaster_hxx__
 
 #include <Point2D.hxx>
 #include <Size.hxx>
@@ -30,15 +30,15 @@
 namespace Engine
 {
 
-//! Raster adds mechanisms to modify the values of the raster map. It is serialized each time step.
-class Raster : public StaticRaster
+//! DynamicRaster adds mechanisms to modify the values of the raster map. It is serialized each time step.
+class DynamicRaster : public StaticRaster
 {
 	std::vector< std::vector<int> >	_maxValues;
 	int	_currentMaxValue;
 	int	_currentMinValue;
 public:
-	Raster();
-	virtual ~Raster();
+	DynamicRaster();
+	virtual ~DynamicRaster();
 
 	// parameters: starting pos and size in matrix to grow
 	//! Increases each cell value by 1 if it is under the maximum allowed.
@@ -73,5 +73,5 @@ public:
 
 } // namespace Engine
 
-#endif // __Raster_hxx__
+#endif // __DynamicRaster_hxx__
 

@@ -29,7 +29,7 @@ IncrementalRaster::IncrementalRaster()
 {
 }
 
-IncrementalRaster::IncrementalRaster( const Raster& baseRaster ) : _baseRaster( &baseRaster )
+IncrementalRaster::IncrementalRaster( const DynamicRaster& baseRaster ) : _baseRaster( &baseRaster )
 {
 	_currentMinValue = _baseRaster->getCurrentMinValue();
 	_currentMaxValue = _baseRaster->getCurrentMaxValue();

@@ -4,7 +4,7 @@
 #include <RandomWorldConfig.hxx>
 #include <MDPAgent.hxx>
 #include <Simulation.hxx>
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <Point2D.hxx>
 #include <GeneralState.hxx>
 #include <Statistics.hxx>

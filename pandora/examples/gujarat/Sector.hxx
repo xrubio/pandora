@@ -3,7 +3,7 @@
 #define __Sector_hxx__
 
 #include <Point2D.hxx>
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <vector>
 #include <iosfwd>
 
@@ -31,7 +31,7 @@ class Sector
 
 private:
 
-	void	computeBiomassAmount( const Engine::Raster& r );
+	void	computeBiomassAmount( const Engine::DynamicRaster& r );
 
 public:
 	Sector( const Engine::World & world );
@@ -71,7 +71,7 @@ public:
 	*/
 
 	void	updateFeatures();
-	void	updateFeatures( const Engine::Raster& r );
+	void	updateFeatures( const Engine::DynamicRaster& r );
 
 	//void	showFeatures( std::ostream& );
 	//std::string	biomassClass() const;

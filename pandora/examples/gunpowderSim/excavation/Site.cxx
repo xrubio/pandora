@@ -35,7 +35,7 @@ void Site::createRasters()
 	registerRaster("exploredRasters");
 	
 	// copying data
-	Engine::Raster & originalVirtualRecord = _record.getRaster("originalRecord", 0);
+	Engine::DynamicRaster & originalVirtualRecord = _record.getRaster("originalRecord", 0);
 	Engine::Point2D<int> index;
 	for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
 	{
@@ -45,7 +45,7 @@ void Site::createRasters()
 			setValue("originalRecord", index, originalVirtualRecord.getValue(index));
 		}
 	}
-	Engine::Raster & degradedVirtualRecord = _record.getRaster("degradedRecord", 0);
+	Engine::DynamicRaster & degradedVirtualRecord = _record.getRaster("degradedRecord", 0);
 	for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
 	{
 		for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)			
@@ -54,7 +54,7 @@ void Site::createRasters()
 			setValue("degradedRecord", index, degradedVirtualRecord.getValue(index));
 		}
 	}
-	Engine::Raster & originalImpacts = _record.getRaster("impacts", 0);
+	Engine::DynamicRaster & originalImpacts = _record.getRaster("impacts", 0);
 	for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
 	{
 		for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)			

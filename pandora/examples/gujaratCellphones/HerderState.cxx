@@ -5,7 +5,7 @@
 namespace GujaratCellphones
 {
 
-HerderState::HerderState(const Engine::Point2D<int> & position, const Engine::Raster & knowledgeMap, const Engine::Raster & resourcesMap, int resourcesToEat) : _position(position), _knowledgeMap(knowledgeMap), _resourcesMap(resourcesMap), _hashKey(0), _resourcesToEat(resourcesToEat), _isCopy(false)
+HerderState::HerderState(const Engine::Point2D<int> & position, const Engine::DynamicRaster & knowledgeMap, const Engine::DynamicRaster & resourcesMap, int resourcesToEat) : _position(position), _knowledgeMap(knowledgeMap), _resourcesMap(resourcesMap), _hashKey(0), _resourcesToEat(resourcesToEat), _isCopy(false)
 {
 	computeHash();
 }

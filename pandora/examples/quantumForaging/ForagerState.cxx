@@ -6,7 +6,7 @@
 namespace QuantumExperiment
 {
 
-ForagerState::ForagerState(const Engine::Point2D<int> & position, int neededResources, const Engine::Raster& knowledgeMap, const Engine::Raster& resourcesMap, int timeStep) : _timeStep(timeStep), _position(position), _foragedResources(0), _starvation(0.0f), _knowledgeMap(knowledgeMap), _resourcesMap(resourcesMap), _hashKey(0), _neededResources(neededResources), _isCopy(false)
+ForagerState::ForagerState(const Engine::Point2D<int> & position, int neededResources, const Engine::DynamicRaster& knowledgeMap, const Engine::DynamicRaster& resourcesMap, int timeStep) : _timeStep(timeStep), _position(position), _foragedResources(0), _starvation(0.0f), _knowledgeMap(knowledgeMap), _resourcesMap(resourcesMap), _hashKey(0), _neededResources(neededResources), _isCopy(false)
 {
 //	std::cout << "creating state by params: " << _rasterResources.getSize() << " original: " << resourcesRaster.getSize() << std::endl;
 	computeHash();

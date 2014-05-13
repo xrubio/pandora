@@ -9,7 +9,7 @@ MDPAgentState::MDPAgentState() : _timeStep(0), _position(-1,-1), _resources(0), 
 {
 }
 
-MDPAgentState::MDPAgentState(const Engine::Point2D<int> & position, int resources, const Engine::Raster & resourcesRaster, unsigned int horizon, int resourcesToEat) : _timeStep(0), _position(position), _resources(resources), _rasterResources(resourcesRaster), _horizon(horizon), _resourcesToEat(resourcesToEat), _isCopy(false)
+MDPAgentState::MDPAgentState(const Engine::Point2D<int> & position, int resources, const Engine::DynamicRaster & resourcesRaster, unsigned int horizon, int resourcesToEat) : _timeStep(0), _position(position), _resources(resources), _rasterResources(resourcesRaster), _horizon(horizon), _resourcesToEat(resourcesToEat), _isCopy(false)
 {
 //	std::cout << "creating state by params: " << _rasterResources.getSize() << " original: " << resourcesRaster.getSize() << std::endl;
 	computeHash();

@@ -30,7 +30,7 @@ void RemoveBulletWorld::createRasters()
 	registerRaster("degradedRecord");
 	registerRaster("impacts");
 
-	Engine::Raster & originalVirtualRecord = _record.getRaster("virtualRecord", _record.getNumSteps());
+	Engine::DynamicRaster & originalVirtualRecord = _record.getRaster("virtualRecord", _record.getNumSteps());
 	// copiar dades 
 	Engine::Point2D<int> index;
 	for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
@@ -42,7 +42,7 @@ void RemoveBulletWorld::createRasters()
 		}
 	}
 	
-	Engine::Raster & originalImpacts = _record.getRaster("impacts", _record.getNumSteps());
+	Engine::DynamicRaster & originalImpacts = _record.getRaster("impacts", _record.getNumSteps());
 	// copiar dades 
 	for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
 	{

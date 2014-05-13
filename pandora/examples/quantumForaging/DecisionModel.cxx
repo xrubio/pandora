@@ -70,7 +70,7 @@ float DecisionModel::cost( const ForagerState & state, action_t action ) const
 {
 	float starvationCost = state.getAvailableAction(action).getStarvationCost();
 
-	const Engine::Raster & knowledge = state.getKnowledgeMap();
+	const Engine::DynamicRaster & knowledge = state.getKnowledgeMap();
 
 	float localKnowledgeIncrease = 0.0f;
 	if(state.getAvailableAction(action).getPosition()==state.getPosition() && knowledge.getValue(state.getPosition())<knowledge.getMaxValueAt(state.getPosition()))

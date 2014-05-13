@@ -2,7 +2,7 @@
 #ifndef __ForagerState_hxx__
 #define __ForagerState_hxx__
 
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <IncrementalRaster.hxx>
 #include <Point2D.hxx>
 #include <HashTable.hxx>
@@ -15,7 +15,7 @@ namespace QuantumExperiment
 class ForagerState
 {
 public:
-	ForagerState(const Engine::Point2D<int> & position,  int neededResources, const Engine::Raster& knowledgeMap, const Engine::Raster& resourcesMap, int timeStep);
+	ForagerState(const Engine::Point2D<int> & position,  int neededResources, const Engine::DynamicRaster& knowledgeMap, const Engine::DynamicRaster& resourcesMap, int timeStep);
 	ForagerState( const ForagerState & state);
 	virtual ~ForagerState();
 

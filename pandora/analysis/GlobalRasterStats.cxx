@@ -281,7 +281,7 @@ void GlobalRasterStats::setParams( Params * params, const std::string & groupFil
 
 std::string GlobalRasterStats::getName() const
 {
-	return "Global Raster Stats";
+	return "Global DynamicRaster Stats";
 }
 
 } // namespace PostProcess

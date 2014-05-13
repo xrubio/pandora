@@ -216,22 +216,22 @@ AgentsVector OpenMPSingleNode::getNeighbours( Agent * target, const double & rad
 	return agentsVector;
 }
 	
-void OpenMPSingleNode::setValue( Raster & raster, const Point2D<int> & position, int value )
+void OpenMPSingleNode::setValue( DynamicRaster & raster, const Point2D<int> & position, int value )
 {
 	raster.setValue(position, value);
 }
 
-int OpenMPSingleNode::getValue( const Raster & raster, const Point2D<int> & position ) const
+int OpenMPSingleNode::getValue( const DynamicRaster & raster, const Point2D<int> & position ) const
 {
 	return raster.getValue(position);
 }
 
-void OpenMPSingleNode::setMaxValueAt( Raster & raster, const Point2D<int> & position, int value )
+void OpenMPSingleNode::setMaxValueAt( DynamicRaster & raster, const Point2D<int> & position, int value )
 {
 	raster.setMaxValue(position, value);
 }
 
-int OpenMPSingleNode::getMaxValueAt( const Raster & raster, const Point2D<int> & position ) const
+int OpenMPSingleNode::getMaxValueAt( const DynamicRaster & raster, const Point2D<int> & position ) const
 {
 	return raster.getMaxValueAt(position);
 }

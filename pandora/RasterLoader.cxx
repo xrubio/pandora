@@ -22,7 +22,7 @@
 
 #include <RasterLoader.hxx>
 #include <StaticRaster.hxx>
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <World.hxx>
 #include <Exception.hxx>
 
@@ -115,7 +115,7 @@ void RasterLoader::fillGDALRaster( StaticRaster & raster, const std::string & fi
 	raster.updateMinMaxValues();
 	
 	// if dynamic, copy to maxValues
-	Raster * dynamicRaster = dynamic_cast<Raster*>(&raster);
+	DynamicRaster * dynamicRaster = dynamic_cast<DynamicRaster*>(&raster);
 	if(dynamicRaster)
 	{
 		std::copy(dynamicRaster->_values.begin(), dynamicRaster->_values.end(), dynamicRaster->_maxValues.begin());
@@ -245,7 +245,7 @@ void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fi
 	raster.updateMinMaxValues();
 	
 	// if dynamic, copy to maxValues
-	Raster * dynamicRaster = dynamic_cast<Raster*>(&raster);
+	DynamicRaster * dynamicRaster = dynamic_cast<DynamicRaster*>(&raster);
 	if(dynamicRaster)
 	{
 		std::copy(dynamicRaster->_values.begin(), dynamicRaster->_values.end(), dynamicRaster->_maxValues.begin());
@@ -316,7 +316,7 @@ void RasterLoader::fillGrassCellRaster( StaticRaster & raster, const std::string
 	raster.updateMinMaxValues();
 
 	// if dynamic, copy to maxValues
-	Raster * dynamicRaster = dynamic_cast<Raster*>(&raster);
+	DynamicRaster * dynamicRaster = dynamic_cast<DynamicRaster*>(&raster);
 	if(dynamicRaster)
 	{
 		std::copy(dynamicRaster->_values.begin(), dynamicRaster->_values.end(), dynamicRaster->_maxValues.begin());

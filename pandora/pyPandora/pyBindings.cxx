@@ -28,7 +28,7 @@
 #include <Size.hxx>
 #include <Rectangle.hxx>
 #include <StaticRaster.hxx>
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <Simulation.hxx>
 #include <World.hxx>
 #include <Agent.hxx>
@@ -94,7 +94,7 @@ public:
 	}
 };
 
-class RasterWrap : public Engine::Raster, public boost::python::wrapper<Engine::Raster>
+class RasterWrap : public Engine::DynamicRaster, public boost::python::wrapper<Engine::DynamicRaster>
 {
 public:
 	void resize( const SizeInt & size )
@@ -104,12 +104,12 @@ public:
 			resize( size );
 			return;
 		}
-		Engine::Raster::resize(size);
+		Engine::DynamicRaster::resize(size);
 	}
 
 	void default_resize( const SizeInt & size )
 	{
-		Engine::Raster::resize(size);
+		Engine::DynamicRaster::resize(size);
 	}
 	
 	const int & getValue( Point2DInt position ) const
@@ -118,12 +118,12 @@ public:
 		{
 			return getValue(position);
 		}
-		return Engine::Raster::getValue(position);
+		return Engine::DynamicRaster::getValue(position);
 	}
 
 	const int & default_getValue(Point2DInt position) const
 	{
-		return Engine::Raster::getValue(position);
+		return Engine::DynamicRaster::getValue(position);
 	}
 
 };
@@ -362,7 +362,7 @@ bool notEqualsRectangle( const RectangleInt & rectangleA, const RectangleInt & r
 }
 
 // overloaded methods
-Engine::Raster & (Engine::World::*getDynamicRaster)(const std::string&) = &Engine::World::getDynamicRaster;
+Engine::DynamicRaster & (Engine::World::*getDynamicRaster)(const std::string&) = &Engine::World::getDynamicRaster;
 Engine::StaticRaster & (Engine::World::*getStaticRaster)(const std::string&) = &Engine::World::getStaticRaster;
 
 int (Engine::World::*getValue)(const std::string&, const Engine::Point2D<int> &) const = &Engine::World::getValue;
@@ -412,11 +412,11 @@ BOOST_PYTHON_MODULE(libpyPandora)
 	;
 
 	boost::python::class_< RasterWrap, boost::noncopyable >("RasterStub")
-		.def("setInitValues", &Engine::Raster::setInitValues) 
-		.def("setValue", &Engine::Raster::setValue)	
-		.def("resize", &Engine::Raster::resize, &RasterWrap::default_resize) 
-		.def("getSize", &Engine::Raster::getSize)
-		.def("getValue", &Engine::Raster::getValue, &RasterWrap::default_getValue, boost::python::return_value_policy<boost::python::copy_const_reference>())
+		.def("setInitValues", &Engine::DynamicRaster::setInitValues) 
+		.def("setValue", &Engine::DynamicRaster::setValue)	
+		.def("resize", &Engine::DynamicRaster::resize, &RasterWrap::default_resize) 
+		.def("getSize", &Engine::DynamicRaster::getSize)
+		.def("getValue", &Engine::DynamicRaster::getValue, &RasterWrap::default_getValue, boost::python::return_value_policy<boost::python::copy_const_reference>())
 	;
 
 	boost::python::class_< Engine::Simulation >("SimulationStub", boost::python::init< const Engine::Size<int> &, const int &, const int & >() )	

@@ -46,7 +46,7 @@ Engine::Point2D<int>	Sector::getNearestTo( Engine::Point2D<int> p ) const
 	return nearest;
 }
 
-void	Sector::computeBiomassAmount( const Engine::Raster& r )
+void	Sector::computeBiomassAmount( const Engine::DynamicRaster& r )
 {
 	_biomassAmount = 0;
 //	int maxBiomassAmount = r.getCurrentMaxValue();
@@ -73,7 +73,7 @@ void	Sector::computeBiomassAmount( const Engine::Raster& r )
 	*/
 }
 
-void	Sector::updateFeatures( const Engine::Raster& r )
+void	Sector::updateFeatures( const Engine::DynamicRaster& r )
 {
 	computeBiomassAmount( r ); 
 }

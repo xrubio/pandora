@@ -5,7 +5,7 @@
 #include "Bullet.hxx"
 #include "BattlefieldConfig.hxx"
 
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <Point2D.hxx>
 #include <Exception.hxx>
 #include <Statistics.hxx>

@@ -17,7 +17,7 @@ public:
 	explicit HunterGathererMDPState();
 
 	// The real one
-	HunterGathererMDPState(Engine::Point2D<int> loc, int initialOnHand, const Engine::Raster& resourcesRaster, int maxResources, int divider);
+	HunterGathererMDPState(Engine::Point2D<int> loc, int initialOnHand, const Engine::DynamicRaster& resourcesRaster, int maxResources, int divider);
 	HunterGathererMDPState( const HunterGathererMDPState& s );
 	const HunterGathererMDPState&	operator=(const HunterGathererMDPState& s );
 	

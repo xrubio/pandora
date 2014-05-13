@@ -102,7 +102,7 @@ void Village::serialize()
 	for(std::list<Herder*>::iterator it=_herders.begin(); it!=_herders.end(); it++)
 	{
 		Herder & herder = **it;
-		Engine::Raster knowledge = _world->getDynamicRaster(herder.getKnowledgeMap());
+		Engine::DynamicRaster knowledge = _world->getDynamicRaster(herder.getKnowledgeMap());
 
 		int herderKnownCells = 0;
 		Engine::Point2D<int> index(0,0);

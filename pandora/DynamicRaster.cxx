@@ -20,7 +20,7 @@
  * 
  */
 
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <RasterLoader.hxx>
 #include <Exception.hxx>
 
@@ -30,15 +30,15 @@
 namespace Engine
 {
 
-Raster::Raster()
+DynamicRaster::DynamicRaster()
 {
 }
 
-Raster::~Raster()
+DynamicRaster::~DynamicRaster()
 {
 }
 
-void Raster::resize( const Size<int> & size )
+void DynamicRaster::resize( const Size<int> & size )
 {
 	StaticRaster::resize(size);
 	_maxValues.resize(size._width);
@@ -48,7 +48,7 @@ void Raster::resize( const Size<int> & size )
 	}
 }
 
-void Raster::updateRasterIncrement()
+void DynamicRaster::updateRasterIncrement()
 {
 	for(size_t i=0; i<_values.size(); i++)
 	{
@@ -62,37 +62,37 @@ void Raster::updateRasterIncrement()
 	}
 }
 
-void Raster::updateRasterToMaxValues()
+void DynamicRaster::updateRasterToMaxValues()
 {
 	// std::copy is deep oriented.
 	std::copy(_maxValues.begin(), _maxValues.end(), _values.begin());
 }
 
-int Raster::getMaxValueAt( Point2D<int> position ) const
+int DynamicRaster::getMaxValueAt( Point2D<int> position ) const
 {
 	if(position._x<0 || position._x>=_maxValues.size())
 	{
 		std::stringstream oss;
-		oss << "Raster::getMaxValueAt - " << position << " x out of bounds: " << _maxValues.size();
+		oss << "DynamicRaster::getMaxValueAt - " << position << " x out of bounds: " << _maxValues.size();
 		throw Exception(oss.str());
 		return -1;
 	}
 	if(position._y<0 || position._y>=_maxValues[position._x].size())
 	{
 		std::stringstream oss;
-		oss << "Raster::getMaxValueAt - " << position << " y out of bounds: " << _maxValues.size() << "/" << _maxValues[position._x].size();
+		oss << "DynamicRaster::getMaxValueAt - " << position << " y out of bounds: " << _maxValues.size() << "/" << _maxValues[position._x].size();
 		throw Exception(oss.str());
 		return -1;
 	}	
 	return _maxValues[position._x][position._y];
 }
 
-void Raster::setValue( Point2D<int> position, int value )
+void DynamicRaster::setValue( Point2D<int> position, int value )
 {
 	if(value>_maxValue)
 	{
 		std::stringstream oss;
-		oss << "Raster::setValue - value: " << value << " bigger than max value: " << _maxValue << " at position: " << position;
+		oss << "DynamicRaster::setValue - value: " << value << " bigger than max value: " << _maxValue << " at position: " << position;
 		throw Exception(oss.str());
 
 		return;
@@ -100,7 +100,7 @@ void Raster::setValue( Point2D<int> position, int value )
 	if(position._x<0 || position._x>=_values.size())
 	{
 		std::stringstream oss;
-		oss << "Raster::setValue - " << position << " x out of bounds: " << _values.size();
+		oss << "DynamicRaster::setValue - " << position << " x out of bounds: " << _values.size();
 		throw Exception(oss.str());
 
 		return;
@@ -108,25 +108,25 @@ void Raster::setValue( Point2D<int> position, int value )
 	if(position._y<0 || position._y>=_values[position._x].size())
 	{
 		std::stringstream oss;
-		oss << "Raster::setValue - " << position << " y out of bounds: " << _values.size() << "/" << _values[position._x].size();
+		oss << "DynamicRaster::setValue - " << position << " y out of bounds: " << _values.size() << "/" << _values[position._x].size();
 		throw Exception(oss.str());
 		return;
 	}
 	if(value>_maxValues[position._x][position._y])
 	{
 		std::stringstream oss;
-		oss << "Raster::setValue - value: " << value << " bigger than max value: " << _maxValues[position._x][position._y] << " at position: " << position;
+		oss << "DynamicRaster::setValue - value: " << value << " bigger than max value: " << _maxValues[position._x][position._y] << " at position: " << position;
 		throw Exception(oss.str());
 	}
 	_values[position._x][position._y] = value;
 }
 
-void Raster::setMaxValue( Point2D<int> position, int value )
+void DynamicRaster::setMaxValue( Point2D<int> position, int value )
 {
 	if(value>_maxValue)
 	{
 		std::stringstream oss;
-		oss << "Raster::setMaxValue - value: " << value << " bigger than max value: " << _maxValue << " at pos: " << position;
+		oss << "DynamicRaster::setMaxValue - value: " << value << " bigger than max value: " << _maxValue << " at pos: " << position;
 		throw Exception(oss.str());
 
 		return;
@@ -135,7 +135,7 @@ void Raster::setMaxValue( Point2D<int> position, int value )
 	if(position._x<0 || position._x>=_maxValues.size())
 	{
 		std::stringstream oss;
-		oss << "Raster::setMaxValue- " << position << " x out of bounds: " << _maxValues.size();
+		oss << "DynamicRaster::setMaxValue- " << position << " x out of bounds: " << _maxValues.size();
 		throw Exception(oss.str());
 
 		return;
@@ -143,24 +143,24 @@ void Raster::setMaxValue( Point2D<int> position, int value )
 	if(position._y<0 || position._y>=_maxValues[position._x].size())
 	{
 		std::stringstream oss;
-		oss << "Raster::setMaxValue- " << position << " y out of bounds: " << _maxValues.size() << "/" << _maxValues[position._x].size();
+		oss << "DynamicRaster::setMaxValue- " << position << " y out of bounds: " << _maxValues.size() << "/" << _maxValues[position._x].size();
 		throw Exception(oss.str());
 		return;
 	}	
 	_maxValues[position._x][position._y] = value;
 }
 
-void Raster::setMaxValue( const int & maxValue )
+void DynamicRaster::setMaxValue( const int & maxValue )
 {
 	_maxValue = maxValue;
 }
 
-void Raster::setMinValue( const int & minValue )
+void DynamicRaster::setMinValue( const int & minValue )
 {
 	_minValue = minValue;
 }
 
-void Raster::updateCurrentMinMaxValues()
+void DynamicRaster::updateCurrentMinMaxValues()
 {
 	_currentMinValue = std::numeric_limits<int>::max();
 	_currentMaxValue = std::numeric_limits<int>::min();
@@ -172,7 +172,7 @@ void Raster::updateCurrentMinMaxValues()
 		}
 }
 
-void Raster::setInitValues( int minValue, int maxValue, int defaultValue )
+void DynamicRaster::setInitValues( int minValue, int maxValue, int defaultValue )
 {
 	_minValue = _currentMinValue = minValue;
 	_maxValue = _currentMaxValue = maxValue;

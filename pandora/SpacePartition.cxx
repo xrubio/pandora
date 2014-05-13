@@ -1599,22 +1599,22 @@ AgentsVector SpacePartition::getNeighbours( Agent * target, const double & radiu
 	return agentsVector;
 }
 	
-void SpacePartition::setValue( Raster & raster, const Point2D<int> & position, int value )
+void SpacePartition::setValue( DynamicRaster & raster, const Point2D<int> & position, int value )
 {
 	raster.setValue(getRealPosition(position), value);
 }
 
-int SpacePartition::getValue( const Raster & raster, const Point2D<int> & position ) const
+int SpacePartition::getValue( const DynamicRaster & raster, const Point2D<int> & position ) const
 {
 	return raster.getValue(getRealPosition(position));
 }
 
-void SpacePartition::setMaxValueAt( Raster & raster, const Point2D<int> & position, int value )
+void SpacePartition::setMaxValueAt( DynamicRaster & raster, const Point2D<int> & position, int value )
 {
 	raster.setMaxValue(getRealPosition(position), value);
 }
 
-int SpacePartition::getMaxValueAt( const Raster & raster, const Point2D<int> & position ) const
+int SpacePartition::getMaxValueAt( const DynamicRaster & raster, const Point2D<int> & position ) const
 {
 	return raster.getMaxValueAt(getRealPosition(position));
 }

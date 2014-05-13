@@ -22,20 +22,20 @@
 #ifndef __IncrementalRaster_hxx__
 #define __IncrementalRaster_hxx__
 
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <map>
 #include <Size.hxx>
 
 namespace Engine
 {
 
-class IncrementalRaster : public Raster
+class IncrementalRaster : public DynamicRaster
 {
 	typedef std::map< Point2D<int>, int >	ChangeTable;	
 
 public:
 	IncrementalRaster();
-	IncrementalRaster( const Raster& baseRaster );
+	IncrementalRaster( const DynamicRaster& baseRaster );
 	IncrementalRaster( const IncrementalRaster& other );
 
 	virtual ~IncrementalRaster();
@@ -71,7 +71,7 @@ public:
 private:
 
 	ChangeTable _changes;
-	const Raster * _baseRaster;
+	const DynamicRaster * _baseRaster;
 	int	_currentMinValue;
 	int	_currentMaxValue;
 };

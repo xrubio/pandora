@@ -204,10 +204,10 @@ public:
 	int countNeighbours( Agent * target, const double & radius, const std::string & type);
 	AgentsVector getNeighbours( Agent * target, const double & radius, const std::string & type);
 	
-	void setValue( Raster & raster, const Point2D<int> & position, int value );
-	int getValue( const Raster & raster, const Point2D<int> & position ) const;
-	void setMaxValueAt( Raster & raster, const Point2D<int> & position, int value );
-	int getMaxValueAt( const Raster & raster, const Point2D<int> & position ) const;
+	void setValue( DynamicRaster & raster, const Point2D<int> & position, int value );
+	int getValue( const DynamicRaster & raster, const Point2D<int> & position ) const;
+	void setMaxValueAt( DynamicRaster & raster, const Point2D<int> & position, int value );
+	int getMaxValueAt( const DynamicRaster & raster, const Point2D<int> & position ) const;
 
 	friend class Serializer;
 };

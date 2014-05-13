@@ -27,7 +27,7 @@
 #include <vector>
 #include <list>
 #include <typedefs.hxx>
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <StaticRaster.hxx>
 #include <Rectangle.hxx>
 #include <Point2D.hxx>
@@ -109,9 +109,9 @@ public:
 	virtual void stepRaster( const int & index);
 
 	//! returns raster identified by parameter 'key'.
-	Raster & getDynamicRaster( const size_t & index );
-	Raster & getDynamicRaster( const std::string & key );
-	const Raster & getDynamicRaster( const size_t & index ) const;
+	DynamicRaster & getDynamicRaster( const size_t & index );
+	DynamicRaster & getDynamicRaster( const std::string & key );
+	const DynamicRaster & getDynamicRaster( const size_t & index ) const;
 
 	//! returns static raster identified by parameter 'key'.
 	StaticRaster & getStaticRaster( const size_t & index );

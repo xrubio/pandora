@@ -1,7 +1,7 @@
 
 #include <GujaratWorld.hxx>
 
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <Point2D.hxx>
 #include <HunterGatherer.hxx>
 //#include <AgroPastoralist.hxx>

@@ -5,7 +5,7 @@
 #include "Paper.hxx"
 #include "Author.hxx"
 #include <Simulation.hxx>
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <Point2D.hxx>
 #include <Agent.hxx>
 #include <GeneralState.hxx>

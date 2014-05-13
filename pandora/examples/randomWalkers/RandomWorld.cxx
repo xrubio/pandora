@@ -4,7 +4,7 @@
 #include <RandomWorldConfig.hxx>
 #include <RandomAgent.hxx>
 #include <Simulation.hxx>
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <Point2D.hxx>
 #include <GeneralState.hxx>
 

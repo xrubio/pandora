@@ -1,7 +1,7 @@
 
 #include "Neighborhood.hxx"
 
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <Exception.hxx>
 #include "Neighbor.hxx"
 #include "NeighborConfig.hxx"

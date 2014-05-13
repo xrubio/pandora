@@ -24,10 +24,10 @@ class ForageAction : public MDPAction
 	int	_caloriesCollected;
 	bool _useFullPopulation;
 
-	void selectBestNearestCell( const Engine::Point2D<int>& n, const Engine::Raster& r, int& bestScore, Engine::Point2D<int>& best ) const; 
+	void selectBestNearestCell( const Engine::Point2D<int>& n, const Engine::DynamicRaster& r, int& bestScore, Engine::Point2D<int>& best ) const; 
 
-	void doWalk( const GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected ) const;
-	void doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int& collected );
+	void doWalk( const GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::DynamicRaster& r, int& collected ) const;
+	void doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::DynamicRaster& r, int& collected );
 
 public:
 	ForageAction( Sector* loc, bool ownsPointer = false );

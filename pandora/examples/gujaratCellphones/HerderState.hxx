@@ -2,7 +2,7 @@
 #ifndef __HerderState_hxx__
 #define __HerderState_hxx__
 
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <IncrementalRaster.hxx>
 #include <Point2D.hxx>
 #include <HashTable.hxx>
@@ -16,7 +16,7 @@ class MoveAction;
 class HerderState
 {
 public:
-	HerderState(const Engine::Point2D<int> & position, const Engine::Raster& knowledgeMap, const Engine::Raster& resourcesMap, int resourcesToEat );
+	HerderState(const Engine::Point2D<int> & position, const Engine::DynamicRaster& knowledgeMap, const Engine::DynamicRaster& resourcesMap, int resourcesToEat );
 	HerderState( const HerderState & state);
 	virtual ~HerderState();
 

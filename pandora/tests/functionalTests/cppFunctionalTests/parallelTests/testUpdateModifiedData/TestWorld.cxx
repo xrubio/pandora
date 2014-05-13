@@ -21,7 +21,7 @@
 
 #include <TestWorld.hxx>
 
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <Point2D.hxx>
 #include <Exception.hxx>
 
@@ -45,7 +45,7 @@ void TestWorld::createRasters()
 	getDynamicRaster("test").setInitValues(0, 2, 0);
 }
 
-void TestWorld::stepRaster( const std::string & key, Engine::Raster & raster )
+void TestWorld::stepRaster( const std::string & key, Engine::DynamicRaster & raster )
 {
 	assert(getValue("test", Engine::Point2D<int>(0,0))==std::min(2,_step));
 	/*

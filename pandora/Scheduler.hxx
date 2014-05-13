@@ -110,10 +110,10 @@ public:
 	virtual void serializeAgents( const int & step) = 0;
 	virtual void serializeRasters( const int & step) = 0;
 
-	virtual void setValue( Raster & raster, const Point2D<int> & position, int value ) = 0;
-	virtual int getValue( const Raster & raster, const Point2D<int> & position ) const = 0;
-	virtual void setMaxValueAt( Raster & raster, const Point2D<int> & position, int value ) = 0;
-	virtual int getMaxValueAt( const Raster & raster, const Point2D<int> & position ) const = 0;
+	virtual void setValue( DynamicRaster & raster, const Point2D<int> & position, int value ) = 0;
+	virtual int getValue( const DynamicRaster & raster, const Point2D<int> & position ) const = 0;
+	virtual void setMaxValueAt( DynamicRaster & raster, const Point2D<int> & position, int value ) = 0;
+	virtual int getMaxValueAt( const DynamicRaster & raster, const Point2D<int> & position ) const = 0;
 
 };
 

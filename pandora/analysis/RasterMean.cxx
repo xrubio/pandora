@@ -1,6 +1,6 @@
 
 #include <analysis/RasterMean.hxx>
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <Exception.hxx>
 #include <Size.hxx>
 
@@ -23,13 +23,13 @@ void RasterMean::computeRaster( const Engine::SimulationRecord::RasterHistory & 
 		{
 			return;
 		}
-		const Engine::Raster & raster = rasterHistory.at(0);
+		const Engine::DynamicRaster & raster = rasterHistory.at(0);
 		_numCells = raster.getSize()._width * raster.getSize()._height;
 	}
 
 	for(int r=0; r<_results.size(); r++)
 	{
-		const Engine::Raster & raster = rasterHistory.at(r);
+		const Engine::DynamicRaster & raster = rasterHistory.at(r);
 		for(int i=0; i<raster.getSize()._width; i++)
 		{
 			for(int j=0; j<raster.getSize()._height; j++)

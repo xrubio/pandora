@@ -7,7 +7,7 @@ HunterGathererMDPState::HunterGathererMDPState() : _timeIndex(0), _mapLocation(-
 {
 }
 
-HunterGathererMDPState::HunterGathererMDPState(Engine::Point2D<int> loc, int initResources, const Engine::Raster& resourcesRaster, int maxResources, int divider )
+HunterGathererMDPState::HunterGathererMDPState(Engine::Point2D<int> loc, int initResources, const Engine::DynamicRaster& resourcesRaster, int maxResources, int divider )
 	: _timeIndex(0), _mapLocation( loc ), _onHandResources( initResources ), _resources( resourcesRaster ), _maxResources( maxResources ), _resourcesDivider( divider ), _daysStarving( 0 ), _isCopy(false)
 {
 	computeHash();

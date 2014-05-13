@@ -21,7 +21,7 @@
 
 #include <TestWorld.hxx>
 
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <Point2D.hxx>
 #include <Exception.hxx>
 

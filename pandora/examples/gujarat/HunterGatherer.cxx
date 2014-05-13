@@ -50,7 +50,7 @@ HunterGatherer::~HunterGatherer()
 	}
 }
 
-void HunterGatherer::updateKnowledge( const Engine::Point2D<int>& agentPos, const Engine::Raster& dataRaster, std::vector<Sector*>& sectors ) const
+void HunterGatherer::updateKnowledge( const Engine::Point2D<int>& agentPos, const Engine::DynamicRaster& dataRaster, std::vector<Sector*>& sectors ) const
 {
 	for ( unsigned k = 0; k < _numSectors; k++ )
 	{

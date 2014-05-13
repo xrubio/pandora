@@ -5,7 +5,7 @@
 #include <Human.hxx>
 #include <Zombie.hxx>
 #include <Simulation.hxx>
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <Point2D.hxx>
 #include <GeneralState.hxx>
 #include <Logger.hxx>

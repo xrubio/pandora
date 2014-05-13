@@ -85,7 +85,7 @@ void ForageAction::execute( Engine::Agent & a )
 }
 
 void	ForageAction::selectBestNearestCell( 	const Engine::Point2D<int>& n,
-						const Engine::Raster& r,
+						const Engine::DynamicRaster& r,
 						int& bestScore,
 						Engine::Point2D<int>& best ) const
 {
@@ -125,7 +125,7 @@ void	ForageAction::selectBestNearestCell( 	const Engine::Point2D<int>& n,
 }
 
 void	ForageAction::doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, 
-				double maxDist, Engine::Raster& r, int& collected ) 
+				double maxDist, Engine::DynamicRaster& r, int& collected ) 
 {
 	double walkedDist = 0.0;
 	Engine::Point2D<int> n = n0;
@@ -156,7 +156,7 @@ void	ForageAction::doWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0,
 
 
 void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>& n0, 
-				double maxDist, Engine::Raster& r, int& collected ) const
+				double maxDist, Engine::DynamicRaster& r, int& collected ) const
 {
 	double walkedDist = 0.0;
 	Engine::Point2D<int> n = n0;

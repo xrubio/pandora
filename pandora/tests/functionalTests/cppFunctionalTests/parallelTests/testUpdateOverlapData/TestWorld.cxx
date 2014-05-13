@@ -47,7 +47,7 @@ void TestWorld::createRasters()
 	getDynamicRaster("test").setInitValues(0, 64, 0);
 }
 
-void TestWorld::stepRaster( const std::string & key, Engine::Raster & raster)
+void TestWorld::stepRaster( const std::string & key, Engine::DynamicRaster & raster)
 {
 	for(int i=0; i<_step; i++)
 	{

@@ -29,7 +29,7 @@
 #include <map>
 #include <hdf5.h>
 
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <StaticRaster.hxx>
 #include <AgentRecord.hxx>
 #include <Point2D.hxx>
@@ -44,7 +44,7 @@ public:
 	// TODO programar funció d'equivalencia a agent record i convertir en llista
 	typedef std::map<std::string, AgentRecord * > AgentRecordsMap;
 	typedef std::map<std::string, int > ValuesMap;	
-	typedef std::vector<Raster> RasterHistory;
+	typedef std::vector<DynamicRaster> RasterHistory;
 	typedef std::map<std::string, RasterHistory> RasterMap;
 	typedef std::map<std::string, StaticRaster> StaticRasterMap;
 	typedef std::map<std::string, AgentRecordsMap > AgentTypesMap;
@@ -103,7 +103,7 @@ public:
 	
 	RasterHistory & getRasterHistory( const std::string & key );
 	const RasterHistory & getRasterHistory( const std::string & key ) const;
-	Raster & getDynamicRaster( const std::string & key, const int & step );
+	DynamicRaster & getDynamicRaster( const std::string & key, const int & step );
 	StaticRaster & getStaticRaster( const std::string & key );
 	StaticRaster & getRasterTmp( const std::string & key, const int & step );
 

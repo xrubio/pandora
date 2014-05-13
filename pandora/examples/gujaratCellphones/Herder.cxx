@@ -80,8 +80,8 @@ void Herder::createKnowledge()
 
 void Herder::updateKnowledge()
 {
-	Engine::Raster & knowledge = _world->getDynamicRaster(_knowledgeMap);
-	Engine::Raster & resources = _world->getDynamicRaster(_resourcesMap);
+	Engine::DynamicRaster & knowledge = _world->getDynamicRaster(_knowledgeMap);
+	Engine::DynamicRaster & resources = _world->getDynamicRaster(_resourcesMap);
 
 	// first step, init environment
 	if(_world->getCurrentStep()==0)
@@ -144,11 +144,11 @@ void Herder::knowledgeTransmission( int frequency ) const
 
 void Herder::copyValue( const Herder & origin, const Herder & target, const Engine::Point2D<int> & index ) const
 {
-	Engine::Raster & knowledgeOrigin = _world->getDynamicRaster(origin.getKnowledgeMap());
-	Engine::Raster & resourcesOrigin = _world->getDynamicRaster(origin.getResourcesMap());
+	Engine::DynamicRaster & knowledgeOrigin = _world->getDynamicRaster(origin.getKnowledgeMap());
+	Engine::DynamicRaster & resourcesOrigin = _world->getDynamicRaster(origin.getResourcesMap());
 
-	Engine::Raster & knowledgeTarget = _world->getDynamicRaster(target.getKnowledgeMap());
-	Engine::Raster & resourcesTarget = _world->getDynamicRaster(target.getResourcesMap());
+	Engine::DynamicRaster & knowledgeTarget = _world->getDynamicRaster(target.getKnowledgeMap());
+	Engine::DynamicRaster & resourcesTarget = _world->getDynamicRaster(target.getResourcesMap());
 
 	knowledgeTarget.setValue(index, knowledgeOrigin.getValue(index));
 	resourcesTarget.setMaxValue(index, resourcesOrigin.getMaxValueAt(index));
@@ -157,8 +157,8 @@ void Herder::copyValue( const Herder & origin, const Herder & target, const Engi
 
 void Herder::shareCell( const Herder & herderA, const Herder & herderB, const Engine::Point2D<int> & index ) const
 {
-	Engine::Raster & knowledgeA = _world->getDynamicRaster(herderA.getKnowledgeMap());
-	Engine::Raster & knowledgeB = _world->getDynamicRaster(herderB.getKnowledgeMap());
+	Engine::DynamicRaster & knowledgeA = _world->getDynamicRaster(herderA.getKnowledgeMap());
+	Engine::DynamicRaster & knowledgeB = _world->getDynamicRaster(herderB.getKnowledgeMap());
 
     // agent B did not visit the cell
 	if(knowledgeA.getValue(index)>=knowledgeB.getValue(index) && knowledgeB.getValue(index)==-1)

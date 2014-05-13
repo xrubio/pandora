@@ -21,7 +21,7 @@ class ForageAction : public BaseAction
 	float _fractionForaged;
 public:
 	ForageAction( const Engine::Point2D<int> & position, float fractionForaged);
-	ForageAction( const Engine::Point2D<int> & position, const Engine::Raster & resourcesMap, int neededResources);
+	ForageAction( const Engine::Point2D<int> & position, const Engine::DynamicRaster & resourcesMap, int neededResources);
 	virtual ~ForageAction();
 
 	void executeMDP( const Forager & agent, const ForagerState & state, ForagerState & stateNext ) const;

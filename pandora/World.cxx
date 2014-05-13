@@ -91,7 +91,7 @@ void World::updateRasterToMaxValues( const std::string & key )
 
 void World::updateRasterToMaxValues( const int & index )
 {
-	((Raster *)_rasters.at(index))->updateRasterToMaxValues();
+	((DynamicRaster *)_rasters.at(index))->updateRasterToMaxValues();
 }
 
 void World::addAgent( Agent * agent, bool executedAgent )
@@ -172,7 +172,7 @@ void World::stepEnvironment()
 
 void World::stepRaster( const int & index  )
 {
-	((Raster*)_rasters.at(index))->updateRasterIncrement();
+	((DynamicRaster*)_rasters.at(index))->updateRasterIncrement();
 }
 
 void World::registerDynamicRaster( const std::string & key, const bool & serialize, int index )
@@ -200,7 +200,7 @@ void World::registerDynamicRaster( const std::string & key, const bool & seriali
 	{
 		delete _rasters.at(index);
 	}
-	_rasters.at(index) = new Raster();
+	_rasters.at(index) = new DynamicRaster();
 	_rasters.at(index)->resize(_scheduler->getBoundaries()._size);
 	_serializeRasters.at(index) = serialize;
 }
@@ -282,7 +282,7 @@ StaticRaster & World::getStaticRaster( const std::string & key )
 	return getStaticRaster(it->second);
 }
 
-Raster & World::getDynamicRaster( const size_t & index)
+DynamicRaster & World::getDynamicRaster( const size_t & index)
 {
 	if(index>=_rasters.size())
 	{
@@ -290,10 +290,10 @@ Raster & World::getDynamicRaster( const size_t & index)
 		oss << "World::getDynamicRaster - index: " << index << " out of bound with size: " << _rasters.size();
 		throw Exception(oss.str());
 	}
-	return (Raster &)*(_rasters.at(index));
+	return (DynamicRaster &)*(_rasters.at(index));
 }
 
-Raster & World::getDynamicRaster( const std::string & key )
+DynamicRaster & World::getDynamicRaster( const std::string & key )
 {	
 	RasterNameMap::const_iterator it = _rasterNames.find(key);
 	if(it==_rasterNames.end())
@@ -305,9 +305,9 @@ Raster & World::getDynamicRaster( const std::string & key )
 	return getDynamicRaster(it->second);
 }
 
-const Raster & World::getDynamicRaster( const size_t & index ) const
+const DynamicRaster & World::getDynamicRaster( const size_t & index ) const
 {	
-	return (const Raster &)*(_rasters.at(index));
+	return (const DynamicRaster &)*(_rasters.at(index));
 }
 
 void World::setValue( const std::string & key, const Point2D<int> & position, int value )
@@ -318,7 +318,7 @@ void World::setValue( const std::string & key, const Point2D<int> & position, in
 
 void World::setValue( const int & index, const Point2D<int> & position, int value )
 {
-	Raster * raster = (Raster*)(_rasters.at(index));
+	DynamicRaster * raster = (DynamicRaster*)(_rasters.at(index));
 	_scheduler->setValue(*raster, position, value);
 }
 
@@ -330,7 +330,7 @@ int World::getValue( const std::string & key, const Point2D<int> & position ) co
 
 int World::getValue( const int & index, const Point2D<int> & position ) const
 {
-	Raster * raster = (Raster*)(_rasters.at(index));
+	DynamicRaster * raster = (DynamicRaster*)(_rasters.at(index));
 	_scheduler->getValue(*raster, position);
 }
 
@@ -342,7 +342,7 @@ void World::setMaxValue( const std::string & key, const Point2D<int> & position,
 
 void World::setMaxValue( const int & index, const Point2D<int> & position, int value )
 {
-	Raster * raster = (Raster*)(_rasters.at(index));
+	DynamicRaster * raster = (DynamicRaster*)(_rasters.at(index));
 	_scheduler->setMaxValueAt(*raster, position, value);
 }
 
@@ -354,7 +354,7 @@ int World::getMaxValueAt( const std::string & key, const Point2D<int> & position
 
 int World::getMaxValueAt( const int & index, const Point2D<int> & position ) const
 {
-	Raster * raster = (Raster*)(_rasters.at(index));
+	DynamicRaster * raster = (DynamicRaster*)(_rasters.at(index));
 	_scheduler->getMaxValueAt(*raster, position);
 }
 

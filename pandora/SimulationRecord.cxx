@@ -185,7 +185,7 @@ bool SimulationRecord::loadHDF5( const std::string & fileName, const bool & load
 					int * dset_data = (int*)malloc(sizeof(int)*dims[0]*dims[1]);
 					
 					// squared	
-					Raster & raster = it->second[i/getFinalResolution()];
+					DynamicRaster & raster = it->second[i/getFinalResolution()];
 					raster.resize(Size<int>(dims[0], dims[1]));
 					// TODO max value!
 					raster.setInitValues(std::numeric_limits<int>::min(),std::numeric_limits<int>::max(), 0);
@@ -225,7 +225,7 @@ bool SimulationRecord::loadHDF5( const std::string & fileName, const bool & load
 				// setting max value for the entire simulation
 				for(int i=0; i<=_numSteps; i=i+getFinalResolution())
 				{
-					Raster & raster = it->second.at(i/getFinalResolution());
+					DynamicRaster & raster = it->second.at(i/getFinalResolution());
 					raster.setMaxValue(maxValue);
 					raster.setMinValue(minValue);
 				
@@ -497,7 +497,7 @@ StaticRaster & SimulationRecord::getRasterTmp( const std::string & key, const in
 	return resourceHistory[index];
 }
 
-Raster & SimulationRecord::getDynamicRaster(  const std::string & key, const int & step )
+DynamicRaster & SimulationRecord::getDynamicRaster(  const std::string & key, const int & step )
 {
 	RasterHistory & resourceHistory = getRasterHistory(key);
 	int index = step/getFinalResolution();

@@ -62,7 +62,7 @@ public:
 	void updateKnowledge();
 	void shareKnowledge( Herder & herder ) const;
 
-	//void printRaster(Engine::Raster & raster);
+	//void printRaster(Engine::DynamicRaster & raster);
 
 	//mdp
 	void configureMDP( const int & horizon, const int & width, const int & explorationBonus );

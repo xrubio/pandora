@@ -5,7 +5,7 @@
 #include "Forager.hxx"
 #include "ForagerState.hxx"
 #include "QuantumWorld.hxx"
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <GeneralState.hxx>
 
 namespace QuantumExperiment
@@ -15,7 +15,7 @@ ForageAction::ForageAction( const Engine::Point2D<int> & position, float fractio
 {
 }
 
-ForageAction::ForageAction( const Engine::Point2D<int> & position, const Engine::Raster & resourcesMap, int neededResources) : BaseAction(position)
+ForageAction::ForageAction( const Engine::Point2D<int> & position, const Engine::DynamicRaster & resourcesMap, int neededResources) : BaseAction(position)
 {	
 	int previousValue = resourcesMap.getValue(position);
 	int foragedResources = std::min(neededResources, previousValue);
@@ -62,7 +62,7 @@ void ForageAction::execute( Engine::Agent & agent )
 	forager.getWorld()->setValue(eResources, _position, rest);
 
 	// decrease the uncertainty of values
-	Engine::Raster & knowledge = forager.getWorld()->getDynamicRaster(forager.getKnowledgeMap());
+	Engine::DynamicRaster & knowledge = forager.getWorld()->getDynamicRaster(forager.getKnowledgeMap());
 	int qualityKnowledge = knowledge.getValue(_position);
 	if(qualityKnowledge<knowledge.getMaxValueAt(_position))
 	{

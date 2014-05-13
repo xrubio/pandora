@@ -24,7 +24,7 @@
 
 #include <World.hxx>
 #include <StaticRaster.hxx>
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <Agent.hxx>
 #include <Simulation.hxx>
 #include <Exception.hxx>

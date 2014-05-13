@@ -34,7 +34,7 @@ class TestWorld : public Engine::World
 public:
 	TestWorld( const Engine::Simulation & sim );
 	virtual ~TestWorld();
-	void stepRaster( const std::string & key, Engine::Raster & raster);		
+	void stepRaster( const std::string & key, Engine::DynamicRaster & raster);		
 };
 
 } // namespace Test 
