@@ -1,15 +1,17 @@
 nameProgram = 'randomWalkers'
 
-agents = ['Agent']
-world = 'World'
-namespaceAgents = ['Namespace']
+agents = ['AgentClassName']
+world = 'WorldClassNAme'
+namespaceAgents = ['NamespaceForEachAgent']
 
-srcFiles = Split('main.cxx')
+pandoraPath = 'PATHTOPANDORA'
+
+srcFiles = Split('main.cxx allFiles.cxx')
 
 import os, sys
 from subprocess import call
 
-sys.path.append('../../scripts/')
+sys.path.append(pandoraPath+'/scripts/')
 import generateMpi 
 
 release = ARGUMENTS.get('release', 1)
@@ -38,10 +40,10 @@ else:
 if int(useMpi)==1:
 	env['CCFLAGS'] += ['-DPANDORAMPI']
 
-includeDirs = Split('./ ../../')
+includeDirs = Split('./ '+pandoraPath)
 
 includeDirs += ['/usr/local/include','/usr/local/hdf5/include','/usr/lib/grass64/include/','/usr/include/gdal/']
-libDirs = Split('../../ /usr/local/lib /usr/local/hdf5/lib/ /usr/lib/grass64/lib/')
+libDirs = Split(pandoraPath + ' /usr/local/lib /usr/local/hdf5/lib/ /usr/lib/grass64/lib/')
 libs += ['mpl']
 
 # add the list of mpi code that must be generated & compiled
