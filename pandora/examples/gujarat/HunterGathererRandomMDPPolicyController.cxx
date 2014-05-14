@@ -23,7 +23,8 @@ HunterGathererRandomMDPPolicyController::~HunterGathererRandomMDPPolicyControlle
 void HunterGathererRandomMDPPolicyController::selectActions( GujaratAgent & agent, std::list<Engine::Action*> & actions )
 {	
 	_model.reset(agent);
-	auto s = _model.init();
+	//auto s = _model.init();
+	Gujarat::HunterGathererMDPState s = _model.init();
 	
 // 	std::cout << "Starting Random action selection on root state: " << s << std::endl;
 

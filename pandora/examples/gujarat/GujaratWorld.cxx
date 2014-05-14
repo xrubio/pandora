@@ -75,15 +75,37 @@ Engine::Point2D<int> GujaratWorld::findNearestWater( const Engine::Point2D<int> 
 }
 */
 
+
+
+void GujaratWorld::duneizeMap(enum Rasters idRaster, int bandWidth)
+{
+	Engine::Point2D<int> index;
+	
+	for(index._x=bandWidth; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
+	{	
+		for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)		
+		{	
+			setMaxValue(idRaster, index, DUNE);
+			setValue(idRaster, index, DUNE);
+		}
+	}
+
+}
+
+
 void GujaratWorld::createRasters()
 {
 	std::stringstream logName;
 	logName << "simulation_" << _simulation.getId();
 	log_DEBUG(logName.str(), getWallTime() << " creating static rasters");
 	
-	registerStaticRaster("soils", _config.isStorageRequired("soils"), eSoils);
+	//registerStaticRaster("soils", _config.isStorageRequired("soils"), eSoils);
+	registerDynamicRaster("soils", _config.isStorageRequired("soils"), eSoils);
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eSoils), _config._soilFile, this);	
-			
+
+	duneizeMap(eSoils, _config._homeRange);
+	
+	
 	registerStaticRaster("dem", _config.isStorageRequired("dem"), eDem);
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eDem), _config._demFile, this);
 

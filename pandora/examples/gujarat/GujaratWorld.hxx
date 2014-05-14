@@ -190,6 +190,7 @@ public:
 	
 	void fillIniRaster(enum Rasters idRaster, int val);
 	
+	void duneizeMap(enum Rasters idRaster, int bandWidth);
 //****************************************
 	
 };

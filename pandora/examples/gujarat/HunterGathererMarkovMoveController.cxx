@@ -1,5 +1,5 @@
 
-#include <HunterGathererDecisionTreeController.hxx>
+#include <HunterGathererMarkovMoveController.hxx>
 
 #include <iostream>
 
@@ -17,16 +17,16 @@
 namespace Gujarat
 {
 
-HunterGathererDecisionTreeController::HunterGathererDecisionTreeController()
+HunterGathererMarkovMoveController::HunterGathererMarkovMoveController()
 {
 //	_DoNothingDaysCovered = 1; 
 }
 
-HunterGathererDecisionTreeController::~HunterGathererDecisionTreeController()
+HunterGathererMarkovMoveController::~HunterGathererMarkovMoveController()
 {
 }
 
-int HunterGathererDecisionTreeController::getSectorIdxMatchingDirection( const HunterGatherer & agent, const std::vector<Sector *> & sectors, const int direction  ) const
+int HunterGathererMarkovMoveController::getSectorIdxMatchingDirection( const HunterGatherer & agent, const std::vector<Sector *> & sectors, const int direction  ) const
 {
 	int i = 0;
 	while(i < sectors.size())
@@ -40,7 +40,7 @@ int HunterGathererDecisionTreeController::getSectorIdxMatchingDirection( const H
 	return -1;
 }
 
-int HunterGathererDecisionTreeController::getMaxBiomassSector(  HunterGatherer & agent  )
+int HunterGathererMarkovMoveController::getMaxBiomassSector(  HunterGatherer & agent  )
 {
 	// Make Forage actions
 	std::vector< int > validActionSectorsIdx;
@@ -80,7 +80,7 @@ int HunterGathererDecisionTreeController::getMaxBiomassSector(  HunterGatherer &
 }
 
 /*
-MDPAction* HunterGathererDecisionTreeController::shouldDoNothing( HunterGatherer & agent )
+MDPAction* HunterGathererMarkovMoveController::shouldDoNothing( HunterGatherer & agent )
 {	
 	// CollectedResources > ConsumedResourcesByAgent * #days
 	if( agent.getOnHandResources() > agent.computeConsumedResources( getDoNothingDaysCovered() ) )
@@ -95,7 +95,7 @@ MDPAction* HunterGathererDecisionTreeController::shouldDoNothing( HunterGatherer
 */
 
 
-MDPAction* HunterGathererDecisionTreeController::shouldForageWithWalkEstimation( HunterGatherer & agent )
+MDPAction* HunterGathererMarkovMoveController::shouldForageWithWalkEstimation( HunterGatherer & agent, int step )
 {	
 	//Sector * maxSector = getMaxBiomassSector(agent);
 	int maxSectorLRIdx = getMaxBiomassSector(agent);
@@ -132,7 +132,7 @@ MDPAction* HunterGathererDecisionTreeController::shouldForageWithWalkEstimation(
 	agent.setResourcePrediction(meanReward);
 	
 	float alpha = ((GujaratConfig)((GujaratWorld*)agent.getWorld())->getConfig()).getAlphaDecTree();
-	if(  alpha*meanReward >= agent.computeConsumedResources(1) )
+	if( step < 7 || alpha*meanReward >= agent.computeConsumedResources(1) )
 	{
 		return f;
 	}
@@ -146,7 +146,7 @@ MDPAction* HunterGathererDecisionTreeController::shouldForageWithWalkEstimation(
 }
 
 
-MDPAction* HunterGathererDecisionTreeController::shouldForage( HunterGatherer & agent )
+MDPAction* HunterGathererMarkovMoveController::shouldForage( HunterGatherer & agent )
 {	
 	//Sector * maxSector = getMaxBiomassSector(agent);
 	int maxSectorLRIdx = getMaxBiomassSector(agent);
@@ -200,7 +200,7 @@ MDPAction* HunterGathererDecisionTreeController::shouldForage( HunterGatherer & 
 	return 0;
 }
 
-MDPAction* HunterGathererDecisionTreeController::shouldMoveHome( HunterGatherer & agent )
+MDPAction* HunterGathererMarkovMoveController::shouldMoveHome( HunterGatherer & agent )
 {	
 	std::vector< MoveHomeAction* > possibleActions;
 	
@@ -232,7 +232,7 @@ MDPAction* HunterGathererDecisionTreeController::shouldMoveHome( HunterGatherer 
 	return chosenAction;
 }
 
-void HunterGathererDecisionTreeController::selectActions( GujaratAgent & agent, std::list<Engine::Action*> & actions )
+void HunterGathererMarkovMoveController::selectActions( GujaratAgent & agent, std::list<Engine::Action*> & actions )
 {	
 	HunterGatherer & agentConcrete = dynamic_cast<HunterGatherer&>( agent );
         //Decission Tree: DoNothing --> Forage --> MoveHome
@@ -248,24 +248,42 @@ void HunterGathererDecisionTreeController::selectActions( GujaratAgent & agent, 
 	}
 	*/
 
+	
+	int step = agent.getWorld()->getCurrentTimeStep();
+	
+	/*
 #ifndef WALKESTIM
 	MDPAction * selectedAction = shouldForage(agentConcrete);
 #endif	
+	*/
+//#ifdef WALKESTIM
+	MDPAction * selectedAction = shouldForageWithWalkEstimation(agentConcrete,step);
+//#endif	
 	
-#ifdef WALKESTIM
-	MDPAction * selectedAction = shouldForageWithWalkEstimation(agentConcrete);
-#endif	
+	if(selectedAction == 0)
+	{
+		selectedAction = shouldMoveHome(agentConcrete);
+		if(selectedAction!=0)
+		{
+			actions.push_back(selectedAction);
+			agent._lastMoveCrono = step;
+			return;
+		}	
+	}
 	
-	if(selectedAction!=0)
+	if(selectedAction!=0 && step - agent._lastMoveCrono <= 5)
 	{
 		actions.push_back(selectedAction);
 		return;
 	}
+	delete selectedAction;
 	selectedAction = shouldMoveHome(agentConcrete);
 	if(selectedAction!=0)
 	{
 		actions.push_back(selectedAction);
-	}
+		agent._lastMoveCrono = step;
+		return;
+	}	
 }
 
 }

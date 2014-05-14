@@ -55,6 +55,8 @@ void HunterGatherer::registerAttributes()
 //	registerIntAttribute("female age");
 	registerIntAttribute("children");
 	registerIntAttribute("collected resources");
+	registerIntAttribute("resource prediction");
+	registerIntAttribute("resource prediction ratio");
 //	registerIntAttribute("starving %");
 	registerIntAttribute("starving days x 100");
 	log_DEBUG(logName.str(), "registering attributes for type: " << getType() << " finished");
@@ -237,12 +239,12 @@ void HunterGatherer::selectActions()
 */
 	//*?
 	try{ int w = GujaratState::controller().getWidth();}
-	catch(std::exception e){std::cerr << "EXC:"<<e.what()<<std::endl;}	
+	catch(std::exception e){std::cerr << "EXC getWidth():"<<e.what()<<std::endl;}	
 
 
 	try{
 		GujaratState::controller().selectActions(*this, _actions);
-	}catch(std::exception e){std::cerr << "EXC:"<<e.what()<<std::endl;}
+	}catch(std::exception e){std::cerr << "EXC selectActions:"<<e.what()<<std::endl;}
 
 	
 }
@@ -362,6 +364,8 @@ void HunterGatherer::serialize()
 	}
 	serializeAttribute("children", numChildren);
 	serializeAttribute("collected resources", _collectedResources);
+	serializeAttribute("resource prediction", _resourcePrediction);
+	serializeAttribute("resource prediction ratio", _resourcePrediction/(1.0f+(float)_collectedResources));
 //	serializeAttribute("starving %", getPercentageOfStarvingDays());
 	serializeAttribute("starving days x 100", _starved*100.0f);
 	serializeAttribute("MoveHome actions", _moveHomeActionsExecuted);

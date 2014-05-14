@@ -353,7 +353,7 @@ void	ForageAction::selectBestNearestLRCell( const GujaratAgent& agent
 
 		int score = LRcellOutcomeHeuristic(*sectorCells[k], gw, explorableCells,resourceRaster);
 
-		double dist = sectorCells[k]->distance(n);
+		double dist = sectorCells[k]->distanceSQ(n);
 		if ( score > bestScore )
 		{
 			bestScore = score;
@@ -375,15 +375,21 @@ void	ForageAction::selectBestNearestLRCell( const GujaratAgent& agent
 			}
 		}
 	}
-	//TODO cost n, instead: best=candidates[uniformRandom(0,candidates.size()-1)]
-	//std::random_shuffle(candidates.begin(), candidates.end());
+		
 	int numCand = candidates.size();
-	int idxCand = rand()%numCand;
-	best = *candidates[idxCand];
-//*?
-//	best = *candidates[Engine::GeneralState::statistics().getUniformDistValue(0,candidates.size()-1)];
-
-	candidates.clear();
+	if (numCand > 0)
+	{
+		int idxCand = rand()%numCand;
+		best = *candidates[idxCand];
+		candidates.clear();
+	}
+	else
+	{
+		// No candidates to offer from the sector.
+		// Most probable reason : no interdune cells inside any LR cell.
+		best._x = -1;
+		best._y = -1;
+	}	
 }
 
 void ForageAction::selectBestNearestHRCellInTrend_ScanFrame(
@@ -889,6 +895,12 @@ void	ForageAction::doTrendVicinityWalkForRewardEstimation( GujaratAgent& agent, 
 	selectBestNearestLRCell( agent, LRn, gw, agent.getWorld()->getDynamicRaster(eLRResources)
 	, (int)(agent.getAvailableTime() / agent.getForageTimeCost())
 	, bestScore, LRBest );
+	if (LRBest._x==-1 && LRBest._y==-1)
+	{
+		// No interdunes in the best LR cell of the sector.
+		collected=0;
+		return;
+	}
 	//std::cout << "2222222" << std::endl;
 	// find endpoint
 	int lowResolution = ((GujaratConfig)gw->getConfig()).getLowResolution();
@@ -973,6 +985,13 @@ void	ForageAction::doTrendVicinityWalk( GujaratAgent& agent, const Engine::Point
 	selectBestNearestLRCell( agent, LRn, gw, agent.getWorld()->getDynamicRaster(eLRResources)
 	, (int)(agent.getAvailableTime() / agent.getForageTimeCost())
 	, bestScore, LRBest );
+	if (LRBest._x==-1 && LRBest._y==-1)
+        {
+                // No interdunes in the best LR cell of the sector.
+                collected=0;
+                return;
+        }
+
 	//std::cout << "2222222" << std::endl;
 	// find endpoint
 	int lowResolution = ((GujaratConfig)gw->getConfig()).getLowResolution();
@@ -1101,6 +1120,12 @@ void	ForageAction::doLRVicinityWalk( GujaratAgent& agent, const Engine::Point2D<
 	selectBestNearestLRCell(agent, LRHome, gw, agent.getWorld()->getDynamicRaster(eLRResources)
 	, (int)(agent.getAvailableTime() / agent.getForageTimeCost())
 	, bestScore, LRBest );
+	if (LRBest._x==-1 && LRBest._y==-1)
+        {
+                // No interdunes in the best LR cell of the sector.
+                collected=0;
+                return;
+        }
 	
 	do{
 		
@@ -1272,6 +1297,13 @@ void	ForageAction::doWalk( const GujaratAgent& agent, const Engine::Point2D<int>
 					, (int)(agent.getAvailableTime() / agent.getForageTimeCost())
 					, bestScore
 					, best );
+		if (best._x==-1 && best._y==-1)
+        	{
+                	// No interdunes in the best LR cell of the sector.
+                	collected=0;
+                	return;
+        	}
+
 		
 	}while ( ( walkedDist + distHome ) < maxDist && (bestScore > 0));
 	
