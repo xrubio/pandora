@@ -10,6 +10,7 @@
 #include <Size.hxx>
 #include <ShpLoader.hxx>
 #include <GeneralState.hxx>
+#include <Exception.hxx>
 
 #include <boost/test/unit_test.hpp>
 
@@ -70,7 +71,7 @@ BOOST_AUTO_TEST_CASE( testAgentRemovedIsNotExecuted )
 BOOST_AUTO_TEST_CASE( testAgentRemovedIsNotInInsideNeighbours ) 
 {
 	Engine::Simulation mySimulation(Engine::Size<int>(10,10), 1);
-	TestWorld myWorld(mySimulation, TestWorld::useSpacePartition("data/results.h5", 1, true));
+	TestWorld myWorld(mySimulation, TestWorld::useSpacePartition("data/results.h5", 1, false));
 	myWorld.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
 
 	TestAgent * myAgent0 = new TestAgent("agent_0");
@@ -89,6 +90,7 @@ BOOST_AUTO_TEST_CASE( testAgentRemovedIsNotInInsideNeighbours )
 	myAgent2->remove();
 	Engine::AgentsVector neighbours2 = myWorld.getNeighbours(myAgent0, 20);
 	BOOST_CHECK_EQUAL(neighbours2.size(), 0);
+    myWorld.run();
 
 }
 
@@ -154,6 +156,60 @@ BOOST_AUTO_TEST_CASE( testLoadShapefile )
     BOOST_CHECK_CLOSE(4.5f,loader.getFieldAsFloat(3,"floatValue"), 0.00001f);
 }
 
+BOOST_AUTO_TEST_CASE( testGetUnknownRasterThrowsException) 
+{      
+    Engine::Simulation mySimulation(Engine::Size<int>(10,10), 1);
+	TestWorld myWorld(mySimulation, TestWorld::useSpacePartition("data/results.h5", 1, false));
+	myWorld.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
+    myWorld.run();
+    try
+    {
+        myWorld.getDynamicRaster("unknown");
+        BOOST_FAIL("getDynamicRaster by key - unexistent raster should raise an exception");
+    }
+    catch(Engine::Exception & exception)
+    {
+
+    }
+    try
+    {
+        myWorld.getStaticRaster("unknown");
+        BOOST_FAIL("getStaticRaster by key - unexistent raster should raise an exception");
+    }
+    catch(Engine::Exception & exception)
+    {
+
+    } 
+    try
+    {
+        myWorld.getStaticRaster(1000);
+        BOOST_FAIL("getStaticRaster by index - unexistent raster should raise an exception");
+    }
+    catch(Engine::Exception & exception)
+    {
+
+    } 
+    try
+    {
+        myWorld.getDynamicRaster(1000);
+        BOOST_FAIL("getDynamicRaster by index - unexistent raster should raise an exception");
+    }
+    catch(Engine::Exception & exception)
+    {
+
+    }
+
+
+}
+
+BOOST_AUTO_TEST_CASE( testLoadRaster ) 
+{
+    Engine::StaticRaster aRaster;
+	Engine::GeneralState::rasterLoader().fillGDALRaster(aRaster, "../../resources/test.tiff");
+    BOOST_CHECK_EQUAL(120, aRaster.getSize()._width);
+    BOOST_CHECK_EQUAL(120, aRaster.getSize()._height);
+    BOOST_CHECK_EQUAL(139, aRaster.getValue(Engine::Point2D<int>(39,39)));
+}
 
 BOOST_AUTO_TEST_SUITE_END()
 

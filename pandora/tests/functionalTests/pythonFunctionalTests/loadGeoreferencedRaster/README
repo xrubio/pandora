@@ -1,0 +1,3 @@
+Check if georeferenced maps can be read and Pandora rasters created from them
+A raster tiff is read (resources/test.tiff)
+

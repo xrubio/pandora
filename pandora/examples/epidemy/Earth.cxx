@@ -24,10 +24,10 @@ Earth::~Earth()
 void Earth::createRasters()
 {	
 	registerStaticRaster("dem", true);
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("dem"), _config._gisData._demName, this);	
+	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("dem"), _config._gisData._demName, getBoundaries());	
 
 	registerStaticRaster("population", true);
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("population"), _config._gisData._populationName, this);		
+	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("population"), _config._gisData._populationName, getBoundaries());		
 
 	registerDynamicRaster("humans", true);
 	getDynamicRaster("humans").setInitValues(0, std::numeric_limits<int>::max(), 0);

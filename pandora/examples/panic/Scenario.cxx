@@ -96,7 +96,7 @@ void Scenario::computeShortestExit(PanicAgent & agent )
 void Scenario::createRasters()
 {
 	registerDynamicRaster("obstacles", false, eObstacles);
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getDynamicRaster(eObstacles), _config._obstacleFile, this);	
+	Engine::GeneralState::rasterLoader().fillGDALRaster(getDynamicRaster(eObstacles), _config._obstacleFile, getBoundaries());	
 	getDynamicRaster(eObstacles).setMaxValue(1);
 
 	registerDynamicRaster("exits", false, eExits);
@@ -121,7 +121,7 @@ void Scenario::createRasters()
 	if(_config._initAgentsDistributionType.compare("raster")==0)
 	{
 		registerStaticRaster("initAgentsDistribution", true);
-		Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("initAgentsDistribution"), _config._initAgentsDistributionFile, this);
+		Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("initAgentsDistribution"), _config._initAgentsDistributionFile, getBoundaries());
 	}
 
 
@@ -188,7 +188,7 @@ void Scenario::createRasters()
 		std::string name = it->first;
 		std::string fileName = it->second;
 		registerStaticRaster(name, true);
-		Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(name), fileName, this);
+		Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(name), fileName, getBoundaries());
 	}
 
 

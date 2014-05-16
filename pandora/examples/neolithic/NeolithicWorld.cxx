@@ -24,10 +24,10 @@ NeolithicWorld::~NeolithicWorld()
 void NeolithicWorld::createRasters()
 {
 	registerStaticRaster("dem", true, eDem);
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eDem), _config._demFile, this);
+	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eDem), _config._demFile, getBoundaries());
 
 	registerStaticRaster("initPopulation", true, eInitPopulation);
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eInitPopulation), _config._initPopulationFile, this);
+	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eInitPopulation), _config._initPopulationFile, getBoundaries());
 
 	registerDynamicRaster("population", true, ePopulation);
 	getDynamicRaster(ePopulation).setDefaultInitValues(0,std::numeric_limits<int>::max(), 0);

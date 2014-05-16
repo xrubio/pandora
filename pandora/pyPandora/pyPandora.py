@@ -24,9 +24,9 @@ class StaticRaster(libpyPandora.StaticRasterStub):
 	def __init__(self):
 		libpyPandora.StaticRasterStub.__init__(self)
 
-class Raster(libpyPandora.RasterStub):
+class DynamicRaster(libpyPandora.DynamicRasterStub):
 	def __init__(self):
-		libpyPandora.RasterStub.__init__(self)
+		libpyPandora.DynamicRasterStub.__init__(self)
 
 class Simulation(libpyPandora.SimulationStub):
 	def __init__(self, size, numSteps, serializeResolution=1 ):
@@ -99,6 +99,10 @@ class GeneralState(libpyPandora.GeneralStateStub):
 class ShpLoader(libpyPandora.ShpLoaderStub):
     def __init__(self):
         libpyPandora.ShpLoaderStub.__init__(self)
+
+class RasterLoader(libpyPandora.RasterLoaderStub):
+    def __init__(self):
+        libpyPandora.RasterLoaderStub.__init__(self)
 
 """
 class AgentHDFtoSHP(libpyPandora.AgentHDFtoSHPStub):

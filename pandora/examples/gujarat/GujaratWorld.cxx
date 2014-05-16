@@ -77,18 +77,18 @@ void GujaratWorld::createRasters()
 	logName << "simulation_" << _simulation.getId();
 	log_DEBUG(logName.str(), getWallTime() << " creating static rasters");
 	registerStaticRaster("soils", _config.isStorageRequired("soils"), eSoils);
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eSoils), _config._soilFile, this);	
+	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eSoils), _config._soilFile, getBoundaries());	
 
 	registerStaticRaster("dem", _config.isStorageRequired("dem"), eDem);
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eDem), _config._demFile, this);
+	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eDem), _config._demFile, getBoundaries());
 
 	registerStaticRaster("distWater", _config.isStorageRequired("distWater"), eDistWater);
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eDistWater), _config._distWaterFile, this);
+	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eDistWater), _config._distWaterFile, getBoundaries());
 
 	if(_config._biomassDistribution.compare("linDecayFromWater")==0 || _config._biomassDistribution.compare("logDecayFromWater")==0)
 	{
 		registerStaticRaster("weightWater", _config.isStorageRequired("weightWater"), eWeightWater);
-		Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eWeightWater), _config._weightWaterFile, this);
+		Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eWeightWater), _config._weightWaterFile, getBoundaries());
 	}
 
 	//registerDynamicRaster("weightWater", true);

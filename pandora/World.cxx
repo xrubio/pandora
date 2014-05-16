@@ -273,12 +273,24 @@ Simulation & World::getSimulation()
 
 StaticRaster & World::getStaticRaster( const size_t & index )
 {
+    if(index>=_rasters.size())
+	{
+		std::stringstream oss;
+		oss << "World::getStaticRaster - index: " << index << " out of bound with size: " << _rasters.size();
+		throw Exception(oss.str());
+	}
 	return *(_rasters.at(index));
 }
 
 StaticRaster & World::getStaticRaster( const std::string & key )
 {
 	RasterNameMap::const_iterator it = _rasterNames.find(key);
+	if(it==_rasterNames.end())
+	{
+		std::stringstream oss;
+		oss << "World::getStaticRaster - raster: " << key << " not registered";
+		throw Exception(oss.str());
+	}
 	return getStaticRaster(it->second);
 }
 

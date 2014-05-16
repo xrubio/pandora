@@ -54,6 +54,7 @@
 #include <Scheduler.hxx>
 #include <GeneralState.hxx>
 #include <ShpLoader.hxx>
+#include <RasterLoader.hxx>
 
 #include <string>
 
@@ -94,7 +95,7 @@ public:
 	}
 };
 
-class RasterWrap : public Engine::DynamicRaster, public boost::python::wrapper<Engine::DynamicRaster>
+class DynamicRasterWrap : public Engine::DynamicRaster, public boost::python::wrapper<Engine::DynamicRaster>
 {
 public:
 	void resize( const SizeInt & size )
@@ -369,6 +370,8 @@ int (Engine::World::*getValue)(const std::string&, const Engine::Point2D<int> &)
 void (Engine::World::*setValue)(const std::string&, const Engine::Point2D<int> &, int) = &Engine::World::setValue;
 
 Engine::Agent * (Engine::World::*getAgent)(const std::string &) = &Engine::World::getAgent;
+    
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(fillGDALRasterOverloads, fillGDALRaster, 2, 3)
 
 BOOST_PYTHON_MODULE(libpyPandora)
 {
@@ -411,12 +414,12 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("getValue", &Engine::StaticRaster::getValue, &StaticRasterWrap::default_getValue, boost::python::return_value_policy<boost::python::copy_const_reference>())
 	;
 
-	boost::python::class_< RasterWrap, boost::noncopyable >("RasterStub")
+	boost::python::class_< DynamicRasterWrap, boost::noncopyable >("DynamicRasterStub")
 		.def("setInitValues", &Engine::DynamicRaster::setInitValues) 
 		.def("setValue", &Engine::DynamicRaster::setValue)	
-		.def("resize", &Engine::DynamicRaster::resize, &RasterWrap::default_resize) 
+		.def("resize", &Engine::DynamicRaster::resize, &DynamicRasterWrap::default_resize) 
 		.def("getSize", &Engine::DynamicRaster::getSize)
-		.def("getValue", &Engine::DynamicRaster::getValue, &RasterWrap::default_getValue, boost::python::return_value_policy<boost::python::copy_const_reference>())
+		.def("getValue", &Engine::DynamicRaster::getValue, &DynamicRasterWrap::default_getValue, boost::python::return_value_policy<boost::python::copy_const_reference>())
 	;
 
 	boost::python::class_< Engine::Simulation >("SimulationStub", boost::python::init< const Engine::Size<int> &, const int &, const int & >() )	
@@ -435,11 +438,15 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("getFieldAsFloat", &Engine::ShpLoader::getFieldAsFloat)	
 	;
 
+    boost::python::class_< Engine::RasterLoader>("RasterLoaderStub")
+	.def("fillGDALRaster", &Engine::RasterLoader::fillGDALRaster, fillGDALRasterOverloads())	
+	;
 
     
     boost::python::class_< Engine::GeneralState, boost::shared_ptr<Engine::GeneralState>, boost::noncopyable>("GeneralStateStub", boost::python::no_init)
 		.add_property("instance", boost::python::make_function(&Engine::GeneralState::instance, boost::python::return_value_policy<boost::python::reference_existing_object>()))
 		.def("shpLoader", boost::python::make_function(&Engine::GeneralState::shpLoader, boost::python::return_value_policy<boost::python::reference_existing_object>()))
+		.def("rasterLoader", boost::python::make_function(&Engine::GeneralState::rasterLoader, boost::python::return_value_policy<boost::python::reference_existing_object>()))
     ;
 
 	boost::python::class_< AgentWrap, std::auto_ptr<AgentWrap>, boost::noncopyable >("AgentStub", boost::python::init< const std::string & > () )
@@ -546,7 +553,6 @@ BOOST_PYTHON_MODULE(libpyPandora)
 
 	boost::python::class_< PostProcess::RasterSum, std::auto_ptr< PostProcess::RasterSum> , boost::python::bases<PostProcess::RasterAnalysis> >("RasterSumStub");
 	boost::python::implicitly_convertible< std::auto_ptr< PostProcess::RasterSum>, std::auto_ptr< PostProcess::RasterAnalysis > >();
-	
 	
 	/*	
 	boost::python::class_< Analysis::AgentHDFtoSHP, std::auto_ptr< Analysis::AgentHDFtoSHP> , boost::python::bases<Analysis::AgentAnalysis> >("AgentHDFtoSHPStub", boost::python::init< const std::string &, int >() )

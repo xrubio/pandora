@@ -50,13 +50,12 @@ RasterLoader::~RasterLoader()
 {
 }
 
-void RasterLoader::fillGDALRaster( StaticRaster & raster, const std::string & fileName, World * world )
+void RasterLoader::fillGDALRaster( StaticRaster & raster, const std::string & fileName, const Rectangle<int> & definedBoundaries )
 {
 	std::stringstream logName;
-	logName << "RasterLoader_world_" << world->getId();
+	logName << "RasterLoader";
 	log_DEBUG(logName.str(), "loading file: " << fileName);
 
-	Simulation & simulation(world->getSimulation());
 	GDALAllRegister();
 	GDALDataset * dataset = (GDALDataset *)GDALOpen(fileName.c_str(), GA_ReadOnly );
 	
@@ -67,17 +66,14 @@ void RasterLoader::fillGDALRaster( StaticRaster & raster, const std::string & fi
 		throw Engine::Exception(oss.str());
 	}
 
-	Size<int> size = Size<int>(dataset->GetRasterXSize(), dataset->GetRasterYSize());
-	if(size!=simulation.getSize())
-	{
-		std::stringstream oss;
-		oss << "RasterLoader::fillGDALRaster - file: " << fileName << " with size: " << size << " different from defined size: " << simulation.getSize() << std::endl;
-		throw Engine::Exception(oss.str());
-	}
-	log_DEBUG(logName.str(), "size of raster: " << size);
-
-	raster.resize(world->getBoundaries()._size);
-	log_DEBUG(logName.str(), "resize done with value: " << world->getBoundaries()._size);
+    Rectangle<int> boundaries = definedBoundaries;
+    // no boundaries passed
+    if(boundaries._size._width == -1)
+    {
+        boundaries._origin = Point2D<int>(0,0);
+        boundaries._size = Size<int>(dataset->GetRasterXSize(), dataset->GetRasterYSize());
+    }
+	raster.resize(boundaries._size);
 
 	GDALRasterBand * band = dataset->GetRasterBand(1);
 	double minMaxValues[2];
@@ -89,13 +85,10 @@ void RasterLoader::fillGDALRaster( StaticRaster & raster, const std::string & fi
 		GDALComputeRasterMinMax((GDALRasterBandH)band, TRUE, minMaxValues);
 	}
 	
-	float * pafScanline = (float *)CPLMalloc(sizeof(float)*(world->getBoundaries()._size._width*world->getBoundaries()._size._height));
-
-	band->RasterIO( GF_Read, world->getBoundaries()._origin._x, world->getBoundaries()._origin._y, world->getBoundaries()._size._width, world->getBoundaries()._size._height, pafScanline, world->getBoundaries()._size._width, world->getBoundaries()._size._height, GDT_Float32, 0, 0 );
+	float * pafScanline = (float *)CPLMalloc(sizeof(float)*(boundaries._size._width*boundaries._size._height));
+	band->RasterIO( GF_Read, boundaries._origin._x, boundaries._origin._y, boundaries._size._width, boundaries._size._height, pafScanline, boundaries._size._width, boundaries._size._height, GDT_Float32, 0, 0 );
 
 	log_DEBUG(logName.str(), "raster IO done");
-	const Rectangle<int> & boundaries = world->getBoundaries();
-	log_DEBUG(logName.str(), "boundaries of world: " << boundaries);
 
 	Point2D<int> index;
 
@@ -133,7 +126,6 @@ void RasterLoader::fillGDALRaster( StaticRaster & raster, const std::string & fi
 			if(colorTable->GetColorEntryAsRGB(i, &newEntry))
 			{
 				raster.addColorEntry(i, newEntry.c1, newEntry.c2, newEntry.c3, newEntry.c4);
-				//std::cout << "entry: " <<i << " color: " << newEntry.c1 << "/" << newEntry.c2 << "/" << newEntry.c3 << " alpha: " << newEntry.c4 << std::endl;
 			}
 		}
 	}

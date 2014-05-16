@@ -7,7 +7,7 @@ import unittest
 sys.path.append('../../../')
 sys.path.append('../../../pyPandora')
 
-from pyPandora import Simulation, Agent, World, Point2DInt, SizeInt, RectangleInt, SpacePartition, ShpLoader, GeneralState
+from pyPandora import Simulation, Agent, World, Point2DInt, SizeInt, RectangleInt, SpacePartition, ShpLoader, RasterLoader, GeneralState, StaticRaster, DynamicRaster
 
 class TestAgent(Agent):
     def __init__(self, id):
@@ -141,6 +141,17 @@ class TestPyPandora(unittest.TestCase):
         self.assertEqual('label d', loader.getFieldAsString(3, 'label'))
         self.assertEqual(4, loader.getFieldAsInt(3, 'intValue'))
         self.assertAlmostEqual(4.5, loader.getFieldAsFloat(3, 'floatValue'))
+    
+    def testLoadRaster(self):
+        aRaster = StaticRaster()
+        loader = GeneralState.rasterLoader()
+        print(aRaster)
+        loader.fillGDALRaster(aRaster, '../../resources/test.tiff')
+        print(aRaster)
+#        self.assertEqual(120, aRaster.getSize()._width)
+#       self.assertEqual(120, aRaster.getSize()._height)
+#       self.assertEqual(139, aRaster.getValue(Point2DInt(39,30)))
    
 if __name__ == '__main__':
     unittest.main()
+

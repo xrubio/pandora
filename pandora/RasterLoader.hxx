@@ -24,6 +24,7 @@
 #define __RasterLoader_hxx__
 
 #include <string>
+#include <Rectangle.hxx>
 
 namespace Engine
 {
@@ -38,7 +39,7 @@ public:
 	virtual ~RasterLoader();
 
 	// load a GDAL file conforming World position
-	void fillGDALRaster( StaticRaster & raster, const std::string & fileName, World * world );
+	void fillGDALRaster( StaticRaster & raster, const std::string & fileName, const Rectangle<int> & definedBoundaries = Rectangle<int>());
 	// load an HDF5 conforming adjusting raster to data, or to World position if not null
 	void fillHDF5Raster( StaticRaster & raster, const std::string & fileName, const std::string & rasterName, World * world = 0);
 	// load a raster file from a GRASS database conforming adjusting raster to data, or to World position if not null
