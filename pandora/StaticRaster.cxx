@@ -24,6 +24,7 @@
 #include <Exception.hxx>
 #include <World.hxx>
 #include <limits>
+#include <iostream>
 
 namespace Engine
 {

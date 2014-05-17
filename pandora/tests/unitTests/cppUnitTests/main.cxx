@@ -202,9 +202,18 @@ BOOST_AUTO_TEST_CASE( testGetUnknownRasterThrowsException)
 
 }
 
-BOOST_AUTO_TEST_CASE( testLoadRaster ) 
+BOOST_AUTO_TEST_CASE( testLoadStaticRaster ) 
 {
     Engine::StaticRaster aRaster;
+	Engine::GeneralState::rasterLoader().fillGDALRaster(aRaster, "../../resources/test.tiff");
+    BOOST_CHECK_EQUAL(120, aRaster.getSize()._width);
+    BOOST_CHECK_EQUAL(120, aRaster.getSize()._height);
+    BOOST_CHECK_EQUAL(139, aRaster.getValue(Engine::Point2D<int>(39,39)));
+}
+
+BOOST_AUTO_TEST_CASE( testLoadDynamicRaster ) 
+{
+    Engine::DynamicRaster aRaster;
 	Engine::GeneralState::rasterLoader().fillGDALRaster(aRaster, "../../resources/test.tiff");
     BOOST_CHECK_EQUAL(120, aRaster.getSize()._width);
     BOOST_CHECK_EQUAL(120, aRaster.getSize()._height);

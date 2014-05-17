@@ -72,7 +72,7 @@ class TestPyPandora(unittest.TestCase):
         myWorld = TestWorld(mySimulation, TestWorld.useSpacePartition('data/results.h5', 1, False))
         myWorld.initialize()
         myWorld.run()
-        myWorld = TestWorld(mySimulation, TestWorld.useSpacePartition('data/results.h5', 1, True))
+        myWorld = TestWorld(mySimulation, TestWorld.useSpacePartition('data/results.h5', 1, False))
         myWorld.initialize()
         myWorld.run()
     
@@ -141,16 +141,51 @@ class TestPyPandora(unittest.TestCase):
         self.assertEqual('label d', loader.getFieldAsString(3, 'label'))
         self.assertEqual(4, loader.getFieldAsInt(3, 'intValue'))
         self.assertAlmostEqual(4.5, loader.getFieldAsFloat(3, 'floatValue'))
-    
-    def testLoadRaster(self):
+
+    def testGetUnknownRasterThrowsException(self):
+        mySimulation = Simulation(SizeInt(10,10), 1)
+        myWorld = TestWorld(mySimulation, TestWorld.useSpacePartition('data/results.h5', 1, True))
+        myWorld.initialize()
+        myWorld.run()
+        try:
+            myWorld.getDynamicRaster('unknown')
+            self.assertEqual(1!=2)
+        except:
+            dummy = 1
+
+        try:
+            myWorld.getStaticRaster('unknown')
+            self.assertEqual(1!=2)
+        except:
+            dummy = 1
+
+        try:
+            myWorld.getStaticRaster(1000)
+            self.assertEqual(1!=2)
+        except:
+            dummy = 1
+
+        try:
+            myWorld.getDynamicRaster(1000)
+            self.assertEqual(1!=2)
+        except:
+            dummy = 1
+
+    def testLoadStaticRaster(self):
         aRaster = StaticRaster()
         loader = GeneralState.rasterLoader()
-        print(aRaster)
         loader.fillGDALRaster(aRaster, '../../resources/test.tiff')
-        print(aRaster)
-#        self.assertEqual(120, aRaster.getSize()._width)
-#       self.assertEqual(120, aRaster.getSize()._height)
-#       self.assertEqual(139, aRaster.getValue(Point2DInt(39,30)))
+        self.assertEqual(120, aRaster.getSize()._width)
+        self.assertEqual(120, aRaster.getSize()._height)
+        self.assertEqual(139, aRaster.getValue(Point2DInt(39,39)))
+   
+    def testLoadDynamicRaster(self):
+        aRaster = DynamicRaster()
+        loader = GeneralState.rasterLoader()
+        loader.fillGDALRaster(aRaster, '../../resources/test.tiff')
+        self.assertEqual(120, aRaster.getSize()._width)
+        self.assertEqual(120, aRaster.getSize()._height)
+        self.assertEqual(139, aRaster.getValue(Point2DInt(39,39)))
    
 if __name__ == '__main__':
     unittest.main()

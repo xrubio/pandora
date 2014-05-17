@@ -66,7 +66,7 @@ void RasterLoader::fillGDALRaster( StaticRaster & raster, const std::string & fi
 		throw Engine::Exception(oss.str());
 	}
 
-    Rectangle<int> boundaries = definedBoundaries;
+    Rectangle<int> boundaries = Rectangle<int>(definedBoundaries);
     // no boundaries passed
     if(boundaries._size._width == -1)
     {
@@ -106,7 +106,7 @@ void RasterLoader::fillGDALRaster( StaticRaster & raster, const std::string & fi
 	CPLFree(pafScanline);
 	log_DEBUG(logName.str(), "done, update minmax values");	
 	raster.updateMinMaxValues();
-	
+
 	// if dynamic, copy to maxValues
 	DynamicRaster * dynamicRaster = dynamic_cast<DynamicRaster*>(&raster);
 	if(dynamicRaster)

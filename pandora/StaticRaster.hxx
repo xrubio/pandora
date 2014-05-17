@@ -55,7 +55,6 @@ public:
 	StaticRaster();
 	virtual ~StaticRaster();
 
-	// TODO not squared rasters
 	//! changes raster size. Parameter 'size' represents the new dimesions for the raster area.
 	virtual void resize( const Size<int> & size );
 	//! Reads the value in the cell located by parameter "position". Returns -1 if "position" is out of the area of the raster.

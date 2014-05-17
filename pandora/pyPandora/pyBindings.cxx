@@ -62,73 +62,6 @@ typedef Engine::Point2D<int> Point2DInt;
 typedef Engine::Size<int> SizeInt;
 typedef Engine::Rectangle<int> RectangleInt;
 
-class StaticRasterWrap : public Engine::StaticRaster, public boost::python::wrapper<Engine::StaticRaster>
-{
-public:
-	void resize( const SizeInt & size )
-	{
-		if (boost::python::override resize = this->get_override("resize")(size))			
-		{
-			resize( size );
-			return;
-		}
-		Engine::StaticRaster::resize(size);
-	}
-
-	void default_resize( const SizeInt & size )
-	{
-		Engine::StaticRaster::resize(size);
-	}
-	
-	const int & getValue( Point2DInt position ) const
-	{
-		if (boost::python::override getValue = this->get_override("getValue")(position))
-		{
-			return getValue(position);
-		}
-		return Engine::StaticRaster::getValue(position);
-	}
-
-	const int & default_getValue(Point2DInt position) const
-	{
-		return Engine::StaticRaster::getValue(position);
-	}
-};
-
-class DynamicRasterWrap : public Engine::DynamicRaster, public boost::python::wrapper<Engine::DynamicRaster>
-{
-public:
-	void resize( const SizeInt & size )
-	{
-		if (boost::python::override resize = this->get_override("resize")(size))			
-		{
-			resize( size );
-			return;
-		}
-		Engine::DynamicRaster::resize(size);
-	}
-
-	void default_resize( const SizeInt & size )
-	{
-		Engine::DynamicRaster::resize(size);
-	}
-	
-	const int & getValue( Point2DInt position ) const
-	{
-		if (boost::python::override getValue = this->get_override("getValue")(position))
-		{
-			return getValue(position);
-		}
-		return Engine::DynamicRaster::getValue(position);
-	}
-
-	const int & default_getValue(Point2DInt position) const
-	{
-		return Engine::DynamicRaster::getValue(position);
-	}
-
-};
-
 class AgentWrap : public Engine::Agent, public boost::python::wrapper<Engine::Agent>
 {
 public:
@@ -408,19 +341,21 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("clone", &RectangleInt::clone)
 		;
 
-	boost::python::class_< StaticRasterWrap, boost::noncopyable >("StaticRasterStub")
-		.def("resize", &Engine::StaticRaster::resize, &StaticRasterWrap::default_resize) 
+    boost::python::class_< Engine::StaticRaster, std::auto_ptr< Engine::StaticRaster> >("StaticRasterStub")
+		.def("resize", &Engine::StaticRaster::resize)
 		.def("getSize", &Engine::StaticRaster::getSize)
-		.def("getValue", &Engine::StaticRaster::getValue, &StaticRasterWrap::default_getValue, boost::python::return_value_policy<boost::python::copy_const_reference>())
-	;
+		.def("getValue", boost::python::make_function(&Engine::StaticRaster::getValue, boost::python::return_value_policy<boost::python::copy_const_reference>()))
 
-	boost::python::class_< DynamicRasterWrap, boost::noncopyable >("DynamicRasterStub")
+	;
+    
+    boost::python::class_< Engine::DynamicRaster, std::auto_ptr< Engine::DynamicRaster>, boost::python::bases<Engine::StaticRaster> >("DynamicRasterStub")
 		.def("setInitValues", &Engine::DynamicRaster::setInitValues) 
 		.def("setValue", &Engine::DynamicRaster::setValue)	
-		.def("resize", &Engine::DynamicRaster::resize, &DynamicRasterWrap::default_resize) 
+		.def("resize", &Engine::DynamicRaster::resize)
 		.def("getSize", &Engine::DynamicRaster::getSize)
-		.def("getValue", &Engine::DynamicRaster::getValue, &DynamicRasterWrap::default_getValue, boost::python::return_value_policy<boost::python::copy_const_reference>())
+		.def("getValue", boost::python::make_function(&Engine::DynamicRaster::getValue, boost::python::return_value_policy<boost::python::copy_const_reference>()))
 	;
+
 
 	boost::python::class_< Engine::Simulation >("SimulationStub", boost::python::init< const Engine::Size<int> &, const int &, const int & >() )	
 		.add_property("size", boost::python::make_function(&Engine::Simulation::getSize, boost::python::return_value_policy<boost::python::reference_existing_object>()))
@@ -553,6 +488,8 @@ BOOST_PYTHON_MODULE(libpyPandora)
 
 	boost::python::class_< PostProcess::RasterSum, std::auto_ptr< PostProcess::RasterSum> , boost::python::bases<PostProcess::RasterAnalysis> >("RasterSumStub");
 	boost::python::implicitly_convertible< std::auto_ptr< PostProcess::RasterSum>, std::auto_ptr< PostProcess::RasterAnalysis > >();
+
+	boost::python::implicitly_convertible< std::auto_ptr<Engine::DynamicRaster>, std::auto_ptr< Engine::StaticRaster > >();
 	
 	/*	
 	boost::python::class_< Analysis::AgentHDFtoSHP, std::auto_ptr< Analysis::AgentHDFtoSHP> , boost::python::bases<Analysis::AgentAnalysis> >("AgentHDFtoSHPStub", boost::python::init< const std::string &, int >() )
