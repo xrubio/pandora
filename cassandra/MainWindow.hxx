@@ -86,6 +86,9 @@ private:
 	QAction * _showLabAction;
 	QAction * _agentAnalysisAction;
 	QAction * _rasterAnalysisAction;
+    QAction * _screenshotAction;
+    QAction * _videoAction;
+    QAction * _mosaicAction;
 
 	QSpinBox * _stepBox;
 	QLabel * _numStepsLabel;
@@ -133,6 +136,7 @@ private slots:
 	void saveProject();
 	void saveProjectAs();
 	void selectSimulation();
+	void selectSimulation( const std::string & fileName, int resolution );
 	void quit();
 
 	void firstStep();
@@ -151,6 +155,11 @@ private slots:
 	void showLaboratory();
 	void showAgentAnalysis();
 	void showRasterAnalysis();
+
+    void takeScreenshot();
+    void takeVideo();
+    void takeVideo( const std::string & outputDir );
+    void takeMosaic();
 
 	void agentConfigured( const std::string & , const AgentConfiguration &); 
 	void rasterConfigured( const std::string & , const RasterConfiguration &); 	

@@ -23,7 +23,7 @@
 #include <AgentConfiguration.hxx>
 #include <sstream>
 #include <iostream>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <Loader3DS.hxx>
 #include <Model3D.hxx>
 

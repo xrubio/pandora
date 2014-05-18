@@ -23,7 +23,7 @@
 #include <StepDataPlot.hxx>
 
 #include <SimulationRecord.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <AgentRecord.hxx>
 
 #include <qwt_legend.h>

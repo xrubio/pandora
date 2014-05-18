@@ -23,7 +23,6 @@
 #ifndef __ColorSelector_hxx__
 #define __ColorSelector_hxx__
 
-#include <Raster.hxx>
 #include <QColor>
 #include <Point3D.hxx>
 

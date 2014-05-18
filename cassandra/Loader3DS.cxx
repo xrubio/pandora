@@ -21,7 +21,7 @@
  */
 
 #include <Loader3DS.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 
 #include <Model3D.hxx>
 #include <Object3D.hxx>

@@ -27,7 +27,7 @@
 #include <GL/glu.h>
 #include <QListWidgetItem>
 
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <SimulationRecord.hxx>
 #include <Model3D.hxx>
 #include <Point2D.hxx>

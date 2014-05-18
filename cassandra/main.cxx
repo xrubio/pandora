@@ -23,7 +23,7 @@
 #include <QApplication>
 
 #include <MainWindow.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <iostream>
 
 int main(int argc, char *argv[])

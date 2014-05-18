@@ -31,7 +31,7 @@
 #include <Display3D.hxx>
 #include <AgentConfiguration.hxx>
 #include <RasterConfigurator.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <ProjectConfiguration.hxx>
 #include <SimulationRecord.hxx>
 #include <LoadingProgressBar.hxx>
@@ -55,6 +55,7 @@
 #include <QDockWidget>
 #include <QListWidgetItem>
 #include <QInputDialog>
+#include <boost/filesystem.hpp>
 
 namespace GUI
 {
@@ -214,6 +215,18 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_rasterAnalysisAction->setStatusTip(tr("Analyse raster stats"));
 	connect(_rasterAnalysisAction, SIGNAL(triggered()), this, SLOT(showRasterAnalysis()));
 
+    _screenshotAction = new QAction(QIcon(":/resources/icons/screenshot.png"), tr("Take &Screenshot"), this);
+	_screenshotAction->setStatusTip(tr("Take a screenshot of the model"));
+	connect(_screenshotAction, SIGNAL(triggered()), this, SLOT(takeScreenshot()));
+
+    _videoAction = new QAction(QIcon(":/resources/icons/video.png"), tr("Take &Video"), this);
+	_videoAction->setStatusTip(tr("Take a video of the model"));
+	connect(_videoAction, SIGNAL(triggered()), this, SLOT(takeVideo()));
+
+    _mosaicAction = new QAction(QIcon(":/resources/icons/mosaic.png"), tr("Take &Mosaic"), this);
+	_mosaicAction->setStatusTip(tr("Take a mosaic of different runs of the model"));
+	connect(_mosaicAction, SIGNAL(triggered()), this, SLOT(takeMosaic()));
+
 	// menus
 	QMenu * fileMenu = menuBar()->addMenu(tr("&File"));
 	fileMenu->addAction(_newProjectAction);
@@ -245,6 +258,12 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	analysisMenu->addSeparator();
 	analysisMenu->addAction(_agentAnalysisAction);
 	analysisMenu->addAction(_rasterAnalysisAction);
+    
+    QMenu * outputMenu = menuBar()->addMenu(tr("&Output"));
+	outputMenu->addSeparator();
+	outputMenu->addAction(_screenshotAction);
+	outputMenu->addAction(_videoAction);
+	outputMenu->addAction(_mosaicAction);
 
 	// toolbars
 	QToolBar * fileBar= addToolBar(tr("File"));
@@ -261,6 +280,11 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	QToolBar * analysisBar = addToolBar(tr("Analysis"));
 	analysisBar->addAction(_agentAnalysisAction);
 	analysisBar->addAction(_rasterAnalysisAction);
+
+	QToolBar * outputBar = addToolBar(tr("Output"));
+	outputBar->addAction(_screenshotAction);
+	outputBar->addAction(_videoAction);
+	outputBar->addAction(_mosaicAction);
 	
 	QLabel * label = new QLabel("Step: ");
 	simulationBar->addWidget(label);
@@ -313,6 +337,9 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_saveProjectAction->setEnabled(false);
 	_saveProjectAsAction->setEnabled(false);
 
+    _screenshotAction->setEnabled(false);
+    _videoAction->setEnabled(false);
+
 	_progressBar = new LoadingProgressBar();
 	connect(_loadSimulationTimer, SIGNAL(timeout()), _progressBar, SLOT(updateProgress()));
 	connect(&_loadSimulationThread, SIGNAL(simulationLoaded(bool)), this, SLOT(loadSimulationFinished(bool)));
@@ -331,6 +358,23 @@ MainWindow::~MainWindow()
 	}
 }
 
+void MainWindow::selectSimulation( const std::string & fileName, int resolution )
+{
+	ProjectConfiguration::instance()->setResolution(resolution);
+    ProjectConfiguration::instance()->setSimulationFileName(fileName);
+
+	setEnabled(false);
+	setUpdatesEnabled(false);
+
+	QRect windowSize(geometry());
+	_progressBar->move(windowSize.x()+(windowSize.width()-_progressBar->geometry().width())/2, windowSize.y()+(windowSize.height()-_progressBar->geometry().height())/2);
+	_progressBar->initLoading();
+
+	_loadSimulationThread.start();
+	_loadSimulationTimer->start();
+
+}
+
 void MainWindow::selectSimulation()
 {
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Select Simulation"), "", tr("Simulation Record (*.h5);;All Files (*)"));
@@ -338,30 +382,15 @@ void MainWindow::selectSimulation()
 	{
 		return;
 	}
-	else
+    // ask for step resolution
+	bool resolutionCorrect;
+	int resolution = QInputDialog::getInt(this, tr("Select time step resolution"),tr("Resolution Step:"), 1, 1, 1000, 1, &resolutionCorrect);
+	if(!resolutionCorrect)
 	{
-		// ask for step resolution
-		bool resolutionCorrect;
-		int resolution = QInputDialog::getInt(this, tr("Select time step resolution"),tr("Resolution Step:"), 1, 1, 1000, 1, &resolutionCorrect);
-		if(!resolutionCorrect)
-		{
-			resolution = 1;
-		}
-		repaint();
-
-		ProjectConfiguration::instance()->setResolution(resolution);
-		ProjectConfiguration::instance()->setSimulationFileName(fileName.toStdString());
-
-		setEnabled(false);
-		setUpdatesEnabled(false);
-
-		QRect windowSize(geometry());
-		_progressBar->move(windowSize.x()+(windowSize.width()-_progressBar->geometry().width())/2, windowSize.y()+(windowSize.height()-_progressBar->geometry().height())/2);
-		_progressBar->initLoading();
-
-		_loadSimulationThread.start();
-		_loadSimulationTimer->start();
+		resolution = 1;
 	}
+	repaint();
+    selectSimulation(fileName.toStdString(), resolution);
 }
 
 void MainWindow::adjustGUI()
@@ -393,6 +422,9 @@ void MainWindow::adjustGUI()
 		_saveProjectAction->setEnabled(false);
 		_saveProjectAsAction->setEnabled(false);
 
+		_screenshotAction->setEnabled(false);
+		_videoAction->setEnabled(false);
+
 		return;
 	}
 	_stepBox->setValue(0);
@@ -416,6 +448,9 @@ void MainWindow::adjustGUI()
 
 	_saveProjectAction->setEnabled(true);
 	_saveProjectAsAction->setEnabled(true);
+
+    _screenshotAction->setEnabled(true);
+    _videoAction->setEnabled(true);
 	
 	_settings->setRadiusSelection(3);
 
@@ -675,6 +710,168 @@ void MainWindow::updateAgentsSelected(std::list<Engine::AgentRecord*> agents,Eng
     agentsSelected.clear();
     agentsSelected = agents;
     _simulationRecord = sim;
+}
+
+void MainWindow::takeScreenshot()
+{
+    if(_display2D->getRealSize().width()==0)
+    {
+        return;
+    }
+    
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Screenshot"), "", tr("Image Files (*.png *.jpg *.bmp)"));
+	if(fileName.isEmpty())
+	{
+		return;
+	}
+    _display2D->resetView();
+    QImage img(_display2D->getRealSize(), QImage::Format_RGB16);
+    QPainter painter(&img);
+    _display2D->render(&painter);
+    img.save(fileName);
+}
+
+void MainWindow::takeVideo( const std::string & outputDir )
+{ 
+    int incrementStep = ProjectConfiguration::instance()->getSimulationRecord()->getSerializedResolution()*ProjectConfiguration::instance()->getResolution();
+    int finalStep = ProjectConfiguration::instance()->getSimulationRecord()->getNumSteps();
+    
+    _display2D->resetView();
+    QImage img(_display2D->getRealSize(), QImage::Format_RGB16);
+    QPainter painter(&img);
+
+    for(int i=0; i<=finalStep; i=i+incrementStep)
+    {
+        _display2D->setViewedStep(i);
+        _display2D->render(&painter);
+        img.save(QString::fromUtf8(outputDir.c_str())+"/step_"+QString("%1").arg(i, 8, 10, QChar('0')).toUpper()+".png");
+    }
+    update();
+
+}
+
+void MainWindow::takeVideo()
+{
+    if(_display2D->getRealSize().width()==0)
+    {
+        return;
+    }
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Select Dir to Store a screenshot for each time step"), "");
+	if(dir.isEmpty())
+	{
+		return;
+	}	
+   
+    std::string outputDir = dir.toStdString();
+    if(boost::filesystem::exists(outputDir) && !boost::filesystem::is_empty(outputDir))
+	{
+		QMessageBox::StandardButton button = QMessageBox::question(0, "Directory exists", QString("Directory \"").append(QString(outputDir.c_str()).append("\" is not empty; do you want to overwrite it?")), QMessageBox::Yes | QMessageBox::No);
+		if(button==QMessageBox::No)
+		{
+			return;
+		}
+		boost::filesystem::remove_all(outputDir);
+	}
+	boost::filesystem::create_directory(outputDir);
+    takeVideo(outputDir);
+}
+
+void MainWindow::takeMosaic()
+{
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Select Dir with runs to create a mosaic"), "");
+	if(dir.isEmpty())
+	{
+		return;
+	}
+    std::string baseDir = dir.toStdString();
+
+    dir = QFileDialog::getExistingDirectory(this, tr("Select Dir to Store the mosaic"), "");
+	if(dir.isEmpty())
+	{
+		return;
+	}	
+    std::string outputDir = dir.toStdString();
+    if(boost::filesystem::exists(outputDir) && !boost::filesystem::is_empty(outputDir))
+	{
+		QMessageBox::StandardButton button = QMessageBox::question(0, "Directory exists", QString("Directory \"").append(QString(outputDir.c_str()).append("\" is not empty; do you want to overwrite it?")), QMessageBox::Yes | QMessageBox::No);
+		if(button==QMessageBox::No)
+		{
+			return;
+		}
+		boost::filesystem::remove_all(outputDir);
+	}
+	boost::filesystem::create_directory(outputDir);
+
+    int numberOfSimulations = 0;
+    // compute number of simulations to analyse
+	for( boost::filesystem::directory_iterator it(baseDir); it!=boost::filesystem::directory_iterator(); it++ )
+	{
+		if(!boost::filesystem::is_directory(it->status()))
+		{
+			continue;
+		}
+		std::stringstream oss;
+		oss << (*it).path().native() << "/config.xml";
+		if(boost::filesystem::exists(oss.str()))
+		{
+			numberOfSimulations++;
+		}
+	}
+    int numRows = 8;
+    for(;numRows>0;numRows--)
+    {
+        if(numRows*numRows<=numberOfSimulations)
+        {
+            break;
+        }
+    }
+	std::cout << "num sims: " << numberOfSimulations << " creating mosaic of: " << numRows << "x" << numRows << std::endl;
+
+    int i=0;
+	for( boost::filesystem::directory_iterator it(baseDir); it!=boost::filesystem::directory_iterator(); it++ )
+	{
+        if(i>=numRows*numRows)
+        {
+            break;
+        }
+        i++;
+		std::cout << "next sim" << std::endl;
+		if(!boost::filesystem::is_directory(it->status()))
+		{
+			continue;
+		}
+		std::stringstream oss;
+		oss << (*it).path().native() << "/config.xml";	
+		TiXmlDocument doc(oss.str().c_str());
+		if (!doc.LoadFile())
+		{
+			QMessageBox msgBox;
+			msgBox.setText("Unable to open config file in dir: "+QString(oss.str().c_str()));
+			msgBox.exec();
+			continue;
+		}
+		TiXmlHandle hDoc(&doc);
+		TiXmlHandle hRoot(0);
+    
+		TiXmlElement * root = doc.FirstChildElement( "config" );
+		TiXmlElement * output = root->FirstChildElement("output");
+		std::string dataFile = (*it).path().native()+"/"+output->Attribute("resultsFile");
+
+		boost::filesystem::path pathToDir = *it;
+		std::cout << "creating series of screenshots for : " << dataFile << std::endl;
+
+        // load simulation
+        ProjectConfiguration::instance()->setResolution(1);
+        ProjectConfiguration::instance()->setSimulationFileName(dataFile);
+        ProjectConfiguration::instance()->loadSimulation();
+        adjustGUI();
+        std::stringstream dir;
+        dir << outputDir << "/shots_" << i << "/";
+	    boost::filesystem::create_directory(dir.str());
+        takeVideo(dir.str());
+        std::cout << " done for: " << dataFile << " folder: " << dir.str() << std::endl;
+    }
+    std::cout << "done!" << std::endl;
 }
 
 } // namespace GUI

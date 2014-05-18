@@ -21,10 +21,10 @@
  */
 
 #include <Display2D.hxx>
-#include <Raster.hxx>
+#include <DynamicRaster.hxx>
 #include <SimulationRecord.hxx>
 #include <AgentRecord.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <QPainter>
 #include <QToolTip>
 #include <QListWidgetItem>
@@ -62,18 +62,34 @@ Display2D::~Display2D()
 void Display2D::resetView()
 {
 	_viewedStep = 0;
-	_orderedRasters.clear();
-	_zoom = 1.0f;
 	_offset.setX(0);
 	_offset.setY(0);
+
+    if(_simulationRecord)
+    {
+	    _zoom = 600.0f/float(std::max(_simulationRecord->getSize()._width, _simulationRecord->getSize()._height));
+    }
+    else
+    {
+	    _zoom = 1.0f;
+    }
 }
 
 void Display2D::setSimulationRecord( Engine::SimulationRecord * simulationRecord )
 {
-	resetView();
+	_orderedRasters.clear();
 	_simulationRecord = simulationRecord;
-	_zoom = 600.0f/float(simulationRecord->getSize()._width);
+	resetView();
 	update();
+}
+
+QSize Display2D::getRealSize() const
+{
+    if(!_simulationRecord)
+    {
+        return QSize(0,0);
+    }
+    return QSize(_simulationRecord->getSize()._width*_zoom, _simulationRecord->getSize()._height*_zoom);
 }
 
 void Display2D::paintEvent(QPaintEvent *event)
@@ -82,7 +98,7 @@ void Display2D::paintEvent(QPaintEvent *event)
 	{
 		return;
 	}
-	QPixmap imageToDraw(_simulationRecord->getSize()._width*_zoom, _simulationRecord->getSize()._height*_zoom);
+	QPixmap imageToDraw(getRealSize());
 	//QImage imageToDraw(_simulationRecord->getSize()*_zoom, _simulationRecord->getSize()*_zoom, QImage::Format_ARGB32_Premultiplied);
 	QPainter painter(&imageToDraw);
 	QPen pen;
@@ -141,6 +157,7 @@ void Display2D::paintEvent(QPaintEvent *event)
 
 	painter.end();
 	painter.begin(&imageToDraw);
+
 	for(Engine::SimulationRecord::AgentTypesMap::const_iterator itType = _simulationRecord->beginTypes(); itType!=_simulationRecord->endTypes(); itType++)
 	{
 		AgentConfiguration * agentConfig = ProjectConfiguration::instance()->getAgentConfig(itType->first);
@@ -167,16 +184,13 @@ void Display2D::paintEvent(QPaintEvent *event)
 				bool exists = agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "exists");
 				if(exists)
 				{
-					QPen agentsPen;
 					int x = agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "x");
 					int y = agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "y");
 					QBrush brush(Qt::SolidPattern);
 					if(_state=="unknown")
 					{
-						agentsPen.setColor(QColor(colorToUse.red()*0.5f, colorToUse.green()*0.5f, colorToUse.blue()*0.5f));
-						agentsPen.setWidth(std::max(1.0f,_zoom/20.0f));
 						brush.setColor(colorToUse);
-						painter.setPen(agentsPen);
+                        painter.setPen(Qt::NoPen);
 						painter.setBrush(brush);
 					}
 					else
@@ -194,10 +208,7 @@ void Display2D::paintEvent(QPaintEvent *event)
 						catch( Engine::Exception & exceptionThrown )
 						{
 						}
-						int halfValue = value*0.5f;
-						agentsPen.setColor(QColor(128, 128-halfValue, 128-halfValue));
 						brush.setColor(QColor(255,255-value,255-value));
-						painter.setPen(agentsPen);
 						painter.setBrush(brush);
 					}
 					int size = agentConfig->getSize();
@@ -259,7 +270,7 @@ QSize Display2D::sizeHint() const
 
 void Display2D::viewedStepChangedSlot( int newViewedStep )
 {
-	_viewedStep = newViewedStep;
+    setViewedStep(newViewedStep);
 	update();
 }
 
@@ -447,6 +458,11 @@ void Display2D::radiusSelectionModified(int radiusSelection)
 {
 	_radiusSelection = radiusSelection;
 	std::cout << "radius selection: " << _radiusSelection << std::endl;
+}
+
+void Display2D::setViewedStep( int viewedStep )
+{
+    _viewedStep = viewedStep;
 }
 
 } // namespace GUI

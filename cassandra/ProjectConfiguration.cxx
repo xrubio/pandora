@@ -25,7 +25,7 @@
 #include <SimulationRecord.hxx>
 #include <AgentConfiguration.hxx>
 #include <RasterConfiguration.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <ColorSelector.hxx>
 #include <ColorInterval.hxx>
 

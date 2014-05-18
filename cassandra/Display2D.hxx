@@ -74,8 +74,6 @@ class Display2D : public QWidget
 	std::string getRasterToolTip( const Engine::Point2D<int> & position );
 	std::string getAgentToolTip( const Engine::Point2D<int> & position );
 
-	// cleans all the display options
-	void resetView();
 public:
 	void zoom( float value );
 	Display2D(QWidget * parent);
@@ -87,6 +85,10 @@ public:
 
 	void setRadiusSelection( int radiusSelection );
 	int getRadiusSelection() const;
+    QSize getRealSize() const;
+	// cleans all the display options
+	void resetView();
+    void setViewedStep( int viewedStep );
 
 protected:  
 	bool event(QEvent *event);

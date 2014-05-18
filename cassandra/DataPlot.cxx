@@ -23,7 +23,7 @@
 #include <DataPlot.hxx>
 
 #include <SimulationRecord.hxx>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 
 #include <qwt_legend.h>
 #include <qwt_plot_curve.h>

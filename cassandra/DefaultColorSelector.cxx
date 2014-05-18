@@ -23,7 +23,7 @@
 #include <DefaultColorSelector.hxx>
 #include <GL/gl.h>
 #include <algorithm>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <iostream>
 
 namespace GUI

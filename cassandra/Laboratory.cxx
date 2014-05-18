@@ -27,7 +27,7 @@
 #include <QTextStream>
 #include <boost/filesystem.hpp>
 #include <iomanip>
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <RunSimulations.hxx>
 #include <SimulationControlThread.hxx>
 #include <limits>

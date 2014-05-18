@@ -36,7 +36,49 @@ RasterConfiguration::RasterConfiguration( const int & minValue, const int & maxV
 	{
 		return;
 	}
-	
+
+    int numSteps = std::min(5, maxValue+1-_minValue);
+	float range = (float)(_maxValue + 1 - _minValue)/numSteps;
+    
+     _colorSelector->setColor(QColor("#FDECA6"),0);
+
+    int i=1;
+    if(i>=numSteps)
+    {
+        return;
+    }
+    std::cout << "\tadding break: " << minValue+range*i << " with range: " << range << std::endl;
+    _colorSelector->addBreak(minValue+range*i);
+    _colorSelector->setColor(QColor("#E6D298"),i);
+    i++;
+
+    if(i>=numSteps)
+    {
+        return;
+    }
+    std::cout << "\tadding break: " << minValue+range*i << " with range: " << range << std::endl;
+    _colorSelector->addBreak(minValue+range*i);
+    _colorSelector->setColor(QColor("#CFB98B"),i);
+    i++;
+
+    if(i>=numSteps)
+    {
+        return;
+    }
+    std::cout << "\tadding break: " << minValue+range*i << " with range: " << range << std::endl;
+    _colorSelector->addBreak(minValue+range*i);
+    _colorSelector->setColor(QColor("#B89F7D"),i);
+    i++;
+
+    if(i>=numSteps)
+    {
+        return;
+    }
+    std::cout << "\tadding break: " << minValue+range*i << " with range: " << range << std::endl;
+    _colorSelector->addBreak(minValue+range*i);
+    _colorSelector->setColor(QColor("#A1856F"),i);
+
+    /*
 	// basic behavior, 5 different random values
 	int numSteps = std::min(5, maxValue+1-_minValue);
 	float range = (float)(_maxValue + 1 - _minValue)/numSteps;
@@ -51,6 +93,7 @@ RasterConfiguration::RasterConfiguration( const int & minValue, const int & maxV
 		//std::cout << "\tadding break: " << minValue+range*i << " with color: " << rangeColor*i << std::endl;
 		_colorSelector->setColor(QColor(0,rangeColor*i,0), i);
 	}
+    */
 }
 
 RasterConfiguration::RasterConfiguration( const RasterConfiguration & prototype ) : _colorSelector(0), _minValue(prototype.getMinValue()), _maxValue(prototype.getMaxValue()), _transparentEnabled(prototype.isTransparentEnabled()), _transparentValue(prototype.getTransparentValue()), _elevationRaster(prototype.getElevationRaster()), _cellResolution(prototype.getCellResolution()), _elevationExaggeration(prototype.getElevationExaggeration()), _offset(prototype.getOffset()), _lod(prototype.getLOD()), _hasElevationRaster(prototype.hasElevationRaster())
