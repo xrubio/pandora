@@ -65,7 +65,6 @@ void AnalysisControlThread::run()
 {
 	_cancelExecution = false;
 	
-	boost::filesystem::path basePath(_baseDir); 
 	for( boost::filesystem::directory_iterator it(_baseDir); it!=boost::filesystem::directory_iterator(); it++ )
 	{
 		std::cout << "next sim" << std::endl;
