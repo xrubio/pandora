@@ -89,6 +89,8 @@ private:
     QAction * _screenshotAction;
     QAction * _videoAction;
     QAction * _mosaicAction;
+    
+    QAction * _heatMapAction;
 
 	QSpinBox * _stepBox;
 	QLabel * _numStepsLabel;
@@ -160,6 +162,8 @@ private slots:
     void takeVideo();
     void takeVideo( const std::string & outputDir );
     void takeMosaic();
+
+    void heatMap();
 
 	void agentConfigured( const std::string & , const AgentConfiguration &); 
 	void rasterConfigured( const std::string & , const RasterConfiguration &); 	

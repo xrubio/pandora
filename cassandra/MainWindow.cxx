@@ -57,6 +57,8 @@
 #include <QInputDialog>
 #include <boost/filesystem.hpp>
 
+#include <HeatMapDialog.hxx>
+
 namespace GUI
 {
 
@@ -227,6 +229,11 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	_mosaicAction->setStatusTip(tr("Take a mosaic of different runs of the model"));
 	connect(_mosaicAction, SIGNAL(triggered()), this, SLOT(takeMosaic()));
 
+    _heatMapAction = new QAction(QIcon(":/resources/icons/heatmap.png"), tr("Create heat map"), this);
+	_heatMapAction->setStatusTip(tr("Create a heat map with multi run data"));
+	connect(_heatMapAction, SIGNAL(triggered()), this, SLOT(heatMap()));
+
+
 	// menus
 	QMenu * fileMenu = menuBar()->addMenu(tr("&File"));
 	fileMenu->addAction(_newProjectAction);
@@ -265,6 +272,10 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	outputMenu->addAction(_videoAction);
 	outputMenu->addAction(_mosaicAction);
 
+    QMenu * edaMenu = menuBar()->addMenu(tr("Exploratory Data Analysis"));
+    edaMenu->addSeparator();
+    edaMenu->addAction(_heatMapAction);
+
 	// toolbars
 	QToolBar * fileBar= addToolBar(tr("File"));
 	fileBar->addAction(_newProjectAction);
@@ -284,7 +295,10 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	QToolBar * outputBar = addToolBar(tr("Output"));
 	outputBar->addAction(_screenshotAction);
 	outputBar->addAction(_videoAction);
-	outputBar->addAction(_mosaicAction);
+	outputBar->addAction(_mosaicAction);	
+    
+    QToolBar * edaBar = addToolBar(tr("EDA"));
+	edaBar->addAction(_heatMapAction);
 	
 	QLabel * label = new QLabel("Step: ");
 	simulationBar->addWidget(label);
@@ -873,6 +887,20 @@ void MainWindow::takeMosaic()
     }
     std::cout << "done!" << std::endl;
 }
+
+void MainWindow::heatMap()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Select file with grouped results"), "", tr("Comma Separated Value (*.csv);;All Files (*)"));
+	if (fileName.isEmpty())
+	{
+		return;
+	}
+
+    HeatMapDialog * dialog = new HeatMapDialog(0, fileName.toStdString());
+    dialog->show();
+    dialog->update();
+}   
+
 
 } // namespace GUI
 

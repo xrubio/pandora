@@ -157,6 +157,7 @@ void Display2D::paintEvent(QPaintEvent *event)
 
 	painter.end();
 	painter.begin(&imageToDraw);
+    painter.setPen(Qt::NoPen);
 
 	for(Engine::SimulationRecord::AgentTypesMap::const_iterator itType = _simulationRecord->beginTypes(); itType!=_simulationRecord->endTypes(); itType++)
 	{
@@ -190,7 +191,6 @@ void Display2D::paintEvent(QPaintEvent *event)
 					if(_state=="unknown")
 					{
 						brush.setColor(colorToUse);
-                        painter.setPen(Qt::NoPen);
 						painter.setBrush(brush);
 					}
 					else

@@ -6,7 +6,7 @@ import math
 shotsDir = '../shots/'
 outDir = './mosaic/'
 timeSteps = 100
-numRows = 64
+numRows = 8
 
 # for each time step create a mosaic
 for i in range(0,timeSteps):
@@ -19,12 +19,13 @@ for i in range(0,timeSteps):
     rowsOfImage = math.ceil(math.sqrt(len(newImages)))
     args.append(str(rowsOfImage)+'x'+str(rowsOfImage))
     args.append('-geometry')
-    args.append(str(math.ceil(2000/rowsOfImage)-4)+'x'+str(math.ceil(2000/rowsOfImage)-4)+'+2+2')
+    args.append(str(math.ceil(1000/rowsOfImage)-4)+'x'+str(math.ceil(1000/rowsOfImage)-4)+'+2+2')
     for tile in newImages:
         args.append(tile)
     args.append(outDir+'mosaic_'+'%08d'%i+'.png')
     call(args)
 
+"""
 # call convert to create the animated gif
 convertArgs = []
 convertArgs.append('convert')
@@ -38,7 +39,7 @@ convertArgs.append('1')
 #convertArgs.append('100')
 for i in range(0, timeSteps):
     convertArgs.append(outDir+'mosaic_'+'%08d'%i+'.png')
-convertArgs.append(outDir+'/mosaic.gif')
+convertArgs.append(outDir+'/mosaic.mpg')
 call(convertArgs)
-
+"""
 
