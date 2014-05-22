@@ -43,7 +43,10 @@ class HeatMapDialog : public QDialog
 	void fillParams();
     void fillVariables();
 
-    std::vector< std::vector<float> > _values;
+    std::vector< std::vector<float> > _rows;
+
+    std::vector<float> _xTicks;
+    std::vector<float> _yTicks;
 
 private slots:
 	void selectXAxis( int index );
@@ -56,6 +59,7 @@ public:
 signals:
     void updateXTicks( std::vector<float> );
     void updateYTicks( std::vector<float> );
+    void updateVariables( std::vector< std::vector<float> >);
 };
 
 } // namespace GUI
