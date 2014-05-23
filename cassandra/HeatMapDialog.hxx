@@ -38,7 +38,7 @@ class HeatMapDialog : public QDialog
 
 	Ui::HeatMapDialog _heatMapDialog;
 
-	bool fillMenus();
+	void fillMenus();
     HeatMapModel _model;
 
 private slots:

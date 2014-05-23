@@ -5,7 +5,6 @@
 #include <QImage>
 #include <QLinearGradient>
 #include <iostream>
-#include <cstdio>
 #include <HeatMapModel.hxx>
 
 namespace GUI
@@ -54,6 +53,7 @@ void HeatMap::paintEvent( QPaintEvent * )
     {
         return;
     }
+
 	QPixmap imageToDraw(size());
 	QPainter painter(&imageToDraw);
 	QPen pen;
@@ -84,7 +84,7 @@ void HeatMap::paintEvent( QPaintEvent * )
             }
             brush.setColor(QColor(_gradientImage.pixel(gradientCoordinate,gradientCoordinate)));
             painter.setBrush(brush);
-            if(i==_selectedCell.x() || j==_selectedCell.y())
+            if(i==size_t(_selectedCell.x()) || j==size_t(_selectedCell.y()))
             {
                 pen.setColor(QColor("#000000"));
                 pen.setWidth(2.0f);
@@ -97,7 +97,7 @@ void HeatMap::paintEvent( QPaintEvent * )
                 painter.setPen(pen);
             }   
             painter.drawRect(rect); 
-            if(i==_selectedCell.x() && j==_selectedCell.y())
+            if(i==size_t(_selectedCell.x()) && j==size_t(_selectedCell.y()))
             {   
                 QFont previousFont = painter.font();  
                 QFont font = painter.font();
@@ -141,6 +141,10 @@ void HeatMap::paintEvent( QPaintEvent * )
 	
 void HeatMap::updateView()
 {
+    if(_model.isEmpty())
+    {
+        return;
+    }
     QSize size(std::max(600, int(_model.xTicks().size())), std::max(600, int(_model.yTicks().size())));
     _cellSize.setWidth(std::max(1, int((size.width()-50)/_model.xTicks().size())));
     _cellSize.setHeight(std::max(1, int((size.height()-50)/_model.yTicks().size())));
@@ -150,6 +154,11 @@ void HeatMap::updateView()
 
 void HeatMap::mouseMoveEvent( QMouseEvent * event)
 {
+    if(_model.isEmpty())
+    {
+        return;
+    }
+
     _selectedCell.setX(-1);
     _selectedCell.setY(-1);
     if(event->pos().x()<50 || event->pos().y()<50)

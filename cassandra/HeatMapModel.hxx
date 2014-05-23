@@ -16,6 +16,8 @@ class HeatMapModel
     std::vector<std::string> _variables;
     std::vector< std::vector<float> > _values;
 
+    std::vector< std::vector<float> > _rows;
+
     int _xIndex;
     std::string _xParam;
     int _yIndex;

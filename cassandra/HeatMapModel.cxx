@@ -1,10 +1,22 @@
 
 #include <HeatMapModel.hxx>
+#include <cstdio>
+#include <cstdlib>
+#include <fstream>
+#include <sstream>
+#include <limits>
+#include <algorithm>
+
+#include <iostream>
 
 namespace GUI
 {
 
 HeatMapModel::HeatMapModel() : _xParam("none"), _yParam("none")
+{
+}
+
+HeatMapModel::~HeatMapModel()
 {
 }
 
@@ -65,11 +77,10 @@ void HeatMapModel::updateValues()
             // collect all data and divide by mean of all the rows that have this value
             for(auto row : _rows)
             {
-                if(row.at(indexX)==_xTicks.at(i) && row.at(indexY)==_yTicks.at(j))
+                if(row.at(_xIndex)==_xTicks.at(i) && row.at(_yIndex)==_yTicks.at(j))
                 {
-                    std::cout << "oeoe" << std::endl;
                     numRuns++;
-                    value += row.at(index);
+                    value += row.at(_variableIndex);
                 }
             }
             if(numRuns==0)
@@ -87,6 +98,7 @@ void HeatMapModel::updateValues()
 
 bool HeatMapModel::loadFile( const std::string & file )
 { 
+    setlocale ( LC_NUMERIC, "C" );
     std::ifstream infile(file.c_str());
     std::string line;
 
@@ -117,14 +129,13 @@ bool HeatMapModel::loadFile( const std::string & file )
 
         while(std::getline(iss, token, ';'))
         {
-            QString foo(token.c_str());
-            row.push_back(foo.toFloat());
+            row.push_back(std::stof(token.c_str()));
         }
         _rows.push_back(row);
     }
-    updateXParam(0);
-    updateYParam(0);
-    updateVariable(0);
+    updateVariable(0, _variables.at(0));
+    updateXParam(0, _variables.at(0));
+    updateYParam(0, _variables.at(0));
     return true;
 }
 
@@ -174,8 +185,6 @@ void HeatMapModel::updateMinMax()
 
     for(size_t i=0; i<_values.size(); i++)
     {
-        _values.at(i).resize(values.at(i).size());
-        std::copy(values.at(i).begin(), values.at(i).end(), _values.at(i).begin());
         float minValue = *std::min_element(_values.at(i).begin(), _values.at(i).end());
         float maxValue = *std::max_element(_values.at(i).begin(), _values.at(i).end());
         if(_maxValue<maxValue)

@@ -22,12 +22,11 @@
 
 #include <HeatMapDialog.hxx>
 #include <HeatMap.hxx>
-#include <fstream>
 
 namespace GUI
 {
 
-HeatMapDialog::HeatMapDialog(QWidget * parent, const std::string & groupFile, HeatMapModel & model ) : QDialog(parent)
+HeatMapDialog::HeatMapDialog(QWidget * parent, const std::string & groupFile ) : QDialog(parent)
 {
 	setModal(false);
 	_heatMapDialog.setupUi(this);
@@ -39,7 +38,7 @@ HeatMapDialog::HeatMapDialog(QWidget * parent, const std::string & groupFile, He
 	connect(_heatMapDialog.variable, SIGNAL(currentIndexChanged(int)), this, SLOT(selectVariable(int)));
   
     HeatMap * heatMap = new HeatMap(0, _model);
-	connect(this, SIGNAL(updateView(), heatMap, SLOT(updateView())));
+	connect(this, SIGNAL(updateView()), heatMap, SLOT(updateView()));
 
     layout()->addWidget(heatMap);
 
@@ -54,7 +53,7 @@ HeatMapDialog::~HeatMapDialog()
 {
 }
 
-bool HeatMapDialog::fillMenus()
+void HeatMapDialog::fillMenus()
 {
     QStringList headers;
     for(size_t i=0; i<_model.variables().size(); i++)
@@ -65,25 +64,35 @@ bool HeatMapDialog::fillMenus()
     _heatMapDialog.xAxis->addItems(headers);
     _heatMapDialog.yAxis->addItems(headers);
     _heatMapDialog.variable->addItems(headers);
-
-    return true;
 }
 
 void HeatMapDialog::selectXAxis( int index )
 {
-    _model.updateXParam(index);
+    if(_model.isEmpty())
+    {
+        return;
+    }
+    _model.updateXParam(index, _heatMapDialog.xAxis->currentText().toStdString());
     emit(updateView());
 }
 
 void HeatMapDialog::selectYAxis( int index )
 {  
-    _model.updateYParam(index);
+    if(_model.isEmpty())
+    {
+        return;
+    }
+    _model.updateYParam(index, _heatMapDialog.yAxis->currentText().toStdString());
     emit(updateView());
 }
 
 void HeatMapDialog::selectVariable( int index )
 {
-    _model.updateVariable(index);
+    if(_model.isEmpty())
+    {
+        return;
+    }
+    _model.updateVariable(index, _heatMapDialog.variable->currentText().toStdString());
     emit(updateView());
 }
 
