@@ -91,6 +91,7 @@ private:
     QAction * _mosaicAction;
     
     QAction * _heatMapAction;
+    QAction * _timeSeriesAction;
 
 	QSpinBox * _stepBox;
 	QLabel * _numStepsLabel;
@@ -164,6 +165,7 @@ private slots:
     void takeMosaic();
 
     void heatMap();
+    void timeSeries();
 
 	void agentConfigured( const std::string & , const AgentConfiguration &); 
 	void rasterConfigured( const std::string & , const RasterConfiguration &); 	

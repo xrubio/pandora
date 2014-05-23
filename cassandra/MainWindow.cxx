@@ -58,6 +58,7 @@
 #include <boost/filesystem.hpp>
 
 #include <HeatMapDialog.hxx>
+#include <TimeSeriesDialog.hxx>
 
 namespace GUI
 {
@@ -232,6 +233,9 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
     _heatMapAction = new QAction(QIcon(":/resources/icons/heatmap.png"), tr("Create heat map"), this);
 	_heatMapAction->setStatusTip(tr("Create a heat map with multi run data"));
 	connect(_heatMapAction, SIGNAL(triggered()), this, SLOT(heatMap()));
+    _timeSeriesAction = new QAction(QIcon(":/resources/icons/ts.png"), tr("Create time series"), this);
+	_timeSeriesAction->setStatusTip(tr("Explore time series with multi run data"));
+	connect(_timeSeriesAction, SIGNAL(triggered()), this, SLOT(timeSeries()));
 
 
 	// menus
@@ -275,6 +279,7 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
     QMenu * edaMenu = menuBar()->addMenu(tr("Exploratory Data Analysis"));
     edaMenu->addSeparator();
     edaMenu->addAction(_heatMapAction);
+    edaMenu->addAction(_timeSeriesAction);
 
 	// toolbars
 	QToolBar * fileBar= addToolBar(tr("File"));
@@ -299,6 +304,7 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
     
     QToolBar * edaBar = addToolBar(tr("EDA"));
 	edaBar->addAction(_heatMapAction);
+	edaBar->addAction(_timeSeriesAction);
 	
 	QLabel * label = new QLabel("Step: ");
 	simulationBar->addWidget(label);
@@ -899,7 +905,21 @@ void MainWindow::heatMap()
     HeatMapDialog * dialog = new HeatMapDialog(0, fileName.toStdString());
     dialog->show();
     dialog->update();
-}   
+}  
+
+void MainWindow::timeSeries()
+{    
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Select file with grouped results"), "", tr("Comma Separated Value (*.csv);;All Files (*)"));
+	if (fileName.isEmpty())
+	{
+		return;
+	}
+
+    TimeSeriesDialog * dialog = new TimeSeriesDialog(0, fileName.toStdString());
+    dialog->show();
+    dialog->update();
+
+}
 
 
 } // namespace GUI
