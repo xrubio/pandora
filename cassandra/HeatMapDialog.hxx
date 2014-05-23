@@ -26,6 +26,7 @@
 #include <QDialog>
 #include <ui_HeatMapDialog.h>
 #include <tinyxml.h>
+#include <HeatMapModel.hxx>
 
 
 namespace GUI
@@ -37,29 +38,20 @@ class HeatMapDialog : public QDialog
 
 	Ui::HeatMapDialog _heatMapDialog;
 
-	std::string _groupFile;
-
-	bool loadGroupFile();
-	void fillParams();
-    void fillVariables();
-
-    std::vector< std::vector<float> > _rows;
-
-    std::vector<float> _xTicks;
-    std::vector<float> _yTicks;
+	bool fillMenus();
+    HeatMapModel _model;
 
 private slots:
 	void selectXAxis( int index );
 	void selectYAxis( int index );
 	void selectVariable( int index );
+
 public:
 	HeatMapDialog( QWidget * parent, const std::string & groupFile );
 	virtual ~HeatMapDialog();
 
 signals:
-    void updateXTicks( std::vector<float> );
-    void updateYTicks( std::vector<float> );
-    void updateVariables( std::vector< std::vector<float> >);
+    void updateView();
 };
 
 } // namespace GUI

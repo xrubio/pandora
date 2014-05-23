@@ -6,26 +6,31 @@
 #include <QLinearGradient>
 #include <iostream>
 #include <cstdio>
+#include <HeatMapModel.hxx>
 
 namespace GUI
 {
 
-HeatMap::HeatMap( QWidget * parent )
+HeatMap::HeatMap( QWidget * parent, const HeatMapModel & model ) : QWidget(parent), _model(model)
 {
     QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setSizePolicy(sizePolicy);
-  
-    /*
-    _values.resize(_xTicks.size());
-   for(int i=0; i<_xTicks.size(); i++)
-   {
-       _values.at(i).resize(_yTicks.size());
-       for(int j=0; j<_yTicks.size(); j++)
-       {
-            _values.at(i).at(j) = j;
-       }
-   }
-   */
+    setMouseTracking(true); 
+    
+    QLinearGradient linearGrad(0,0,100,100);
+    linearGrad.setColorAt(0.0f, QColor("#FDECA6"));
+    linearGrad.setColorAt(0.2f, QColor("#E6D298"));
+    linearGrad.setColorAt(0.4f, QColor("#CFB98B"));
+    linearGrad.setColorAt(0.6f, QColor("#B89F7D"));
+    linearGrad.setColorAt(0.8f, QColor("#A1856F"));
+
+    QPixmap gradientValues(QSize(100,100));
+    QPainter paintGrad(&gradientValues);
+    QBrush brush(linearGrad);
+    paintGrad.setBrush(brush);
+    paintGrad.drawRect(QRect(0,0,100,100));
+
+    _gradientImage = gradientValues.toImage();
 }
 
 HeatMap::~HeatMap()
@@ -43,9 +48,9 @@ QSize HeatMap::sizeHint() const
 	return QSize(600, 600);
 }
 
-void HeatMap::paintEvent( QPaintEvent * event )
+void HeatMap::paintEvent( QPaintEvent * )
 {
-    if(_xTicks.size()==0 || _yTicks.size()==0)
+    if(_model.isEmpty())
     {
         return;
     }
@@ -60,56 +65,68 @@ void HeatMap::paintEvent( QPaintEvent * event )
 	
     imageToDraw.fill(QColor(255,255,255));
 
-    QLinearGradient linearGrad(0,0,100,100);
-    linearGrad.setColorAt(0.0f, QColor("#FDECA6"));
-    linearGrad.setColorAt(0.2f, QColor("#E6D298"));
-    linearGrad.setColorAt(0.4f, QColor("#CFB98B"));
-    linearGrad.setColorAt(0.6f, QColor("#B89F7D"));
-    linearGrad.setColorAt(0.8f, QColor("#A1856F"));
-    QBrush brush2(linearGrad);
 
-    QPixmap gradientP(QSize(100,100));
-    QPainter paintGrad(&gradientP);
-    paintGrad.setBrush(brush2);
-    paintGrad.drawRect(QRect(0,0,100,100));
-
-    QImage foo2 = gradientP.toImage();
-
-    QSize cellSize(std::max(1, int((size().width()-50)/_xTicks.size())), std::max(1,int((size().height()-50)/_yTicks.size())));
-    for(size_t i=0; i<_xTicks.size(); i++)
+    for(size_t i=0; i<_model.xTicks().size(); i++)
     {
-        for(size_t j=0; j<_yTicks.size(); j++)
+        for(size_t j=0; j<_model.yTicks().size(); j++)
         {
-            QRect rect(50+i*cellSize.width(),50+j*cellSize.height(),cellSize.width(), cellSize.height());
-            float normalisedValue = float(_values.at(i).at(j)-_minValue)/(_maxValue-_minValue);
-            int bar = 100.0f*normalisedValue;
+            QRect rect(50+i*_cellSize.width(),50+j*_cellSize.height(),_cellSize.width(), _cellSize.height());
+
+            int gradientCoordinate = 100.0f*_model.getNormalisedValue(i,j);
             // 0 is out of range due to QGradient code
-            if(bar<1)
+            if(gradientCoordinate<1)
             {
-                bar = 1;
+                gradientCoordinate = 1;
             }
-            if(bar>99)
+            if(gradientCoordinate>99)
             {
-                bar = 99;
+                gradientCoordinate= 99;
             }
-            //std::cout << "i: " << i << " j: " << j << " value: " << _values.at(i).at(j) << " bar: " << bar << std::endl;
-            brush.setColor(QColor(foo2.pixel(bar,bar)));
+            brush.setColor(QColor(_gradientImage.pixel(gradientCoordinate,gradientCoordinate)));
             painter.setBrush(brush);
-            painter.drawRect(rect);
+            if(i==_selectedCell.x() || j==_selectedCell.y())
+            {
+                pen.setColor(QColor("#000000"));
+                pen.setWidth(2.0f);
+                painter.setPen(pen);
+            }
+            else
+            {
+                pen.setColor(QColor("#585858"));
+                pen.setWidth(1.0f);
+                painter.setPen(pen);
+            }   
+            painter.drawRect(rect); 
+            if(i==_selectedCell.x() && j==_selectedCell.y())
+            {   
+                QFont previousFont = painter.font();  
+                QFont font = painter.font();
+                int pixelSize = _cellSize.height()/2;
+
+                QFontMetrics metrics(font);
+                font.setPixelSize(pixelSize);
+                while(pixelSize>1 && QFontMetrics(font).width(QString::number(_model.getValue(i,j)>_cellSize.width())))
+                {
+                    pixelSize--;
+                    font.setPixelSize(pixelSize);
+                }
+                painter.drawText(QRect(50+i*_cellSize.width(),50+j*_cellSize.height(), _cellSize.width(), _cellSize.height()), Qt::AlignCenter, QString::number(_model.getValue(i,j)));
+                painter.setFont(previousFont);
+            }
         }
     } 
     
     // text
-    painter.drawText(size().width()/2, 20, "Parameter 1");    
-    for(size_t i=0; i<_xTicks.size(); i++)
+    painter.drawText(size().width()/2, 20,_model.xParam().c_str()); 
+    for(size_t i=0; i<_model.xTicks().size(); i++)
     {
-        painter.drawText(QRect(50+i*cellSize.width() + cellSize.width()/2, 40, 100, cellSize.height()), QString::number(_xTicks.at(i)));
+        painter.drawText(QRect(50+i*_cellSize.width() + _cellSize.width()/2, 30, 100, _cellSize.height()), QString::number(_model.xTicks().at(i)));
     }
 
-    painter.drawText(20, 20, "Parameter 2");
-    for(size_t i=0; i<_yTicks.size(); i++)
+    painter.drawText(20, 20, _model.yParam().c_str());
+    for(size_t i=0; i<_model.yTicks().size(); i++)
     {
-        painter.drawText(QRect(20, 50+i*cellSize.height() + cellSize.height()/2, 100, cellSize.height()), QString::number(_yTicks.at(i)));
+        painter.drawText(QRect(20, 50+i*_cellSize.height() + _cellSize.height()/2, 100, _cellSize.height()), QString::number(_model.yTicks().at(i)));
     }
 
 
@@ -119,54 +136,30 @@ void HeatMap::paintEvent( QPaintEvent * event )
 	screenPainter.save();
 	screenPainter.drawPixmap(0,0,imageToDraw);
 	screenPainter.restore();
+
 }
 	
-void HeatMap::setXValues( std::vector<float> values )
+void HeatMap::updateView()
 {
-    _xTicks.clear();
-    _xTicks.resize(values.size());
-    std::copy(values.begin(), values.end(), _xTicks.begin());
-    QSize size(std::max(600, int(_xTicks.size())), std::max(600, int(_xTicks.size())));
+    QSize size(std::max(600, int(_model.xTicks().size())), std::max(600, int(_model.yTicks().size())));
+    _cellSize.setWidth(std::max(1, int((size.width()-50)/_model.xTicks().size())));
+    _cellSize.setHeight(std::max(1, int((size.height()-50)/_model.yTicks().size())));
     resize(size);
     update();
 }
 
-void HeatMap::setYValues( std::vector<float> values )
+void HeatMap::mouseMoveEvent( QMouseEvent * event)
 {
-    _yTicks.clear();
-    _yTicks.resize(values.size());
-    std::copy(values.begin(), values.end(), _yTicks.begin());
-    QSize size(std::max(600, int(_xTicks.size())), std::max(600, int(_yTicks.size())));
-    resize(size);
-    update();
-}
-
-void HeatMap::setVariables( std::vector< std::vector<float> > values )
-{
-    std::cout << "num values: " << values.size() << std::endl;
-    _values.clear();
-    _values.resize(values.size());
-    _maxValue = std::numeric_limits<float>::min();
-    _minValue = std::numeric_limits<float>::max();
-
-    for(size_t i=0; i<_values.size(); i++)
+    _selectedCell.setX(-1);
+    _selectedCell.setY(-1);
+    if(event->pos().x()<50 || event->pos().y()<50)
     {
-        _values.at(i).resize(values.at(i).size());
-        std::copy(values.at(i).begin(), values.at(i).end(), _values.at(i).begin());
-        float minValue = *std::min_element(_values.at(i).begin(), _values.at(i).end());
-        float maxValue = *std::max_element(_values.at(i).begin(), _values.at(i).end());
-        std::cout << "\tlocal min value: " << minValue << " max: " << maxValue << std::endl;
-        if(_maxValue<maxValue)
-        {
-            _maxValue = maxValue;
-        }
-        if(_minValue>minValue)
-        {
-            _minValue = minValue;
-        }
+        return;
     }
-    std::cout << "min value: " << _minValue << " max: " << _maxValue << std::endl;
+    _selectedCell.setX((event->pos().x()-50)/_cellSize.width());
+    _selectedCell.setY((event->pos().y()-50)/_cellSize.height());
+    update();
 }
-	
+
 } // namespace GUI
 
