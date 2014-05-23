@@ -30,8 +30,6 @@ HeatMapDialog::HeatMapDialog(QWidget * parent, const std::string & groupFile ) :
 {
 	setModal(false);
 	_heatMapDialog.setupUi(this);
-    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    setSizePolicy(sizePolicy);
 
 	connect(_heatMapDialog.xAxis, SIGNAL(currentIndexChanged(int)), this, SLOT(selectXAxis(int)));
 	connect(_heatMapDialog.yAxis, SIGNAL(currentIndexChanged(int)), this, SLOT(selectYAxis(int)));

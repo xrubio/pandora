@@ -12,7 +12,7 @@ namespace GUI
 
 HeatMap::HeatMap( QWidget * parent, const HeatMapModel & model ) : QWidget(parent), _model(model)
 {
-    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setSizePolicy(sizePolicy);
     setMouseTracking(true); 
     
@@ -148,7 +148,7 @@ void HeatMap::updateView()
     QSize size(std::max(600, int(_model.xTicks().size())), std::max(600, int(_model.yTicks().size())));
     _cellSize.setWidth(std::max(1, int((size.width()-50)/_model.xTicks().size())));
     _cellSize.setHeight(std::max(1, int((size.height()-50)/_model.yTicks().size())));
-    resize(size);
+//    resize(size);
     update();
 }
 
