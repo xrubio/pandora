@@ -66,6 +66,7 @@ void TimeSeriesModel::fillTimeSteps( const std::string & file )
     {
         std::istringstream iss(line);
         std::string token;
+        // timeStep is always the first param
         std::getline(iss, token, ';');
         _timeSteps.push_back(atoi(token.c_str()));
         continue;
@@ -87,6 +88,8 @@ void TimeSeriesModel::fillResults( const std::string & file )
     std::string token;        
     
     _results.clear();
+    // timeStep is always the first param
+    std::getline(iss, token, ';');
     while(std::getline(iss, token, ';'))
     {
         _results.push_back(token);
@@ -110,7 +113,6 @@ void TimeSeriesModel::loadGroupFile( const std::string & groupFile )
     {
         std::stringstream oss;
 		oss << dir << "/run_"  << std::setfill('0') << std::setw(4) << i <<  ".csv";
-        std::cout << "checking: " << oss.str() << std::endl;
         if(boost::filesystem::exists(oss.str()))
         {
             if(_results.empty())
