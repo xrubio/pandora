@@ -16,9 +16,8 @@ TimeSeriesModel::~TimeSeriesModel()
 {
 }
 
-void TimeSeriesModel::fillParams( const std::string & groupFile )
+void TimeSeriesModel::fillParamNames( const std::string & groupFile )
 {
-    std::cout << "fill params from: " << groupFile << std::endl;
     setlocale ( LC_NUMERIC, "C" );
     std::ifstream infile(groupFile.c_str());
     std::string line;
@@ -31,24 +30,24 @@ void TimeSeriesModel::fillParams( const std::string & groupFile )
     std::string token;        
     
     // iterate through first line
-    _params.clear();
+    _paramNames.clear();
     // first is run name
     std::getline(iss, token, ';');
     while(std::getline(iss, token, ';'))
     {    
-        bool isParam = true;
+        bool isParamName = true;
         // remove params that are in results (they are NOT params)
-        for(auto result : _results)
+        for(auto resultName : _resultNames)
         {
-            if(result==token)
+            if(resultName==token)
             {
-                isParam = false;
+                isParamName = false;
                 break;
             }
         }
-        if(isParam)
+        if(isParamName)
         {
-            _params.push_back(token);
+            _paramNames.push_back(token);
         }
     }
 }
@@ -73,9 +72,8 @@ void TimeSeriesModel::fillTimeSteps( const std::string & file )
     }
 }
 
-void TimeSeriesModel::fillResults( const std::string & file )
+void TimeSeriesModel::fillResultNames( const std::string & file )
 {
-    std::cout << "fill results from: " << file << std::endl;
     setlocale ( LC_NUMERIC, "C" );
     std::ifstream infile(file.c_str());
     std::string line;
@@ -87,12 +85,12 @@ void TimeSeriesModel::fillResults( const std::string & file )
     std::istringstream iss(line);
     std::string token;        
     
-    _results.clear();
+    _resultNames.clear();
     // timeStep is always the first param
     std::getline(iss, token, ';');
     while(std::getline(iss, token, ';'))
     {
-        _results.push_back(token);
+        _resultNames.push_back(token);
     }
 }
 
@@ -103,9 +101,9 @@ void TimeSeriesModel::loadGroupFile( const std::string & groupFile )
     size_t pos = groupFile.rfind("/");
     std::string dir = groupFile.substr(0, pos);
 
-    _params.clear();
+    _paramNames.clear();
+    _resultNames.clear();
     _results.clear();
-    _values.clear();
 
     int i=0;
     bool finished = false;
@@ -117,7 +115,7 @@ void TimeSeriesModel::loadGroupFile( const std::string & groupFile )
         {
             if(_results.empty())
             {
-                fillResults(oss.str());
+                fillResultNames(oss.str());
                 fillTimeSteps(oss.str());
             }
         }
@@ -128,17 +126,17 @@ void TimeSeriesModel::loadGroupFile( const std::string & groupFile )
         i++;
     }
     std::cout << i << " results files parsed" << std::endl; 
-    fillParams(groupFile);
+    fillParamNames(groupFile);
 }
 
-const std::vector<std::string> & TimeSeriesModel::params() const
+const std::vector<std::string> & TimeSeriesModel::paramNames() const
 {
-    return _params;
+    return _paramNames;
 }
  
-const std::vector<std::string> & TimeSeriesModel::results() const
+const std::vector<std::string> & TimeSeriesModel::resultNames() const
 {
-    return _results;
+    return _resultNames;
 }
  
 const std::vector<int> & TimeSeriesModel::timeSteps() const
@@ -146,6 +144,20 @@ const std::vector<int> & TimeSeriesModel::timeSteps() const
     return _timeSteps;
 }
 
+size_t TimeSeriesModel::numRuns() const
+{
+    return 0;
+}
+    
+float TimeSeriesModel::params( const size_t & run, const size_t & paramIndex ) const
+{
+    return 0;
+}
+
+float TimeSeriesModel::results( const size_t & run, const size_t & resultIndex, const size_t & timeStep ) const
+{
+    return 0;
+}
 
 } // namespace GUI
 

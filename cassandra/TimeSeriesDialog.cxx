@@ -33,14 +33,14 @@ TimeSeriesDialog::TimeSeriesDialog(QWidget * parent, const std::string & groupFi
 
     _model.loadGroupFile(groupFile);
 
-    for( auto param : _model.params())
+    for( auto param : _model.paramNames())
     {
-        std::cout << "next param: " << param << std::endl;
+        std::cout << "next param name: " << param << std::endl;
     }
 
-    for( auto result : _model.results())
+    for( auto result : _model.resultNames())
     {
-        std::cout << "next result: " << result << std::endl;
+        std::cout << "next result name: " << result << std::endl;
     }
     
     for( auto step : _model.timeSteps())

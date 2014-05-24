@@ -6,26 +6,26 @@
 namespace Tests 
 {
 
-void CassandraTests::timeSeriesModelLoadsParams()
+void CassandraTests::timeSeriesModelLoadsParamNames()
 {
     GUI::TimeSeriesModel model;
     model.loadGroupFile("../data/EDA/groupResults.csv");
-    QCOMPARE(int(model.params().size()),2);
+    QCOMPARE(int(model.paramNames().size()),2);
 
-    QCOMPARE(model.params().at(0).c_str(),"width_size");
-    QCOMPARE(model.params().at(1).c_str(),"value_numAgents");
+    QCOMPARE(model.paramNames().at(0).c_str(),"width_size");
+    QCOMPARE(model.paramNames().at(1).c_str(),"value_numAgents");
 }
 
-void CassandraTests::timeSeriesModelLoadsResults()
+void CassandraTests::timeSeriesModelLoadsResultNames()
 {
     GUI::TimeSeriesModel model;
     model.loadGroupFile("../data/EDA/groupResults.csv");
-    QCOMPARE(int(model.results().size()),4);
+    QCOMPARE(int(model.resultNames().size()),4);
     
-    QCOMPARE(model.results().at(0).c_str(),"Sum exists");
-    QCOMPARE(model.results().at(1).c_str(),"Mean resources");
-    QCOMPARE(model.results().at(2).c_str(),"Mean x");
-    QCOMPARE(model.results().at(3).c_str(),"Mean y");
+    QCOMPARE(model.resultNames().at(0).c_str(),"Sum exists");
+    QCOMPARE(model.resultNames().at(1).c_str(),"Mean resources");
+    QCOMPARE(model.resultNames().at(2).c_str(),"Mean x");
+    QCOMPARE(model.resultNames().at(3).c_str(),"Mean y");
 }
 
 void CassandraTests::timeSeriesModelLoadsTimeSteps()
@@ -37,6 +37,32 @@ void CassandraTests::timeSeriesModelLoadsTimeSteps()
     {
         QCOMPARE(int(model.timeSteps().at(i)),int(i));
     }
+}
+
+void CassandraTests::timeSeriesModelLoadParams()
+{
+    GUI::TimeSeriesModel model;
+    model.loadGroupFile("../data/EDA/groupResults.csv");
+
+    // total runs
+    QCOMPARE(int(model.numRuns()),101);
+    // particular data
+    QCOMPARE(float(model.params(24, 0)),342.1f);
+    QCOMPARE(float(model.params(24, 1)),4.1f);
+}
+
+void CassandraTests::timeSeriesModelLoadResults()
+{
+    GUI::TimeSeriesModel model;
+    model.loadGroupFile("../data/EDA/groupResults.csv");
+
+    // total runs
+    QCOMPARE(int(model.numRuns()),101);
+    // particular data
+    QCOMPARE(float(model.results(14, 0, 8)),5.00f);
+    QCOMPARE(float(model.results(14, 1, 5)), 13.40f);
+    QCOMPARE(float(model.results(14, 2, 0)), 4.20f);
+    QCOMPARE(float(model.results(14, 3, 10)), 5.20f);
 }
 
 } // namespace Tests 

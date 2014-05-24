@@ -12,9 +12,11 @@ class CassandraTests : public QObject
     Q_OBJECT
 
 private slots:
-    void timeSeriesModelLoadsParams();
-    void timeSeriesModelLoadsResults();
+    void timeSeriesModelLoadsParamNames();
+    void timeSeriesModelLoadsResultNames();
     void timeSeriesModelLoadsTimeSteps();
+    void timeSeriesModelLoadParams();
+    void timeSeriesModelLoadResults();
 };
 
 } // namespace  Tests
