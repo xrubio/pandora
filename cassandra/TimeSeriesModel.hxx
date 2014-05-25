@@ -18,6 +18,11 @@ class TimeSeriesModel
     // vector of runs, each with a vector of results for each time step
     std::vector< std::vector< std::vector<float> > > _results;
 
+    // _params is filled with a set of runs, each with a vector of floats (one for each param)
+    void fillParams( const std::string & groupFile );
+    // _results is filled with a set of runs, each with a vector of floats (each one having the list of temporal values for each result)
+    void fillResults( const std::string & file );
+
     void fillParamNames( const std::string & groupFile );
     void fillResultNames( const std::string & file );
     void fillTimeSteps( const std::string & file );
@@ -34,7 +39,8 @@ public:
     size_t numRuns() const;
     // returns the value of a param for a given run
     float params( const size_t & run, const size_t & paramIndex ) const;
-    float results( const size_t & run, const size_t & resultIndex, const size_t & timeStep ) const;
+    // returns the value of param for a given run and timeStep
+    float results( const size_t & run, const size_t & resultIndex, const int & timeStep) const;
 };
 
 }

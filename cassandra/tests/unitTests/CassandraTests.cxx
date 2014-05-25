@@ -45,10 +45,10 @@ void CassandraTests::timeSeriesModelLoadParams()
     model.loadGroupFile("../data/EDA/groupResults.csv");
 
     // total runs
-    QCOMPARE(int(model.numRuns()),101);
+    QCOMPARE(int(model.numRuns()),100);
     // particular data
-    QCOMPARE(float(model.params(24, 0)),342.1f);
-    QCOMPARE(float(model.params(24, 1)),4.1f);
+    QCOMPARE(float(model.params(25, 0)),80.0f);
+    QCOMPARE(float(model.params(48, 1)),10.0f);
 }
 
 void CassandraTests::timeSeriesModelLoadResults()
@@ -56,10 +56,8 @@ void CassandraTests::timeSeriesModelLoadResults()
     GUI::TimeSeriesModel model;
     model.loadGroupFile("../data/EDA/groupResults.csv");
 
-    // total runs
-    QCOMPARE(int(model.numRuns()),101);
     // particular data
-    QCOMPARE(float(model.results(14, 0, 8)),5.00f);
+    QCOMPARE(float(model.results(14, 0, 8)), 5.00f);
     QCOMPARE(float(model.results(14, 1, 5)), 13.40f);
     QCOMPARE(float(model.results(14, 2, 0)), 4.20f);
     QCOMPARE(float(model.results(14, 3, 10)), 5.20f);

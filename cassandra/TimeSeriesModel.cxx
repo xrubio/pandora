@@ -94,6 +94,60 @@ void TimeSeriesModel::fillResultNames( const std::string & file )
     }
 }
 
+void TimeSeriesModel::fillParams( const std::string & groupFile )
+{
+
+    setlocale ( LC_NUMERIC, "C" );
+    std::ifstream infile(groupFile.c_str());
+    std::string line;
+
+    // header
+    std::getline(infile, line);
+    // each line is a run
+    // the order is always 'run name;param 1;param2;param 3;final result 1; final result 2;...
+    while(std::getline(infile, line))
+    {
+        std::vector<float> run;
+
+        std::istringstream iss(line);
+        std::string token;        
+        std::getline(iss, token, ';');
+        for(size_t i=0; i<_paramNames.size(); i++)
+        {
+            std::getline(iss, token, ';');
+            run.push_back(std::atof(token.c_str()));
+        }
+        _params.push_back(run);
+    }
+}
+
+void TimeSeriesModel::fillResults( const std::string & file )
+{   
+    std::vector< std::vector<float> > run;
+    run.resize(_resultNames.size());
+
+    setlocale ( LC_NUMERIC, "C" );
+    std::ifstream infile(file.c_str());
+    std::string line;
+
+    // header
+    std::getline(infile, line);
+    // each line is a time step
+    while(std::getline(infile, line))
+    {
+        std::istringstream iss(line);
+        std::string token;
+        // time step ignored
+        std::getline(iss, token, ';');
+        for(size_t i=0; i<_resultNames.size(); i++)
+        {
+            std::getline(iss, token, ';');
+            run.at(i).push_back(std::atof(token.c_str()));
+        }
+    }
+    _results.push_back(run);
+}
+
 void TimeSeriesModel::loadGroupFile( const std::string & groupFile )
 {
     std::cout << "loading group file: " << groupFile << std::endl;
@@ -103,6 +157,8 @@ void TimeSeriesModel::loadGroupFile( const std::string & groupFile )
 
     _paramNames.clear();
     _resultNames.clear();
+
+    _params.clear();
     _results.clear();
 
     int i=0;
@@ -118,6 +174,7 @@ void TimeSeriesModel::loadGroupFile( const std::string & groupFile )
                 fillResultNames(oss.str());
                 fillTimeSteps(oss.str());
             }
+            fillResults(oss.str());
         }
         else
         {
@@ -125,8 +182,8 @@ void TimeSeriesModel::loadGroupFile( const std::string & groupFile )
         }
         i++;
     }
-    std::cout << i << " results files parsed" << std::endl; 
     fillParamNames(groupFile);
+    fillParams(groupFile);
 }
 
 const std::vector<std::string> & TimeSeriesModel::paramNames() const
@@ -146,17 +203,25 @@ const std::vector<int> & TimeSeriesModel::timeSteps() const
 
 size_t TimeSeriesModel::numRuns() const
 {
-    return 0;
+    return _params.size();
 }
     
 float TimeSeriesModel::params( const size_t & run, const size_t & paramIndex ) const
 {
-    return 0;
+    return _params.at(run).at(paramIndex);
 }
 
-float TimeSeriesModel::results( const size_t & run, const size_t & resultIndex, const size_t & timeStep ) const
+float TimeSeriesModel::results( const size_t & run, const size_t & resultIndex, const int & timeStep ) const
 {
-    return 0;
+    for(size_t i=0; i<_timeSteps.size(); i++)
+    {
+        if(timeStep != _timeSteps.at(i))
+        {
+            continue;
+        }
+        return _results.at(run).at(resultIndex).at(i);
+    }
+    return 0.0f;
 }
 
 } // namespace GUI
