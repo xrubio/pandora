@@ -17,6 +17,7 @@ private slots:
     void timeSeriesModelLoadsTimeSteps();
     void timeSeriesModelLoadParams();
     void timeSeriesModelLoadResults();
+    void timeSeriesModelMean();
 };
 
 } // namespace  Tests

@@ -21,6 +21,8 @@
  */
 
 #include <TimeSeriesDialog.hxx>
+#include <TimeSeriesView.hxx>
+#include <QListWidget>
 #include <iostream>
 
 namespace GUI
@@ -33,25 +35,80 @@ TimeSeriesDialog::TimeSeriesDialog(QWidget * parent, const std::string & groupFi
 
     _model.loadGroupFile(groupFile);
 
+    size_t i =0;
     for( auto param : _model.paramNames())
     {
-        std::cout << "next param name: " << param << std::endl;
+        QGroupBox * newParam = new QGroupBox();
+        newParam->setTitle(param.c_str());
+
+        QListWidget * listValues = new QListWidget(0);
+        listValues->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
+        std::vector<float> paramValues;
+        for( size_t run=0; run<_model.numRuns(); run++)
+        {
+            paramValues.push_back(_model.params(run, i));
+        }
+        std::sort(paramValues.begin(), paramValues.end());
+        std::vector<float>::iterator it = std::unique(paramValues.begin(), paramValues.end());
+        paramValues.resize(std::distance(paramValues.begin(), it));
+
+        for( size_t value=0; value<paramValues.size(); value++)
+        {
+            listValues->addItem(QString::number(paramValues.at(value)));
+        }
+        
+        connect(listValues, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChanged()));
+        QVBoxLayout * vbox = new QVBoxLayout;
+        vbox->addWidget(listValues);
+        _listParams.push_back(listValues);
+        newParam->setLayout(vbox);
+        _ts.params->layout()->addWidget(newParam);
+        i++;
     }
 
+    QStringList results;
     for( auto result : _model.resultNames())
     {
-        std::cout << "next result name: " << result << std::endl;
+        results.push_back(result.c_str());
     }
+    _ts.result->addItems(results);
     
-    for( auto step : _model.timeSteps())
-    {
-        std::cout << "next step: " << step << std::endl;
-    }
-
+    TimeSeriesView * timeSeriesView = new TimeSeriesView(0, _model);
+    connect(this, SIGNAL(updateView()), timeSeriesView, SLOT(updateView()));
+    layout()->addWidget(timeSeriesView);
+	
+    connect(_ts.result, SIGNAL(currentIndexChanged(int)), this, SLOT(selectVariable(int)));
+    selectVariable(0);
 }
 
 TimeSeriesDialog::~TimeSeriesDialog()
 {
+}
+
+void TimeSeriesDialog::selectVariable( int index )
+{
+    _model.selectResult(index);
+    emit(updateView());
+}
+
+void TimeSeriesDialog::selectionChanged()
+{
+    for(size_t i=0; i<_listParams.size(); i++)
+    {
+        std::vector<float> selectedValues;
+        QListWidget * paramList = _listParams.at(i);
+        for(int j=0; j<paramList->count(); j++)
+        {
+            if(!paramList->item(j)->isSelected())
+            {
+                continue;
+            }
+            selectedValues.push_back(paramList->item(j)->text().toFloat());
+        }
+        _model.setSelectedValues(i, selectedValues);
+        std::cout << "param: " << i << " selected values: " << selectedValues.size() << std::endl;
+    }
 }
 
 } // namespace GUI

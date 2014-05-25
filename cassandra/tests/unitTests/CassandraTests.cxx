@@ -63,6 +63,21 @@ void CassandraTests::timeSeriesModelLoadResults()
     QCOMPARE(float(model.results(14, 3, 10)), 5.20f);
 }
 
+void CassandraTests::timeSeriesModelMean()
+{
+    GUI::TimeSeriesModel model;
+    model.loadGroupFile("../data/EDA/groupResults.csv");
+
+    model.selectResult(0);
+    QCOMPARE(float(model.mean(5)), 5.5f);
+    model.selectResult(1);
+    QCOMPARE(float(model.mean(1)), 6.4528f);
+    model.selectResult(2);
+    QCOMPARE(float(model.mean(8)), 26.9808f);
+    model.selectResult(3);
+    QCOMPARE(float(model.mean(6)), 4.9709f);
+}
+
 } // namespace Tests 
 
 QTEST_MAIN(Tests::CassandraTests)

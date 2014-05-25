@@ -119,6 +119,7 @@ void TimeSeriesModel::fillParams( const std::string & groupFile )
         }
         _params.push_back(run);
     }
+    _selectedValues.resize(_params.size());
 }
 
 void TimeSeriesModel::fillResults( const std::string & file )
@@ -222,6 +223,108 @@ float TimeSeriesModel::results( const size_t & run, const size_t & resultIndex, 
         return _results.at(run).at(resultIndex).at(i);
     }
     return 0.0f;
+}
+    
+float TimeSeriesModel::mean( int step ) const
+{
+    float value = 0.0f;
+    for(size_t i=0; i<numRuns(); i++)
+    {
+        value += results(i, _selectedResult, step);
+    }
+    return value/float(numRuns());
+}
+
+float TimeSeriesModel::selectedMean( int step ) const
+{
+    float value = 0.0f;
+    int selectedRuns;
+    for(size_t i=0; i<numRuns(); i++)
+    {
+        bool selected = true;
+        for(size_t j=0; j<_selectedValues.size(); j++)
+        {
+            if(!isParamSelected(j, params(i,j)))
+            {
+                selected = false;
+                break;
+            }
+        }
+        if(selected)
+        {
+            selectedRuns++;
+            value += results(i, _selectedResult, step);
+        }
+    }
+    std::cout << "value: " << value << " selected runs" << selectedRuns << std::endl;
+    return value/float(selectedRuns);
+}
+
+void TimeSeriesModel::selectResult( int index )
+{
+    _selectedResult = size_t(index);
+}
+
+bool TimeSeriesModel::isParamSelected( int paramIndex, float value ) const
+{
+    // none selected, all selected
+    if(_selectedValues.at(paramIndex).size()==0)
+    {
+        return true;
+    }
+
+    for(size_t i=0; i<_selectedValues.at(paramIndex).size(); i++)
+    {
+        if(_selectedValues.at(paramIndex).at(i)==value)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+float TimeSeriesModel::maxResultValue() const
+{
+    float maxValue = std::numeric_limits<float>::min();
+    for(auto step : _timeSteps)
+    {
+        float value = mean(step);
+        if(value>maxValue)
+        {
+            maxValue = value;
+        }
+    }
+    return maxValue;
+}
+
+float TimeSeriesModel::minResultValue() const
+{   
+    float minValue = std::numeric_limits<float>::max();
+    for(auto step : _timeSteps)
+    {
+        float value = mean(step);
+        if(value<minValue)
+        {
+            minValue = value;
+        }
+    }
+    return minValue;
+}
+    
+bool TimeSeriesModel::isEmpty() const
+{
+    if(_results.size()==0)
+    {
+        return true;
+    }
+    return false;
+}
+    
+void TimeSeriesModel::setSelectedValues( int paramIndex, const std::vector<float> & selectedValues )
+{
+    _selectedValues.at(paramIndex).clear();
+    _selectedValues.at(paramIndex).resize(selectedValues.size());
+    std::copy(selectedValues.begin(), selectedValues.end(), _selectedValues.at(paramIndex).begin());
 }
 
 } // namespace GUI

@@ -27,6 +27,8 @@
 #include <ui_TimeSeriesDialog.h>
 #include <TimeSeriesModel.hxx>
 
+class QListWidget;
+
 namespace GUI
 {
 
@@ -36,9 +38,16 @@ class TimeSeriesDialog : public QDialog
 
 	Ui::TimeSeriesDialog _ts;
     TimeSeriesModel _model;
+    std::vector<QListWidget*> _listParams;
 public:
 	TimeSeriesDialog( QWidget * parent, const std::string & dirRuns );
 	virtual ~TimeSeriesDialog();    
+signals:
+    void updateView();
+
+public slots:
+    void selectVariable( int index );
+    void selectionChanged();
 };
 
 } // namespace GUI

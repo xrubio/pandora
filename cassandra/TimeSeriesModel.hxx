@@ -27,6 +27,10 @@ class TimeSeriesModel
     void fillResultNames( const std::string & file );
     void fillTimeSteps( const std::string & file );
 
+    size_t _selectedResult;
+    // for each param the list of selected values (used for means)
+    std::vector< std::vector<float> > _selectedValues;
+
 public:
     TimeSeriesModel();
     virtual ~TimeSeriesModel();
@@ -41,6 +45,16 @@ public:
     float params( const size_t & run, const size_t & paramIndex ) const;
     // returns the value of param for a given run and timeStep
     float results( const size_t & run, const size_t & resultIndex, const int & timeStep) const;
+
+    float mean( int step ) const;
+    float selectedMean( int step ) const;
+
+    void selectResult( int index );
+    float maxResultValue() const;
+    float minResultValue() const;
+    bool isEmpty() const;
+    void setSelectedValues( int paramIndex, const std::vector<float> & selectedValues );
+    bool isParamSelected( int paramIndex, float value ) const;
 };
 
 }
