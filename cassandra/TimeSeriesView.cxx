@@ -21,7 +21,7 @@ TimeSeriesView::~TimeSeriesView()
 
 QSize TimeSeriesView::minimumSizeHint() const
 {
-	return QSize(300, 300);
+	return QSize(150, 150);
 }
 
 QSize TimeSeriesView::sizeHint() const
@@ -42,8 +42,8 @@ void TimeSeriesView::paintEvent( QPaintEvent * )
     }
 
     QSizeF cellSize;
-    cellSize.setWidth(size().width()/_model.timeSteps().size());
-    cellSize.setHeight(size().height()/(_model.maxResultValue()-_model.minResultValue()));
+    cellSize.setWidth((size().width()-50)/_model.timeSteps().size());
+    cellSize.setHeight((size().height()-50)/(_model.maxResultValue()-_model.minResultValue()));
 
     QVector<QPointF> generalMean;
     QVector<QPointF> selectedMean;
@@ -58,13 +58,14 @@ void TimeSeriesView::paintEvent( QPaintEvent * )
         int step = _model.timeSteps().at(i);
         int nextStep = _model.timeSteps().at(i+1);
 
-        generalMean.push_back(QPointF(step*cellSize.width(),size().height()-(value-_model.minResultValue())*cellSize.height()));
-        generalMean.push_back(QPointF(nextStep*cellSize.width(),size().height()-(nextValue-_model.minResultValue())*cellSize.height()));
+        generalMean.push_back(QPointF(50+step*cellSize.width(),size().height()-50-(value-_model.minResultValue())*cellSize.height()));
+        generalMean.push_back(QPointF(50+nextStep*cellSize.width(),size().height()-50-(nextValue-_model.minResultValue())*cellSize.height()));
         
-        selectedMean.push_back(QPointF(step*cellSize.width(),size().height()-(selectedValue-_model.minResultValue())*cellSize.height()));
-        selectedMean.push_back(QPointF(nextStep*cellSize.width(),size().height()-(selectedNextValue-_model.minResultValue())*cellSize.height()));
+        selectedMean.push_back(QPointF(50+step*cellSize.width(),size().height()-50-(selectedValue-_model.minResultValue())*cellSize.height()));
+        selectedMean.push_back(QPointF(50+nextStep*cellSize.width(),size().height()-50-(selectedNextValue-_model.minResultValue())*cellSize.height()));
+    }   
+    
 
-    }
     QPainter screenPainter(this);
     QPen oldPen = screenPainter.pen();
 
@@ -78,7 +79,21 @@ void TimeSeriesView::paintEvent( QPaintEvent * )
     screenPainter.setPen(selectedPen);
     screenPainter.drawLines(selectedMean);
 
-    screenPainter.setPen(oldPen);
+    screenPainter.setPen(oldPen);  
+    
+    // text
+    for(size_t i=0; i<_model.timeSteps().size(); i++)
+    {
+        screenPainter.drawText(QRect(50+i*cellSize.width(), size().height()-30, cellSize.width(), cellSize.height()), QString::number(_model.timeSteps().at(i)));
+    }
+    // 10 steps in y axis
+    float yStep = (_model.maxResultValue()-_model.minResultValue())/10.0f;
+    float iValue = _model.minResultValue();
+    for(float i=size().height(); i>=0; i=i-((size().height()-50)/10.0f))
+    {
+        screenPainter.drawText(QRect(0, i-50, cellSize.width(), cellSize.height()), QString::number(iValue));
+        iValue += yStep;
+    }
 }
 
 void TimeSeriesView::mouseMoveEvent( QMouseEvent * event)
