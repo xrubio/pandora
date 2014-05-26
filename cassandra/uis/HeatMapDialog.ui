@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Heat Map</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>

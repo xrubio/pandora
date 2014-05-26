@@ -21,7 +21,7 @@ TimeSeriesView::~TimeSeriesView()
 
 QSize TimeSeriesView::minimumSizeHint() const
 {
-	return QSize(600, 600);
+	return QSize(300, 300);
 }
 
 QSize TimeSeriesView::sizeHint() const
@@ -44,12 +44,6 @@ void TimeSeriesView::paintEvent( QPaintEvent * )
     QSizeF cellSize;
     cellSize.setWidth(size().width()/_model.timeSteps().size());
     cellSize.setHeight(size().height()/(_model.maxResultValue()-_model.minResultValue()));
-
-    /*
-    std::cout << "size: " << size().width() << "/" << size().height() << std::endl;
-    std::cout << "min: " << _model.minResultValue() << " max: " << _model.maxResultValue() << " diff: " << _model.maxResultValue()-_model.minResultValue() << std::endl;
-    std::cout << "resolution: " << cellSize.width() << "/" << cellSize.height() << std::endl;
-    */
 
     QVector<QPointF> generalMean;
     QVector<QPointF> selectedMean;
@@ -75,12 +69,12 @@ void TimeSeriesView::paintEvent( QPaintEvent * )
     QPen oldPen = screenPainter.pen();
 
     QPen pen(QColor("#6C6C6C"));
-    pen.setWidth(5);
+    pen.setWidth(6);
     screenPainter.setPen(pen);
     screenPainter.drawLines(generalMean);
     
-    QPen selectedPen(QColor("#FF0000"));
-    selectedPen.setWidth(4);
+    QPen selectedPen(QColor("#FF404D"));
+    selectedPen.setWidth(3);
     screenPainter.setPen(selectedPen);
     screenPainter.drawLines(selectedMean);
 
