@@ -42,7 +42,7 @@ TimeSeriesDialog::TimeSeriesDialog(QWidget * parent, const std::string & groupFi
         newParam->setTitle(param.c_str());
 
         QListWidget * listValues = new QListWidget(0);
-        listValues->setSelectionMode(QAbstractItemView::ExtendedSelection);
+        listValues->setSelectionMode(QAbstractItemView::MultiSelection);
 
         std::vector<float> paramValues;
         for( size_t run=0; run<_model.numRuns(); run++)
@@ -107,8 +107,8 @@ void TimeSeriesDialog::selectionChanged()
             selectedValues.push_back(paramList->item(j)->text().toFloat());
         }
         _model.setSelectedValues(i, selectedValues);
-        std::cout << "param: " << i << " selected values: " << selectedValues.size() << std::endl;
     }
+    emit(updateView());
 }
 
 } // namespace GUI

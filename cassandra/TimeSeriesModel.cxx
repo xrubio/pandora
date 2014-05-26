@@ -50,6 +50,7 @@ void TimeSeriesModel::fillParamNames( const std::string & groupFile )
             _paramNames.push_back(token);
         }
     }
+    _selectedValues.resize(_paramNames.size());
 }
 
 void TimeSeriesModel::fillTimeSteps( const std::string & file )
@@ -119,7 +120,6 @@ void TimeSeriesModel::fillParams( const std::string & groupFile )
         }
         _params.push_back(run);
     }
-    _selectedValues.resize(_params.size());
 }
 
 void TimeSeriesModel::fillResults( const std::string & file )
@@ -238,7 +238,7 @@ float TimeSeriesModel::mean( int step ) const
 float TimeSeriesModel::selectedMean( int step ) const
 {
     float value = 0.0f;
-    int selectedRuns;
+    int selectedRuns = 0;
     for(size_t i=0; i<numRuns(); i++)
     {
         bool selected = true;
@@ -256,7 +256,6 @@ float TimeSeriesModel::selectedMean( int step ) const
             value += results(i, _selectedResult, step);
         }
     }
-    std::cout << "value: " << value << " selected runs" << selectedRuns << std::endl;
     return value/float(selectedRuns);
 }
 
@@ -288,7 +287,7 @@ float TimeSeriesModel::maxResultValue() const
     float maxValue = std::numeric_limits<float>::min();
     for(auto step : _timeSteps)
     {
-        float value = mean(step);
+        float value = std::max(mean(step), selectedMean(step));
         if(value>maxValue)
         {
             maxValue = value;
@@ -302,7 +301,7 @@ float TimeSeriesModel::minResultValue() const
     float minValue = std::numeric_limits<float>::max();
     for(auto step : _timeSteps)
     {
-        float value = mean(step);
+        float value = std::min(mean(step), selectedMean(step));
         if(value<minValue)
         {
             minValue = value;
