@@ -41,6 +41,11 @@ public:
 	// load a GDAL file conforming World position
 	void fillGDALRaster( StaticRaster & raster, const std::string & fileName, const Rectangle<int> & definedBoundaries = Rectangle<int>());
 	// load an HDF5 conforming adjusting raster to data, or to World position if not null
+    void fillHDF5RasterDirectPath( StaticRaster & raster, const std::string & fileName, const std::string & pathToData, World * world );
+
+    // load an HDF5 from a serialized dynamic raster at a given time step
+    void fillHDF5Raster( StaticRaster & raster, const std::string & fileName, const std::string & rasterName, int step, World * world = 0);
+    // load an HDF5 from a serialized static raster
 	void fillHDF5Raster( StaticRaster & raster, const std::string & fileName, const std::string & rasterName, World * world = 0);
 	// load a raster file from a GRASS database conforming adjusting raster to data, or to World position if not null
 	// Simulation MUST be executed from a Grass instance, and raster must exist in current location/mapset

@@ -134,7 +134,7 @@ void RasterLoader::fillGDALRaster( StaticRaster & raster, const std::string & fi
 	log_DEBUG(logName.str(), "done!");	
 }
 
-void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fileName, const std::string & rasterName, World * world )
+void RasterLoader::fillHDF5RasterDirectPath( StaticRaster & raster, const std::string & fileName, const std::string & pathToData, World * world )
 {
 	std::stringstream logName;
 	if(world)
@@ -145,12 +145,11 @@ void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fi
 	{
 		logName << "RasterLoader";
 	}
-	log_DEBUG(logName.str(), "loading file: " << fileName << " rasterName: " << rasterName);
+	log_DEBUG(logName.str(), "loading file: " << fileName << " pathToData: " << pathToData);
 
-	std::ostringstream oss;
-	oss << "/" << rasterName << "/values";
+
 	hid_t fileId = H5Fopen(fileName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-	hid_t dset_id = H5Dopen(fileId, oss.str().c_str(), H5P_DEFAULT);
+	hid_t dset_id = H5Dopen(fileId, pathToData.c_str(), H5P_DEFAULT);
 	hid_t dataspaceId = H5Dget_space(dset_id);
 	hsize_t dims[2];
 	H5Sget_simple_extent_dims(dataspaceId, dims, NULL);
@@ -159,7 +158,7 @@ void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fi
 	if(world && (dims[0]!=world->getSimulation().getSize()._width || dims[1]!=world->getSimulation().getSize()._height))
 	{
 		std::stringstream oss;
-		oss << "RasterLoader::fillHDF5Raster - file: " << fileName << " and raster name: " << rasterName << " with size: " << dims[0] << "/" << dims[1] << " different from defined size: " << world->getSimulation().getSize() << std::endl;
+		oss << "RasterLoader::fillHDF5RasterDirectPath - file: " << fileName << " and dataset: " << pathToData<< " with size: " << dims[0] << "/" << dims[1] << " different from defined size: " << world->getSimulation().getSize() << std::endl;
 		throw Engine::Exception(oss.str());
 	}
 	
@@ -172,7 +171,6 @@ void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fi
 	else
 	{
 		dset_data = (int*)malloc(sizeof(int)*dims[0]*dims[1]);
-		// squared
 		raster.resize(Size<int>(dims[0], dims[1]));
 	}
 
@@ -207,32 +205,42 @@ void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fi
 	free(dset_data);
 
 	std::ostringstream oss2;
-	oss2 << "/colorTables/" << rasterName;
+	oss2 << "/colorTables/" << pathToData; 
+    
+    H5E_auto2_t oldfunc;
+    void *old_client_data;
+    H5Eget_auto(H5E_DEFAULT, &oldfunc, &old_client_data);
+
+    /* Turn off error handling */
+    H5Eset_auto(H5E_DEFAULT, NULL, NULL);
 	hid_t colorTableId = H5Dopen(fileId, oss2.str().c_str(), H5P_DEFAULT);
-	hid_t colorTableSpaceId = H5Dget_space(colorTableId);
-	hsize_t colorTableDims[2];
-	H5Sget_simple_extent_dims(colorTableSpaceId, colorTableDims, NULL);
+    
+    /* Restore previous error handler */
+    H5Eset_auto(H5E_DEFAULT, oldfunc, old_client_data);
 
-	//std::cout << "raster: " << rasterName << " has color table of size: " << colorTableDims[0] << "/" << colorTableDims[1] << std::endl;
-	// color table
-	if(colorTableDims[0]!=0)
-	{
-		raster.setColorTable(true, colorTableDims[0]);
-		int * colors = (int*)malloc(sizeof(int)*colorTableDims[0]*colorTableDims[1]);
-		H5Dread(colorTableId, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, colors);
-		for(size_t i=0; i<colorTableDims[0]; i++)
-		{
-			size_t index = colorTableDims[1]*i;
-			raster.addColorEntry(i, short(colors[index]), short(colors[index+1]), short(colors[index+2]), short(colors[index+3]));
-			//std::cout << "entry: " << i << " colors: " << short(colors[index]) << "/" << short(colors[index+1]) << "/" << short(colors[index+2]) << " alpha: " << short(colors[index+3]) << std::endl;
-		}
-		free(colors);
-	}
+    if(colorTableId>0)
+    {
+        hid_t colorTableSpaceId = H5Dget_space(colorTableId);
+        hsize_t colorTableDims[2];
+        H5Sget_simple_extent_dims(colorTableSpaceId, colorTableDims, NULL);
 
-	H5Sclose(colorTableSpaceId);
-	H5Dclose(colorTableId);
+        // color table
+        if(colorTableDims[0]!=0)
+        {
+            raster.setColorTable(true, colorTableDims[0]);
+            int * colors = (int*)malloc(sizeof(int)*colorTableDims[0]*colorTableDims[1]);
+            H5Dread(colorTableId, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, colors);
+            for(size_t i=0; i<colorTableDims[0]; i++)
+            {
+                size_t index = colorTableDims[1]*i;
+                raster.addColorEntry(i, short(colors[index]), short(colors[index+1]), short(colors[index+2]), short(colors[index+3]));
+            }
+            free(colors);
+        }
 
-
+        H5Sclose(colorTableSpaceId);
+        H5Dclose(colorTableId);
+    }
 	H5Fclose(fileId);
 	raster.updateMinMaxValues();
 	
@@ -244,6 +252,20 @@ void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fi
 		dynamicRaster->updateCurrentMinMaxValues();
 	}
 	log_DEBUG(logName.str(), "file: " << fileName << " rasterName: " << rasterName << " loaded");
+}
+
+void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fileName, const std::string & rasterName, int step, World * world )
+{
+	std::ostringstream oss;
+	oss << "/" << rasterName << "/step" << step;
+    fillHDF5RasterDirectPath(raster, fileName, oss.str(), world);
+}
+
+void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fileName, const std::string & rasterName, World * world )
+{	
+    std::ostringstream oss;
+	oss << "/" << rasterName << "/values";
+    fillHDF5RasterDirectPath(raster, fileName, oss.str(), world);
 }
 
 void RasterLoader::fillGrassCellRaster( StaticRaster & raster, const std::string & rasterName, World * world )
