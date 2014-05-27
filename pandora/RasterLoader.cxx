@@ -186,7 +186,7 @@ void RasterLoader::fillHDF5RasterDirectPath( StaticRaster & raster, const std::s
 			for(index._y=boundaries._origin._y; index._y<boundaries._origin._y+boundaries._size._height; index._y++)
 			{
 				Point2D<int> index2(index - boundaries._origin);
-				int index = boundaries._size._height*index2._y+index2._x;
+				int index = boundaries._size._width*index2._y+index2._x;
 				raster._values[index2._x][index2._y] = (int)dset_data[index];
 			}
 		}
