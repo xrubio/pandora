@@ -1,6 +1,7 @@
 
 #include <HunterGathererDecisionTreeController.hxx>
 
+#include <vector>
 #include <iostream>
 
 #include <MoveHomeAction.hxx>
@@ -163,6 +164,7 @@ MDPAction* HunterGathererDecisionTreeController::shouldForage( HunterGatherer & 
 	int biomass = agent.getLRSectors()[maxSectorLRIdx]->getBiomassAmount();
 
 	// thinking that the agent will forage at most 9 cells
+	int numCells = agent.getHRSectors()[maxSectorIdx]->numCells();
 
 #ifndef TREEIDUN
 	int numCells = agent.getHRSectors()[maxSectorHRIdx]->numCells();

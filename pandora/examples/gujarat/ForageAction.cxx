@@ -1050,6 +1050,7 @@ void	ForageAction::doTrendVicinityWalk( GujaratAgent& agent, const Engine::Point
 }
 
 
+
 void	ForageAction::doVicinityWalk( GujaratAgent& agent, const Engine::Point2D<int>& n0, double maxDist, Engine::Raster& r, int & collected ) 
 {
 	double walkedDist 	= 0.0;
