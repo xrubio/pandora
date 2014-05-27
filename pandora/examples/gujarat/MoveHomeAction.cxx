@@ -243,7 +243,7 @@ void MoveHomeAction::execute( Engine::Agent & agent )
 	// here? or at HunterGatherer::executeActions()?
 	//gujaratAgent.clearSectorKnowledge(LRposOld,LRpos);
 	gujaratAgent.clearSectorKnowledge();
-	
+	gujaratAgent.setLastMoveCrono(gw->getCurrentTimeStep()); 
 	/*
 	std::cout << "MSG> MOVE: "
 	<< "t=" << agent.getWorld()->getCurrentTimeStep() << ","

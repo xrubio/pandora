@@ -96,12 +96,17 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 				retrieveAttributeMandatory( elem, "value", _duneBiomass );
 				retrieveAttributeMandatory( elem, "efficiency", _duneEfficiency );
 				retrieveAttributeMandatory( elem, "minimum", _duneMinimum);
+				
+				retrieveAttributeMandatory( elem, "baseMeanRainfall", _duneBiomassBaseMeanRainfall);
+				
 			}
 			else if ( !elemType.compare("interdune") )
 			{
 				retrieveAttributeMandatory( elem, "value", _interduneBiomass );
 				retrieveAttributeMandatory( elem, "efficiency", _interduneEfficiency );
 				retrieveAttributeMandatory( elem, "minimum", _interduneMinimum);
+				
+				retrieveAttributeMandatory( elem, "baseMeanRainfall", _interduneBiomassBaseMeanRainfall);
 			}
 			else
 			{
@@ -110,6 +115,9 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 				sstr << "Unknown cellBiomass type " << elemType << " found!!!" << std::endl;
 				throw Engine::Exception( sstr.str() ); 
 			}
+			
+			
+			
 		}
 		else if ( !elem->ValueStr().compare( "storeRaster" ) ) 
 		{

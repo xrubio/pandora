@@ -184,7 +184,7 @@ template<typename T> class uct_t : public improvement_t<T> {
     }
 
     float search_tree(const T &s, unsigned depth) const {
-		try{		
+		//try{		
 		
 #ifdef DEBUG
         std::cout << std::setw(2*depth) << "" << "search_tree(" << s << "):";
@@ -315,11 +315,11 @@ template<typename T> class uct_t : public improvement_t<T> {
 	    it->second.values_.at(1+a) = old_value;
             return old_value;
         }
-	}catch(std::exception e)
-	{
-		std::cerr << "EXCEPTION AT UCT.H: float search_tree(const T &s, unsigned depth) const:"<< e.what() << std::endl;
-		assert(0);
-	}
+	//}catch(std::exception e)
+	//{
+	//	std::cerr << "EXCEPTION AT UCT.H: float search_tree(const T &s, unsigned depth) const:"<< e.what() << std::endl;
+	//	assert(0);
+	//}
     }
 
     Problem::action_t select_action(const T &state,

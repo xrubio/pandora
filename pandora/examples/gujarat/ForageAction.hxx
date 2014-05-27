@@ -135,6 +135,10 @@ public:
 								, const Engine::Raster& resRaster) const
 	{
 		long   n                          = gw->getValueLR(LRCounterSoilINTERDUNE,kCell2D);
+		if (n==0)
+		{
+			return 0;
+		}
 		int    res                        = gw->getValueLR(resRaster,kCell2D);
 		float  meanRes                    = ((float)res) / ((float)n);
 		int    expectedExploredCells      = std::min((int)n,explorableCells);

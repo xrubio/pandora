@@ -59,6 +59,8 @@ protected:
 
 	float _starved; // MpiBasicAttribute
 	
+	int _lastMoveCrono; // MpiBasicAttribute
+	
 	Engine::Point2D<int> getNearLocation( int range );
 	int _forageActionsExecuted;
 	int _moveHomeActionsExecuted;
@@ -183,6 +185,9 @@ public:
 	
 	void setResourcePrediction(float x) { _resourcePrediction = x;}
 	float getResourcePrediction() const { return _resourcePrediction;}	
+	
+	int getLastMoveCrono() { return _lastMoveCrono; }
+	void setLastMoveCrono(int s) { _lastMoveCrono = s; }
 };
 
 } // namespace Gujarat

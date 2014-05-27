@@ -9,14 +9,21 @@
 #include <GeneralState.hxx>
 #include <GujaratState.hxx>
 #include <sstream>
+#include <Exceptions.hxx>
 
 namespace Gujarat
 {
 
 GujaratAgent::GujaratAgent( const std::string & id ) 
-	: Engine::Agent(id), 
-	 _spentTime(0), _collectedResources(0), _age(0),
-	_socialRange( 50 ), _starved( 0.0f ), _forageActionsExecuted(0), _moveHomeActionsExecuted(0)
+	: Engine::Agent(id)
+	, _spentTime(0)
+	, _collectedResources(0)
+	, _age(0)
+	, _socialRange( 50 )
+	, _starved( 0.0f )
+	, _forageActionsExecuted(0)
+	, _moveHomeActionsExecuted(0)
+	, _lastMoveCrono(-1)
 {
 	//_emigrationProbability = 0.0;
 	//_reproductionProbability = 0.0;
@@ -86,7 +93,16 @@ void GujaratAgent::updateState()
 //	log_DEBUG( logName.str(), "\tagent.collectedResourcesAfterConsumption=" << surplus);
 	if ( surplus < 0 )
 	{
-		_starved += 1.0f-((float)_collectedResources/(float)(computeConsumedResources(1)));
+        float starvedIncrease = 1.0f-((float)_collectedResources/(float)(computeConsumedResources(1)));
+        if(starvedIncrease<0.0f)
+        {
+			std::stringstream oss;
+			oss << "GujaratAgent::updateState - starved increase: " << starvedIncrease << " is negative, collected: " << _collectedResources << " needed: " << computeConsumedResources(1);
+			throw Engine::Exception(oss.str());
+            return;
+        }
+		_starved += starvedIncrease;
+
 		//_emigrationProbability += 1.0f/(float)(((GujaratWorld*)_world)->getConfig()._daysPerSeason);
 		//log_DEBUG( logName.str(),  "\tagent.isStarving=yes");
 	}

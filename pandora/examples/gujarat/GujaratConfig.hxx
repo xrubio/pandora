@@ -70,13 +70,18 @@ class GujaratConfig : public Engine::Config
 	float _duneEfficiency;
 	// minimum percentage of dune biomass at the end of the year
 	float _duneMinimum;
+	// mean rainfall that would make grow biomass in dunes to the amount specified at <cellBiomass type="dune" value="XXX" ...>
+	float _duneBiomassBaseMeanRainfall;
 	// quantity of biomass in one interdune cell on a mean rain year
 	float _interduneBiomass;
 	// percentage of interdune biomass that can be used for H/G
 	float _interduneEfficiency;
 	// minimum percentage of interdune biomass at the end of the year
 	float _interduneMinimum;
-
+	// mean rainfall that would make grow biomass in interdunes to the amount specified at <cellBiomass type="interdune" value="XXX" ...>
+	float _interduneBiomassBaseMeanRainfall;
+	
+	
 	float _rainHistoricalDistribMean;
 	float _rainHistoricalDistribStdev;
 	

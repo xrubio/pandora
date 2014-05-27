@@ -16,7 +16,9 @@
 #include <HunterGathererDecisionTreeController.hxx>
 #include <HunterGathererProgrammedController.hxx>
 #include <HunterGathererMDPController.hxx>
-//#include <HunterGathererRandomMDPPolicyController.hxx>
+#include <HunterGathererRandomMDPPolicyController.hxx>
+#include <HunterGathererSimpleRandomController.hxx>
+#include <HunterGathererMarkovMoveController.hxx>
 
 #include <math.h> 
 
@@ -260,11 +262,28 @@ void GujaratState::setHGController( const std::string & type, const HunterGather
 	{	
 		for(int i=0; i<instance()._hgControllers.size(); i++)
 		{
-			//instance()._hgControllers.at(i) = new HunterGathererRandomMDPPolicyController(config);
+			instance()._hgControllers.at(i) = new HunterGathererRandomMDPPolicyController(config);
 		}
 		return;
 	}	
+	else if(type.compare("SimpleRandom")==0)
+	{	
+		for(int i=0; i<instance()._hgControllers.size(); i++)
+		{
+			instance()._hgControllers.at(i) = new HunterGathererSimpleRandomController();
+		}
+		return;
+	}
+	else if(type.compare("MarkovMove")==0)
+	{	
+		for(int i=0; i<instance()._hgControllers.size(); i++)
+		{
+			instance()._hgControllers.at(i) = new HunterGathererMarkovMoveController();
+		}
+		return;
+	}
 	
+
 	std::stringstream oss;
 	oss << "GujaratState::setHGController() - unknown type of controller: " << type;
 	throw Engine::Exception(oss.str());
@@ -354,7 +373,15 @@ void GujaratState::initializeSectorsMaskTrigonometricaly( int numSectors, int ho
 			}
 			else
 			{
+				
 				float angle = getAngle(fX,fY);
+				float pre = angle;
+				float post = angle + alpha/2.0;
+				if (post > 360.0)
+				{
+					post = post -360.0;
+				}
+				angle = post;
 				sm.at(x+homeRange).at(y+homeRange) =  (angle/alpha);	
 				
 				//std::cout <<"GNUPLOT "<< x <<"\t"<<y<<"\t"<< sm.at(x+homeRange).at(y+homeRange) << std::endl;
@@ -365,7 +392,7 @@ void GujaratState::initializeSectorsMaskTrigonometricaly( int numSectors, int ho
 		}
 	}
 
-	
+/*	
 	std::cout << "SectorMask Homerange =" << homeRange << std::endl;		
 	for ( int x=-homeRange; x<=homeRange; x++ )
 	{
@@ -375,7 +402,7 @@ void GujaratState::initializeSectorsMaskTrigonometricaly( int numSectors, int ho
 		}
 		std::cout << std::endl;		
 	}
-	
+*/	
 }
 
 
@@ -384,11 +411,11 @@ void GujaratState::initializeSectorsMask( int numSectors, int homeRange, Sectors
 {
 	// Use a more elegant way of doing this
 	//*? TODO
-	/*if(homeRange < 100) 
+	if(homeRange < 100) 
 	{
 		initializeSectorsMaskTrigonometricaly(numSectors, homeRange, sm );	
 	}
-	else*/ {
+	else {
 		std::vector< std::vector< Engine::Point2D<int> > > sectors;
 	
 		float alpha = 360/numSectors;
@@ -406,6 +433,12 @@ void GujaratState::initializeSectorsMask( int numSectors, int homeRange, Sectors
 
 		b._x = 0;
 		b._y = - homeRange;
+
+		float rot = alpha * 0.9f;
+
+//                b._x = b._x*std::cos(rot) - b._y*std::sin(rot);
+  //              b._y = b._x*std::sin(rot) + b._y*std::cos(rot);
+
 
 		for(int i=0; i<numSectors; i++)
 		{
@@ -441,6 +474,18 @@ void GujaratState::initializeSectorsMask( int numSectors, int homeRange, Sectors
 		}
 
 	}
+/*
+        std::cout << "SectorMask Homerange =" << homeRange << std::endl;
+        for ( int x=-homeRange; x<=homeRange; x++ )
+        {
+                for ( int y=-homeRange; y<=homeRange; y++ )
+                {
+                        std::cout << 1+sm.at(x+homeRange).at(y+homeRange);
+                }
+                std::cout << std::endl;
+        }
+*/
+
 }
 
 

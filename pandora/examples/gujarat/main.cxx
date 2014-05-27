@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 			fileName = argv[1];
 		}
 
-		omp_set_num_threads(4);
+		//omp_set_num_threads(4);
 
 
 // Should wire the same CPU to the same threads 

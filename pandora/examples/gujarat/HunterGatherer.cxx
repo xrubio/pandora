@@ -239,12 +239,12 @@ void HunterGatherer::selectActions()
 */
 	//*?
 	try{ int w = GujaratState::controller().getWidth();}
-	catch(std::exception e){std::cerr << "EXC:"<<e.what()<<std::endl;}	
+	catch(std::exception e){std::cerr << "EXC getWidth():"<<e.what()<<std::endl;}	
 
 
 	try{
 		GujaratState::controller().selectActions(*this, _actions);
-	}catch(std::exception e){std::cerr << "EXC:"<<e.what()<<std::endl;}
+	}catch(std::exception e){std::cerr << "EXC selectActions:"<<e.what()<<std::endl;}
 
 	
 }
