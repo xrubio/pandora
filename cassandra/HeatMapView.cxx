@@ -1,5 +1,5 @@
 
-#include <HeatMap.hxx>
+#include <HeatMapView.hxx>
 #include <QPainter>
 #include <QLayout>
 #include <QImage>
@@ -10,7 +10,7 @@
 namespace GUI
 {
 
-HeatMap::HeatMap( QWidget * parent, const HeatMapModel & model ) : QWidget(parent), _model(model)
+HeatMapView::HeatMapView( QWidget * parent, const HeatMapModel & model ) : QWidget(parent), _model(model)
 {
     QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setSizePolicy(sizePolicy);
@@ -32,22 +32,22 @@ HeatMap::HeatMap( QWidget * parent, const HeatMapModel & model ) : QWidget(paren
     _gradientImage = gradientValues.toImage();
 }
 
-HeatMap::~HeatMap()
+HeatMapView::~HeatMapView()
 {
 }
 
-QSize HeatMap::minimumSizeHint() const
-{
-	return QSize(600, 600);
-}
-
-
-QSize HeatMap::sizeHint() const
+QSize HeatMapView::minimumSizeHint() const
 {
 	return QSize(600, 600);
 }
 
-void HeatMap::paintEvent( QPaintEvent * )
+
+QSize HeatMapView::sizeHint() const
+{
+	return QSize(600, 600);
+}
+
+void HeatMapView::paintEvent( QPaintEvent * )
 {
     if(_model.isEmpty())
     {
@@ -110,7 +110,7 @@ void HeatMap::paintEvent( QPaintEvent * )
                     pixelSize--;
                     font.setPixelSize(pixelSize);
                 }
-                painter.drawText(QRect(50+i*_cellSize.width(),50+j*_cellSize.height(), _cellSize.width(), _cellSize.height()), Qt::AlignCenter, QString::number(_model.getValue(i,j)));
+                painter.drawText(QRect(50+i*_cellSize.width(),50+j*_cellSize.height(), _cellSize.width(), _cellSize.height()), Qt::AlignCenter, QString::number(_model.getValue(i,j), 'f', 2));
                 painter.setFont(previousFont);
             }
         }
@@ -139,7 +139,7 @@ void HeatMap::paintEvent( QPaintEvent * )
 
 }
 	
-void HeatMap::updateView()
+void HeatMapView::updateView()
 {
     if(_model.isEmpty())
     {
@@ -152,7 +152,7 @@ void HeatMap::updateView()
     update();
 }
 
-void HeatMap::mouseMoveEvent( QMouseEvent * event)
+void HeatMapView::mouseMoveEvent( QMouseEvent * event)
 {
     if(_model.isEmpty())
     {

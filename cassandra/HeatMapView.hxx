@@ -1,6 +1,6 @@
 
-#ifndef __HeatMap_hxx__
-#define __HeatMap_hxx__
+#ifndef __HeatMapView_hxx__
+#define __HeatMapView_hxx__
 
 #include <QWidget>
 #include <QMouseEvent>
@@ -10,7 +10,7 @@ namespace GUI
 
 class HeatMapModel;
 
-class HeatMap : public QWidget
+class HeatMapView : public QWidget
 {
     Q_OBJECT
 
@@ -21,8 +21,8 @@ class HeatMap : public QWidget
 
     const HeatMapModel & _model;
 public:
-    HeatMap( QWidget * parent, const HeatMapModel & model );
-    virtual ~HeatMap();
+    HeatMapView( QWidget * parent, const HeatMapModel & model );
+    virtual ~HeatMapView();
 
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
@@ -38,6 +38,6 @@ protected:
 
 } // namespace GUI
 
-#endif // __HeatMap_hxx__
+#endif // __HeatMapView_hxx__
 
 

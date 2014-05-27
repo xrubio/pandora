@@ -21,7 +21,7 @@
  */
 
 #include <HeatMapDialog.hxx>
-#include <HeatMap.hxx>
+#include <HeatMapView.hxx>
 
 namespace GUI
 {
@@ -35,7 +35,7 @@ HeatMapDialog::HeatMapDialog(QWidget * parent, const std::string & groupFile ) :
 	connect(_heatMapDialog.yAxis, SIGNAL(currentIndexChanged(int)), this, SLOT(selectYAxis(int)));
 	connect(_heatMapDialog.variable, SIGNAL(currentIndexChanged(int)), this, SLOT(selectVariable(int)));
   
-    HeatMap * heatMap = new HeatMap(0, _model);
+    HeatMapView * heatMap = new HeatMapView(0, _model);
 	connect(this, SIGNAL(updateView()), heatMap, SLOT(updateView()));
 
     layout()->addWidget(heatMap);
