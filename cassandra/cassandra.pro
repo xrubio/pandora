@@ -33,7 +33,7 @@ INCLUDEPATH += /usr/include/qt4/
 INCLUDEPATH += /usr/include/IL/
 INCLUDEPATH += /usr/local/hdf5/include/
 INCLUDEPATH += /usr/local/qwt-6.0.0/include/
-CONFIG += qt debug
+CONFIG += qt
 QMAKE_CXXFLAGS += -std=c++11
 
 
