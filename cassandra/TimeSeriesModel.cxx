@@ -185,6 +185,7 @@ void TimeSeriesModel::loadGroupFile( const std::string & groupFile )
     }
     fillParamNames(groupFile);
     fillParams(groupFile);
+    std::cout << "finished loading: " << numRuns() << " runs" << std::endl;
 }
 
 const std::vector<std::string> & TimeSeriesModel::paramNames() const

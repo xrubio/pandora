@@ -54,21 +54,16 @@ void TimeSeriesView::paintEvent( QPaintEvent * )
         
         float selectedValue = _model.selectedMean(_model.timeSteps().at(i));
         float selectedNextValue = _model.selectedMean(_model.timeSteps().at(i+1));
-
-        int step = _model.timeSteps().at(i);
-        int nextStep = _model.timeSteps().at(i+1);
-
-        generalMean.push_back(QPointF(50+step*cellSize.width(),size().height()-50-(value-_model.minResultValue())*cellSize.height()));
-        generalMean.push_back(QPointF(50+nextStep*cellSize.width(),size().height()-50-(nextValue-_model.minResultValue())*cellSize.height()));
         
-        selectedMean.push_back(QPointF(50+step*cellSize.width(),size().height()-50-(selectedValue-_model.minResultValue())*cellSize.height()));
-        selectedMean.push_back(QPointF(50+nextStep*cellSize.width(),size().height()-50-(selectedNextValue-_model.minResultValue())*cellSize.height()));
-    }   
+        generalMean.push_back(QPointF(50+i*cellSize.width(),size().height()-50-(value-_model.minResultValue())*cellSize.height()));
+        generalMean.push_back(QPointF(50+(i+1)*cellSize.width(),size().height()-50-(nextValue-_model.minResultValue())*cellSize.height()));
+        
+        selectedMean.push_back(QPointF(50+i*cellSize.width(),size().height()-50-(selectedValue-_model.minResultValue())*cellSize.height()));
+        selectedMean.push_back(QPointF(50+(i+1)*cellSize.width(),size().height()-50-(selectedNextValue-_model.minResultValue())*cellSize.height()));
+    }
     
-
     QPainter screenPainter(this);
     QPen oldPen = screenPainter.pen();
-
     QPen pen(QColor("#6C6C6C"));
     pen.setWidth(6);
     screenPainter.setPen(pen);
@@ -80,18 +75,17 @@ void TimeSeriesView::paintEvent( QPaintEvent * )
     screenPainter.drawLines(selectedMean);
 
     screenPainter.setPen(oldPen);  
-    
     // text
     for(size_t i=0; i<_model.timeSteps().size(); i++)
     {
-        screenPainter.drawText(QRect(50+i*cellSize.width(), size().height()-30, cellSize.width(), cellSize.height()), QString::number(_model.timeSteps().at(i)));
+        screenPainter.drawText(QRect(50+i*cellSize.width(), size().height()-30, 100, 20), QString::number(_model.timeSteps().at(i)));
     }
     // 10 steps in y axis
     float yStep = (_model.maxResultValue()-_model.minResultValue())/10.0f;
     float iValue = _model.minResultValue();
     for(float i=size().height(); i>=0; i=i-((size().height()-50)/10.0f))
     {
-        screenPainter.drawText(QRect(0, i-50, cellSize.width(), cellSize.height()), QString::number(iValue));
+        screenPainter.drawText(QRect(0, i-50, 100, 20), QString::number(iValue, 'f', 2));
         iValue += yStep;
     }
 }
