@@ -33,6 +33,7 @@ public slots:
 protected:
     void paintEvent( QPaintEvent * );
     void mouseMoveEvent( QMouseEvent * event);
+	void resizeEvent( QResizeEvent * event);
 
 };
 

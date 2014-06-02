@@ -12,7 +12,7 @@ namespace GUI
 
 HeatMapView::HeatMapView( QWidget * parent, const HeatMapModel & model ) : QWidget(parent), _model(model)
 {
-    QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setSizePolicy(sizePolicy);
     setMouseTracking(true); 
     
@@ -38,7 +38,7 @@ HeatMapView::~HeatMapView()
 
 QSize HeatMapView::minimumSizeHint() const
 {
-	return QSize(600, 600);
+	return QSize(300, 300);
 }
 
 
@@ -145,11 +145,15 @@ void HeatMapView::updateView()
     {
         return;
     }
-    QSize size(std::max(600, int(_model.xTicks().size())), std::max(600, int(_model.yTicks().size())));
-    _cellSize.setWidth(std::max(1, int((size.width()-50)/_model.xTicks().size())));
-    _cellSize.setHeight(std::max(1, int((size.height()-50)/_model.yTicks().size())));
-//    resize(size);
+    QSize size2(std::max(size().width(), int(_model.xTicks().size())), std::max(size().height(), int(_model.yTicks().size())));
+    _cellSize.setWidth(std::max(1, int((size2.width()-50)/_model.xTicks().size())));
+    _cellSize.setHeight(std::max(1, int((size2.height()-50)/_model.yTicks().size())));
     update();
+}
+
+void HeatMapView::resizeEvent( QResizeEvent * event)
+{
+	updateView();
 }
 
 void HeatMapView::mouseMoveEvent( QMouseEvent * event)
