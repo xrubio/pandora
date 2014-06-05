@@ -66,14 +66,12 @@ const int & StaticRaster::getValue( Point2D<int> position ) const
 		std::stringstream oss;
 		oss << "StaticRaster::getValue - " << position << " x out of bounds: " << _values.size();
 		throw Exception(oss.str());
-		return -1;
 	}
 	if(position._y<0 || position._y>=_values[position._x].size())
 	{
 		std::stringstream oss;
 		oss << "StaticRaster::getValue - " << position << " y out of bounds: " << _values.size() << "/" << _values[position._x].size();
 		throw Exception(oss.str());
-		return -1;
 	}
 	return _values[position._x][position._y];
 }
