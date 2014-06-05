@@ -236,7 +236,7 @@ void World::registerStaticRaster( const std::string & key, const bool & serializ
 	_serializeRasters.at(index) = serialize;
 }
 
-bool World::checkPosition( const Point2D<int> & newPosition )
+bool World::checkPosition( const Point2D<int> & newPosition ) const
 {
 	// checking size: if environment is a border of the real world
 	if(!getBoundaries().contains(newPosition))

@@ -122,7 +122,7 @@ public:
 	//! create a new raster map with the stablished size and given key
 	void registerDynamicRaster( const std::string & key, const bool & serialize, int index = -1);
 	//! checks if position parameter 'newPosition' is free to occupy by an agent, 'newPosition' is inside of the world and the maximum of agent cell-occupancy is not exceeded.
-	bool checkPosition( const Point2D<int> & newPosition );
+	bool checkPosition( const Point2D<int> & newPosition ) const;
 
 	//! returns the simulation characterization of this world
 	Simulation & getSimulation();
