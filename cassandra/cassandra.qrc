@@ -29,6 +29,7 @@
 
         <file>resources/icons/heatmap.png</file>
         <file>resources/icons/ts.png</file>
+        <file>resources/icons/text.png</file>
 
 		<file>resources/agentIcons/default_agent_1.png</file>
 		<file>resources/agentIcons/default_agent_2.png</file>

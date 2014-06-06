@@ -45,6 +45,7 @@ private slots:
 	void selectXAxis( int index );
 	void selectYAxis( int index );
 	void selectVariable( int index );
+    void takeScreenshot();
 
 public:
 	HeatMapDialog( QWidget * parent, const std::string & groupFile );

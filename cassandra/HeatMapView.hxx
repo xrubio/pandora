@@ -20,6 +20,7 @@ class HeatMapView : public QWidget
     QImage _gradientImage;
 
     const HeatMapModel & _model;
+    bool _showText;
 public:
     HeatMapView( QWidget * parent, const HeatMapModel & model );
     virtual ~HeatMapView();
@@ -29,6 +30,7 @@ public:
 
 public slots:    
     void updateView();
+    void switchText();
 
 protected:
     void paintEvent( QPaintEvent * );

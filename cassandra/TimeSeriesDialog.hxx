@@ -48,6 +48,7 @@ signals:
 public slots:
     void selectVariable( int index );
     void selectionChanged();
+    void takeScreenshot();
 };
 
 } // namespace GUI

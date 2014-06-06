@@ -10,7 +10,7 @@
 namespace GUI
 {
 
-HeatMapView::HeatMapView( QWidget * parent, const HeatMapModel & model ) : QWidget(parent), _model(model)
+HeatMapView::HeatMapView( QWidget * parent, const HeatMapModel & model ) : QWidget(parent), _model(model), _showText(false)
 {
     QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setSizePolicy(sizePolicy);
@@ -84,7 +84,7 @@ void HeatMapView::paintEvent( QPaintEvent * )
             }
             brush.setColor(QColor(_gradientImage.pixel(gradientCoordinate,gradientCoordinate)));
             painter.setBrush(brush);
-            if(i==size_t(_selectedCell.x()) || j==size_t(_selectedCell.y()))
+            if(!_showText && (i==size_t(_selectedCell.x()) || j==size_t(_selectedCell.y())))
             {
                 pen.setColor(QColor("#000000"));
                 pen.setWidth(2.0f);
@@ -97,7 +97,7 @@ void HeatMapView::paintEvent( QPaintEvent * )
                 painter.setPen(pen);
             }   
             painter.drawRect(rect); 
-            if(i==size_t(_selectedCell.x()) && j==size_t(_selectedCell.y()))
+            if(_showText || (i==size_t(_selectedCell.x()) && j==size_t(_selectedCell.y())))
             {   
                 QFont previousFont = painter.font();  
                 QFont font = painter.font();
@@ -112,7 +112,7 @@ void HeatMapView::paintEvent( QPaintEvent * )
                 }
                 painter.drawText(QRect(50+i*_cellSize.width(),50+j*_cellSize.height(), _cellSize.width(), _cellSize.height()), Qt::AlignCenter, QString::number(_model.getValue(i,j), 'f', 2));
                 painter.setFont(previousFont);
-            }
+        }
         }
     } 
     
@@ -172,6 +172,11 @@ void HeatMapView::mouseMoveEvent( QMouseEvent * event)
     _selectedCell.setX((event->pos().x()-50)/_cellSize.width());
     _selectedCell.setY((event->pos().y()-50)/_cellSize.height());
     update();
+}
+
+void HeatMapView::switchText()
+{
+    _showText = !_showText;
 }
 
 } // namespace GUI

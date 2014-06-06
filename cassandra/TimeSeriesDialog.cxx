@@ -24,6 +24,9 @@
 #include <TimeSeriesView.hxx>
 #include <QListWidget>
 #include <iostream>
+#include <QToolBar>
+#include <QFileDialog>
+#include <QPainter>
 
 namespace GUI
 {
@@ -80,6 +83,16 @@ TimeSeriesDialog::TimeSeriesDialog(QWidget * parent, const std::string & groupFi
 	
     connect(_ts.result, SIGNAL(currentIndexChanged(int)), this, SLOT(selectVariable(int)));
     selectVariable(0);
+
+    QAction * screenshotAction = new QAction(QIcon(":/resources/icons/screenshot.png"), tr("Take &Screenshot"), this);
+    screenshotAction->setStatusTip(tr("Take a screenshot"));
+	connect(screenshotAction, SIGNAL(triggered()), this, SLOT(takeScreenshot()));
+
+    QToolBar * tools = new QToolBar(tr("Tools"));
+    layout()->setMenuBar(tools);
+	tools->addAction(screenshotAction);
+
+
 }
 
 TimeSeriesDialog::~TimeSeriesDialog()
@@ -109,7 +122,23 @@ void TimeSeriesDialog::selectionChanged()
         _model.setSelectedValues(i, selectedValues);
     }
     emit(updateView());
+}   
+
+void TimeSeriesDialog::takeScreenshot()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Screenshot"), "", tr("Image Files (*.png *.jpg *.bmp)"));
+	if(fileName.isEmpty())
+	{
+		return;
+	}
+    
+    TimeSeriesView * view = findChild<TimeSeriesView *>();
+    QImage img(view->size(), QImage::Format_RGB16);
+    QPainter painter(&img);
+    view->render(&painter);
+    img.save(fileName);
 }
+
 
 } // namespace GUI
 

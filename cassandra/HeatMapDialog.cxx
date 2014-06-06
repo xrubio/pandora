@@ -22,6 +22,9 @@
 
 #include <HeatMapDialog.hxx>
 #include <HeatMapView.hxx>
+#include <QToolBar>
+#include <QFileDialog>
+#include <QPainter>
 
 namespace GUI
 {
@@ -44,7 +47,20 @@ HeatMapDialog::HeatMapDialog(QWidget * parent, const std::string & groupFile ) :
     {
         return;
     }
-    fillMenus();
+    fillMenus();   
+    
+    QAction * screenshotAction = new QAction(QIcon(":/resources/icons/screenshot.png"), tr("Take &Screenshot"), this);
+    screenshotAction->setStatusTip(tr("Take a screenshot"));
+	connect(screenshotAction, SIGNAL(triggered()), this, SLOT(takeScreenshot()));
+
+    QAction * textAction = new QAction(QIcon(":/resources/icons/text.png"), tr("Switch &Text"), this);
+    textAction->setStatusTip(tr("Toggle text"));
+	connect(textAction, SIGNAL(triggered()), heatMap, SLOT(switchText()));
+
+    QToolBar * tools = new QToolBar(tr("Tools"));
+    layout()->setMenuBar(tools);
+	tools->addAction(screenshotAction);
+	tools->addAction(textAction);
 }
 
 HeatMapDialog::~HeatMapDialog()
@@ -94,5 +110,19 @@ void HeatMapDialog::selectVariable( int index )
     emit(updateView());
 }
 
+void HeatMapDialog::takeScreenshot()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Screenshot"), "", tr("Image Files (*.png *.jpg *.bmp)"));
+	if(fileName.isEmpty())
+	{
+		return;
+	}
+    
+    HeatMapView * view = findChild<HeatMapView*>();
+    QImage img(view->size(), QImage::Format_RGB16);
+    QPainter painter(&img);
+    view->render(&painter);
+    img.save(fileName);
+}
 } // namespace GUI
 
