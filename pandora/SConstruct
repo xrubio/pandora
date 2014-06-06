@@ -5,10 +5,12 @@ release = ARGUMENTS.get('release', 1)
 extremeDebug = ARGUMENTS.get('edebug', 0)
 
 env = Environment(ENV=os.environ, CXX='mpicxx')
+hdf5_path = os.environ.get('HDF5_PATH', '/usr/local/hdf5')
+grass64_path = os.environ.get('GRASS64_PATH', '/usr/lib/grass64')
 
 env.VariantDir('build', '.')
 
-libs = Split('pthread gdal hdf5 z tinyxml grass_gis boost_filesystem boost_system boost_timer boost_chrono gomp')
+libs = Split('pthread gdal hdf5 z tinyxml grass_gis boost_filesystem boost_system boost_timer boost_chrono gomp mpl dl')
 
 if int(release) == 0:
 	env['CCFLAGS'] = Split('-std=c++0x -g -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG')
@@ -21,30 +23,21 @@ else:
 	libraryName = 'pandora'
 	pythonLibraryName = 'pyPandora'
 
-coreFiles = Split('World.cxx StaticRaster.cxx DynamicRaster.cxx Agent.cxx Statistics.cxx SimulationRecord.cxx AgentRecord.cxx Serializer.cxx SequentialSerializer.cxx Simulation.cxx Config.cxx MpiFactory.cxx IncrementalRaster.cxx RasterLoader.cxx Action.cxx LoggerBase.cxx GeneralState.cxx ShpLoader.cxx SpacePartition.cxx OpenMPSingleNode.cxx')
-
-analysisFiles = Split('analysis/Analysis.cxx analysis/AgentMean.cxx analysis/AgentSum.cxx analysis/AgentNum.cxx analysis/Output.cxx analysis/AgentStdDev.cxx analysis/GlobalAgentStats.cxx analysis/IndividualStats.cxx analysis/AgentHistogram.cxx analysis/AgentHDFtoSHP.cxx analysis/GlobalRasterStats.cxx analysis/RasterMean.cxx analysis/RasterSum.cxx')
-
+coreFiles = [str(f) for f in Glob('*.cxx') if str(f) != 'MpiStubCode.cxx']
+analysisFiles = [str(f) for f in Glob('analysis/*.cxx')]
 srcFiles = coreFiles + analysisFiles
 
-srcBaseFiles = [] 
-for src in srcFiles:
-	srcBaseFiles.append('build/'+src)
-
-includeDirs = Split('. analysis/ /usr/local/include /usr/local/hdf5/include /usr/lib/grass64/include/ /usr/include/gdal/')
-libDirs = Split('. /usr/local/lib /usr/local/hdf5/lib/ /usr/lib/grass64/lib/')
-libs += ['mpl']
-libs += ['dl']
+srcBaseFiles = ['build/' + src for src in srcFiles]
+includeDirs = ['.', 'analysis/', '/usr/local/include', hdf5_path + '/include', grass64_path + '/include', '/usr/include/gdal/']
+libDirs = ['.', '/usr/local/lib', hdf5_path + '/lib', grass64_path + '/lib']
 
 env.SharedLibrary(libraryName, srcBaseFiles, CPPPATH=includeDirs, LIBS=libs, LIBPATH=libDirs)
 
-envPython = Environment(ENV=os.environ, CXX='mpicxx')
 
+envPython = Environment(ENV=os.environ, CXX='mpicxx')
 envPython['LINKFLAGS'] = Split('-Wl,--export-dynamic,-no-undefined')
 envPython['LIBPATH'] = libDirs
 envPython['LIBPATH'] += ['/usr/lib/python3.3/config-3.3m-x86_64-linux-gnu/']
-
-Split('-Wl,--export-dynamic,-no-undefined')
 envPython.VariantDir('build_py', '.')
 
 if int(release) == 0:
@@ -53,13 +46,9 @@ if int(release) == 0:
 		envPython['CCFLAGS'] += ['-DPANDORAEDEBUG']
 else:
 	envPython['CCFLAGS'] = Split('-Ofast -DTIXML_USE_STL')
-	
-srcPyFiles = [] 
-for src in srcFiles:
-	srcPyFiles.append('build_py/'+src)
 
+srcPyFiles = ['build_py/' + src for src in srcFiles]
 srcPyFiles.append('build_py/pyPandora/pyBindings.cxx')
-
 srcPyFiles.append('build_py/MpiStubCode.cxx')
 
 libsPython = libs
