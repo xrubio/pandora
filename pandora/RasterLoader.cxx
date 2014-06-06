@@ -251,7 +251,7 @@ void RasterLoader::fillHDF5RasterDirectPath( StaticRaster & raster, const std::s
 		std::copy(dynamicRaster->_values.begin(), dynamicRaster->_values.end(), dynamicRaster->_maxValues.begin());
 		dynamicRaster->updateCurrentMinMaxValues();
 	}
-	//log_DEBUG(logName.str(), "file: " << fileName << " rasterName: " << rasterName << " loaded");
+	log_DEBUG(logName.str(), "file: " << fileName << " path to data: " << pathToData << " loaded");
 }
 
 void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fileName, const std::string & rasterName, int step, World * world )
