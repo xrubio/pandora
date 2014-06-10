@@ -125,7 +125,10 @@ bool HeatMapModel::loadFile( const std::string & file )
         std::string token;
 
         // first token is run
-        std::getline(iss, token, ';');
+        if(!std::getline(iss, token, ';'))
+        {
+            continue;
+        }
 
         while(std::getline(iss, token, ';'))
         {
@@ -136,6 +139,7 @@ bool HeatMapModel::loadFile( const std::string & file )
     updateVariable(0, _variables.at(0));
     updateXParam(0, _variables.at(0));
     updateYParam(0, _variables.at(0));
+    
     return true;
 }
 

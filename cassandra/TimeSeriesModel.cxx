@@ -79,8 +79,10 @@ void TimeSeriesModel::fillResultNames( const std::string & file )
     std::ifstream infile(file.c_str());
     std::string line;
 
-    // header
-    std::getline(infile, line);
+    if(!std::getline(infile, line))
+    {
+        return;
+    }
 
     std::vector<std::string> tokens;
     std::istringstream iss(line);
@@ -97,18 +99,25 @@ void TimeSeriesModel::fillResultNames( const std::string & file )
 
 void TimeSeriesModel::fillParams( const std::string & groupFile )
 {
-
     setlocale ( LC_NUMERIC, "C" );
     std::ifstream infile(groupFile.c_str());
     std::string line;
 
-    // header
-    std::getline(infile, line);
+    if(!std::getline(infile, line))
+    {
+        return;
+    }
+    std::cout << "first line: " << line << std::endl;
     // each line is a run
     // the order is always 'run name;param 1;param2;param 3;final result 1; final result 2;...
     while(std::getline(infile, line))
     {
+        if(line.empty())
+        {
+            continue;
+        }
         std::vector<float> run;
+        std::cout << "line: " << line << std::endl;
 
         std::istringstream iss(line);
         std::string token;        
