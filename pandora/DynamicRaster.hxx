@@ -48,12 +48,12 @@ public:
 	void updateRasterToMaxValues();
 	
 	//! Reads the maximum allowed value in the cell located by parameter "position". Returns -1 if "position" is out of the area of the raster.
-	virtual int getMaxValueAt( Point2D<int> position ) const;
+	virtual int getMaxValueAt( const Point2D<int>& position ) const;
 	
 	//! Assigns the value "value" to the cell located by parameter "position". Does nothing if "position" is out of the area of the raster.
-	virtual void setValue( Point2D<int> position, int value );
+	virtual void setValue( const Point2D<int>& position, int value );
 	//! Changes the maximum value allowed in the cell located by parameter "position" to the new amount "value". Does nothing if "position" is out of the area of the raster.
-	void setMaxValue( Point2D<int> position, int value );
+	void setMaxValue( const Point2D<int>& position, int value );
 	
 	//! Initializes the components of vector '_values' to defaultValue, and to maxValue the ones from vector _maxValue.
 	void setInitValues( int minValue, int maxValue, int defaultValue );

@@ -68,7 +68,7 @@ void DynamicRaster::updateRasterToMaxValues()
 	std::copy(_maxValues.begin(), _maxValues.end(), _values.begin());
 }
 
-int DynamicRaster::getMaxValueAt( Point2D<int> position ) const
+int DynamicRaster::getMaxValueAt( const Point2D<int>& position ) const
 {
 	if(position._x<0 || position._x>=_maxValues.size())
 	{
@@ -87,7 +87,7 @@ int DynamicRaster::getMaxValueAt( Point2D<int> position ) const
 	return _maxValues[position._x][position._y];
 }
 
-void DynamicRaster::setValue( Point2D<int> position, int value )
+void DynamicRaster::setValue( const Point2D<int>& position, int value )
 {
 	if(value>_maxValue)
 	{
@@ -121,7 +121,7 @@ void DynamicRaster::setValue( Point2D<int> position, int value )
 	_values[position._x][position._y] = value;
 }
 
-void DynamicRaster::setMaxValue( Point2D<int> position, int value )
+void DynamicRaster::setMaxValue( const Point2D<int>& position, int value )
 {
 	if(value>_maxValue)
 	{
