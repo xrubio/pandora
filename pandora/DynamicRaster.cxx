@@ -38,6 +38,17 @@ DynamicRaster::~DynamicRaster()
 {
 }
 
+bool DynamicRaster::operator==(const DynamicRaster& other) const {
+	return StaticRaster::operator==(other) &&
+	       _currentMinValue == other._currentMinValue &&
+	       _currentMaxValue == other._currentMaxValue &&
+	       _maxValues == other._maxValues;
+}
+
+bool DynamicRaster::operator!=(const DynamicRaster& other) const {
+	return !(*this == other);
+}
+
 void DynamicRaster::resize( const Size<int> & size )
 {
 	StaticRaster::resize(size);
