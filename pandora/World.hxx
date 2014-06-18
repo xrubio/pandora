@@ -110,8 +110,9 @@ public:
 
 	//! returns raster identified by parameter 'key'.
 	DynamicRaster & getDynamicRaster( const size_t & index );
-	DynamicRaster & getDynamicRaster( const std::string & key );
 	const DynamicRaster & getDynamicRaster( const size_t & index ) const;
+	DynamicRaster & getDynamicRaster( const std::string & key );
+	const DynamicRaster & getDynamicRaster( const std::string & key ) const;
 
 	//! returns static raster identified by parameter 'key'.
 	StaticRaster & getStaticRaster( const size_t & index );
