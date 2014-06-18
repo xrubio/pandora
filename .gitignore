@@ -1,3 +1,6 @@
+
+*.log
+
 # Compiled source #
 *.o
 *.sconsign.dblite
