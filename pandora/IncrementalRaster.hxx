@@ -70,8 +70,7 @@ public:
 		return _changes.size() < other._changes.size();
 	}
 
-private:
-
+protected:
 	ChangeTable		_changes;
 	const Raster*		_baseRaster;
 	int			_currentMinValue;
