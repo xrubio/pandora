@@ -59,7 +59,7 @@ void StaticRaster::setDefaultInitValues( int minValue, int maxValue, int default
 	}
 }
 
-const int & StaticRaster::getValue( Point2D<int> position ) const
+const int & StaticRaster::getValue( const Point2D<int>& position ) const
 {
 	if(position._x<0 || position._x>=_values.size())
 	{
@@ -76,7 +76,7 @@ const int & StaticRaster::getValue( Point2D<int> position ) const
 	return _values[position._x][position._y];
 }
 
-void StaticRaster::setInitValue( Point2D<int> position, int value )
+void StaticRaster::setInitValue( const Point2D<int>& position, int value )
 {
 	if(value>_maxValue)
 	{
