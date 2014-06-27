@@ -34,11 +34,6 @@
 
 #include <hdf5.h>
 
-extern "C" 
-{
-#include <grass/gis.h>
-}
-
 namespace Engine
 {
 
@@ -266,77 +261,6 @@ void RasterLoader::fillHDF5Raster( StaticRaster & raster, const std::string & fi
     std::ostringstream oss;
 	oss << "/" << rasterName << "/values";
     fillHDF5RasterDirectPath(raster, fileName, oss.str(), world);
-}
-
-void RasterLoader::fillGrassCellRaster( StaticRaster & raster, const std::string & rasterName, World * world )
-{
-	std::stringstream logName;
-	logName << "RasterLoader_world_" << world->getId();
-	log_DEBUG(logName.str(), "loading GRASS raster: " << rasterName);
-	G_gisinit("pandora");
-	std::cout << "loading grass raster from : " << rasterName << " in location: " << G_location() << " and mapset: " << G_mapset() << "...";	
-	int fileId = G_open_cell_old(rasterName.c_str(), G_mapset());
-	if(fileId==-1)
-	{
-		std::stringstream oss;
-		oss << "StaticRaster::loadGrassCellRasterFile - error opening raster file from GRASS: " << rasterName << std::endl;
-		throw Engine::Exception(oss.str());
-		return;
-	}
-	if(world && (G_window_cols()!=world->getSimulation().getSize()._width || G_window_rows()!=world->getSimulation().getSize()._height))
-	{
-		std::stringstream oss;
-		oss << "StaticRaster::loadGrassCellRasterFile - Grass raster: " << rasterName << " with size: " << G_window_cols() << "/" << G_window_rows() << " different from defined size: " << world->getSimulation().getSize() << std::endl;
-		throw Engine::Exception(oss.str());
-		return;
-	}
-
-	if(world)
-	{
-		raster.resize(world->getBoundaries()._size);
-	}
-	else
-	{
-		raster.resize(Engine::Size<int>(G_window_rows(), G_window_cols()));
-	}
-
-	if(world)
-	{
-		// TODO use GRASS regions
-		std::vector<CELL> rowData;
-		rowData.resize(G_window_cols());
-		for( int i=0; i<G_window_rows(); i++)
-		{
-			G_get_c_raster_row(fileId, &rowData[0], i);
-			for( int j=0; j<G_window_cols(); j++)
-			{
-				Engine::Point2D<int> cellPosition(j,i);
-				if(world->getBoundaries().contains(cellPosition))
-				{
-					Point2D<int> localPosition(cellPosition - world->getBoundaries()._origin);
-					raster._values[localPosition._x][localPosition._y] = rowData[j];
-				}
-			}
-		}
-	}
-	else
-	{
-		for( int i=0; i<G_window_rows(); i++)
-		{
-			G_get_c_raster_row(fileId, &(raster._values[i][0]), i);
-		}
-	}
-	G_close_cell(fileId);
-	raster.updateMinMaxValues();
-
-	// if dynamic, copy to maxValues
-	DynamicRaster * dynamicRaster = dynamic_cast<DynamicRaster*>(&raster);
-	if(dynamicRaster)
-	{
-		std::copy(dynamicRaster->_values.begin(), dynamicRaster->_values.end(), dynamicRaster->_maxValues.begin());
-		dynamicRaster->updateCurrentMinMaxValues();
-	}
-	log_DEBUG(logName.str(), "raster: " << rasterName << " loaded");
 }
 
 } // namespace Engine

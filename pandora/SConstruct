@@ -6,11 +6,10 @@ extremeDebug = ARGUMENTS.get('edebug', 0)
 
 env = Environment(ENV=os.environ, CXX='mpicxx')
 hdf5_path = os.environ.get('HDF5_PATH', '/usr/local/hdf5')
-grass64_path = os.environ.get('GRASS64_PATH', '/usr/lib/grass64')
 
 env.VariantDir('build', '.')
 
-libs = Split('pthread gdal hdf5 z tinyxml grass_gis boost_filesystem boost_system boost_timer boost_chrono gomp mpl dl')
+libs = Split('pthread gdal hdf5 z tinyxml boost_filesystem boost_system boost_timer boost_chrono gomp mpl dl')
 
 if int(release) == 0:
 	env['CCFLAGS'] = Split('-std=c++0x -g -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG')
@@ -28,8 +27,8 @@ analysisFiles = [str(f) for f in Glob('analysis/*.cxx')]
 srcFiles = coreFiles + analysisFiles
 
 srcBaseFiles = ['build/' + src for src in srcFiles]
-includeDirs = ['.', 'analysis/', '/usr/local/include', hdf5_path + '/include', grass64_path + '/include', '/usr/include/gdal/']
-libDirs = ['.', '/usr/local/lib', hdf5_path + '/lib', grass64_path + '/lib']
+includeDirs = ['.', 'analysis/', '/usr/local/include', hdf5_path + '/include', '/usr/include/gdal/']
+libDirs = ['.', '/usr/local/lib', hdf5_path + '/lib']
 
 env.SharedLibrary(libraryName, srcBaseFiles, CPPPATH=includeDirs, LIBS=libs, LIBPATH=libDirs)
 
