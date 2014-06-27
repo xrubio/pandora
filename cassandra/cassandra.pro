@@ -27,6 +27,7 @@ INCLUDEPATH += ../pandora/
 INCLUDEPATH += ../pandora/analysis/
 INCLUDEPATH += /usr/include/qwt/
 INCLUDEPATH += /usr/include/mpich2/ 
+INCLUDEPATH += /usr/include/mpich/ 
 INCLUDEPATH += /usr/include/GL/
 INCLUDEPATH += /usr/include/qt4/QtOpenGL/
 INCLUDEPATH += /usr/include/qt4/

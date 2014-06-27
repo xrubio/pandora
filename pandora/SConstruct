@@ -37,7 +37,7 @@ env.SharedLibrary(libraryName, srcBaseFiles, CPPPATH=includeDirs, LIBS=libs, LIB
 envPython = Environment(ENV=os.environ, CXX='mpicxx')
 envPython['LINKFLAGS'] = Split('-Wl,--export-dynamic,-no-undefined')
 envPython['LIBPATH'] = libDirs
-envPython['LIBPATH'] += ['/usr/lib/python3.3/config-3.3m-x86_64-linux-gnu/']
+envPython['LIBPATH'] += ['/usr/lib/python3.4/config-3.4m-x86_64-linux-gnu/']
 envPython.VariantDir('build_py', '.')
 
 if int(release) == 0:
@@ -55,10 +55,10 @@ libsPython = libs
 includeDirsPython = ['']
 
 conf = Configure(envPython)
-if conf.CheckLib('python3.3'):
-	libsPython += ['boost_python-py33']
-	libsPython += ['python3.3m']
-	includeDirsPython = ['/usr/include/python3.3/']
+if conf.CheckLib('python3.4'):
+	libsPython += ['boost_python-py34']
+	libsPython += ['python3.4m']
+	includeDirsPython = ['/usr/include/python3.4/']
 elif conf.CheckLib('python3.2mu'):
 	libsPython += ['boost_python-py32']
 	libsPython += ['python3.2mu']	
