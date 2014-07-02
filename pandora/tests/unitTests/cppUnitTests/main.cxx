@@ -220,6 +220,18 @@ BOOST_AUTO_TEST_CASE( testLoadDynamicRaster )
     BOOST_CHECK_EQUAL(139, aRaster.getValue(Engine::Point2D<int>(39,39)));
 }
 
+BOOST_AUTO_TEST_CASE( testAddAgent) 
+{
+	Engine::Simulation mySimulation(Engine::Size<int>(10,10), 1);
+	TestWorld myWorld(mySimulation, TestWorld::useSpacePartition("data/results.h5", 1, false));
+	myWorld.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
+
+	TestAgent * myAgent0 = new TestAgent("agent_0");
+	myWorld.addAgent(myAgent0);
+	myAgent0->setRandomPosition();
+    BOOST_CHECK_EQUAL(&myWorld, myAgent0->getWorld());
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } // namespace Test

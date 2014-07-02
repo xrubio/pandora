@@ -2,6 +2,8 @@
 #ifndef __Scheduler_hxx__
 #define __Scheduler_hxx__
 
+#include <Agent.hxx>
+
 namespace Engine
 {
 
@@ -19,14 +21,14 @@ protected:
 	// this method returns a list with the list of agents in euclidean distance radius of position. if include center is false, position is not checked
 	template<class T> struct aggregator : public std::unary_function<T,void>
 	{
-		aggregator(double radius, T &center, const std::string & type ) :  _radius(radius), _center(center), _type(type)
+		aggregator(double radius, Agent &center, const std::string & type ) :  _radius(radius), _center(center), _type(type)
 		{
 			_particularType = _type.compare("all");
 		}
 		virtual ~aggregator(){}
-		void operator()( T * neighbor )
+		void operator()( T neighbor )
 		{
-			if(neighbor==&_center || !neighbor->exists())
+			if(neighbor->getId()==_center.getId() || !neighbor->exists())
 			{
 				return;
 			}
@@ -36,20 +38,20 @@ protected:
 			}
 			if(_center.getPosition().distance(neighbor->getPosition())-_radius<= 0.0001)
 			{
-					execute( *neighbor );
+					execute( neighbor );
 			}
 		}
-		virtual void execute( T & neighbor )=0;
+		virtual void execute( T neighbor )=0;
 		bool _particularType;
 		double _radius;
-		T & _center;
+		Agent & _center;
 		std::string _type;
 	};
 
 	template<class T> struct aggregatorCount : public aggregator<T>
 	{
-		aggregatorCount( double radius, T & center, const std::string & type ) : aggregator<T>(radius,center,type), _count(0) {}
-		void execute( T & neighbor )
+		aggregatorCount( double radius, Agent & center, const std::string & type ) : aggregator<T>(radius,center,type), _count(0) {}
+		void execute( T neighbor )
 		{
 			_count++;
 		}
@@ -57,10 +59,10 @@ protected:
 	};
 	template<class T> struct aggregatorGet : public aggregator<T>
 	{
-		aggregatorGet( double radius, T & center, const std::string & type ) : aggregator<T>(radius,center,type) {}
-		void execute( T & neighbor )
+		aggregatorGet( double radius, Agent & center, const std::string & type ) : aggregator<T>(radius,center,type) {}
+		void execute( T neighbor )
 		{
-			_neighbors.push_back(&neighbor);
+			_neighbors.push_back(neighbor);
 		}
 		AgentsVector _neighbors;
 	};

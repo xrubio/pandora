@@ -18,7 +18,7 @@ class TestAgent(Agent):
 
     def serialize(self):
         return
-
+    
 class TestWorld(World):
     def __init__(self, simulation, scheduler):
         World.__init__( self, simulation, scheduler, False)
@@ -186,7 +186,18 @@ class TestPyPandora(unittest.TestCase):
         self.assertEqual(120, aRaster.getSize()._width)
         self.assertEqual(120, aRaster.getSize()._height)
         self.assertEqual(139, aRaster.getValue(Point2DInt(39,39)))
-   
+    
+    def testAddAgent(self):
+        mySimulation = Simulation(SizeInt(10,10), 1)
+        myWorld = TestWorld(mySimulation, TestWorld.useSpacePartition('data/results.h5', 1, False))
+        myWorld.initialize()
+
+        myAgent = TestAgent('agent_0')
+        myWorld.addAgent(myAgent)
+        myAgent.setRandomPosition()
+        myWorld.run()
+        self.assertEqual(myAgent.getWorld(), myWorld)
+ 
 if __name__ == '__main__':
     unittest.main()
 

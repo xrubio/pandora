@@ -4,14 +4,15 @@
 
 #include <list>
 #include <vector>
+#include <memory>
 
 namespace Engine
 {
 
 class Agent;
 
-typedef std::list< Agent* > AgentsList;
-typedef std::vector< Agent* > AgentsVector;
+typedef std::list< std::shared_ptr<Agent> > AgentsList;
+typedef std::vector< std::shared_ptr<Agent> > AgentsVector;
 
 } // namespace Engine
 

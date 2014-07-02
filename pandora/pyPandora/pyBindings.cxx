@@ -57,6 +57,7 @@
 #include <RasterLoader.hxx>
 
 #include <string>
+#include <memory>
 
 typedef Engine::Point2D<int> Point2DInt;
 typedef Engine::Size<int> SizeInt;
@@ -170,10 +171,12 @@ public:
 		Engine::World::registerStaticRaster(key, serialize, -1);			
 	}
 	
-	void addAgentSimple( Engine::Agent * agent )
+	void addAgentSimple( std::shared_ptr<AgentWrap> agent)
 	{
-		Engine::World::addAgent(agent, true);
+        agent->setWorld(this);
+	_agents.push_back(agent);
 	}
+
 
 	std::vector<std::string> getNeighboursIds( Engine::Agent & target, const double & radius, const std::string & type="all" )
 	{
@@ -231,16 +234,14 @@ public:
 	}
 };
 
-void passAgentAnalysisOwnership( PostProcess::GlobalAgentStats & results, std::auto_ptr<PostProcess::AgentAnalysis> analysisPtr )
+void passAgentAnalysisOwnership( PostProcess::GlobalAgentStats & results, std::shared_ptr<PostProcess::AgentAnalysis> analysisPtr )
 {
 	results.addAnalysis(analysisPtr.get());
-	analysisPtr.release();
 }
 
-void passRasterAnalysisOwnership( PostProcess::GlobalRasterStats & results, std::auto_ptr<PostProcess::RasterAnalysis> analysisPtr )
+void passRasterAnalysisOwnership( PostProcess::GlobalRasterStats & results, std::shared_ptr<PostProcess::RasterAnalysis> analysisPtr )
 {
 	results.addAnalysis(analysisPtr.get());
-	analysisPtr.release();
 }
 
 std::string printPoint( const Point2DInt & point )
@@ -341,14 +342,14 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("clone", &RectangleInt::clone)
 		;
 
-    boost::python::class_< Engine::StaticRaster, std::auto_ptr< Engine::StaticRaster> >("StaticRasterStub")
+    boost::python::class_< Engine::StaticRaster, std::shared_ptr< Engine::StaticRaster> >("StaticRasterStub")
 		.def("resize", &Engine::StaticRaster::resize)
 		.def("getSize", &Engine::StaticRaster::getSize)
 		.def("getValue", boost::python::make_function(&Engine::StaticRaster::getValue, boost::python::return_value_policy<boost::python::copy_const_reference>()))
 
 	;
     
-    boost::python::class_< Engine::DynamicRaster, std::auto_ptr< Engine::DynamicRaster>, boost::python::bases<Engine::StaticRaster> >("DynamicRasterStub")
+    boost::python::class_< Engine::DynamicRaster, std::shared_ptr< Engine::DynamicRaster>, boost::python::bases<Engine::StaticRaster> >("DynamicRasterStub")
 		.def("setInitValues", &Engine::DynamicRaster::setInitValues) 
 		.def("setValue", &Engine::DynamicRaster::setValue)	
 		.def("resize", &Engine::DynamicRaster::resize)
@@ -378,13 +379,13 @@ BOOST_PYTHON_MODULE(libpyPandora)
 	;
 
     
-    boost::python::class_< Engine::GeneralState, boost::shared_ptr<Engine::GeneralState>, boost::noncopyable>("GeneralStateStub", boost::python::no_init)
+    boost::python::class_< Engine::GeneralState, std::shared_ptr<Engine::GeneralState>, boost::noncopyable>("GeneralStateStub", boost::python::no_init)
 		.add_property("instance", boost::python::make_function(&Engine::GeneralState::instance, boost::python::return_value_policy<boost::python::reference_existing_object>()))
 		.def("shpLoader", boost::python::make_function(&Engine::GeneralState::shpLoader, boost::python::return_value_policy<boost::python::reference_existing_object>()))
 		.def("rasterLoader", boost::python::make_function(&Engine::GeneralState::rasterLoader, boost::python::return_value_policy<boost::python::reference_existing_object>()))
     ;
 
-	boost::python::class_< AgentWrap, std::auto_ptr<AgentWrap>, boost::noncopyable >("AgentStub", boost::python::init< const std::string & > () )
+	boost::python::class_< AgentWrap, std::shared_ptr<AgentWrap>, boost::noncopyable >("AgentStub", boost::python::init< const std::string & > () )
 		.def("updateState", &Engine::Agent::updateState, &AgentWrap::default_UpdateState)
 		.def("registerAttributes", &Engine::Agent::registerAttributes, &AgentWrap::default_RegisterAttributes)
 		.def("getWorld", &Engine::Agent::getWorldRef, boost::python::return_value_policy<boost::python::reference_existing_object>())
@@ -419,7 +420,7 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.staticmethod("useSpacePartition")
 		.def("useOpenMPSingleNode", &Engine::World::useOpenMPSingleNode, boost::python::return_value_policy<boost::python::reference_existing_object>())
 		.staticmethod("useOpenMPSingleNode")
-		.def("addAgentStub", &WorldWrap::addAgentSimple)
+		.def("addAgent", &WorldWrap::addAgentSimple,boost::python::with_custodian_and_ward<1,2>())
 		.def("setValue", setValue)
 		.def("getValue", getValue)
 		.def("getAgentIds", &WorldWrap::getAgentIds)
@@ -432,15 +433,15 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.add_property("currentStep", &Engine::World::getCurrentStep)
 	;	
 	
-	boost::python::class_< Engine::SpacePartition, std::auto_ptr<Engine::SpacePartition> >("SpacePartitionStub", boost::python::init< const std::string &, const int &, bool >())
+	boost::python::class_< Engine::SpacePartition, std::shared_ptr<Engine::SpacePartition> >("SpacePartitionStub", boost::python::init< const std::string &, const int &, bool >())
 	;
 	
-	boost::python::implicitly_convertible< std::auto_ptr< Engine::SpacePartition >, std::auto_ptr< Engine::Scheduler > >();	
+	boost::python::implicitly_convertible< std::shared_ptr< Engine::SpacePartition >, std::shared_ptr< Engine::Scheduler > >();	
 
-	boost::python::class_< Engine::OpenMPSingleNode, std::auto_ptr<Engine::OpenMPSingleNode> >("OpenMPSingleNodeStub", boost::python::init< const std::string & >())
+	boost::python::class_< Engine::OpenMPSingleNode, std::shared_ptr<Engine::OpenMPSingleNode> >("OpenMPSingleNodeStub", boost::python::init< const std::string & >())
 	;
 	
-	boost::python::implicitly_convertible< std::auto_ptr< Engine::OpenMPSingleNode >, std::auto_ptr< Engine::Scheduler > >();	
+	boost::python::implicitly_convertible< std::shared_ptr< Engine::OpenMPSingleNode >, std::shared_ptr< Engine::Scheduler > >();	
 
 
 	boost::python::class_< Engine::SimulationRecord>("SimulationRecordStub", boost::python::init< int, bool >())
@@ -457,44 +458,44 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("applyTo", &PostProcess::GlobalRasterStats::apply)
 	;
 
-	boost::python::class_< PostProcess::Analysis, std::auto_ptr<PostProcess::Analysis> >("AnalysisStub", boost::python::init< const std::string &, bool >() )
+	boost::python::class_< PostProcess::Analysis, std::shared_ptr<PostProcess::Analysis> >("AnalysisStub", boost::python::init< const std::string &, bool >() )
 	;
 	
-	boost::python::class_< AgentAnalysisWrap, std::auto_ptr<AgentAnalysisWrap> , boost::python::bases<PostProcess::Analysis>, boost::noncopyable >("AgentAnalysisStub", boost::python::init< const std::string &, bool >() )
+	boost::python::class_< AgentAnalysisWrap, std::shared_ptr<AgentAnalysisWrap> , boost::python::bases<PostProcess::Analysis>, boost::noncopyable >("AgentAnalysisStub", boost::python::init< const std::string &, bool >() )
 		.def("computeAgent", boost::python::pure_virtual(&PostProcess::AgentAnalysis::computeAgent))
 	;
-	boost::python::implicitly_convertible< std::auto_ptr< PostProcess::AgentAnalysis >, std::auto_ptr< PostProcess::Analysis > >();	
+	boost::python::implicitly_convertible< std::shared_ptr< PostProcess::AgentAnalysis >, std::shared_ptr< PostProcess::Analysis > >();	
 
 	// raster analysis
-	boost::python::class_< RasterAnalysisWrap, std::auto_ptr<RasterAnalysisWrap> , boost::python::bases<PostProcess::Analysis>, boost::noncopyable >("RasterAnalysisStub", boost::python::init< const std::string &, bool >() )
+	boost::python::class_< RasterAnalysisWrap, std::shared_ptr<RasterAnalysisWrap> , boost::python::bases<PostProcess::Analysis>, boost::noncopyable >("RasterAnalysisStub", boost::python::init< const std::string &, bool >() )
 		.def("computeRaster", boost::python::pure_virtual(&PostProcess::RasterAnalysis::computeRaster))
 	;
-	boost::python::implicitly_convertible< std::auto_ptr< PostProcess::RasterAnalysis >, std::auto_ptr< PostProcess::Analysis > >();	
+	boost::python::implicitly_convertible< std::shared_ptr< PostProcess::RasterAnalysis >, std::shared_ptr< PostProcess::Analysis > >();	
 
-	boost::python::class_< PostProcess::AgentNum, std::auto_ptr< PostProcess::AgentNum> , boost::python::bases<PostProcess::AgentAnalysis> >("AgentNumStub");
-	boost::python::implicitly_convertible< std::auto_ptr< PostProcess::AgentNum >, std::auto_ptr< PostProcess::AgentAnalysis > >();
+	boost::python::class_< PostProcess::AgentNum, std::shared_ptr< PostProcess::AgentNum> , boost::python::bases<PostProcess::AgentAnalysis> >("AgentNumStub");
+	boost::python::implicitly_convertible< std::shared_ptr< PostProcess::AgentNum >, std::shared_ptr< PostProcess::AgentAnalysis > >();
 
-	boost::python::class_< PostProcess::AgentMean, std::auto_ptr< PostProcess::AgentMean> , boost::python::bases<PostProcess::AgentAnalysis> >("AgentMeanStub", boost::python::init< const std::string & >() );
-	boost::python::implicitly_convertible< std::auto_ptr< PostProcess::AgentMean >, std::auto_ptr< PostProcess::AgentAnalysis > >();
+	boost::python::class_< PostProcess::AgentMean, std::shared_ptr< PostProcess::AgentMean> , boost::python::bases<PostProcess::AgentAnalysis> >("AgentMeanStub", boost::python::init< const std::string & >() );
+	boost::python::implicitly_convertible< std::shared_ptr< PostProcess::AgentMean >, std::shared_ptr< PostProcess::AgentAnalysis > >();
 
-	boost::python::class_< PostProcess::AgentSum, std::auto_ptr< PostProcess::AgentSum> , boost::python::bases<PostProcess::AgentAnalysis> >("AgentSumStub", boost::python::init< const std::string & >() );
-	boost::python::implicitly_convertible< std::auto_ptr< PostProcess::AgentSum >, std::auto_ptr< PostProcess::AgentAnalysis > >();
+	boost::python::class_< PostProcess::AgentSum, std::shared_ptr< PostProcess::AgentSum> , boost::python::bases<PostProcess::AgentAnalysis> >("AgentSumStub", boost::python::init< const std::string & >() );
+	boost::python::implicitly_convertible< std::shared_ptr< PostProcess::AgentSum >, std::shared_ptr< PostProcess::AgentAnalysis > >();
 	
-	boost::python::class_< PostProcess::AgentStdDev, std::auto_ptr< PostProcess::AgentStdDev> , boost::python::bases<PostProcess::AgentAnalysis> >("AgentStdDevStub", boost::python::init< const std::string & >() );
-	boost::python::implicitly_convertible< std::auto_ptr< PostProcess::AgentStdDev >, std::auto_ptr< PostProcess::AgentAnalysis > >();
+	boost::python::class_< PostProcess::AgentStdDev, std::shared_ptr< PostProcess::AgentStdDev> , boost::python::bases<PostProcess::AgentAnalysis> >("AgentStdDevStub", boost::python::init< const std::string & >() );
+	boost::python::implicitly_convertible< std::shared_ptr< PostProcess::AgentStdDev >, std::shared_ptr< PostProcess::AgentAnalysis > >();
 	
-	boost::python::class_< PostProcess::RasterMean, std::auto_ptr< PostProcess::RasterMean> , boost::python::bases<PostProcess::RasterAnalysis> >("RasterMeanStub");
-	boost::python::implicitly_convertible< std::auto_ptr< PostProcess::RasterMean>, std::auto_ptr< PostProcess::RasterAnalysis > >();
+	boost::python::class_< PostProcess::RasterMean, std::shared_ptr< PostProcess::RasterMean> , boost::python::bases<PostProcess::RasterAnalysis> >("RasterMeanStub");
+	boost::python::implicitly_convertible< std::shared_ptr< PostProcess::RasterMean>, std::shared_ptr< PostProcess::RasterAnalysis > >();
 
-	boost::python::class_< PostProcess::RasterSum, std::auto_ptr< PostProcess::RasterSum> , boost::python::bases<PostProcess::RasterAnalysis> >("RasterSumStub");
-	boost::python::implicitly_convertible< std::auto_ptr< PostProcess::RasterSum>, std::auto_ptr< PostProcess::RasterAnalysis > >();
+	boost::python::class_< PostProcess::RasterSum, std::shared_ptr< PostProcess::RasterSum> , boost::python::bases<PostProcess::RasterAnalysis> >("RasterSumStub");
+	boost::python::implicitly_convertible< std::shared_ptr< PostProcess::RasterSum>, std::shared_ptr< PostProcess::RasterAnalysis > >();
 
-	boost::python::implicitly_convertible< std::auto_ptr<Engine::DynamicRaster>, std::auto_ptr< Engine::StaticRaster > >();
+	boost::python::implicitly_convertible< std::shared_ptr<Engine::DynamicRaster>, std::shared_ptr< Engine::StaticRaster > >();
 	
 	/*	
-	boost::python::class_< Analysis::AgentHDFtoSHP, std::auto_ptr< Analysis::AgentHDFtoSHP> , boost::python::bases<Analysis::AgentAnalysis> >("AgentHDFtoSHPStub", boost::python::init< const std::string &, int >() )
+	boost::python::class_< Analysis::AgentHDFtoSHP, std::shared_ptr< Analysis::AgentHDFtoSHP> , boost::python::bases<Analysis::AgentAnalysis> >("AgentHDFtoSHPStub", boost::python::init< const std::string &, int >() )
 	;
-	boost::python::implicitly_convertible< std::auto_ptr< Analysis::AgentHDFtoSHP >, std::auto_ptr< Analysis::AgentAnalysis > >();
+	boost::python::implicitly_convertible< std::shared_ptr< Analysis::AgentHDFtoSHP >, std::shared_ptr< Analysis::AgentAnalysis > >();
 	*/
 }
 

@@ -48,13 +48,8 @@ class OpenMPSingleNode(libpyPandora.OpenMPSingleNodeStub):
 		libpyPandora.OpenMPSingleNodeStub.__init__(self, fileName )
 
 class World(libpyPandora.WorldStub):
-	_listOfAgents = []
 	def __init__(self, simulation, scheduler = None, allowMultipleAgentsPerCell = True ):
 		libpyPandora.WorldStub.__init__( self, simulation, scheduler, allowMultipleAgentsPerCell)
-
-	def addAgent(self, agent):
-		self.addAgentStub(agent)
-		self._listOfAgents.append(agent)
 
 class SimulationRecord(libpyPandora.SimulationRecordStub):
 	def __init__(self, loadedResolution=1, gui=True):

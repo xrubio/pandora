@@ -517,7 +517,7 @@ void Serializer::serializeAgents( const int & step, const AgentsList::const_iter
 		{
 			continue;
 		}
-		serializeAgent((*it), step, i);
+		serializeAgent(it->get(), step, i);
 		i++;
 	}
 	// serialize remaining agents

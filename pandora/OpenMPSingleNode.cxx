@@ -74,14 +74,14 @@ void OpenMPSingleNode::executeAgents()
 #endif
 	for(size_t i=0; i<agentsToExecute.size(); i++)
 	{
-		Agent * agent = agentsToExecute[i];
+		Agent * agent = agentsToExecute[i].get();
 		agent->updateKnowledge();
 		agent->selectActions();
 	}	
 	
 	for(size_t i=0; i<agentsToExecute.size(); i++)
 	{
-		Agent * agent = agentsToExecute[i];
+		Agent * agent = agentsToExecute[i].get();
 		agent->executeActions();
 		agent->updateState();
 	}
@@ -104,7 +104,7 @@ Agent * OpenMPSingleNode::getAgent( const std::string & id )
 	AgentsList::iterator it = getAgentIterator(id);
 	if(it!=_world->endAgents() && (*it)->exists())
 	{
-		return *it;
+		return it->get();
 	}
 	return 0;
 }
@@ -126,7 +126,7 @@ AgentsList::iterator OpenMPSingleNode::getAgentIterator( const std::string & id 
 {
 	for(AgentsList::iterator it=_world->beginAgents(); it!=_world->endAgents(); it++)
 	{
-		Agent * agent = *it;
+		Agent * agent = it->get();
 		if(agent->getId()==id)
 		{
 			return it;
@@ -140,7 +140,7 @@ void OpenMPSingleNode::removeAgents()
 	AgentsList::iterator it=_removedAgents.begin();
 	while(it!=_removedAgents.end())
 	{
-		Agent * agent = *it;
+		Agent * agent = it->get();
 		AgentsList::iterator itAg = getAgentIterator(agent->getId());
 		if(itAg==_world->endAgents())
 		{
@@ -151,7 +151,6 @@ void OpenMPSingleNode::removeAgents()
 		}
 		_world->eraseAgent(itAg);
 		it = _removedAgents.erase(it);
-		delete agent;
 	}
 	_removedAgents.clear();
 }
@@ -206,12 +205,12 @@ void OpenMPSingleNode::serializeRasters( const int & step )
 
 int OpenMPSingleNode::countNeighbours( Agent * target, const double & radius, const std::string & type )
 {
-	return for_each(_world->beginAgents(), _world->endAgents(), aggregatorCount<Engine::Agent>(radius,*target, type))._count;
+	return for_each(_world->beginAgents(), _world->endAgents(), aggregatorCount<std::shared_ptr<Agent> >(radius,*target, type))._count;
 }
 
 AgentsVector OpenMPSingleNode::getNeighbours( Agent * target, const double & radius, const std::string & type )
 {
-	AgentsVector agentsVector = for_each(_world->beginAgents(), _world->endAgents(), aggregatorGet<Engine::Agent>(radius,*target, type))._neighbors;
+	AgentsVector agentsVector = for_each(_world->beginAgents(), _world->endAgents(), aggregatorGet<std::shared_ptr<Agent> >(radius,*target, type))._neighbors;
 	std::random_shuffle(agentsVector.begin(), agentsVector.end());
 	return agentsVector;
 }

@@ -160,7 +160,7 @@ void SpacePartition::stepSection( const int & sectionIndex )
 	// we have to randomize the execution of agents in a given section index
 	while(it!=_world->endAgents())
 	{
-		Agent * agent = *it;
+		Agent * agent = it->get();
 		if(_sections[sectionIndex].contains(agent->getPosition()) && !hasBeenExecuted(agent))
 		{
 			agentsToExecute.push_back(agent);
@@ -194,13 +194,13 @@ void SpacePartition::stepSection( const int & sectionIndex )
 		if(!_ownedArea.contains(agent->getPosition()) && !willBeRemoved(agent))
 		{
 			log_DEBUG(logName.str(), getWallTime() << " migrating agent: " << agent << " being executed at index: " << sectionIndex << " of task: "<< _id );
-			agentsToSend.push_back(agent);
+			agentsToSend.push_back(std::shared_ptr<Agent>(agent));
 
 			// the agent is no longer property of this world
 			AgentsList::iterator itErase  = getOwnedAgent(agent->getId());
 			// it will be deleted
 			_world->eraseAgent(itErase);
-			_overlapAgents.push_back(agent);
+			_overlapAgents.push_back(std::shared_ptr<Agent>(agent));
 			log_DEBUG(logName.str(), getWallTime() <<  "putting agent: " << agent << " to overlap");
 		}
 		else
@@ -239,11 +239,11 @@ void SpacePartition::sendAgents( AgentsList & agentsToSend )
 
 		for(AgentsList::iterator it=agentsToSend.begin(); it!=agentsToSend.end(); it++)
 		{
-			Agent * agent = (*it);
+			Agent * agent = it->get();
 			if(agent->isType(itType->first))
 			{
 				int newID = getIdFromPosition(agent->getPosition());
-				agentsToNeighbors[getNeighborIndex(newID)].push_back(agent);
+				agentsToNeighbors[getNeighborIndex(newID)].push_back(std::shared_ptr<Agent>(agent));
 			}
 		}
 
@@ -262,7 +262,7 @@ void SpacePartition::sendAgents( AgentsList & agentsToSend )
 			AgentsList::iterator it= agentsToNeighbors[i].begin();
 			while(it!=agentsToNeighbors[i].end())
 			{
-				Agent * agent = *it;
+				Agent * agent = it->get();
 				void * package = agent->fillPackage();
 				log_DEBUG(logName.str(), getWallTime() << " step: " << _world->getCurrentStep() << " sendAgent - sending agent: " << *it << " to: " << _neighbors[i] );
 				error = MPI_Send(package, 1, *agentType, _neighbors[i], eAgent, MPI_COMM_WORLD);
@@ -402,7 +402,7 @@ void SpacePartition::sendGhostAgents( const int & sectionIndex )
 			Rectangle<int> overlapZone = getOverlap(neighborsToUpdate[i], sectionIndex);
 			for(AgentsList::iterator it=_world->beginAgents(); it!=_world->endAgents(); it++)
 			{
-				Agent * agent = *it;
+				Agent * agent = it->get();
 				// we check the type. TODO register the type in another string
 				// TODO refactor!!!
 				log_DEBUG(logName.str(),  getWallTime() << " step: " << _world->getCurrentStep() << " agent: " << agent << " of type: " << itType->first << " test will be removed: " << willBeRemoved(agent) << " checking overlap zone: " << overlapZone << " overlap boundaries: " << _boundaries << " - test is inside zone: " << overlapZone.contains(agent->getPosition()-_boundaries._origin));
@@ -417,7 +417,7 @@ void SpacePartition::sendGhostAgents( const int & sectionIndex )
 			}
 			for(AgentsList::iterator it=_overlapAgents.begin(); it!=_overlapAgents.end(); it++)
 			{
-				Agent * agent = *it;	
+				Agent * agent = it->get();	
 				if(agent->isType(itType->first))
 				{
 					if((!willBeRemoved(agent)) && (overlapZone.contains(agent->getPosition()-_boundaries._origin)))
@@ -439,7 +439,7 @@ void SpacePartition::sendGhostAgents( const int & sectionIndex )
 			}
 			for(AgentsList::iterator it=agentsToNeighbors[i].begin(); it!=agentsToNeighbors[i].end(); it++)
 			{
-				Agent * agent = *it;
+				Agent * agent = it->get();
 				void * package = agent->fillPackage();
 				log_DEBUG(logName.str(), getWallTime() << " step: " << _world->getCurrentStep() << " sending ghost agent: " << *it << " from: " << _id << " to: " << neighborsToUpdate[i]);
 				error = MPI_Send(package, 1, *agentType, neighborsToUpdate[i], eGhostAgent, MPI_COMM_WORLD);
@@ -520,7 +520,7 @@ void SpacePartition::receiveGhostAgents( const int & sectionIndex )
 				}
 				if(!worldOwnsAgent)
 				{
-					newGhostAgents.push_back(agent);
+					newGhostAgents.push_back(std::shared_ptr<Agent>(agent));
 				}
 			}
 			log_DEBUG(logName.str(), getWallTime() << " step: " << _world->getCurrentStep() << " num ghost agents sent for neighbor: " << neighborsToUpdate[i] << " in section index: " << sectionIndex << ": " << newGhostAgents.size());
@@ -529,7 +529,7 @@ void SpacePartition::receiveGhostAgents( const int & sectionIndex )
 			AgentsList::iterator it=_overlapAgents.begin();
 			while(it!=_overlapAgents.end())
 			{
-				Agent * agent = (*it);
+				Agent * agent = it->get();
 				if(agent->isType(itType->first))
 				{
 					// si l'agent no està en zona que s'ha d'actualitzar, continuar
@@ -1438,7 +1438,7 @@ Agent * SpacePartition::getAgent( const std::string & id )
 	AgentsList::iterator it = getOwnedAgent(id);
 	if(it!=_world->endAgents())
 	{
-		Agent * agent = (*it);
+		Agent * agent = it->get();
 		if(agent->exists())
 		{
 			return agent;
@@ -1447,7 +1447,7 @@ Agent * SpacePartition::getAgent( const std::string & id )
 	it = getGhostAgent(id);
 	if(it!=_overlapAgents.end())
 	{
-		Agent * agent = (*it);
+		Agent * agent = it->get();
 		if(agent->exists())
 		{
 			return agent;
@@ -1475,7 +1475,7 @@ void SpacePartition::removeAgents()
 	AgentsList::iterator it=_removedAgents.begin();
 	while(it!=_removedAgents.end())
 	{
-		Agent * agent = *it;
+		Agent * agent = it->get();
 		AgentsList::iterator itAg = getOwnedAgent(agent->getId());
 		if(itAg==_world->endAgents())
 		{
@@ -1486,7 +1486,6 @@ void SpacePartition::removeAgents()
 		}
 		_world->eraseAgent(itAg);
 		it = _removedAgents.erase(it);
-		delete agent;
 	}
 	_removedAgents.clear();
 }
@@ -1585,15 +1584,15 @@ void SpacePartition::serializeRasters( const int & step )
 
 int SpacePartition::countNeighbours( Agent * target, const double & radius, const std::string & type )
 {
-	int numAgents = for_each(_world->beginAgents(), _world->endAgents(), aggregatorCount<Engine::Agent>(radius,*target, type))._count;
-	int numOverlapAgents = for_each(_overlapAgents.begin(), _overlapAgents.end(), aggregatorCount<Engine::Agent>(radius,*target, type))._count;
+	int numAgents = for_each(_world->beginAgents(), _world->endAgents(), aggregatorCount<std::shared_ptr<Agent> >(radius,*target, type))._count;
+	int numOverlapAgents = for_each(_overlapAgents.begin(), _overlapAgents.end(), aggregatorCount<std::shared_ptr<Agent> >(radius,*target, type))._count;
 	return numAgents+numOverlapAgents;
 }
 
 AgentsVector SpacePartition::getNeighbours( Agent * target, const double & radius, const std::string & type )
 {
-	AgentsVector agentsVector = for_each(_world->beginAgents(), _world->endAgents(), aggregatorGet<Engine::Agent>(radius,*target, type))._neighbors;
-	AgentsVector overlapAgentsVector =  for_each(_overlapAgents.begin(), _overlapAgents.end(), aggregatorGet<Engine::Agent>(radius,*target, type))._neighbors;
+	AgentsVector agentsVector = for_each(_world->beginAgents(), _world->endAgents(), aggregatorGet<std::shared_ptr<Agent> >(radius,*target, type))._neighbors;
+	AgentsVector overlapAgentsVector =  for_each(_overlapAgents.begin(), _overlapAgents.end(), aggregatorGet<std::shared_ptr<Agent> >(radius,*target, type))._neighbors;
 	std::copy(overlapAgentsVector.begin(), overlapAgentsVector.end(), std::back_inserter(agentsVector));
 	std::random_shuffle(agentsVector.begin(), agentsVector.end());
 	return agentsVector;

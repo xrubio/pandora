@@ -52,6 +52,7 @@ World::World( const Simulation & simulation, Scheduler * scheduler, const bool &
 
 World::~World()
 {
+    /*
 	AgentsList::iterator it=_agents.begin();
 	while(it!=_agents.end())
 	{
@@ -59,6 +60,7 @@ World::~World()
 		it = _agents.erase(it);
 		delete agent;
 	}
+    */
 	for(size_t i=0; i<_rasters.size(); i++)
 	{
 		if(_rasters.at(i))
@@ -97,7 +99,7 @@ void World::updateRasterToMaxValues( const int & index )
 void World::addAgent( Agent * agent, bool executedAgent )
 {
 	agent->setWorld(this);
-	_agents.push_back(agent);
+	_agents.push_back(std::shared_ptr<Agent>(agent));
 	if(executedAgent)
 	{
 		_scheduler->agentAdded(agent, executedAgent);
@@ -250,14 +252,14 @@ bool World::checkPosition( const Point2D<int> & newPosition ) const
 	}
 	
 	// checking if it is already occupied
-	std::vector<Agent *> hosts = _scheduler->getAgent(newPosition);
+	AgentsVector hosts = _scheduler->getAgent(newPosition);
 	if(hosts.size()==0)
 	{
 		return true;
 	}
 	for(size_t i=0; i<hosts.size(); i++)
 	{
-		Agent * agent = hosts.at(i);
+		Agent * agent = hosts.at(i).get();
 		if(agent->exists())
 		{
 			return false;

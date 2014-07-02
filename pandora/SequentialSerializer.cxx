@@ -266,7 +266,7 @@ void SequentialSerializer::serializeAgents( const int & step, const AgentsList::
 		{
 			continue;
 		}
-		serializeAgent((*it), step, i);
+		serializeAgent(it->get(), step, i);
 		i++;
 	}
 	// serialize remaining agents
