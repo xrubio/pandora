@@ -13,7 +13,7 @@
 namespace Examples 
 {
 
-NeolithicWorld::NeolithicWorld( Engine::Simulation & simulation, const NeolithicConfig & config ) : World(simulation, 1, false, config._resultsFile), _config(config)
+NeolithicWorld::NeolithicWorld(const NeolithicConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler ) : World(simulation, scheduler, false), _config(config)
 {
 }
 
@@ -35,27 +35,23 @@ void NeolithicWorld::createRasters()
 	getDynamicRaster(ePopulationBase).setDefaultInitValues(0,std::numeric_limits<int>::max(), 0);
 	registerDynamicRaster("arrivalTime", true, eArrivalTime);
 	getDynamicRaster(eArrivalTime).setDefaultInitValues(0,std::numeric_limits<int>::max(), 0);
-	
-	Engine::Point2D<int> index;	
-	for(index._x=_overlapBoundaries._origin._x; index._x<_overlapBoundaries._origin._x+_overlapBoundaries._size._x; index._x++)		
-	{
-		for(index._y=_overlapBoundaries._origin._y; index._y<_overlapBoundaries._origin._y+_overlapBoundaries._size._y; index._y++)			
-		{
-			setMaxValue(ePopulation, index, _config._saturationDensity);
-			setMaxValue(ePopulationBase, index, _config._saturationDensity);
-			setMaxValue(eArrivalTime, index, _simulation.getNumSteps()+1);
-			// if the point has initial population, set it at maximum
-			if(getValue(eInitPopulation, index)!=0)
-			{
-				setValue(ePopulation, index, _config._saturationDensity);
-				setValue(eArrivalTime, index, 1);
-			}
-			else
-			{
-				setValue(ePopulation, index, 0);
-				setValue(eArrivalTime, index, -1);
-			}
-		}
+
+    for(auto index : getBoundaries() )
+    {
+        setMaxValue(ePopulation, index, _config._saturationDensity);
+        setMaxValue(ePopulationBase, index, _config._saturationDensity);
+        setMaxValue(eArrivalTime, index, _simulation.getNumSteps()+1);
+        // if the point has initial population, set it at maximum
+        if(getValue(eInitPopulation, index)!=0)
+        {
+            setValue(ePopulation, index, _config._saturationDensity);
+            setValue(eArrivalTime, index, 1);
+        }
+        else
+        {
+            setValue(ePopulation, index, 0);
+            setValue(eArrivalTime, index, -1);
+        }
 	}
 }
 
@@ -79,92 +75,83 @@ void NeolithicWorld::stepEnvironment()
 
 void NeolithicWorld::reproductionStep()
 {
-	Engine::Point2D<int> index;	
-	for(index._x=_overlapBoundaries._origin._x; index._x<_overlapBoundaries._origin._x+_overlapBoundaries._size._x; index._x++)		
-	{
-		for(index._y=_overlapBoundaries._origin._y; index._y<_overlapBoundaries._origin._y+_overlapBoundaries._size._y; index._y++)			
-		{
-			int actualPopulation = getValue(ePopulation, index);
-			//int oldPopulation = actualPopulation;
+    for( auto index : getBoundaries())
+    {
+        int actualPopulation = getValue(ePopulation, index);
+        //int oldPopulation = actualPopulation;
 
-			if(actualPopulation>=(_config._saturationDensity/_config._reproductiveRate))
-			{
-				actualPopulation = _config._saturationDensity;
-			}
-			else
-			{
-				actualPopulation *= _config._reproductiveRate;
-			}
+        if(actualPopulation>=(_config._saturationDensity/_config._reproductiveRate))
+        {
+            actualPopulation = _config._saturationDensity;
+        }
+        else
+        {
+            actualPopulation *= _config._reproductiveRate;
+        }
 
-			setValue(ePopulationBase, index, actualPopulation);
-			setValue(ePopulation, index, 0);
-		}
-	}
+        setValue(ePopulationBase, index, actualPopulation);
+        setValue(ePopulation, index, 0);
+    }
 }
 
 void NeolithicWorld::homogeneousDispersionStep()
 {
-	Engine::Point2D<int> index;	
-	for(index._x=_overlapBoundaries._origin._x; index._x<_overlapBoundaries._origin._x+_overlapBoundaries._size._x; index._x++)		
-	{
-		for(index._y=_overlapBoundaries._origin._y; index._y<_overlapBoundaries._origin._y+_overlapBoundaries._size._y; index._y++)			
-		{
-			float actualPopulation = _config._persistence*float(getValue(ePopulationBase, index));
-			if(actualPopulation<=0.0f)
-			{
-				continue;
-			}
+    for( auto index : getBoundaries())
+    {
+        float actualPopulation = _config._persistence*float(getValue(ePopulationBase, index));
+        if(actualPopulation<=0.0f)
+        {
+            continue;
+        }
 
-			float migrationPopulation = ((1-_config._persistence)/4.0f)*float(getValue(ePopulationBase, index));
-			
-			/*
-			if(migrationPopulation>0)
-			{
-				std::cout << "population migrating from: " << index << " with neighbors: " << numNeighbors << " = " << migrationPopulation << std::endl;
-			}
-			*/
+        float migrationPopulation = ((1-_config._persistence)/4.0f)*float(getValue(ePopulationBase, index));
+        
+        /*
+        if(migrationPopulation>0)
+        {
+            std::cout << "population migrating from: " << index << " with neighbors: " << numNeighbors << " = " << migrationPopulation << std::endl;
+        }
+        */
 
-			setValue(ePopulation, index, getValue(ePopulation, index)+actualPopulation);
-			
-			Engine::Point2D<int> neighborW(index._x-1, index._y);
-			if(_overlapBoundaries.isInside(neighborW))
-			{
-				setValue(ePopulation, neighborW, getValue(ePopulation, neighborW)+migrationPopulation);
-			}
-			
-			Engine::Point2D<int> neighborE(index._x+1, index._y);
-			if(_overlapBoundaries.isInside(neighborE))
-			{
-				setValue(ePopulation, neighborE, getValue(ePopulation, neighborE)+migrationPopulation);
-			}
-			
-			Engine::Point2D<int> neighborN(index._x, index._y-1);	
-			if(_overlapBoundaries.isInside(neighborN))
-			{
-				setValue(ePopulation, neighborN, getValue(ePopulation, neighborN)+migrationPopulation);
-			}		
-			
-			Engine::Point2D<int> neighborS(index._x, index._y+1);	
-			if(_overlapBoundaries.isInside(neighborS))
-			{
-				setValue(ePopulation, neighborS, getValue(ePopulation, neighborS)+migrationPopulation);
+        setValue(ePopulation, index, getValue(ePopulation, index)+actualPopulation);
+        
+        Engine::Point2D<int> neighborW(index._x-1, index._y);
+        if(getBoundaries().contains(neighborW))
+        {
+            setValue(ePopulation, neighborW, getValue(ePopulation, neighborW)+migrationPopulation);
+        }
+        
+        Engine::Point2D<int> neighborE(index._x+1, index._y);
+        if(getBoundaries().contains(neighborE))
+        {
+            setValue(ePopulation, neighborE, getValue(ePopulation, neighborE)+migrationPopulation);
+        }
+        
+        Engine::Point2D<int> neighborN(index._x, index._y-1);	
+        if(getBoundaries().contains(neighborN))
+        {
+            setValue(ePopulation, neighborN, getValue(ePopulation, neighborN)+migrationPopulation);
+        }		
+        
+        Engine::Point2D<int> neighborS(index._x, index._y+1);	
+        if(getBoundaries().contains(neighborS))
+        {
+            setValue(ePopulation, neighborS, getValue(ePopulation, neighborS)+migrationPopulation);
 
-			}
+        }
 
-			/*
-			if(actualPopulation>0)
-			{
-				std::cout << "index: " << index << " generated pop: " << getValue("oldPopulation", index) << " remaining population: " << actualPopulation << " and migrating: " << migrationPopulation <<std::endl;				 
-			}
-			*/
-		}
-	}
-
+        /*
+        if(actualPopulation>0)
+        {
+            std::cout << "index: " << index << " generated pop: " << getValue("oldPopulation", index) << " remaining population: " << actualPopulation << " and migrating: " << migrationPopulation <<std::endl;				 
+        }
+        */
+    }
 }
 
 void NeolithicWorld::disperseTo( const Engine::Point2D<int> & origin, const Engine::Point2D<int> & destination, const int & migrationPopulation )	
 {
-	if(!_overlapBoundaries.isInside(destination))
+	if(!getBoundaries().contains(destination))
 	{
 		return;
 	}
@@ -193,25 +180,25 @@ int NeolithicWorld::countNeighbors( const Engine::Point2D<int> & index )
 	int neighbors = 0;
 	
 	Engine::Point2D<int> neighborW(index._x-1, index._y);
-	if(_overlapBoundaries.isInside(neighborW) && !isMountain(neighborW))
+	if(getBoundaries().contains(neighborW) && !isMountain(neighborW))
 	{
 		neighbors++;
 	}
 	
 	Engine::Point2D<int> neighborE(index._x+1, index._y);
-	if(_overlapBoundaries.isInside(neighborE) && !isMountain(neighborE))
+	if(getBoundaries().contains(neighborE) && !isMountain(neighborE))
 	{
 		neighbors++;
 	}
 
 	Engine::Point2D<int> neighborN(index._x, index._y-1);
-	if(_overlapBoundaries.isInside(neighborN) && !isMountain(neighborN))
+	if(getBoundaries().contains(neighborN) && !isMountain(neighborN))
 	{
 		neighbors++;
 	}
 
 	Engine::Point2D<int> neighborS(index._x, index._y+1);
-	if(_overlapBoundaries.isInside(neighborS) && !isMountain(neighborS))
+	if(getBoundaries().contains(neighborS) && !isMountain(neighborS))
 	{
 		neighbors++;
 	}
@@ -220,74 +207,66 @@ int NeolithicWorld::countNeighbors( const Engine::Point2D<int> & index )
 
 void NeolithicWorld::nonHomogeneousDispersionStep()
 {
-	Engine::Point2D<int> index;	
-	for(index._x=_overlapBoundaries._origin._x; index._x<_overlapBoundaries._origin._x+_overlapBoundaries._size._x; index._x++)		
+    for( auto index : getBoundaries())
 	{
-		for(index._y=_overlapBoundaries._origin._y; index._y<_overlapBoundaries._origin._y+_overlapBoundaries._size._y; index._y++)			
-		{
-			float actualPopulation = _config._persistence*float(getValue(ePopulationBase, index));
-			if(actualPopulation<=0.0f)
-			{
-				continue;
-			}
+        float actualPopulation = _config._persistence*float(getValue(ePopulationBase, index));
+        if(actualPopulation<=0.0f)
+        {
+            continue;
+        }
 
-			float numNeighbors = countNeighbors(index);
-			float migrationPopulation = ((1-_config._persistence)/numNeighbors)*float(getValue(ePopulationBase, index));
-			
-			/*
-			if(migrationPopulation>0)
-			{
-				std::cout << "population migrating from: " << index << " with neighbors: " << numNeighbors << " = " << migrationPopulation << std::endl;
-			}
-			*/
-			int realPopulation = std::min(getValue(ePopulation, index)+(int)actualPopulation, (int)_config._saturationDensity);
-			setValue(ePopulation, index, realPopulation);
-			
-			Engine::Point2D<int> neighborW(index._x-1, index._y);
-			disperseTo(index, neighborW, migrationPopulation);
+        float numNeighbors = countNeighbors(index);
+        float migrationPopulation = ((1-_config._persistence)/numNeighbors)*float(getValue(ePopulationBase, index));
+        
+        /*
+        if(migrationPopulation>0)
+        {
+            std::cout << "population migrating from: " << index << " with neighbors: " << numNeighbors << " = " << migrationPopulation << std::endl;
+        }
+        */
+        int realPopulation = std::min(getValue(ePopulation, index)+(int)actualPopulation, (int)_config._saturationDensity);
+        setValue(ePopulation, index, realPopulation);
+        
+        Engine::Point2D<int> neighborW(index._x-1, index._y);
+        disperseTo(index, neighborW, migrationPopulation);
 
-			Engine::Point2D<int> neighborE(index._x+1, index._y);
-			disperseTo(index, neighborE, migrationPopulation);
+        Engine::Point2D<int> neighborE(index._x+1, index._y);
+        disperseTo(index, neighborE, migrationPopulation);
 
-			Engine::Point2D<int> neighborN(index._x, index._y-1);	
-			disperseTo(index, neighborN, migrationPopulation);
+        Engine::Point2D<int> neighborN(index._x, index._y-1);	
+        disperseTo(index, neighborN, migrationPopulation);
 
-			Engine::Point2D<int> neighborS(index._x, index._y+1);	
-			disperseTo(index, neighborS, migrationPopulation);
-			
-			/*
-			if(actualPopulation>0)
-			{
-				std::cout << "index: " << index << " generated pop: " << getValue("oldPopulation", index) << " remaining population: " << actualPopulation << " and migrating: " << migrationPopulation <<std::endl;				 
-			}
-			*/
-		}
-	}
+        Engine::Point2D<int> neighborS(index._x, index._y+1);	
+        disperseTo(index, neighborS, migrationPopulation);
+        
+        /*
+        if(actualPopulation>0)
+        {
+            std::cout << "index: " << index << " generated pop: " << getValue("oldPopulation", index) << " remaining population: " << actualPopulation << " and migrating: " << migrationPopulation <<std::endl;				 
+        }
+        */
+    }
 
 }
 void NeolithicWorld::arrivalCheck()
 {
-	Engine::Point2D<int> index;	
-	for(index._x=_overlapBoundaries._origin._x; index._x<_overlapBoundaries._origin._x+_overlapBoundaries._size._x; index._x++)		
-	{
-		for(index._y=_overlapBoundaries._origin._y; index._y<_overlapBoundaries._origin._y+_overlapBoundaries._size._y; index._y++)			
-		{
-			int newPopulation = getValue(ePopulation, index);
-			/*
-			if(newPopulation>0)
-			{
-				std::cout << "index: " << index << " past pop: " << pastPopulation << " new pop: " << newPopulation << " saturation density: " << _saturationDensity << std::endl;
-			}
-			*/
-			int threshold = 0.9f*_config._saturationDensity;
-			int arrived = getValue(eArrivalTime, index);
-			if(arrived==-1 && newPopulation>=threshold)
-			{
-				//std::cout << "neolithic arrived to: " << index << std::endl;
-				setValue(eArrivalTime, index, _step+1);
-			}
-		}
-	}
+    for( auto index : getBoundaries())
+    {
+        int newPopulation = getValue(ePopulation, index);
+        /*
+        if(newPopulation>0)
+        {
+            std::cout << "index: " << index << " past pop: " << pastPopulation << " new pop: " << newPopulation << " saturation density: " << _saturationDensity << std::endl;
+        }
+        */
+        int threshold = 0.9f*_config._saturationDensity;
+        int arrived = getValue(eArrivalTime, index);
+        if(arrived==-1 && newPopulation>=threshold)
+        {
+            //std::cout << "neolithic arrived to: " << index << std::endl;
+            setValue(eArrivalTime, index, _step+1);
+        }
+    }
 }
 
 bool NeolithicWorld::isMountain( const Engine::Point2D<int> & index )
@@ -336,7 +315,7 @@ void NeolithicWorld::travelBySea( const Engine::Point2D<int> & origin, const Eng
 		}
 		checked.push_back(point);
 		//std::cout << "checking: " << point << std::endl;
-		if(!_overlapBoundaries.isInside(point))
+		if(!getBoundaries().contains(point))
 		{
 			//std::cout << "candidate: " << point << " out of bounds" << std::endl;
 			continue;

@@ -41,7 +41,7 @@ class NeolithicWorld : public Engine::World
 	int countNeighbors( const Engine::Point2D<int> & index );
 
 public:
-	NeolithicWorld( Engine::Simulation & simulation, const NeolithicConfig & config );
+    NeolithicWorld(const NeolithicConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0);
 	virtual ~NeolithicWorld();
 };
 

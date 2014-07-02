@@ -17,8 +17,8 @@ void NeolithicConfig::extractParticularAttribs(TiXmlElement * root)
 	TiXmlElement * element = root->FirstChildElement("location");
 	float resolution = 0.0f;
 	retrieveAttributeMandatory(element, "resolution", resolution);
-	retrieveAttributeMandatory(element, "width", _size._x);
-	retrieveAttributeMandatory(element, "height", _size._y);
+	retrieveAttributeMandatory(element, "width", _size._width);
+	retrieveAttributeMandatory(element, "height", _size._height);
 	retrieveAttributeMandatory(element, "demFile", _demFile);
 	retrieveAttributeMandatory(element, "initPopulationFile", _initPopulationFile);
 
@@ -40,7 +40,7 @@ void NeolithicConfig::extractParticularAttribs(TiXmlElement * root)
 	_saturationDensity = resolution * resolution * saturationDensityConstant;
 }
 	
-const Engine::Point2D<int> & NeolithicConfig::getSize() const
+const Engine::Size<int> & NeolithicConfig::getSize() const
 {
 	return _size;
 }

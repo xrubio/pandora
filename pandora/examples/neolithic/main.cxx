@@ -24,10 +24,10 @@ int main(int argc, char *argv[])
 		Examples::NeolithicConfig config;
 		config.deserialize(fileName);
 	
-		Engine::Simulation neoSim(config.getSize(), config.getNumSteps());
-		Examples::NeolithicWorld world( neoSim, config);
+		Engine::Simulation neoSim(config.getSize(), config.getNumSteps(), config.getSerializeResolution());
+		Examples::NeolithicWorld world( config, neoSim, world.useOpenMPSingleNode(config.getResultsFile()));
 	
-		world.init(argc, argv);
+		world.initialize(argc, argv);
 		world.run();
 	}
 	catch( std::exception & exceptionThrown )
