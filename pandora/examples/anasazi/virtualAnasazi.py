@@ -376,7 +376,7 @@ class Household(Agent):
 class Valley(World):
 
 	def __init__(self, simulation, config ):
-		World.__init__( self, simulation, 1, 1, config._resultsFile)
+		World.__init__( self, simulation, Valley.useOpenMPSingleNode(config._resultsFile))
 		self._config = config
 		self._alluviumExist = False
 		self._streamExist = False
@@ -629,15 +629,15 @@ class Valley(World):
 		self.setValue('quality x100', location, int(quality*100.0))
 
 	def createRasters(self):
-		self.registerDynamicRaster("landCover", False)
-		self.registerDynamicRaster("water", False)
-		self.registerDynamicRaster("historical", False)
-		self.registerDynamicRaster("farms", False)
-		self.registerDynamicRaster("households", False)
-		self.registerDynamicRaster("yield x100", False)
-		self.registerDynamicRaster("quality x100", False)
-		self.registerDynamicRaster("maize", False) 
-		self.registerDynamicRaster("hydro x100", False)
+		self.registerDynamicRaster("landCover", True)
+		self.registerDynamicRaster("water", True)
+		self.registerDynamicRaster("historical", True)
+		self.registerDynamicRaster("farms", True)
+		self.registerDynamicRaster("households", True)
+		self.registerDynamicRaster("yield x100", True)
+		self.registerDynamicRaster("quality x100", True)
+		self.registerDynamicRaster("maize", True) 
+		self.registerDynamicRaster("hydro x100", True)
 		
 		self.getDynamicRaster("landCover").setInitValues(0, 60, 60)
 		self.getDynamicRaster("water").setInitValues(0, 1, 0)

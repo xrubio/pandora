@@ -2,7 +2,8 @@
 <config>  
 	<!-- Global simulation parameters -->
 	<output resultsFile="./data/anazasi.h5" logsDir="./logs"/>
-	<numSteps value="10" serializeResolution="1"/> 
+<!--	<numSteps value="500" serializeResolution="1"/> -->
+    <numSteps value="10" serializeResolution="1"/>
 	<size width="80" height="120"/>
 	<data landCover="resources/Map.txt" apdsi='resources/adjustedPDSI.txt' settlements='resources/settlements.txt' water='resources/water.txt' hydro='resources/environment.txt'/>
 	<environment harvestVariance="0.4" harvestAdjustment="0.61" mobilityDist="16"/>
