@@ -24,8 +24,6 @@ libqt4-dev
 
 - GIS support
 
-grass
-grass-dev
 libgdal1-dev
 
 - MPI support
@@ -36,17 +34,17 @@ scons
 python
 
 You can install all of them with this command:
-$ sudo apt-get install libtinyxml-dev libdevil-dev freeglut3-dev libqwt-dev libqwt6 libqt4-dev libqt4-opengl-dev grass grass-dev libgdal1-dev mpich2 scons build-essential libboost-random-dev libboost-python-dev libboost-filesystem-dev libboost-system-dev libmpich2-dev python3-dev libboost-test-dev libboost-timer-dev libboost-chrono-dev
+$ sudo apt-get install libtinyxml-dev libdevil-dev freeglut3-dev libqwt-dev libqwt6 libqt4-dev libqt4-opengl-dev libgdal1-dev mpich2 scons build-essential libboost-random-dev libboost-python-dev libboost-filesystem-dev libboost-system-dev libmpich2-dev python3-dev libboost-test-dev libboost-timer-dev libboost-chrono-dev
 
 Python 3 is used by default, but if you want to use python 2.7 this is also possible (just change the installed packages as needed).
 
 To make sure that the operating system finds the needed libraries, add library directories that are not standard to LD_LIBRARY_PATH external variable. It can be done adding this line to the end of the file .bashrc inside your $HOME directory. You should also add Pandora directory
 
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/hdf5/lib/:/usr/lib/grass64/lib/
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/hdf5/lib/
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/pandora/pandora/
 
 - Compiling HDF5
-Ubuntu dependencies forces you to install the serial version of HDF5 as grass dependency. For this reason, we will need to download, compile and install hdf5.
+Ubuntu dependencies forces you to install the serial version of HDF5 as gdaldependency. For this reason, we will need to download, compile and install hdf5.
 	* Go to HDF5 webpage and download the sources:
 		$ cd ~/
 		$ mkdir hdf5

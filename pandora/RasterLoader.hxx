@@ -48,8 +48,6 @@ public:
     // load an HDF5 from a serialized static raster
 	void fillHDF5Raster( StaticRaster & raster, const std::string & fileName, const std::string & rasterName, World * world = 0);
 	// load a raster file from a GRASS database conforming adjusting raster to data, or to World position if not null
-	// Simulation MUST be executed from a Grass instance, and raster must exist in current location/mapset
-	void fillGrassCellRaster( StaticRaster & raster, const std::string & rasterName, World * world = 0);
 }; 
 
 } // namespace Engine
