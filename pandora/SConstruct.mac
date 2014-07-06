@@ -5,6 +5,7 @@ release = ARGUMENTS.get('release', 1)
 extremeDebug = ARGUMENTS.get('edebug', 0)
 
 env = Environment(ENV=os.environ, CXX='mpicxx')
+hdf5_path = os.environ.get('HDF5_PATH', '/usr/local/hdf5')
 
 env.VariantDir('build', '.')
 env['LINKFLAGS'] = '-undefined warning'
@@ -15,34 +16,35 @@ if int(release) == 0:
 	env['CCFLAGS'] = Split('-cxx=g++-4.8 -std=c++0x -g -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG')
 	if int(extremeDebug)==1:
 		env['CCFLAGS'] += ['-DPANDORAEDEBUG']
-	libraryName = 'pandorad.so'
-	pythonLibraryName = 'pyPandorad.so'
+	libraryName = 'pandorad'
+	pythonLibraryName = 'pyPandorad'
 else:
 	env['CCFLAGS'] = Split('-cxx=g++-4.8 -Ofast -DTIXML_USE_STL -fopenmp -std=c++0x ')
-	libraryName = 'pandora.so'
-	pythonLibraryName = 'pyPandora.so'
+	libraryName = 'pandora'
+	pythonLibraryName = 'pyPandora'
 
 coreFiles = [str(f) for f in Glob('*.cxx') if str(f) != 'MpiStubCode.cxx']
 analysisFiles = [str(f) for f in Glob('analysis/*.cxx')]
 srcFiles = coreFiles + analysisFiles
 
 srcBaseFiles = ['build/' + src for src in srcFiles]
-includeDirs = ['.', 'analysis/', '/usr/local/include', '/usr/include/gdal/']
-libDirs = ['.', '/usr/local/Cellar/python3/3.4.1/Frameworks/Python.framework/Versions/3.4/lib/','/usr/local/lib']
+includeDirs = ['.', 'analysis/', '/usr/local/include', hdf5_path + '/include', '/usr/include/gdal/']
+libDirs = ['.', '/usr/local/lib', hdf5_path + '/lib']
 
 env.SharedLibrary(libraryName, srcBaseFiles, CPPPATH=includeDirs, LIBS=libs, LIBPATH=libDirs)
 
 
 envPython = Environment(ENV=os.environ, CXX='mpicxx')
+envPython['LINKFLAGS'] = Split('-Wl,--export-dynamic,-no-undefined')
 envPython['LIBPATH'] = libDirs
 envPython.VariantDir('build_py', '.')
 
 if int(release) == 0:
-	envPython['CCFLAGS'] = Split('-cxx=g++-4.8 -g -Wall  -std=c++0x -DTIXML_USE_STL -DPANDORADEBUG')	
+	envPython['CCFLAGS'] = Split('-cxx=g++-4.8 -g -Wall -DTIXML_USE_STL -DPANDORADEBUG')	
 	if int(extremeDebug)==1:
 		envPython['CCFLAGS'] += ['-DPANDORAEDEBUG']
 else:
-	envPython['CCFLAGS'] = Split('-cxx=g++-4.8 -Ofast -DTIXML_USE_STL -std=c++0x')
+	envPython['CCFLAGS'] = Split('-cxx=g++-4.8 -Ofast -DTIXML_USE_STL')
 
 srcPyFiles = ['build_py/' + src for src in srcFiles]
 srcPyFiles.append('build_py/pyPandora/pyBindings.cxx')
@@ -52,9 +54,19 @@ libsPython = libs
 includeDirsPython = ['']
 
 conf = Configure(envPython)
-libsPython += ['boost_python']
-libsPython += ['python3.4m']
-includeDirsPython = ['/usr/local/Cellar/python3/3.4.1/Frameworks/Python.framework/Versions/3.4/include/python3.4m/']
+if conf.CheckLib('python3.4'):
+	libsPython += ['boost_python-py34']
+	libsPython += ['python3.4m']
+	includeDirsPython = ['/usr/include/python3.4/']
+elif conf.CheckLib('python3.2mu'):
+	libsPython += ['boost_python-py32']
+	libsPython += ['python3.2mu']	
+	includeDirsPython = ['/usr/include/python3.2/']
+else:
+	# default, python 2.7
+	libsPython += ['boost_python-py27']
+	libsPython += ['python2.7']
+	includeDirsPython = ['/usr/include/python2.7/']
 
 includeDirsPython += includeDirs
 envPython = conf.Finish()

@@ -132,7 +132,7 @@ bool HeatMapModel::loadFile( const std::string & file )
 
         while(std::getline(iss, token, ';'))
         {
-            row.push_back(std::stof(token.c_str()));
+            row.push_back(std::atof(token.c_str()));
         }
         _rows.push_back(row);
     }

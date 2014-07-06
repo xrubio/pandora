@@ -23,9 +23,9 @@
 #include <SimulationControlThread.hxx>
 #include <sstream>
 #include <cstdlib>
-#include <wait.h>
 #include <iomanip>
 #include <boost/filesystem.hpp>
+#include <signal.h>
 
 namespace GUI
 {

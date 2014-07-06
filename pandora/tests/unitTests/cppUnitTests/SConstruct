@@ -25,7 +25,7 @@ generateMPICodeBuilder = Builder(action=generateMpi.execute)
 env.Append( BUILDERS = {'GenerateMPICode' : generateMPICodeBuilder})
 
 linkFlags = Split('-fopenmp')
-libs = Split('tinyxml pthread grass_gis grass_datetime boost_unit_test_framework gdal')
+libs = Split('tinyxml pthread boost_unit_test_framework gdal')
 if int(release) == 0:
 	env['CCFLAGS'] = Split('-g -O0 -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG -std=c++0x')
 	if int(extremeDebug)==1:
@@ -40,8 +40,8 @@ if int(useMpi)==1:
 
 includeDirs = Split('./ ../../../')
 
-includeDirs += ['/usr/local/include','/usr/local/hdf5/include','/usr/lib/grass64/include/','/usr/include/gdal/']
-libDirs = Split('../../../ /usr/local/lib /usr/local/hdf5/lib/ /usr/lib/grass64/lib/')
+includeDirs += ['/usr/local/include','/usr/local/hdf5/include','/usr/include/gdal/']
+libDirs = Split('../../../ /usr/local/lib /usr/local/hdf5/lib/ ')
 libs += ['mpl']
 
 # add the list of mpi code that must be generated & compiled
