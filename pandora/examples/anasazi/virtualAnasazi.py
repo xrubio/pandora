@@ -8,8 +8,8 @@ import xml.etree.ElementTree
 
 import time
 
-sys.path.append('/home/xrubio/workspace/pandora/pandora/pyPandora/')
-sys.path.append('/home/xrubio/workspace/pandora/pandora/')
+sys.path.append('../../')
+sys.path.append('../../pyPandora/')
 
 from pyPandora import Simulation, Agent, World, Point2DInt, SizeInt
 
