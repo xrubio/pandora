@@ -345,7 +345,7 @@ int World::getValue( const std::string & key, const Point2D<int> & position ) co
 int World::getValue( const int & index, const Point2D<int> & position ) const
 {
 	DynamicRaster * raster = (DynamicRaster*)(_rasters.at(index));
-	_scheduler->getValue(*raster, position);
+	return _scheduler->getValue(*raster, position);
 }
 
 void World::setMaxValue( const std::string & key, const Point2D<int> & position, int value )
