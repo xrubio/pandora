@@ -25,7 +25,7 @@ generateMPICodeBuilder = Builder(action=generateMpi.execute)
 env.Append( BUILDERS = {'GenerateMPICode' : generateMPICodeBuilder})
 
 linkFlags = Split('-fopenmp')
-libs = Split('tinyxml pthread grass_gis grass_datetime')
+libs = Split('tinyxml pthread')
 if int(release) == 0:
 	env['CCFLAGS'] = Split('-g -O0 -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG -std=c++0x')
 	if int(extremeDebug)==1:
@@ -40,8 +40,8 @@ if int(useMpi)==1:
 
 includeDirs = Split('./ ../../ ../../../libs/libmdp')
 
-includeDirs += ['/usr/lib/grass64/include/','/usr/include/gdal/']
-libDirs = ['../../', '/usr/lib/grass64/lib/']
+includeDirs += ['/usr/include/gdal/']
+libDirs = ['../../']
 
 if int(useMpi)==1:
 	includeDirs += ['/usr/local/hdf5/include']

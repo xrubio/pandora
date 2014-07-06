@@ -25,7 +25,12 @@
 #include <cstdlib>
 #include <iomanip>
 #include <boost/filesystem.hpp>
-#include <signal.h>
+
+#ifdef __linux
+    #include <wait.h>
+#elif __APPLE__
+    #include <signal.h>
+#endif
 
 namespace GUI
 {

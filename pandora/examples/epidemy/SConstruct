@@ -34,8 +34,8 @@ else:
 		env['CXX'] = 'mpicxx'
 
 linkFlags = Split('-fopenmp')
-libs = Split('tinyxml pthread grass_gis grass_datetime')
-#libs = Split('pthread mpich pandorad gdal hdf5 tinyxml grass_gis')
+libs = Split('tinyxml pthread')
+#libs = Split('pthread mpich pandorad gdal hdf5 tinyxml')
 if int(release) == 0:
 	env['CCFLAGS'] = Split('-g -O0 -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG')
 	if int(extremeDebug)==1:
@@ -52,18 +52,16 @@ if int(mareNostrum)==1:
 	includeDirs += ['/gpfs/apps/BOOST/1_48_0/include/']
 	includeDirs += ['/gpfs/apps/TINYXML/2.6.2/64/STL/include']
 	includeDirs += ['/gpfs/apps/GDAL/1.7.1/64/include']	
-	includeDirs += ['/gpfs/apps/GRASS/6.4.2/grass-6.4.2/include/']
 
 	libDirs = Split('../../ /gpfs/apps/HDF5/1.8.9/64/lib /opt/ibmcmp/vacpp/10.1/lib64/ /gpfs/apps/GDAL/1.7.1/64/lib /gpfs/apps/TINYXML/2.6.2/64/STL/lib')
-	libDirs += ['/gpfs/apps/GRASS/6.4.2/grass-6.4.2/lib/']
 	libDirs += ['/gpfs/apps/BOOST/1_48_0/lib/']
 	libs += ['gpfs']
 	libs += ['xl']
 	libs += ['boost_filesystem']
 	libs += ['boost_system']
 else:
-	includeDirs += ['/usr/local/include','/usr/local/hdf5/include','/usr/lib/grass64/include/','/usr/include/gdal/']
-	libDirs = Split('../../ /usr/local/lib /usr/local/hdf5/lib/ /usr/lib/grass64/lib/')
+	includeDirs += ['/usr/local/include','/usr/local/hdf5/include','/usr/include/gdal/']
+	libDirs = Split('../../ /usr/local/lib /usr/local/hdf5/lib/')
 	libs += ['mpl']
 
 # if debug && mare nostrum mpitrace is added

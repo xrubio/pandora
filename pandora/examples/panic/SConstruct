@@ -26,7 +26,7 @@ generateMPICodeBuilder = Builder(action=generateMpi.execute)
 env.Append( BUILDERS = {'GenerateMPICode' : generateMPICodeBuilder})
 
 linkFlags = Split('-fopenmp')
-libs = Split('tinyxml pthread grass_gis grass_datetime')
+libs = Split('tinyxml pthread')
 if int(release) == 0:
 	env['CCFLAGS'] = Split('-g -O0 -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG')
 	if int(extremeDebug)==1:
@@ -46,14 +46,12 @@ if int(mareNostrum)==1:
 	includeDirs += ['/apps/BOOST/1_52_0/include/']
 	includeDirs += ['/apps/TINYXML/2.6.2/include']
 	includeDirs += ['/apps/GDAL/1.9.2/include']
-	includeDirs += ['/apps/GRASS/6.4.3RC2/grass-6.4.3RC2/include/']
 	libs += ['hdf5','gdal','boost_filesystem','boost_system']
 	libDirs = Split('../../ /apps/HDF5/1.8.10-mpi/OPENMPI/lib /apps/GDAL/1.9.2/lib /apps/TINYXML/2.6.2/lib')
 	libDirs += ['/apps/BOOST/1_52_0/lib/']
-	libDirs += ['/apps/GRASS/6.4.3RC2/grass-6.4.3RC2/lib/']
 else:
-	includeDirs += ['/usr/lib/grass64/include/','/usr/include/gdal/']
-	libDirs = ['../../', '/usr/lib/grass64/lib/']
+	includeDirs += ['/usr/include/gdal/']
+	libDirs = ['../../']
 
 	if int(useMpi)==1:
 		includeDirs += ['/usr/local/hdf5/include']
