@@ -2,7 +2,7 @@
 This tutorial will explain how to install Pandora framework.
 
 - Requirements
-You will need a PC with GNU/Linux installed. The tutorial will explain how to install Pandora on Ubuntu 12.04 (Precise Pangolin), but any other distribution would work (probably with additional effort related to looking for the correct packages and versions).
+You will need a PC with GNU/Linux installed. The tutorial will explain how to install Pandora on Ubuntu (release 14.04, Trusty Tahr), but any other distribution would work (probably with additional effort related to looking for the correct packages and versions).
 
 - Installing dependencies
 First of all, open a console terminal (like Konsole or xterm) and upgrade your system to the last updates:
