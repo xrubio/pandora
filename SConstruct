@@ -77,6 +77,8 @@ includeDirsPython += includeDirs
 envPython = conf.Finish()
 sharedPyLib = envPython.SharedLibrary('lib/'+pythonLibraryName,  srcPyFiles, CPPPATH=includeDirsPython, LIBS=libsPython, SHLIBVERSION=version)
 
+
+# installation
 installLibDir = installDir + '/lib/'
 installHeadersDir = installDir + '/include/'
 installAnalysisHeadersDir = installHeadersDir+'analysis'
@@ -89,4 +91,8 @@ installedAnalysisHeaders = env.Install(installAnalysisHeadersDir, analysisHeader
 installBin = env.Install(installDir, Glob('./bin'))
 
 env.Alias('install', [installedLib, installedPyLib, installedHeaders, installedAnalysisHeaders, installBin])
+
+# cassandra
+cassandraCompilation = env.Command("cassandra/cassandra", "", "cd cassandra && qmake && make")
+env.Alias('cassandra', cassandraCompilation)
 
