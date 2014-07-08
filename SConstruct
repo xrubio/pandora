@@ -90,9 +90,13 @@ installedAnalysisHeaders = env.Install(installAnalysisHeadersDir, analysisHeader
 
 installBin = env.Install(installDir, Glob('./bin'))
 
-env.Alias('install', [installedLib, installedPyLib, installedHeaders, installedAnalysisHeaders, installBin])
 
 # cassandra
-cassandraCompilation = env.Command("cassandra/cassandra", "", "cd cassandra && qmake && make")
+cassandraCompilation = env.Command("bin/cassandra", "", "cd cassandra && qmake && make")
+
+# final targets
+Default(sharedLib)
+Default(sharedPyLib)
 env.Alias('cassandra', cassandraCompilation)
+env.Alias('install', [installedLib, installedPyLib, installedHeaders, installedAnalysisHeaders, installBin])
 
