@@ -9,7 +9,9 @@ srcFiles = Split('main.cxx RandomAgent.cxx RandomWorld.cxx RandomWorldConfig.cxx
 import os, sys
 from subprocess import call
 
-sys.path.append('../../scripts/')
+pandoraPath = os.getenv('PANDORAPATH', '/usr/local/pandora')
+sys.path.append(pandoraPath+'/bin')
+
 import generateMpi 
 
 release = ARGUMENTS.get('release', 1)
@@ -23,18 +25,18 @@ env.Append( BUILDERS = {'GenerateMPICode' : generateMPICodeBuilder})
 linkFlags = Split('-fopenmp')
 libs = Split('tinyxml pthread')
 if int(release) == 0:
-	env['CCFLAGS'] = Split('-std=c++0x -g -O0 -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG')
+	env['CCFLAGS'] = '-std=c++0x -g -O0 -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG'.split()
 	if int(extremeDebug)==1:
 		env['CCFLAGS'] += ['-DPANDORAEDEBUG']
 	libs += ['pandorad']
 else:
-	env['CCFLAGS'] = Split('-std=c++0x -O3 -DTIXML_USE_STL -fopenmp')
+	env['CCFLAGS'] = '''-std=c++0x -O3 -DTIXML_USE_STL -fopenmp'''.split()
 	libs += ['pandora']
 
-includeDirs = Split('./ ../../')
+includeDirs = """. pandoraPath""".split()
 
-includeDirs += ['/usr/local/include','/usr/local/hdf5/include','/usr/include/gdal/']
-libDirs = Split('../../ /usr/local/lib /usr/local/hdf5/lib/')
+includeDirs += ['/usr/local/include','/usr/local/hdf5/include','/usr/include/gdal/', pandoraPath+'/include']
+libDirs = Split('../../ /usr/local/lib /usr/local/hdf5/lib/ '+pandoraPath+'/lib')
 libs += ['mpl']
 
 # add the list of mpi code that must be generated & compiled

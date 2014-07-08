@@ -1,6 +1,9 @@
 
+version = '0.0.1'
+
 import os
 
+installDir = ARGUMENTS.get('installDir', '/usr/local/pandora/')
 release = ARGUMENTS.get('release', 1)
 extremeDebug = ARGUMENTS.get('edebug', 0)
 
@@ -22,15 +25,18 @@ else:
 	libraryName = 'pandora'
 	pythonLibraryName = 'pyPandora'
 
-coreFiles = [str(f) for f in Glob('*.cxx') if str(f) != 'MpiStubCode.cxx']
-analysisFiles = [str(f) for f in Glob('analysis/*.cxx')]
+coreFiles = [str(f) for f in Glob('src/*.cxx')]
+analysisFiles = [str(f) for f in Glob('src/analysis/*.cxx')]
 srcFiles = coreFiles + analysisFiles
 
+coreHeaders = [str(f) for f in Glob('include/*.hxx')]
+analysisHeaders = [str(f) for f in Glob('include/analysis/*.hxx')]
+
 srcBaseFiles = ['build/' + src for src in srcFiles]
-includeDirs = ['.', 'analysis/', '/usr/local/include', hdf5_path + '/include', '/usr/include/gdal/']
+includeDirs = ['include/', 'include/analysis/', '/usr/local/include', hdf5_path + '/include', '/usr/include/gdal/']
 libDirs = ['.', '/usr/local/lib', hdf5_path + '/lib']
 
-env.SharedLibrary(libraryName, srcBaseFiles, CPPPATH=includeDirs, LIBS=libs, LIBPATH=libDirs)
+sharedLib = env.SharedLibrary('lib/'+libraryName, srcBaseFiles, CPPPATH=includeDirs, LIBS=libs, LIBPATH=libDirs, SHLIBVERSION=version)
 
 
 envPython = Environment(ENV=os.environ, CXX='mpicxx')
@@ -47,8 +53,7 @@ else:
 	envPython['CCFLAGS'] = Split('-Ofast -DTIXML_USE_STL -std=c++0x ')
 
 srcPyFiles = ['build_py/' + src for src in srcFiles]
-srcPyFiles.append('build_py/pyPandora/pyBindings.cxx')
-srcPyFiles.append('build_py/MpiStubCode.cxx')
+srcPyFiles += [str(f) for f in Glob('src/pyPandora/*.cxx')]
 
 libsPython = libs
 includeDirsPython = ['']
@@ -70,5 +75,18 @@ else:
 
 includeDirsPython += includeDirs
 envPython = conf.Finish()
-envPython.SharedLibrary(pythonLibraryName, srcPyFiles, CPPPATH=includeDirsPython, LIBS=libsPython)
+sharedPyLib = envPython.SharedLibrary('lib/'+pythonLibraryName,  srcPyFiles, CPPPATH=includeDirsPython, LIBS=libsPython, SHLIBVERSION=version)
+
+installLibDir = installDir + '/lib/'
+installHeadersDir = installDir + '/include/'
+installAnalysisHeadersDir = installHeadersDir+'analysis'
+installedLib = env.InstallVersionedLib(installLibDir, sharedLib, SHLIBVERSION=version)
+installedPyLib = env.InstallVersionedLib(installLibDir, sharedPyLib, SHLIBVERSION=version)
+
+installedHeaders = env.Install(installHeadersDir, coreHeaders)
+installedAnalysisHeaders = env.Install(installAnalysisHeadersDir, analysisHeaders)
+
+installBin = env.Install(installDir, Glob('./bin'))
+
+env.Alias('install', [installedLib, installedPyLib, installedHeaders, installedAnalysisHeaders, installBin])
 
