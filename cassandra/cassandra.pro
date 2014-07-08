@@ -23,8 +23,8 @@ DEFINES += TIXML_USE_STL
 DEPENDPATH += .
 INCLUDEPATH += .
 INCLUDEPATH += uis/
-INCLUDEPATH += $(PANDORAPATH)/include
-INCLUDEPATH += $(PANDORAPATH)/include/analysis
+INCLUDEPATH += ../include
+INCLUDEPATH += ../include/analysis
 INCLUDEPATH += /usr/include/qwt/
 INCLUDEPATH += /usr/include/mpich2/ 
 INCLUDEPATH += /usr/include/mpich/ 
@@ -36,7 +36,7 @@ INCLUDEPATH += /usr/local/hdf5/include/
 INCLUDEPATH += /usr/local/qwt-6.0.0/include/
 CONFIG += qt
 QMAKE_CXXFLAGS += -std=c++11
-QMAKE_LIBDIR += ../lib
+QMAKE_LIBDIR += ../lib/
 QMAKE_LIBS += -lpandora
 
 # Required when installing qwt-6.0.0 from sources

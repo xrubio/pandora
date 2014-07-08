@@ -98,5 +98,5 @@ cassandraCompilation = env.Command("bin/cassandra", "", "cd cassandra && qmake &
 Default(sharedLib)
 Default(sharedPyLib)
 env.Alias('cassandra', cassandraCompilation)
-env.Alias('install', [installedLib, installedPyLib, installedHeaders, installedAnalysisHeaders, installBin])
+env.Alias('install', [cassandraCompilation, sharedLib, sharedPyLib, installedLib, installedPyLib, installedHeaders, installedAnalysisHeaders, installBin])
 
