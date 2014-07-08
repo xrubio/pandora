@@ -37,6 +37,18 @@ StaticRaster::~StaticRaster()
 {
 }
 
+bool StaticRaster::operator==(const StaticRaster& other) const {
+	return _minValue == other._minValue &&
+	       _maxValue == other._maxValue &&
+	       _values == other._values &&
+	       _hasColorTable == other._hasColorTable &&
+	       _colorTable == other._colorTable;
+}
+
+bool StaticRaster::operator!=(const StaticRaster& other) const {
+	return !(*this == other);
+}
+
 void StaticRaster::resize( const Size<int> & size )
 {
 	_values.resize(size._width);

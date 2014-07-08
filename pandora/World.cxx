@@ -296,7 +296,7 @@ StaticRaster & World::getStaticRaster( const std::string & key )
 	return getStaticRaster(it->second);
 }
 
-DynamicRaster & World::getDynamicRaster( const size_t & index)
+const DynamicRaster & World::getDynamicRaster( const size_t & index) const
 {
 	if(index>=_rasters.size())
 	{
@@ -307,7 +307,12 @@ DynamicRaster & World::getDynamicRaster( const size_t & index)
 	return (DynamicRaster &)*(_rasters.at(index));
 }
 
-DynamicRaster & World::getDynamicRaster( const std::string & key )
+DynamicRaster & World::getDynamicRaster( const size_t & index) {
+	// @see http://stackoverflow.com/a/123995
+	return const_cast<DynamicRaster &>( static_cast<const World&>( *this ).getDynamicRaster(index) );
+}
+
+const DynamicRaster & World::getDynamicRaster( const std::string & key ) const
 {	
 	RasterNameMap::const_iterator it = _rasterNames.find(key);
 	if(it==_rasterNames.end())
@@ -319,9 +324,9 @@ DynamicRaster & World::getDynamicRaster( const std::string & key )
 	return getDynamicRaster(it->second);
 }
 
-const DynamicRaster & World::getDynamicRaster( const size_t & index ) const
-{	
-	return (const DynamicRaster &)*(_rasters.at(index));
+DynamicRaster & World::getDynamicRaster( const std::string & key ) {
+	// @see http://stackoverflow.com/a/123995
+	return const_cast<DynamicRaster &>( static_cast<const World&>( *this ).getDynamicRaster(key) );
 }
 
 void World::setValue( const std::string & key, const Point2D<int> & position, int value )

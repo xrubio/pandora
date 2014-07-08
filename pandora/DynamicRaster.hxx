@@ -39,6 +39,10 @@ class DynamicRaster : public StaticRaster
 public:
 	DynamicRaster();
 	virtual ~DynamicRaster();
+	
+	//! Equality operators
+	bool operator==(const DynamicRaster& other) const;
+	bool operator!=(const DynamicRaster& other) const;
 
 	// parameters: starting pos and size in matrix to grow
 	//! Increases each cell value by 1 if it is under the maximum allowed.

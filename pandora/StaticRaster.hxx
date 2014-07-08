@@ -38,6 +38,11 @@ struct ColorEntry
 	short _g;
 	short _b;
 	short _alpha;
+	
+	bool operator==(const ColorEntry& other) const {
+		return _r == other._r && _g == other._g && _b == other._b && _alpha == other._alpha;
+	}
+	bool operator!=(const ColorEntry& other) const { return !(*this == other); }
 };
 
 //! this class is used to load a static raster map. Values can't be modified, and it won't be serialized each time step (only one time)
@@ -54,6 +59,10 @@ protected:
 public:
 	StaticRaster();
 	virtual ~StaticRaster();
+	
+	//! Equality operators
+	bool operator==(const StaticRaster& other) const;
+	bool operator!=(const StaticRaster& other) const;
 
 	//! changes raster size. Parameter 'size' represents the new dimesions for the raster area.
 	virtual void resize( const Size<int> & size );
