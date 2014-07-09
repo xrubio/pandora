@@ -1,9 +1,14 @@
 #!/usr/bin/python3
 
-import sys, random
-sys.path.append('..')
-sys.path.append('../../')
+import os, sys
+
+pandoraPath = os.getenv('PANDORAPATH', '/usr/local/pandora')
+sys.path.append(pandoraPath+'/bin')
+sys.path.append(pandoraPath+'/lib')
+
 from pyPandora import Simulation, Agent, World, Point2DInt, SimulationRecord, GlobalAgentStats, AgentNum, AgentMean, AgentSum, AgentStdDev, GlobalRasterStats, RasterMean, RasterSum, SizeInt
+
+import random
 
 # data generation
 

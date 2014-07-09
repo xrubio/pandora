@@ -58,7 +58,7 @@ else:
 
 srcPyFiles = ['build_py/' + src for src in srcFiles]
 srcPyFiles += [str(f) for f in Glob('src/pyPandora/*.cxx')]
-
+srcPyFiles += [str(f) for f in Glob('utils/*.cxx')]
 
 conf = Configure(envPython)
 
@@ -87,7 +87,7 @@ installedHeaders = env.Install(installHeadersDir, coreHeaders)
 installedAnalysisHeaders = env.Install(installAnalysisHeadersDir, analysisHeaders)
 
 installBin = env.Install(installDir, Glob('./bin'))
-
+installMpiStub = env.Install(installDir+'/utils', Glob('./utils/*.cxx'))
 
 # cassandra
 cassandraCompilation = env.Command("bin/cassandra", "", "cd cassandra && qmake && make")
@@ -96,5 +96,5 @@ cassandraCompilation = env.Command("bin/cassandra", "", "cd cassandra && qmake &
 Default(sharedLib)
 Default(sharedPyLib)
 env.Alias('cassandra', cassandraCompilation)
-env.Alias('install', [cassandraCompilation, sharedLib, sharedPyLib, installedLib, installedPyLib, installedHeaders, installedAnalysisHeaders, installBin])
+env.Alias('install', [cassandraCompilation, sharedLib, sharedPyLib, installedLib, installedPyLib, installedHeaders, installedAnalysisHeaders, installBin, installMpiStub])
 

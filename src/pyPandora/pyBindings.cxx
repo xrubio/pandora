@@ -174,7 +174,7 @@ public:
 	void addAgentSimple( std::shared_ptr<AgentWrap> agent)
 	{
         agent->setWorld(this);
-	_agents.push_back(agent);
+    	_agents.push_back(agent);
 	}
 
 

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import os, sys
-from subprocess import call
 
 pandoraPath = os.getenv('PANDORAPATH', '/usr/local/pandora')
 sys.path.append(pandoraPath+'/bin')

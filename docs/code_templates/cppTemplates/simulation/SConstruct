@@ -1,11 +1,11 @@
 # this is a standard scons that can be copied and used to compile your models
-nameProgram = '#PROGRAM_NAME'
+nameProgram = 'helloWorld'
 
-agents = ['#AGENT_CLASSNAME']
-world = '#WORLD_CLASSNAME'
-namespaceAgents = ['#NAMESPACE_FOR_EACH_AGENT']
+agents = ['HelloAgent']
+world = 'HelloWorld'
+namespaceAgents = ['']
 
-srcFiles = Split('main.cxx #ALL_FILES.CXX')
+srcFiles = Split('main.cxx HelloWorld.cxx HelloAgent.cxx')
 
 import os, sys
 from subprocess import call
@@ -34,10 +34,8 @@ else:
 	env['CCFLAGS'] = '''-std=c++0x -O3 -DTIXML_USE_STL -fopenmp'''.split()
 	libs += ['pandora']
 
-includeDirs = """. pandoraPath""".split()
-
-includeDirs += ['/usr/local/include','/usr/local/hdf5/include','/usr/include/gdal/', pandoraPath+'/include']
-libDirs = Split('../../ /usr/local/lib /usr/local/hdf5/lib/ '+pandoraPath+'/lib')
+includeDirs = ['.', '/usr/local/include','/usr/local/hdf5/include','/usr/include/gdal/', pandoraPath+'/include']
+libDirs = Split('/usr/local/lib /usr/local/hdf5/lib/ '+pandoraPath+'/lib')
 libs += ['mpl']
 
 # add the list of mpi code that must be generated & compiled

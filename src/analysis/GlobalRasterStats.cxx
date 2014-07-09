@@ -64,13 +64,7 @@ void GlobalRasterStats::setAnalysisOwnership( bool analysisOwnership )
 void GlobalRasterStats::apply( const Engine::SimulationRecord & simRecord, const std::string & outputFile, const std::string & type )
 {	
 	std::cout << "Executing postprocess: " << getName() << " ...";
-	// pre process
-	for(RasterAnalysisList::const_iterator itL=_analysisList.begin(); itL!=_analysisList.end(); itL++)
-	{
-		std::cout << "Preprocessing analysis: " << (*itL)->getName() << "...";
-		std::cout << " done" << std::endl;
-	}
-	
+
 	std::ofstream file;
 	file.open(outputFile.c_str());
   

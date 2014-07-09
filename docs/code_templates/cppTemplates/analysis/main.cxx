@@ -37,28 +37,22 @@ int main(int argc, char *argv[])
 {
 	try
 	{
-        if(argc!=4)
-    	{
-	    	throw Engine::Exception("USAGE: analysis file.h5 agent.csv rasters.csv");
-    		return 0;
-	    }
-
 		Engine::SimulationRecord simRecord( 1, false);
-		simRecord.loadHDF5(argv[1], true, true);
+		simRecord.loadHDF5("../simulation/data/results.h5", true, true);
 
 		PostProcess::GlobalAgentStats agentResults;
 		agentResults.addAnalysis(new PostProcess::AgentNum());
-		agentResults.addAnalysis(new PostProcess::AgentMean("resources"));
-		agentResults.addAnalysis(new PostProcess::AgentStdDev("resources"));
-		agentResults.addAnalysis(new PostProcess::AgentSum("resources"));
+		agentResults.addAnalysis(new PostProcess::AgentMean("value"));
+		agentResults.addAnalysis(new PostProcess::AgentStdDev("value"));
+		agentResults.addAnalysis(new PostProcess::AgentSum("value"));
 
-		agentResults.apply(simRecord, argv[2], "RandomAgent");
+		agentResults.apply(simRecord, "agentOutput.csv", "HelloAgent");
 
 		PostProcess::GlobalRasterStats rasterResults;
 		rasterResults.addAnalysis(new PostProcess::RasterMean());
 		rasterResults.addAnalysis(new PostProcess::RasterSum());
 
-		rasterResults.apply(simRecord, argv[3], "resources");
+		rasterResults.apply(simRecord, "rasterOutput.csv", "values");
 	}
 	catch( Engine::Exception & exceptionThrown )
 	{

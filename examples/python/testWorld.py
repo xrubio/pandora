@@ -1,10 +1,12 @@
 #!/usr/bin/python3
 
-import sys
-sys.path.append('..')
-sys.path.append('../../')
-from pyPandora import Point2DInt, Simulation, World, SizeInt
+import os, sys
 
+pandoraPath = os.getenv('PANDORAPATH', '/usr/local/pandora')
+sys.path.append(pandoraPath+'/bin')
+sys.path.append(pandoraPath+'/lib')
+
+from pyPandora import Point2DInt, Simulation, World, SizeInt
 
 class MyWorld(World):
 	def __init__(self, simulation ):

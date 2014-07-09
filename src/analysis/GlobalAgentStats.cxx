@@ -64,13 +64,6 @@ void GlobalAgentStats::setAnalysisOwnership( bool analysisOwnership )
 void GlobalAgentStats::apply( const Engine::SimulationRecord & simRecord, const std::string & outputFile, const std::string & type )
 {	
 	std::cout << "Executing postprocess: " << getName() << " ...";
-	// pre process
-	for(AgentAnalysisList::const_iterator itL=_analysisList.begin(); itL!=_analysisList.end(); itL++)
-	{
-		std::cout << "Preprocessing analysis: " << (*itL)->getName() << "...";
-
-		std::cout << " done" << std::endl;
-	}
 	
 	std::ofstream file;
 	file.open(outputFile.c_str());
