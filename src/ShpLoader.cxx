@@ -2,7 +2,7 @@
 #include <ShpLoader.hxx>
 #include <Exception.hxx>
 
-#include <ogrsf_frmts.h>
+#include <gdal/ogrsf_frmts.h>
 
 namespace Engine
 {

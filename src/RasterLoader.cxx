@@ -30,7 +30,7 @@
 #include <Logger.hxx>
 
 #include <vector>
-#include <gdal_priv.h>
+#include <gdal/gdal_priv.h>
 
 #include <hdf5.h>
 

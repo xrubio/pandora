@@ -1,7 +1,21 @@
+# this is a standard scons that can be copied and used to create analysis for your models
 
+############# TEMPLATE FOR ANALYSIS ##################
+######################################################
+################ CUSTOM INFORMATION  #################
+##### please fill with information about your model ##
+######################################################
+
+# program binary name
 nameProgram = 'analysis'
 
+# list of src files
 srcFiles = Split('main.cxx')
+
+###################################################
+########## END OF CUSTOM INFORMATION  #############
+##### don't modify anything below these lines #####
+###################################################
 
 import os, sys
 from subprocess import call
@@ -11,25 +25,28 @@ sys.path.append(pandoraPath+'/bin')
 
 srcFiles += [pandoraPath+'/utils/MpiStubCode.cxx']
 
-release = ARGUMENTS.get('release', 1)
-extremeDebug = ARGUMENTS.get('edebug', 0)
-env = Environment(ENV=os.environ, CXX='mpicxx')
+vars = Variables('custom.py')
+vars.Add(BoolVariable('debug', 'compile with debug flags', 'no'))
+vars.Add(BoolVariable('edebug', 'compile with extreme debug logs', 'no'))
 
-linkFlags = Split('-fopenmp')
-libs = Split('tinyxml pthread')
+env = Environment(variables=vars, ENV=os.environ, CXX='mpicxx')
+Help(vars.GenerateHelpText(env))
 
-if int(release) == 0:
-	env['CCFLAGS'] = '-std=c++0x -g -O0 -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG'.split()
-	if int(extremeDebug)==1:
-		env['CCFLAGS'] += ['-DPANDORAEDEBUG']
-	libs += ['pandorad']
+env.Append(LINKFLAGS = '-fopenmp')
+env.Append(LIBS = 'tinyxml pthread'.split())
+env.Append(CCFLAGS = '-std=c++0x -DTIXML_USE_STL'.split())
+
+if env['debug'] == True:
+    env.Append(CCFLAGS = '-g -O0 -Wall -DPANDORADEBUG'.split())
+    if env['edebug']==True:
+        env.Append(CCFLAGS = '-DPANDORAEDEBUG')
+    env.Append(LIBS = 'pandorad')
 else:
-	env['CCFLAGS'] = '''-std=c++0x -O3 -DTIXML_USE_STL -fopenmp'''.split()
-	libs += ['pandora']
+    env.Append(CCFLAGS = '-Ofast'.split())
+    env.Append(LIBS = 'pandora')
 
-includeDirs = ['.', '/usr/local/include','/usr/local/hdf5/include','/usr/include/gdal/', pandoraPath+'/include']
-libDirs = Split('../../ /usr/local/lib /usr/local/hdf5/lib/ '+pandoraPath+'/lib')
-libs += ['mpl']
+env.Append(CPPPATH = ['.', pandoraPath+'/include'])
+env.Append(LIBPATH = [pandoraPath+'/lib'])
 
-env.Program(nameProgram, srcFiles, CPPPATH=includeDirs, LIBS=libs, LIBPATH=libDirs, LINKFLAGS=linkFlags)
+env.Program(nameProgram, srcFiles)
 

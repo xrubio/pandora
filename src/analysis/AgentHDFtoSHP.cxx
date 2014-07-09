@@ -2,7 +2,7 @@
 #include <analysis/AgentHDFtoSHP.hxx>
 #include <AgentRecord.hxx>
 #include <SimulationRecord.hxx>
-#include <ogrsf_frmts.h>
+#include <gdal/ogrsf_frmts.h>
 #include <Exception.hxx>
 #include <sstream>
 #include <boost/filesystem.hpp>
