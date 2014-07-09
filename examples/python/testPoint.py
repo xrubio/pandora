@@ -1,8 +1,12 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
-import sys
-sys.path.append('..')
-sys.path.append('../../')
+import os, sys
+from subprocess import call
+
+pandoraPath = os.getenv('PANDORAPATH', '/usr/local/pandora')
+sys.path.append(pandoraPath+'/bin')
+sys.path.append(pandoraPath+'/lib')
+
 from pyPandora import Point2DInt
 
 testPoint = Point2DInt(4,6)

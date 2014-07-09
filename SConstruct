@@ -7,23 +7,25 @@ installDir = ARGUMENTS.get('installDir', '/usr/local/pandora/')
 release = ARGUMENTS.get('release', 1)
 extremeDebug = ARGUMENTS.get('edebug', 0)
 
-env = Environment(ENV=os.environ, CXX='mpicxx')
-hdf5_path = os.environ.get('HDF5_PATH', '/usr/local/hdf5')
+AddOption('--with-python2', dest='usePython2', default=False, action='store_true', help='use Python2.7 instead of Python3')
 
+env = Environment(ENV=os.environ, CXX='mpicxx')
+
+hdf5_path = os.environ.get('HDF5_PATH', '/usr/local/hdf5')
 env.VariantDir('build', '.')
 
 libs = Split('pthread gdal hdf5 z tinyxml boost_filesystem boost_system boost_timer boost_chrono gomp mpl dl')
 
 if int(release) == 0:
-	env['CCFLAGS'] = Split('-std=c++0x -g -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG')
-	if int(extremeDebug)==1:
-		env['CCFLAGS'] += ['-DPANDORAEDEBUG']
-	libraryName = 'pandorad'
-	pythonLibraryName = 'pyPandorad'
+    env['CCFLAGS'] = Split('-std=c++0x -g -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG')
+    if int(extremeDebug)==1:
+        env['CCFLAGS'] += ['-DPANDORAEDEBUG']
+    libraryName = 'pandorad'
+    pythonLibraryName = 'pyPandorad'
 else:
-	env['CCFLAGS'] = Split('-Ofast -DTIXML_USE_STL -fopenmp -std=c++0x ')
-	libraryName = 'pandora'
-	pythonLibraryName = 'pyPandora'
+    env['CCFLAGS'] = Split('-Ofast -DTIXML_USE_STL -fopenmp -std=c++0x ')
+    libraryName = 'pandora'
+    pythonLibraryName = 'pyPandora'
 
 coreFiles = [str(f) for f in Glob('src/*.cxx')]
 analysisFiles = [str(f) for f in Glob('src/analysis/*.cxx')]
@@ -40,42 +42,38 @@ sharedLib = env.SharedLibrary('lib/'+libraryName, srcBaseFiles, CPPPATH=includeD
 
 
 envPython = Environment(ENV=os.environ, CXX='mpicxx')
-envPython['LINKFLAGS'] = Split('-Wl,--export-dynamic,-no-undefined')
-envPython['LIBPATH'] = libDirs
-envPython['LIBPATH'] += ['/usr/lib/python3.4/config-3.4m-x86_64-linux-gnu/']
+envPython.Append(LINKFLAGS = '''-Wl,--export-dynamic,-no-undefined'''.split())
+envPython.Append(LIBPATH = libDirs)
+envPython.Append(LIBS = libs)
+envPython.Append(CPPPATH= includeDirs)
+
 envPython.VariantDir('build_py', '.')
 
 if int(release) == 0:
-	envPython['CCFLAGS'] = Split('-g -Wall -DTIXML_USE_STL  -std=c++0x -DPANDORADEBUG')	
-	if int(extremeDebug)==1:
-		envPython['CCFLAGS'] += ['-DPANDORAEDEBUG']
+    envPython['CCFLAGS'] = Split('-g -Wall -DTIXML_USE_STL  -std=c++0x -DPANDORADEBUG') 
+    if int(extremeDebug)==1:
+        envPython['CCFLAGS'] += ['-DPANDORAEDEBUG']
 else:
-	envPython['CCFLAGS'] = Split('-Ofast -DTIXML_USE_STL -std=c++0x ')
+    envPython['CCFLAGS'] = Split('-Ofast -DTIXML_USE_STL -std=c++0x ')
 
 srcPyFiles = ['build_py/' + src for src in srcFiles]
 srcPyFiles += [str(f) for f in Glob('src/pyPandora/*.cxx')]
 
-libsPython = libs
-includeDirsPython = ['']
 
 conf = Configure(envPython)
-if conf.CheckLib('python3.4'):
-	libsPython += ['boost_python-py34']
-	libsPython += ['python3.4m']
-	includeDirsPython = ['/usr/include/python3.4/']
-elif conf.CheckLib('python3.2mu'):
-	libsPython += ['boost_python-py32']
-	libsPython += ['python3.2mu']	
-	includeDirsPython = ['/usr/include/python3.2/']
-else:
-	# default, python 2.7
-	libsPython += ['boost_python-py27']
-	libsPython += ['python2.7']
-	includeDirsPython = ['/usr/include/python2.7/']
 
-includeDirsPython += includeDirs
+if(GetOption('usePython2')==False):
+    envPython.ParseConfig("pkg-config python3 --cflags --libs")
+    if conf.CheckLib('boost_python-py33'):
+        envPython.Append(LIBS = 'boost_python-py33')
+    elif conf.ChecLib('boost_python-py34'):
+        envPython.Append(LIBS = 'boost_python-py34')
+else:
+    envPython.ParseConfig("pkg-config python2 --cflags --libs")
+    envPython.Append(LIBS = 'boost_python-py27')
+
 envPython = conf.Finish()
-sharedPyLib = envPython.SharedLibrary('lib/'+pythonLibraryName,  srcPyFiles, CPPPATH=includeDirsPython, LIBS=libsPython, SHLIBVERSION=version)
+sharedPyLib = envPython.SharedLibrary('lib/'+pythonLibraryName,  srcPyFiles, SHLIBVERSION=version)
 
 
 # installation
