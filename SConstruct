@@ -18,16 +18,20 @@ Help(vars.GenerateHelpText(env))
 env.Append(LIBS = 'pthread gdal hdf5 z tinyxml boost_filesystem boost_system boost_timer boost_chrono gomp mpl dl'.split())
 
 env.Append(CCFLAGS = '-DTIXML_USE_STL -fopenmp -std=c++0x')
+
+if(Platform()=='darwin'):
+    env.Append(CCFLAGS = '-cxx=g++-4.8')
+
 if env['debug'] == True:
-    env.Append(CCFLAGS = '-g -Wall-DPANDORADEBUG')
+    env.Append(CCFLAGS = '-g -Wall -DPANDORADEBUG')
     if env['edebug']==True:
         env.Append(CCFLAGS = '-DPANDORAEDEBUG')
-    libraryName = 'pandorad'
-    pythonLibraryName = 'pyPandorad'
+    libraryName = 'pandorad.so'
+    pythonLibraryName = 'pyPandorad.so'
 else:
     env.Append(CCFLAGS = '-Ofast')
-    libraryName = 'pandora'
-    pythonLibraryName = 'pyPandora'
+    libraryName = 'pandora.so'
+    pythonLibraryName = 'pyPandora.so'
 
 coreFiles = [str(f) for f in Glob('src/*.cxx')]
 analysisFiles = [str(f) for f in Glob('src/analysis/*.cxx')]

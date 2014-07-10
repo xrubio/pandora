@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
         Engine::Size<int> size(10,10);
         int numSteps = 10;
 
-		Engine::Simulation simulationParams(size, 10);
+		Engine::Simulation simulationParams(size, numSteps);
 		HelloWorld world(simulationParams);
         world.initialize();
 		world.run();
