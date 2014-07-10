@@ -1,11 +1,10 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
-import sys, random
+import os, sys
 
-pandoraDir = '/home/xrubio/workspace/pandora/'
-
-sys.path.append(pandoraDir+'/pandora/')
-sys.path.append(pandoraDir+'/pandora/pyPandora/')
+pandoraPath = os.getenv('PANDORAPATH', '/usr/local/pandora')
+sys.path.append(pandoraPath+'/bin')
+sys.path.append(pandoraPath+'/lib')
 
 from pyPandora import Simulation, Agent, World, Point2DInt, SizeInt, RectangleInt, SpacePartition, GeneralState, RasterLoader
 
