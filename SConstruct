@@ -53,7 +53,7 @@ if platform.system()=='Linux':
 elif platform.system()=='Darwin':
     env.Append(LIBPATH = '/usr/local/lib')
 
-sharedLib = env.SharedLibrary('lib/'+libraryName, srcBaseFiles)
+sharedLib = env.SharedLibrary('lib/'+libraryName, srcBaseFiles, SHLIBVERSION=version)
 
 envPython = env.Clone()
 
@@ -84,7 +84,7 @@ else:
         envPython.Append(LIBS = 'boost_python') 
 
 envPython = conf.Finish()
-sharedPyLib = envPython.SharedLibrary('lib/'+pythonLibraryName,  srcPyFiles)
+sharedPyLib = envPython.SharedLibrary('lib/'+pythonLibraryName,  srcPyFiles, SHLIBVERSION=version)
 
 
 # installation
