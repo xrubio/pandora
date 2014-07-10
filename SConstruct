@@ -1,14 +1,16 @@
 
 version = '0.0.1'
 
-import os
+import os, platform
 
 vars = Variables('custom.py')
 vars.Add(BoolVariable('debug', 'compile with debug flags', 'no'))
 vars.Add(BoolVariable('edebug', 'compile with extreme debug logs', 'no'))
 vars.Add(BoolVariable('python2', 'use Python2.7 instead of Python3', 'no'))
-vars.Add('installDir', 'use Python2.7 instead of Python3', '/usr/local/pandora')
-vars.Add(PathVariable('hdf5', 'Path where HDF5 library was installed', '/usr/local/hdf5', PathVariable.PathIsDir))
+vars.Add('installDir', 'directory where to install Pandora', '/usr/local/pandora')
+
+if platform.system()=='Linux':
+    vars.Add(PathVariable('hdf5', 'Path where HDF5 library was installed', '/usr/local/hdf5', PathVariable.PathIsDir))
 
 env = Environment(variables=vars, ENV=os.environ, CXX='mpicxx')
 env.VariantDir('build', '.')
@@ -19,8 +21,9 @@ env.Append(LIBS = 'pthread gdal hdf5 z tinyxml boost_filesystem boost_system boo
 
 env.Append(CCFLAGS = '-DTIXML_USE_STL -fopenmp -std=c++0x')
 
-if(Platform()=='darwin'):
+if platform.system()=='Darwin':
     env.Append(CCFLAGS = '-cxx=g++-4.8')
+    env.Append(LINKFLAGS = '-undefined warning')
 
 if env['debug'] == True:
     env.Append(CCFLAGS = '-g -Wall -DPANDORADEBUG')
@@ -42,13 +45,20 @@ analysisHeaders = [str(f) for f in Glob('include/analysis/*.hxx')]
 
 srcBaseFiles = ['build/' + src for src in srcFiles]
 env.Append(CPPPATH = 'include include/analysis'.split())
-env.Append(CPPPATH = [env['hdf5']+'/include'])
-env.Append(LIBPATH = [env['hdf5']+'/lib'])
 
-sharedLib = env.SharedLibrary('lib/'+libraryName, srcBaseFiles, SHLIBVERSION=version)
+if platform.system()=='Linux':
+    env.Append(CPPPATH = [env['hdf5']+'/include', '/usr/include/gdal/'])
+    env.Append(CPPPATH = [env['hdf5']+'/include'])
+    env.Append(LIBPATH = [env['hdf5']+'/lib'])
+elif platform.system()=='Darwin':
+    env.Append(LIBPATH = '/usr/local/lib')
+
+sharedLib = env.SharedLibrary('lib/'+libraryName, srcBaseFiles)
 
 envPython = env.Clone()
-envPython.Append(LINKFLAGS = '-Wl,--export-dynamic,-no-undefined'.split())
+
+if platform.system()=='Linux':
+    envPython.Append(LINKFLAGS = '-Wl,--export-dynamic,-no-undefined'.split())
 
 envPython.VariantDir('build_py', '.')
 
@@ -59,17 +69,22 @@ srcPyFiles += [str(f) for f in Glob('utils/*.cxx')]
 conf = Configure(envPython)
 
 if(env['python2']==False):
-    envPython.ParseConfig("python3-config --includes --libs")
+    envPython.ParseConfig("python3-config --includes --ldflags")
     if conf.CheckLib('boost_python-py33'):
         envPython.Append(LIBS = 'boost_python-py33')
     elif conf.CheckLib('boost_python-py34'):
         envPython.Append(LIBS = 'boost_python-py34')
+    else:
+        envPython.Append(LIBS = 'boost_python3') 
 else:
-    envPython.ParseConfig("python-config --includes --libs")
-    envPython.Append(LIBS = 'boost_python-py27')
+    envPython.ParseConfig("python-config --includes --ldflags")
+    if conf.CheckLib('boost_python-py27'):
+        envPython.Append(LIBS = 'boost_python-py27')
+    else:
+        envPython.Append(LIBS = 'boost_python') 
 
 envPython = conf.Finish()
-sharedPyLib = envPython.SharedLibrary('lib/'+pythonLibraryName,  srcPyFiles, SHLIBVERSION=version)
+sharedPyLib = envPython.SharedLibrary('lib/'+pythonLibraryName,  srcPyFiles)
 
 
 # installation
@@ -87,6 +102,8 @@ installMpiStub = env.Install(env['installDir']+'/utils', Glob('./utils/*.cxx'))
 
 # cassandra
 cassandraCompilation = env.Command("bin/cassandra", "", "cd cassandra && qmake && make")
+if platform.system()=='Darwin':
+    cassandraCompilation = env.Command("bin/cassandra", "", "cd cassandra && qmake cassandra_osx.pro && make")
 
 # final targets
 Default(sharedLib)

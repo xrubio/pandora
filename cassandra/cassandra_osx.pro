@@ -4,7 +4,7 @@
 
 
 TEMPLATE = app
-TARGET =
+TARGET = ../bin/cassandra
 FORMS += uis/AgentConfigurator.ui
 FORMS += uis/Settings.ui
 FORMS += uis/RasterConfigurator.ui
@@ -42,7 +42,7 @@ QMAKE_CXXFLAGS += -F/usr/local/Cellar/qwt/6.1.0/lib/qwt.framework/ -stdlib=libst
 QMAKE_LFLAGS += -F/usr/local/Cellar/qwt/6.1.0/lib/qwt.framework/ -stdlib=libstdc++
 QT += opengl
 
-LIBS += -L../pandora/ -lpandora -lhdf5 -lmpich -lmpi -F/usr/local/lib/ -framework qwt -lGL -lGLU -lIL -ltinyxml -lboost_filesystem -lboost_system -L/usr/local/Cellar/gcc/4.8.3_1/lib/gcc/x86_64-apple-darwin13.2.0/4.8.3/ -L/usr/local/Cellar/devil/1.7.8_1/lib/
+LIBS += -L$$(PANDORAPATH)/lib -lpandora -lhdf5 -lmpich -lmpi -F/usr/local/lib/ -framework qwt -lGL -lGLU -lIL -ltinyxml -lboost_filesystem -lboost_system -L/usr/local/Cellar/gcc/4.8.3_1/lib/gcc/x86_64-apple-darwin13.2.0/4.8.3/ -L/usr/local/Cellar/devil/1.7.8_1/lib/
 
 
 # Input

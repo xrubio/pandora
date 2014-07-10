@@ -1,7 +1,9 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
-import sys
-sys.path.append('../')
+import sys, os
+
+pandoraPath = os.getenv('PANDORAPATH', '/usr/local/pandora')
+sys.path.append(pandoraPath+'/lib')
 import libpyPandora
 
 class Point2DInt(libpyPandora.Point2DIntStub):

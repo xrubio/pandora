@@ -67,9 +67,9 @@ Ubuntu dependencies forces you to install the serial version of HDF5 as gdaldepe
 		$ cd PATHTOPANDORA/pandora/
 	* Compile:
 		$ scons
-		- if you want to compile in debug mode type: $ scons release=0
-        - if you want to use python2.7 type: $scons --with-python2
-        - you can check the full list of options with: $ scons -c
+		- if you want to compile in debug mode type: $ scons debug=1 
+        - if you want to use python2.7 type: $scons python2
+        - you can check the full list of options with: $ scons -h
 
 	* Go to any example or app and compile it:
 		$ cd examples/randomWalkers/
@@ -92,8 +92,8 @@ Ubuntu dependencies forces you to install the serial version of HDF5 as gdaldepe
 		$ cd PATHTOPANDORA/pandora/
      * execute:
         $ sudo scons install (providing root password)
-        By default Pandora will be installed in /usr/local/pandora. If you want to use a different directory use the option --install-dir=$PATH, such ash:
-        $ sudo scons install --install-dir=/opt/
+        By default Pandora will be installed in /usr/local/pandora. If you want to use a different directory use the option installDir=$PATH, such ash:
+        $ sudo scons install installDir=/opt/
 
     * You will need to add Pandora directory to your .bashrc, using these lines:
         export PANDORAPATH=/usr/local/pandora
