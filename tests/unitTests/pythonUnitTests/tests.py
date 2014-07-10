@@ -1,11 +1,12 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
-# unit testing of pyPandora
+import os, sys
 
-import sys, random
+pandoraPath = os.getenv('PANDORAPATH', '/usr/local/pandora')
+sys.path.append(pandoraPath+'/bin')
+sys.path.append(pandoraPath+'/lib')
+
 import unittest
-sys.path.append('../../../')
-sys.path.append('../../../pyPandora')
 
 from pyPandora import Simulation, Agent, World, Point2DInt, SizeInt, RectangleInt, SpacePartition, ShpLoader, RasterLoader, GeneralState, StaticRaster, DynamicRaster
 

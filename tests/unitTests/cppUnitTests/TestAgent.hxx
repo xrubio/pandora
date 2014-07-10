@@ -22,12 +22,10 @@ public:
 	// This code has been automatically generated //
 	/////// Please do not modify it ////////////////
 	////////////////////////////////////////////////
-#ifdef PANDORAMPI
 	TestAgent( void * );
 	void * fillPackage();
 	void sendVectorAttributes(int);
 	void receiveVectorAttributes(int);
-#endif // PANDORAMPI
 	////////////////////////////////////////////////
 	//////// End of generated code /////////////////
 	////////////////////////////////////////////////
