@@ -59,13 +59,13 @@ srcPyFiles += [str(f) for f in Glob('utils/*.cxx')]
 conf = Configure(envPython)
 
 if(env['python2']==False):
-    envPython.ParseConfig("pkg-config python3 --cflags --libs")
+    envPython.ParseConfig("python3-config --includes --libs")
     if conf.CheckLib('boost_python-py33'):
         envPython.Append(LIBS = 'boost_python-py33')
     elif conf.CheckLib('boost_python-py34'):
         envPython.Append(LIBS = 'boost_python-py34')
 else:
-    envPython.ParseConfig("pkg-config python2 --cflags --libs")
+    envPython.ParseConfig("python-config --includes --libs")
     envPython.Append(LIBS = 'boost_python-py27')
 
 envPython = conf.Finish()
