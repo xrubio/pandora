@@ -25,6 +25,7 @@ INCLUDEPATH += .
 INCLUDEPATH += uis/
 INCLUDEPATH += ../pandora/
 INCLUDEPATH += ../pandora/analysis/
+INCLUDEPATH += /ic3home/ajornet/usr/local/boost_1_55_0/include
 INCLUDEPATH += /usr/include/qwt/
 INCLUDEPATH += /usr/include/mpich2/ 
 INCLUDEPATH += /usr/include/mpich/ 
@@ -39,7 +40,7 @@ QMAKE_CXXFLAGS += -std=c++11
 
 
 # Required when installing qwt-6.0.0 from sources
-LIBS += -fopenmp -L../pandora/ -lpandora -L/usr/local/qwt-6.0.0/lib/ -L/usr/local/hdf5/lib/ -lqwt -lhdf5 -lmpich -lmpi -lGL -lGLU -lQtOpenGL -lIL -ltinyxml -lboost_filesystem -lboost_system 
+LIBS += -fopenmp -L../pandora/ -lpandora -L/usr/local/qwt-6.0.0/lib/ -L/usr/local/hdf5/lib/ -lqwt -lhdf5 -lmpi -lGL -lGLU -lQtOpenGL -lIL -ltinyxml -lboost_filesystem -lboost_system 
 
 
 # Input
@@ -48,6 +49,6 @@ SOURCES += main.cxx Display2D.cxx  MainWindow.cxx AgentTypeSelection.cxx AgentTr
 
 RESOURCES = cassandra.qrc
 
-LIBS += \
-    ../pandora/libpandora.so
+LIBS += ../pandora/libpandora.so
+QMAKE_LIBDIR += /ic3home/ajornet/usr/local/boost_1_55_0/lib
 
