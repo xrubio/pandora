@@ -34,21 +34,6 @@
 namespace Engine
 {
 class Agent;
-	
-//! List of Mpi messages sent by the scheduler
-enum MpiMessageType
-{
-	eNumAgents = 1,
-	eAgent = 2,
-	eNumGhostAgents = 3,
-	eGhostAgent = 4,
-	eRasterData = 5,
-	eRasterMaxData = 6,
-	eVectorAttribute = 7, 	
-	eSizeVector = 8,
-	eNumModifiedAgents = 9,
-	eModifiedAgent = 10
-};
 
 //! struct containing raster information sent between nodes
 struct MpiOverlap

@@ -250,9 +250,9 @@ def writeVectorAttributesPassing( f, agentName, vectorAttributesMap ):
     for nameAttribute in vectorAttributesMap.keys():
         print 'sending vector: ' + nameAttribute + ' with type: ' + vectorAttributesMap[nameAttribute]
         f.write('\tsizeVector = '+nameAttribute+'.size();\n')
-        f.write('\tMPI_Send(&sizeVector, 1, MPI_INTEGER, target, eSizeVector, MPI_COMM_WORLD);\n')
+        f.write('\tMPI_Send(&sizeVector, 1, MPI_INTEGER, target, Engine::eSizeVector, MPI_COMM_WORLD);\n')
         mpiType = getMpiTypeConversion(vectorAttributesMap[nameAttribute])
-        f.write('\tMPI_Send(&'+nameAttribute+'[0], sizeVector, '+mpiType+', target, eVectorAttribute, MPI_COMM_WORLD);\n')
+        f.write('\tMPI_Send(&'+nameAttribute+'[0], sizeVector, '+mpiType+', target, Engine::eVectorAttribute, MPI_COMM_WORLD);\n')
         f.write('\n')
     f.write('}\n')
     f.write('\n')
@@ -263,10 +263,10 @@ def writeVectorAttributesPassing( f, agentName, vectorAttributesMap ):
     f.write('\tMPI_Status status;\n')
     for nameAttribute in vectorAttributesMap.keys():        
         print 'receiving vector: ' + nameAttribute + ' with type: ' + vectorAttributesMap[nameAttribute]
-        f.write('\tMPI_Recv(&sizeVector, 1, MPI_INTEGER, origin, eSizeVector, MPI_COMM_WORLD, &status);\n')
+        f.write('\tMPI_Recv(&sizeVector, 1, MPI_INTEGER, origin, Engine::eSizeVector, MPI_COMM_WORLD, &status);\n')
         f.write('\t'+nameAttribute+'.resize(sizeVector);\n')
         mpiType = getMpiTypeConversion(vectorAttributesMap[nameAttribute])
-        f.write('\tMPI_Recv(&'+nameAttribute+'[0], sizeVector, '+mpiType+', origin, eVectorAttribute, MPI_COMM_WORLD, &status);\n')
+        f.write('\tMPI_Recv(&'+nameAttribute+'[0], sizeVector, '+mpiType+', origin, Engine::eVectorAttribute, MPI_COMM_WORLD, &status);\n')
         f.write('\n')
     f.write('}\n')
     f.write('\n')
@@ -280,6 +280,7 @@ def createMpiCode( agentName, source, header, namespace, parent, attributesMap, 
     f.write('#include <'+agentName+'.hxx>\n')
     f.write('#include <cstring>\n')
     f.write('#include <mpi.h>\n')
+    f.write('#include <typedefs.hxx>\n')
     f.write('\n')
     if namespace!="":
         f.write('namespace '+namespace+'\n')
