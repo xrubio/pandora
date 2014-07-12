@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 		Engine::Simulation mdpSim(config.getSize(), config.getNumSteps(), config.getSerializeResolution());
 		Examples::RandomWorld world( mdpSim, config);
 	
-		world.init(argc, argv);
+		world.initialize(argc, argv);
 		world.run();
 	}
 	catch( std::exception & exceptionThrown )

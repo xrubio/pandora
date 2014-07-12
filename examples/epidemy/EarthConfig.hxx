@@ -3,21 +3,17 @@
 
 #include <Config.hxx>
 #include <Point2D.hxx>
+#include <Size.hxx>
 
 namespace Examples
 {
 
-struct GISData
-{
-	Engine::Point2D<int> _size;
-	int _resolution;
-	std::string _demName;
-	std::string _populationName;
-};
-
 class EarthConfig : public Engine::Config
 {
-	GISData _gisData;
+	Engine::Size<int> _size;
+    std::string _demName;
+	std::string _populationName;
+
 	// number of real individuals to 1 in simulation
 	int _scale;
 	Engine::Point2D<int> _firstCase;
@@ -28,7 +24,7 @@ public:
 
 	void extractParticularAttribs(TiXmlElement *pRoot);
 
-	const Engine::Point2D<int> & getSize() const;
+	const Engine::Size<int> & getSize() const;
 
 	friend class Earth;
 };

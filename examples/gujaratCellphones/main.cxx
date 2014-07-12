@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
 		Engine::Simulation myWorldSim(config.getSize(),config.getNumSteps(), config.getSerializeResolution());
 		GujaratCellphones::HerderWorld world(myWorldSim, config);
 
-		world.initialize();
+		world.initialize(argc, argv);
 		world.run();
 	}
 	catch( std::exception & exceptionThrown ) {

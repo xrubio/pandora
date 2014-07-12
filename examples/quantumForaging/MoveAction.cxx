@@ -28,7 +28,7 @@ void MoveAction::executeMDP( const Forager & forager, const ForagerState & state
 {
 	stateNext.setPosition(_position);
 
-	Engine::Point2D<int> localPos = _position - forager.getWorld()->getOverlapBoundaries()._origin;
+	Engine::Point2D<int> localPos = _position - forager.getWorld()->getBoundaries()._origin;
 	int oldKnowledge = state.getKnowledgeMap().getValue(localPos);
 	if(oldKnowledge<state.getKnowledgeMap().getMaxValueAt(localPos))
 	{

@@ -1,13 +1,15 @@
 
 #include "Scenario.hxx"
+#include "ScenarioConfig.hxx"
 #include "PanicAgent.hxx"
+
+#include <typedefs.hxx>
 
 namespace Panic
 {
 
-Scenario::Scenario(Engine::Simulation &simulation, ScenarioConfig &config) : World(simulation, 1, true, config._resultsFile)
+Scenario::Scenario( ScenarioConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler ) : World(simulation, scheduler, false), _config(config)
 {
-	_config = config;
 }
 
 Scenario::~Scenario()
@@ -127,61 +129,54 @@ void Scenario::createRasters()
 
 	// compute exit cells
 	Engine::Point2D<int> index(0,0);
-	int maxValue = _overlapBoundaries._size._x;
-	for(index._x=0; index._x<_overlapBoundaries._size._x; index._x++)
+    for(auto index : getBoundaries())
 	{
-		for(index._y=0; index._y<_overlapBoundaries._size._y; index._y++)
-		{
-			if(getStaticRaster(eObstacles).getValue(index)!=0)
-			{
-				continue;
-			}
+        if(getStaticRaster(eObstacles).getValue(index)!=0)
+        {
+            continue;
+        }
 
-			if(index._x==0 || index._y==0)
-			{
-				getDynamicRaster(eExits).setMaxValue(index, 1);
-			}
-			if(index._x==_overlapBoundaries._size._x-1 || index._y==_overlapBoundaries._size._y-1)
-			{
-				getDynamicRaster(eExits).setMaxValue(index, 1);
-			}
-		}
+        if(index._x==0 || index._y==0)
+        {
+            getDynamicRaster(eExits).setMaxValue(index, 1);
+        }
+        if(index._x==getBoundaries()._size._width-1 || index._y==getBoundaries()._size._height-1)
+        {
+            getDynamicRaster(eExits).setMaxValue(index, 1);
+        }
 	}
 	updateRasterToMaxValues(eExits);
 	fillExitList();
 
 	// compute number of adjacent walls
-	for(index._x=0; index._x<_overlapBoundaries._size._x; index._x++)
-	{
-		for(index._y=0; index._y<_overlapBoundaries._size._y; index._y++)
-		{
-			if(getValue(eObstacles, index)==1)
-			{
-				continue;
-			}
-			Engine::Point2D<int> neighbor(0,0);
-			int adjacentWalls = 0;	
-			for(neighbor._x=index._x-1; neighbor._x<=index._x+1; neighbor._x++)
-			{
-				for(neighbor._y=index._y-1; neighbor._y<=index._y+1; neighbor._y++)
-				{
-					if(neighbor._x==index._x && neighbor._y==index._y)
-					{
-						continue;
-					}
-					if(!checkPosition(neighbor))
-					{
-						continue;
-					}
-					if(getValue(eObstacles, neighbor)==1)
-					{
-						adjacentWalls++;
-					}
-				}
-			}
-			setValue(eWalls, index, adjacentWalls);
-		}
-	}
+    for(auto index : getBoundaries())
+    {
+        if(getValue(eObstacles, index)==1)
+        {
+            continue;
+        }
+        Engine::Point2D<int> neighbor(0,0);
+        int adjacentWalls = 0;	
+        for(neighbor._x=index._x-1; neighbor._x<=index._x+1; neighbor._x++)
+        {
+            for(neighbor._y=index._y-1; neighbor._y<=index._y+1; neighbor._y++)
+            {
+                if(neighbor._x==index._x && neighbor._y==index._y)
+                {
+                    continue;
+                }
+                if(!checkPosition(neighbor))
+                {
+                    continue;
+                }
+                if(getValue(eObstacles, neighbor)==1)
+                {
+                    adjacentWalls++;
+                }
+            }
+        }
+        setValue(eWalls, index, adjacentWalls);
+    }
 	
 	for(ScenarioConfig::SupportRastersMap::iterator it=_config._supportMaps.begin(); it!=_config._supportMaps.end(); it++)
 	{
@@ -190,23 +185,17 @@ void Scenario::createRasters()
 		registerStaticRaster(name, true);
 		Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(name), fileName, getBoundaries());
 	}
-
-
 }
 
 void Scenario::fillExitList()
 {
-	Engine::Point2D<int> index;
-	for(index._x=0; index._x<_overlapBoundaries._size._x; index._x++)
+    for(auto index : getBoundaries())
 	{
-		for(index._y=0; index._y<_overlapBoundaries._size._y; index._y++)
+        if(getDynamicRaster(eExits).getValue(index)==0)
 		{
-			if(getDynamicRaster(eExits).getValue(index)==0)
-			{
-				continue;
-			}
-			_exits.push_back(index);
+			continue;
 		}
+		_exits.push_back(index);
 	}
 }
 
@@ -241,7 +230,7 @@ void Scenario::checkPanicEvents()
 				{
 					setMaxValue(eObstacles, index, 1);
 					setValue(eObstacles, index, 1);
-					AgentsVector agents = getAgent(index);
+                    Engine::AgentsVector agents = getAgent(index);
 					for(int i=0; i<agents.size(); i++)
 					{
 						removeAgent(agents.at(i));
@@ -261,33 +250,6 @@ void Scenario::checkPanicEvents()
 void Scenario::stepEnvironment()
 {
 	checkPanicEvents();
-	/*
-	// update body compression
-	Engine::Point2D<int> index;
-	for(index._x=0; index._x<_overlapBoundaries._size._x; index._x++)
-	{
-		for(index._y=0; index._y<_overlapBoundaries._size._y; index._y++)
-		{
-			if(getValue(eObstacles, index)==1)
-			{
-				continue;
-			}
-	
-			// 4 deaths = not passable
-			if(getValue(eDeaths, index)>_config._bodiesToObstacle)
-			{
-				setMaxValue(eObstacles, index, 1);
-				setValue(eObstacles, index, 1);
-				// all agents are moved to neighbors
-				Engine::AgentsVector agents = getAgent(index);
-				for(int i=0; i<agents.size(); i++)
-				{
-
-				}
-			}
-		}
-	}
-	*/
 }
 
 } // namespace Panic

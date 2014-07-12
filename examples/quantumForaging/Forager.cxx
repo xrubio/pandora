@@ -83,19 +83,15 @@ void Forager::updateKnowledge()
 		int averageValue = maxValue/2;
 		//std::cout << "min: " << minValue << " max: " << maxValue << " average: " << averageValue << std::endl;
 
-		Engine::Point2D<int> index(0,0);
-		for(index._x=0; index._x<_world->getOverlapBoundaries()._size._x; index._x++)
+        for( auto index : _world->getBoundaries())
 		{
-			for(index._y=0; index._y<_world->getOverlapBoundaries()._size._y; index._y++)
+			if(_perfectInformation)
 			{
-				if(_perfectInformation)
-				{
-					resources.setMaxValue(index, _world->getDynamicRaster(eResources).getValue(index));
-				}
-				else
-				{
-					resources.setMaxValue(index, averageValue);
-				}
+				resources.setMaxValue(index, _world->getDynamicRaster(eResources).getValue(index));
+			}
+			else
+			{
+				resources.setMaxValue(index, averageValue);
 			}
 		}
 		resources.updateRasterToMaxValues();
@@ -128,13 +124,6 @@ void Forager::selectActions()
 	UCT * uctPolicy = new UCT(*_uctBasePolicy, _width, _horizon, _explorationBonus, false);
 	Problem::action_t index = (*uctPolicy)(_model->init());
 	BaseAction * action = _model->init().getAvailableAction(index).copy();
-	/*
-	for(int i=0; i<_model->init().getNumAvailableActions(); i++)
-	{
-		std::cout << "possible action for agent: " << this << " index: " << i << " is: " << _model->init().getAvailableAction(i).describe() << " would have cost: "<< _model->cost( _model->init(), i) << std::endl;
-	}
-	*/
-	//std::cout << "action chosen for agent: " << this << " at step: " << _world->getCurrentStep() << " with index: " << index << " is: " << action->describe() << std::endl;	
 	delete uctPolicy;
 	_actions.push_back(action);
 
@@ -142,14 +131,11 @@ void Forager::selectActions()
 	{
 		_moveActions++;
 	}
-	//std::cout << this << " end selecting actions for time step: " << _world->getCurrentStep() << std::endl;
 }
 
 void Forager::updateState()
 {
 	_starvation += 1.0f - float(_currentResources)/float(_neededResources);
-	//std::cout << this << " starvation: " << _starvation << std::endl;
-	//std::cout << " needed: " << getNeededResources() << " resources: " << _resources << " starvation acc: " << _starvationDays << std::endl;
 	_currentResources = 0;
 }
 

@@ -3,7 +3,6 @@
 
 #include <World.hxx>
 #include <GeneralState.hxx>
-#include "ScenarioConfig.hxx"
 
 namespace Engine
 {
@@ -13,6 +12,7 @@ namespace Engine
 namespace Panic 
 {
 class PanicAgent;
+class ScenarioConfig;
 
 enum Rasters
 {
@@ -34,7 +34,7 @@ class Scenario: public Engine::World
 {
 	typedef std::list<Engine::Point2D<int> > ExitsList;
 	ExitsList _exits;
-	ScenarioConfig _config;
+	ScenarioConfig & _config;
 
 	void createAgents();
 	void createRasters();
@@ -45,7 +45,7 @@ class Scenario: public Engine::World
 	bool maxCapacity( const Engine::Point2D<int> & position );
 	void checkPanicEvents();
 public:
-	Scenario( Engine::Simulation &simulation, ScenarioConfig &config );
+	Scenario( ScenarioConfig &config, Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0);
 	virtual ~Scenario();
 };
 

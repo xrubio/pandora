@@ -2,10 +2,7 @@
 #ifndef __Neighbor_hxx__
 #define __Neighbor_hxx__
 
-#include "Agent.hxx"
-
-#include <vector>
-#include <list>
+#include <Agent.hxx>
 
 namespace Segregation 
 {
@@ -24,14 +21,24 @@ public:
 	Neighbor( const std::string & id );
 	virtual ~Neighbor();
 
-	void * createPackage();
-
-	void step();
-	void serialize();
+	void updateState();
 
 	void setFriendlyPercentage( const float & friendlyPercentage );
 	void setNeighborDistance( const float & neighborDistance );
 	void setMaxMovingDistance( const float & maxMovingDistance );
+
+	////////////////////////////////////////////////
+	// This code has been automatically generated //
+	/////// Please do not modify it ////////////////
+	////////////////////////////////////////////////
+	Neighbor( void * );
+	void * fillPackage();
+	void sendVectorAttributes(int);
+	void receiveVectorAttributes(int);
+	////////////////////////////////////////////////
+	//////// End of generated code /////////////////
+	////////////////////////////////////////////////
+
 };
 
 } // namespace Segregation 

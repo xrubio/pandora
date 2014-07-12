@@ -69,12 +69,11 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent& agent,
 	int boxSizeX = 2*agent.getHomeMobilityRange()+1;
 	int boxSizeY = 2*agent.getHomeMobilityRange()+1;
 	Engine::Point2D<int> boxOrigin(boxOriginX, boxOriginY);	
-	Engine::Point2D<int> boxSize(boxSizeX,boxSizeY);	
-	Engine::Rectangle<int> unTrimmedHomeBox(boxOrigin,boxSize);
+	Engine::Size<int> boxSize(boxSizeX,boxSizeY);	
+	Engine::Rectangle<int> unTrimmedHomeBox(boxSize, boxOrigin);
 	Engine::Rectangle<int> homeBox;
 
-	unTrimmedHomeBox.intersection(agent.getWorld()->getOverlapBoundaries(),homeBox);
-	//std::cout << "pos: " << agentPos << " untrimmed box: " << unTrimmedHomeBox << " overlap: " << agent.getWorld()->getOverlapBoundaries() << " home box: " << homeBox << std::endl;
+	unTrimmedHomeBox.intersection(agent.getWorld()->getBoundaries(),homeBox);
 	
 	// Retrieve the areas that have intersection non zero with homeBox
 	const GujaratWorld * world              = (GujaratWorld *)agent.getWorld();
@@ -107,9 +106,9 @@ void MoveHomeAction::generatePossibleActions( const GujaratAgent& agent,
 		int countDunes = 0;
 		Engine::Point2D<int> index;
 		std::vector< Engine::Point2D<int> > dunes;
-		for (index._x = intersection._origin._x; index._x < intersection._origin._x+intersection._size._x; index._x++)			
+		for (index._x = intersection._origin._x; index._x < intersection._origin._x+intersection._size._width; index._x++)			
 		{
-			for (index._y = intersection._origin._y; index._y < intersection._origin._y+intersection._size._y; index._y++)			
+			for (index._y = intersection._origin._y; index._y < intersection._origin._y+intersection._size._height; index._y++)			
 			{
 				log_DEBUG(logName.str(), "checking pos: " << index << " from origin: " << agentPos);
 

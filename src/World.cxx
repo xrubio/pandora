@@ -428,6 +428,12 @@ Scheduler * World::useOpenMPSingleNode(const std::string & fileName)
 const int & World::getId() const { return _scheduler->getId(); }
 const int & World::getNumTasks() const { return _scheduler->getNumTasks(); }
 const Rectangle<int> & World::getBoundaries() const{ return _scheduler->getBoundaries(); }
+void World::removeAgent( std::shared_ptr<Agent> agentPtr )
+{
+    Agent * agent = agentPtr.get();
+    _scheduler->removeAgent(agent);
+}
+
 void World::removeAgent( Agent * agent ) { _scheduler->removeAgent(agent); }
 Agent * World::getAgent( const std::string & id ) { return _scheduler->getAgent(id); }
 AgentsVector World::getAgent( const Point2D<int> & position, const std::string & type) { return _scheduler->getAgent(position, type); }

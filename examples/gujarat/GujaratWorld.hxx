@@ -82,7 +82,7 @@ class GujaratWorld : public Engine::World
 	//Engine::Point2D<int> findNearestWater( const Engine::Point2D<int> & point );
 	float getBiomassVariation( bool wetSeason, Soils & cellSoil, const Engine::Point2D<int> & index ) const;
 public:
-	GujaratWorld( Engine::Simulation & simulation, const GujaratConfig & config );
+	GujaratWorld( const GujaratConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0);
 	virtual ~GujaratWorld();
 	
 	void stepEnvironment();

@@ -25,9 +25,9 @@ int main(int argc, char *argv[])
 		config.deserialize(fileName);
 	
 		Engine::Simulation academiaSimulation(config.getSize(), config.getNumSteps());
-		Examples::Academia academia( academiaSimulation, config);
+		Examples::Academia academia( config, academiaSimulation, academia.useOpenMPSingleNode(config.getResultsFile()));
 	
-		academia.init(argc, argv);
+		academia.initialize(argc, argv);
 		academia.run();
 	}
 	catch( std::exception & exceptionThrown )

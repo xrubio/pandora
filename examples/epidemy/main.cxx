@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 	{	
 		if(argc>2)
 		{
-			throw Engine::Exception("USAGE: zombieAttack [config file]");
+			throw Engine::Exception("USAGE: epidemy [config file]");
 		}		
 	
 		std::string fileName("config.xml");
@@ -24,10 +24,10 @@ int main(int argc, char *argv[])
 		Examples::EarthConfig config;
 		config.deserialize(fileName);
 	
-		Engine::Simulation zombieAttackSim(config.getSize(), config.getNumSteps());
-		Examples::Earth earth( zombieAttackSim, config);
+		Engine::Simulation epidemyParams(config.getSize(), config.getNumSteps(), config.getSerializeResolution());
+		Examples::Earth earth( config, epidemyParams, earth.useOpenMPSingleNode(config.getResultsFile()));
 	
-		earth.init(argc, argv);
+		earth.initialize(argc,argv);
 		earth.run();
 	}
 	catch( std::exception & exceptionThrown )

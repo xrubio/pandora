@@ -2,13 +2,14 @@
 #define __QuantumWorldConfig_hxx__
 
 #include <Config.hxx>
+#include <Size.hxx>
 
 namespace QuantumExperiment 
 {
 
 class QuantumWorldConfig : public Engine::Config
 {
-	int _size;
+    Engine::Size<int> _size;
 
 	// agents
 	int _numAgents;
@@ -27,7 +28,7 @@ public:
 	QuantumWorldConfig();
 	virtual ~QuantumWorldConfig();
 	void extractParticularAttribs(TiXmlElement *pRoot);
-	int getSize() const;
+	const Engine::Size<int> & getSize() const;
 	
 	friend class QuantumWorld;
 	friend class Forager;

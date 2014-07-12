@@ -11,7 +11,7 @@
 namespace Segregation 
 {
 
-Neighborhood::Neighborhood( Engine::Simulation & simulation, const NeighborConfig & config ) : World(simulation, std::max(config._neighborDistance, config._maxMovingDistance), false, config._resultsFile), _config(config)					
+Neighborhood::Neighborhood( const NeighborConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler ) : World(simulation, scheduler, false), _config(config)
 {
 }
 
@@ -19,15 +19,9 @@ Neighborhood::~Neighborhood()
 {
 }    
 
-void Neighborhood::createRasters()
-{
-	registerDynamicRaster("base", true);
-	getDynamicRaster("base").setInitValues(0, std::numeric_limits<int>::max(), 0);
-}
-
 void Neighborhood::createAgents()
 {
-	int numAgents = _config._size * _config._size * _config._populationDensity;
+	int numAgents = _config._size._width * _config._size._height * _config._density;
 	int numDimes = numAgents * _config._dimePercentage;
 	std::cout << "creating : " << numAgents << " neighbors, dimes: " << numDimes << " and pennies: " << numAgents - numDimes  << std::endl;
 
@@ -35,7 +29,7 @@ void Neighborhood::createAgents()
 	int indexPennies = 0;
 	for(int i=0; i<numAgents; i++)
 	{
-		if((i%_simulation.getNumTasks())==_simulation.getId())
+		if((i%getNumTasks())==getId())
 		{
 			std::ostringstream oss;
 			if(indexDimes<numDimes)
@@ -57,9 +51,6 @@ void Neighborhood::createAgents()
 			agent->setPosition(getRandomPosition());
 		}
 	}
-}
-void Neighborhood::stepEnvironment()
-{
 }
 
 } // namespace Segregation 

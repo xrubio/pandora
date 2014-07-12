@@ -55,10 +55,6 @@ void NeolithicWorld::createRasters()
 	}
 }
 
-void NeolithicWorld::createAgents()
-{
-}
-
 void NeolithicWorld::stepEnvironment()
 {
 	reproductionStep();

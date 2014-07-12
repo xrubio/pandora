@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 import os, sys
 
@@ -8,19 +8,22 @@ sys.path.append(pandoraPath+'/lib')
 
 from pyPandora import Simulation, Agent, World, Point2DInt, SimulationRecord, GlobalAgentStats, AgentNum, AgentMean, AgentSum, AgentStdDev, GlobalRasterStats, RasterMean, RasterSum
 
-record = SimulationRecord(1, False)
-record.loadHDF5('../data/anazasi.h5', True, True)
+def main():
+    record = SimulationRecord(1, False)
+    record.loadHDF5('../data/anazasi.h5', True, True)
 
-agentResults = GlobalAgentStats(';')
-agentResults.addAnalysis(AgentNum())
-#agentResults.addAnalysis(AgentMean('estimates'))
-#agentResults.addAnalysis(AgentStdDev('strength x100'))
-#agentResults.addAnalysis(AgentSum('strength x100'))
-agentResults.applyTo(record,'households.csv', 'Household')
+    agentResults = GlobalAgentStats(';')
+    agentResults.addAnalysis(AgentNum())
+    agentResults.addAnalysis(AgentMean('estimates'))
+    agentResults.addAnalysis(AgentStdDev('strength x100'))
+    agentResults.addAnalysis(AgentSum('strength x100'))
+    agentResults.applyTo(record,'households.csv', 'Household')
 
-#rasterResults = GlobalRasterStats(';')
-#rasterResults.addAnalysis(RasterMean())
-#rasterResults.addAnalysis(RasterSum())
+    rasterResults = GlobalRasterStats(';')
+    rasterResults.addAnalysis(RasterMean())
+    rasterResults.addAnalysis(RasterSum())
+    rasterResults.applyTo(record, 'water.csv', 'yield x100')
 
-#rasterResults.applyTo(record, 'water.csv', 'yield x100')
+if __name__ == "__main__":
+    main()  
 

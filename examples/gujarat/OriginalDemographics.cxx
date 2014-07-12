@@ -18,27 +18,8 @@ OriginalDemographics::~OriginalDemographics()
 {
 }
 
-bool	OriginalDemographics::checkEmigration(  GujaratAgent& agent )
-{
-	return false;
-}
-
 void	OriginalDemographics::checkMortality( GujaratAgent& agent )
 {
-
-	/*
-	// TODO check resources, now year, must be seasonal
-	int popSize = agent.getPopulationSize();
-	// each individual eats 10 resources
-	int maintainedPopulation = agent.getOnHandResources()/2000.0f;
-	int starvingPopulation = popSize - maintainedPopulation;
-	// for each starving pop, possibility of death = 10% for each individual
-	if(starvingPopulation>0)
-	{
-		agent.decimatePopulation();
-	}
-	*/
-
 	int originalPopulation = agent.getPopulationSize();
 	int popSize = agent.getPopulationSize();
 	std::cout << "percentage of starving: " << agent.getPercentageOfStarvingDays() << std::endl;
@@ -57,9 +38,6 @@ void	OriginalDemographics::checkMortality( GujaratAgent& agent )
 	popSize = agent.getPopulationSize();
 
 	std::cout << "agent: " << agent << " starved: " << agent.getStarved() << " days - percentage: " << agent.getPercentageOfStarvingDays() << " original pop: " << originalPopulation << " current pop: " << popSize << " death by starvation: " << deathByStarvation << " adults natural death: " << adultsNaturalDeath << " children natural death: " << childNaturalDeath << std::endl;
-	
-	// Old age death check
-	//agent.checkDeathByAging( 50 );
 }
 
 void	OriginalDemographics::checkReproduction( GujaratAgent& agent )

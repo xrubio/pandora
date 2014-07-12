@@ -15,7 +15,8 @@ void QuantumWorldConfig::extractParticularAttribs(TiXmlElement * root)
 {
 	//environment
 	TiXmlElement * element = root->FirstChildElement("environment");
-	retrieveAttributeMandatory(element, "size", _size);
+	retrieveAttributeMandatory(element, "width", _size._width);
+	retrieveAttributeMandatory(element, "height", _size._height);
 	
 	// agents
 	element = root->FirstChildElement("agents");
@@ -31,7 +32,7 @@ void QuantumWorldConfig::extractParticularAttribs(TiXmlElement * root)
 	retrieveAttributeMandatory(child, "explorationBonus", _explorationBonus);	
 }
 
-int QuantumWorldConfig::getSize() const
+const Engine::Size<int> & QuantumWorldConfig::getSize() const
 {
 	return _size;
 }

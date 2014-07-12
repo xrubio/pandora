@@ -150,9 +150,9 @@ public:
 	const std::string & getRasterName( const int & index ) const;
 public:
 	//! Factory method design pattern for creating concrete agents and rasters. It is delegated to concrete Worlds. This method must be defined by children, it is the method where agents are created and addAgents must be called
-	virtual void createAgents() = 0;
+	virtual void createAgents(){};
 	//! to be redefined for subclasses
-	virtual void createRasters() = 0;
+	virtual void createRasters(){};
 
 	int	getCurrentTimeStep() const { return _step; }
 	//! time from initialization step to the moment the method is executed
@@ -173,6 +173,7 @@ public:
 	size_t getNumberOfAgents() const { return _agents.size(); }
 	void eraseAgent( AgentsList::iterator & it ) { _agents.erase(it); }
 	void removeAgent( Agent * agent );
+	void removeAgent( std::shared_ptr<Agent> agentPtr );
 	Agent * getAgent( const std::string & id );
 	AgentsVector getAgent( const Point2D<int> & position, const std::string & type="all" );
 	void addStringAttribute( const std::string & type, const std::string & key, const std::string & value );

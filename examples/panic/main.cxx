@@ -25,9 +25,9 @@ int main(int argc, char *argv[])
 		config.deserialize(fileName);
 	
 		Engine::Simulation panicSimulation(config.getSize(), config.getNumSteps(), config.getSerializeResolution());
-		Panic::Scenario scenario( panicSimulation, config);
+		Panic::Scenario scenario( config, panicSimulation, scenario.useOpenMPSingleNode(config.getResultsFile()));
 	
-		scenario.init(argc, argv);
+		scenario.initialize(argc, argv);
 		scenario.run();
 	}
 	catch( std::exception & exceptionThrown )

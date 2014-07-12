@@ -1,81 +1,66 @@
+############# TEMPLATE FOR MODELS  ###################
+######################################################
+######################################################
+################ CUSTOM INFORMATION  #################
+##### please fill with information about your model ##
+######################################################
+
 nameProgram = 'epidemy'
 
 agents = ['Human', 'Zombie']
 namespaceAgents = ['Examples', 'Examples']
+world = 'Earth'
 
 srcFiles = Split('main.cxx EarthConfig.cxx Earth.cxx Human.cxx Zombie.cxx MoveAction.cxx DoNothingAction.cxx')
 
+###################################################
+########## END OF CUSTOM INFORMATION  #############
+##### don't modify anything below these lines #####
+###################################################
 
 import os, sys
 from subprocess import call
 
-sys.path.append('../../scripts/')
+pandoraPath = os.getenv('PANDORAPATH', '/usr/local/pandora')
+sys.path.append(pandoraPath+'/bin')
+
 import generateMpi 
 
-release = ARGUMENTS.get('release', 1)
-mareNostrum = ARGUMENTS.get('mn', 0)
-localmpich = ARGUMENTS.get('localmpich',0)
-extremeDebug = ARGUMENTS.get('edebug', 0)
+vars = Variables('custom.py')
+vars.Add(BoolVariable('debug', 'compile with debug flags', 'no'))
+vars.Add(BoolVariable('edebug', 'compile with extreme debug logs', 'no'))
 
-if int(localmpich) == 1 :
-	env = Environment(ENV=os.environ, CXX='/usr/local/bin/mpicxx')
-else :
-	env = Environment(ENV=os.environ, CXX='mpicxx')
-	
+env = Environment(variables=vars, ENV=os.environ, CXX='mpicxx')
+Help(vars.GenerateHelpText(env))
+
 generateMPICodeBuilder = Builder(action=generateMpi.execute)
 env.Append( BUILDERS = {'GenerateMPICode' : generateMPICodeBuilder})
 
-if int(mareNostrum) == 1:
-	env['CXX'] = '/opt/osshpc/mpich-mx/64/bin/mpicxx'
+env.Append(LINKFLAGS = '-fopenmp')
+env.Append(LIBS = 'tinyxml pthread mpl'.split())
+env.Append(CCFLAGS = '-std=c++0x -DTIXML_USE_STL'.split())
+if env['debug'] == True:
+    env.Append(CCFLAGS = '-g -O0 -Wall -DPANDORADEBUG'.split())
+    if env['edebug']==True:
+        env.Append(CCFLAGS = '-DPANDORAEDEBUG')
+    env.Append(LIBS = 'pandorad')
 else:
-	if int(localmpich) == 1 :
-		env['CXX'] = '/usr/local/bin/mpicxx'
-	else :
-		env['CXX'] = 'mpicxx'
+    env.Append(CCFLAGS = '-Ofast'.split())
+    env.Append(LIBS = 'pandora')
 
-linkFlags = Split('-fopenmp')
-libs = Split('tinyxml pthread')
-#libs = Split('pthread mpich pandorad gdal hdf5 tinyxml')
-if int(release) == 0:
-	env['CCFLAGS'] = Split('-g -O0 -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG')
-	if int(extremeDebug)==1:
-		env['CCFLAGS'] += ['-DPANDORAEDEBUG']
-	libs += ['pandorad']
-else:
-	env['CCFLAGS'] = Split('-O3 -DTIXML_USE_STL -fopenmp')
-	libs += ['pandora']
-
-includeDirs = Split('./ ../../ ../../../libs/libmdp/')
-
-if int(mareNostrum)==1:	
-	includeDirs += ['/gpfs/apps/HDF5/1.8.9/64/include']
-	includeDirs += ['/gpfs/apps/BOOST/1_48_0/include/']
-	includeDirs += ['/gpfs/apps/TINYXML/2.6.2/64/STL/include']
-	includeDirs += ['/gpfs/apps/GDAL/1.7.1/64/include']	
-
-	libDirs = Split('../../ /gpfs/apps/HDF5/1.8.9/64/lib /opt/ibmcmp/vacpp/10.1/lib64/ /gpfs/apps/GDAL/1.7.1/64/lib /gpfs/apps/TINYXML/2.6.2/64/STL/lib')
-	libDirs += ['/gpfs/apps/BOOST/1_48_0/lib/']
-	libs += ['gpfs']
-	libs += ['xl']
-	libs += ['boost_filesystem']
-	libs += ['boost_system']
-else:
-	includeDirs += ['/usr/local/include','/usr/local/hdf5/include','/usr/include/gdal/']
-	libDirs = Split('../../ /usr/local/lib /usr/local/hdf5/lib/')
-	libs += ['mpl']
-
-# if debug && mare nostrum mpitrace is added
-#if int(release)==0 and int(mareNostrum)==1:
-#	libs += ['mpitrace']
-#	libDirs += ['/gpfs/apps/CEPBATOOLS/mpitrace-stable-1.2-mx/lib']
+env.Append(CPPPATH = ['.', pandoraPath+'/include'])
+env.Append(LIBPATH = [pandoraPath+'/lib'])
 
 # add the list of mpi code that must be generated & compiled
 mpiAgentsSrc = ['mpiCode/FactoryCode.cxx']
 agentsSrc = ['main.cxx']
-for agent in agents:	
-	if agent != '':
-		agentsSrc.append(agent+".cxx")
-		mpiAgentsSrc.append("mpiCode/"+agent+"_mpi.cxx")
+for agent in agents:    
+    if agent != '':
+        agentsSrc.append(agent+".cxx")
+        mpiAgentsSrc.append("mpiCode/"+agent+"_mpi.cxx")
+
 env['namespaces'] = namespaceAgents
 env.GenerateMPICode( target=mpiAgentsSrc, source=agentsSrc)
-env.Program(nameProgram, srcFiles+mpiAgentsSrc, CPPPATH=includeDirs, LIBS=libs, LIBPATH=libDirs, LINKFLAGS=linkFlags)
+env.Depends(world+'.hxx',mpiAgentsSrc)
+env.Program(nameProgram, srcFiles+mpiAgentsSrc)
+

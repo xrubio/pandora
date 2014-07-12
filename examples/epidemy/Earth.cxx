@@ -9,11 +9,12 @@
 #include <Point2D.hxx>
 #include <GeneralState.hxx>
 #include <Logger.hxx>
+#include <typedefs.hxx>
 
 namespace Examples 
 {
 
-Earth::Earth( Engine::Simulation & simulation, const EarthConfig & config ) : World(simulation, 11, true, config._resultsFile), _config(config), _indexZombies(0)
+Earth::Earth( const EarthConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler ) : World(simulation, scheduler, true), _config(config), _indexZombies(0)
 {
 }
 
@@ -24,10 +25,10 @@ Earth::~Earth()
 void Earth::createRasters()
 {	
 	registerStaticRaster("dem", true);
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("dem"), _config._gisData._demName, getBoundaries());	
+	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("dem"), _config._demName, getBoundaries());	
 
 	registerStaticRaster("population", true);
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("population"), _config._gisData._populationName, getBoundaries());		
+	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("population"), _config._populationName, getBoundaries());		
 
 	registerDynamicRaster("humans", true);
 	getDynamicRaster("humans").setInitValues(0, std::numeric_limits<int>::max(), 0);
@@ -43,33 +44,30 @@ void Earth::createRasters()
 void Earth::createAgents()
 {
 	std::stringstream logName;
-	logName << "simulation_" << _simulation.getId();
+	logName << "simulation_" << getId();
 	log_INFO(logName.str(), getWallTime() << " creating agents");
 
 	Engine::Point2D<int> index;
 	int totalHumans = 0;
-	for(index._x=getBoundaries()._origin._x; index._x<getBoundaries()._origin._x+getBoundaries()._size._x; index._x++)
-	{
-		for(index._y=getBoundaries()._origin._y; index._y<getBoundaries()._origin._y+getBoundaries()._size._y; index._y++)
-		{
-			int numHumans = getValue("population", index);
-			if(numHumans>0)
-			{
-				int scaledHumans = 0;
-				for(int i=0; i<numHumans; i=i+_config._scale)
-				{	
-					std::ostringstream oss;
-		 			oss << "Human_" << totalHumans+scaledHumans;
-					Human * newHuman = new Human(oss.str());
-					addAgent(newHuman);
-					newHuman->setPosition(index);
-					scaledHumans++;
-				}
-				totalHumans += scaledHumans;
-				log_INFO(logName.str(), getWallTime() << " created: " << scaledHumans << " humans at pos: " << index);
-				setValue("humans", index, scaledHumans);
-			}
-		}
+    for(auto index : getBoundaries())
+    {
+        int numHumans = getValue("population", index);
+        if(numHumans>0)
+        {
+            int scaledHumans = 0;
+            for(int i=0; i<numHumans; i=i+_config._scale)
+            {	
+                std::ostringstream oss;
+                oss << "Human_" << totalHumans+scaledHumans;
+                Human * newHuman = new Human(oss.str());
+                addAgent(newHuman);
+                newHuman->setPosition(index);
+                scaledHumans++;
+            }
+            totalHumans += scaledHumans;
+            log_INFO(logName.str(), getWallTime() << " created: " << scaledHumans << " humans at pos: " << index);
+            setValue("humans", index, scaledHumans);
+        }
 	}
 	log_INFO(logName.str(), getWallTime() << " " << totalHumans << " humans created");
 
@@ -100,20 +98,16 @@ void Earth::addZombie( const Engine::Point2D<int> & position )
 void Earth::stepEnvironment()
 {
 	std::stringstream logName;
-	logName << "simulation_" << _simulation.getId();
+	logName << "simulation_" << getId();
 	int totalHumans = 0;
 	int totalZombies = 0;
 
-	Engine::Point2D<int> index;
-	for(index._x=getOverlapBoundaries()._origin._x; index._x<getOverlapBoundaries()._origin._x+getOverlapBoundaries()._size._x; index._x++)
-	{
-		for(index._y=getOverlapBoundaries()._origin._y; index._y<getOverlapBoundaries()._origin._y+getOverlapBoundaries()._size._y; index._y++)
-		{
-			setValue("humans", index, 0);
-			setValue("zombies", index, 0);
-		}
+    for(auto index : getBoundaries())
+    {
+    	setValue("humans", index, 0);
+	    setValue("zombies", index, 0);
 	}
-	for(AgentsList::const_iterator it=_agents.begin(); it!=_agents.end(); it++)
+	for(Engine::AgentsList::const_iterator it=_agents.begin(); it!=_agents.end(); it++)
 	{
 		const Engine::Agent & agent = **it;	
 		if(!agent.exists())

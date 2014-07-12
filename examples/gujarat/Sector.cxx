@@ -55,7 +55,7 @@ void	Sector::computeBiomassAmount( const Engine::DynamicRaster& r )
 	// TODO refactor
 	for ( unsigned i = 0; i < _cells.size(); i++ )
 	{
-		_biomassAmount += r.getValue( _cells[i]-_world.getOverlapBoundaries()._origin );
+		_biomassAmount += r.getValue( _cells[i]-_world.getBoundaries()._origin );
 	}
 /*	
 	double normAmount = (double)_biomassAmount;

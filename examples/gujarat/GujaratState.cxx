@@ -4,9 +4,6 @@
 #include <tinyxml.h>
 #include <Exception.hxx>
 #include <CaloricRequirementsTable.hxx>
-#include <GujaratDemographics.hxx>
-//#include <RamirezDemographics.hxx>
-//#include <AlexisDemographics.hxx>
 #include <OriginalDemographics.hxx>
 #include <AgentController.hxx>
 #include <Geometry.hxx>
@@ -21,9 +18,7 @@ namespace Gujarat
 {
 
 GujaratState * GujaratState::_instance = 0;
-//CaloricRequirementsTable * GujaratState::_hgCaloricRequirements = 0;
-//CaloricRequirementsTable * GujaratState::_apCaloricRequirements = 0;
-GujaratDemographics * GujaratState::_demographics = 0;
+OriginalDemographics * GujaratState::_demographics = 0;
 
 GujaratState & GujaratState::instance()
 {
@@ -36,17 +31,11 @@ GujaratState & GujaratState::instance()
 
 GujaratState::GujaratState()
 {
+	_demographics = new OriginalDemographics;
 }
 
 GujaratState::~GujaratState()
 {
-	/*
-	if( _apCaloricRequirements )
-	{
-		delete _apCaloricRequirements;
-		_apCaloricRequirements = 0;
-	}
-	*/
 	if(_demographics)
 	{
 		delete _demographics;
@@ -175,41 +164,7 @@ float GujaratState::availableForageTime( const std::string & type, int age )
 	throw Engine::Exception(oss.str());
 }
 	
-
-void GujaratState::setDemographics( const std::string & model )
-{
-	if(_demographics)
-	{
-		delete _demographics;
-	}
-	_demographics = new OriginalDemographics;
-
-	/*
-	if(model.compare("original")==0)
-	{
-		_demographics = new OriginalDemographics;
-		return;
-	}
-	else if(model.compare("ramirez")==0)
-	{
-		_demographics = new RamirezDemographics;
-		return;
-	}
-	else if(model.compare("alexis")==0)
-	{
-		_demographics = new AlexisDemographics;
-		return;
-	}
-	*/
-
-	/*
-	std::stringstream oss;
-	oss << "GujaratState::setDemographics() - unknown model: " << model;
-	throw Engine::Exception(oss.str());
-	*/
-}
-
-GujaratDemographics & GujaratState::demographics()
+OriginalDemographics & GujaratState::demographics()
 {
 	if(!_demographics)
 	{

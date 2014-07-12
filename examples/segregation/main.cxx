@@ -1,8 +1,8 @@
 
 #include "NeighborConfig.hxx"
 #include "Neighborhood.hxx"
-#include "Simulation.hxx"
-#include "Exception.hxx"
+#include <Simulation.hxx>
+#include <Exception.hxx>
 
 #include <iostream>
 #include <cstdlib>
@@ -24,10 +24,10 @@ int main(int argc, char *argv[])
 		Segregation::NeighborConfig config;
 		config.deserialize(fileName);
 
-		Engine::Simulation segregationSim(config.getSize(), config.getNumSteps());
-		Segregation::Neighborhood neighborhood( segregationSim, config);
+		Engine::Simulation segregationSim(config.getSize(), config.getNumSteps(), config.getSerializeResolution());
+		Segregation::Neighborhood neighborhood( config, segregationSim, neighborhood.useOpenMPSingleNode(config.getResultsFile()));
 	
-		neighborhood.init(argc, argv);
+		neighborhood.initialize(argc, argv);
 		neighborhood.run();
 	}
 	catch( std::exception & exceptionThrown )

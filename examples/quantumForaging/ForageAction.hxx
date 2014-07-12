@@ -8,7 +8,7 @@
 
 namespace Engine
 {
-	class Raster;
+	class DynamicRaster;
 }
 
 namespace QuantumExperiment

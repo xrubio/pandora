@@ -2,6 +2,7 @@
 #define __ScenarioConfig_hxx__
 
 #include <Config.hxx>
+#include <Size.hxx>
 #include <Point2D.hxx>
 #include <map>
 #include <list>
@@ -23,7 +24,7 @@ class ScenarioConfig : public Engine::Config
 	typedef std::map<std::string, std::string> SupportRastersMap;
 	typedef std::list<PanicEvent> PanicEventsList;
 
-	int _size;
+    Engine::Size<int> _size;
 	std::string _obstacleFile;
 
 	// agents
@@ -50,7 +51,7 @@ public:
 	ScenarioConfig();
 	virtual ~ScenarioConfig();
 	void extractParticularAttribs(TiXmlElement *pRoot);
-	int getSize() const;
+	const Engine::Size<int> & getSize() const;
 	
 	friend class Scenario;
 	friend class PanicAgent;

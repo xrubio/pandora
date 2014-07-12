@@ -1,5 +1,6 @@
 
 #include "Neighbor.hxx"
+#include <typedefs.hxx>
 
 namespace Segregation
 {
@@ -13,10 +14,10 @@ Neighbor::~Neighbor()
 
 void Neighbor::updateKnowledge()
 {
-	Engine::World::AgentsVector neighbors = getWorld()->getNeighbours( this, _neighborDistance );
+	Engine::AgentsVector neighbors = getWorld()->getNeighbours( this, _neighborDistance );
 	int numNeighbors = neighbors.size();
 	int friendlyNeighbors = 0;
-	for(Engine::World::AgentsVector::iterator it=neighbors.begin(); it!=neighbors.end(); it++)
+	for(Engine::AgentsVector::iterator it=neighbors.begin(); it!=neighbors.end(); it++)
 	{
 		if((*it)->isType(getType()))
 		{
@@ -39,7 +40,7 @@ void Neighbor::moveHome()
 	{
 		for(index._y=_position._y-_maxMovingDistance; index._y<=_position._y+_maxMovingDistance; index._y++)
 		{
-			if(!getWorld()->checkPosition(index) || !getWorld()->getOverlapBoundaries().isInside(index) || index.isEqual(_position))
+			if(!getWorld()->checkPosition(index) || !getWorld()->getBoundaries().contains(index) || index.isEqual(_position))
 			{
 				continue;
 			}
@@ -56,22 +57,13 @@ void Neighbor::moveHome()
 	}
 }
 
-void Neighbor::step()
+void Neighbor::updateState()
 {
 	updateKnowledge();
 	if(_needsToMove)
 	{
 		moveHome();
 	}
-}
-
-void * Neighbor::createPackage()
-{
-	return 0;
-}
-
-void Neighbor::serialize()
-{
 }
 
 void Neighbor::setFriendlyPercentage( const float & friendlyPercentage )

@@ -15,7 +15,8 @@ void ScenarioConfig::extractParticularAttribs(TiXmlElement * root)
 {
 	//environment
 	TiXmlElement * element = root->FirstChildElement("environment");
-	retrieveAttributeMandatory(element, "size", _size);
+	retrieveAttributeMandatory(element, "width", _size._width);
+	retrieveAttributeMandatory(element, "height", _size._height);
 
 	TiXmlElement * elementRasters = element->FirstChildElement("rasters");
 
@@ -70,7 +71,7 @@ void ScenarioConfig::extractParticularAttribs(TiXmlElement * root)
 	retrieveAttributeMandatory(element2, "knowledge", _knowledge);
 }
 
-int ScenarioConfig::getSize() const
+const Engine::Size<int> & ScenarioConfig::getSize() const
 {
 	return _size;
 }

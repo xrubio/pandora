@@ -9,7 +9,7 @@
 		<event x="332" y="328" initRadius="50" obstacleRadius="20" step="0"/>
 		<event x="533" y="159" initRadius="50" obstacleRadius="20" step="20"/>
 	</panicEvents>
-	<environment size="708">
+	<environment width="708" height="708">
 		<rasters>
 			<obstacles file="/home/xrubio/workspace/pandora/pandora/examples/panic/resources/catedral/buildings.tiff"/>
 			<support name="orto5" file="/home/xrubio/workspace/pandora/pandora/examples/panic/resources/catedral/orto5m.tiff"/>

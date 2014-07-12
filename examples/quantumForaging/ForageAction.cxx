@@ -34,7 +34,7 @@ BaseAction * ForageAction::copy() const
 
 void ForageAction::executeMDP( const Forager & forager, const ForagerState & state, ForagerState & stateNext ) const
 {
-	Engine::Point2D<int> localPos = _position - forager.getWorld()->getOverlapBoundaries()._origin;
+	Engine::Point2D<int> localPos = _position - forager.getWorld()->getBoundaries()._origin;
 
 	int previousValue = state.getResourcesMap().getValue(localPos);
 	int foragedResources = std::min(forager.getNeededResources(), previousValue);

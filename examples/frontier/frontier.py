@@ -1,13 +1,16 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
-import sys
+import os, sys
+from subprocess import call
+
+pandoraPath = os.getenv('PANDORAPATH', '/usr/local/pandora')
+sys.path.append(pandoraPath+'/bin')
+sys.path.append(pandoraPath+'/lib')
+
 import random
 import argparse
 import xml.etree.ElementTree
 import math
-
-sys.path.append('../../')
-sys.path.append('../../pyPandora/')
 
 from pyPandora import Simulation, Agent, World, Point2DInt, SizeInt
 

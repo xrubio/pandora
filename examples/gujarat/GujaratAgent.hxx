@@ -27,8 +27,6 @@ private:
 
 	virtual GujaratAgent * createNewAgent() = 0;
 
-	//virtual bool checkEmigration();
-
 protected:
 	int _availableTime; // MpiBasicAttribute
 	int _spentTime; // MpiBasicAttribute
@@ -43,15 +41,10 @@ protected:
 	int _homeMobilityRange; // MpiBasicAttribute
 
 	float _massToCaloriesRate; // MpiBasicAttribute
-	//float _surplusSpoilageFactor;
-	
-	//float   _foodNeedsForReproduction;
 
 	float _walkingSpeedHour; // MpiBasicAttribute
 	float _forageTimeCost; // MpiBasicAttribute
 	float _availableForageTime; // MpiBasicAttribute
-	//float _emigrationProbability; 
-	//float _reproductionProbability;
 
 	float _starved; // MpiBasicAttribute
 	
@@ -76,13 +69,9 @@ public:
 	int	getNrChildren() const;
 	int	getPopulationSize() const;
 
-	// MRJ: Kills 1 out of every 10 people in the agent (on average)
-	void	decimatePopulation();
 	// MRJ: Checks if agent member dies with chance%, with age in [min,max]
 	void	checkDeath( int minAge, int maxAge, float chance );
-	//void	checkDeathByAging( int minAge );
 	// if male or female died, reproduction is impossible	
-	//void	checkIndividualStarvationDeath(int index, int deficitRatioPer1000);
 	bool	canReproduce() const;
 	void	addNewIndividual( int age );
 	void	addNewChild();
@@ -93,27 +82,14 @@ public:
 	float computeMaxForagingDistance( bool fullPopulation = true ) const;
 	int	computeEffectiveBiomassForaged( int nominal ) const;
 	int	convertBiomassToCalories( int biomass ) const;
-//	bool	starvationLastTimeStep() const { return _starved; }
-
-	//void	setSurplusSpoilageFactor( float v ) { _surplusSpoilageFactor = v; }
-	//float	getSurplusSpoilageFactor() const { return _surplusSpoilageFactor; }
-
-	//void 	setFoodNeedsForReproduction( float v) { _foodNeedsForReproduction = v; }
 	
-	void	setWalkingSpeedHour( float v ) { _walkingSpeedHour = v; }
+    void	setWalkingSpeedHour( float v ) { _walkingSpeedHour = v; }
 	float	getWalkingSpeedHour() const { return _walkingSpeedHour; }
 
 	void	setForageTimeCost( float v ) { _forageTimeCost = v; }
 	float	getForageTimeCost() const { return _forageTimeCost; }
 
 	float getAvailableTime() const;
-//	void	setAvailableForageTime( float v ) { _availableForageTime = v; }
-//	float	getAvailableForageTime() const { return _availableForageTime; }
-
-	//void	setEmigrationProbability( float v ) { _emigrationProbability = v; }
-	//float	getEmigrationProbability() const { return _emigrationProbability; }
-	//void	setReproductionProbability( float v ) { _reproductionProbability = v; }
-	//float	getReproductionProbability() const { return _reproductionProbability; }
 
 	double	getTimeSpentForagingTile() const;
 

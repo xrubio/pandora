@@ -10,11 +10,12 @@
 #include <Agent.hxx>
 #include <GeneralState.hxx>
 #include <Logger.hxx>
+#include <typedefs.hxx>
 
 namespace Examples 
 {
 
-Academia::Academia( Engine::Simulation & simulation, const AcademiaConfig & config ) : World(simulation, config._citationRadius+1, false, config._resultsFile), _newPaperKey(0), _newAuthorKey(0), _config(config)
+Academia::Academia( const AcademiaConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler ) : World(simulation, scheduler, false), _config(config), _newPaperKey(0), _newAuthorKey(0)
 {
 }
 
@@ -30,7 +31,7 @@ void Academia::createAgents()
 {
 	for(int i=0; i<_config._numInitialPapers; i++)
 	{
-		if((i%_simulation.getNumTasks())==_simulation.getId())
+		if((i%getNumTasks())==getId())
 		{			
 			std::ostringstream oss;
 			oss << "Paper_" << _newPaperKey;
@@ -62,22 +63,22 @@ void Academia::generateNewPaper( Paper & paper )
 	std::ostringstream oss;
 	oss << "Paper_" << _newPaperKey;
 
-	Engine::World::AgentsVector potentialCitations = getNeighbours(&paper, _config._citationRadius, "Paper");
+	Engine::AgentsVector potentialCitations = getNeighbours(&paper, _config._citationRadius, "Paper");
 	
 	float influence = 0.0f;
 	Engine::Point2D<int> newPosition = paper.getPosition();
-	Engine::World::AgentsVector::iterator it = potentialCitations.begin();
+	Engine::AgentsVector::iterator it = potentialCitations.begin();
 	log_DEBUG( logName.str(), "generating new paper from original: " << paper);
 
-	Engine::World::AgentsVector citedPapers;
+	Engine::AgentsVector citedPapers;
 	while(it!=potentialCitations.end() && influence < 1.0f)
 	{
 		influence += Engine::GeneralState::statistics().getExponentialDistValue(0.0f, 1.0f);
-		Engine::Agent * agent = *it;
+		Engine::Agent * agent = it->get();
 		newPosition._x += (agent->getPosition()._x - paper.getPosition()._x)*((1.0f-influence)/2);
 		newPosition._y += (agent->getPosition()._y - paper.getPosition()._y)*((1.0f-influence)/2);
 		log_DEBUG( logName.str(), "\tnew kene to: " << newPosition << " influenced by paper: " << agent << " with influence : " << influence);
-		citedPapers.push_back(agent);
+		citedPapers.push_back(std::shared_ptr<Engine::Agent>(agent));
 		it++;
 	}
 
@@ -90,9 +91,9 @@ void Academia::generateNewPaper( Paper & paper )
 
 	for(int i=0; i<citedPapers.size(); i++)
 	{
-		Paper * citedPaper = (Paper*)citedPapers.at(i);
-		citedPaper->incrementNumCitations();
-		Author * author = citedPaper->getAuthor();
+		Paper & citedPaper = (Paper&)citedPapers.at(i);
+		citedPaper.incrementNumCitations();
+		Author * author = citedPaper.getAuthor();
 		author->incrementNumCitations();
 	}
 

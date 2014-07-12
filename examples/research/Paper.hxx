@@ -32,11 +32,18 @@ public:
 	void incrementNumCitations();
 	void setCitedPapers( int citedPapers );
 
-	// Mpi related
+	////////////////////////////////////////////////
+	// This code has been automatically generated //
+	/////// Please do not modify it ////////////////
+	////////////////////////////////////////////////
 	Paper( void * );
-	void * fillPackage(); 
+	void * fillPackage();
 	void sendVectorAttributes(int);
 	void receiveVectorAttributes(int);
+	////////////////////////////////////////////////
+	//////// End of generated code /////////////////
+	////////////////////////////////////////////////
+
 };
 
 } // namespace Examples

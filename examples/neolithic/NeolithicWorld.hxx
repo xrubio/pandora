@@ -21,7 +21,6 @@ class NeolithicConfig;
 class NeolithicWorld : public Engine::World
 {
 	void createRasters();
-	void createAgents();
 
 	const NeolithicConfig & _config;
 

@@ -2,6 +2,7 @@
 #define __AcademiaConfig_hxx__
 
 #include <Config.hxx>
+#include <Size.hxx>
 
 namespace Examples
 {
@@ -9,7 +10,7 @@ namespace Examples
 class AcademiaConfig : public Engine::Config
 {	
 	int _numInitialPapers;
-	int _size;
+    Engine::Size<int> _size;
 
 	float _probabilityNewAuthor;
 	float _probabilityNewPaper;
@@ -23,7 +24,7 @@ public:
 
 	void extractParticularAttribs(TiXmlElement *pRoot);
 
-	int getSize() const;
+	const Engine::Size<int> & getSize() const;
 
 	friend class Academia;
 };

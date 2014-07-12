@@ -14,7 +14,7 @@ class TiXmlElement;
 namespace Gujarat 
 {
 
-class GujaratDemographics;
+class OriginalDemographics;
 class AgentController;
 class HunterGathererMDPConfig;
 
@@ -31,7 +31,7 @@ private:
 
 	std::vector<AgentController*> _hgControllers;
 
-	static GujaratDemographics * _demographics;
+	static OriginalDemographics * _demographics;
 
 	SectorsMask _sectorsMask;
 
@@ -44,13 +44,11 @@ public:
 
 	static void setHGCaloricRequirements( int minAge, int adultAge, float minValue, float adultValue );
 	static void setHGAvailableForageTime( int minAge, int adultAge, float minValue, float adultValue );
-	//static void setAPCaloricRequirements( TiXmlElement * element );
-	static void setDemographics( const std::string & model );
 
 	static int caloricRequirements( const std::string & type, int age );
 	static float availableForageTime( const std::string & type, int age );
 	//static CaloricRequirementsTable & caloricRequirements( const std::string & type );
-	static GujaratDemographics & demographics();
+	static OriginalDemographics & demographics();
 
 	static void setHGController( const std::string & type, const HunterGathererMDPConfig & config );
 	static AgentController & controller();

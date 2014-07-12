@@ -20,13 +20,10 @@ class Neighborhood : public Engine::World
 	const NeighborConfig & _config;
 
 public:
-	Neighborhood( Engine::Simulation & simulation, const NeighborConfig & config );
+	Neighborhood( const NeighborConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0);
 	virtual ~Neighborhood();
 	
-	void createRasters();
 	void createAgents();
-
-	void stepEnvironment();
 
 }; // class Neighborhood
 

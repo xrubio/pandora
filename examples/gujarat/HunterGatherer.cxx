@@ -11,6 +11,7 @@
 #include <GujaratState.hxx>
 #include <GeneralState.hxx>
 #include <Logger.hxx>
+#include <typedefs.hxx>
 
 namespace Gujarat
 {
@@ -70,7 +71,7 @@ void HunterGatherer::updateKnowledge( const Engine::Point2D<int>& agentPos, cons
 			Engine::Point2D<int> p;
 			p._x = agentPos._x + x;
 			p._y = agentPos._y + y;
-			if ( !_world->getOverlapBoundaries().isInside(p) )
+			if ( !_world->getBoundaries().contains(p) )
 			{
 				continue;
 			}
@@ -132,7 +133,7 @@ void HunterGatherer::updateKnowledge()
 			p._x = _position._x + x;
 			p._y = _position._y + y;
 			// TODO overlapboundaries
-			if ( !_world->getBoundaries().isInside(p) )
+			if ( !_world->getBoundaries().contains(p) )
 			{
 				continue;
 			}
@@ -200,10 +201,10 @@ bool HunterGatherer::needsResources()
 
 bool HunterGatherer::cellValid( Engine::Point2D<int>& loc )
 {
-	if ( !_world->getOverlapBoundaries().isInside(loc) )
+	if ( !_world->getBoundaries().contains(loc) )
 		return false;
 	// Check that the home of another agent resides in loc
-	std::vector<Agent * > agents = _world->getAgent(loc);
+    Engine::AgentsVector agents = _world->getAgent(loc);
 	if(agents.size()==0)
 	{
 		return true;
@@ -211,8 +212,8 @@ bool HunterGatherer::cellValid( Engine::Point2D<int>& loc )
 
 	for(int i=0; i<agents.size(); i++)
 	{
-		Agent * agent = agents.at(i);
-		if(agent->exists() && agent!=this)
+        std::shared_ptr<Agent> agent = agents.at(i);
+		if(agent->exists() && agent.get()!=this)
 		{
 			return false;
 		}

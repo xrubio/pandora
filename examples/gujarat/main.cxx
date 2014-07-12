@@ -21,13 +21,12 @@ int main(int argc, char *argv[])
 			fileName = argv[1];
 		}
 		Gujarat::GujaratConfig config;
-		std::cout << "Loading config file: " << fileName << std::endl;
 		config.deserialize(fileName);
 
 		Engine::Simulation gujaratSim(config.getSize(), config.getNumSteps(), config.getSerializeResolution());
-		Gujarat::GujaratWorld world( gujaratSim , config);
+		Gujarat::GujaratWorld world( config, gujaratSim, world.useOpenMPSingleNode(config.getResultsFile()));
 	
-		world.init(argc, argv);
+		world.initialize(argc, argv);
 		world.run();
 	}
 	catch( std::exception & exceptionThrown )

@@ -15,9 +15,9 @@ int main(int argc, char *argv[]) {
 		config.deserialize(fileName);
 
 		Engine::Simulation myWorldSim(config.getSize(),config.getNumSteps(), config.getSerializeResolution());
-		QuantumExperiment::QuantumWorld world(myWorldSim, config);
+		QuantumExperiment::QuantumWorld world(config, myWorldSim, world.useOpenMPSingleNode(config.getResultsFile()));
 
-		world.init(argc, argv);
+		world.initialize(argc, argv);
 		world.run();
 	}
 	catch( std::exception & exceptionThrown ) {

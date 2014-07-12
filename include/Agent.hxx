@@ -109,8 +109,8 @@ public:
 	bool isType( const std::string & type ) const;
 	std::string getType() const;
 	
-	// defined in children, it must use serializeAttribute to save valuble data
-	virtual void serialize()=0;
+	// defined in children, it must use serializeAttribute to save valuable data
+	virtual void serialize(){};
 	
 	virtual void updateKnowledge(){};
 	virtual void selectActions(){};

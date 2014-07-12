@@ -148,19 +148,13 @@ void PanicAgent::selectActions()
 		{
 			desiredDegrees+= 360.0f;
 		}
-		//std::cout << "pos: " << _position << " to 0,0 rads: " << desiredRadians<< " degrees: " << desiredDegrees << std::endl;
-		//std::cout << "pos: " << _position << " basic dir: " << _direction << " fov: " << fov << " direction to test: " << direction << " dist to obstacle: " << distToObstacle << std::endl;
 
 		float diffRadiansCos = std::cos(desiredRadians)*std::cos(radians) + std::sin(desiredRadians)*std::sin(radians);
 		float diffRadians = std::acos(diffRadiansCos);
 		float diffDegrees = diffRadians*180.0f/M_PI;
 
 		float dirValue = rangeOfSight*rangeOfSight + distToObstacle*distToObstacle - 2*rangeOfSight*distToObstacle*std::cos(diffRadians);
-	//	float value = _config->_weightDir*dirValue + _config->_weightCompression*getCompressionLevel(newDirection);
 		float value = (1+getCompressionLevel(newDirection))*dirValue;
-//		std::cout << "dir: " <<newDirection << " dir: " <<  _config->_weightDir*dirValue << " compression: " << _config->_weightCompression*getCompressionLevel(newDirection) << std::endl;
-		//std::cout << "degreea: " << desiredDegrees << " degreeb: " << direction << " diff: " << diffDegrees << " rada: " << desiredRadians << " radb: " << radians << " diffRadians: " << diffRadians << " value: " << value << std::endl;
-
 
 		if(value<minValue)
 		{	
@@ -177,14 +171,12 @@ void PanicAgent::selectActions()
 		}
 	}
 
-	//std::cout << "final direction: " << finalDirection << " with value: " << minValue << std::endl;
 	_direction = finalDirection;
 
 	Engine::Point2D<float> newPos = getNextPos(_direction, Engine::Point2D<float>(_position._x+_rest._x, _position._y+_rest._y));
 	Engine::Point2D<int> newIntPos = Engine::Point2D<int>(std::floor(newPos._x), std::floor(newPos._y));
 	_rest._x = newPos._x - newIntPos._x;
 	_rest._y = newPos._y - newIntPos._y;
-//	std::cout << this << " rest: " << _rest << " new pos: " << newPos << " new int pos: " << newIntPos << " for step: " << " dir: " << _direction << " step: " <<  _world->getCurrentStep() << std::endl;
 
 	if(_world->checkPosition(newIntPos) && _world->getDynamicRaster(eObstacles).getValue(newIntPos)==0)
 	{
@@ -195,12 +187,6 @@ void PanicAgent::selectActions()
 		else
 		{
 			_consecutive++;
-			/*
-			if(_consecutive>1)
-			{
-				std::cout << "consecutive at pos: " << newIntPos << " - " << _consecutive << std::endl;
-			}
-			*/
 		}
 		_actions.push_back(new MoveAction(newIntPos, _config->_agentCompressionWeight, _config->_wallCompressionWeight, _config->_contagion));
 	}
@@ -236,14 +222,14 @@ void PanicAgent::updateState()
 
 void PanicAgent::registerAttributes()
 {
-//	registerIntAttribute("direction");
-//	registerIntAttribute("panicked");
+	registerIntAttribute("direction");
+	registerIntAttribute("panicked");
 }
 
 void PanicAgent::serialize()
 {
-//	serializeAttribute("direction", _direction);
-//	serializeAttribute("panicked", _panicked);
+	serializeAttribute("direction", _direction);
+	serializeAttribute("panicked", _panicked);
 }
 	
 void PanicAgent::setExit( const Engine::Point2D<int> & exit )

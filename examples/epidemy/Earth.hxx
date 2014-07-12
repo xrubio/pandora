@@ -26,7 +26,7 @@ class Earth : public Engine::World
 
 	int _indexZombies;
 public:
-	Earth( Engine::Simulation & simulation, const EarthConfig & config );
+	Earth( const EarthConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0);
 	virtual ~Earth();
 
 	float getZombieVirulence() const;

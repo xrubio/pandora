@@ -4,7 +4,6 @@
 #include <DynamicRaster.hxx>
 #include <Point2D.hxx>
 #include <HunterGatherer.hxx>
-//#include <AgroPastoralist.hxx>
 #include <Exception.hxx>
 #include <GujaratConfig.hxx>
 #include <OriginalDemographics.hxx>
@@ -20,9 +19,8 @@
 
 namespace Gujarat
 {
-
-GujaratWorld::GujaratWorld( Engine::Simulation & simulation, const GujaratConfig & config ) 
-	: World(simulation, config._homeRange+1, true, config._resultsFile), _agentKey(0), _climate(config,*this), _config(config)					
+    
+GujaratWorld::GujaratWorld( const GujaratConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler ) :  World(simulation, scheduler, false), _config(config), _agentKey(0), _climate(config,*this)
 {
 	// overlap is maxHomeRange + 1 to allow splits to be in adjacent worlds
 	// TODO code a function proces config for resources 
@@ -37,44 +35,10 @@ GujaratWorld::~GujaratWorld()
 {
 }    
 
-/*
-Engine::Point2D<int> GujaratWorld::findNearestWater( const Engine::Point2D<int> & point )
-{
-	Engine::Point2D<int> nearestWater(-1,-1);
-	float bestDist = std::numeric_limits<float>::max();
-	Engine::Point2D<int> index;
-	bool found = false;
-	int nextDist = 1;
-	while(!found)
-	{
-		for(index._x=point._x-nextDist; index._x<point._x+nextDist; index._x++)
-		{
-			for(index._y=point._y-nextDist; index._y<point._y+nextDist; index._y++)
-			{
-				if(_overlapBoundaries.isInside(index) && getValue("soils", index)==WATER)
-				{
-					found = true;
-					float dist = index.distance(point);
-					if(dist<bestDist)
-					{
-						bestDist = dist;
-						nearestWater = index;
-					}
-				}
-
-			}
-		}		
-		nextDist++;
-	}
-	//std::cout << "final dist: " << nextDist << std::endl;
-	return nearestWater;
-}
-*/
-
 void GujaratWorld::createRasters()
 {
 	std::stringstream logName;
-	logName << "simulation_" << _simulation.getId();
+	logName << "simulation_" << getId();
 	log_DEBUG(logName.str(), getWallTime() << " creating static rasters");
 	registerStaticRaster("soils", _config.isStorageRequired("soils"), eSoils);
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eSoils), _config._soilFile, getBoundaries());	
@@ -116,9 +80,6 @@ void GujaratWorld::createRasters()
 	getDynamicRaster(eForageActivity).setInitValues(0, std::numeric_limits<int>::max(), 0);
 	/*
 	registerDynamicRaster("homeActivity", eHomeActivity, _config.isStorageRequired("homeActivity"));
-	getDynamicRaster("homeActivity").setInitValues(0, std::numeric_limits<int>::max(), 0);
-	registerDynamicRaster("farmingActivity", eFarmingActivity, _config.isStorageRequired("farmingActivity"));
-	getDynamicRaster("farmingActivity").setInitValues(0, std::numeric_limits<int>::max(), 0);
 	*/
 
 	/*
@@ -138,11 +99,11 @@ void GujaratWorld::createRasters()
 void GujaratWorld::createAgents()
 {
 	std::stringstream logName;
-	logName << "simulation_" << _simulation.getId();
+	logName << "simulation_" << getId();
 	log_DEBUG(logName.str(), getWallTime() << " creating agents");
 	for(int i=0; i<_config._numHG; i++)
 	{ 
-		if((i%_simulation.getNumTasks())==_simulation.getId())
+		if((i%getNumTasks())==getId())
 		{			
 			log_DEBUG(logName.str(), getWallTime() << " new HG with index: " << i);
 			std::ostringstream oss;
@@ -171,28 +132,6 @@ void GujaratWorld::createAgents()
 			log_DEBUG(logName.str(), getWallTime() << " new HG: " << agent);
 		}
 	}
-
-	/*
-	for(int i=0; i<_config._numAP; i++)
-	{ 
-		if((i%_simulation.getNumTasks())==_simulation.getId())
-		{
-			std::ostringstream oss;
- 			oss << "AgroPastoralist_" << i;
-			AgroPastoralist * agent = new AgroPastoralist(oss.str());
-			addAgent(agent); 
-			_config._apInitializer->initialize(agent);
-			agent->setSocialRange( _config._socialRange );
-			//agent->setSurplusSpoilageFactor( _config._surplusSpoilage );
-			agent->setHomeMobilityRange( _config._socialRange );
-			agent->setMaxCropHomeDistance( _config._maxCropHomeDistance );
-			agent->setMassToCaloriesRate( _config._massToEnergyRate * _config._energyToCalRate );
-
-			agent->initializePosition();
-			std::cout << _simulation.getId() << " new AgroPastoralist: " << agent << std::endl;
-		}
-	}
-	*/
 }
 
 void GujaratWorld::updateRainfall()
@@ -205,52 +144,46 @@ void GujaratWorld::updateSoilCondition()
 	Engine::Point2D<int> index;
 	if(_climate.getSeason()==HOTWET)
 	{
-		for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
-		{
-			for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)
-			{
-				setValue(eResources, index, getValue(eMoisture, index));
-				if(getValue(eResourceType, index)==WILD)
-				{
-					continue;
-				}
-				
-				if(getValue(eResourceType, index)==SEASONALFALLOW)
-				{
-					setValue(eResourceType, index, DOMESTICATED);
-				}
-				int consecutiveYears = getValue(eConsecutiveYears, index);
-				consecutiveYears++;				
-				if(consecutiveYears<3)
-				{
-					setValue(eConsecutiveYears, index, consecutiveYears);
-				}
-				else
-				{
-					setValue(eConsecutiveYears, index, 0);
-					if(getValue(eResourceType, index)==FALLOW)
-					{
-						setValue(eResourceType, index, WILD);
+	    for(auto index:getBoundaries())
+        {
+            setValue(eResources, index, getValue(eMoisture, index));
+            if(getValue(eResourceType, index)==WILD)
+            {
+                continue;
+            }
+            
+            if(getValue(eResourceType, index)==SEASONALFALLOW)
+            {
+                setValue(eResourceType, index, DOMESTICATED);
+            }
+            int consecutiveYears = getValue(eConsecutiveYears, index);
+            consecutiveYears++;				
+            if(consecutiveYears<3)
+            {
+                setValue(eConsecutiveYears, index, consecutiveYears);
+            }
+            else
+            {
+                setValue(eConsecutiveYears, index, 0);
+                if(getValue(eResourceType, index)==FALLOW)
+                {
+                    setValue(eResourceType, index, WILD);
 
-					}
-					else
-					{
-						setValue(eResourceType, index, FALLOW);
-					}
-				}
-			}
+                }
+                else
+                {
+                    setValue(eResourceType, index, FALLOW);
+                }
+            }
 		}
 	}
 	else if(_climate.getSeason()==HOTDRY)
 	{
-		for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
+	    for(auto index:getBoundaries())
 		{
-			for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)
+			if(getValue(eResourceType, index)==DOMESTICATED)
 			{
-				if(getValue(eResourceType, index)==DOMESTICATED)
-				{
-					setValue(eResourceType, index, SEASONALFALLOW);
-				}
+				setValue(eResourceType, index, SEASONALFALLOW);
 			}
 		}
 	}
@@ -259,37 +192,33 @@ void GujaratWorld::updateSoilCondition()
 void GujaratWorld::updateResources()
 {
 	std::stringstream logName;
-	logName << "updateResources_" << _simulation.getId();
+	logName << "updateResources_" << getId();
 	log_DEBUG(logName.str(), getWallTime() << " initiating");
 
-	Engine::Point2D<int> index;
-	for( index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++ )		
+	for(auto index:getBoundaries())
 	{
-		for( index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++ )
-		{
-			//log_DEBUG(logName.str(), getWallTime() << " index: " << index << " with boundaries: " << _boundaries);
-			// 3. Increment or Decrement cell biomass depending on yearly biomass
-			//    figures and current timestep
-			int currentValue = getValue(eResources, index);
-			float currentFraction = (float)getValue(eResourcesFraction, index)/100.0f;
-			Soils cellSoil = (Soils)getValue(eSoils, index);
-			//log_DEBUG(logName.str(), getWallTime() << " index: " << index << " current: " << currentValue << " fraction: " << currentFraction << " cell soil: " << cellSoil);
-			if(cellSoil!=WATER)
-			{
-				Seasons season = _climate.getSeason();
-				bool wetSeason = false;
-				if(season==HOTWET)
-				{
-					wetSeason = true;
-				}			
-				float newValue = std::max(0.0f, currentValue+currentFraction+getBiomassVariation(wetSeason, cellSoil, index));
-				currentValue = newValue;
-				float fraction = 100.0f*(newValue  - currentValue);
-				//log_DEBUG(logName.str(), getWallTime() << " newValue: " << currentValue << " fraction: " << fraction);
-				setValue(eResources, index, currentValue);
-				setValue(eResourcesFraction, index, (int)fraction);
-			}
-		}
+        //log_DEBUG(logName.str(), getWallTime() << " index: " << index << " with boundaries: " << _boundaries);
+        // 3. Increment or Decrement cell biomass depending on yearly biomass
+        //    figures and current timestep
+        int currentValue = getValue(eResources, index);
+        float currentFraction = (float)getValue(eResourcesFraction, index)/100.0f;
+        Soils cellSoil = (Soils)getValue(eSoils, index);
+        //log_DEBUG(logName.str(), getWallTime() << " index: " << index << " current: " << currentValue << " fraction: " << currentFraction << " cell soil: " << cellSoil);
+        if(cellSoil!=WATER)
+        {
+            Seasons season = _climate.getSeason();
+            bool wetSeason = false;
+            if(season==HOTWET)
+            {
+                wetSeason = true;
+            }			
+            float newValue = std::max(0.0f, currentValue+currentFraction+getBiomassVariation(wetSeason, cellSoil, index));
+            currentValue = newValue;
+            float fraction = 100.0f*(newValue  - currentValue);
+            //log_DEBUG(logName.str(), getWallTime() << " newValue: " << currentValue << " fraction: " << fraction);
+            setValue(eResources, index, currentValue);
+            setValue(eResourcesFraction, index, (int)fraction);
+        }
 	}
 	log_DEBUG(logName.str(), getWallTime() << " end of updateResources");
 }
@@ -297,18 +226,14 @@ void GujaratWorld::updateResources()
 void GujaratWorld::recomputeYearlyBiomass()
 {
 	// update all the map resources to the minimum of the year (in case it was diminished by agents)
-	Engine::Point2D<int> index;
-	for( index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++ )                
+	for(auto index:getBoundaries())
 	{
-		for( index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++ )
-		{
-			setValue(eResourcesFraction, index, 0);
-			setValue(eResources, index, _remainingBiomass[getValue(eSoils, index)]);
-		}
+		setValue(eResourcesFraction, index, 0);
+		setValue(eResources, index, _remainingBiomass[getValue(eSoils, index)]);
 	}
 
 	std::stringstream logName;
-	logName << "World_" << _simulation.getId();
+	logName << "World_" << getId();
 	// 1. Compute factor between actual rain and average rain		
 	float raininessFactor = _climate.getRain() / _climate.getMeanAnnualRain();
 	
@@ -358,7 +283,7 @@ void GujaratWorld::stepEnvironment()
 	_climate.advanceSeason();
 
 	std::stringstream logName;
-	logName << "World_" << _simulation.getId();
+	logName << "World_" << getId();
 
 	// if this is the first step of a wet season, rainfall and biomass are calculated for the entire year
 	if ( _climate.rainSeasonStarted() )

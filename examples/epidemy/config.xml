@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<config>  
+	<!-- Global simulation parameters -->
+	<output resultsFile="./data/epìdemy.h5" logsDir="./logs"/>
+	<numSteps value="10" serializeResolution="1"/>
+	<size width="260" height="260"/>
+    <!-- raster with dem, population values and scale of simulation real individuals to sim ratio -->
+    <inputData dem="resources/dem_1km.tiff" population="resources/population.tiff" scale="1"/>
+    <!-- location and number of first outbreak -->
+    <firstCase num="1" x="10" y="10"/>
+</config>
+

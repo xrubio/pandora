@@ -25,7 +25,7 @@ class Academia : public Engine::World
 
 	const AcademiaConfig & _config;
 public:
-	Academia( Engine::Simulation & simulation, const AcademiaConfig & config );
+	Academia( const AcademiaConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0);
 	virtual ~Academia();
 
 	void generateNewPaper( Paper & paper );

@@ -81,8 +81,6 @@ void GujaratConfig::extractParticularAttribs(TiXmlElement * root)
 	retrieveAttributeMandatory( element, "walkingSpeedHour", _walkingSpeedHour );
 	retrieveAttributeMandatory( element, "forageTimeCost", _forageTimeCost );
 //	retrieveAttributeMandatory( element, "availableForageTime", _availableForageTime );
-	retrieveAttributeMandatory( element, "demographicsModel", _demographicsModel );
-	GujaratState::setDemographics(_demographicsModel);
 
 	retrieveAttributeMandatory( element, "controllerType", _hunterGathererController );
 	parseHGMDPConfig( element->FirstChildElement("controllerConfig") );
@@ -236,14 +234,12 @@ void GujaratConfig::parseHGMDPConfig( TiXmlElement* element )
  
 void GujaratConfig::parseSoilInfo( TiXmlElement * element )
 {    
-	// TODO use STL
-    //*? use SWITCH
-	_soilFile = element->Attribute("fileName"); // path
-	_size._x = atoi(element->Attribute("size"));
-	_size._y = atoi(element->Attribute("size"));
+	_soilFile = element->Attribute("fileName");
+	_size._width = atoi(element->Attribute("size"));
+	_size._height = atoi(element->Attribute("size"));
 }
 
-const Engine::Point2D<int> & GujaratConfig::getSize() const
+const Engine::Size<int> & GujaratConfig::getSize() const
 {
 	return _size;
 }

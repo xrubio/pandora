@@ -9,7 +9,7 @@
 		<event x="332" y="328" initRadius="50" obstacleRadius="20" step="0"/>
 		<event x="533" y="159" initRadius="50" obstacleRadius="20" step="20"/>
 	</panicEvents>
-	<environment size="534">
+	<environment width="534" height="534">
 		<rasters>
 			<obstacles file="resources/catalunya/dem_cat.tiff"/>
 			<support name="dem" file="resources/catalunya/dem_cat.tiff"/>

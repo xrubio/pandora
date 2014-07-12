@@ -22,17 +22,13 @@ enum Rasters
 
 class QuantumWorld: public Engine::World
 {
-	QuantumWorldConfig _config;
+	const QuantumWorldConfig & _config;
 
 	void createAgents();
 	void createRasters();
 
-	// environment
-//	void recomputeYearlyBiomass();
-//	void updateResources();
-
 public:
-	QuantumWorld( Engine::Simulation &simulation, QuantumWorldConfig &config );
+	QuantumWorld( const QuantumWorldConfig &config, Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0);
 	virtual ~QuantumWorld();
 	void stepEnvironment();
 };
