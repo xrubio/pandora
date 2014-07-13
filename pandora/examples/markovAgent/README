@@ -1,7 +1,0 @@
-This example shows how to implement a Markov Decision-Making Process using library libmdp develpoed at Universitat Pompeu Fabra.
-The set of agents look for the best movements to maximise the quantity of collected resources. Every time step an agent:
-
-- Evaluates the best movement based on MDP. It can stay at the cell where it is, or move to any of the 8 adjacent neighbors.
-- Execute the movement and collects 3 resources (if did not move) or 1 resource (if it moved)
-- Consumes 2 resources 
-

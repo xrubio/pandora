@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<config>  
+	<!-- Global simulation parameters -->
+	<output resultsFile="./data/anazasi.h5" logsDir="./logs"/>
+    <numSteps value="500" serializeResolution="1"/>
+	<size width="80" height="120"/>
+	<data landCover="resources/Map.txt" apdsi='resources/adjustedPDSI.txt' settlements='resources/settlements.txt' water='resources/water.txt' hydro='resources/environment.txt'/>
+	<environment harvestVariance="0.4" harvestAdjustment="0.61" mobilityDist="16"/>
+	<households initialNumber="50" typicalSize="5" nutritionNeedPerPerson="160" maizeToGift="0.33">	
+		<initialAge min="0" max="29"/>
+		<deathAge min="38" max="38"/>
+		
+		<fertility min="0.155" max="0.155"/>
+		<fertilityAge min="16" max="16"/>
+		<fertilityEndsAge min="34" max="34"/>
+
+		<initialCorn min="2000" max="2400"/>
+	</households>
+</config>
+

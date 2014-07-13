@@ -1,0 +1,52 @@
+# this is a standard scons that can be copied and used to create analysis for your models
+
+############# TEMPLATE FOR ANALYSIS ##################
+######################################################
+################ CUSTOM INFORMATION  #################
+##### please fill with information about your model ##
+######################################################
+
+# program binary name
+nameProgram = 'analysis'
+
+# list of src files
+srcFiles = Split('main.cxx')
+
+###################################################
+########## END OF CUSTOM INFORMATION  #############
+##### don't modify anything below these lines #####
+###################################################
+
+import os, sys
+from subprocess import call
+
+pandoraPath = os.getenv('PANDORAPATH', '/usr/local/pandora')
+sys.path.append(pandoraPath+'/bin')
+
+srcFiles += [pandoraPath+'/utils/MpiStubCode.cxx']
+
+vars = Variables('custom.py')
+vars.Add(BoolVariable('debug', 'compile with debug flags', 'no'))
+vars.Add(BoolVariable('edebug', 'compile with extreme debug logs', 'no'))
+
+env = Environment(variables=vars, ENV=os.environ, CXX='mpicxx')
+Help(vars.GenerateHelpText(env))
+
+env.Append(LINKFLAGS = '-fopenmp')
+env.Append(LIBS = 'tinyxml pthread'.split())
+env.Append(CCFLAGS = '-std=c++0x -DTIXML_USE_STL'.split())
+
+if env['debug'] == True:
+    env.Append(CCFLAGS = '-g -O0 -Wall -DPANDORADEBUG'.split())
+    if env['edebug']==True:
+        env.Append(CCFLAGS = '-DPANDORAEDEBUG')
+    env.Append(LIBS = 'pandorad')
+else:
+    env.Append(CCFLAGS = '-Ofast'.split())
+    env.Append(LIBS = 'pandora')
+
+env.Append(CPPPATH = ['.', pandoraPath+'/include'])
+env.Append(LIBPATH = [pandoraPath+'/lib'])
+
+env.Program(nameProgram, srcFiles)
+

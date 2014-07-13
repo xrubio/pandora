@@ -1,0 +1,3 @@
+Check if shapefiles can be read to create new agents
+A shapefile is read (resources/test.shp) and 4 agents are created based on the coordinates defined in the origin file.
+

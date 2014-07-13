@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<config>  
+	<output resultsFile="./data/segregation.h5" logsDir="./logs"/>
+	<numSteps value="1" serializeResolution="1"/>
+	<size width="10" height="10"/>
+	<!-- friendlyPercentage of neighbor cells with friends required to not move -->
+	<!-- density of occupied cells -->
+	<!-- percentage of agents that are dime (the other will be pennies) -->
+	<!-- distance at which neighbors are evaluated -->
+	<!-- distance at which an agent can move when neighbor friendly conditions are not met -->
+	<populationParams friendlyPercentage="0.6" density="0.7" dimePercentage="0.4" neighborDistance="1.5" maxMovingDistance="10"/>
+</config>
+

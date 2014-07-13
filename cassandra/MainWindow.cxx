@@ -125,31 +125,31 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 
 
 	// file menu 
-	_newProjectAction = new QAction(QIcon(":/resources/icons/project_new.png"), tr("&New Project"), this);
+	_newProjectAction = new QAction(QIcon(":share/cassandra/icons/project_new.png"), tr("&New Project"), this);
 	_newProjectAction->setShortcut(tr("Ctrl+N"));
 	_newProjectAction->setStatusTip(tr("Create new project"));
 	connect(_newProjectAction, SIGNAL(triggered()), this, SLOT(newProject()));
 
-	_loadProjectAction = new QAction(QIcon(":/resources/icons/project_open.png"), tr("&Load Project..."), this);
+	_loadProjectAction = new QAction(QIcon(":share/cassandra/icons/project_open.png"), tr("&Load Project..."), this);
 	_loadProjectAction->setShortcut(tr("Ctrl+L"));
 	_loadProjectAction->setStatusTip(tr("Load project"));
 	connect(_loadProjectAction, SIGNAL(triggered()), this, SLOT(loadProject()));
 
-	_saveProjectAction = new QAction(QIcon(":/resources/icons/project_save.png"), tr("&Save Project..."), this);
+	_saveProjectAction = new QAction(QIcon(":share/cassandra/icons/project_save.png"), tr("&Save Project..."), this);
 	_saveProjectAction->setShortcut(tr("Ctrl+S"));
 	_saveProjectAction->setStatusTip(tr("Save project"));
 	connect(_saveProjectAction, SIGNAL(triggered()), this, SLOT(saveProject()));
 
-	_saveProjectAsAction = new QAction(QIcon(":/resources/icons/project_save_as.png"), tr("&Save Project as..."), this);
+	_saveProjectAsAction = new QAction(QIcon(":share/cassandra/icons/project_save_as.png"), tr("&Save Project as..."), this);
 	_saveProjectAsAction->setShortcut(tr("Ctrl+Alt+S"));
 	_saveProjectAsAction->setStatusTip(tr("Save project as"));
 	connect(_saveProjectAsAction, SIGNAL(triggered()), this, SLOT(saveProjectAs()));
 	
-	_selectSimulationAction= new QAction(QIcon(":/resources/icons/simulation_select.png"), tr("&Select Simulation..."), this);
+	_selectSimulationAction= new QAction(QIcon(":share/cassandra/icons/simulation_select.png"), tr("&Select Simulation..."), this);
 	_selectSimulationAction->setStatusTip(tr("Select simulation to load"));
 	connect(_selectSimulationAction, SIGNAL(triggered()), this, SLOT(selectSimulation()));
 
-	_settingsAction = new QAction(QIcon(":/resources/icons/settings.png"), tr("&Settings"), this);
+	_settingsAction = new QAction(QIcon(":share/cassandra/icons/settings.png"), tr("&Settings"), this);
 	_settingsAction->setStatusTip(tr("General Settings"));
 	connect(_settingsAction, SIGNAL(triggered()), this, SLOT(showSettings()));
 
@@ -159,81 +159,81 @@ MainWindow::MainWindow() : _display2D(0), _display3D(0), _agentTypeSelection(0),
 	connect(_quitAction, SIGNAL(triggered()), this, SLOT(quit()));
 
 	// simulation menu
-	_firstStepAction = new QAction(QIcon(":/resources/icons/restart.png"), tr("&Restart"), this);
+	_firstStepAction = new QAction(QIcon(":share/cassandra/icons/restart.png"), tr("&Restart"), this);
 	_firstStepAction->setShortcut(tr("Ctrl+R"));
 	_firstStepAction->setStatusTip(tr("Restart simulation"));
 	connect(_firstStepAction, SIGNAL(triggered()), this, SLOT(firstStep()));
 
-	_previousStepAction = new QAction(QIcon(":/resources/icons/previous.png"), tr("&Previous"), this);
+	_previousStepAction = new QAction(QIcon(":share/cassandra/icons/previous.png"), tr("&Previous"), this);
 	_previousStepAction->setShortcut(tr("Ctrl+P"));
 	_previousStepAction->setStatusTip(tr("Previous Step"));
 	connect(_previousStepAction, SIGNAL(triggered()), this, SLOT(previousStep()));
 
-	_nextStepAction = new QAction(QIcon(":/resources/icons/next.png"), tr("&Next"), this);
+	_nextStepAction = new QAction(QIcon(":share/cassandra/icons/next.png"), tr("&Next"), this);
 	_nextStepAction->setShortcut(tr("Ctrl+N"));
 	_nextStepAction->setStatusTip(tr("Next Step"));
 	connect(_nextStepAction, SIGNAL(triggered()), this, SLOT(nextStep()));	
 	
-	_finalStepAction = new QAction(QIcon(":/resources/icons/final.png"), tr("&Final"), this);
+	_finalStepAction = new QAction(QIcon(":share/cassandra/icons/final.png"), tr("&Final"), this);
 	_finalStepAction->setShortcut(tr("Ctrl+F"));
 	_finalStepAction->setStatusTip(tr("Final Step"));
 	connect(_finalStepAction, SIGNAL(triggered()), this, SLOT(finalStep()));
 	
-	_playAction = new QAction(QIcon(":/resources/icons/play.png"), tr("&Play"), this);
+	_playAction = new QAction(QIcon(":share/cassandra/icons/play.png"), tr("&Play"), this);
 	_playAction->setShortcut(tr("Ctrl+Space"));
 	_playAction->setStatusTip(tr("Play/Pause"));
 	connect(_playAction, SIGNAL(triggered()), this, SLOT(play()));
 
 	// View Menu
 	
-	_zoomInAction = new QAction(QIcon(":/resources/icons/zoomIn.png"), tr("&Zoom In"), this);
+	_zoomInAction = new QAction(QIcon(":share/cassandra/icons/zoomIn.png"), tr("&Zoom In"), this);
 	_zoomInAction->setShortcut(tr("Ctrl++"));
 	_zoomInAction->setStatusTip(tr("Zoom In"));
 	connect(_zoomInAction, SIGNAL(triggered()), _display2D, SLOT(zoomIn()));
 	
-	_zoomOutAction = new QAction(QIcon(":/resources/icons/zoomOut.png"), tr("&Zoom Out"), this);
+	_zoomOutAction = new QAction(QIcon(":share/cassandra/icons/zoomOut.png"), tr("&Zoom Out"), this);
 	_zoomOutAction->setShortcut(tr("Ctrl+-"));
 	_zoomOutAction->setStatusTip(tr("Zoom Out"));
 	connect(_zoomOutAction, SIGNAL(triggered()), _display2D, SLOT(zoomOut()));
 	
-	_showAgentsAction = new QAction(QIcon(":/resources/icons/agents.png"), tr("&Show Agents"), this);
+	_showAgentsAction = new QAction(QIcon(":share/cassandra/icons/agents.png"), tr("&Show Agents"), this);
 	_showAgentsAction->setShortcut(tr("Ctrl+A"));
 	_showAgentsAction->setStatusTip(tr("Show Agents"));
 	connect(_showAgentsAction, SIGNAL(triggered()), _display2D, SLOT(showAgents()));
 	
-    _show3DAction = new QAction(QIcon(":/resources/icons/3dview.png"), tr("&Raster 3D"), this);
+    _show3DAction = new QAction(QIcon(":share/cassandra/icons/3dview.png"), tr("&Raster 3D"), this);
 	_show3DAction->setShortcut(tr("Ctrl+3"));
 	_show3DAction->setStatusTip(tr("Show 3D raster"));
 	connect(_show3DAction, SIGNAL(triggered()), this, SLOT(show3DWindow()));
 
-	_showLabAction = new QAction(QIcon(":/resources/icons/lab.png"), tr("&Laboratory"), this);
+	_showLabAction = new QAction(QIcon(":share/cassandra/icons/lab.png"), tr("&Laboratory"), this);
 	_showLabAction->setStatusTip(tr("Open Laboratory"));
 	connect(_showLabAction, SIGNAL(triggered()), this, SLOT(showLaboratory()));
 
-	_agentAnalysisAction = new QAction(QIcon(":/resources/icons/agentAnalysis.png"), tr("&Agent Analysis"), this);
+	_agentAnalysisAction = new QAction(QIcon(":share/cassandra/icons/agentAnalysis.png"), tr("&Agent Analysis"), this);
 	_agentAnalysisAction->setStatusTip(tr("Analyse agent stats"));
 	connect(_agentAnalysisAction, SIGNAL(triggered()), this, SLOT(showAgentAnalysis()));
 
-	_rasterAnalysisAction = new QAction(QIcon(":/resources/icons/rasterAnalysis.png"), tr("&Raster Analysis"), this);
+	_rasterAnalysisAction = new QAction(QIcon(":share/cassandra/icons/rasterAnalysis.png"), tr("&Raster Analysis"), this);
 	_rasterAnalysisAction->setStatusTip(tr("Analyse raster stats"));
 	connect(_rasterAnalysisAction, SIGNAL(triggered()), this, SLOT(showRasterAnalysis()));
 
-    _screenshotAction = new QAction(QIcon(":/resources/icons/screenshot.png"), tr("Take &Screenshot"), this);
+    _screenshotAction = new QAction(QIcon(":share/cassandra/icons/screenshot.png"), tr("Take &Screenshot"), this);
 	_screenshotAction->setStatusTip(tr("Take a screenshot of the model"));
 	connect(_screenshotAction, SIGNAL(triggered()), this, SLOT(takeScreenshot()));
 
-    _videoAction = new QAction(QIcon(":/resources/icons/video.png"), tr("Take &Video"), this);
+    _videoAction = new QAction(QIcon(":share/cassandra/icons/video.png"), tr("Take &Video"), this);
 	_videoAction->setStatusTip(tr("Take a video of the model"));
 	connect(_videoAction, SIGNAL(triggered()), this, SLOT(takeVideo()));
 
-    _mosaicAction = new QAction(QIcon(":/resources/icons/mosaic.png"), tr("Take &Mosaic"), this);
+    _mosaicAction = new QAction(QIcon(":share/cassandra/icons/mosaic.png"), tr("Take &Mosaic"), this);
 	_mosaicAction->setStatusTip(tr("Take a mosaic of different runs of the model"));
 	connect(_mosaicAction, SIGNAL(triggered()), this, SLOT(takeMosaic()));
 
-    _heatMapAction = new QAction(QIcon(":/resources/icons/heatmap.png"), tr("Create heat map"), this);
+    _heatMapAction = new QAction(QIcon(":share/cassandra/icons/heatmap.png"), tr("Create heat map"), this);
 	_heatMapAction->setStatusTip(tr("Create a heat map with multi run data"));
 	connect(_heatMapAction, SIGNAL(triggered()), this, SLOT(heatMap()));
-    _timeSeriesAction = new QAction(QIcon(":/resources/icons/ts.png"), tr("Create time series"), this);
+    _timeSeriesAction = new QAction(QIcon(":share/cassandra/icons/ts.png"), tr("Create time series"), this);
 	_timeSeriesAction->setStatusTip(tr("Explore time series with multi run data"));
 	connect(_timeSeriesAction, SIGNAL(triggered()), this, SLOT(timeSeries()));
 

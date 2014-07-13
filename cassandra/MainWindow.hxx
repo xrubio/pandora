@@ -131,7 +131,8 @@ public:
 	MainWindow();
     virtual ~MainWindow();
 
-
+public slots:
+	void selectSimulation( const std::string & fileName, int resolution );
 private slots:
 
 	void newProject();
@@ -139,7 +140,6 @@ private slots:
 	void saveProject();
 	void saveProjectAs();
 	void selectSimulation();
-	void selectSimulation( const std::string & fileName, int resolution );
 	void quit();
 
 	void firstStep();

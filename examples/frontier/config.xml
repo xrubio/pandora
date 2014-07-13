@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<config>  
+	<!-- Global simulation parameters -->
+	<output resultsFile="./data/frontier.h5" logsDir="./logs"/>
+	<numSteps value="100" serializeResolution="1"/>
+	<size width="20" height="20"/>
+	<asabiya increase="0.5" decay="0.1" min="0.0003"/>
+	<conflict distanceSensibility="2" attackThreshold="0.9"/>
+</config>
+

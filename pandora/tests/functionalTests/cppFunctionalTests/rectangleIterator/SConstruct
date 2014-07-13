@@ -1,5 +1,0 @@
-
-env = Environment()
-includeDir = Split('./ ../../../../')
-env['CCFLAGS'] = Split('-std=c++0x')
-env.Program('rectangleIterator', 'main.cxx', CPPPATH=includeDir) 

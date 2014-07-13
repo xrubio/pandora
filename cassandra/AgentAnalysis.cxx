@@ -464,15 +464,15 @@ void AgentAnalysis::addGlobalAnalysis( AnalysisControlThread* thread )
 			switch(type)
 			{
 				case TraitAnalysisSelection::eMean:
-					global->addAnalysis(new PostProcess::AgentMean(trait));
+					global->addAnalysis(std::shared_ptr<PostProcess::AgentAnalysis>(new PostProcess::AgentMean(trait)));
 					break;
 				
 				case TraitAnalysisSelection::eSum:
-					global->addAnalysis(new PostProcess::AgentSum(trait));
+					global->addAnalysis(std::shared_ptr<PostProcess::AgentAnalysis>(new PostProcess::AgentSum(trait)));
 					break;
 			
 				case TraitAnalysisSelection::eStandardDeviation:
-					global->addAnalysis(new PostProcess::AgentStdDev(trait));
+					global->addAnalysis(std::shared_ptr<PostProcess::AgentAnalysis>(new PostProcess::AgentStdDev(trait)));
 					break;
 
 				default:

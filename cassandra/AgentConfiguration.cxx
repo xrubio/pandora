@@ -26,13 +26,16 @@
 #include <Exception.hxx>
 #include <Loader3DS.hxx>
 #include <Model3D.hxx>
+#include <cstdlib>
 
 namespace GUI
 {
 
 AgentConfiguration::AgentConfiguration() : _color(rand()%256,rand()%256,rand()%256), _icon(0), _useIcon(false), _fileName2D(""), _size(1.0f), _size3D(1.0f, 1.0f, 1.0f), _fileName3D(""), _model(0)
 {
-	setFileName3D("resources/3dmodels/cube.3ds");
+    std::stringstream oss;
+    oss <<getenv("PANDORAPATH") << "/share/cassandra/3dmodels/cube.3ds";
+	setFileName3D( oss.str() );
 }
 
 AgentConfiguration::AgentConfiguration( const AgentConfiguration & prototype ) : _color(prototype.getColor()), _icon(0), _useIcon(prototype.useIcon()), _fileName2D(prototype.getFileName2D()), _size(prototype.getSize()), _size3D(prototype.getSize3D()), _fileName3D(prototype.getFileName3D()), _model(0)

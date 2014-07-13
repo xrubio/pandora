@@ -1,0 +1,73 @@
+# this is a standard scons that can be copied and used to compile your models
+
+############# TEMPLATE FOR MODELS  ###################
+######################################################
+######################################################
+################ CUSTOM INFORMATION  #################
+##### please fill with information about your model ##
+######################################################
+
+# program binary name
+nameProgram = 'helloWorld'
+
+# user-defined agents (inherit from Engine::Agent)
+agents = ['HelloAgent']
+# user-defined world (inherit from Engine::World)
+world = 'HelloWorld'
+# please indicate the namespace of the custom agents classes
+namespaceAgents = ['']
+
+# list of src files
+srcFiles = Split('main.cxx HelloWorld.cxx HelloAgent.cxx')
+
+###################################################
+########## END OF CUSTOM INFORMATION  #############
+##### don't modify anything below these lines #####
+###################################################
+
+import os, sys
+from subprocess import call
+
+pandoraPath = os.getenv('PANDORAPATH', '/usr/local/pandora')
+sys.path.append(pandoraPath+'/bin')
+
+import generateMpi 
+
+vars = Variables('custom.py')
+vars.Add(BoolVariable('debug', 'compile with debug flags', 'no'))
+vars.Add(BoolVariable('edebug', 'compile with extreme debug logs', 'no'))
+
+env = Environment(variables=vars, ENV=os.environ, CXX='mpicxx')
+Help(vars.GenerateHelpText(env))
+
+generateMPICodeBuilder = Builder(action=generateMpi.execute)
+env.Append( BUILDERS = {'GenerateMPICode' : generateMPICodeBuilder})
+
+env.Append(LINKFLAGS = '-fopenmp')
+env.Append(LIBS = 'tinyxml pthread mpl'.split())
+env.Append(CCFLAGS = '-std=c++0x -DTIXML_USE_STL'.split())
+if env['debug'] == True:
+    env.Append(CCFLAGS = '-g -O0 -Wall -DPANDORADEBUG'.split())
+    if env['edebug']==True:
+        env.Append(CCFLAGS = '-DPANDORAEDEBUG')
+    env.Append(LIBS = 'pandorad')
+else:
+    env.Append(CCFLAGS = '-Ofast'.split())
+    env.Append(LIBS = 'pandora')
+
+env.Append(CPPPATH = ['.', pandoraPath+'/include'])
+env.Append(LIBPATH = [pandoraPath+'/lib'])
+
+# add the list of mpi code that must be generated & compiled
+mpiAgentsSrc = ['mpiCode/FactoryCode.cxx']
+agentsSrc = ['main.cxx']
+for agent in agents:    
+    if agent != '':
+        agentsSrc.append(agent+".cxx")
+        mpiAgentsSrc.append("mpiCode/"+agent+"_mpi.cxx")
+
+env['namespaces'] = namespaceAgents
+env.GenerateMPICode( target=mpiAgentsSrc, source=agentsSrc)
+env.Depends(world+'.hxx',mpiAgentsSrc)
+env.Program(nameProgram, srcFiles+mpiAgentsSrc)
+

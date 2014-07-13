@@ -1,46 +1,46 @@
 <!DOCTYPE RCC><RCC version="1.0">
 	<qresource>
-		<file>resources/icons/project_open.png</file>
-		<file>resources/icons/project_save.png</file>
-		<file>resources/icons/project_save_as.png</file>
-		<file>resources/icons/project_new.png</file>
-		<file>resources/icons/settings.png</file>
+		<file>../share/cassandra/icons/project_open.png</file>
+		<file>../share/cassandra/icons/project_save.png</file>
+		<file>../share/cassandra/icons/project_save_as.png</file>
+		<file>../share/cassandra/icons/project_new.png</file>
+		<file>../share/cassandra/icons/settings.png</file>
 
-		<file>resources/icons/simulation_select.png</file>
+		<file>../share/cassandra/icons/simulation_select.png</file>
 
-		<file>resources/icons/final.png</file>
-		<file>resources/icons/next.png</file>
-		<file>resources/icons/openFile.png</file>
-		<file>resources/icons/previous.png</file>
-		<file>resources/icons/restart.png</file>
-		<file>resources/icons/zoomIn.png</file>
-		<file>resources/icons/zoomOut.png</file>
-		<file>resources/icons/play.png</file>
-		<file>resources/icons/agents.png</file>
-		<file>resources/icons/3dview.png</file>
-		<file>resources/icons/lab.png</file>
+		<file>../share/cassandra/icons/final.png</file>
+		<file>../share/cassandra/icons/next.png</file>
+		<file>../share/cassandra/icons/openFile.png</file>
+		<file>../share/cassandra/icons/previous.png</file>
+		<file>../share/cassandra/icons/restart.png</file>
+		<file>../share/cassandra/icons/zoomIn.png</file>
+		<file>../share/cassandra/icons/zoomOut.png</file>
+		<file>../share/cassandra/icons/play.png</file>
+		<file>../share/cassandra/icons/agents.png</file>
+		<file>../share/cassandra/icons/3dview.png</file>
+		<file>../share/cassandra/icons/lab.png</file>
 
-		<file>resources/icons/agentAnalysis.png</file>
-		<file>resources/icons/rasterAnalysis.png</file>
+		<file>../share/cassandra/icons/agentAnalysis.png</file>
+		<file>../share/cassandra/icons/rasterAnalysis.png</file>
 		
-        <file>resources/icons/screenshot.png</file>
-        <file>resources/icons/video.png</file>
-        <file>resources/icons/mosaic.png</file>
+        <file>../share/cassandra/icons/screenshot.png</file>
+        <file>../share/cassandra/icons/video.png</file>
+        <file>../share/cassandra/icons/mosaic.png</file>
 
-        <file>resources/icons/heatmap.png</file>
-        <file>resources/icons/ts.png</file>
-        <file>resources/icons/text.png</file>
+        <file>../share/cassandra/icons/heatmap.png</file>
+        <file>../share/cassandra/icons/ts.png</file>
+        <file>../share/cassandra/icons/text.png</file>
 
-		<file>resources/agentIcons/default_agent_1.png</file>
-		<file>resources/agentIcons/default_agent_2.png</file>
-		<file>resources/agentIcons/default_agent_3.png</file>
-		<file>resources/agentIcons/default_agent_4.png</file>
-		<file>resources/agentIcons/default_agent_5.png</file>
-		<file>resources/agentIcons/default_agent_6.png</file>
-		<file>resources/agentIcons/default_agent_7.png</file>
-		<file>resources/agentIcons/default_agent_8.png</file>
-		<file>resources/agentIcons/default_agent_9.png</file>
-		<file>resources/agentIcons/default_agent_10.png</file>
+		<file>../share/cassandra/agentIcons/default_agent_1.png</file>
+		<file>../share/cassandra/agentIcons/default_agent_2.png</file>
+		<file>../share/cassandra/agentIcons/default_agent_3.png</file>
+		<file>../share/cassandra/agentIcons/default_agent_4.png</file>
+		<file>../share/cassandra/agentIcons/default_agent_5.png</file>
+		<file>../share/cassandra/agentIcons/default_agent_6.png</file>
+		<file>../share/cassandra/agentIcons/default_agent_7.png</file>
+		<file>../share/cassandra/agentIcons/default_agent_8.png</file>
+		<file>../share/cassandra/agentIcons/default_agent_9.png</file>
+		<file>../share/cassandra/agentIcons/default_agent_10.png</file>
 	</qresource>
 </RCC>
 

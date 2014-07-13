@@ -464,11 +464,11 @@ void RasterAnalysis::addGlobalAnalysis( AnalysisControlThread* thread )
 			switch(type)
 			{
 				case RasterAnalysisSelection::eMean:
-					global->addAnalysis(new PostProcess::RasterMean());
+					global->addAnalysis(std::shared_ptr<PostProcess::RasterAnalysis>(new PostProcess::RasterMean()));
 					break;
 				
 				case RasterAnalysisSelection::eSum:
-					global->addAnalysis(new PostProcess::RasterSum());
+					global->addAnalysis(std::shared_ptr<PostProcess::RasterAnalysis>(new PostProcess::RasterSum()));
 					break;
 		
 					/*

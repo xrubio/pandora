@@ -1,0 +1,12 @@
+
+import os
+
+env = Environment()
+    
+pandoraPath = os.getenv('PANDORAPATH', '/usr/local/pandora')
+
+env.Append(CPPPATH = ['.', pandoraPath+'/include'])
+env.Append(LIBPATH = [pandoraPath+'/lib'])
+env.Append(CCFLAGS = '-std=c++0x -DTIXML_USE_STL'.split())
+env.Program('rectangleIterator', 'main.cxx') 
+
