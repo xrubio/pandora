@@ -42,14 +42,6 @@ GlobalAgentStats::~GlobalAgentStats()
 		return;
 	}
 
-	AgentAnalysisList::iterator it =_analysisList.begin();
-	while(it!=_analysisList.end())
-	{
-		Analysis * analysis = *it;
-		it = _analysisList.erase(it);
-		delete analysis;
-	}
-
 	if(_params)
 	{
 		delete _params;
@@ -94,8 +86,7 @@ void GlobalAgentStats::apply( const Engine::SimulationRecord & simRecord, const 
 				const Engine::SimulationRecord::AgentRecordsMap & agentRecords = it->second;
 				for(Engine::SimulationRecord::AgentRecordsMap::const_iterator itA=agentRecords.begin(); itA!=agentRecords.end(); itA++)
 				{
-					AgentAnalysis * analysis = (*itL);
-					analysis->computeAgent(*(itA->second));
+					(*itL)->computeAgent(*(itA->second));
 				}
 			}
 		}
@@ -105,8 +96,7 @@ void GlobalAgentStats::apply( const Engine::SimulationRecord & simRecord, const 
 			{
 				for(Engine::SimulationRecord::AgentRecordsMap::const_iterator it=simRecord.beginAgents(type); it!=simRecord.endAgents(type); it++)
 				{
-					AgentAnalysis * analysis = (AgentAnalysis*)(*itL);
-					analysis->computeAgent(*(it->second));
+					(*itL)->computeAgent(*(it->second));
 				}
 			}
 		}
@@ -155,7 +145,7 @@ void GlobalAgentStats::apply( const Engine::SimulationRecord & simRecord, const 
 		// time series for one attribute
 		if(_analysisList.size()==1)
 		{
-			AgentAnalysis * analysis = *(_analysisList.begin());
+            std::shared_ptr<AgentAnalysis> analysis = *(_analysisList.begin());
 			for(int i=0; i<=simRecord.getNumSteps(); i=i+simRecord.getFinalResolution())
 			{
 				line << _separator << std::setprecision(2) << std::fixed << analysis->getResult(i/simRecord.getFinalResolution());
@@ -215,7 +205,7 @@ void GlobalAgentStats::writeParams( std::stringstream & line, const std::string 
 }
 
 
-void GlobalAgentStats::addAnalysis( AgentAnalysis * analysis )
+void GlobalAgentStats::addAnalysis( std::shared_ptr<AgentAnalysis> analysis )
 {
 	_analysisList.push_back(analysis);
 }

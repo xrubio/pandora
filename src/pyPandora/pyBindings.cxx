@@ -236,12 +236,12 @@ public:
 
 void passAgentAnalysisOwnership( PostProcess::GlobalAgentStats & results, std::shared_ptr<PostProcess::AgentAnalysis> analysisPtr )
 {
-	results.addAnalysis(analysisPtr.get());
+	results.addAnalysis(analysisPtr);
 }
 
 void passRasterAnalysisOwnership( PostProcess::GlobalRasterStats & results, std::shared_ptr<PostProcess::RasterAnalysis> analysisPtr )
 {
-	results.addAnalysis(analysisPtr.get());
+	results.addAnalysis(analysisPtr);
 }
 
 std::string printPoint( const Point2DInt & point )
@@ -449,12 +449,12 @@ BOOST_PYTHON_MODULE(libpyPandora)
 	;
 
 	boost::python::class_< PostProcess::GlobalAgentStats>("GlobalAgentsStatsStub", boost::python::init< const std::string & > ())
-		.def("addAnalysis", &passAgentAnalysisOwnership)
+		.def("addAnalysis", &passAgentAnalysisOwnership,boost::python::with_custodian_and_ward<1,2>())
 		.def("applyTo", &PostProcess::GlobalAgentStats::apply)
 	;
 	
 	boost::python::class_< PostProcess::GlobalRasterStats>("GlobalRasterStatsStub", boost::python::init< const std::string & > ())
-		.def("addAnalysis", &passRasterAnalysisOwnership)
+		.def("addAnalysis", &passRasterAnalysisOwnership,boost::python::with_custodian_and_ward<1,2>())
 		.def("applyTo", &PostProcess::GlobalRasterStats::apply)
 	;
 

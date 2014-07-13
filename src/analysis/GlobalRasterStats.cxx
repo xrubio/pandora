@@ -42,14 +42,6 @@ GlobalRasterStats::~GlobalRasterStats()
 		return;
 	}
 
-	RasterAnalysisList::iterator it =_analysisList.begin();
-	while(it!=_analysisList.end())
-	{
-		Analysis * analysis = *it;
-		it = _analysisList.erase(it);
-		delete analysis;
-	}
-
 	if(_params)
 	{
 		delete _params;
@@ -92,15 +84,13 @@ void GlobalRasterStats::apply( const Engine::SimulationRecord & simRecord, const
 			for(Engine::SimulationRecord::RasterMap::const_iterator it=simRecord.beginRasters(); it!=simRecord.endRasters(); it++)
 			{
 				const Engine::SimulationRecord::RasterHistory & rasterHistory = it->second;
-				RasterAnalysis * analysis = (*itL);
-				analysis->computeRaster(rasterHistory);
+				(*itL)->computeRaster(rasterHistory);
 			}
 		}
 		else
 		{
 			const Engine::SimulationRecord::RasterHistory & rasterHistory = simRecord.getRasterHistory(type);
-			RasterAnalysis * analysis = (*itL);
-			analysis->computeRaster(rasterHistory);
+			(*itL)->computeRaster(rasterHistory);
 		}
 		std::cout << "done" << std::endl;
 		std::cout << "Postprocessing analysis: " << (*itL)->getName() << "...";
@@ -148,7 +138,7 @@ void GlobalRasterStats::apply( const Engine::SimulationRecord & simRecord, const
 		// time series for one attribute
 		if(_analysisList.size()==1)
 		{
-			RasterAnalysis * analysis = *(_analysisList.begin());
+            std::shared_ptr<RasterAnalysis > analysis = *(_analysisList.begin());
 			for(int i=0; i<simRecord.getNumSteps()/simRecord.getFinalResolution(); i++)
 			{
 				line << _separator << std::setprecision(2) << std::fixed << analysis->getResult(i);
@@ -208,7 +198,7 @@ void GlobalRasterStats::writeParams( std::stringstream & line, const std::string
 }
 
 
-void GlobalRasterStats::addAnalysis( RasterAnalysis * analysis )
+void GlobalRasterStats::addAnalysis( std::shared_ptr<RasterAnalysis> analysis )
 {
 	_analysisList.push_back(analysis);
 }

@@ -23,6 +23,7 @@
 #define __GlobalAgentStats_hxx__
 
 #include <analysis/Output.hxx>
+#include <memory>
 
 namespace PostProcess
 {
@@ -33,7 +34,7 @@ class GlobalAgentStats : public Output
 public:
 	typedef std::list< std::list<std::string> > Params;
 protected:
-	typedef std::list<AgentAnalysis *> AgentAnalysisList;
+	typedef std::list<std::shared_ptr<AgentAnalysis> > AgentAnalysisList;
 	AgentAnalysisList _analysisList;
 
 	// if true analysis will be deleted in destructor
@@ -50,7 +51,7 @@ public:
 
 	void setAnalysisOwnership( bool analysisOwnership );
 	void apply( const Engine::SimulationRecord & simRecord, const std::string & outputFile, const std::string & type );
-	void addAnalysis( AgentAnalysis * analysis );
+	void addAnalysis( std::shared_ptr<AgentAnalysis> analysis );
 
 	std::string getName() const;
 	// set params for performing group analysis. If a single analysis is applied a time series file will be generated following resolution and numSteps.

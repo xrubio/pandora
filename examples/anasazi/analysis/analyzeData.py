@@ -9,16 +9,14 @@ sys.path.append(pandoraPath+'/lib')
 from pyPandora import Simulation, Agent, World, Point2DInt, SimulationRecord, GlobalAgentStats, AgentNum, AgentMean, AgentSum, AgentStdDev, GlobalRasterStats, RasterMean, RasterSum
 
 def main():
-    record = SimulationRecord(1, False)
+    record = SimulationRecord(100, False)
     record.loadHDF5('../data/anazasi.h5', True, True)
 
     agentResults = GlobalAgentStats(';')
     agentResults.addAnalysis(AgentNum())
     agentResults.addAnalysis(AgentMean('estimates'))
-    agentResults.addAnalysis(AgentStdDev('strength x100'))
-    agentResults.addAnalysis(AgentSum('strength x100'))
     agentResults.applyTo(record,'households.csv', 'Household')
-
+    
     rasterResults = GlobalRasterStats(';')
     rasterResults.addAnalysis(RasterMean())
     rasterResults.addAnalysis(RasterSum())
