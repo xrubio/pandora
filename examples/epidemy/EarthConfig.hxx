@@ -15,9 +15,11 @@ class EarthConfig : public Engine::Config
 	std::string _populationName;
 
 	// number of real individuals to 1 in simulation
-	int _scale;
+	int _scale;    
 	Engine::Point2D<int> _firstCase;
 	int _numCases;
+
+    float _virulence;
 public:
 	EarthConfig();
 	virtual ~EarthConfig();

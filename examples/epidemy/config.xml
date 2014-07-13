@@ -5,8 +5,8 @@
 	<numSteps value="10" serializeResolution="1"/>
 	<size width="260" height="260"/>
     <!-- raster with dem, population values and scale of simulation real individuals to sim ratio -->
-    <inputData dem="resources/dem_1km.tiff" population="resources/population.tiff" scale="1"/>
+    <inputData dem="resources/dem_1km.tiff" population="resources/population.tiff" scale="1000"/>
     <!-- location and number of first outbreak -->
-    <firstCase num="1" x="10" y="10"/>
+    <outbreak initInfected="500" x="10" y="10" virulence="1000"/>
 </config>
 

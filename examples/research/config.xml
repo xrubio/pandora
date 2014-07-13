@@ -2,7 +2,7 @@
 <config>
 	<!-- Global simulation parameters -->
 	<output resultsFile="./data/research.h5" logsDir="./logs"/>
-	<numSteps value="50" serializeResolution="1"/>
+	<numSteps value="100" serializeResolution="1"/>
 	<numInitialPapers value="10"/>
 	<size value="100"/>
 	<probabilityNewAuthor value="0.1"/>

@@ -91,9 +91,9 @@ void Academia::generateNewPaper( Paper & paper )
 
 	for(int i=0; i<citedPapers.size(); i++)
 	{
-		Paper & citedPaper = (Paper&)citedPapers.at(i);
-		citedPaper.incrementNumCitations();
-		Author * author = citedPaper.getAuthor();
+		Paper * citedPaper = (Paper*)(citedPapers.at(i).get());
+		citedPaper->incrementNumCitations();
+		Author * author = citedPaper->getAuthor();
 		author->incrementNumCitations();
 	}
 

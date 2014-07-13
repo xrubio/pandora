@@ -87,7 +87,7 @@ void Earth::createAgents()
 
 float Earth::getZombieVirulence() const
 {
-	return 1.0f;
+	return _config._virulence;
 }
 
 void Earth::addZombie( const Engine::Point2D<int> & position )

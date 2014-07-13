@@ -45,16 +45,16 @@ IncrementalRaster::~IncrementalRaster()
 {
 }
 
-void IncrementalRaster::resize( const Point2D<int>& size )
+void IncrementalRaster::resize( const Size<int>& size )
 {
 }
 
-void IncrementalRaster::setValue( Point2D<int> pos, int value )
+void IncrementalRaster::setValue( const Point2D<int> & pos, int value )
 {
 	_changes[pos] = value;
 }
 
-const int & IncrementalRaster::getValue( Point2D<int> pos ) const
+const int & IncrementalRaster::getValue( const Point2D<int> & pos ) const
 {
 	ChangeTable::const_iterator it = _changes.find( pos );
 	if ( it == _changes.end() )
@@ -96,7 +96,7 @@ Size<int> IncrementalRaster::getSize() const
 	return _baseRaster->getSize();
 }
 	
-int IncrementalRaster::getMaxValueAt( Point2D<int> position ) const
+int IncrementalRaster::getMaxValueAt( const Point2D<int> & position ) const
 {
 	return _baseRaster->getMaxValueAt(position);
 }

@@ -31,10 +31,20 @@ int main(int argc, char *argv[])
 	srand(time(0));
 	try
 	{
+        if(argc>2)
+		{
+			throw Engine::Exception("USAGE: cassandra [simulation file.h5]");
+		}		
+
 		QApplication::setGraphicsSystem("raster");
 		QApplication app(argc, argv);
 		GUI::MainWindow mainWindow;
 		mainWindow.show();
+		if(argc!=1)
+        {
+            std::string simulation = argv[1];
+            mainWindow.selectSimulation(simulation,1);
+        }
 		return app.exec();
 	}
 	catch( Engine::Exception & exceptionThrown )

@@ -13,6 +13,8 @@ class Neighbor : public Engine::Agent
 	bool _needsToMove; // MpiBasicAttribute	
 	float _neighborDistance; // MpiBasicAttribute	
 	float _maxMovingDistance; // MpiBasicAttribute	
+    int _friends; // MpiBasicAttribute
+    int _neighbors; // MpiBasicAttribute
 
 	void updateKnowledge();
 	void moveHome();
@@ -26,6 +28,9 @@ public:
 	void setFriendlyPercentage( const float & friendlyPercentage );
 	void setNeighborDistance( const float & neighborDistance );
 	void setMaxMovingDistance( const float & maxMovingDistance );
+
+    void registerAttributes();
+    void serialize();
 
 	////////////////////////////////////////////////
 	// This code has been automatically generated //

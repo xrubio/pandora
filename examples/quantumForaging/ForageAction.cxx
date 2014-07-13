@@ -16,7 +16,7 @@ ForageAction::ForageAction( const Engine::Point2D<int> & position, float fractio
 }
 
 ForageAction::ForageAction( const Engine::Point2D<int> & position, const Engine::DynamicRaster & resourcesMap, int neededResources) : BaseAction(position)
-{	
+{
 	int previousValue = resourcesMap.getValue(position);
 	int foragedResources = std::min(neededResources, previousValue);
 	_fractionForaged = (float)foragedResources/(float)neededResources; 

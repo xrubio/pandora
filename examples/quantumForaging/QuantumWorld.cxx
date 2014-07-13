@@ -46,7 +46,24 @@ void QuantumWorld::createRasters()
 		// value ranging from 0 to 100
 		int value = Engine::GeneralState::statistics().getUniformDistValue(0,100);
 		getDynamicRaster(eResources).setMaxValue(index, value);
-	}
+	}	
+    
+    for(int i=0; i<_config._numAgents; i++)
+	{
+		std::ostringstream oss;
+		oss << "Forager_"<<i;
+    
+        std::ostringstream ossKnowledge;
+        ossKnowledge<< oss.str() << "_knowledge";
+	    std::ostringstream ossResources;
+    	ossResources << oss.str() << "_resources";
+
+    	registerDynamicRaster(ossKnowledge.str(), false);
+    	registerDynamicRaster(ossResources.str(), false);
+	    getDynamicRaster(ossKnowledge.str()).setInitValues(0, 10, 0);
+	    getDynamicRaster(ossResources.str()).setInitValues(0, std::numeric_limits<int>::max(), 0);
+    }
+
 	updateRasterToMaxValues(eResources);	
 }
 

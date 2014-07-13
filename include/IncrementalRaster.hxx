@@ -40,11 +40,11 @@ public:
 
 	virtual ~IncrementalRaster();
 
-	virtual void		resize(  const Point2D<int> & size );
+	virtual void		resize(  const Size<int> & size );
 
-	void 		setValue( Point2D<int> pos, int value );
-	const int& 	getValue( Point2D<int> pos ) const;
-	int getMaxValueAt( Point2D<int> position ) const;
+	void 		setValue( const Point2D<int> & pos, int value );
+	const int& 	getValue( const Point2D<int> & pos ) const;
+	int getMaxValueAt( const Point2D<int> & position ) const;
 
 	int			getCurrentMinValue() const { return _currentMinValue; }
 	int			getCurrentMaxValue() const { return _currentMaxValue; }

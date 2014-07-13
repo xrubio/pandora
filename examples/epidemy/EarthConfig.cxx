@@ -23,10 +23,11 @@ void EarthConfig::extractParticularAttribs(TiXmlElement * root)
 	retrieveAttributeMandatory( element, "population", _populationName);
 	retrieveAttributeMandatory( element, "scale", _scale);
 	
-	element = root->FirstChildElement("firstCase");
-	retrieveAttributeMandatory(element, "num", _numCases);
+	element = root->FirstChildElement("outbreak");
+	retrieveAttributeMandatory(element, "initInfected", _numCases);
 	retrieveAttributeMandatory(element, "x", _firstCase._x);
 	retrieveAttributeMandatory(element, "y", _firstCase._y);
+	retrieveAttributeMandatory(element, "virulence", _virulence);
 }
 	
 const Engine::Size<int> & EarthConfig::getSize() const

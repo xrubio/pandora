@@ -60,11 +60,6 @@ void Forager::createKnowledge()
 	std::ostringstream oss2;
 	oss2 << _id << "_resources";
 	_resourcesMap = oss2.str();
-
-	_world->registerDynamicRaster(_knowledgeMap, true);
-	_world->registerDynamicRaster(_resourcesMap, true);
-	_world->getDynamicRaster(_knowledgeMap).setInitValues(0, 10, 0);
-	_world->getDynamicRaster(_resourcesMap).setInitValues(0, std::numeric_limits<int>::max(), 0);
 }
 
 void Forager::updateKnowledge()

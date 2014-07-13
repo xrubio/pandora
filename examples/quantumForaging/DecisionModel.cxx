@@ -126,9 +126,7 @@ void DecisionModel::makeActionsForState( ForagerState & state ) const
 				continue;
 			}
 
-			//std::cout << "from position: " << state.getPosition() << " creating new at: " << newPosition << std::endl;
 			MoveAction * newAction = new MoveAction(newPosition);
-			//std::cout << "creating new action: " << newAction << std::endl;
 			state.addAction(newAction);
 		}
 	}

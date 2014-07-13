@@ -1,10 +1,14 @@
 
 #include "Neighbor.hxx"
 #include <typedefs.hxx>
+#include <iostream>
+#include <Logger.hxx>
+#include <GeneralState.hxx>
+#include <sstream>
 
 namespace Segregation
 {
-Neighbor::Neighbor( const std::string & id ) : Agent(id), _friendlyPercentage(0.5f), _needsToMove(false), _neighborDistance(1.0f), _maxMovingDistance(1.0f)
+Neighbor::Neighbor( const std::string & id ) : Agent(id), _friendlyPercentage(0.5f), _needsToMove(false), _neighborDistance(1.0f), _maxMovingDistance(1.0f), _friends(0), _neighbors(0)
 {
 }
 
@@ -15,16 +19,23 @@ Neighbor::~Neighbor()
 void Neighbor::updateKnowledge()
 {
 	Engine::AgentsVector neighbors = getWorld()->getNeighbours( this, _neighborDistance );
-	int numNeighbors = neighbors.size();
-	int friendlyNeighbors = 0;
+    std::cout << this << " neighbors: " << neighbors.size() << std::endl;
+	_neighbors = neighbors.size();
+    _friends= 0;
+    
+    std::stringstream logName;
+	logName << "friends";
+
+	log_INFO( logName.str(), "neighbors: " << _neighbors<< " friendly: " << _friends);
 	for(Engine::AgentsVector::iterator it=neighbors.begin(); it!=neighbors.end(); it++)
 	{
+	    log_INFO( logName.str(), "type" << getType() << " type other: " << (*it)->getType() << " is type: " << (*it)->isType(getType()));
 		if((*it)->isType(getType()))
 		{
-			friendlyNeighbors++;
+			_friends++;
 		}
 	}
-	if(numNeighbors==0 || (float)friendlyNeighbors/(float)numNeighbors<=_friendlyPercentage)
+	if(_neighbors==0 || (float)_friends/(float)_neighbors<=_friendlyPercentage)
 	{
 		_needsToMove = false;
 		return;
@@ -59,12 +70,26 @@ void Neighbor::moveHome()
 
 void Neighbor::updateState()
 {
-	updateKnowledge();
 	if(_needsToMove)
 	{
 		moveHome();
 	}
 }
+
+void Neighbor::registerAttributes()
+{
+	registerIntAttribute("needs to move");
+	registerIntAttribute("friends");
+	registerIntAttribute("neighbors");
+}
+
+void Neighbor::serialize()
+{
+	serializeAttribute("needs to move", (int)_needsToMove);
+	serializeAttribute("friends", _friends);
+	serializeAttribute("neighbors", _neighbors);
+}
+
 
 void Neighbor::setFriendlyPercentage( const float & friendlyPercentage )
 {
