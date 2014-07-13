@@ -98,6 +98,7 @@ installedHeaders = env.Install(installHeadersDir, coreHeaders)
 installedAnalysisHeaders = env.Install(installAnalysisHeadersDir, analysisHeaders)
 
 installBin = env.Install(env['installDir'], Glob('./bin'))
+installShare = env.Install(env['installDir'], Glob('./share'))
 installMpiStub = env.Install(env['installDir']+'/utils', Glob('./utils/*.cxx'))
 
 # cassandra
@@ -109,5 +110,5 @@ if platform.system()=='Darwin':
 Default(sharedLib)
 Default(sharedPyLib)
 env.Alias('cassandra', cassandraCompilation)
-env.Alias('install', [cassandraCompilation, sharedLib, sharedPyLib, installedLib, installedPyLib, installedHeaders, installedAnalysisHeaders, installBin, installMpiStub])
+env.Alias('install', [cassandraCompilation, sharedLib, sharedPyLib, installedLib, installedPyLib, installedHeaders, installedAnalysisHeaders, installBin, installShare, installMpiStub])
 
