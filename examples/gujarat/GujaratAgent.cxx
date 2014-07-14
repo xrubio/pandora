@@ -168,7 +168,8 @@ GujaratAgent * GujaratAgent::getMarriageCandidate()
 		return 0;
 	}
 	std::random_shuffle(possible.begin(), possible.end());
-	return (GujaratAgent*)(&(possible.at(0)));
+    Engine::Agent * agent = possible.at(0).get();
+    return (GujaratAgent*)(agent);
 }
 
 void GujaratAgent::checkMarriage()
