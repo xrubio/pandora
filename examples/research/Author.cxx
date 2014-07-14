@@ -1,5 +1,7 @@
 
 #include "Author.hxx"
+#include "Paper.hxx"
+#include <iostream>
 
 namespace Examples
 {
@@ -14,10 +16,25 @@ Author::~Author()
 
 void Author::updateState()
 {
-	if(_researchLife<_researchLifeMaximum)
+    // too old to publish ;-)
+	if(_researchLife>_researchLifeMaximum)
 	{
-		_researchLife++;
-	}
+        return;
+    }
+
+    // position of the authors set to the weighted mean of her papers
+    Engine::Point2D<int> position(0,0);
+    for( auto pos : _paperPositions)
+    {
+        position += pos; 
+    }
+    position._x /= _paperPositions.size();
+    position._y /= _paperPositions.size();
+    if(getWorld()->checkPosition(position))
+    {
+        setPosition(position);
+    }
+    _researchLife++;
 }
 
 void Author::registerAttributes()
@@ -41,8 +58,9 @@ bool Author::isActive() const
 	return false;
 }
 
-void Author::incrementNumPapers()
+void Author::incrementNumPapers( const Engine::Point2D<int> & paperPosition)
 {
+    _paperPositions.push_back(paperPosition);
 	_numPapers++;
 }
 

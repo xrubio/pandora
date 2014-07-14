@@ -15,8 +15,8 @@ class AcademiaConfig : public Engine::Config
 	float _probabilityNewAuthor;
 	float _probabilityNewPaper;
 
-	int _originalityThreshold;
-	int _citationRadius;
+	float _originalityThreshold;
+	float _citationRadius;
 	int _researcherLife;
 public:
 	AcademiaConfig();

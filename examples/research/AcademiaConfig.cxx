@@ -14,24 +14,17 @@ AcademiaConfig::~AcademiaConfig()
 
 void AcademiaConfig::extractParticularAttribs(TiXmlElement * root)
 {
-	TiXmlElement * element = root->FirstChildElement("numInitialPapers");
-	retrieveAttributeMandatory( element, "value", _numInitialPapers);
-	element = root->FirstChildElement("size");
-	retrieveAttributeMandatory( element, "value", _size._width);
-	retrieveAttributeMandatory( element, "value", _size._height);
+    TiXmlElement * element = root->FirstChildElement("size");
+	retrieveAttributeMandatory( element, "width", _size._width);
+	retrieveAttributeMandatory( element, "height", _size._height);
 
-	element = root->FirstChildElement("probabilityNewAuthor");
-	retrieveAttributeMandatory( element, "value", _probabilityNewAuthor);
-	element = root->FirstChildElement("probabilityNewPaper");
-	retrieveAttributeMandatory( element, "value", _probabilityNewPaper);
-	
-	element = root->FirstChildElement("originalityThreshold");
-	retrieveAttributeMandatory( element, "value", _originalityThreshold);
-	element = root->FirstChildElement("citationRadius");
-	retrieveAttributeMandatory( element, "value", _citationRadius);
-
-	element = root->FirstChildElement("researcherLife");
-	retrieveAttributeMandatory( element, "value", _researcherLife);	
+	element = root->FirstChildElement("research");
+	retrieveAttributeMandatory( element, "initialPapers", _numInitialPapers);
+	retrieveAttributeMandatory( element, "newAuthor", _probabilityNewAuthor);
+	retrieveAttributeMandatory( element, "newPaper", _probabilityNewPaper);
+	retrieveAttributeMandatory( element, "originality", _originalityThreshold);
+	retrieveAttributeMandatory( element, "radius", _citationRadius);
+	retrieveAttributeMandatory( element, "researcherLife", _researcherLife);
 }
 	
 const Engine::Size<int> & AcademiaConfig::getSize() const

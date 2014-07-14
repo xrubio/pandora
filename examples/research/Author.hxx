@@ -7,12 +7,17 @@
 namespace Examples
 {
 
+class Paper;
+
 class Author : public Engine::Agent
 {
 	int _researchLife; // MpiBasicAttribute;
 	int _researchLifeMaximum; // MpiBasicAttribute
 	int _numPapers; // MpiBasicAttribute
 	int _numCitations; // MpiBasicAttribute
+
+    std::list<Engine::Point2D<int> > _paperPositions;
+    
 public:
 	Author( const std::string & id, int researchLifeMaximum );
 	virtual ~Author();
@@ -21,7 +26,7 @@ public:
 	void serialize();
 
 	bool isActive() const;
-	void incrementNumPapers();
+	void incrementNumPapers( const Engine::Point2D<int> & paperPosition );
 	void incrementNumCitations();
 
 	////////////////////////////////////////////////

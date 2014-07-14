@@ -7,7 +7,7 @@
 namespace Examples
 {
 
-Paper::Paper( const std::string & id, int timeOfCreation ) : Agent(id), _probabilityNewPaper(0.0f), _author(0), _citations(0), _timeOfCreation(timeOfCreation)
+Paper::Paper( const std::string & id, int timeOfCreation ) : Agent(id), _probabilityNewPaper(0.0f), _author(0), _citations(0), _citedPapers(0), _timeOfCreation(timeOfCreation)
 {
 }
 

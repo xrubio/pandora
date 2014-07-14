@@ -41,13 +41,13 @@ void Academia::createAgents()
 			Author * newAuthor = new Author(ossAuthor.str(), Engine::GeneralState::statistics().getUniformDistValue(0, _config._researcherLife));
 			addAgent(newAuthor);
 			newAuthor->setPosition(Engine::Point2D<int>(0,0));
-			newAuthor->incrementNumPapers();
 			
 			Paper * paper = new Paper(oss.str(), 0);
 			addAgent(paper);
 			paper->setRandomPosition();
 			paper->setAuthor(newAuthor);
 			paper->setProbabilityNewPaper(_config._probabilityNewPaper);
+			newAuthor->incrementNumPapers(paper->getPosition());
 
 			_newPaperKey++;
 			_newAuthorKey++;
@@ -64,7 +64,7 @@ void Academia::generateNewPaper( Paper & paper )
 	oss << "Paper_" << _newPaperKey;
 
 	Engine::AgentsVector potentialCitations = getNeighbours(&paper, _config._citationRadius, "Paper");
-	
+
 	float influence = 0.0f;
 	Engine::Point2D<int> newPosition = paper.getPosition();
 	Engine::AgentsVector::iterator it = potentialCitations.begin();
@@ -78,7 +78,7 @@ void Academia::generateNewPaper( Paper & paper )
 		newPosition._x += (agent->getPosition()._x - paper.getPosition()._x)*((1.0f-influence)/2);
 		newPosition._y += (agent->getPosition()._y - paper.getPosition()._y)*((1.0f-influence)/2);
 		log_DEBUG( logName.str(), "\tnew kene to: " << newPosition << " influenced by paper: " << agent << " with influence : " << influence);
-		citedPapers.push_back(std::shared_ptr<Engine::Agent>(agent));
+		citedPapers.push_back(*it);
 		it++;
 	}
 
@@ -88,16 +88,16 @@ void Academia::generateNewPaper( Paper & paper )
 		return;
 	}
 
-
 	for(int i=0; i<citedPapers.size(); i++)
 	{
 		Paper * citedPaper = (Paper*)(citedPapers.at(i).get());
 		citedPaper->incrementNumCitations();
 		Author * author = citedPaper->getAuthor();
+		log_DEBUG( logName.str(), citedPaper << " incrementing num citations");
 		author->incrementNumCitations();
+		log_DEBUG( logName.str(), author << " incrementing num citations");
 	}
 
-	log_DEBUG( logName.str(), "paper with kene: " << newPosition << " generated from original: " << paper << " with distance: " << paper.getPosition().distance(newPosition));
 	
 	Paper * newPaper = 0;
 	
@@ -120,14 +120,17 @@ void Academia::generateNewPaper( Paper & paper )
 		newAuthor = paper.getAuthor();
 		log_DEBUG( logName.str(), "paper with kene: " << newPosition << " has old author: " << newAuthor);
 	}
-	newAuthor->incrementNumPapers();
+	log_DEBUG( logName.str(), newAuthor << " new author");
+        
 	newPaper = new Paper(oss.str(), getCurrentTimeStep());
+	addAgent(newPaper);
 	newPaper->setCitedPapers(citedPapers.size());
 	newPaper->setAuthor(newAuthor);
 
 	newPaper->setProbabilityNewPaper(_config._probabilityNewPaper);
 	newPaper->setPosition(newPosition);
-	addAgent(newPaper);
+	newAuthor->incrementNumPapers(newPaper->getPosition());
+	log_DEBUG( logName.str(), newPaper << " new paper");
 	_newPaperKey++;
 }
 
