@@ -199,12 +199,15 @@ void RasterLoader::fillHDF5RasterDirectPath( StaticRaster & raster, const std::s
 	}
 	free(dset_data);
 
+    int lastIndex = pathToData.find_last_of("/"); 
+    std::string rasterName = pathToData.substr(0, lastIndex); 
 	std::ostringstream oss2;
-	oss2 << "/colorTables/" << pathToData; 
+	oss2 << "/colorTables/" << rasterName; 
     
     H5E_auto2_t oldfunc;
     void *old_client_data;
     H5Eget_auto(H5E_DEFAULT, &oldfunc, &old_client_data);
+
 
     /* Turn off error handling */
     H5Eset_auto(H5E_DEFAULT, NULL, NULL);
@@ -212,6 +215,7 @@ void RasterLoader::fillHDF5RasterDirectPath( StaticRaster & raster, const std::s
     
     /* Restore previous error handler */
     H5Eset_auto(H5E_DEFAULT, oldfunc, old_client_data);
+    std::cout << "checking: " << oss2.str() << " -> " << colorTableId << std::endl;
 
     if(colorTableId>0)
     {
