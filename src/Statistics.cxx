@@ -31,7 +31,7 @@
 namespace Engine
 {
 
-Statistics::Statistics() :  _randomGenerator(getNewSeed()), _randomNumbers(0, _distributionSize-1), _nextRandomNumber(_randomGenerator,_randomNumbers)
+Statistics::Statistics() :  _randomGenerator(getNewSeed()), _randomNumbers(0, _distributionSize-1), _nextRandomNumber(_randomGenerator,_randomNumbers), _next01Number(_randomGenerator)
 {
 	generateExponentialDistribution();
 	generateNormalDistribution();
@@ -141,6 +141,11 @@ int Statistics::getUniformDistValue( int min, int max ) const
 	value     = value + fMin;
 
 	return value;
+}
+
+float Statistics::getUniformDistValue()
+{
+    return _next01Number();
 }
 
 uint64_t Statistics::getNewSeed()

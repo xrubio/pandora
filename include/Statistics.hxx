@@ -39,6 +39,8 @@ class Statistics
 	boost::uniform_int<> _randomNumbers;
 	mutable boost::variate_generator< RandomEngine, boost::uniform_int<> > _nextRandomNumber;
 
+    boost::uniform_01<RandomEngine> _next01Number;
+
 	// TODO fix expo and normal distributions!
 	std::vector<float> _exponentialDistribution;
 	void generateExponentialDistribution();
@@ -52,6 +54,8 @@ public:
 
 	// uniform dist does not need to generate numbers, as randomNumbers itself is a 
 	int getUniformDistValue( int min, int max ) const;
+    // uniform float distribution between 0 and 1
+    float getUniformDistValue();
 	//! Gets a random number from /dev/urandom to be used as a seed.
 	uint64_t getNewSeed();
 
