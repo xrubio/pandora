@@ -16,7 +16,7 @@ class Neighbor : public Engine::Agent
     int _friends; // MpiBasicAttribute
     int _neighbors; // MpiBasicAttribute
 
-	void updateKnowledge();
+	void foo();
 	void moveHome();
 
 public:

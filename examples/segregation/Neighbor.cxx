@@ -16,30 +16,28 @@ Neighbor::~Neighbor()
 {
 }
 
-void Neighbor::updateKnowledge()
+void Neighbor::foo()
 {
 	Engine::AgentsVector neighbors = getWorld()->getNeighbours( this, _neighborDistance );
-    std::cout << this << " neighbors: " << neighbors.size() << std::endl;
 	_neighbors = neighbors.size();
     _friends= 0;
     
-    std::stringstream logName;
-	logName << "friends";
 
-	log_INFO( logName.str(), "neighbors: " << _neighbors<< " friendly: " << _friends);
 	for(Engine::AgentsVector::iterator it=neighbors.begin(); it!=neighbors.end(); it++)
 	{
-	    log_INFO( logName.str(), "type" << getType() << " type other: " << (*it)->getType() << " is type: " << (*it)->isType(getType()));
 		if((*it)->isType(getType()))
 		{
 			_friends++;
 		}
 	}
-	if(_neighbors==0 || (float)_friends/(float)_neighbors<=_friendlyPercentage)
+	if(_neighbors==0 || (float)_friends/(float)_neighbors>=_friendlyPercentage)
 	{
 		_needsToMove = false;
 		return;
-	}
+	}    
+    std::stringstream logName;
+	logName << "friends";
+    log_INFO( logName.str(), this << " will move, neighbors: " << _neighbors<< " friendly: " << _friends << " percentage: " << (float)_friends/(float)_neighbors << " required: " << _friendlyPercentage);
 	_needsToMove = true;
 }
 
@@ -51,7 +49,7 @@ void Neighbor::moveHome()
 	{
 		for(index._y=_position._y-_maxMovingDistance; index._y<=_position._y+_maxMovingDistance; index._y++)
 		{
-			if(!getWorld()->checkPosition(index) || !getWorld()->getBoundaries().contains(index) || index.isEqual(_position))
+			if(!getWorld()->checkPosition(index) || index==_position)
 			{
 				continue;
 			}
@@ -64,12 +62,13 @@ void Neighbor::moveHome()
 	if(possiblePositions.size()!=0)
 	{
 		std::random_shuffle(possiblePositions.begin(), possiblePositions.end());
-		_position = possiblePositions[0];
+        setPosition(possiblePositions[0]);
 	}
 }
 
 void Neighbor::updateState()
 {
+    foo();
 	if(_needsToMove)
 	{
 		moveHome();
