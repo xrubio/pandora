@@ -1,0 +1,2 @@
+stores and allows cassandra to load and show all types of supported Agent attributes (int, float and string)
+
