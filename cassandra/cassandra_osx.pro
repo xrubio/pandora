@@ -23,8 +23,8 @@ DEFINES += TIXML_USE_STL
 DEPENDPATH += .
 INCLUDEPATH += .
 INCLUDEPATH += uis/
-INCLUDEPATH += ../pandora/
-INCLUDEPATH += ../pandora/analysis/
+INCLUDEPATH += ../include/
+INCLUDEPATH += ../include/analysis/
 INCLUDEPATH += /usr/local/Cellar/qwt/6.1.0/lib/qwt.framework/Versions/6/Headers/
 INCLUDEPATH += /opt/X11/include/ 
 INCLUDEPATH += /opt/X11/include/GL 
@@ -33,16 +33,19 @@ INCLUDEPATH += /usr/local/Cellar/devil/1.7.8_1/include/IL/
 
 CONFIG += qt
 CONFIG += -std=c++11
-CONFIG += -stdlib=libstdc++
 QMAKE_CXXFLAGS += -std=c++11
-QMAKE_CXX = g++
+QMAKE_CXXFLAGS -= -stdlib=libc++
+QMAKE_CXX = g++-4.8
 QMAKE_CC = gcc
-QMAKE_LINK = g++
-QMAKE_CXXFLAGS += -F/usr/local/Cellar/qwt/6.1.0/lib/qwt.framework/ -stdlib=libstdc++
-QMAKE_LFLAGS += -F/usr/local/Cellar/qwt/6.1.0/lib/qwt.framework/ -stdlib=libstdc++
+QMAKE_LINK = g++-4.8
+QMAKE_CXXFLAGS += -F/usr/local/Cellar/qwt/6.1.0/lib/qwt.framework/
+QMAKE_LFLAGS += -F/usr/local/Cellar/qwt/6.1.0/lib/qwt.framework/
+QMAKE_LFLAGS -= -stdlib=libc++
 QT += opengl
+QMAKE_LIBDIR += ../lib/
+QMAKE_LIBS += -lpandora
 
-LIBS += -L$$(PANDORAPATH)/lib -lpandora -lhdf5 -lmpich -lmpi -F/usr/local/lib/ -framework qwt -lGL -lGLU -lIL -ltinyxml -lboost_filesystem -lboost_system -L/usr/local/Cellar/gcc/4.8.3_1/lib/gcc/x86_64-apple-darwin13.2.0/4.8.3/ -L/usr/local/Cellar/devil/1.7.8_1/lib/
+LIBS += -lhdf5 -F/usr/local/lib/ -framework qwt -lGL -lGLU -lIL -ltinyxml -lboost_filesystem -lboost_system -L/usr/local/Cellar/gcc/4.8.3_1/lib/gcc/x86_64-apple-darwin13.2.0/4.8.3/ -L/usr/local/Cellar/devil/1.7.8_1/lib/
 
 
 # Input

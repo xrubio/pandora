@@ -53,7 +53,6 @@ if platform.system()=='Linux':
 elif platform.system()=='Darwin':
     env.Append(LIBPATH = '/usr/local/lib')
 
-sharedLib = env.SharedLibrary('lib/'+libraryName, srcBaseFiles, SHLIBVERSION=version)
 
 envPython = env.Clone()
 
@@ -84,13 +83,21 @@ else:
         envPython.Append(LIBS = 'boost_python') 
 
 envPython = conf.Finish()
-sharedPyLib = envPython.SharedLibrary('lib/'+pythonLibraryName,  srcPyFiles, SHLIBVERSION=version)
+
+# versioned lib do not create correct links with .so in osx
+if platform.system()=='Linux':
+    sharedPyLib = envPython.SharedLibrary('lib/'+pythonLibraryName,  srcPyFiles, SHLIBVERSION=version)
+    sharedLib = env.SharedLibrary('lib/'+libraryName, srcBaseFiles, SHLIBVERSION=version)
+elif platform.system()=='Darwin':
+    sharedPyLib = envPython.SharedLibrary('lib/'+pythonLibraryName,  srcPyFiles)
+    sharedLib = env.SharedLibrary('lib/'+libraryName, srcBaseFiles)
 
 
 # installation
 installLibDir = env['installDir'] + '/lib/'
 installHeadersDir = env['installDir'] + '/include/'
 installAnalysisHeadersDir = installHeadersDir+'analysis'
+
 installedLib = env.InstallVersionedLib(installLibDir, sharedLib, SHLIBVERSION=version)
 installedPyLib = env.InstallVersionedLib(installLibDir, sharedPyLib, SHLIBVERSION=version)
 
