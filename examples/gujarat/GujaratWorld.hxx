@@ -16,18 +16,14 @@ enum Rasters
 {
 	eSoils,
 	eDem,
-	eDistWater,
-	eWeightWater,
-	eDuneMap,
 	eResources,
-	eResourcesFraction,
 	eForageActivity,
 	eHomeActivity,
-	eFarmingActivity,
-	eResourceType,
-	eConsecutiveYears,
 	eSectors,
-	eMoisture
+	eDuneMap,
+	eDistWater,
+	eWeightWater,
+	eResourcesFraction
 };
 
 // id's depends on GIS data
@@ -36,14 +32,6 @@ enum Soils
 	WATER = 1,
 	INTERDUNE = 2,
 	DUNE = 3
-};
-
-enum ResourceType
-{
-	WILD = 1,
-	DOMESTICATED = 2,
-	FALLOW = 3,
-	SEASONALFALLOW = 4
 };
 
 class GujaratWorld : public Engine::World
@@ -73,8 +61,6 @@ class GujaratWorld : public Engine::World
 	void loadFile( const std::string & fileName, const std::string & rasterKey);
 
 	void updateRainfall();
-	//void updateMoisture();
-	void updateSoilCondition();
 	void updateResources();
 
 	void recomputeYearlyBiomass();

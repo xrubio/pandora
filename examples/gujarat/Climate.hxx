@@ -23,13 +23,10 @@ class Climate
 	typedef boost::mt19937 RandomEngine;
 	RandomEngine _randomGenerator;
 	Seasons _currentSeason;
-	//distrib rainDistribs[Seasons*2] = {m1,d1,m2,d2,m3,d3}; // PENDENT, rebre les mitjanes-desv
 	float   _currentRain; // mm on heigth of rain
 	float	_alphaRain;
 	float	_betaRain;
 
-	//Moistures    moistureLevel;
-	//Temperatures temperatureLevel;	
 	boost::variate_generator< RandomEngine, boost::uniform_real<> > _uniformDistribution;
 
 	const GujaratConfig & _config;

@@ -64,11 +64,6 @@ void GujaratWorld::createRasters()
 
 	log_DEBUG(logName.str(), getWallTime() << " creating dynamic rasters");
 
-	/*
-	registerDynamicRaster("moisture", _config.isStorageRequired("moisture"));
-	getDynamicRaster("moisture").setInitValues(0, std::numeric_limits<int>::max(), 0);
-	*/
-	
 	registerDynamicRaster("resources", _config.isStorageRequired("resources"), eResources);
 	getDynamicRaster(eResources).setInitValues(0, std::numeric_limits<int>::max(), 0);
 	
@@ -83,10 +78,6 @@ void GujaratWorld::createRasters()
 	*/
 
 	/*
-	registerDynamicRaster("resourceType", eResourceType, _config.isStorageRequired("resourceType")); // type of resources: wild, domesticated or fallow
-	getDynamicRaster("resourceType").setInitValues(0, SEASONALFALLOW, WILD);
-	registerDynamicRaster("consecutiveYears", eConsecutiveYears, _config.isStorageRequired("consecutiveYears")); // years passed using a given cell for a particular use
-	getDynamicRaster("consecutiveYears").setInitValues(0, 3, 0);
 	registerDynamicRaster("sectors", eSectors, _config.isStorageRequired("sectors"));
 	getDynamicRaster("sectors").setInitValues(0, _config._numSectors, 0);
 	*/
@@ -137,56 +128,6 @@ void GujaratWorld::createAgents()
 void GujaratWorld::updateRainfall()
 {		
 	_climate.step();
-}
-
-void GujaratWorld::updateSoilCondition()
-{
-	Engine::Point2D<int> index;
-	if(_climate.getSeason()==HOTWET)
-	{
-	    for(auto index:getBoundaries())
-        {
-            setValue(eResources, index, getValue(eMoisture, index));
-            if(getValue(eResourceType, index)==WILD)
-            {
-                continue;
-            }
-            
-            if(getValue(eResourceType, index)==SEASONALFALLOW)
-            {
-                setValue(eResourceType, index, DOMESTICATED);
-            }
-            int consecutiveYears = getValue(eConsecutiveYears, index);
-            consecutiveYears++;				
-            if(consecutiveYears<3)
-            {
-                setValue(eConsecutiveYears, index, consecutiveYears);
-            }
-            else
-            {
-                setValue(eConsecutiveYears, index, 0);
-                if(getValue(eResourceType, index)==FALLOW)
-                {
-                    setValue(eResourceType, index, WILD);
-
-                }
-                else
-                {
-                    setValue(eResourceType, index, FALLOW);
-                }
-            }
-		}
-	}
-	else if(_climate.getSeason()==HOTDRY)
-	{
-	    for(auto index:getBoundaries())
-		{
-			if(getValue(eResourceType, index)==DOMESTICATED)
-			{
-				setValue(eResourceType, index, SEASONALFALLOW);
-			}
-		}
-	}
 }
 
 void GujaratWorld::updateResources()
@@ -295,12 +236,6 @@ void GujaratWorld::stepEnvironment()
 	// resources are updated each time step
 	updateResources();
 	getDynamicRaster(eResources).updateCurrentMinMaxValues();
-
-	// these rasters are only updated at the beginning of seasons
-//	if ( !_climate.cellUpdateRequired() ) return;
-
-
-	//updateSoilCondition();
 }
 
 const Climate & GujaratWorld::getClimate() const

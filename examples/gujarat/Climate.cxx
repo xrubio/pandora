@@ -9,7 +9,6 @@ namespace Gujarat
 {
 
 Climate::Climate( const GujaratConfig & config, const GujaratWorld& theWorld ) 	
-//	: _randomGenerator(Engine::GeneralState::statistics().getNewSeed()), _currentSeason(HOTDRY),  
 	: _randomGenerator((long int)config._climateSeed), _currentSeason(HOTDRY),  
 	_currentRain(0.0f),
 	_uniformDistribution(_randomGenerator, boost::uniform_real <> (0,1)), 
@@ -33,17 +32,11 @@ bool Climate::cellUpdateRequired() const
 
 void Climate::step()
 {
-	/*
-	World passes its Statistics object. This way random number management is centralized.
-	*/
-
 	if ( !cellUpdateRequired() )
 		return;
 
 	if(_currentSeason == HOTWET )
 	{
-		// TODO document ODD : change weibull for gamma
-		
 		boost::gamma_distribution<> gd(_alphaRain);
 		boost::variate_generator<boost::mt19937&, boost::gamma_distribution<> >
 		var_gamma(_randomGenerator, gd);

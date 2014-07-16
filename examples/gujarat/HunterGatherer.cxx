@@ -16,9 +16,7 @@
 namespace Gujarat
 {
 
-HunterGatherer::HunterGatherer( const std::string & id ) 
-	: GujaratAgent(id)/*, _surplusForReproductionThreshold(2), _surplusWanted(1)*/, _homeRange(50),
-	_numSectors( -1 )
+HunterGatherer::HunterGatherer( const std::string & id ) : GujaratAgent(id), _homeRange(50), _numSectors( -1 )
 {
 }
 
@@ -87,12 +85,6 @@ void HunterGatherer::updateKnowledge( const Engine::Point2D<int>& agentPos, cons
 
 void HunterGatherer::updateKnowledge()
 {
-	// H/G can't preserve resources
-	//std::cout << "collected from last time: " << _collectedResources << " surplus: " << _collectedResources - computeConsumedResources(1);
-	//_collectedResources -= computeConsumedResources(1);
-	//_collectedResources *= getSurplusSpoilageFactor();
-
-	//std::cout << " spoiled: " << _collectedResources << " needed resources: " << computeConsumedResources(1) <<  std::endl;
 	_collectedResources = 0;
 	std::stringstream logName;
 	logName << "agents_" << _world->getId() << "_" << getId();
@@ -112,9 +104,7 @@ void HunterGatherer::updateKnowledge()
 	{
 		for ( unsigned k = 0; k < _numSectors; k++ )
 		{
-			//std::cout << this << "clearing sector: " << k << std::endl;
 			_sectors[k]->clearCells();
-			//std::cout << "DONE!" <<  std::endl;
 		}
 	}
 	
@@ -132,13 +122,11 @@ void HunterGatherer::updateKnowledge()
 			Engine::Point2D<int> p;
 			p._x = _position._x + x;
 			p._y = _position._y + y;
-			// TODO overlapboundaries
 			if ( !_world->getBoundaries().contains(p) )
 			{
 				continue;
 			}
 			_sectors[indexSector]->addCell( p );
-			//getWorld()->setValue( "sectors", p, 1 );
 		}
 	}
 	log_DEBUG(logName.str(), "update features");
@@ -190,42 +178,6 @@ GujaratAgent * HunterGatherer::createNewAgent()
 	agent->_populationAges.resize(2);
 
 	return agent;
-}
-
-/*
-bool HunterGatherer::needsResources()
-{
-	return _collectedResources < (_surplusForReproductionThreshold + _surplusWanted);
-}
-*/
-
-bool HunterGatherer::cellValid( Engine::Point2D<int>& loc )
-{
-	if ( !_world->getBoundaries().contains(loc) )
-		return false;
-	// Check that the home of another agent resides in loc
-    Engine::AgentsVector agents = _world->getAgent(loc);
-	if(agents.size()==0)
-	{
-		return true;
-	}
-
-	for(int i=0; i<agents.size(); i++)
-	{
-        std::shared_ptr<Agent> agent = agents.at(i);
-		if(agent->exists() && agent.get()!=this)
-		{
-			return false;
-		}
-	}
-	return true;
-}
-
-bool HunterGatherer::cellRelevant( Engine::Point2D<int>& loc )
-{
-	Soils soilType = (Soils) _world->getValue(eSoils, loc);
-	int resourceType = _world->getValue(eResourceType, loc);
-	return soilType == INTERDUNE && resourceType == WILD;
 }
 
 void HunterGatherer::serialize()
