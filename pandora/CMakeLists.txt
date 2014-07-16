@@ -8,8 +8,8 @@ SET(CMAKE_CXX_COMPILER mpicxx)
 # set(CMAKE_BUILD_TYPE Release)
 
 # set vars
-set(HDF5PATH "/ic3home/ajornet/usr/local/hdf5")
-set(BOOSTPATH "/ic3home/ajornet/usr/local/boost_1_55_0")
+set(HDF5PATH "/usr/local/hdf5")
+set(BOOSTPATH "/usr/local/boost_1_55_0")
 
 # define c++ flags
 set(CMAKE_CXX_FLAGS_DEBUG "-std=c++0x -g -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG")
@@ -19,14 +19,13 @@ set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -DTIXML_USE_STL -fopenmp -std=c++0x")
 set(CMAKE_DEBUG_POSTFIX "d")
 
 # include folder
-include_directories(. analysis/ ${BOOSTPATH}/include /ic3home/ajornet/usr/local/include /usr/include ${HDF5PATH}/include /usr/include/gdal)
+include_directories(. analysis/ ${BOOSTPATH}/include /usr/include ${HDF5PATH}/include /usr/include/gdal)
 
 # path folders
-LINK_DIRECTORIES(/ic3home/ajornet/usr/local/lib /usr/local/lib ${HDF5PATH}/lib ${BOOSTPATH}/lib)
+LINK_DIRECTORIES(/usr/local/lib ${HDF5PATH}/lib ${BOOSTPATH}/lib)
 
 # search for all files to compile
 file(GLOB sourcefiles_SRC
-#    "*.hxx"
     "*.cxx"
     "analysis/*.cxx"
 )
