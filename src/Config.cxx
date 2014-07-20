@@ -31,9 +31,19 @@
 namespace Engine
 {
 
-Config::Config() : _resultsFile(""), _numSteps(0), _serializeResolution(1)
+Config::Config() : _resultsFile(""), _size(0,0), _numSteps(0), _serializeResolution(1)
 {
 }
+
+Config::Config( const std::string & configFile )
+{
+    deserialize(configFile);
+}
+
+Config::Config( const Size<int> & size, const int & numSteps, const int & serializeResolution ) : _resultsFile(""), _size(size), _numSteps(numSteps), _serializeResolution(serializeResolution)
+{
+}
+                                                                                                   
 
 Config::~Config()
 {
@@ -90,6 +100,11 @@ void Config::extractAttribs(TiXmlElement *pRoot)
 	retrieveAttributeMandatory(pParm, "value", _numSteps);
 	retrieveAttributeOptional(pParm, "serializeResolution", _serializeResolution);
     
+    pParm = pRoot->FirstChildElement("size");
+	retrieveAttributeMandatory(pParm, "width", _size._width);
+	retrieveAttributeOptional(pParm, "height", _size._height);
+    
+
     extractParticularAttribs(pRoot);
 }
 
@@ -256,6 +271,11 @@ void Config::retrieveAttributeOptional( TiXmlElement* elem, const std::string & 
 		return;	
 	}
 	value = atof(retrievedStr->c_str());
+}
+
+const Size<int> & Config::getSize() const
+{
+    return _size;
 }
 
 

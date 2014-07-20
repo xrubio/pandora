@@ -31,8 +31,8 @@
 #include <StaticRaster.hxx>
 #include <Rectangle.hxx>
 #include <Point2D.hxx>
-#include <Simulation.hxx>
 #include <algorithm>
+#include <Config.hxx>
 
 namespace Engine
 {
@@ -47,8 +47,7 @@ class World
 public:
 	typedef std::map< std::string, int> RasterNameMap;
 protected:		
-	Simulation _simulation;
-
+    const Config & _config;
 	//! global list of agents
 	AgentsList _agents;
 	
@@ -77,10 +76,10 @@ protected:
 public:
 	//! constructor.
 	/*!
-	The World object is bounded to a Simulation configuration through the parameter 'simulation'.
+	The World object is bounded to an instance of Config
 	The parameter 'allowMultipleAgentsPerCell' defines if more than one agent can occupy a cell of the World.
 	*/
-	World( const Simulation & simulation, Scheduler * scheduler = 0, const bool & allowMultipleAgentsPerCell = true);
+	World( const Config & config, Scheduler * scheduler = 0, const bool & allowMultipleAgentsPerCell = true);
 	
 	virtual ~World();
 
@@ -125,9 +124,6 @@ public:
 	//! checks if position parameter 'newPosition' is free to occupy by an agent, 'newPosition' is inside of the world and the maximum of agent cell-occupancy is not exceeded.
 	bool checkPosition( const Point2D<int> & newPosition ) const;
 
-	//! returns the simulation characterization of this world
-	Simulation & getSimulation();
-
 	//! sets the value of raster "key" to value "value" in global position "position"
 	void setValue( const std::string & key, const Point2D<int> & position, int value );
 	//! sets the value of raster "index" to value "value" in global position "position"
@@ -154,6 +150,7 @@ public:
 	virtual void createAgents(){};
 	//! to be redefined for subclasses
 	virtual void createRasters(){};
+    const Config & getConfig() const { return _config; }
 
 	int	getCurrentTimeStep() const { return _step; }
 	//! time from initialization step to the moment the method is executed
@@ -161,7 +158,6 @@ public:
 	//! provides a random valid position inside boundaries
 	Point2D<int> getRandomPosition();
 
-public:
 	/** get the boundaries of the world. For sequential executions it will be the boundaries of the entire simulation,
 	  * but if this is not the case it is the area owned by the instance plus the overlaps
 	  */

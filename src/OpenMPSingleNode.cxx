@@ -22,13 +22,14 @@
 #include <OpenMPSingleNode.hxx>
 #include <Agent.hxx>
 #include <Logger.hxx>
+#include <Config.hxx>
 #include <Exception.hxx>
 #include <boost/chrono.hpp>
 
 namespace Engine
 {
 
-OpenMPSingleNode::OpenMPSingleNode(const std::string & fileName) : _serializer(*this, fileName)
+OpenMPSingleNode::OpenMPSingleNode(const Config & config ) : _serializer(*this, config)
 {
 }
 
@@ -40,7 +41,7 @@ void OpenMPSingleNode::init( int argc, char *argv[] )
 {
 	_timer.start();
 	_boundaries._origin = Point2D<int>(0,0);
-	_boundaries._size = _world->getSimulation().getSize();
+	_boundaries._size = _world->getConfig().getSize();
 	std::cout << "simulation: " << _id << " of: " << _numTasks << " initialized" << std::endl;
 }
 

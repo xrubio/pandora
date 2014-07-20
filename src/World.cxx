@@ -40,7 +40,7 @@
 namespace Engine
 {
 
-World::World( const Simulation & simulation, Scheduler * scheduler, const bool & allowMultipleAgentsPerCell) : _simulation(simulation), _allowMultipleAgentsPerCell(allowMultipleAgentsPerCell), _step(0), _scheduler(scheduler)
+World::World( const Config & config, Scheduler * scheduler, const bool & allowMultipleAgentsPerCell) : _config(config), _allowMultipleAgentsPerCell(allowMultipleAgentsPerCell), _step(0), _scheduler(scheduler)
 {
 	// default Scheduler 
 	if(!_scheduler)
@@ -118,7 +118,7 @@ void World::step()
 	logName << "simulation_" << getId();
 	log_INFO(logName.str(), getWallTime() << " executing step: " << _step );
 
-	if(_step%_simulation.getSerializerResolution()==0)
+	if(_step%_config.getSerializerResolution()==0)
 	{
 		_scheduler->serializeRasters(_step);
 		_scheduler->serializeAgents(_step);
@@ -135,14 +135,14 @@ void World::run()
 {
 	std::stringstream logName;
 	logName << "simulation_" << getId();
-	log_INFO(logName.str(), getWallTime() << " executing " << _simulation.getNumSteps() << " steps...");
+	log_INFO(logName.str(), getWallTime() << " executing " << _config.getNumSteps() << " steps...");
 
-	for(_step=0; _step<_simulation.getNumSteps(); _step++)
+	for(_step=0; _step<_config.getNumSteps(); _step++)
 	{
 		step();
 	}
 	// storing last step data
-	if(_step%_simulation.getSerializerResolution()==0)
+	if(_step%_config.getSerializerResolution()==0)
 	{
 		_scheduler->serializeRasters(_step);
 		_scheduler->serializeAgents(_step);
@@ -266,11 +266,6 @@ bool World::checkPosition( const Point2D<int> & newPosition ) const
 		}
 	}
 	return true;
-}
-
-Simulation & World::getSimulation()
-{
-	return _simulation;
 }
 
 StaticRaster & World::getStaticRaster( const size_t & index )

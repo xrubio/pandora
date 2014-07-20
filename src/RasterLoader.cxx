@@ -150,10 +150,10 @@ void RasterLoader::fillHDF5RasterDirectPath( StaticRaster & raster, const std::s
 	H5Sget_simple_extent_dims(dataspaceId, dims, NULL);
 	H5Sclose(dataspaceId);
 	
-	if(world && (dims[0]!=world->getSimulation().getSize()._width || dims[1]!=world->getSimulation().getSize()._height))
+	if(world && (dims[0]!=world->getConfig().getSize()._width || dims[1]!=world->getConfig().getSize()._height))
 	{
 		std::stringstream oss;
-		oss << "RasterLoader::fillHDF5RasterDirectPath - file: " << fileName << " and dataset: " << pathToData<< " with size: " << dims[0] << "/" << dims[1] << " different from defined size: " << world->getSimulation().getSize() << std::endl;
+		oss << "RasterLoader::fillHDF5RasterDirectPath - file: " << fileName << " and dataset: " << pathToData<< " with size: " << dims[0] << "/" << dims[1] << " different from defined size: " << world->getConfig().getSize() << std::endl;
 		throw Engine::Exception(oss.str());
 	}
 	

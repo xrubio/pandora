@@ -2,17 +2,17 @@
 #include <SequentialSerializer.hxx>
 #include <boost/filesystem.hpp>
 #include <World.hxx>
-#include <Simulation.hxx>
 #include <Exception.hxx>
 #include <Agent.hxx>
 #include <Scheduler.hxx>
 #include <Logger.hxx>
 #include <StaticRaster.hxx>
+#include <Config.hxx>
 
 namespace Engine
 {
 
-SequentialSerializer::SequentialSerializer( const Scheduler & scheduler, const std::string & resultsFile ) : _scheduler(scheduler), _resultsFile(resultsFile)
+SequentialSerializer::SequentialSerializer( const Scheduler & scheduler, const Config & config ) : _scheduler(scheduler), _config(config)
 {
 }
 
@@ -22,21 +22,20 @@ SequentialSerializer::~SequentialSerializer()
 
 void SequentialSerializer::init( World & world )
 {
-	_simulation = &(world.getSimulation());
 	std::stringstream logName;
 	logName << "SequentialSerializer_" << _scheduler.getId();
 	log_DEBUG(logName.str(), " init sequential serializer");
 
 	// check if directory exists
-	unsigned int filePos = _resultsFile.find_last_of("/");
-	std::string path = _resultsFile.substr(0,filePos+1);
+	unsigned int filePos = _config.getResultsFile().find_last_of("/");
+	std::string path = _config.getResultsFile().substr(0,filePos+1);
 
 	// create dir where logs will be stored if it is not already created
 	if(!path.empty())
 	{
 		boost::filesystem::create_directory(path);
 	}
-	_fileId = H5Fcreate(_resultsFile.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+	_fileId = H5Fcreate(_config.getResultsFile().c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 	// adding a group with global generic data
 	hsize_t simpleDimension = 1;
 	hid_t globalFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
@@ -44,25 +43,25 @@ void SequentialSerializer::init( World & world )
 
 	hid_t attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	hid_t attributeId = H5Acreate(globalDatasetId, "numSteps", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
-	H5Awrite(attributeId, H5T_NATIVE_INT, &_simulation->getNumSteps());
+	H5Awrite(attributeId, H5T_NATIVE_INT, &_config.getNumSteps());
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 	
 	attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	attributeId = H5Acreate(globalDatasetId, "serializerResolution", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
-	H5Awrite(attributeId, H5T_NATIVE_INT, &_simulation->getSerializerResolution());
+	H5Awrite(attributeId, H5T_NATIVE_INT, &_config.getSerializeResolution());
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 
 	attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	attributeId = H5Acreate(globalDatasetId, "width", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
-	H5Awrite(attributeId, H5T_NATIVE_INT, &_simulation->getSize()._width);
+	H5Awrite(attributeId, H5T_NATIVE_INT, &_config.getSize()._width);
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 
 	attributeFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
 	attributeId = H5Acreate(globalDatasetId, "height", H5T_NATIVE_INT, attributeFileSpace, H5P_DEFAULT, H5P_DEFAULT);
-	H5Awrite(attributeId, H5T_NATIVE_INT, &_simulation->getSize()._height);
+	H5Awrite(attributeId, H5T_NATIVE_INT, &_config.getSize()._height);
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 
@@ -72,7 +71,7 @@ void SequentialSerializer::init( World & world )
 	H5Sclose(attributeFileSpace);
 	H5Aclose(attributeId);
 
-	log_INFO(logName.str(), _scheduler.getWallTime() << " id: " << _scheduler.getId() << " size: " << _simulation->getSize() << " num tasks: " << _scheduler.getNumTasks() << " serializer resolution:" << _simulation->getSerializerResolution() << " and steps: " << _simulation->getNumSteps());
+	log_INFO(logName.str(), _scheduler.getWallTime() << " id: " << _scheduler.getId() << " size: " << _config.getSize() << " num tasks: " << _scheduler.getNumTasks() << " serializer resolution:" << _config.getSerializeResolution() << " and steps: " << _config.getNumSteps());
 
 	// we store the name of the rasters
 	hid_t rasterNameFileSpace = H5Screate_simple(1, &simpleDimension, NULL);
@@ -194,8 +193,8 @@ void SequentialSerializer::init( World & world )
 	
 	//the real size of the matrix is sqrt(num simulator)*matrixsize	
 	hsize_t dimensions[2];
-	dimensions[0] = hsize_t(_simulation->getSize()._width);
-	dimensions[1] = hsize_t(_simulation->getSize()._height);
+	dimensions[0] = hsize_t(_config.getSize()._width);
+	dimensions[1] = hsize_t(_config.getSize()._height);
 
 	// static rasters	
 	for(size_t i=0; i<world.getNumberOfRasters(); i++)
@@ -221,9 +220,9 @@ void SequentialSerializer::init( World & world )
 			continue;
 		}	
 		hid_t rasterGroupId = H5Gcreate(_fileId, world.getRasterName(i).c_str(), 0, H5P_DEFAULT, H5P_DEFAULT);
-		for(int i=0; i<=_simulation->getNumSteps(); i++)
+		for(int i=0; i<=_config.getNumSteps(); i++)
 		{  
-			if(i%_simulation->getSerializerResolution()!=0)
+			if(i%_config.getSerializeResolution()!=0)
 			{
 				continue;
 			}
@@ -443,9 +442,9 @@ void SequentialSerializer::registerType( Agent * agent )
 	StringMap * newTypeStringMap = new StringMap;
 
 	// create a dataset for each timestep
-	for(int i=0; i<=_simulation->getNumSteps(); i++)
+	for(int i=0; i<=_config.getNumSteps(); i++)
 	{
-		if(i%_simulation->getSerializerResolution()!=0)
+		if(i%_config.getSerializeResolution()!=0)
 		{
 			continue;
 		}

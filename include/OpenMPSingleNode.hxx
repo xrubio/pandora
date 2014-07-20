@@ -22,7 +22,6 @@
 #ifndef __OpenMPSingleNode_hxx__
 #define __OpenMPSingleNode_hxx__
 
-#include <Simulation.hxx>
 #include <World.hxx>
 #include <typedefs.hxx>
 #include <SequentialSerializer.hxx>
@@ -34,7 +33,8 @@
 namespace Engine
 {
 class Agent;
-	
+class Config;
+
 /** OpenMPSingleNode is a execution scheduler
   * It executes a Pandora run a single computer node using only shared-memory distribution (OpenMP) 
   * It is efficient for simple models, as several simulations can be executed in a single node 
@@ -51,7 +51,7 @@ class OpenMPSingleNode : public Scheduler
 	// returns the iterator inside World::_agents with _id = id; in case it is not found returns _agents.end()
 	AgentsList::iterator getAgentIterator( const std::string & id );
 public:
-	OpenMPSingleNode( const std::string & fileName);
+	OpenMPSingleNode( const Config & config );
 	virtual ~OpenMPSingleNode();
 
 	void finish();

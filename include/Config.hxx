@@ -26,6 +26,7 @@
 #include <cstdlib>
 #include <tinyxml.h>
 #include <string>
+#include <Size.hxx>
 
 namespace Engine
 {
@@ -38,6 +39,9 @@ protected:
 	// general attributes
 	// file where simulation results will be stored
 	std::string _resultsFile;
+
+    // Space of simulation
+    Size<int> _size;
 	// number of time steps of the simulation
 	int _numSteps;
 	// number of steps to execute before serializing the state of the simulation
@@ -55,7 +59,12 @@ protected:
 	void retrieveAttributeOptional( TiXmlElement* elem, const std::string & attrName, bool & value );
 
 public:
+    // default constructor
 	Config();
+    // minimalist constructor (xml file not necessary)
+	Config( const Size<int> & size, const int & numSteps, const int & serializerResolution = 1 );
+    // xml-based constructor
+	Config( const std::string & configFile ); 
 	virtual ~Config();
 	
 	TiXmlElement * openTiXml(const std::string & filename);  
@@ -70,6 +79,7 @@ public:
 		return stream << "Config(" << c._resultsFile << "," << c._numSteps << ")"; 
 	}
 
+	const Size<int> & getSize() const;
 	const int & getNumSteps() const;
 	const int & getSerializeResolution() const;
 	const std::string & getResultsFile() const{return _resultsFile; }
