@@ -87,6 +87,11 @@ void Agent::serializeAttribute( const std::string & name, const int & value )
 	_world->addIntAttribute(getType(), name,value);
 }
 
+void Agent::serializeAttribute( const std::string & name, const float & value )
+{
+	_world->addFloatAttribute(getType(), name,value);
+}
+
 void Agent::serializeAttribute( const std::string & name, const std::string & value)
 {
 	_world->addStringAttribute(getType(), name,value);

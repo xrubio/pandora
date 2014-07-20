@@ -46,6 +46,7 @@ public:
 private:
 	// list of attributes of an agent
 	AttributesList _intAttributes;
+	AttributesList _floatAttributes;
 	AttributesList _stringAttributes;
 
 protected:
@@ -58,6 +59,7 @@ protected:
 	/** Pointer to the world that owns this agent **/
 	World * _world;
 	
+	void serializeAttribute( const std::string & name, const float & value );
 	void serializeAttribute( const std::string & name, const int & value );
 	void serializeAttribute( const std::string & name, const std::string & value );
 	
@@ -66,6 +68,7 @@ protected:
 public:
 
 	void registerIntAttribute(const std::string & name ) { _intAttributes.push_back(name); }
+	void registerFloatAttribute(const std::string & name ) { _floatAttributes.push_back(name); }
 	void registerStringAttribute(const std::string & name ) { _stringAttributes.push_back(name); }
 	
 	//! Standard constructor.
@@ -128,7 +131,10 @@ public:
 	AttributesList::iterator beginIntAttributes(){ return _intAttributes.begin(); }
 	AttributesList::iterator endIntAttributes(){ return _intAttributes.end(); }
 
-	virtual void registerAttributes(){}
+    AttributesList::iterator beginFloatAttributes(){ return _floatAttributes.begin(); }
+	AttributesList::iterator endFloatAttributes(){ return _floatAttributes.end(); }
+
+    virtual void registerAttributes(){}
 };
 
 } // namespace Engine

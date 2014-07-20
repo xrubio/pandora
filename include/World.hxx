@@ -179,6 +179,7 @@ public:
 	AgentsVector getAgent( const Point2D<int> & position, const std::string & type="all" );
 	void addStringAttribute( const std::string & type, const std::string & key, const std::string & value );
 	void addIntAttribute( const std::string & type, const std::string & key, int value );
+	void addFloatAttribute( const std::string & type, const std::string & key, float value );
 	const int & getId() const;
 	const int & getNumTasks() const;
 

@@ -444,6 +444,7 @@ Agent * World::getAgent( const std::string & id ) { return _scheduler->getAgent(
 AgentsVector World::getAgent( const Point2D<int> & position, const std::string & type) { return _scheduler->getAgent(position, type); }
 void World::addStringAttribute( const std::string & type, const std::string & key, const std::string & value ) { _scheduler->addStringAttribute(type, key, value);}
 void World::addIntAttribute( const std::string & type, const std::string & key, int value ) { _scheduler->addIntAttribute(type, key, value); }
+void World::addFloatAttribute( const std::string & type, const std::string & key, float value ) { _scheduler->addFloatAttribute(type, key, value); }
 
 } // namespace Engine
 
