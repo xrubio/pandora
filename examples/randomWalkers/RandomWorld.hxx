@@ -4,11 +4,6 @@
 
 #include <World.hxx>
 
-namespace Engine
-{
-	class Simulation;
-}
-
 namespace Examples 
 {
 
@@ -18,10 +13,8 @@ class RandomWorld : public Engine::World
 {
 	void createRasters();
 	void createAgents();
-
-	const RandomWorldConfig & _config;
 public:
-	RandomWorld(const RandomWorldConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0);
+	RandomWorld(Engine::Config * config, Engine::Scheduler * scheduler = 0);
 	virtual ~RandomWorld();
 };
 

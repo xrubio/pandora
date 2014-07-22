@@ -29,7 +29,7 @@
 namespace Engine
 {
 
-OpenMPSingleNode::OpenMPSingleNode(const Config & config ) : _serializer(*this, config)
+OpenMPSingleNode::OpenMPSingleNode() : _serializer(*this)
 {
 }
 

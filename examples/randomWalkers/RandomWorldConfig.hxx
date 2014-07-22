@@ -3,7 +3,6 @@
 #define __RandomWorldConfig_hxx__
 
 #include <Config.hxx>
-#include <Size.hxx>
 
 namespace Examples
 {
@@ -11,14 +10,11 @@ namespace Examples
 class RandomWorldConfig : public Engine::Config
 {	
 	int _numAgents;
-	Engine::Size<int> _size;
 public:
-	RandomWorldConfig();
+	RandomWorldConfig( const std::string & xmlFile );
 	virtual ~RandomWorldConfig();
 
-	void extractParticularAttribs(TiXmlElement *pRoot);
-
-	const Engine::Size<int> & getSize() const;
+	void loadParams();
 
 	friend class RandomWorld;
 };

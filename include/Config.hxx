@@ -36,7 +36,11 @@ class Config
 
 protected:
 	TiXmlDocument * _doc;
+    TiXmlElement * _root;
 	// general attributes
+    // xml config file (if it exists)
+    std::string _configFile;
+
 	// file where simulation results will be stored
 	std::string _resultsFile;
 
@@ -47,32 +51,19 @@ protected:
 	// number of steps to execute before serializing the state of the simulation
 	int _serializeResolution;
 
-	void retrieveAttributeMandatory( TiXmlElement* elem, const std::string & attrName, std::string& value );
-	void retrieveAttributeOptional( TiXmlElement* elem, const std::string & attrName, std::string& value );
-	void retrieveAttributeMandatory( TiXmlElement* elem, const std::string & attrName, int& value );
-	void retrieveAttributeOptional( TiXmlElement* elem, const std::string & attrName, int& value );
-	void retrieveAttributeMandatory( TiXmlElement* elem, const std::string & attrName, long int& value );
-	void retrieveAttributeOptional( TiXmlElement* elem, const std::string & attrName, long int& value );
-	void retrieveAttributeMandatory( TiXmlElement* elem, const std::string & attrName, float& value );
-	void retrieveAttributeOptional( TiXmlElement* elem, const std::string & attrName, float& value );
-	void retrieveAttributeMandatory( TiXmlElement* elem, const std::string & attrName, bool & value );
-	void retrieveAttributeOptional( TiXmlElement* elem, const std::string & attrName, bool & value );
 
-public:
-    // default constructor
-	Config();
-    // minimalist constructor (xml file not necessary)
-	Config( const Size<int> & size, const int & numSteps, const int & serializerResolution = 1 );
-    // xml-based constructor
-	Config( const std::string & configFile ); 
-	virtual ~Config();
+    TiXmlElement * findElement( const std::string & elementPath );
 	
 	TiXmlElement * openTiXml(const std::string & filename);  
 	void closeTiXml();
-	virtual void extractAttribs(TiXmlElement *pRoot);
-	virtual void extractParticularAttribs(TiXmlElement *pRoot) = 0;    
-	virtual void serialize(const std::string & filename);
-	virtual void deserialize(const std::string & filename);
+	void loadBaseParams();
+public:
+    // minimalist constructor (xml file not necessary)
+	Config( const Size<int> & size = Size<int>(0,0), const int & numSteps = 1, const std::string & resultsFile = "data/results.h5", const int & serializerResolution = 1 );
+    // xml-based constructor
+	Config( const std::string & configFile ); 
+	virtual ~Config();
+	void loadFile();
 
 	friend std::ostream & operator<<( std::ostream & stream, const Config & c)
 	{
@@ -83,7 +74,13 @@ public:
 	const int & getNumSteps() const;
 	const int & getSerializeResolution() const;
 	const std::string & getResultsFile() const{return _resultsFile; }
+	virtual void loadParams(){};    
   
+    std::string getParamStr( const std::string & elementPath, const std::string & attrName);
+	int getParamInt( const std::string & elementPath, const std::string & attrName);
+	long int getParamLongInt( const std::string & elementPath, const std::string & attrName);
+	float getParamFloat( const std::string & elementPath, const std::string & attrName);
+	bool getParamBool( const std::string & elementPath, const std::string & attrName);
 };
 
 } // namespace Engine

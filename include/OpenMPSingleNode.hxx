@@ -33,7 +33,6 @@
 namespace Engine
 {
 class Agent;
-class Config;
 
 /** OpenMPSingleNode is a execution scheduler
   * It executes a Pandora run a single computer node using only shared-memory distribution (OpenMP) 
@@ -51,7 +50,7 @@ class OpenMPSingleNode : public Scheduler
 	// returns the iterator inside World::_agents with _id = id; in case it is not found returns _agents.end()
 	AgentsList::iterator getAgentIterator( const std::string & id );
 public:
-	OpenMPSingleNode( const Config & config );
+	OpenMPSingleNode();
 	virtual ~OpenMPSingleNode();
 
 	void finish();

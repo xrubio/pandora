@@ -33,6 +33,7 @@
 #include <Point2D.hxx>
 #include <algorithm>
 #include <Config.hxx>
+#include <memory>
 
 namespace Engine
 {
@@ -47,7 +48,7 @@ class World
 public:
 	typedef std::map< std::string, int> RasterNameMap;
 protected:		
-    const Config & _config;
+    std::shared_ptr<Config> _config;
 	//! global list of agents
 	AgentsList _agents;
 	
@@ -79,7 +80,7 @@ public:
 	The World object is bounded to an instance of Config
 	The parameter 'allowMultipleAgentsPerCell' defines if more than one agent can occupy a cell of the World.
 	*/
-	World( const Config & config, Scheduler * scheduler = 0, const bool & allowMultipleAgentsPerCell = true);
+	World( Config * config, Scheduler * scheduler = 0, const bool & allowMultipleAgentsPerCell = true);
 	
 	virtual ~World();
 
@@ -150,7 +151,7 @@ public:
 	virtual void createAgents(){};
 	//! to be redefined for subclasses
 	virtual void createRasters(){};
-    const Config & getConfig() const { return _config; }
+    const Config & getConfig() const { return *_config; }
 
 	int	getCurrentTimeStep() const { return _step; }
 	//! time from initialization step to the moment the method is executed
@@ -190,9 +191,9 @@ public:
 	}
 
 	//! factory method for distributed Scheduler based on spatial distribution of a simulation
-	static Scheduler * useSpacePartition(const std::string & fileName = "data/results.h5", int overlap = 1, bool finalize = true );
+	static Scheduler * useSpacePartition(int overlap = 1, bool finalize = true );
 	//! factory method for sequential Scheduler without any non-shared communication mechanism, apt for being executed in a single computer
-	static Scheduler * useOpenMPSingleNode(const std::string & fileName = "data/results.h5");
+	static Scheduler * useOpenMPSingleNode();
 };
 
 } // namespace Engine

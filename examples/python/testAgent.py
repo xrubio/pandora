@@ -8,7 +8,7 @@ sys.path.append(pandoraPath+'/lib')
 
 import random
 
-from pyPandora import Simulation, Agent, World, Point2DInt, SizeInt
+from pyPandora import Config, Agent, World, Point2DInt, SizeInt
 
 class MyAgent(Agent):
 	def __init__(self, id):
@@ -23,8 +23,8 @@ class MyAgent(Agent):
 		return
 
 class MyWorld(World):
-	def __init__(self, simulation ):
-		World.__init__( self, simulation)
+	def __init__(self, config):
+		World.__init__( self, config)
 
 	def createRasters(self):		
 		self.registerDynamicRaster("test", 1)
@@ -36,8 +36,8 @@ class MyWorld(World):
 			self.addAgent(newAgent)
 			newAgent.setRandomPosition()
 
-mySimulation = Simulation(SizeInt(32,32), 300)
-myWorld = MyWorld(mySimulation)
+myConfig = Config(SizeInt(32,32), 300)
+myWorld = MyWorld(myConfig)
 myWorld.initialize()
 myWorld.run()
 

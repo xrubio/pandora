@@ -31,19 +31,13 @@
 namespace Engine
 {
 
-Config::Config() : _resultsFile(""), _size(0,0), _numSteps(0), _serializeResolution(1)
+Config::Config( const std::string & configFile ) : _doc(0), _root(0), _configFile(configFile)
 {
 }
 
-Config::Config( const std::string & configFile )
-{
-    deserialize(configFile);
-}
-
-Config::Config( const Size<int> & size, const int & numSteps, const int & serializeResolution ) : _resultsFile(""), _size(size), _numSteps(numSteps), _serializeResolution(serializeResolution)
+Config::Config( const Size<int> & size, const int & numSteps, const std::string & resultsFile, const int & serializeResolution ) : _doc(0), _root(0), _resultsFile(resultsFile), _size(size), _numSteps(numSteps), _serializeResolution(serializeResolution), _configFile("")
 {
 }
-                                                                                                   
 
 Config::~Config()
 {
@@ -51,10 +45,6 @@ Config::~Config()
 	{	
 		delete _doc;
 	}
-}
-
-void Config::serialize(const std::string & filename)
-{
 }
 
 TiXmlElement * Config::openTiXml(const std::string & filename)
@@ -85,38 +75,38 @@ void Config::closeTiXml()
 	}
 	delete _doc;
 	_doc = 0;
+    _root = 0;
 }
   
-void Config::extractAttribs(TiXmlElement *pRoot)
+void Config::loadBaseParams()
 {
-	TiXmlElement *pParm = pRoot->FirstChildElement("output");
-	retrieveAttributeMandatory( pParm, "resultsFile", _resultsFile);
-
-	std::string logsDir;
-	retrieveAttributeMandatory( pParm, "logsDir", logsDir);
+    _resultsFile = getParamStr("output", "resultsFile");
+    std::string logsDir = getParamStr("output", "logsDir");
 	GeneralState::logger().setLogsDir(logsDir);
 
-	pParm = pRoot->FirstChildElement("numSteps");
-	retrieveAttributeMandatory(pParm, "value", _numSteps);
-	retrieveAttributeOptional(pParm, "serializeResolution", _serializeResolution);
-    
-    pParm = pRoot->FirstChildElement("size");
-	retrieveAttributeMandatory(pParm, "width", _size._width);
-	retrieveAttributeOptional(pParm, "height", _size._height);
-    
+    _numSteps = getParamInt("numSteps", "value");
+    _serializeResolution = getParamInt("numSteps", "serializeResolution");
 
-    extractParticularAttribs(pRoot);
+    _size._width = getParamInt("size", "width");
+    _size._height = getParamInt("size", "height");
 }
 
-void Config::deserialize(const std::string & filename)
+void Config::loadFile()
 {
-	TiXmlElement *pRoot = openTiXml(filename);
-	if( pRoot )
-	{
-		extractAttribs(pRoot);    
-		// destroy pRoot and pParm
-		closeTiXml();
-	}
+    if(_configFile.empty())
+    {
+        return;
+    }
+
+	_root = openTiXml(_configFile);
+    if(!_root)
+    {
+        return;
+    }
+
+    loadBaseParams();
+    loadParams();
+    closeTiXml();
 }
 
 const int & Config::getNumSteps() const
@@ -129,155 +119,100 @@ const int & Config::getSerializeResolution() const
 	return _serializeResolution;
 }
 
-void Config::retrieveAttributeMandatory( TiXmlElement* elem, const std::string & attrName, std::string& value )
+std::string Config::getParamStr( const std::string & elementPath, const std::string & attrName)
 {
+    TiXmlElement * elem = findElement(elementPath);
 	const std::string * retrievedStr = elem->Attribute( attrName );
 	if (!retrievedStr)
 	{
 		std::stringstream sstr;
-		sstr << "[CONFIG]: ERROR: Attribute " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
+		sstr << "[CONFIG]: ERROR: Param " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
 		throw Engine::Exception(sstr.str());
-		return;
+		return "error";
 	}
-	value = *retrievedStr;
+	return *retrievedStr;
 }
 
-void Config::retrieveAttributeOptional( TiXmlElement* elem, const std::string & attrName, std::string& value )
+bool Config::getParamBool( const std::string & elementPath, const std::string & attrName)
 {
-	const std::string * retrievedStr = elem->Attribute( attrName );
-	if(!retrievedStr)
-	{
-		std::stringstream sstr;
-		std::cerr << "[CONFIG]: WARNING: Attribute " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
-		value = "";
-		return;	
-	}
-	value = *retrievedStr;
-}
-
-void Config::retrieveAttributeMandatory( TiXmlElement* elem, const std::string & attrName, bool& value )
-{
+    TiXmlElement * elem = findElement(elementPath);
 	const std::string * retrievedStr = elem->Attribute( attrName );
 	if (!retrievedStr)
 	{
 		std::stringstream sstr;
-		sstr << "[CONFIG]: ERROR: Attribute " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
+		sstr << "[CONFIG]: ERROR: Param " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
 		throw Engine::Exception(sstr.str());
-		return;
+		return false;
 	}
 	if(!retrievedStr->compare("yes") || !retrievedStr->compare("true") || !retrievedStr->compare("1"))
 	{
-		value = true;
+        return true;
 	}
-	else
-	{
-		value = false;
-	}
+    return false;
 }
 
-void Config::retrieveAttributeOptional( TiXmlElement* elem, const std::string & attrName, bool& value )
+int Config::getParamInt( const std::string & elementPath, const std::string & attrName)
 {
+    TiXmlElement * elem = findElement(elementPath);
 	const std::string * retrievedStr = elem->Attribute( attrName );
 	if(!retrievedStr)
 	{
 		std::stringstream sstr;
-		std::cerr << "[CONFIG]: WARNING: Attribute " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
-		value = "";
-		return;	
-	}
-	if(!retrievedStr->compare("yes") || !retrievedStr->compare("true"))
-	{
-		value = true;
-	}
-	else
-	{
-		value = false;
-	}
-}
-
-
-void Config::retrieveAttributeMandatory( TiXmlElement* elem, const std::string & attrName, int& value )
-{
-	const std::string * retrievedStr = elem->Attribute( attrName );
-	if(!retrievedStr)
-	{
-		std::stringstream sstr;
-		sstr << "[CONFIG]: ERROR: Attribute " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
+		sstr << "[CONFIG]: ERROR: Param " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
 		throw Engine::Exception(sstr.str());
 	}
-	value = atoi(retrievedStr->c_str());
+	return atoi(retrievedStr->c_str());
 }
 
-void Config::retrieveAttributeOptional( TiXmlElement* elem, const std::string & attrName, int& value )
-{	
-	const std::string * retrievedStr = elem->Attribute( attrName );
-	if(!retrievedStr)
-	{
-		std::stringstream sstr;
-		std::cerr << "[CONFIG]: WARNING: Attribute " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
-		value = 0;
-		return;	
-	}
-	value = atoi(retrievedStr->c_str());
-
-}
-void Config::retrieveAttributeMandatory( TiXmlElement* elem, const std::string & attrName, long int& value )
+long int Config::getParamLongInt( const std::string & elementPath, const std::string & attrName )
 {
+    TiXmlElement * elem = findElement(elementPath);
 	const std::string * retrievedStr = elem->Attribute( attrName );
 	if(!retrievedStr)
 	{
 		std::stringstream sstr;
-		sstr << "[CONFIG]: ERROR: Attribute " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
+		sstr << "[CONFIG]: ERROR: Param " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
 		throw Engine::Exception(sstr.str());
 	}
-	value = atol(retrievedStr->c_str());
+	return atol(retrievedStr->c_str());
 }
 
-void Config::retrieveAttributeOptional( TiXmlElement* elem, const std::string & attrName, long int& value )
-{	
-	const std::string * retrievedStr = elem->Attribute( attrName );
-	if(!retrievedStr)
-	{
-		std::stringstream sstr;
-		std::cerr << "[CONFIG]: WARNING: Attribute " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
-		value = 0;
-		return;	
-	}
-	value = atol(retrievedStr->c_str());
-
-}
-
-
-void Config::retrieveAttributeMandatory( TiXmlElement* elem, const std::string & attrName, float& value )
+float Config::getParamFloat( const std::string & elementPath, const std::string & attrName)
 {
+    TiXmlElement * elem = findElement(elementPath);
 	const std::string * retrievedStr = elem->Attribute( attrName );
 	if(!retrievedStr)
 	{
 		std::stringstream sstr;
-		sstr << "[CONFIG]: ERROR: Attribute " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
+		sstr << "[CONFIG]: ERROR: Param " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
 		throw Engine::Exception(sstr.str());
 	}
-	value = atof(retrievedStr->c_str());
+	return atof(retrievedStr->c_str());
 }
-
-void Config::retrieveAttributeOptional( TiXmlElement* elem, const std::string & attrName, float& value )
+    
+TiXmlElement * Config::findElement( const std::string & elementPath )
 {
-	const std::string * retrievedStr = elem->Attribute( attrName );
-	if(!retrievedStr)
-	{
-		std::stringstream sstr;
-		std::cerr << "[CONFIG]: WARNING: Attribute " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
-		value = 0.0f;
-		return;	
-	}
-	value = atof(retrievedStr->c_str());
+    // split elementPath based on "/" delimiters 
+    std::istringstream iss(elementPath);
+    std::vector<std::string> tokens; 
+    std::string token;
+    while(std::getline(iss, token, '/'))
+    {
+        tokens.push_back(token);
+    }
+
+    TiXmlElement * element = _root;
+    for(std::vector<std::string>::const_iterator it=tokens.begin(); it!=tokens.end(); it++)
+    {
+        element = element->FirstChildElement(*it);
+    }
+    return element;
 }
 
 const Size<int> & Config::getSize() const
 {
     return _size;
 }
-
 
 } // namespace Engine
 

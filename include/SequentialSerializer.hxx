@@ -47,7 +47,7 @@ class SequentialSerializer
 	typedef std::map< std::string, StringMap * > StringAttributesMap;
 
 	const Scheduler & _scheduler;
-	const Config & _config;
+    const Config * _config;
 
 	hid_t _fileId;
 	hid_t _agentsFileId;
@@ -67,7 +67,7 @@ class SequentialSerializer
 	void serializeRaster( const StaticRaster & raster, const std::string & datasetKey );
 
 public:
-	SequentialSerializer( const Scheduler & scheduler, const Config & config );
+	SequentialSerializer( const Scheduler & scheduler );
 	virtual ~SequentialSerializer();
 	void init( World & world );
 	void finish();

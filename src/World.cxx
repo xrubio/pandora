@@ -40,8 +40,12 @@
 namespace Engine
 {
 
-World::World( const Config & config, Scheduler * scheduler, const bool & allowMultipleAgentsPerCell) : _config(config), _allowMultipleAgentsPerCell(allowMultipleAgentsPerCell), _step(0), _scheduler(scheduler)
-{
+World::World( Engine::Config * config, Scheduler * scheduler, const bool & allowMultipleAgentsPerCell) : _config(config), _allowMultipleAgentsPerCell(allowMultipleAgentsPerCell), _step(0), _scheduler(scheduler)
+{ 
+    if(config)
+    {
+        config->loadFile();
+    }
 	// default Scheduler 
 	if(!_scheduler)
 	{
@@ -52,15 +56,6 @@ World::World( const Config & config, Scheduler * scheduler, const bool & allowMu
 
 World::~World()
 {
-    /*
-	AgentsList::iterator it=_agents.begin();
-	while(it!=_agents.end())
-	{
-		Agent * agent = *it;
-		it = _agents.erase(it);
-		delete agent;
-	}
-    */
 	for(size_t i=0; i<_rasters.size(); i++)
 	{
 		if(_rasters.at(i))
@@ -118,7 +113,7 @@ void World::step()
 	logName << "simulation_" << getId();
 	log_INFO(logName.str(), getWallTime() << " executing step: " << _step );
 
-	if(_step%_config.getSerializerResolution()==0)
+	if(_step%_config->getSerializeResolution()==0)
 	{
 		_scheduler->serializeRasters(_step);
 		_scheduler->serializeAgents(_step);
@@ -135,14 +130,14 @@ void World::run()
 {
 	std::stringstream logName;
 	logName << "simulation_" << getId();
-	log_INFO(logName.str(), getWallTime() << " executing " << _config.getNumSteps() << " steps...");
+	log_INFO(logName.str(), getWallTime() << " executing " << _config->getNumSteps() << " steps...");
 
-	for(_step=0; _step<_config.getNumSteps(); _step++)
+	for(_step=0; _step<_config->getNumSteps(); _step++)
 	{
 		step();
 	}
 	// storing last step data
-	if(_step%_config.getSerializerResolution()==0)
+	if(_step%_config->getSerializeResolution()==0)
 	{
 		_scheduler->serializeRasters(_step);
 		_scheduler->serializeAgents(_step);
@@ -414,14 +409,14 @@ const std::string & World::getRasterName( const int & index) const
 }
 
 
-Scheduler * World::useSpacePartition(const std::string & fileName, int overlap, bool finalize )
+Scheduler * World::useSpacePartition(int overlap, bool finalize )
 {
-	return new SpacePartition(fileName, overlap, finalize);
+	return new SpacePartition(overlap, finalize);
 }
 
-Scheduler * World::useOpenMPSingleNode(const std::string & fileName)
+Scheduler * World::useOpenMPSingleNode()
 {
-	return new OpenMPSingleNode(fileName);
+	return new OpenMPSingleNode();
 }
 
 

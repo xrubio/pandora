@@ -4,7 +4,7 @@
 
 #include "TestAgent.hxx"
 #include "TestWorld.hxx"
-#include <Simulation.hxx>
+#include <Config.hxx>
 #include <World.hxx>
 #include <Point2D.hxx>
 #include <Size.hxx>
@@ -33,30 +33,28 @@ BOOST_AUTO_TEST_CASE( testEqualityPoint )
 
 BOOST_AUTO_TEST_CASE( testSimulationSize ) 
 {	
-	Engine::Simulation mySimulation(Engine::Size<int>(10,10), 1);
+	Engine::Config myConfig(Engine::Size<int>(10,10), 1);
 	Engine::Size<int> size(9,10);
 	
-	BOOST_CHECK(size!=mySimulation.getSize());
+	BOOST_CHECK(size!=myConfig.getSize());
 	size._width = 10;
-	BOOST_CHECK(size==mySimulation.getSize());
+	BOOST_CHECK(size==myConfig.getSize());
 }
 
 BOOST_AUTO_TEST_CASE( testExecuteTwoWorlds ) 
 {	
-	Engine::Simulation mySimulation(Engine::Size<int>(10,10), 1);
-	TestWorld myWorld(mySimulation, TestWorld::useSpacePartition("data/results.h5", 1, false));
+	TestWorld myWorld(new Engine::Config(Engine::Size<int>(10,10), 1), TestWorld::useSpacePartition(1, false));
 	myWorld.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
 	myWorld.run();
 
-	TestWorld myWorld2(mySimulation, TestWorld::useSpacePartition("data/results.h5", 1, false));
+	TestWorld myWorld2(new Engine::Config(Engine::Size<int>(10,10), 1), TestWorld::useSpacePartition(1, false));
 	myWorld2.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
 	myWorld2.run();
 }
 
 BOOST_AUTO_TEST_CASE( testAgentRemovedIsNotExecuted ) 
 {	
-	Engine::Simulation mySimulation(Engine::Size<int>(10,10), 1);
-	TestWorld myWorld(mySimulation, TestWorld::useSpacePartition("data/results.h5", 1, false));
+	TestWorld myWorld(new Engine::Config(Engine::Size<int>(10,10), 1), TestWorld::useSpacePartition(1, false));
 	myWorld.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
 
 	TestAgent * myAgent = new TestAgent("agent_0");
@@ -70,8 +68,7 @@ BOOST_AUTO_TEST_CASE( testAgentRemovedIsNotExecuted )
 
 BOOST_AUTO_TEST_CASE( testAgentRemovedIsNotInInsideNeighbours ) 
 {
-	Engine::Simulation mySimulation(Engine::Size<int>(10,10), 1);
-	TestWorld myWorld(mySimulation, TestWorld::useSpacePartition("data/results.h5", 1, false));
+	TestWorld myWorld(new Engine::Config(Engine::Size<int>(10,10), 1), TestWorld::useSpacePartition(1, false));
 	myWorld.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
 
 	TestAgent * myAgent0 = new TestAgent("agent_0");
@@ -158,8 +155,7 @@ BOOST_AUTO_TEST_CASE( testLoadShapefile )
 
 BOOST_AUTO_TEST_CASE( testGetUnknownRasterThrowsException) 
 {      
-    Engine::Simulation mySimulation(Engine::Size<int>(10,10), 1);
-	TestWorld myWorld(mySimulation, TestWorld::useSpacePartition("data/results.h5", 1, false));
+	TestWorld myWorld(new Engine::Config(Engine::Size<int>(10,10), 1), TestWorld::useSpacePartition(1, false));
 	myWorld.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
     myWorld.run();
     try
@@ -222,8 +218,7 @@ BOOST_AUTO_TEST_CASE( testLoadDynamicRaster )
 
 BOOST_AUTO_TEST_CASE( testAddAgent) 
 {
-	Engine::Simulation mySimulation(Engine::Size<int>(10,10), 1);
-	TestWorld myWorld(mySimulation, TestWorld::useSpacePartition("data/results.h5", 1, false));
+	TestWorld myWorld(new Engine::Config(Engine::Size<int>(10,10), 1), TestWorld::useSpacePartition(1, false));
 	myWorld.initialize(boost::unit_test::framework::master_test_suite().argc, boost::unit_test::framework::master_test_suite().argv);
 
 	TestAgent * myAgent0 = new TestAgent("agent_0");
@@ -231,7 +226,6 @@ BOOST_AUTO_TEST_CASE( testAddAgent)
 	myAgent0->setRandomPosition();
     BOOST_CHECK_EQUAL(&myWorld, myAgent0->getWorld());
 }
-
 BOOST_AUTO_TEST_SUITE_END()
 
 } // namespace Test
