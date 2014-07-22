@@ -39,12 +39,12 @@ int main(int argc, char *argv[])
 		QApplication::setGraphicsSystem("raster");
 		QApplication app(argc, argv);
 		GUI::MainWindow mainWindow;
-		mainWindow.show();
 		if(argc!=1)
         {
             std::string simulation = argv[1];
             mainWindow.selectSimulation(simulation,1);
         }
+		mainWindow.show();
 		return app.exec();
 	}
 	catch( Engine::Exception & exceptionThrown )
