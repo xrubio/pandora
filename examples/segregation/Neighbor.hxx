@@ -16,13 +16,13 @@ class Neighbor : public Engine::Agent
     int _friends; // MpiBasicAttribute
     int _neighbors; // MpiBasicAttribute
 
-	void foo();
 	void moveHome();
 
 public:
 	Neighbor( const std::string & id );
 	virtual ~Neighbor();
 
+	void updateKnowledge();
 	void updateState();
 
 	void setFriendlyPercentage( const float & friendlyPercentage );

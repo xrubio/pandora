@@ -2,7 +2,7 @@
 <config>  
 	<output resultsFile="./data/segregation.h5" logsDir="./logs"/>
 	<numSteps value="50" serializeResolution="1"/>
-	<size width="50" height="50"/>
+	<size width="25" height="25"/>
 	<!-- friendlyPercentage of neighbor cells with friends required to not move -->
 	<!-- density of occupied cells -->
 	<!-- percentage of agents that are dime (the other will be pennies) -->
