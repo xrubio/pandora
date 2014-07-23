@@ -16,8 +16,6 @@ class PanicAgent : public Engine::Agent
 	int _direction;
 	bool _exited;
 	bool _panicked;
-	ScenarioConfig * _config;
-	int _compressionThreshold;
 	Engine::Point2D<int> _exit;
 	Engine::Point2D<float> _rest;
 
@@ -29,7 +27,7 @@ class PanicAgent : public Engine::Agent
 
 public:
 	// todo remove environment from here
-	PanicAgent( const std::string & id, ScenarioConfig & config);
+	PanicAgent( const std::string & id);
 	virtual ~PanicAgent();
 	void setExit( const Engine::Point2D<int> & exit );
 	

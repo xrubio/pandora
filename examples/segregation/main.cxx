@@ -1,7 +1,6 @@
 
 #include "NeighborConfig.hxx"
 #include "Neighborhood.hxx"
-#include <Simulation.hxx>
 #include <Exception.hxx>
 
 #include <iostream>
@@ -21,12 +20,7 @@ int main(int argc, char *argv[])
 		{
 			fileName = argv[1];
 		}
-		Segregation::NeighborConfig config;
-		config.deserialize(fileName);
-
-		Engine::Simulation segregationSim(config.getSize(), config.getNumSteps(), config.getSerializeResolution());
-		Segregation::Neighborhood neighborhood( config, segregationSim, neighborhood.useOpenMPSingleNode(config.getResultsFile()));
-	
+		Segregation::Neighborhood neighborhood( new Segregation::NeighborConfig(fileName), neighborhood.useOpenMPSingleNode());
 		neighborhood.initialize(argc, argv);
 		neighborhood.run();
 	}

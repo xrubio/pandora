@@ -2,7 +2,6 @@
 #include <Earth.hxx>
 #include <EarthConfig.hxx>
 #include <Exception.hxx>
-#include <Simulation.hxx>
 
 #include <iostream>
 #include <cstdlib>
@@ -21,11 +20,7 @@ int main(int argc, char *argv[])
 		{
 			fileName = argv[1];
 		}
-		Examples::EarthConfig config;
-		config.deserialize(fileName);
-	
-		Engine::Simulation epidemyParams(config.getSize(), config.getNumSteps(), config.getSerializeResolution());
-		Examples::Earth earth( config, epidemyParams, earth.useOpenMPSingleNode(config.getResultsFile()));
+		Examples::Earth earth( new Examples::EarthConfig(fileName), earth.useOpenMPSingleNode());
 	
 		earth.initialize(argc,argv);
 		earth.run();

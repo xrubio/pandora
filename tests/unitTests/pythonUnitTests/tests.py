@@ -8,7 +8,7 @@ sys.path.append(pandoraPath+'/lib')
 
 import unittest
 
-from pyPandora import Simulation, Agent, World, Point2DInt, SizeInt, RectangleInt, SpacePartition, ShpLoader, RasterLoader, GeneralState, StaticRaster, DynamicRaster
+from pyPandora import Config, Agent, World, Point2DInt, SizeInt, RectangleInt, SpacePartition, ShpLoader, RasterLoader, GeneralState, StaticRaster, DynamicRaster
 
 class TestAgent(Agent):
     def __init__(self, id):
@@ -21,8 +21,8 @@ class TestAgent(Agent):
         return
     
 class TestWorld(World):
-    def __init__(self, simulation, scheduler):
-        World.__init__( self, simulation, scheduler, False)
+    def __init__(self, config, scheduler):
+        World.__init__( self, config, scheduler, False)
 
     def createRasters(self):
         return
@@ -48,16 +48,15 @@ class TestPyPandora(unittest.TestCase):
         self.assertNotEqual(point1, point2)
 
     def testSimulationSize(self):
-        mySimulation = Simulation(SizeInt(10,10), 1)
+        myConfig = Config(SizeInt(10,10), 1)
         size = SizeInt(9,10)
 
-        self.assertNotEqual(mySimulation.size, size)
+        self.assertNotEqual(myConfig.size, size)
         size._width = 10
-        self.assertEqual(mySimulation.size, size)
-
+        self.assertEqual(myConfig.size, size)
     def testAgentRemovedIsNotExecuted(self):
-        mySimulation = Simulation(SizeInt(10,10), 1)
-        myWorld = TestWorld(mySimulation, TestWorld.useSpacePartition('data/results.h5', 1, False))
+        myConfig = Config(SizeInt(10,10), 1)
+        myWorld = TestWorld(myConfig, TestWorld.useSpacePartition(1, False))
         myWorld.initialize()
 
         myAgent = TestAgent('agent_0')
@@ -69,17 +68,17 @@ class TestPyPandora(unittest.TestCase):
         myWorld.run()
 
     def testExecuteTwoWorlds(self):
-        mySimulation = Simulation(SizeInt(10,10), 1)
-        myWorld = TestWorld(mySimulation, TestWorld.useSpacePartition('data/results.h5', 1, False))
+        myConfig = Config(SizeInt(10,10), 1)
+        myWorld = TestWorld(myConfig, TestWorld.useSpacePartition(1, False))
         myWorld.initialize()
         myWorld.run()
-        myWorld = TestWorld(mySimulation, TestWorld.useSpacePartition('data/results.h5', 1, False))
+        myWorld = TestWorld(myConfig, TestWorld.useSpacePartition(1, False))
         myWorld.initialize()
         myWorld.run()
     
     def testAgentRemovedIsNotInsideNeighbours(self):
-        mySimulation = Simulation(SizeInt(10,10), 1)
-        myWorld = TestWorld(mySimulation, TestWorld.useSpacePartition('data/results.h5', 1, False))
+        myConfig = Config(SizeInt(10,10), 1)
+        myWorld = TestWorld(myConfig, TestWorld.useSpacePartition(1, False))
         myWorld.initialize()
         myWorld.run()
 
@@ -144,8 +143,8 @@ class TestPyPandora(unittest.TestCase):
         self.assertAlmostEqual(4.5, loader.getFieldAsFloat(3, 'floatValue'))
 
     def testGetUnknownRasterThrowsException(self):
-        mySimulation = Simulation(SizeInt(10,10), 1)
-        myWorld = TestWorld(mySimulation, TestWorld.useSpacePartition('data/results.h5', 1, True))
+        myConfig = Config(SizeInt(10,10), 1)
+        myWorld = TestWorld(myConfig, TestWorld.useSpacePartition(1, True))
         myWorld.initialize()
         myWorld.run()
         try:
@@ -189,8 +188,8 @@ class TestPyPandora(unittest.TestCase):
         self.assertEqual(139, aRaster.getValue(Point2DInt(39,39)))
     
     def testAddAgent(self):
-        mySimulation = Simulation(SizeInt(10,10), 1)
-        myWorld = TestWorld(mySimulation, TestWorld.useSpacePartition('data/results.h5', 1, False))
+        myConfig = Config(SizeInt(10,10), 1)
+        myWorld = TestWorld(myConfig, TestWorld.useSpacePartition(1, False))
         myWorld.initialize()
 
         myAgent = TestAgent('agent_0')
@@ -198,7 +197,7 @@ class TestPyPandora(unittest.TestCase):
         myAgent.setRandomPosition()
         myWorld.run()
         self.assertEqual(myAgent.getWorld(), myWorld)
- 
+
 if __name__ == '__main__':
     unittest.main()
 

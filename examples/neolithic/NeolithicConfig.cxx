@@ -4,7 +4,7 @@
 namespace Examples
 {
 
-NeolithicConfig::NeolithicConfig() : _size(0,0), _mountains(false), _heightThreshold(0), _seaTravel(false), _seaTravelDistance(0), _saturationDensity(0.0f), _reproductiveRate(0.0f), _persistence(0.0f), _demFile(""), _initPopulationFile("")
+NeolithicConfig::NeolithicConfig( const std::string & xmlFile ) : Config(xmlFile), _mountains(false), _heightThreshold(0), _seaTravel(false), _seaTravelDistance(0), _saturationDensity(0.0f), _reproductiveRate(0.0f), _persistence(0.0f), _demFile(""), _initPopulationFile("")
 {
 }
   
@@ -12,38 +12,25 @@ NeolithicConfig::~NeolithicConfig()
 {
 }
 
-void NeolithicConfig::extractParticularAttribs(TiXmlElement * root)
+void NeolithicConfig::loadParams()
 {
-	TiXmlElement * element = root->FirstChildElement("location");
-	float resolution = 0.0f;
-	retrieveAttributeMandatory(element, "resolution", resolution);
-	retrieveAttributeMandatory(element, "width", _size._width);
-	retrieveAttributeMandatory(element, "height", _size._height);
-	retrieveAttributeMandatory(element, "demFile", _demFile);
-	retrieveAttributeMandatory(element, "initPopulationFile", _initPopulationFile);
 
-	element = root->FirstChildElement("mountains");
-	retrieveAttributeMandatory(element, "active", _mountains);
-	retrieveAttributeMandatory(element, "threshold", _heightThreshold);
+    _demFile = getParamStr("location", "demFile");
+    _initPopulationFile = getParamStr("location", "initPopulationFile");
 
-	element = root->FirstChildElement("seaTravel");
-	retrieveAttributeMandatory(element, "active", _seaTravel);
-	retrieveAttributeMandatory(element, "distance", _seaTravelDistance);
+    _mountains = getParamBool("mountains", "active");
+    _heightThreshold = getParamInt("mountains", "threshold");
+
+    _seaTravel = getParamBool("seaTravel", "active");
+    _seaTravelDistance = getParamInt("seaTravel", "distance");
+    float resolution = getParamFloat("location", "resolution");
 	_seaTravelDistance /= resolution;
 
-	element = root->FirstChildElement("dispersion");
-	float saturationDensityConstant = 0.0f;
-	retrieveAttributeMandatory(element, "saturationDensityConstant", saturationDensityConstant);
-	retrieveAttributeMandatory(element, "reproductiveRate", _reproductiveRate);
-	retrieveAttributeMandatory(element, "persistence", _persistence);
-	
+    float saturationDensityConstant = getParamFloat("dispersion", "saturationDensityConstant");
+    _reproductiveRate = getParamFloat("dispersion", "reproductiveRate");
+    _persistence = getParamFloat("dispersion", "persistence");
 	_saturationDensity = resolution * resolution * saturationDensityConstant;
 }
 	
-const Engine::Size<int> & NeolithicConfig::getSize() const
-{
-	return _size;
-}
-  
 } // namespace Examples
 

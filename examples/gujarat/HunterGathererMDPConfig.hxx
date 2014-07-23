@@ -1,19 +1,15 @@
 #ifndef __HunterGathererMDPConfig_hxx__
 #define __HunterGathererMDPConfig_hxx__
 
-#include <iosfwd>
-
-class TiXmlElement;
-
 namespace Gujarat
 {
+class GujaratConfig;
 
 class HunterGathererMDPConfig
 {
 public:
 	HunterGathererMDPConfig();
-	HunterGathererMDPConfig( TiXmlElement* elem );
-	~HunterGathererMDPConfig();	
+	virtual ~HunterGathererMDPConfig();	
 
 
 	int	getNumberForageActions() const { return _nrForageActions; }
@@ -22,8 +18,6 @@ public:
 	int	getHorizon() const { return _horizon; } 
 	int	getWidth() const { return _width; }
 	float	getExplorationBonus() const { return _explorationBonus; }
-
-	void	dump( std::ostream& os ) const;
 
 private:
 
@@ -34,8 +28,11 @@ private:
 	int	_width;
 	float	_explorationBonus;
 
+public:
+    friend class GujaratConfig;
 };
 
 }
 
 #endif // HunterGathererMDPConfig.hxx
+

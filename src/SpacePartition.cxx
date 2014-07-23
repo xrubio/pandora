@@ -24,11 +24,12 @@
 #include <MpiFactory.hxx>
 #include <Logger.hxx>
 #include <Exception.hxx>
+#include <Config.hxx>
 
 namespace Engine
 {
 
-SpacePartition::SpacePartition(const std::string & fileName, const int & overlap, bool finalize ) : _worldPos(-1,-1), _finalize(finalize), _overlap(overlap), _initialTime(0.0f), _serializer(*this, fileName)
+SpacePartition::SpacePartition( const int & overlap, bool finalize ) : _worldPos(-1,-1), _finalize(finalize), _overlap(overlap), _initialTime(0.0f), _serializer(*this)
 {
 }
 
@@ -73,7 +74,7 @@ void SpacePartition::checkOverlapSize()
 	if(_overlap*2>subfieldSizeX || _overlap*2>subfieldSizeY)
 	{
 		std::stringstream oss;
-		oss << "SpacePartition::checkOverlapSize- subfield sizes: " << subfieldSizeX << "/" << subfieldSizeY << " from global: " << _world->getSimulation().getSize() << " and owned area: " << _ownedArea << " must be at least twice the value of overlap: " << _overlap << " to avoid conflicts between non adjacent subfields";
+		oss << "SpacePartition::checkOverlapSize- subfield sizes: " << subfieldSizeX << "/" << subfieldSizeY << " from global: " << _world->getConfig().getSize() << " and owned area: " << _ownedArea << " must be at least twice the value of overlap: " << _overlap << " to avoid conflicts between non adjacent subfields";
 		throw Exception(oss.str());
 	}
 }
@@ -98,8 +99,8 @@ void SpacePartition::stablishBoundaries()
 		}
 	}
 	// owned area inside global coordinates, depending on worldPos
-	_ownedArea._size._width = _world->getSimulation().getSize()._width/sqrt(_numTasks);
-	_ownedArea._size._height = _world->getSimulation().getSize()._height/sqrt(_numTasks);
+	_ownedArea._size._width = _world->getConfig().getSize()._width/sqrt(_numTasks);
+	_ownedArea._size._height = _world->getConfig().getSize()._height/sqrt(_numTasks);
 	_ownedArea._origin._x = _worldPos._x*_ownedArea._size._width;
 	_ownedArea._origin._y = _worldPos._y*_ownedArea._size._height;
 
@@ -112,7 +113,7 @@ void SpacePartition::stablishBoundaries()
 		_boundaries._size._width += _overlap;
 	}
 	// east boundary
-	if(_ownedArea._origin._x!=_world->getSimulation().getSize()._width-_ownedArea._size._width)
+	if(_ownedArea._origin._x!=_world->getConfig().getSize()._width-_ownedArea._size._width)
 	{
 		_boundaries._size._width += _overlap;
 	}
@@ -123,7 +124,7 @@ void SpacePartition::stablishBoundaries()
 		_boundaries._size._height += _overlap;
 	}
 	// south boundary
-	if(_ownedArea._origin._y!=_world->getSimulation().getSize()._height-_ownedArea._size._height)
+	if(_ownedArea._origin._y!=_world->getConfig().getSize()._height-_ownedArea._size._height)
 	{
 		_boundaries._size._height += _overlap;
 	}
@@ -144,7 +145,7 @@ void SpacePartition::stablishBoundaries()
 
 	std::stringstream logName;
 	logName << "simulation_" << _id;
-	log_INFO(logName.str(), getWallTime() << " pos: " << _worldPos << ", global size: " << _world->getSimulation().getSize() << ", boundaries: " << _boundaries << " and owned area: " << _ownedArea);
+	log_INFO(logName.str(), getWallTime() << " pos: " << _worldPos << ", global size: " << _world->getConfig().getSize() << ", boundaries: " << _boundaries << " and owned area: " << _ownedArea);
 	log_INFO(logName.str(), getWallTime() << " sections 0: " << _sections[0] << " - 1: " << _sections[1] << " - 2:" << _sections[2] << " - 3: " << _sections[3]);
 }
 
@@ -1097,7 +1098,7 @@ Rectangle<int> SpacePartition::getOverlap( const int & id, const int & sectionIn
 		else
 		{
 			result._origin._x = _ownedArea._size._width/2;	
-			if(_ownedArea._origin._x+_ownedArea._size._width!=_world->getSimulation().getSize()._width)
+			if(_ownedArea._origin._x+_ownedArea._size._width!=_world->getConfig().getSize()._width)
 			{
 				result._origin._x -= _overlap;
 			}
@@ -1130,7 +1131,7 @@ Rectangle<int> SpacePartition::getOverlap( const int & id, const int & sectionIn
 		else
 		{
 			result._origin._y = _ownedArea._size._height/2;
-			if(_ownedArea._origin._y+_ownedArea._size._height!=_world->getSimulation().getSize()._height)
+			if(_ownedArea._origin._y+_ownedArea._size._height!=_world->getConfig().getSize()._height)
 			{
 				result._origin._y -= _overlap;
 			}
@@ -1172,7 +1173,7 @@ Rectangle<int> SpacePartition::getOverlap( const int & id, const int & sectionIn
 			}
 		}
 
-		if(_ownedArea._origin._x+_ownedArea._size._width!=_world->getSimulation().getSize()._width)
+		if(_ownedArea._origin._x+_ownedArea._size._width!=_world->getConfig().getSize()._width)
 		{
 			result._size._width += _overlap;
 		}
@@ -1204,7 +1205,7 @@ Rectangle<int> SpacePartition::getOverlap( const int & id, const int & sectionIn
 			}
 		}
 
-		if(_ownedArea._origin._y+_ownedArea._size._height!=_world->getSimulation().getSize()._height)
+		if(_ownedArea._origin._y+_ownedArea._size._height!=_world->getConfig().getSize()._height)
 		{
 			result._size._height += _overlap;
 		}

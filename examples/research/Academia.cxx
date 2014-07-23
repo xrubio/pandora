@@ -4,7 +4,6 @@
 #include "AcademiaConfig.hxx"
 #include "Paper.hxx"
 #include "Author.hxx"
-#include <Simulation.hxx>
 #include <DynamicRaster.hxx>
 #include <Point2D.hxx>
 #include <Agent.hxx>
@@ -15,7 +14,7 @@
 namespace Examples 
 {
 
-Academia::Academia( const AcademiaConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler ) : World(simulation, scheduler, false), _config(config), _newPaperKey(0), _newAuthorKey(0)
+Academia::Academia( AcademiaConfig * config,Engine::Scheduler * scheduler ) : World(config, scheduler, false), _newPaperKey(0), _newAuthorKey(0)
 {
 }
 
@@ -29,7 +28,8 @@ void Academia::createRasters()
 
 void Academia::createAgents()
 {
-	for(int i=0; i<_config._numInitialPapers; i++)
+    const AcademiaConfig & academiaConfig = (const AcademiaConfig &)getConfig();
+	for(int i=0; i<academiaConfig._numInitialPapers; i++)
 	{
 		if((i%getNumTasks())==getId())
 		{			
@@ -38,7 +38,7 @@ void Academia::createAgents()
 			std::ostringstream ossAuthor;
 			ossAuthor << "Author_" << _newAuthorKey;
 
-			Author * newAuthor = new Author(ossAuthor.str(), Engine::GeneralState::statistics().getUniformDistValue(0, _config._researcherLife));
+			Author * newAuthor = new Author(ossAuthor.str(), Engine::GeneralState::statistics().getUniformDistValue(0, academiaConfig._researcherLife));
 			addAgent(newAuthor);
 			newAuthor->setPosition(Engine::Point2D<int>(0,0));
 			
@@ -46,7 +46,7 @@ void Academia::createAgents()
 			addAgent(paper);
 			paper->setRandomPosition();
 			paper->setAuthor(newAuthor);
-			paper->setProbabilityNewPaper(_config._probabilityNewPaper);
+			paper->setProbabilityNewPaper(academiaConfig._probabilityNewPaper);
 			newAuthor->incrementNumPapers(paper->getPosition());
 
 			_newPaperKey++;
@@ -57,13 +57,14 @@ void Academia::createAgents()
 	
 void Academia::generateNewPaper( Paper & paper )
 {
+    const AcademiaConfig & academiaConfig = (const AcademiaConfig &)getConfig();
 	std::stringstream logName;
 	logName << "NewPapers_" << getId();
 
 	std::ostringstream oss;
 	oss << "Paper_" << _newPaperKey;
 
-	Engine::AgentsVector potentialCitations = getNeighbours(&paper, _config._citationRadius, "Paper");
+	Engine::AgentsVector potentialCitations = getNeighbours(&paper, academiaConfig._citationRadius, "Paper");
 
 	float influence = 0.0f;
 	Engine::Point2D<int> newPosition = paper.getPosition();
@@ -82,9 +83,9 @@ void Academia::generateNewPaper( Paper & paper )
 		it++;
 	}
 
-	if(paper.getPosition().distance(newPosition)<_config._originalityThreshold)
+	if(paper.getPosition().distance(newPosition)<academiaConfig._originalityThreshold)
 	{
-		log_DEBUG( logName.str(), "originality threshold: " << _config._originalityThreshold << " not arrived, with original kene: " << paper.getPosition() << ",  new paper kene: " << newPosition << " and distance: " << paper.getPosition().distance(newPosition));
+		log_DEBUG( logName.str(), "originality threshold: " << academiaConfig._originalityThreshold << " not arrived, with original kene: " << paper.getPosition() << ",  new paper kene: " << newPosition << " and distance: " << paper.getPosition().distance(newPosition));
 		return;
 	}
 
@@ -105,12 +106,12 @@ void Academia::generateNewPaper( Paper & paper )
 	randomValue /= 100000;
 
 	Author * newAuthor = 0;
-	if(!paper.getAuthor()->isActive() || randomValue<_config._probabilityNewAuthor)
+	if(!paper.getAuthor()->isActive() || randomValue<academiaConfig._probabilityNewAuthor)
 	{
 		std::ostringstream ossAuthor;
 		ossAuthor << "Author_" << _newAuthorKey;
 		_newAuthorKey++;
-		newAuthor = new Author(ossAuthor.str(), Engine::GeneralState::statistics().getUniformDistValue(0, _config._researcherLife));
+		newAuthor = new Author(ossAuthor.str(), Engine::GeneralState::statistics().getUniformDistValue(0, academiaConfig._researcherLife));
 		addAgent(newAuthor);
 		newAuthor->setPosition(Engine::Point2D<int>(0,0));
 		log_DEBUG( logName.str(), "paper with kene: " << newPosition << " has new author: " << newAuthor);
@@ -127,13 +128,12 @@ void Academia::generateNewPaper( Paper & paper )
 	newPaper->setCitedPapers(citedPapers.size());
 	newPaper->setAuthor(newAuthor);
 
-	newPaper->setProbabilityNewPaper(_config._probabilityNewPaper);
+	newPaper->setProbabilityNewPaper(academiaConfig._probabilityNewPaper);
 	newPaper->setPosition(newPosition);
 	newAuthor->incrementNumPapers(newPaper->getPosition());
 	log_DEBUG( logName.str(), newPaper << " new paper");
 	_newPaperKey++;
 }
-
 
 } // namespace Examples
 

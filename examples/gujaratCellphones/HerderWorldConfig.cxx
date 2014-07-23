@@ -3,25 +3,19 @@
 namespace GujaratCellphones
 {
 
-HerderWorldConfig::HerderWorldConfig() {
-}
-
-HerderWorldConfig::~HerderWorldConfig() {
-}
-
-void HerderWorldConfig::extractParticularAttribs(TiXmlElement * root)
+HerderWorldConfig::HerderWorldConfig( const std::string & xmlFile ) : Config(xmlFile)
 {
-	TiXmlElement * element = 0;
-	TiXmlElement * child = 0;
+}
 
-	//environment
-	element = root->FirstChildElement("environment");
-	child = element->FirstChildElement("landscape");
-	retrieveAttributeMandatory(child, "width", _size._width);
-	retrieveAttributeMandatory(child, "height", _size._height);
-	retrieveAttributeMandatory(child, "averageResources", _averageResources);
-    std::string distribution;
-	retrieveAttributeMandatory(child, "distribution", distribution);
+HerderWorldConfig::~HerderWorldConfig()
+{
+}
+
+void HerderWorldConfig::loadParams()
+{
+    _averageResources = getParamInt("environment/landscape", "averageResources");
+    std::string distribution = getParamStr("environment/landscape", "distribution");
+
     if(distribution=="distance")
     {
         _randomDistribution = eDistance;
@@ -34,44 +28,28 @@ void HerderWorldConfig::extractParticularAttribs(TiXmlElement * root)
     {
         _randomDistribution = eRandom;
     }
-
-	child = element->FirstChildElement("climate");
-	retrieveAttributeMandatory(child, "daysDrySeason", _daysDrySeason);
-	retrieveAttributeMandatory(child, "meanRain", _rainHistoricalDistribMean);
-	retrieveAttributeMandatory(child, "stddev", _rainHistoricalDistribStdDev);
-
-
+    _daysDrySeason = getParamInt("environment/climate", "daysDrySeason");
+    _rainHistoricalDistribMean = getParamFloat("environment/climate", "meanRain");
+    _rainHistoricalDistribStdDev= getParamFloat("environment/climate", "stddev");
 
 	//population
-	element = root->FirstChildElement("population");
-	child = element->FirstChildElement("villages");
-	retrieveAttributeMandatory(child, "num", _numVillages);
-	retrieveAttributeMandatory(child, "agentsPerVillage", _numAgentsPerVillage);
-	child = element->FirstChildElement("animals");	
-	retrieveAttributeMandatory(child, "numPerHerder", _animalsPerHerder);
-	retrieveAttributeMandatory(child, "resourcesPerDay", _resourcesNeededPerAnimal);	
+    _numVillages = getParamInt("population/villages", "num");
+    _numAgentsPerVillage = getParamInt("population/villages", "agentsPerVillage");
+    _animalsPerHerder = getParamInt("population/animals", "numPerHerder");
+    _resourcesNeededPerAnimal = getParamInt("population/animals", "resourcesPerDay");
 
 	//mdp
-	element = root->FirstChildElement("mdp");
-	retrieveAttributeMandatory(element, "horizon", _horizon);
-	retrieveAttributeMandatory(element, "width", _width);	
-	retrieveAttributeMandatory(element, "explorationBonus", _explorationBonus);	
-
+    _horizon = getParamInt("mdp", "horizon");
+    _width = getParamInt("mdp", "width");
+    _explorationBonus = getParamInt("mdp", "explorationBonus");
 
 	//knowledge transmission
-	element = root->FirstChildElement("knowledgeTransmission");
-	child = element->FirstChildElement("inVillage");	
-	retrieveAttributeMandatory(child, "active", _inVillageTransmission);
-	retrieveAttributeMandatory(child, "fixedValue", _inVillageTransmissionValue);
-	
-	child = element->FirstChildElement("outVillage");	
-	retrieveAttributeMandatory(child, "active", _outVillageTransmission);
-	retrieveAttributeMandatory(child, "fixedValue", _outVillageTransmissionValue);
-}
+    _inVillageTransmission = getParamBool("knowledgeTransmission/inVillage", "active");
+    _inVillageTransmissionValue = getParamInt("knowledgeTransmission/inVillage", "fixedValue");
 
-Engine::Size<int> HerderWorldConfig::getSize() const
-{
-	return _size;
+    _outVillageTransmission = getParamBool("knowledgeTransmission/outVillage", "active");
+    _outVillageTransmissionValue = getParamInt("knowledgeTransmission/outVillage", "fixedValue");
 }
 
 } // namespace GujaratCellphones
+

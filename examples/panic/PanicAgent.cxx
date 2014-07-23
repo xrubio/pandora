@@ -13,7 +13,7 @@
 namespace Panic
 {
 
-PanicAgent::PanicAgent( const std::string & id, ScenarioConfig & config ) : Agent(id), _direction(0), _exited(false), _panicked(false), _config(&config), _compressionThreshold(config._compressionThreshold), _rest(0.0f, 0.0f), _consecutive(0)
+PanicAgent::PanicAgent( const std::string & id) : Agent(id), _direction(0), _exited(false), _panicked(false), _rest(0.0f, 0.0f), _consecutive(0)
 {
 	_direction = Engine::GeneralState::statistics().getUniformDistValue(0,359);
 }
@@ -35,6 +35,8 @@ Engine::Point2D<float> PanicAgent::getNextPos( const int & direction, const Engi
 float PanicAgent::getDistToNearestObstacle( const int & direction )
 {
 	Engine::Point2D<float> newPos = Engine::Point2D<float>(_position._x+_rest._x, _position._y+_rest._y);
+
+    const ScenarioConfig & scenarioConfig = (const ScenarioConfig &)getWorld()->getConfig();
 	while(1)
 	{
 		newPos = getNextPos(direction, newPos);
@@ -66,7 +68,7 @@ float PanicAgent::getDistToNearestObstacle( const int & direction )
 		}
 		
 		// too many people (>_bodiesToObstacle)
-		if(_world->getValue(eNumAgents, newIntPos)>=_config->_bodiesToObstacle)
+		if(_world->getValue(eNumAgents, newIntPos)>=scenarioConfig._bodiesToObstacle)
 		{	
 			if(newIntPos!=_position)
 			{
@@ -75,7 +77,7 @@ float PanicAgent::getDistToNearestObstacle( const int & direction )
 		}	
 		
 		// too many injured people (>_bodiesToObstacle)
-		if(_world->getValue(eDeaths, newIntPos)>=_config->_bodiesToObstacle)
+		if(_world->getValue(eDeaths, newIntPos)>=scenarioConfig._bodiesToObstacle)
 		{	
 			if(newIntPos!=_position)
 			{
@@ -178,6 +180,7 @@ void PanicAgent::selectActions()
 	_rest._x = newPos._x - newIntPos._x;
 	_rest._y = newPos._y - newIntPos._y;
 
+    const ScenarioConfig & scenarioConfig = (const ScenarioConfig &)getWorld()->getConfig();
 	if(_world->checkPosition(newIntPos) && _world->getDynamicRaster(eObstacles).getValue(newIntPos)==0)
 	{
 		if(newIntPos!=_position)
@@ -188,7 +191,7 @@ void PanicAgent::selectActions()
 		{
 			_consecutive++;
 		}
-		_actions.push_back(new MoveAction(newIntPos, _config->_agentCompressionWeight, _config->_wallCompressionWeight, _config->_contagion));
+		_actions.push_back(new MoveAction(newIntPos, scenarioConfig._agentCompressionWeight, scenarioConfig._wallCompressionWeight, scenarioConfig._contagion));
 	}
 }
 
@@ -205,11 +208,12 @@ void PanicAgent::updateState()
 		_world->removeAgent(this);
 	}
 
-	if(_world->getValue(eCompression, _position)>_compressionThreshold)
+    const ScenarioConfig & scenarioConfig = (const ScenarioConfig &)getWorld()->getConfig();
+	if(_world->getValue(eCompression, _position)>scenarioConfig._compressionThreshold)
 	{
 		_world->setValue(eDeaths, _position, _world->getValue(eDeaths, _position)+1);		
 		_world->setValue(eNumAgents, _position, _world->getValue(eNumAgents, _position)-1);		
-		_world->setValue(eCompression, _position, std::max(0, _world->getValue(eCompression, _position)-_compressionThreshold));
+		_world->setValue(eCompression, _position, std::max(0, _world->getValue(eCompression, _position)-scenarioConfig._compressionThreshold));
 		_world->removeAgent(this);
 	}
 

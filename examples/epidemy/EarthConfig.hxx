@@ -10,7 +10,6 @@ namespace Examples
 
 class EarthConfig : public Engine::Config
 {
-	Engine::Size<int> _size;
     std::string _demName;
 	std::string _populationName;
 
@@ -21,13 +20,10 @@ class EarthConfig : public Engine::Config
 
     float _virulence;
 public:
-	EarthConfig();
+	EarthConfig( const std::string & xmlFile );
 	virtual ~EarthConfig();
 
-	void extractParticularAttribs(TiXmlElement *pRoot);
-
-	const Engine::Size<int> & getSize() const;
-
+	void loadParams();
 	friend class Earth;
 };
 

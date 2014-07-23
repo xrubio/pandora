@@ -6,7 +6,7 @@
 
 namespace Engine
 {
-	class Simulation;
+	class Config;
 }
 
 namespace Test 
@@ -17,7 +17,7 @@ class TestWorld : public Engine::World
 	void createRasters();
 	void createAgents();
 public:
-	TestWorld(Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0);
+	TestWorld(Engine::Config * config, Engine::Scheduler * scheduler = 0);
 	virtual ~TestWorld();
 };
 

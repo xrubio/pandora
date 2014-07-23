@@ -3,17 +3,12 @@
 #include <NeolithicConfig.hxx>
 
 #include <GeneralState.hxx>
-/*
-#include "Raster.hxx"
-#include "Exception.hxx"
-#include "Statistics.hxx"
-#include "gdal_priv.h"
-*/
+
 
 namespace Examples 
 {
 
-NeolithicWorld::NeolithicWorld(const NeolithicConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler ) : World(simulation, scheduler, false), _config(config)
+NeolithicWorld::NeolithicWorld(NeolithicConfig * config, Engine::Scheduler * scheduler ) : World(config, scheduler, false)
 {
 }
 
@@ -23,11 +18,13 @@ NeolithicWorld::~NeolithicWorld()
 
 void NeolithicWorld::createRasters()
 {
+    const NeolithicConfig & neolithicConfig = (const NeolithicConfig&)getConfig();
+
 	registerStaticRaster("dem", true, eDem);
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eDem), _config._demFile, getBoundaries());
+	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eDem), neolithicConfig._demFile, getBoundaries());
 
 	registerStaticRaster("initPopulation", true, eInitPopulation);
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eInitPopulation), _config._initPopulationFile, getBoundaries());
+	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eInitPopulation), neolithicConfig._initPopulationFile, getBoundaries());
 
 	registerDynamicRaster("population", true, ePopulation);
 	getDynamicRaster(ePopulation).setDefaultInitValues(0,std::numeric_limits<int>::max(), 0);
@@ -38,13 +35,13 @@ void NeolithicWorld::createRasters()
 
     for(auto index : getBoundaries() )
     {
-        setMaxValue(ePopulation, index, _config._saturationDensity);
-        setMaxValue(ePopulationBase, index, _config._saturationDensity);
-        setMaxValue(eArrivalTime, index, _simulation.getNumSteps()+1);
+        setMaxValue(ePopulation, index, neolithicConfig._saturationDensity);
+        setMaxValue(ePopulationBase, index, neolithicConfig._saturationDensity);
+        setMaxValue(eArrivalTime, index, neolithicConfig.getNumSteps()+1);
         // if the point has initial population, set it at maximum
         if(getValue(eInitPopulation, index)!=0)
         {
-            setValue(ePopulation, index, _config._saturationDensity);
+            setValue(ePopulation, index, neolithicConfig._saturationDensity);
             setValue(eArrivalTime, index, 1);
         }
         else
@@ -57,8 +54,9 @@ void NeolithicWorld::createRasters()
 
 void NeolithicWorld::stepEnvironment()
 {
+    const NeolithicConfig & neolithicConfig = (const NeolithicConfig&)getConfig();
 	reproductionStep();
-	if(!_config._mountains && !_config._seaTravel)
+	if(!neolithicConfig._mountains && !neolithicConfig._seaTravel)
 	{
 		homogeneousDispersionStep();
 	}
@@ -71,18 +69,17 @@ void NeolithicWorld::stepEnvironment()
 
 void NeolithicWorld::reproductionStep()
 {
+    const NeolithicConfig & neolithicConfig = (const NeolithicConfig&)getConfig();
     for( auto index : getBoundaries())
     {
         int actualPopulation = getValue(ePopulation, index);
-        //int oldPopulation = actualPopulation;
-
-        if(actualPopulation>=(_config._saturationDensity/_config._reproductiveRate))
+        if(actualPopulation>=(neolithicConfig._saturationDensity/neolithicConfig._reproductiveRate))
         {
-            actualPopulation = _config._saturationDensity;
+            actualPopulation = neolithicConfig._saturationDensity;
         }
         else
         {
-            actualPopulation *= _config._reproductiveRate;
+            actualPopulation *= neolithicConfig._reproductiveRate;
         }
 
         setValue(ePopulationBase, index, actualPopulation);
@@ -92,23 +89,17 @@ void NeolithicWorld::reproductionStep()
 
 void NeolithicWorld::homogeneousDispersionStep()
 {
+    const NeolithicConfig & neolithicConfig = (const NeolithicConfig&)getConfig();
     for( auto index : getBoundaries())
     {
-        float actualPopulation = _config._persistence*float(getValue(ePopulationBase, index));
+        float actualPopulation = neolithicConfig._persistence*float(getValue(ePopulationBase, index));
         if(actualPopulation<=0.0f)
         {
             continue;
         }
 
-        float migrationPopulation = ((1-_config._persistence)/4.0f)*float(getValue(ePopulationBase, index));
+        float migrationPopulation = ((1-neolithicConfig._persistence)/4.0f)*float(getValue(ePopulationBase, index));
         
-        /*
-        if(migrationPopulation>0)
-        {
-            std::cout << "population migrating from: " << index << " with neighbors: " << numNeighbors << " = " << migrationPopulation << std::endl;
-        }
-        */
-
         setValue(ePopulation, index, getValue(ePopulation, index)+actualPopulation);
         
         Engine::Point2D<int> neighborW(index._x-1, index._y);
@@ -135,13 +126,6 @@ void NeolithicWorld::homogeneousDispersionStep()
             setValue(ePopulation, neighborS, getValue(ePopulation, neighborS)+migrationPopulation);
 
         }
-
-        /*
-        if(actualPopulation>0)
-        {
-            std::cout << "index: " << index << " generated pop: " << getValue("oldPopulation", index) << " remaining population: " << actualPopulation << " and migrating: " << migrationPopulation <<std::endl;				 
-        }
-        */
     }
 }
 
@@ -158,14 +142,15 @@ void NeolithicWorld::disperseTo( const Engine::Point2D<int> & origin, const Engi
 	}
 	else if(!isMountain(destination))
 	{
-		if(!_config._seaTravel && !_config._mountains)
+        const NeolithicConfig & neolithicConfig = (const NeolithicConfig&)getConfig();
+		if(!neolithicConfig._seaTravel && !neolithicConfig._mountains)
 		{
 			setValue(ePopulation, destination, getValue(ePopulation, destination)+migrationPopulation);
 		}
 		else
 		{
 			// if non homogeneous we need to avoid adding more population than max density (due to dividing between 1/2/3 neighbors)
-			int finalPopulation = std::min(getValue(ePopulation, destination)+migrationPopulation, (int)_config._saturationDensity);
+			int finalPopulation = std::min(getValue(ePopulation, destination)+migrationPopulation, (int)neolithicConfig._saturationDensity);
 			setValue(ePopulation, destination, finalPopulation);
 		}
 	}
@@ -203,16 +188,17 @@ int NeolithicWorld::countNeighbors( const Engine::Point2D<int> & index )
 
 void NeolithicWorld::nonHomogeneousDispersionStep()
 {
+    const NeolithicConfig & neolithicConfig = (const NeolithicConfig&)getConfig();
     for( auto index : getBoundaries())
 	{
-        float actualPopulation = _config._persistence*float(getValue(ePopulationBase, index));
+        float actualPopulation = neolithicConfig._persistence*float(getValue(ePopulationBase, index));
         if(actualPopulation<=0.0f)
         {
             continue;
         }
 
         float numNeighbors = countNeighbors(index);
-        float migrationPopulation = ((1-_config._persistence)/numNeighbors)*float(getValue(ePopulationBase, index));
+        float migrationPopulation = ((1-neolithicConfig._persistence)/numNeighbors)*float(getValue(ePopulationBase, index));
         
         /*
         if(migrationPopulation>0)
@@ -220,7 +206,7 @@ void NeolithicWorld::nonHomogeneousDispersionStep()
             std::cout << "population migrating from: " << index << " with neighbors: " << numNeighbors << " = " << migrationPopulation << std::endl;
         }
         */
-        int realPopulation = std::min(getValue(ePopulation, index)+(int)actualPopulation, (int)_config._saturationDensity);
+        int realPopulation = std::min(getValue(ePopulation, index)+(int)actualPopulation, (int)neolithicConfig._saturationDensity);
         setValue(ePopulation, index, realPopulation);
         
         Engine::Point2D<int> neighborW(index._x-1, index._y);
@@ -246,6 +232,7 @@ void NeolithicWorld::nonHomogeneousDispersionStep()
 }
 void NeolithicWorld::arrivalCheck()
 {
+    const NeolithicConfig & neolithicConfig = (const NeolithicConfig&)getConfig();
     for( auto index : getBoundaries())
     {
         int newPopulation = getValue(ePopulation, index);
@@ -255,7 +242,7 @@ void NeolithicWorld::arrivalCheck()
             std::cout << "index: " << index << " past pop: " << pastPopulation << " new pop: " << newPopulation << " saturation density: " << _saturationDensity << std::endl;
         }
         */
-        int threshold = 0.9f*_config._saturationDensity;
+        int threshold = 0.9f*neolithicConfig._saturationDensity;
         int arrived = getValue(eArrivalTime, index);
         if(arrived==-1 && newPopulation>=threshold)
         {
@@ -267,7 +254,8 @@ void NeolithicWorld::arrivalCheck()
 
 bool NeolithicWorld::isMountain( const Engine::Point2D<int> & index )
 {
-	if(getValue(eDem,index)>_config._heightThreshold)
+    const NeolithicConfig & neolithicConfig = (const NeolithicConfig&)getConfig();
+	if(getValue(eDem,index)>neolithicConfig._heightThreshold)
 	{
 		return true;
 	}
@@ -285,6 +273,7 @@ bool NeolithicWorld::isSea( const Engine::Point2D<int> & index )
 
 void NeolithicWorld::travelBySea( const Engine::Point2D<int> & origin, const Engine::Point2D<int> & destination, const int & migrationPopulation )
 {
+    const NeolithicConfig & neolithicConfig = (const NeolithicConfig&)getConfig();
 	//std::cout << "travelling from: " << origin <<  " to destination: " << destination << " BEGIN" << std::endl;
 	std::vector<Engine::Point2D<int> > destinations;
 
@@ -330,7 +319,7 @@ void NeolithicWorld::travelBySea( const Engine::Point2D<int> & origin, const Eng
 			candidates.push_back(nN);
 			candidates.push_back(nS);
 		}
-		else if((!isMountain(point)) && !(origin.isEqual(point)) && (origin.distance(point)<=_config._seaTravelDistance))
+		else if((!isMountain(point)) && !(origin.isEqual(point)) && (origin.distance(point)<=neolithicConfig._seaTravelDistance))
 		{
 			//std::cout << "candidate: " << point << " added to destinations" << std::endl;
 			destinations.push_back(point);
@@ -341,7 +330,7 @@ void NeolithicWorld::travelBySea( const Engine::Point2D<int> & origin, const Eng
 	int migrationToDestination = (float)migrationPopulation/(float)destinations.size();
 	for(int i=0; i<destinations.size(); i++)
 	{
-		int realPopulation = std::min(getValue(ePopulation, destinations[i])+migrationToDestination, (int)_config._saturationDensity);
+		int realPopulation = std::min(getValue(ePopulation, destinations[i])+migrationToDestination, (int)neolithicConfig._saturationDensity);
 		setValue(ePopulation, destinations[i], realPopulation);
 	}
 }

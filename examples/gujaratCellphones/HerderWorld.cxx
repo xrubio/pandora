@@ -4,9 +4,8 @@
 namespace GujaratCellphones
 {
 
-HerderWorld::HerderWorld(Engine::Simulation &simulation, HerderWorldConfig &config) : World(simulation, HerderWorld::useOpenMPSingleNode(config._resultsFile), true), _climate(config)
+HerderWorld::HerderWorld( HerderWorldConfig * config) : World(config, HerderWorld::useOpenMPSingleNode(), true), _climate(*config)
 {
-	_config = config;
 	_maxResources.resize(11);
 }
 
@@ -16,24 +15,25 @@ HerderWorld::~HerderWorld()
 
 void HerderWorld::createAgents()
 {
-	for(int i=0; i<_config._numVillages; i++)
+    const HerderWorldConfig & herderConfig = (const HerderWorldConfig &)getConfig();
+	for(int i=0; i<herderConfig._numVillages; i++)
 	{
-		Engine::Point2D<int> villageLocation(_config._size._width/2,_config._size._height/2);
+		Engine::Point2D<int> villageLocation(herderConfig._size._width/2,herderConfig._size._height/2);
 		std::ostringstream oss;
 		oss << "Village_" << i;
 		Village * newVillage = new Village(oss.str(), i);
 		newVillage->setPosition(villageLocation);
 
 		// in village transmission
-		if(_config._inVillageTransmission)
+		if(herderConfig._inVillageTransmission)
 		{
-			if(_config._inVillageTransmissionValue==-1)
+			if(herderConfig._inVillageTransmissionValue==-1)
 			{
 				newVillage->setInVillageTransmission(Engine::GeneralState::statistics().getUniformDistValue(0, 100));
 			}
 			else
 			{
-				newVillage->setInVillageTransmission(_config._inVillageTransmissionValue);
+				newVillage->setInVillageTransmission(herderConfig._inVillageTransmissionValue);
 			}
 		}
 		else
@@ -42,15 +42,15 @@ void HerderWorld::createAgents()
 		}
 		
 		// mobile transmission
-		if(_config._outVillageTransmission)
+		if(herderConfig._outVillageTransmission)
 		{
-			if(_config._outVillageTransmissionValue==-1)
+			if(herderConfig._outVillageTransmissionValue==-1)
 			{
 				newVillage->setOutVillageTransmission(Engine::GeneralState::statistics().getUniformDistValue(0, 100));
 			}
 			else
 			{
-				newVillage->setOutVillageTransmission(_config._outVillageTransmissionValue);
+				newVillage->setOutVillageTransmission(herderConfig._outVillageTransmissionValue);
 			}
 		}
 		else
@@ -59,12 +59,12 @@ void HerderWorld::createAgents()
 		}
 		addAgent(newVillage);
 
-		for(int j=0; j< _config._numAgentsPerVillage; j++)
+		for(int j=0; j< herderConfig._numAgentsPerVillage; j++)
 		{
 			std::ostringstream ossH;
 			ossH << "Herder_"<<newVillage->getNewKey()<<"_vil" << i;
-			Herder * newHerder = new Herder(ossH.str(), _config._animalsPerHerder, _config._resourcesNeededPerAnimal, *newVillage);
-			newHerder->configureMDP(_config._horizon, _config._width, _config._explorationBonus);			
+			Herder * newHerder = new Herder(ossH.str(), herderConfig._animalsPerHerder, herderConfig._resourcesNeededPerAnimal, *newVillage);
+			newHerder->configureMDP(herderConfig._horizon, herderConfig._width, herderConfig._explorationBonus);			
 
 			addAgent(newHerder);
 			newHerder->createKnowledge();
@@ -74,6 +74,7 @@ void HerderWorld::createAgents()
 
 void HerderWorld::createRasters()
 {	
+    const HerderWorldConfig & herderConfig = (const HerderWorldConfig &)getConfig();
 	registerDynamicRaster("resources", true, eResources);
 	getDynamicRaster(eResources).setInitValues(0, std::numeric_limits<int>::max(), 0);
 
@@ -86,11 +87,11 @@ void HerderWorld::createRasters()
     for(auto index : getBoundaries())
     {
         int value = 0;
-        if(_config._randomDistribution == eIncrease)
+        if(herderConfig._randomDistribution == eIncrease)
         {
             value = (cellIncrease*index._y);
         }
-        else if(_config._randomDistribution == eDistance)
+        else if(herderConfig._randomDistribution == eDistance)
         {
             Engine::Point2D<int> center(getBoundaries()._size._width/2, getBoundaries()._size._height/2);
             // half is a random value + half is based on distance
@@ -111,13 +112,14 @@ void HerderWorld::createRasters()
 
 void HerderWorld::recomputeYearlyBiomass()
 {
-	float rainWeight = _climate.getRain()/_config._rainHistoricalDistribMean;
-	std::cout << " rain: " << _climate.getRain() << " mean: " << _config._rainHistoricalDistribMean << " weight: " << rainWeight << std::endl;
+    const HerderWorldConfig & herderConfig = (const HerderWorldConfig &)getConfig();
+	float rainWeight = _climate.getRain()/herderConfig._rainHistoricalDistribMean;
+	std::cout << " rain: " << _climate.getRain() << " mean: " << herderConfig._rainHistoricalDistribMean << " weight: " << rainWeight << std::endl;
 	Engine::Point2D<int> index;
 
 	for(int i=0; i<_maxResources.size(); i++)
 	{
-		float maxValue = (i*rainWeight*_config._averageResources)/5.0f;
+		float maxValue = (i*rainWeight*herderConfig._averageResources)/5.0f;
 		_maxResources.at(i) = maxValue;
 
 	}
@@ -130,7 +132,8 @@ void HerderWorld::recomputeYearlyBiomass()
 
 bool HerderWorld::isWetSeason() const
 {
-	if(_step%_config._daysDrySeason==0)
+    const HerderWorldConfig & herderConfig = (const HerderWorldConfig &)getConfig();
+	if(_step%herderConfig._daysDrySeason==0)
 	{
 		return true;
 	}
@@ -153,18 +156,14 @@ void HerderWorld::stepEnvironment()
 
 int HerderWorld::daysUntilWetSeason() const
 {
+    const HerderWorldConfig & herderConfig = (const HerderWorldConfig &)getConfig();
 	if(isWetSeason())
 	{
 		return 0;
 	}
-	int days = _step%_config._daysDrySeason;
-	return _config._daysDrySeason - days;
+	int days = _step%herderConfig._daysDrySeason;
+	return herderConfig._daysDrySeason - days;
 }
 	
-const HerderWorldConfig & HerderWorld::getConfig() const
-{
-	return _config;
-}
-
 }
 

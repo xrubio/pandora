@@ -23,7 +23,6 @@
 #define __SpacePartition_hxx__
 
 #include <mpi.h>
-#include <Simulation.hxx>
 #include <World.hxx>
 #include <typedefs.hxx>
 #include <Serializer.hxx>
@@ -154,7 +153,7 @@ class SpacePartition : public Scheduler
 	Point2D<int> getRealPosition( const Point2D<int> & globalPosition ) const;
 
 public:
-	SpacePartition( const std::string & fileName, const int & overlap, bool finalize );
+	SpacePartition(const int & overlap, bool finalize );
 	virtual ~SpacePartition();
 
 	void finish();

@@ -6,11 +6,11 @@ pandoraPath = os.getenv('PANDORAPATH', '/usr/local/pandora')
 sys.path.append(pandoraPath+'/bin')
 sys.path.append(pandoraPath+'/lib')
 
-from pyPandora import Point2DInt, Simulation, World, SizeInt
+from pyPandora import Point2DInt, Config, World, SizeInt
 
 class MyWorld(World):
-	def __init__(self, simulation ):
-		World.__init__( self, simulation)
+	def __init__(self, config):
+		World.__init__( self, config)
 
 	def createRasters(self):
 		self.registerDynamicRaster("test", 1)
@@ -27,8 +27,8 @@ class MyWorld(World):
 				pos = Point2DInt(i,j)
 				raster.setValue(pos, 1+self.currentStep)
 
-mySimulation = Simulation(SizeInt(64,64), 10)
-myWorld = MyWorld(mySimulation)
+myConfig = Config(SizeInt(64,64), 10)
+myWorld = MyWorld(myConfig)
 myWorld.initialize()
 myWorld.run()
 

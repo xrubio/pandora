@@ -34,7 +34,7 @@
 namespace Engine
 {
 
-class Simulation;
+class Config;
 class Agent;
 class StaticRaster;
 class Raster;
@@ -51,12 +51,8 @@ class Serializer
 	typedef std::map< std::string, IntMap * > IntAttributesMap;
 	typedef std::map< std::string, StringMap * > StringAttributesMap;
 
-	const Simulation * _simulation;
+    const Config * _config;
 	const SpacePartition & _scheduler;
-	int _numSteps;
-	int _serializerResolution;
-
-	std::string _resultsFile;
 
 	StaticRastersRefMap _dynamicRasters;
 
@@ -83,7 +79,7 @@ class Serializer
 	void finishAgentsSerialization( int step);
 
 public:
-	Serializer( const SpacePartition & scheduler, const std::string & resultsFile );
+	Serializer( const SpacePartition & scheduler);
 	virtual ~Serializer();
 
 	void init(World & world );

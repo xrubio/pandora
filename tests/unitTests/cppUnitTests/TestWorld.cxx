@@ -2,12 +2,12 @@
 #include "TestWorld.hxx"
 #include "TestAgent.hxx"
 #include <iostream>
-#include <Simulation.hxx>
+#include <Config.hxx>
 
 namespace Test 
 {
 
-TestWorld::TestWorld( Engine::Simulation & simulation, Engine::Scheduler * scheduler) : World(simulation, scheduler, false)
+TestWorld::TestWorld( Engine::Config * config, Engine::Scheduler * scheduler) : World(config, scheduler, false)
 {
 }
 

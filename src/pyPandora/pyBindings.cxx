@@ -29,8 +29,8 @@
 #include <Rectangle.hxx>
 #include <StaticRaster.hxx>
 #include <DynamicRaster.hxx>
-#include <Simulation.hxx>
 #include <World.hxx>
+#include <Config.hxx>
 #include <Agent.hxx>
 #include <AgentRecord.hxx>
 #include <SimulationRecord.hxx>
@@ -62,6 +62,33 @@
 typedef Engine::Point2D<int> Point2DInt;
 typedef Engine::Size<int> SizeInt;
 typedef Engine::Rectangle<int> RectangleInt;
+
+
+class ConfigWrap : public Engine::Config, public boost::python::wrapper<Engine::Config>
+{
+public:
+	ConfigWrap( const Engine::Size<int> & size = Engine::Size<int>(0,0), const int & numSteps = 1, const std::string & resultsFile = "data/results.h5", const int & serializerResolution = 1 ) : Config(size, numSteps, resultsFile, serializerResolution)
+    {
+    }
+	ConfigWrap( const std::string & configFile ) : Config(configFile)
+    {
+    }
+    
+    void loadParams()
+	{
+		if (boost::python::override loadParams = this->get_override("loadParams"))
+		{
+			loadParams();
+			return;
+		}
+		Engine::Config::loadParams();
+	}
+
+	void default_LoadParams()
+	{
+		Engine::Config::loadParams();
+	}
+};
 
 class AgentWrap : public Engine::Agent, public boost::python::wrapper<Engine::Agent>
 {
@@ -132,8 +159,14 @@ class WorldWrap : public Engine::World, public boost::python::wrapper<Engine::Wo
 {
 public:
 	// Scheduler for python is always default
-	WorldWrap(const Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0, const bool & allowMultipleAgentsPerCell = true) : World( simulation,scheduler,allowMultipleAgentsPerCell )
+	WorldWrap(std::shared_ptr<ConfigWrap> config, Engine::Scheduler * scheduler = 0, const bool & allowMultipleAgentsPerCell = true) : World( 0, scheduler, allowMultipleAgentsPerCell )
 	{
+        if(config)
+        {
+            config->loadFile();
+        }
+        // workaround; pointer ownership trasmission during constructor does not work in boost::python
+        configureSharedPtr(config);
 	}
 
 	void createRasters()
@@ -177,6 +210,10 @@ public:
     	_agents.push_back(agent);
 	}
 
+    void configureSharedPtr( std::shared_ptr<ConfigWrap> config )
+    {
+        _config = config;
+    }
 
 	std::vector<std::string> getNeighboursIds( Engine::Agent & target, const double & radius, const std::string & type="all" )
 	{
@@ -304,7 +341,7 @@ int (Engine::World::*getValue)(const std::string&, const Engine::Point2D<int> &)
 void (Engine::World::*setValue)(const std::string&, const Engine::Point2D<int> &, int) = &Engine::World::setValue;
 
 Engine::Agent * (Engine::World::*getAgent)(const std::string &) = &Engine::World::getAgent;
-    
+
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(fillGDALRasterOverloads, fillGDALRaster, 2, 3)
 
 BOOST_PYTHON_MODULE(libpyPandora)
@@ -358,9 +395,17 @@ BOOST_PYTHON_MODULE(libpyPandora)
 	;
 
 
-	boost::python::class_< Engine::Simulation >("SimulationStub", boost::python::init< const Engine::Size<int> &, const int &, const int & >() )	
-		.add_property("size", boost::python::make_function(&Engine::Simulation::getSize, boost::python::return_value_policy<boost::python::reference_existing_object>()))
-		.add_property("numSteps", boost::python::make_function(&Engine::Simulation::getNumSteps, boost::python::return_value_policy<boost::python::copy_const_reference>()))
+	boost::python::class_< ConfigWrap, std::shared_ptr<ConfigWrap>, boost::noncopyable >("ConfigStub", boost::python::init< const Engine::Size<int> &, const int &, const std::string &, const int & >())
+        .def(boost::python::init< const std::string &>())
+		.add_property("size", boost::python::make_function(&ConfigWrap::getSize, boost::python::return_value_policy<boost::python::reference_existing_object>()))
+		.add_property("numSteps", boost::python::make_function(&ConfigWrap::getNumSteps, boost::python::return_value_policy<boost::python::copy_const_reference>()))
+		.add_property("serializerResolution", boost::python::make_function(&ConfigWrap::getSerializeResolution, boost::python::return_value_policy<boost::python::copy_const_reference>()))
+		.def("loadParams", &Engine::Config::loadParams, &ConfigWrap::default_LoadParams)
+		.def("getParamStr", &Engine::Config::getParamStr)
+		.def("getParamInt", &Engine::Config::getParamInt)
+		.def("getParamLongInt", &Engine::Config::getParamLongInt)
+		.def("getParamFloat", &Engine::Config::getParamFloat)
+		.def("getParamBool", &Engine::Config::getParamBool)
 	;
 
 	boost::python::class_< Engine::ShpLoader>("ShpLoaderStub")
@@ -405,7 +450,7 @@ BOOST_PYTHON_MODULE(libpyPandora)
 	boost::python::class_< std::vector<std::string> >("StringVector").def(boost::python::vector_indexing_suite< std::vector<std::string> >());
 	boost::python::class_< std::vector<int> >("IntVector").def(boost::python::vector_indexing_suite< std::vector<int> >());
 	
-	boost::python::class_< WorldWrap, boost::noncopyable >("WorldStub", boost::python::init< const Engine::Simulation &, Engine::Scheduler *, const bool & >()[boost::python::with_custodian_and_ward<1,3>()])
+	boost::python::class_< WorldWrap, boost::noncopyable >("WorldStub", boost::python::init< std::shared_ptr<ConfigWrap>, Engine::Scheduler *, const bool & >()[boost::python::with_custodian_and_ward<1,2>(),boost::python::with_custodian_and_ward<1,3>()])
 		.def("createRasters", boost::python::pure_virtual(&Engine::World::createRasters))
 		.def("createAgents", boost::python::pure_virtual(&Engine::World::createAgents))
 		.def("stepEnvironment", &Engine::World::stepEnvironment, &WorldWrap::default_StepEnvironment)
@@ -428,17 +473,17 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("getAgent", getAgent, boost::python::return_value_policy<boost::python::reference_existing_object>())
 		.def("getNumberOfRasters", &Engine::World::getNumberOfRasters)
 		.def("getNumberOfAgents", &Engine::World::getNumberOfAgents)
-		.def("getSimulation", &Engine::World::getSimulation, boost::python::return_value_policy<boost::python::reference_existing_object>())
 		.def("getBoundaries", &Engine::World::getBoundaries, boost::python::return_value_policy<boost::python::reference_existing_object>())
 		.add_property("currentStep", &Engine::World::getCurrentStep)
+		.add_property("config", boost::python::make_function(&Engine::World::getConfig, boost::python::return_value_policy<boost::python::reference_existing_object>()))
 	;	
 	
-	boost::python::class_< Engine::SpacePartition, std::shared_ptr<Engine::SpacePartition> >("SpacePartitionStub", boost::python::init< const std::string &, const int &, bool >())
+	boost::python::class_< Engine::SpacePartition, std::shared_ptr<Engine::SpacePartition> >("SpacePartitionStub", boost::python::init< const int &, bool >())
 	;
 	
 	boost::python::implicitly_convertible< std::shared_ptr< Engine::SpacePartition >, std::shared_ptr< Engine::Scheduler > >();	
 
-	boost::python::class_< Engine::OpenMPSingleNode, std::shared_ptr<Engine::OpenMPSingleNode> >("OpenMPSingleNodeStub", boost::python::init< const std::string & >())
+	boost::python::class_< Engine::OpenMPSingleNode, std::shared_ptr<Engine::OpenMPSingleNode> >("OpenMPSingleNodeStub", boost::python::init<>())
 	;
 	
 	boost::python::implicitly_convertible< std::shared_ptr< Engine::OpenMPSingleNode >, std::shared_ptr< Engine::Scheduler > >();	
