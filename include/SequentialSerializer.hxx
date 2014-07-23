@@ -42,8 +42,10 @@ class SequentialSerializer
 {
 	typedef std::map< std::string, StaticRaster *> StaticRastersRefMap;
 	typedef std::map< std::string, std::vector<int> * > IntMap;
+	typedef std::map< std::string, std::vector<float> * > FloatMap;
 	typedef std::map< std::string, std::vector<std::string> * > StringMap;
 	typedef std::map< std::string, IntMap * > IntAttributesMap;
+	typedef std::map< std::string, FloatMap * > FloatAttributesMap;
 	typedef std::map< std::string, StringMap * > StringAttributesMap;
 
 	const Scheduler & _scheduler;
@@ -55,6 +57,7 @@ class SequentialSerializer
 
 	StringAttributesMap _stringAttributes;
 	IntAttributesMap _intAttributes;
+	FloatAttributesMap _floatAttributes;
 	std::map<std::string, int> _agentIndexMap;
 
 	void executeAgentSerialization( const std::string & type, int step);
@@ -74,6 +77,8 @@ public:
 	
 	void addStringAttribute( const std::string & type, const std::string & key, const std::string & value );
 	void addIntAttribute( const std::string & type, const std::string & key, int value );
+	void addFloatAttribute( const std::string & type, const std::string & key, float value );
+
 	void serializeAgents( const int & step, const AgentsList::const_iterator beginAgents, const AgentsList::const_iterator endAgents);
 	void serializeStaticRasters( const StaticRastersRefMap & staticRasters);
 	void serializeRasters(int step);

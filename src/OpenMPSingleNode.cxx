@@ -189,6 +189,11 @@ void OpenMPSingleNode::addStringAttribute( const std::string & type, const std::
 	_serializer.addStringAttribute(type, key, value);
 }
 
+void OpenMPSingleNode::addFloatAttribute( const std::string & type, const std::string & key, float value )
+{
+	_serializer.addFloatAttribute(type, key, value);
+}
+
 void OpenMPSingleNode::addIntAttribute( const std::string & type, const std::string & key, int value )
 {
 	_serializer.addIntAttribute(type, key, value);

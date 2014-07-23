@@ -41,7 +41,6 @@ class Agent;
 class OpenMPSingleNode : public Scheduler
 {
 	boost::timer::cpu_timer _timer;
-	// TODO change for sequential hdf5
 	SequentialSerializer _serializer;	
 
 	// list of agents that are removed during a time step, and need to be erased by the end of the time step
@@ -75,6 +74,7 @@ public:
 	double getWallTime() const;
 
 	void addStringAttribute( const std::string & type, const std::string & key, const std::string & value );
+	void addFloatAttribute( const std::string & type, const std::string & key, float value );
 	void addIntAttribute( const std::string & type, const std::string & key, int value );
 	void serializeAgents( const int & step);
 	void serializeRasters( const int & step);

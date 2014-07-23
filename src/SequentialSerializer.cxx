@@ -356,6 +356,39 @@ void SequentialSerializer::executeAgentSerialization( const std::string & type, 
 		H5Sclose(fileSpace);
 		H5Dclose(datasetId);
 	}
+    
+    FloatAttributesMap::iterator itF = _floatAttributes.find(type);
+	FloatMap * attributesF = itF->second;	
+	for(FloatMap::iterator itM=attributesF->begin(); itM!=attributesF->end(); itM++)
+	{
+		std::vector<float> * data = itM->second;
+		// nothing to serialize
+		if(data->size()==0)
+		{
+			return;
+		}
+		hsize_t	block[1];
+		block[0] = data->size();
+		
+		hsize_t simpleDimension = data->size();
+		// TODO es repeteix per cada atribut
+		hsize_t newSize[1];
+		newSize[0] = currentIndex+data->size();
+
+		std::ostringstream oss;
+		oss << type << "/step" << step << "/" << itM->first;
+		hid_t datasetId = H5Dopen(_agentsFileId, oss.str().c_str(), H5P_DEFAULT);
+		H5Dset_extent( datasetId, newSize);
+		hid_t fileSpace = H5Dget_space(datasetId);
+		H5Sselect_hyperslab(fileSpace, H5S_SELECT_SET, offset, stride, count, block);
+  		hid_t memorySpace = H5Screate_simple(1, &simpleDimension, 0);
+		H5Dwrite(datasetId, H5T_NATIVE_FLOAT, memorySpace, fileSpace, H5P_DEFAULT, &(data->at(0)));
+		data->clear();
+
+		H5Sclose(memorySpace);
+		H5Sclose(fileSpace);
+		H5Dclose(datasetId);
+	}
 	
 	StringAttributesMap::iterator itS = _stringAttributes.find(type);
 	StringMap * attributesS = itS->second;	
@@ -420,6 +453,27 @@ void SequentialSerializer::addIntAttribute( const std::string & type, const std:
 	intVector->push_back(value);
 }
 
+void SequentialSerializer::addFloatAttribute( const std::string & type, const std::string & key, float value )
+{
+	FloatAttributesMap::iterator it = _floatAttributes.find(type);
+	if(it==_floatAttributes.end())
+	{
+		std::stringstream oss;
+		oss << "SequentialSerializer::addFloatAttribute - looking for unknown agent type: " << type;
+		throw Exception(oss.str());
+	}
+	FloatMap * floatMap = it->second;
+	FloatMap::iterator itI = floatMap->find(key);
+	if(itI==floatMap->end())
+	{
+		std::stringstream oss;
+		oss << "SequentialSerializer::addFloatAttribute - looking for unknown attribute: " << key << " in agent type: " << type;
+		throw Exception(oss.str());
+	}
+	std::vector<float> * floatVector = itI->second;
+	floatVector->push_back(value);
+}
+
 void SequentialSerializer::registerType( Agent * agent )
 {
 	std::string type = agent->getType();
@@ -440,6 +494,7 @@ void SequentialSerializer::registerType( Agent * agent )
 	H5Pset_chunk(propertyListId, 1, &chunks);
 
 	IntMap * newTypeIntMap = new IntMap;
+    FloatMap * newTypeFloatMap = new FloatMap;
 	StringMap * newTypeStringMap = new StringMap;
 
 	// create a dataset for each timestep
@@ -459,7 +514,16 @@ void SequentialSerializer::registerType( Agent * agent )
 			newTypeIntMap->insert( make_pair(*it, new std::vector<int>() ));
 			hid_t idDataset= H5Dcreate(stepGroup, (*it).c_str(), H5T_NATIVE_INT, agentFileSpace, H5P_DEFAULT, propertyListId, H5P_DEFAULT);
 			H5Dclose(idDataset);
+		}      
+        
+        for(Agent::AttributesList::iterator it=agent->beginFloatAttributes(); it!=agent->endFloatAttributes(); it++)
+		{	
+			log_DEBUG(logName.str(), "\tnew float attribute: " << *it);
+			newTypeFloatMap->insert( make_pair(*it, new std::vector<float>() ));
+			hid_t idDataset= H5Dcreate(stepGroup, (*it).c_str(), H5T_NATIVE_FLOAT, agentFileSpace, H5P_DEFAULT, propertyListId, H5P_DEFAULT);
+			H5Dclose(idDataset);
 		}
+
 		
 		hid_t idType = H5Tcopy(H5T_C_S1);
 		H5Tset_size (idType, H5T_VARIABLE);
@@ -477,6 +541,7 @@ void SequentialSerializer::registerType( Agent * agent )
 
 	_agentIndexMap.insert( make_pair(type, 0) );
 	_intAttributes.insert( make_pair(type, newTypeIntMap));
+	_floatAttributes.insert( make_pair(type, newTypeFloatMap));
 	_stringAttributes.insert( make_pair(type, newTypeStringMap));
 }
 

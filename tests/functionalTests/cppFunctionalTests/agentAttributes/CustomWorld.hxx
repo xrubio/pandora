@@ -6,7 +6,7 @@
 
 namespace Engine
 {
-	class Simulation;
+	class Config;
 }
 
 namespace Test 
@@ -17,7 +17,7 @@ class CustomWorld : public Engine::World
 	void createAgents();
 
 public:
-	CustomWorld( const Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0);
+	CustomWorld( Engine::Config * config, Engine::Scheduler * scheduler = 0);
 	virtual ~CustomWorld();
 };
 

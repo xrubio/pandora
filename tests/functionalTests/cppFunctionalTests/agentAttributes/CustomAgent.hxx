@@ -28,6 +28,19 @@ public:
 	void setStringAttribute( const std::string & attribute );
 	void setIntAttribute( int intAttribute );
 	void setFloatAttribute( float floatAttribute );
+
+	////////////////////////////////////////////////
+	// This code has been automatically generated //
+	/////// Please do not modify it ////////////////
+	////////////////////////////////////////////////
+	CustomAgent( void * );
+	void * fillPackage();
+	void sendVectorAttributes(int);
+	void receiveVectorAttributes(int);
+	////////////////////////////////////////////////
+	//////// End of generated code /////////////////
+	////////////////////////////////////////////////
+
 };
 
 } // namespace Test

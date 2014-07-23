@@ -1,12 +1,12 @@
 
 #include <CustomWorld.hxx>
 #include <CustomAgent.hxx>
-#include <Simulation.hxx>
+#include <Config.hxx>
 
 namespace Test 
 {
 
-CustomWorld::CustomWorld( const Engine::Simulation & simulation, Engine::Scheduler * scheduler) : World(simulation, scheduler)
+CustomWorld::CustomWorld( Engine::Config * config, Engine::Scheduler * scheduler) : World(config, scheduler)
 {
 }
 

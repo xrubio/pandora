@@ -1573,6 +1573,11 @@ void SpacePartition::addIntAttribute( const std::string & type, const std::strin
 	_serializer.addIntAttribute(type, key, value);
 }
 
+void SpacePartition::addFloatAttribute( const std::string & type, const std::string & key, float value )
+{
+	_serializer.addFloatAttribute(type, key, value);
+}
+
 void SpacePartition::serializeAgents( const int & step )
 {
 	_serializer.serializeAgents(step, _world->beginAgents(), _world->endAgents());

@@ -34,7 +34,7 @@ void CustomAgent::setStringAttribute( const std::string & strAttribute)
     _strAttribute = strAttribute;
 }
 
-void CustomAgent::setIntValue( int intAttribute )
+void CustomAgent::setIntAttribute( int intAttribute )
 {
     _intAttribute = intAttribute;
 }

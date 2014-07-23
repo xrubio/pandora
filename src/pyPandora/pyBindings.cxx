@@ -134,6 +134,11 @@ public:
 		serializeAttribute(key, value);
 	}
 
+	void serializeFloatAttribute( const std::string & key, float value )
+	{
+		serializeAttribute(key, value);
+	}
+
     void serializeStringAttribute( const std::string & key, const std::string & value )
     {
         serializeAttribute(key,value);
@@ -170,13 +175,33 @@ public:
 	}
 
 	void createRasters()
-	{
-		this->get_override("createRasters")();
+	{      
+        if (boost::python::override createRasters = this->get_override("createRasters"))
+		{
+			createRasters();
+			return;
+		}
+		Engine::World::createRasters();
 	}	
+    void default_createRasters()
+    {
+        World::createRasters();
+    }
+
 	void createAgents()
 	{
-		this->get_override("createAgents")();
+        if (boost::python::override createAgents = this->get_override("createAgents"))
+		{
+			createAgents();
+			return;
+		}
+		Engine::World::createAgents();
 	}
+    void default_createAgents()
+    {
+        World::createAgents();
+    }
+
 	void stepEnvironment()
 	{
 		if (boost::python::override stepEnvironment = this->get_override("stepEnvironment"))
@@ -186,7 +211,6 @@ public:
 		}
 		Engine::World::stepEnvironment();
 	}
-
 	void default_StepEnvironment()
 	{
 		World::stepEnvironment();
@@ -439,6 +463,8 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.def("serializeIntAttribute", &AgentWrap::serializeIntAttribute)
         .def("registerStringAttribute", &Engine::Agent::registerStringAttribute)
 		.def("serializeStringAttribute", &AgentWrap::serializeStringAttribute)
+        .def("registerFloatAttribute", &Engine::Agent::registerFloatAttribute)
+		.def("serializeFloatAttribute", &AgentWrap::serializeFloatAttribute)
 		.def("remove", &Engine::Agent::remove)
 		.def("setRandomPosition", &Engine::Agent::setRandomPosition)
 		.add_property("id", boost::python::make_function(&Engine::Agent::getId, boost::python::return_value_policy<boost::python::copy_const_reference>()))
@@ -451,8 +477,8 @@ BOOST_PYTHON_MODULE(libpyPandora)
 	boost::python::class_< std::vector<int> >("IntVector").def(boost::python::vector_indexing_suite< std::vector<int> >());
 	
 	boost::python::class_< WorldWrap, boost::noncopyable >("WorldStub", boost::python::init< std::shared_ptr<ConfigWrap>, Engine::Scheduler *, const bool & >()[boost::python::with_custodian_and_ward<1,2>(),boost::python::with_custodian_and_ward<1,3>()])
-		.def("createRasters", boost::python::pure_virtual(&Engine::World::createRasters))
-		.def("createAgents", boost::python::pure_virtual(&Engine::World::createAgents))
+		.def("createRasters", &Engine::World::createRasters, &WorldWrap::default_createRasters)
+		.def("createAgents", &Engine::World::createAgents, &WorldWrap::default_createAgents)
 		.def("stepEnvironment", &Engine::World::stepEnvironment, &WorldWrap::default_StepEnvironment)
 		.def("initialize", &WorldWrap::initializeNoArguments)
 		.def("checkPosition", &Engine::World::checkPosition)
