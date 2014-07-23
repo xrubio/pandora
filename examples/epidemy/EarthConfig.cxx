@@ -4,7 +4,7 @@
 namespace Examples
 {
 
-EarthConfig::EarthConfig() : _scale(1), _numCases(0), _firstCase(0,0), _size(0,0), _demName("no loaded"), _populationName("no loaded")
+EarthConfig::EarthConfig( const std::string & xmlFile ) : Config(xmlFile), _scale(1), _numCases(0), _firstCase(0,0), _demName("no loaded"), _populationName("no loaded")
 {
 }
 
@@ -12,27 +12,17 @@ EarthConfig::~EarthConfig()
 {
 }
 
-void EarthConfig::extractParticularAttribs(TiXmlElement * root)
+void EarthConfig::loadParams()
 {
-	TiXmlElement * element = root->FirstChildElement("size");
-	retrieveAttributeMandatory( element, "width", _size._width);
-	retrieveAttributeMandatory( element, "height", _size._height);
+    _demName = getParamStr("inputData", "dem");
+    _populationName = getParamStr("inputData", "population");
+    _scale = getParamInt("inputData", "scale");
 
-	element = root->FirstChildElement("inputData");
-	retrieveAttributeMandatory( element, "dem", _demName);
-	retrieveAttributeMandatory( element, "population", _populationName);
-	retrieveAttributeMandatory( element, "scale", _scale);
-	
-	element = root->FirstChildElement("outbreak");
-	retrieveAttributeMandatory(element, "initInfected", _numCases);
-	retrieveAttributeMandatory(element, "x", _firstCase._x);
-	retrieveAttributeMandatory(element, "y", _firstCase._y);
-	retrieveAttributeMandatory(element, "virulence", _virulence);
-}
-	
-const Engine::Size<int> & EarthConfig::getSize() const
-{
-	return _size;
+    _numCases = getParamInt("outbreak", "initInfected");
+    _firstCase._x = getParamInt("outbreak", "x");
+    _firstCase._y = getParamInt("outbreak", "y");
+    _virulence = getParamFloat("outbreak", "virulence");
+
 }
 
 } // namespace Examples

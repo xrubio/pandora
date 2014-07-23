@@ -9,10 +9,9 @@ sys.path.append(pandoraPath+'/lib')
 
 import random
 import argparse
-import xml.etree.ElementTree
 import math
 
-from pyPandora import Simulation, Agent, World, Point2DInt, SizeInt
+from pyPandora import Config, Agent, World, Point2DInt, SizeInt
 
 def enum(**enums):
     """ converts a sequence of values to an C++ style enum """
@@ -20,32 +19,26 @@ def enum(**enums):
 
 terrainTypes = enum(ePastures=0, eFields=1)
 
-class FrontierConfig():
-    def __init__(self):
-        return
+class FrontierConfig(Config):
+    def __init__(self, xmlFile):
+        Config.__init__(self, xmlFile)
+
+        self._asabiyaIncrease = 0.0
+        self._asabiyaDecay = 0.0
+        self._minAsabiya = 0.0
+
+        self._distanceSensibility = 0.0
+        self._attackThreshold = 0.0
     
-    def deserialize(self, xmlFile):
-        tree = xml.etree.ElementTree.parse(xmlFile)
-        root = tree.getroot()
-
-        self._resultsFile = str(root.find('output').get('resultsFile'))
-        self._logsDir = str(root.find('output').get('logsDir'))
-
-        self._size = SizeInt(int(root.find('size').get('width')), int(root.find('size').get('height')))
-        self._numSteps = int(root.find('numSteps').get('value'))
-        self._serializeResolution = int(root.find('numSteps').get('serializeResolution'))
-
+    def loadParams(self):
         # r_0 in the logistic growth model
-        self._asabiyaIncrease = float(root.find('asabiya').get('increase'))
-        # exponential decay of asabiya
-        self._asabiyaDecay = float(root.find('asabiya').get('decay'))
-        # minimal value of average asabiya of an empire
-        self._minAsabiya = float(root.find('asabiya').get('min'))
+        self._asabiyaIncrease = self.getParamFloat('asabiya', 'increase')
+        self._asabiyaDecay = self.getParamFloat('asabiya', 'decay')
+        self._minAsabiya = self.getParamFloat('asabiya', 'min')
+
+        self._distanceSensibility = self.getParamFloat('conflict', 'distanceSensibility')
+        self._attackThreshold = self.getParamFloat('conflict', 'attackThreshold')
         
-        # parameter fixing the influence of distance from political center to asabiya
-        self._distanceSensibility = float(root.find('conflict').get('distanceSensibility'))
-        # the attack value must be superior to attackThreshold in order to conquer a neighbouring cell
-        self._attackThreshold = float(root.find('conflict').get('attackThreshold'))
 
 class Empire(Agent):
     """ An empire created during the simulation """
@@ -60,8 +53,9 @@ class Empire(Agent):
     def updateNumRegions(self):
         self._numRegions = 0
         index = Point2DInt(0,0)
-        for index._x in range(0, self.getWorld()._config._size._width):
-            for index._y in range(0, self.getWorld()._config._size._height):
+        size = self.getWorld().config.size
+        for index._x in range(0, size._width):
+            for index._y in range(0, size._height):
                 if self.getWorld().getValue("id", index) == self._empireId:
                     self._numRegions += 1
         #print('empire: ',self,' has: ',self._numRegions,' regions')
@@ -70,8 +64,9 @@ class Empire(Agent):
         self._averageAsabiya = 0.0
 
         index = Point2DInt(0,0)
-        for index._x in range(0, self.getWorld()._config._size._width):
-            for index._y in range(0, self.getWorld()._config._size._height):
+        size = self.getWorld().config.size
+        for index._x in range(0, size._width):
+            for index._y in range(0, size._height):
                 if self.getWorld().getValue("id", index) == self._empireId:
                     self._averageAsabiya = self._averageAsabiya + float(self.getWorld().getValue("asabiya", index)/1000.0)
 
@@ -83,8 +78,9 @@ class Empire(Agent):
         centre = Point2DInt(0,0)
 
         index = Point2DInt(0,0)
-        for index._x in range(0, self.getWorld()._config._size._width):
-            for index._y in range(0, self.getWorld()._config._size._height):
+        size = self.getWorld().config.size
+        for index._x in range(0, size._width):
+            for index._y in range(0, size._height):
                 if self.getWorld().getValue("id", index) == self._empireId:
                     centre._x = centre._x + index._x
                     centre._y = centre._y + index._y
@@ -113,10 +109,8 @@ class Empire(Agent):
         self.serializeIntAttribute('num regions', self._numRegions)
 
 class Frontier(World):
-
-    def __init__(self, simulation, config ):
-        World.__init__(self, simulation, Frontier.useOpenMPSingleNode(config._resultsFile))
-        self._config = config
+    def __init__(self, config ):
+        World.__init__(self, config, Frontier.useOpenMPSingleNode())
         self._numEmpires = 1
 
     def createRasters(self):
@@ -167,41 +161,41 @@ class Frontier(World):
 
     def calculateAsabiya(self):
         index = Point2DInt(0,0)
-        for index._x in range(0, self._config._size._width):
-            for index._y in range(0, self._config._size._height):
+        for index._x in range(0, self.config.size._width):
+            for index._y in range(0, self.config.size._height):
                 if self.isEmpireBoundary(index):
                     self.setValue("boundary", index, 1)
                     asabiya = float(self.getValue("asabiya", index)/1000.0)
-                    newAsabiya = asabiya + self._config._asabiyaIncrease*asabiya*(1.0-asabiya)
+                    newAsabiya = asabiya + self.config._asabiyaIncrease*asabiya*(1.0-asabiya)
                     self.setValue("asabiya", index, int(1000.0*newAsabiya))
                     #print('\tcell: ',index,' boundary had asabiya: ',asabiya,' now: ','self.getValue("asabiya", index)/1000.0))
                 else:
                     self.setValue("boundary", index, 0)
                     asabiya = float(self.getValue("asabiya", index)/1000.0)
-                    newAsabiya = asabiya - self._config._asabiyaDecay*asabiya
+                    newAsabiya = asabiya - self.config._asabiyaDecay*asabiya
                     # value must not be 0
                     self.setValue("asabiya", index, max(1, int(1000.0*newAsabiya)))
                     #print('\tcell: ',index,' NOT boundary had asabiya: ',asabiya,' now: ',self.getValue("asabiya", index)/1000.0))
 
     def cleanEmpireRaster(self, empireId):
         index = Point2DInt(0,0)
-        for index._x in range(0, self._config._size._width):
-            for index._y in range(0, self._config._size._height):
+        for index._x in range(0, self.config.size._width):
+            for index._y in range(0, self.config.size._height):
                 if self.getValue("id", index)==empireId:
                     self.setValue("id", index, 0)
 
 
     def checkCollapse(self):
         index = Point2DInt(0,0)
-        for index._x in range(0, self._config._size._width):
-            for index._y in range(0, self._config._size._height):
+        for index._x in range(0, self.config.size._width):
+            for index._y in range(0, self.config.size._height):
                 empireIds = self.getAgentIds(index, 'Empire')
                 for empireId in empireIds:
                     empire = self.getAgent(empireId)
                     #print('empire: ',empire,' has average asabiya: ',empire._averageAsabiya)
                     """
                     TODO which option is better?
-                    if empire._averageAsabiya<self._config._minAsabiya:
+                    if empire._averageAsabiya<self.config._minAsabiya:
                         print "empire: " + empireId + " collapses"
                         self.cleanEmpireRaster(empire._empireId)
                         empire._numRegions = 0
@@ -242,13 +236,13 @@ class Frontier(World):
             averageDefendingAsabiya = defendingEmpire._averageAsabiya
             distToDefendingCentre = defendingEmpire.position.distance(defender)
     
-        powerAttacker = numAttackingRegions*averageAttackingAsabiya*math.exp(-distToAttackingCentre/self._config._distanceSensibility)
-        powerDefender = numDefendingRegions*averageDefendingAsabiya*math.exp(-distToDefendingCentre/self._config._distanceSensibility)
+        powerAttacker = numAttackingRegions*averageAttackingAsabiya*math.exp(-distToAttackingCentre/self.config._distanceSensibility)
+        powerDefender = numDefendingRegions*averageDefendingAsabiya*math.exp(-distToDefendingCentre/self.config._distanceSensibility)
         
-        #print "\tattack from : " + str(attacker._x) + '/' + str(attacker._y) + ' to: ' +  str(defender._x) + '/' + str(defender._y) + " power att: " + str(powerAttacker) + " power def: " + str(powerDefender) + " diff: " + str(powerAttacker-powerDefender) + " thresh: " + str(self._config._attackThreshold)
+        #print "\tattack from : " + str(attacker._x) + '/' + str(attacker._y) + ' to: ' +  str(defender._x) + '/' + str(defender._y) + " power att: " + str(powerAttacker) + " power def: " + str(powerDefender) + " diff: " + str(powerAttacker-powerDefender) + " thresh: " + str(self.config._attackThreshold)
 
         self.setValue("executed", attacker, 1)
-        if(powerAttacker-powerDefender>self._config._attackThreshold):
+        if(powerAttacker-powerDefender>self.config._attackThreshold):
             self.setValue("executed", defender, 1)
             # losing empire
             if self.getValue("id", defender)!=0:
@@ -286,8 +280,8 @@ class Frontier(World):
 
         index = Point2DInt(0,0)
         potentialAttackers = []
-        for index._x in range(0, self._config._size._width):
-            for index._y in range(0, self._config._size._height):
+        for index._x in range(0, self.config.size._width):
+            for index._y in range(0, self.config.size._height):
                 if self.isEmpireBoundary(index):
                     potentialAttackers.append(Point2DInt(index._x, index._y))
 
@@ -303,8 +297,8 @@ class Frontier(World):
         
         # clean executed raster
         index = Point2DInt(0,0)
-        for index._x in range(0, self._config._size._width):
-            for index._y in range(0, self._config._size._height):
+        for index._x in range(0, self.config.size._width):
+            for index._y in range(0, self.config.size._height):
                 self.setValue("executed", index, 0)
     
     def stepEnvironment(self):
@@ -318,11 +312,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-x', '--config', default='config.xml', help='config file')
     args = parser.parse_args()
-    config = FrontierConfig()
-    config.deserialize(args.config)
 
-    mySimulation = Simulation(config._size, config._numSteps, config._serializeResolution)
-    frontier = Frontier(mySimulation, config)
+    frontierConfig = FrontierConfig(args.config)
+    frontier = Frontier(frontierConfig)
     frontier.initialize()
     frontier.run()
  

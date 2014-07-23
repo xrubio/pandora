@@ -223,7 +223,7 @@ void Herder::updateState()
     }
 
     HerderWorld & world = (HerderWorld &)*_world;
-    const HerderWorldConfig & config = world.getConfig();
+    const HerderWorldConfig & config = (const HerderWorldConfig &)world.getConfig();
     // in village activities
 	if(world.daysUntilWetSeason()==0)
 	{	

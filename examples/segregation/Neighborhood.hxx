@@ -5,11 +5,6 @@
 #include <World.hxx>
 #include <string>
 
-namespace Engine
-{
-	class Simulation;
-}
-
 namespace Segregation 
 {
 
@@ -17,10 +12,8 @@ class NeighborConfig;
 
 class Neighborhood : public Engine::World
 {
-	const NeighborConfig & _config;
-
 public:
-	Neighborhood( const NeighborConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0);
+	Neighborhood( NeighborConfig * config, Engine::Scheduler * scheduler = 0);
 	virtual ~Neighborhood();
 	
 	void createAgents();

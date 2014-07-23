@@ -11,7 +11,6 @@ namespace Examples
 
 class NeolithicConfig: public Engine::Config
 {
-	Engine::Size<int> _size;
 	bool _mountains;
 	// threshold defining minimum height for a cell to be considered mountain
 	int _heightThreshold;
@@ -31,11 +30,10 @@ class NeolithicConfig: public Engine::Config
 	std::string _demFile;
 	std::string _initPopulationFile;
 public:
-	NeolithicConfig();  
+	NeolithicConfig( const std::string & xmlFile );  
 	virtual ~NeolithicConfig();
     
-	void extractParticularAttribs(TiXmlElement *pRoot);
-	const Engine::Size<int> & getSize() const;
+	void loadParams(); 
 	friend class NeolithicWorld;
 };
 

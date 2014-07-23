@@ -6,7 +6,7 @@ pandoraPath = os.getenv('PANDORAPATH', '/usr/local/pandora')
 sys.path.append(pandoraPath+'/bin')
 sys.path.append(pandoraPath+'/lib')
 
-from pyPandora import Simulation, Agent, World, Point2DInt, SizeInt, RectangleInt, SpacePartition, GeneralState, ShpLoader
+from pyPandora import Config, Agent, World, Point2DInt, SizeInt, RectangleInt, SpacePartition, GeneralState, ShpLoader
 
 class ShpAgent(Agent):
     _label = ''
@@ -34,8 +34,8 @@ class ShpAgent(Agent):
 
 class ShpWorld(World):
     _shpFileName = 'no file'
-    def __init__(self, simulation, scheduler, shpFileName ):
-        World.__init__( self, simulation, scheduler, False)
+    def __init__(self, config, scheduler, shpFileName ):
+        World.__init__( self, config, scheduler, False)
         self._shpFileName = shpFileName
 
     def createRasters(self):
@@ -59,9 +59,9 @@ class ShpWorld(World):
 
 def main():
     shpFileName = '../../../resources/test.shp'
-    simulation = Simulation(SizeInt(64,64), 1)
+    config = Config(SizeInt(64,64))
 
-    shpWorld = ShpWorld(simulation, ShpWorld.useOpenMPSingleNode('data/shp.h5'), shpFileName)
+    shpWorld = ShpWorld(config, ShpWorld.useOpenMPSingleNode(), shpFileName)
     shpWorld.initialize()
     shpWorld.run()
 

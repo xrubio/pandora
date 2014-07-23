@@ -11,7 +11,7 @@
 namespace Segregation 
 {
 
-Neighborhood::Neighborhood( const NeighborConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler ) : World(simulation, scheduler, false), _config(config)
+Neighborhood::Neighborhood( NeighborConfig * config, Engine::Scheduler * scheduler ) : World(config, scheduler, false)
 {
 }
 
@@ -21,8 +21,9 @@ Neighborhood::~Neighborhood()
 
 void Neighborhood::createAgents()
 {
-	int numAgents = _config._size._width * _config._size._height * _config._density;
-	int numDimes = numAgents * _config._dimePercentage;
+    const NeighborConfig & neighborConfig = (const NeighborConfig &)getConfig();
+	int numAgents = neighborConfig._size._width * neighborConfig._size._height * neighborConfig._density;
+	int numDimes = numAgents * neighborConfig._dimePercentage;
 	std::cout << "creating : " << numAgents << " neighbors, dimes: " << numDimes << " and pennies: " << numAgents - numDimes  << std::endl;
 
 	int indexDimes = 0;
@@ -45,9 +46,9 @@ void Neighborhood::createAgents()
 			}
 			Neighbor * agent = new Neighbor(oss.str());
 			addAgent(agent);
-			agent->setFriendlyPercentage( _config._friendlyPercentage );
-			agent->setNeighborDistance( _config._neighborDistance );
-			agent->setMaxMovingDistance( _config._maxMovingDistance);
+			agent->setFriendlyPercentage( neighborConfig._friendlyPercentage );
+			agent->setNeighborDistance( neighborConfig._neighborDistance );
+			agent->setMaxMovingDistance( neighborConfig._maxMovingDistance);
 			agent->setPosition(getRandomPosition());
 		}
 	}

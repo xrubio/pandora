@@ -8,7 +8,7 @@
 namespace Panic
 {
 
-Scenario::Scenario( ScenarioConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler ) : World(simulation, scheduler, false), _config(config)
+Scenario::Scenario( ScenarioConfig * config, Engine::Scheduler * scheduler ) : World(config, scheduler, false)
 {
 }
 
@@ -18,8 +18,9 @@ Scenario::~Scenario()
 
 bool Scenario::maxCapacity( const Engine::Point2D<int> & position )
 {
+    const ScenarioConfig & scenarioConfig = (const ScenarioConfig &)getConfig();
 	// if random no problem
-	if(_config._initAgentsDistributionType.compare("random")==0)
+	if(scenarioConfig._initAgentsDistributionType.compare("random")==0)
 	{
 		return false;
 	}
@@ -38,11 +39,12 @@ bool Scenario::maxCapacity( const Engine::Point2D<int> & position )
 
 void Scenario::createAgents()
 {
-	for(int i=0; i<_config._numAgents; i++)
+    const ScenarioConfig & scenarioConfig = (const ScenarioConfig &)getConfig();
+	for(int i=0; i<scenarioConfig._numAgents; i++)
 	{
 		std::ostringstream oss;
 		oss << "PanicAgent_"<<i;
-		PanicAgent * agent = new PanicAgent(oss.str(), _config);
+		PanicAgent * agent = new PanicAgent(oss.str());
 		addAgent(agent);
 
 		// avoid agent in obstacle and initial dense crowd
@@ -59,10 +61,11 @@ void Scenario::createAgents()
 
 void Scenario::computeShortestExit(PanicAgent & agent )
 {
+    const ScenarioConfig & scenarioConfig = (const ScenarioConfig &)getConfig();
 	std::vector< Engine::Point2D<int> > possibleExits;
 	int randomValue = Engine::GeneralState::statistics().getUniformDistValue(0,9);
 	// probability 20% of not knowing the exit
-	if(randomValue>_config._knowledge)
+	if(randomValue>scenarioConfig._knowledge)
 	{
 		int randomExitIndex = Engine::GeneralState::statistics().getUniformDistValue(0, _exits.size()-1);
 		ExitsList::const_iterator it=_exits.begin();
@@ -97,8 +100,9 @@ void Scenario::computeShortestExit(PanicAgent & agent )
 
 void Scenario::createRasters()
 {
+    const ScenarioConfig & scenarioConfig = (const ScenarioConfig &)getConfig();
 	registerDynamicRaster("obstacles", false, eObstacles);
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getDynamicRaster(eObstacles), _config._obstacleFile, getBoundaries());	
+	Engine::GeneralState::rasterLoader().fillGDALRaster(getDynamicRaster(eObstacles), scenarioConfig._obstacleFile, getBoundaries());	
 	getDynamicRaster(eObstacles).setMaxValue(1);
 
 	registerDynamicRaster("exits", false, eExits);
@@ -120,10 +124,10 @@ void Scenario::createRasters()
 	registerDynamicRaster("panic", false, ePanic);
 	getDynamicRaster(ePanic).setInitValues(0, 1, 0);
 	
-	if(_config._initAgentsDistributionType.compare("raster")==0)
+	if(scenarioConfig._initAgentsDistributionType.compare("raster")==0)
 	{
 		registerStaticRaster("initAgentsDistribution", true);
-		Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("initAgentsDistribution"), _config._initAgentsDistributionFile, getBoundaries());
+		Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("initAgentsDistribution"), scenarioConfig._initAgentsDistributionFile, getBoundaries());
 	}
 
 
@@ -178,7 +182,7 @@ void Scenario::createRasters()
         setValue(eWalls, index, adjacentWalls);
     }
 	
-	for(ScenarioConfig::SupportRastersMap::iterator it=_config._supportMaps.begin(); it!=_config._supportMaps.end(); it++)
+	for(ScenarioConfig::SupportRastersMap::const_iterator it=scenarioConfig._supportMaps.begin(); it!=scenarioConfig._supportMaps.end(); it++)
 	{
 		std::string name = it->first;
 		std::string fileName = it->second;
@@ -201,10 +205,11 @@ void Scenario::fillExitList()
 
 void Scenario::checkPanicEvents()
 {
-	ScenarioConfig::PanicEventsList::iterator it=_config._panicEvents.begin();
-	while(it!=_config._panicEvents.end())
+    const ScenarioConfig & scenarioConfig = (const ScenarioConfig &)getConfig();
+	ScenarioConfig::PanicEventsList::const_iterator it=scenarioConfig._panicEvents.begin();
+	while(it!=scenarioConfig._panicEvents.end())
 	{
-		PanicEvent & event = *it;
+		const PanicEvent & event = *it;
 		if(event._step!=getCurrentStep())
 		{
 			it++;
@@ -241,8 +246,7 @@ void Scenario::checkPanicEvents()
 				}
 			}
 		}
-
-		it = _config._panicEvents.erase(it);
+		it++;
 	}
 
 }

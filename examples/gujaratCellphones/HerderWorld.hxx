@@ -26,7 +26,6 @@ class Herder;
 
 class HerderWorld : public Engine::World
 {
-	HerderWorldConfig _config;
 	Climate _climate;
 	// maximum resources for soil quality (from 0 to 10)
 	std::vector<float> _maxResources;
@@ -41,11 +40,10 @@ class HerderWorld : public Engine::World
 	bool isWetSeason() const;
 
 public:
-	HerderWorld( Engine::Simulation &simulation, HerderWorldConfig &config );
+	HerderWorld( HerderWorldConfig * config );
 	virtual ~HerderWorld();
 	void stepEnvironment();
 	int daysUntilWetSeason() const; // remaining days until next wet season
-	const HerderWorldConfig & getConfig() const;
 };
 
 } // namespace Tutorial 

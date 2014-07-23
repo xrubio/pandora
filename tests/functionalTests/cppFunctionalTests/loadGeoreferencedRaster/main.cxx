@@ -1,7 +1,7 @@
 
 #include <RasterWorld.hxx>
 #include <Exception.hxx>
-#include <Simulation.hxx>
+#include <Config.hxx>
 #include <Size.hxx>
 
 #include <iostream>
@@ -11,9 +11,8 @@ int main(int argc, char *argv[])
 {
     try
     {
-        Engine::Simulation sim(Engine::Size<int>(120,120), 1);
         std::string rasterFileName = "../../../resources/test.tiff";
-        Test::RasterWorld world(sim, Test::RasterWorld::useOpenMPSingleNode("data/raster.h5"), rasterFileName);
+        Test::RasterWorld world(new Engine::Config(Engine::Size<int>(120,120), 1), Test::RasterWorld::useOpenMPSingleNode(), rasterFileName);
         world.initialize(argc, argv);
         world.run();
 	}

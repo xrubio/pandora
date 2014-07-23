@@ -204,7 +204,13 @@ TiXmlElement * Config::findElement( const std::string & elementPath )
     TiXmlElement * element = _root;
     for(std::vector<std::string>::const_iterator it=tokens.begin(); it!=tokens.end(); it++)
     {
-        element = element->FirstChildElement(*it);
+        element = element->FirstChildElement(*it); 
+        if(!element)
+        {	
+            std::stringstream sstr;
+		    sstr << "Config::findElement " << elementPath << " is not inside config file";
+    		throw Engine::Exception(sstr.str());
+        }
     }
     return element;
 }

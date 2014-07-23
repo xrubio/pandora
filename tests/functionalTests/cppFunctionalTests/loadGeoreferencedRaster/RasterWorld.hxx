@@ -6,7 +6,7 @@
 
 namespace Engine
 {
-	class Simulation;
+	class Config;
 }
 
 namespace Test 
@@ -19,7 +19,7 @@ class RasterWorld : public Engine::World
 	std::string _rasterFile;
 
 public:
-	RasterWorld( const Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0, const std::string & rasterFile = "no file");
+	RasterWorld( Engine::Config * config, Engine::Scheduler * scheduler = 0, const std::string & rasterFile = "no file");
 	virtual ~RasterWorld();
 };
 

@@ -6,7 +6,7 @@
 
 namespace Engine
 {
-	class Simulation;
+	class Config;
 }
 
 namespace Test 
@@ -19,7 +19,7 @@ class ShpWorld : public Engine::World
 	std::string _shpFile;
 
 public:
-	ShpWorld( const Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0, const std::string & shpFile = "no file");
+	ShpWorld( Engine::Config * config, Engine::Scheduler * scheduler = 0, const std::string & shpFile = "no file");
 	virtual ~ShpWorld();
 };
 

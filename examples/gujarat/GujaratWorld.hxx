@@ -20,7 +20,6 @@ enum Rasters
 	eForageActivity,
 	eHomeActivity,
 	eSectors,
-	eDuneMap,
 	eDistWater,
 	eWeightWater,
 	eResourcesFraction
@@ -39,7 +38,6 @@ class GujaratWorld : public Engine::World
 
 	long int _agentKey;
 	Climate _climate;
-	const GujaratConfig & _config;
 	// biomass produced by a cell each year
 	std::vector<float>	_yearlyBiomass;
 	// biomass increase for each day of rain season per cell
@@ -68,13 +66,12 @@ class GujaratWorld : public Engine::World
 	//Engine::Point2D<int> findNearestWater( const Engine::Point2D<int> & point );
 	float getBiomassVariation( bool wetSeason, Soils & cellSoil, const Engine::Point2D<int> & index ) const;
 public:
-	GujaratWorld( const GujaratConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0);
+	GujaratWorld( GujaratConfig * config, Engine::Scheduler * scheduler = 0);
 	virtual ~GujaratWorld();
 	
 	void stepEnvironment();
 	//void stepGeneralUpdate( int step );
 	const Climate & getClimate() const;
-	const GujaratConfig& getConfig() const { return _config; }
 
 	int  convertToCalories( int mass );
 	long int getNewKey();

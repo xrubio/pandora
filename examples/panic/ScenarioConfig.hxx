@@ -24,7 +24,6 @@ class ScenarioConfig : public Engine::Config
 	typedef std::map<std::string, std::string> SupportRastersMap;
 	typedef std::list<PanicEvent> PanicEventsList;
 
-    Engine::Size<int> _size;
 	std::string _obstacleFile;
 
 	// agents
@@ -32,7 +31,7 @@ class ScenarioConfig : public Engine::Config
 	int _contagion;
 	float _agentCompressionWeight;
 	float _wallCompressionWeight;
-	float _compressionThreshold;
+	int _compressionThreshold;
 	int _bodiesToObstacle;
 	int _knowledge;
 
@@ -48,10 +47,9 @@ class ScenarioConfig : public Engine::Config
 	std::string _initAgentsDistributionFile;
 
 public:
-	ScenarioConfig();
+	ScenarioConfig( const std::string & xmlFile );
 	virtual ~ScenarioConfig();
-	void extractParticularAttribs(TiXmlElement *pRoot);
-	const Engine::Size<int> & getSize() const;
+	void loadParams(); 
 	
 	friend class Scenario;
 	friend class PanicAgent;

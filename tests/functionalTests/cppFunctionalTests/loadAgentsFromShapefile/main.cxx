@@ -1,7 +1,7 @@
 
 #include <ShpWorld.hxx>
 #include <Exception.hxx>
-#include <Simulation.hxx>
+#include <Config.hxx>
 #include <Size.hxx>
 
 #include <iostream>
@@ -12,8 +12,7 @@ int main(int argc, char *argv[])
     try
     {
         std::string shapeFileName = "../../../resources/test.shp";
-        Engine::Simulation sim(Engine::Size<int>(64,64), 1);
-        Test::ShpWorld world(sim, Test::ShpWorld::useOpenMPSingleNode("data/shp.h5"), shapeFileName);
+        Test::ShpWorld world(new Engine::Config(Engine::Size<int>(64,64), 1), Test::ShpWorld::useOpenMPSingleNode(), shapeFileName);
         world.initialize(argc, argv);
         world.run();
 	}

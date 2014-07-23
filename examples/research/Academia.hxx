@@ -4,11 +4,6 @@
 
 #include <World.hxx>
 
-namespace Engine
-{
-	class Simulation;
-}
-
 namespace Examples 
 {
 
@@ -23,9 +18,8 @@ class Academia : public Engine::World
 	void createRasters();
 	void createAgents();
 
-	const AcademiaConfig & _config;
 public:
-	Academia( const AcademiaConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0);
+	Academia( AcademiaConfig * config, Engine::Scheduler * scheduler = 0);
 	virtual ~Academia();
 
 	void generateNewPaper( Paper & paper );

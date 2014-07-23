@@ -3,8 +3,6 @@
 #define __NeighborConfig_hxx__
 
 #include <Config.hxx>
-#include <Size.hxx>
-#include <sstream>
 
 namespace Segregation 
 {
@@ -12,19 +10,17 @@ namespace Segregation
 
 class NeighborConfig : public Engine::Config
 { 
-    Engine::Size<int> _size;
 	float _friendlyPercentage;
 	float _density;
 	float _dimePercentage;
 	float _neighborDistance;
 	float _maxMovingDistance;
 public:
-	NeighborConfig();  
+	NeighborConfig( const std::string & xmlFile );  
 	virtual ~NeighborConfig();
     
-	void extractParticularAttribs(TiXmlElement *pRoot);
+	void loadParams(); 
 	friend class Neighborhood;
-	const Engine::Size<int> & getSize();
 };
 
 } // namespace Segregation 
