@@ -11,11 +11,11 @@ int main(int argc, char *argv[])
 {
     try
     {
-        Test::CustomWorld world(new Engine::Config(Engine::Size<int>(64,64), 5, "sequential/data.hdf5"), Test::CustomWorld::useOpenMPSingleNode());
+        Test::CustomWorld world(new Engine::Config(Engine::Size<int>(64,64), 5, "sequential/data.h5"), Test::CustomWorld::useOpenMPSingleNode());
         world.initialize(argc, argv);
         world.run();
         
-        Test::CustomWorld world2(new Engine::Config(Engine::Size<int>(64,64), 5, "spacePartition/data.hdf5"), Test::CustomWorld::useSpacePartition());
+        Test::CustomWorld world2(new Engine::Config(Engine::Size<int>(64,64), 5, "spacePartition/data.h5"), Test::CustomWorld::useSpacePartition());
         world2.initialize(argc, argv);
         world2.run();
 

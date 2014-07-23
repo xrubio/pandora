@@ -41,9 +41,12 @@ namespace Engine
 class SimulationRecord
 {
 public:
-	// TODO programar funció d'equivalencia a agent record i convertir en llista
 	typedef std::map<std::string, AgentRecord * > AgentRecordsMap;
-	typedef std::map<std::string, int > ValuesMap;	
+	
+    typedef std::map<std::string, int > IntAttributesMap;	
+	typedef std::map<std::string, float > FloatAttributesMap;	
+	typedef std::map<std::string, std::string > StrAttributesMap;	
+
 	typedef std::vector<DynamicRaster> RasterHistory;
 	typedef std::map<std::string, RasterHistory> RasterMap;
 	typedef std::map<std::string, StaticRaster> StaticRasterMap;
@@ -64,14 +67,16 @@ private:
 	// resolution of serializedData
 	int _serializedResolution;
 
-	// we need to know min and max values for each state in order to paint agents 
-	ValuesMap _minAttributeValues;
-	ValuesMap _maxAttributeValues;
+	// we need to know min and max values for each numerical attribute in order to paint agents 
+	IntAttributesMap _minIntValues;
+	IntAttributesMap _maxIntValues;
+    FloatAttributesMap _minFloatValues;
+    FloatAttributesMap _maxFloatValues;
 
 	Size<int> _size;
 
 	// we need this function in order to be called by H5Giterate. It must be static to match the C call signature
-	static herr_t registerAgentStep( hid_t loc_id, const char *name, void *opdata );
+	//static herr_t registerAgentStep( hid_t loc_id, const char *name, void *opdata );
 
 	static herr_t iterateAgentTypes( hid_t loc_id, const char * name, const H5L_info_t *linfo, void *opdata );
 	static herr_t iterateAgentDatasets( hid_t loc_id, const char * name, const H5L_info_t *linfo, void *opdata );
@@ -93,12 +98,13 @@ private:
 	void loadAttributes( const hid_t & stepGroup, hssize_t & numElements, const std::vector<std::string> & indexAgents, AgentRecordsMap & agents );
 	// updates min/max values checking value for the attribute key
 	void updateMinMaxAttributeValues( const std::string & key, int value );
+	void updateMinMaxAttributeValues( const std::string & key, float value );
 public:
 	SimulationRecord( int loadedResolution = 1, bool gui = true );
 	virtual ~SimulationRecord();
 
 	// the real method, called from registerAgentStep
-	void registerAgent( hid_t loc_id, const char * name );
+	//void registerAgent( hid_t loc_id, const char * name );
 	bool loadHDF5( const std::string & fileName, const bool & loadRasters=true, const bool & loadAgents=true);
 	
 	RasterHistory & getRasterHistory( const std::string & key );
@@ -132,12 +138,14 @@ public:
 
 	AgentRecordsVector getAgentsAtPosition( int step, const Point2D<int> & position ) const;
 	
-	// TODO make a different class
-	double getMean( const std::string & type, const std::string & state, int step );
-	double getSum( const std::string & type, const std::string & state, int step );
+	double getMean( const std::string & type, const std::string & attribute, int step );
+	double getSum( const std::string & type, const std::string & attribute, int step );
 	
-	int getMinValueForState( const std::string & state );
-	int getMaxValueForState( const std::string & state );
+	int getMinInt( const std::string & attribute);
+	int getMaxInt( const std::string & attribute);
+    float getMinFloat( const std::string & attribute);
+	float getMaxFloat( const std::string & attribute);
+
 	const Size<int> & getSize() const;
 	const float & getLoadingPercentageDone() const;
 	const std::string & getLoadingState() const;

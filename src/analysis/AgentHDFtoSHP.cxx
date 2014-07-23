@@ -96,8 +96,9 @@ void AgentHDFtoSHP::preProcess(const Engine::SimulationRecord & , const std::str
 
 void AgentHDFtoSHP::createFeature( const Engine::AgentRecord & agentRecord, int timeStep, bool storeTimeStep )
 {
+    /* TODO
 	// if the agent was not alive in this num step don't export it
-	if(agentRecord.getState(timeStep, "exists")==0)
+	if(agentRecord.getInt(timeStep, "exists")==0)
 	{
 		return;
 	}
@@ -142,6 +143,7 @@ void AgentHDFtoSHP::createFeature( const Engine::AgentRecord & agentRecord, int 
 		return;
 	}
 	OGRFeature::DestroyFeature(feature);
+    */
 	return;
 }
 
@@ -172,6 +174,7 @@ std::string AgentHDFtoSHP::getFieldNameFromString( const std::string & fieldName
 
 void AgentHDFtoSHP::defineFields( const Engine::AgentRecord & agentRecord )
 {
+    /* TODO
 	for(Engine::AgentRecord::StatesMap::const_iterator it=agentRecord.beginStates(); it!=agentRecord.endStates(); it++)
 	{
 		const std::string & key = it->first;		
@@ -193,6 +196,7 @@ void AgentHDFtoSHP::defineFields( const Engine::AgentRecord & agentRecord )
     	}
 	}
 	_definitionComplete = true;
+    */
 }
 
 void AgentHDFtoSHP::computeAgent( const Engine::AgentRecord & agentRecord )

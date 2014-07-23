@@ -32,28 +32,50 @@ namespace Engine
 
 class AgentRecord
 {
-	typedef std::vector<int> ValuesVector;
+	typedef std::vector<int> IntValues;
+	typedef std::vector<float> FloatValues;
+	typedef std::vector<std::string> StrValues;
 
 public:
-	typedef std::map<std::string, ValuesVector > StatesMap;
+	typedef std::map<std::string, IntValues > IntAttributesMap;
+	typedef std::map<std::string, FloatValues > FloatAttributesMap;
+	typedef std::map<std::string, StrValues > StrAttributesMap;
 
 private:
 	std::string _id;
 	// total number of steps in simulation (not agent life)
 	int _numSteps;
-	StatesMap _states;
+	IntAttributesMap _intAttributes;
+	FloatAttributesMap _floatAttributes;
+	StrAttributesMap _strAttributes;
 public:
 	AgentRecord( const std::string & id, int numSteps );
 	virtual ~AgentRecord();
 	
-	void addState( int numStep, const std::string & id, int value );
-	int getState( int numStep, const std::string & key ) const;
+	void addInt( int numStep, const std::string & id, int value );
+	void addFloat( int numStep, const std::string & id, float value );
+	void addStr( int numStep, const std::string & id, const std::string & value );
+
+	int getInt( int numStep, const std::string & key ) const;
+	float getFloat( int numStep, const std::string & key ) const;
+	const std::string & getStr( int numStep, const std::string & key ) const;
 	std::string getCompleteState( int numStep ) const;
 
-	StatesMap::const_iterator beginStates() const;
-	StatesMap::const_iterator endStates() const;
+	IntAttributesMap::const_iterator beginInt() const { return _intAttributes.begin(); }
+	IntAttributesMap::const_iterator endInt() const { return _intAttributes.end(); }
+
+	FloatAttributesMap::const_iterator beginFloat() const { return _floatAttributes.begin(); }
+	FloatAttributesMap::const_iterator endFloat() const { return _floatAttributes.end(); }
+
+	StrAttributesMap::const_iterator beginStr() const { return _strAttributes.begin(); }
+	StrAttributesMap::const_iterator endStr() const { return _strAttributes.end(); }
+
 	const std::string & getId() const { return _id; }
 	int getNumSteps() const { return _numSteps; }
+
+    bool isInt( const std::string & key ) const;
+    bool isFloat( const std::string & key ) const;
+    bool isStr( const std::string & key ) const;
 };
 
 } // namespace Engine

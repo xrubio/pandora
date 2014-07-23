@@ -36,45 +36,116 @@ AgentRecord::~AgentRecord()
 {
 }
 
-void AgentRecord::addState( int numStep, const std::string & key, int value )
+void AgentRecord::addInt( int numStep, const std::string & key, int value )
 {
-	StatesMap::iterator it = _states.find(key);
-	// the key already exists
-	if(it==_states.end())
+	IntAttributesMap::iterator it = _intAttributes.find(key);
+	// the key still doesn't exist
+	if(it==_intAttributes.end())
 	{
-		//_states.insert( std::pair< std::string, ValuesVector >(key, std::vector<int> ));		
-		std::vector<int> values;
+		IntValues values;
 		values.resize(_numSteps);
-		_states.insert( make_pair( key, values ));
-		it = _states.find(key);
-		/*
-		ValuesVector & vector = it->second;
-		vector.resize(_numSteps);
-		*/
+		_intAttributes.insert( make_pair( key, values ));
+		it = _intAttributes.find(key);
 	}
-	ValuesVector & vector = it->second;
+	IntValues& vector = it->second;
 	vector[numStep] = value;
 }
 
-int AgentRecord::getState( int numStep, const std::string & key ) const
+void AgentRecord::addFloat( int numStep, const std::string & key, float value )
 {
-	StatesMap::const_iterator it = _states.find(key);
+	FloatAttributesMap::iterator it = _floatAttributes.find(key);
+	// the key still doesn't exist
+	if(it==_floatAttributes.end())
+	{
+		FloatValues values;
+		values.resize(_numSteps);
+		_floatAttributes.insert( make_pair( key, values ));
+		it = _floatAttributes.find(key);
+	}
+	FloatValues& vector = it->second;
+	vector[numStep] = value;
+}
+
+void AgentRecord::addStr( int numStep, const std::string & key, const std::string & value )
+{
+	StrAttributesMap::iterator it = _strAttributes.find(key);
+	// the key still doesn't exist
+	if(it==_strAttributes.end())
+	{
+		StrValues values;
+		values.resize(_numSteps);
+		_strAttributes.insert( make_pair( key, values ));
+		it = _strAttributes.find(key);
+	}
+	StrValues& vector = it->second;
+	vector[numStep] = value;
+}
+
+int AgentRecord::getInt( int numStep, const std::string & key ) const
+{
+	IntAttributesMap::const_iterator it = _intAttributes.find(key);
 	// the key already exists
-	if(it==_states.end())
+	if(it==_intAttributes.end())
 	{
 		std::stringstream oss;
-		oss << "AgentRecord::getState - searching for unknown key: " << key << " in agent record";
+		oss << "AgentRecord::getInt - searching for unknown key: " << key << " in agent record";
 		throw Engine::Exception(oss.str());
 	}
-	const ValuesVector & vector = it->second;
+	const IntValues & vector = it->second;
+	return vector.at(numStep);
+}
+
+float AgentRecord::getFloat( int numStep, const std::string & key ) const
+{
+	FloatAttributesMap::const_iterator it = _floatAttributes.find(key);
+	// the key already exists
+	if(it==_floatAttributes.end())
+	{
+		std::stringstream oss;
+		oss << "AgentRecord::getFloat - searching for unknown key: " << key << " in agent record";
+		throw Engine::Exception(oss.str());
+	}
+	const FloatValues & vector = it->second;
+	return vector.at(numStep);
+}
+
+const std::string & AgentRecord::getStr( int numStep, const std::string & key ) const
+{
+	StrAttributesMap::const_iterator it = _strAttributes.find(key);
+	// the key already exists
+	if(it==_strAttributes.end())
+	{
+		std::stringstream oss;
+		oss << "AgentRecord::getStr - searching for unknown key: " << key << " in agent record";
+		throw Engine::Exception(oss.str());
+	}
+	const StrValues & vector = it->second;
 	return vector.at(numStep);
 }
 
 std::string AgentRecord::getCompleteState( int numStep ) const
 {
 	std::stringstream completeState;
-	completeState << "id: " << _id << " pos: " << getState(numStep, "x") << "/" << getState(numStep, "y") << std::endl;
-	for(StatesMap::const_iterator it=_states.begin(); it!=_states.end(); it++)
+	completeState << "id: " << _id << " pos: " << getInt(numStep, "x") << "/" << getInt(numStep, "y") << std::endl;
+	for(IntAttributesMap::const_iterator it=_intAttributes.begin(); it!=_intAttributes.end(); it++)
+	{
+		const std::string & key = it->first;
+		if(key.compare("exists")==0 || key.compare("x")==0 || key.compare("y")==0)
+		{
+			continue;
+		}
+		completeState << "\t" << it->first << ": " << it->second[numStep] << std::endl;
+	}
+    for(FloatAttributesMap::const_iterator it=_floatAttributes.begin(); it!=_floatAttributes.end(); it++)
+	{
+		const std::string & key = it->first;
+		if(key.compare("exists")==0 || key.compare("x")==0 || key.compare("y")==0)
+		{
+			continue;
+		}
+		completeState << "\t" << it->first << ": " << it->second[numStep] << std::endl;
+	}
+    for(StrAttributesMap::const_iterator it=_strAttributes.begin(); it!=_strAttributes.end(); it++)
 	{
 		const std::string & key = it->first;
 		if(key.compare("exists")==0 || key.compare("x")==0 || key.compare("y")==0)
@@ -86,14 +157,34 @@ std::string AgentRecord::getCompleteState( int numStep ) const
 	return completeState.str();
 }
 
-AgentRecord::StatesMap::const_iterator AgentRecord::beginStates() const
+bool AgentRecord::isInt( const std::string & key ) const
 {
-	return _states.begin();
+    IntAttributesMap::const_iterator it = _intAttributes.find(key);
+	if(it==_intAttributes.end())
+    {
+        return false;
+    }
+    return true;
 }
 
-AgentRecord::StatesMap::const_iterator AgentRecord::endStates() const
-{
-	return _states.end();
+bool AgentRecord::isFloat( const std::string & key ) const
+{ 
+    FloatAttributesMap::const_iterator it = _floatAttributes.find(key);
+	if(it==_floatAttributes.end())
+    {
+        return false;
+    }
+    return true;
+}
+
+bool AgentRecord::isStr( const std::string & key ) const
+{   
+    StrAttributesMap::const_iterator it = _strAttributes.find(key);
+	if(it==_strAttributes.end())
+    {
+        return false;
+    }
+    return true;
 }
 
 } // namespace Engine

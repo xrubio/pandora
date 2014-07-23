@@ -64,7 +64,7 @@ bool IndividualStats::attributeToStore( const std::string & key )
 
 void IndividualStats::computeAgent( const Engine::AgentRecord & agentRecord )
 {
-	if(agentRecord.getState(_numStep, "exists")==0)
+	if(agentRecord.getInt(_numStep, "exists")==0)
 	{
 		return;
 	}
@@ -73,8 +73,15 @@ void IndividualStats::computeAgent( const Engine::AgentRecord & agentRecord )
 	newLine << agentRecord.getId();
 	for(std::list<std::string>::iterator it=_attributes.begin(); it!=_attributes.end(); it++)
 	{
-		const std::string & key = *it;
-		newLine << _separator << agentRecord.getState(_numStep, key);
+		const std::string & key = *it; 
+        if(agentRecord.isInt(key))
+        {
+		    newLine << _separator << agentRecord.getInt(_numStep, key);
+        }
+        else if(agentRecord.isFloat(key))
+        {  
+		    newLine << _separator << agentRecord.getFloat(_numStep, key);
+        }
 	}
 	_file << newLine.str() << std::endl;
 }

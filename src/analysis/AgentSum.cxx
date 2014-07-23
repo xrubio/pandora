@@ -16,8 +16,16 @@ AgentSum::~AgentSum()
 void AgentSum::computeAgent( const Engine::AgentRecord & agentRecord )
 {
 	for(int i=0; i<_results.size(); i++)
-	{
-		int value = agentRecord.getState(i, _attributeName);
+	{        
+        double value = 0.0f;
+        if(agentRecord.isInt(_attributeName))
+        {
+            value = agentRecord.getInt(i, _attributeName);
+        }
+        else if(agentRecord.isFloat(_attributeName))
+        {  
+            value = agentRecord.getFloat(i, _attributeName);
+        }
 		_results[i] += value;
 	}
 }

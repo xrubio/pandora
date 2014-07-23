@@ -27,7 +27,15 @@ void AgentHistogram::preProcess( const Engine::SimulationRecord & simRecord, con
 
 void AgentHistogram::computeAgent( const Engine::AgentRecord & agentRecord )
 {
-	int value = agentRecord.getState(_numStep, _attribute);
+	double value = 0.0f;
+    if(agentRecord.isInt(_attribute))
+    {
+        value = agentRecord.getInt(_numStep, _attribute);
+    }
+    else if(agentRecord.isFloat(_attribute))
+    {
+        value = agentRecord.getFloat(_numStep, _attribute);
+    }
 	size_t index = value/_interval;
 	if(_histogram.size()<=index)
 	{

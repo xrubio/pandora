@@ -297,7 +297,7 @@ hssize_t SimulationRecord::registerAgentIds( const hid_t & stepGroup, std::vecto
 		}
 		AgentRecord * agentRecord = it->second;
 		// the agent exists in _loadingStep
-		agentRecord->addState( _loadingStep/getFinalResolution(), "exists", true);
+		agentRecord->addInt( _loadingStep/getFinalResolution(), "exists", true);
 	}
 	// clean memory
 	H5Dvlen_reclaim (stringType, stringSpace, H5P_DEFAULT, stringIds);
@@ -310,11 +310,11 @@ hssize_t SimulationRecord::registerAgentIds( const hid_t & stepGroup, std::vecto
 
 void SimulationRecord::updateMinMaxAttributeValues( const std::string & key, int value )
 {	
-	ValuesMap::iterator itMin = _minAttributeValues.find(key);
+	IntAttributesMap::iterator itMin = _minIntValues.find(key);
 	// check if it is minimum value
-	if(itMin==_minAttributeValues.end())
+	if(itMin==_minIntValues.end())
 	{
-		_minAttributeValues.insert( make_pair(key, value));
+		_minIntValues.insert( make_pair(key, value));
 	}
 	else if(value<itMin->second)
 	{
@@ -322,10 +322,35 @@ void SimulationRecord::updateMinMaxAttributeValues( const std::string & key, int
 	}
 	
 	// check maximum value
-	ValuesMap::iterator itMax = _maxAttributeValues.find(key);
-	if(itMax==_maxAttributeValues.end())
+	IntAttributesMap::iterator itMax = _maxIntValues.find(key);
+	if(itMax==_maxIntValues.end())
 	{
-		_maxAttributeValues.insert( make_pair(key, value));
+		_maxIntValues.insert( make_pair(key, value));
+	}
+	else if(value>itMax->second)
+	{
+		itMax->second = value;
+	}
+}
+
+void SimulationRecord::updateMinMaxAttributeValues( const std::string & key, float value )
+{	
+	FloatAttributesMap::iterator itMin = _minFloatValues.find(key);
+	// check if it is minimum value
+	if(itMin==_minFloatValues.end())
+	{
+		_minFloatValues.insert( make_pair(key, value));
+	}
+	else if(value<itMin->second)
+	{
+		itMin->second = value;
+	}
+	
+	// check maximum value
+	FloatAttributesMap::iterator itMax = _maxFloatValues.find(key);
+	if(itMax==_maxFloatValues.end())
+	{
+		_maxFloatValues.insert( make_pair(key, value));
 	}
 	else if(value>itMax->second)
 	{
@@ -355,7 +380,7 @@ void SimulationRecord::loadAttributes( const hid_t & stepGroup, hssize_t & numEl
 				std::string agentName = indexAgents.at(iAgent);
 				AgentRecordsMap::iterator it = agents.find(agentName);
 				AgentRecord * agentRecord = it->second;
-				agentRecord->addState( _loadingStep/getFinalResolution(), *itA, data.at(iAgent));
+				agentRecord->addInt( _loadingStep/getFinalResolution(), *itA, data.at(iAgent));
 				updateMinMaxAttributeValues(*itA, data.at(iAgent));
 			}
 		}
@@ -364,10 +389,19 @@ void SimulationRecord::loadAttributes( const hid_t & stepGroup, hssize_t & numEl
             std::cout << "SimulationRecord::loadHDF5 - loading attribute: " << *itA << " of type string, not yet implemented" << std::endl;
 		}
         else if(typeClass== H5T_FLOAT)
-		{
-            std::cout << "SimulationRecord::loadHDF5 - loading attribute: " << *itA << " of type float, not yet implemented" << std::endl;
+		{	
+            std::vector<float> data;
+			data.resize(numElements);
+			H5Dread(attributeDatasetId, H5T_NATIVE_FLOAT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &(data.at(0)));
+			for(int iAgent=0; iAgent<numElements; iAgent++)
+			{
+				std::string agentName = indexAgents.at(iAgent);
+				AgentRecordsMap::iterator it = agents.find(agentName);
+				AgentRecord * agentRecord = it->second;
+				agentRecord->addFloat( _loadingStep/getFinalResolution(), *itA, data.at(iAgent));
+				updateMinMaxAttributeValues(*itA, data.at(iAgent));
+			}
 		}
-
 		else
 		{
 			std::stringstream oss;
@@ -631,18 +665,18 @@ SimulationRecord::AgentRecordsVector SimulationRecord::getAgentsAtPosition( int 
 		for(AgentRecordsMap::const_iterator it=beginAgents(itType); it!=endAgents(itType); it++)
 		{
 			AgentRecord * agentRecord = it->second;	
-			int x = agentRecord->getState(step, "x");
-			int y = agentRecord->getState(step, "y");
+			int x = agentRecord->getInt(step, "x");
+			int y = agentRecord->getInt(step, "y");
 			if(x==position._x && y==position._y)
 			{
 				results.push_back(agentRecord);
 			}
 		}
 	}
-	return  results;
+	return results;
 }
 
-double SimulationRecord::getMean( const std::string & type, const std::string & state, int step )
+double SimulationRecord::getMean( const std::string & type, const std::string & attribute, int step )
 {
 	double value = 0;
 	int sample = 0;
@@ -650,29 +684,41 @@ double SimulationRecord::getMean( const std::string & type, const std::string & 
 	if(itType==_types.end())
 	{
 		std::stringstream oss;
-		oss << "SimulationRecord::getMean - asking for state: " << state << " in type " << type;
+		oss << "SimulationRecord::getMean - asking for attribute: " << attribute<< " in type " << type;
 		throw Exception(oss.str());
 	}
 	AgentRecordsMap agents = itType->second;
 	for(AgentRecordsMap::iterator it=agents.begin(); it!=agents.end(); it++)
 	{
 		AgentRecord * agentRecord = it->second;	
-		bool exists = agentRecord->getState(step, "exists");
-		if(exists)
+		bool exists = agentRecord->getInt(step, "exists");
+		if(!exists)
 		{
-			int agentValue = agentRecord->getState(step, state);
-			if(agentValue!=std::numeric_limits<int>::max())
-			{
-				value += agentValue;
-				sample++;
-			}
-		}
+            continue;
+        }
+        float agentValue = 0.0f;
+        if(agentRecord->isInt(attribute))
+        {
+			agentValue = agentRecord->getInt(step, attribute);
+        }
+        else if(agentRecord->isFloat(attribute))
+        {
+			agentValue = agentRecord->getFloat(step, attribute);
+        }
+        else
+        {
+    		std::stringstream oss;
+    		oss << "SimulationRecord::getMean - computing non-numeric attribute: " << attribute;
+    		throw Exception(oss.str());
+        }
+        value += agentValue;
+	    sample++;
 	}
 	value = value/sample;
 	return value;
 }
 
-double SimulationRecord::getSum( const std::string & type, const std::string & state, int step )
+double SimulationRecord::getSum( const std::string & type, const std::string & attribute, int step )
 {
 	double value = 0;
 	
@@ -680,29 +726,57 @@ double SimulationRecord::getSum( const std::string & type, const std::string & s
 	if(itType==_types.end())
 	{
 		std::stringstream oss;
-		oss << "SimulationRecord::getSum - asking for state: " << state << " in type " << type;
+		oss << "SimulationRecord::getSum - asking for attribute: " << attribute << " in type " << type;
 		throw Exception(oss.str());
 	}
 	AgentRecordsMap agents = itType->second;
 	for(AgentRecordsMap::iterator it=agents.begin(); it!=agents.end(); it++)
 	{
 		AgentRecord * agentRecord = it->second;	
-		bool exists = agentRecord->getState(step, "exists");
-		if(exists)
+		bool exists = agentRecord->getInt(step, "exists");
+		if(!exists)
 		{
-			int agentValue = agentRecord->getState(step, state);	
-			if(agentValue!=std::numeric_limits<int>::max())
-			{
-				value += agentValue;
-			}
-		}
+            continue;
+        }
+        float agentValue = 0.0f;
+        if(agentRecord->isInt(attribute))
+        {
+			agentValue = agentRecord->getInt(step, attribute);
+        }
+        else if(agentRecord->isFloat(attribute))
+        {
+			agentValue = agentRecord->getFloat(step, attribute);
+        }
+        else
+        {
+    		std::stringstream oss;
+    		oss << "SimulationRecord::getSum - computing non-numeric attribute: " << attribute;
+    		throw Exception(oss.str());
+        }
+        value += agentValue;
 	}
 	return value;
 }
 
+/*
 void SimulationRecord::registerAgent( hid_t loc_id, const char * name )
 {
 	hid_t datasetId = H5Dopen(loc_id, name, H5P_DEFAULT);
+    hid_t datatype = H5Dget_type(datasetId);
+    H5T_class_t attributeType = H5Tget_class(datatype);
+
+    if(attributeType==H5T_NATIVE_INT)
+    {
+        std::cout << "int!!!" << std::endl;
+    }
+    else if(attributeType==H5T_NATIVE_FLOAT)
+    {
+        std::cout << "float!!!" << std::endl;
+    }
+    else
+    {
+        std::cout << "different!!!" << std::endl;
+    }
 	std::string agentName(name);
 
 	unsigned int typePos = agentName.find_first_of("_");
@@ -733,25 +807,26 @@ void SimulationRecord::registerAgent( hid_t loc_id, const char * name )
 		int value = 0;
 		H5Aread(attributeId, H5T_NATIVE_INT, &value);
 
+        // TODO read different typeS?
 	
 		AgentRecord * agentRecord = it->second;
-		agentRecord->addState( _loadingStep/getFinalResolution(), std::string(nameAttribute), value );
+		agentRecord->addInt( _loadingStep/getFinalResolution(), std::string(nameAttribute), value );
 		H5Aclose(attributeId);
 
-		ValuesMap::iterator it = _minAttributeValues.find(nameAttribute);
-		if(it==_minAttributeValues.end())
+		IntAttributesMap::iterator it = _minIntValues.find(nameAttribute);
+		if(it==_minIntValues.end())
 		{
-			_minAttributeValues.insert( make_pair(std::string(nameAttribute), value) );
+			_minIntValues.insert( make_pair(std::string(nameAttribute), value) );
 		}
 		else if(value<it->second)
 		{
 			it->second = value;
 		}
 
-		it = _maxAttributeValues.find(nameAttribute);
-		if(it==_maxAttributeValues.end())
+		it = _maxIntValues.find(nameAttribute);
+		if(it==_maxIntValues.end())
 		{
-			_maxAttributeValues.insert( make_pair(std::string(nameAttribute), value) );
+			_maxIntValues.insert( make_pair(std::string(nameAttribute), value) );
 		}
 		else if(value>it->second)
 		{
@@ -760,38 +835,66 @@ void SimulationRecord::registerAgent( hid_t loc_id, const char * name )
 	}
 	H5Dclose(datasetId);
 }
+*/
 
-int SimulationRecord::getMinValueForState( const std::string & state )
+int SimulationRecord::getMinInt( const std::string & attribute)
 {
-	ValuesMap::iterator it = _minAttributeValues.find(state);
-	if(it==_minAttributeValues.end())
+	IntAttributesMap::iterator it = _minIntValues.find(attribute);
+	if(it==_minIntValues.end())
 	{
 		std::stringstream oss;
-		oss << "SimulationRecord::getMinValueForState - asking for not registered state: " << state;
+		oss << "SimulationRecord::getMinInt- asking for not registered attribute: " << attribute;
 		throw Exception(oss.str());
 	}
 	return it->second;
 }
 
-int SimulationRecord::getMaxValueForState( const std::string & state )
+float SimulationRecord::getMinFloat( const std::string & attribute)
+{
+	FloatAttributesMap::iterator it = _minFloatValues.find(attribute);
+	if(it==_minFloatValues.end())
+	{
+		std::stringstream oss;
+		oss << "SimulationRecord::getMinFloat- asking for not registered attribute: " << attribute;
+		throw Exception(oss.str());
+	}
+	return it->second;
+}
+
+int SimulationRecord::getMaxInt( const std::string & attribute)
 {	
-	ValuesMap::iterator it = _maxAttributeValues.find(state);
-	if(it==_maxAttributeValues.end())
+	IntAttributesMap::iterator it = _maxIntValues.find(attribute);
+	if(it==_maxIntValues.end())
 	{
 		std::stringstream oss;
-		oss << "SimulationRecord::getMaxValueForState - asking for not registered state: " << state;
+		oss << "SimulationRecord::getMaxInt - asking for not registered attribute: " << attribute;
 		throw Exception(oss.str());
 	}
 	return it->second;
 
 }
 
+float SimulationRecord::getMaxFloat( const std::string & attribute)
+{	
+	FloatAttributesMap::iterator it = _maxFloatValues.find(attribute);
+	if(it==_maxFloatValues.end())
+	{
+		std::stringstream oss;
+		oss << "SimulationRecord::getMaxFloat - asking for not registered attribute: " << attribute;
+		throw Exception(oss.str());
+	}
+	return it->second;
+
+}
+
+/*
 herr_t SimulationRecord::registerAgentStep( hid_t loc_id, const char *name, void *opdata )
 {
 	SimulationRecord * record = (SimulationRecord*)opdata;
 	record->registerAgent(loc_id, name);
     return 0;
 }
+*/
 
 const Size<int> & SimulationRecord::getSize() const
 {

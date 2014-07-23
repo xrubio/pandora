@@ -17,7 +17,7 @@ void AgentNum::computeAgent( const Engine::AgentRecord & agentRecord )
 {
 	for(int i=0; i<_results.size(); i++)
 	{
-		int value = agentRecord.getState(i, "exists");
+		int value = agentRecord.getInt(i, "exists");
 		_results[i] += value;
 	}
 }

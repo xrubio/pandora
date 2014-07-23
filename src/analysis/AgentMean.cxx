@@ -27,9 +27,17 @@ void AgentMean::computeAgent( const Engine::AgentRecord & agentRecord )
 {
 	for(int i=0; i<_results.size(); i++)
 	{
-		if(agentRecord.getState(i, "exists"))
+		if(agentRecord.getInt(i, "exists"))
 		{
-			int value = agentRecord.getState(i, _attributeName);
+            float value = 0.0f;
+            if(agentRecord.isInt(_attributeName))
+            {
+                value = agentRecord.getInt(i, _attributeName);
+            }
+            else if(agentRecord.isFloat(_attributeName))
+            {  
+                value = agentRecord.getFloat(i, _attributeName);
+            }
 			_results[i] += value;
 			_numAgents[i]++;
 		}
