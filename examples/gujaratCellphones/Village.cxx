@@ -87,7 +87,7 @@ void Village::registerAttributes()
 
 void Village::serialize()
 {
-	serializeAttribute("herders", _herders.size());
+	serializeAttribute("herders", int(_herders.size()));
 	int totalAnimals = 0;
 	for(std::list<Herder*>::iterator it=_herders.begin(); it!=_herders.end(); it++)
 	{
