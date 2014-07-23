@@ -3,12 +3,12 @@
 
 #include <RasterLoader.hxx>
 #include <GeneralState.hxx>
-#include <Simulation.hxx>
+#include <Config.hxx>
 
 namespace Test 
 {
 
-RasterWorld::RasterWorld( const Engine::Simulation & simulation, Engine::Scheduler * scheduler, const std::string & rasterFile ) : World(simulation, scheduler), _rasterFile(rasterFile)
+RasterWorld::RasterWorld( Engine::Config * config, Engine::Scheduler * scheduler, const std::string & rasterFile ) : World(config, scheduler), _rasterFile(rasterFile)
 {
 }
 

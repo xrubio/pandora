@@ -3,7 +3,6 @@
 
 #include <RandomWorldConfig.hxx>
 #include <RandomAgent.hxx>
-#include <Simulation.hxx>
 #include <DynamicRaster.hxx>
 #include <Point2D.hxx>
 #include <GeneralState.hxx>
@@ -11,7 +10,7 @@
 namespace Examples 
 {
 
-RandomWorld::RandomWorld(const RandomWorldConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler ) : World(simulation, scheduler, false), _config(config)
+RandomWorld::RandomWorld(Engine::Config * config, Engine::Scheduler * scheduler ) : World(config, scheduler, false)
 {
 }
 
@@ -34,7 +33,8 @@ void RandomWorld::createRasters()
 
 void RandomWorld::createAgents()
 {
-	for(int i=0; i<_config._numAgents; i++)
+    const RandomWorldConfig & randomConfig = (const RandomWorldConfig&)(*_config);
+	for(int i=0; i<randomConfig._numAgents; i++)
 	{
 		if((i%getNumTasks())==getId())
 		{

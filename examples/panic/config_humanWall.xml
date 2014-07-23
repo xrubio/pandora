@@ -4,8 +4,9 @@
 	<output resultsFile="./data/panic.h5" logsDir="./logs"/>
 	<!-- each step is 0.5 secs -->
 	<numSteps value="200" serializeResolution="1"/>	
+	<size width="100" height="100"/>
 	<!-- concert human wall -->
-	<environment width="100" height="100">
+	<environment>
 		<rasters>
 			<obstacles file="resources/humanWall/walls1Exit.tiff"/>
 		</rasters>

@@ -3,9 +3,10 @@
 	<!-- simulation config -->
 	<output resultsFile="./data/phones.h5" logsDir="./logs"/>
 	<numSteps value="2400" serializeResolution="1"/>
+    <size width="60" height="60"/>
 	<environment>
         <!-- distribution can be "increase" (following y), "random" or "distance" -->
-		<landscape width="60" height="60" averageResources="1000" distribution="increase"/>
+		<landscape averageResources="1000" distribution="increase"/>
         <!--
 		<climate daysDrySeason="10" meanRain="468.0" stddev="103.4"/>
         -->

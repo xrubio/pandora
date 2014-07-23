@@ -2,7 +2,6 @@
 #include <Academia.hxx>
 #include <AcademiaConfig.hxx>
 #include <Exception.hxx>
-#include <Simulation.hxx>
 
 #include <iostream>
 #include <cstdlib>
@@ -21,11 +20,7 @@ int main(int argc, char *argv[])
 		{
 			fileName = argv[1];
 		}
-		Examples::AcademiaConfig config;
-		config.deserialize(fileName);
-	
-		Engine::Simulation academiaSimulation(config.getSize(), config.getNumSteps());
-		Examples::Academia academia( config, academiaSimulation, academia.useOpenMPSingleNode(config.getResultsFile()));
+		Examples::Academia academia( new Examples::AcademiaConfig(fileName), academia.useOpenMPSingleNode());
 	
 		academia.initialize(argc, argv);
 		academia.run();

@@ -1,7 +1,6 @@
 
 #include <GujaratWorld.hxx>
 #include <GujaratConfig.hxx>
-#include <Simulation.hxx>
 #include <Exception.hxx>
 #include <iostream>
 #include <cstdlib>
@@ -20,12 +19,7 @@ int main(int argc, char *argv[])
 		{
 			fileName = argv[1];
 		}
-		Gujarat::GujaratConfig config;
-		config.deserialize(fileName);
-
-		Engine::Simulation gujaratSim(config.getSize(), config.getNumSteps(), config.getSerializeResolution());
-		Gujarat::GujaratWorld world( config, gujaratSim, world.useOpenMPSingleNode(config.getResultsFile()));
-	
+		Gujarat::GujaratWorld world( new Gujarat::GujaratConfig(fileName), world.useOpenMPSingleNode());
 		world.initialize(argc, argv);
 		world.run();
 	}

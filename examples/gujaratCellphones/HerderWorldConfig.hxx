@@ -18,7 +18,6 @@ class HerderWorldConfig : public Engine::Config
 {
 	//environment
     ResourceDistribution _randomDistribution;
-	Engine::Size<int> _size;
 	int _averageResources;
 	int _daysDrySeason;
 	float _rainHistoricalDistribMean;
@@ -43,11 +42,10 @@ class HerderWorldConfig : public Engine::Config
 	int _outVillageTransmissionValue;
 	
 public:
-	HerderWorldConfig();
+	HerderWorldConfig( const std::string & xmlFile );
 	virtual ~HerderWorldConfig();
-	void extractParticularAttribs(TiXmlElement *pRoot);
-	Engine::Size<int> getSize() const;
-	
+    void loadParams();
+
 	friend class HerderWorld;
 	friend class Climate;
 	friend class Herder;

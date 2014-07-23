@@ -4,7 +4,7 @@
 namespace Examples
 {
 
-RandomWorldConfig::RandomWorldConfig() : _numAgents(0), _size(0, 0)
+RandomWorldConfig::RandomWorldConfig( const std::string & xmlFile ) : Config(xmlFile), _numAgents(0)
 {
 }
 
@@ -12,19 +12,10 @@ RandomWorldConfig::~RandomWorldConfig()
 {
 }
 
-void RandomWorldConfig::extractParticularAttribs(TiXmlElement * root)
+void RandomWorldConfig::loadParams()
 {
-	TiXmlElement * element = root->FirstChildElement("numAgents");
-	retrieveAttributeMandatory( element, "value", _numAgents);
-	element = root->FirstChildElement("size");
-	retrieveAttributeMandatory( element, "width", _size._width);
-	retrieveAttributeMandatory( element, "height", _size._height);
+	_numAgents = getParamInt( "numAgents", "value");
 }
 	
-const Engine::Size<int> & RandomWorldConfig::getSize() const
-{
-	return _size;
-}
-
 } // namespace Examples
 

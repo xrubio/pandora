@@ -4,11 +4,6 @@
 
 #include <World.hxx>
 
-namespace Engine
-{
-	class Simulation;
-}
-
 namespace Examples 
 {
 
@@ -19,14 +14,12 @@ class Earth : public Engine::World
 	void createRasters();
 	void createAgents();
 
-	const EarthConfig & _config;
-
 	std::list<Engine::Point2D<int> > _newCases;
 	void stepEnvironment();
 
 	int _indexZombies;
 public:
-	Earth( const EarthConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0);
+	Earth( EarthConfig * config, Engine::Scheduler * scheduler = 0);
 	virtual ~Earth();
 
 	float getZombieVirulence() const;

@@ -2,7 +2,6 @@
 #include <iostream>
 #include "HerderWorld.hxx"
 #include "HerderWorldConfig.hxx"
-#include <Simulation.hxx>
 #include <Exception.hxx>
 
 int main(int argc, char *argv[])
@@ -19,11 +18,7 @@ int main(int argc, char *argv[])
         {
             fileName = argv[1];
         }
-		GujaratCellphones::HerderWorldConfig config;
-		config.deserialize(fileName);
-
-		Engine::Simulation myWorldSim(config.getSize(),config.getNumSteps(), config.getSerializeResolution());
-		GujaratCellphones::HerderWorld world(myWorldSim, config);
+		GujaratCellphones::HerderWorld world(new GujaratCellphones::HerderWorldConfig(fileName));
 
 		world.initialize(argc, argv);
 		world.run();

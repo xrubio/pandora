@@ -2,7 +2,6 @@
 #include <Scenario.hxx>
 #include <ScenarioConfig.hxx>
 #include <Exception.hxx>
-#include <Simulation.hxx>
 
 #include <iostream>
 #include <cstdlib>
@@ -21,12 +20,7 @@ int main(int argc, char *argv[])
 		{
 			fileName = argv[1];
 		}
-		Panic::ScenarioConfig config;
-		config.deserialize(fileName);
-	
-		Engine::Simulation panicSimulation(config.getSize(), config.getNumSteps(), config.getSerializeResolution());
-		Panic::Scenario scenario( config, panicSimulation, scenario.useOpenMPSingleNode(config.getResultsFile()));
-	
+		Panic::Scenario scenario( new Panic::ScenarioConfig(fileName), scenario.useOpenMPSingleNode());
 		scenario.initialize(argc, argv);
 		scenario.run();
 	}

@@ -4,12 +4,12 @@
 
 #include <ShpLoader.hxx>
 #include <GeneralState.hxx>
-#include <Simulation.hxx>
+#include <Config.hxx>
 
 namespace Test 
 {
 
-ShpWorld::ShpWorld( const Engine::Simulation & simulation, Engine::Scheduler * scheduler, const std::string & shpFile ) : World(simulation, scheduler), _shpFile(shpFile)
+ShpWorld::ShpWorld( Engine::Config * config, Engine::Scheduler * scheduler, const std::string & shpFile ) : World(config, scheduler), _shpFile(shpFile)
 {
 }
 

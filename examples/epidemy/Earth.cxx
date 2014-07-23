@@ -4,7 +4,6 @@
 #include <EarthConfig.hxx>
 #include <Human.hxx>
 #include <Zombie.hxx>
-#include <Simulation.hxx>
 #include <DynamicRaster.hxx>
 #include <Point2D.hxx>
 #include <GeneralState.hxx>
@@ -14,7 +13,7 @@
 namespace Examples 
 {
 
-Earth::Earth( const EarthConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler ) : World(simulation, scheduler, true), _config(config), _indexZombies(0)
+Earth::Earth( EarthConfig * config, Engine::Scheduler * scheduler ) : World(config, scheduler, true), _indexZombies(0)
 {
 }
 
@@ -23,12 +22,13 @@ Earth::~Earth()
 }
 
 void Earth::createRasters()
-{	
+{
+    const EarthConfig & earthConfig = (const EarthConfig&)getConfig();
 	registerStaticRaster("dem", true);
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("dem"), _config._demName, getBoundaries());	
+	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("dem"), earthConfig._demName, getBoundaries());	
 
 	registerStaticRaster("population", true);
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("population"), _config._populationName, getBoundaries());		
+	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("population"), earthConfig._populationName, getBoundaries());		
 
 	registerDynamicRaster("humans", true);
 	getDynamicRaster("humans").setInitValues(0, std::numeric_limits<int>::max(), 0);
@@ -43,6 +43,7 @@ void Earth::createRasters()
 
 void Earth::createAgents()
 {
+    const EarthConfig & earthConfig = (const EarthConfig&)getConfig();
 	std::stringstream logName;
 	logName << "simulation_" << getId();
 	log_INFO(logName.str(), getWallTime() << " creating agents");
@@ -55,7 +56,7 @@ void Earth::createAgents()
         if(numHumans>0)
         {
             int scaledHumans = 0;
-            for(int i=0; i<numHumans; i=i+_config._scale)
+            for(int i=0; i<numHumans; i=i+earthConfig._scale)
             {	
                 std::ostringstream oss;
                 oss << "Human_" << totalHumans+scaledHumans;
@@ -71,23 +72,24 @@ void Earth::createAgents()
 	}
 	log_INFO(logName.str(), getWallTime() << " " << totalHumans << " humans created");
 
-	for(int i=0; i<_config._numCases; i++)
+	for(int i=0; i<earthConfig._numCases; i++)
 	{
 		std::ostringstream oss;
 		oss << "Zombie_" << _indexZombies;
 		Zombie * newZombie = new Zombie(oss.str());
 		addAgent(newZombie);
-		newZombie->setPosition(_config._firstCase);
+		newZombie->setPosition(earthConfig._firstCase);
 		_indexZombies++;
 	}
-	setValue("newCases", _config._firstCase, _config._numCases);
-	setValue("zombies", _config._firstCase, _config._numCases);
-	log_INFO(logName.str(), getWallTime() << " " << _config._numCases << " zombies created at infection focus: " << _config._firstCase);
+	setValue("newCases", earthConfig._firstCase, earthConfig._numCases);
+	setValue("zombies", earthConfig._firstCase, earthConfig._numCases);
+	log_INFO(logName.str(), getWallTime() << " " << earthConfig._numCases << " zombies created at infection focus: " << earthConfig._firstCase);
 }
 
 float Earth::getZombieVirulence() const
 {
-	return _config._virulence;
+    const EarthConfig & earthConfig = (const EarthConfig&)getConfig();
+	return earthConfig._virulence;
 }
 
 void Earth::addZombie( const Engine::Point2D<int> & position )

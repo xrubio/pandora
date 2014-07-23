@@ -32,7 +32,7 @@ namespace Engine
 
 class Scheduler;
 class World;
-class Simulation;
+class Config;
 class StaticRaster;
 
 /** Serializer class that stores simulation data with standard HDF5 interface 
@@ -47,11 +47,10 @@ class SequentialSerializer
 	typedef std::map< std::string, StringMap * > StringAttributesMap;
 
 	const Scheduler & _scheduler;
-	Simulation * _simulation;
+    const Config * _config;
+
 	hid_t _fileId;
 	hid_t _agentsFileId;
-	// basic file where general run info and raster data is stored
-	std::string _resultsFile;
 	StaticRastersRefMap _dynamicRasters;
 
 	StringAttributesMap _stringAttributes;
@@ -68,7 +67,7 @@ class SequentialSerializer
 	void serializeRaster( const StaticRaster & raster, const std::string & datasetKey );
 
 public:
-	SequentialSerializer( const Scheduler & scheduler, const std::string & resultsFile );
+	SequentialSerializer( const Scheduler & scheduler );
 	virtual ~SequentialSerializer();
 	void init( World & world );
 	void finish();

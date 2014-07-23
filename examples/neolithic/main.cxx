@@ -2,7 +2,6 @@
 #include <NeolithicWorld.hxx>
 #include <NeolithicConfig.hxx>
 #include <Exception.hxx>
-#include <Simulation.hxx>
 
 #include <iostream>
 #include <cstdlib>
@@ -21,11 +20,7 @@ int main(int argc, char *argv[])
 		{
 			fileName = argv[1];
 		}
-		Examples::NeolithicConfig config;
-		config.deserialize(fileName);
-	
-		Engine::Simulation neoSim(config.getSize(), config.getNumSteps(), config.getSerializeResolution());
-		Examples::NeolithicWorld world( config, neoSim, world.useOpenMPSingleNode(config.getResultsFile()));
+		Examples::NeolithicWorld world( new Examples::NeolithicConfig(fileName), world.useOpenMPSingleNode());
 	
 		world.initialize(argc, argv);
 		world.run();

@@ -16,7 +16,7 @@ Neighbor::~Neighbor()
 {
 }
 
-void Neighbor::foo()
+void Neighbor::updateKnowledge()
 {
 	Engine::AgentsVector neighbors = getWorld()->getNeighbours( this, _neighborDistance );
 	_neighbors = neighbors.size();
@@ -68,7 +68,6 @@ void Neighbor::moveHome()
 
 void Neighbor::updateState()
 {
-    foo();
 	if(_needsToMove)
 	{
 		moveHome();

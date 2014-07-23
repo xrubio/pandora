@@ -109,6 +109,7 @@ public:
 	// serialization
 	virtual void addStringAttribute( const std::string & type, const std::string & key, const std::string & value ) = 0;
 	virtual void addIntAttribute( const std::string & type, const std::string & key, int value ) = 0;
+	virtual void addFloatAttribute( const std::string & type, const std::string & key, float value ) = 0;
 	virtual void serializeAgents( const int & step) = 0;
 	virtual void serializeRasters( const int & step) = 0;
 

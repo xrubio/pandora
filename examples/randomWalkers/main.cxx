@@ -2,7 +2,7 @@
 #include <RandomWorld.hxx>
 #include <RandomWorldConfig.hxx>
 #include <Exception.hxx>
-#include <Simulation.hxx>
+#include <Config.hxx>
 
 #include <iostream>
 #include <cstdlib>
@@ -21,11 +21,7 @@ int main(int argc, char *argv[])
 		{
 			fileName = argv[1];
 		}
-		Examples::RandomWorldConfig config;
-		config.deserialize(fileName);
-	
-		Engine::Simulation helloWorldSim(config.getSize(), config.getNumSteps(), config.getSerializeResolution());
-		Examples::RandomWorld world( config, helloWorldSim, world.useOpenMPSingleNode(config.getResultsFile()));
+		Examples::RandomWorld world(new Examples::RandomWorldConfig(fileName), world.useOpenMPSingleNode());
 	
 		world.initialize(argc, argv);
 		world.run();

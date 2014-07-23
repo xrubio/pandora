@@ -22,8 +22,6 @@ class NeolithicWorld : public Engine::World
 {
 	void createRasters();
 
-	const NeolithicConfig & _config;
-
 	void stepEnvironment();
 
 	bool isMountain( const Engine::Point2D<int> & index );
@@ -40,7 +38,7 @@ class NeolithicWorld : public Engine::World
 	int countNeighbors( const Engine::Point2D<int> & index );
 
 public:
-    NeolithicWorld(const NeolithicConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0);
+    NeolithicWorld(NeolithicConfig * config, Engine::Scheduler * scheduler = 0);
 	virtual ~NeolithicWorld();
 };
 

@@ -6,7 +6,7 @@ pandoraPath = os.getenv('PANDORAPATH', '/usr/local/pandora')
 sys.path.append(pandoraPath+'/bin')
 sys.path.append(pandoraPath+'/lib')
 
-from pyPandora import Simulation, Agent, World, Point2DInt, SimulationRecord, GlobalAgentStats, AgentNum, AgentMean, AgentSum, AgentStdDev, GlobalRasterStats, RasterMean, RasterSum, SizeInt
+from pyPandora import Config, Agent, World, Point2DInt, SimulationRecord, GlobalAgentStats, AgentNum, AgentMean, AgentSum, AgentStdDev, GlobalRasterStats, RasterMean, RasterSum, SizeInt
 
 import random
 
@@ -29,8 +29,8 @@ class MyAgent(Agent):
 		self.serializeIntAttribute('value', self._value);
 
 class MyWorld(World):
-	def __init__(self, simulation ):
-		World.__init__( self, simulation)
+	def __init__(self, config):
+		World.__init__( self, config)
 
 	def createRasters(self):		
 		self.registerDynamicRaster("test", 1)
@@ -43,8 +43,8 @@ class MyWorld(World):
 			newAgent.setRandomPosition()
 			newAgent._value = random.randint(0,10)
 
-mySimulation = Simulation(SizeInt(32,32), 10)
-myWorld = MyWorld(mySimulation)
+myConfig = Config(SizeInt(32,32), 10)
+myWorld = MyWorld(myConfig)
 myWorld.initialize()
 myWorld.run()
 

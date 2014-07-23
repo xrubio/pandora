@@ -20,7 +20,7 @@
 namespace Gujarat
 {
     
-GujaratWorld::GujaratWorld( const GujaratConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler ) :  World(simulation, scheduler, false), _config(config), _agentKey(0), _climate(config,*this)
+GujaratWorld::GujaratWorld( GujaratConfig * config, Engine::Scheduler * scheduler ) :  World(config, scheduler, false), _agentKey(0), _climate(*config,*this)
 {
 	// overlap is maxHomeRange + 1 to allow splits to be in adjacent worlds
 	// TODO code a function proces config for resources 
@@ -37,53 +37,50 @@ GujaratWorld::~GujaratWorld()
 
 void GujaratWorld::createRasters()
 {
+    const GujaratConfig & gujaratConfig = (const GujaratConfig &)getConfig();
 	std::stringstream logName;
 	logName << "simulation_" << getId();
 	log_DEBUG(logName.str(), getWallTime() << " creating static rasters");
-	registerStaticRaster("soils", _config.isStorageRequired("soils"), eSoils);
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eSoils), _config._soilFile, getBoundaries());	
+	registerStaticRaster("soils", gujaratConfig.isStorageRequired("soils"), eSoils);
+	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eSoils), gujaratConfig._soilFile, getBoundaries());	
 
-	registerStaticRaster("dem", _config.isStorageRequired("dem"), eDem);
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eDem), _config._demFile, getBoundaries());
+	registerStaticRaster("dem", gujaratConfig.isStorageRequired("dem"), eDem);
+	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eDem), gujaratConfig._demFile, getBoundaries());
 
-	registerStaticRaster("distWater", _config.isStorageRequired("distWater"), eDistWater);
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eDistWater), _config._distWaterFile, getBoundaries());
+	registerStaticRaster("distWater", gujaratConfig.isStorageRequired("distWater"), eDistWater);
+	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eDistWater), gujaratConfig._distWaterFile, getBoundaries());
 
-	if(_config._biomassDistribution.compare("linDecayFromWater")==0 || _config._biomassDistribution.compare("logDecayFromWater")==0)
+	if(gujaratConfig._biomassDistribution.compare("linDecayFromWater")==0 || gujaratConfig._biomassDistribution.compare("logDecayFromWater")==0)
 	{
-		registerStaticRaster("weightWater", _config.isStorageRequired("weightWater"), eWeightWater);
-		Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eWeightWater), _config._weightWaterFile, getBoundaries());
+		registerStaticRaster("weightWater", gujaratConfig.isStorageRequired("weightWater"), eWeightWater);
+		Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eWeightWater), gujaratConfig._weightWaterFile, getBoundaries());
 	}
 
 	//registerDynamicRaster("weightWater", true);
 	//getDynamicRaster("weightWater").setInitValues(0, std::numeric_limits<int>::max(), 0);
-	/*
-	registerStaticRaster("duneMap", eDuneMap, _config.isStorageRequired("duneMap"));
-	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("duneMap"), _config._duneMapFile, this);
-	*/
 
 	log_DEBUG(logName.str(), getWallTime() << " creating dynamic rasters");
 
-	registerDynamicRaster("resources", _config.isStorageRequired("resources"), eResources);
+	registerDynamicRaster("resources", gujaratConfig.isStorageRequired("resources"), eResources);
 	getDynamicRaster(eResources).setInitValues(0, std::numeric_limits<int>::max(), 0);
 	
 	// we need to keep track of resource fractions
 	registerDynamicRaster("resourcesFraction", false, eResourcesFraction);
 	getDynamicRaster(eResourcesFraction).setInitValues(0, 100, 0);
 
-	registerDynamicRaster("forageActivity", _config.isStorageRequired("forageActivity"), eForageActivity); 
+	registerDynamicRaster("forageActivity", gujaratConfig.isStorageRequired("forageActivity"), eForageActivity); 
 	getDynamicRaster(eForageActivity).setInitValues(0, std::numeric_limits<int>::max(), 0);
 	/*
-	registerDynamicRaster("homeActivity", eHomeActivity, _config.isStorageRequired("homeActivity"));
+	registerDynamicRaster("homeActivity", eHomeActivity, gujaratConfig.isStorageRequired("homeActivity"));
 	*/
 
 	/*
-	registerDynamicRaster("sectors", eSectors, _config.isStorageRequired("sectors"));
-	getDynamicRaster("sectors").setInitValues(0, _config._numSectors, 0);
+	registerDynamicRaster("sectors", eSectors, gujaratConfig.isStorageRequired("sectors"));
+	getDynamicRaster("sectors").setInitValues(0, gujaratConfig._numSectors, 0);
 	*/
 
 	log_DEBUG(logName.str(), getWallTime() << " generating settlement areas");
-	_settlementAreas.generateAreas( *this, _config._lowResolution);
+	_settlementAreas.generateAreas( *this, gujaratConfig._lowResolution);
 	log_DEBUG(logName.str(), getWallTime() << " create rasters done");
 }
 
@@ -92,7 +89,8 @@ void GujaratWorld::createAgents()
 	std::stringstream logName;
 	logName << "simulation_" << getId();
 	log_DEBUG(logName.str(), getWallTime() << " creating agents");
-	for(int i=0; i<_config._numHG; i++)
+    const GujaratConfig & gujaratConfig = (const GujaratConfig &)getConfig();
+	for(int i=0; i<gujaratConfig._numHG; i++)
 	{ 
 		if((i%getNumTasks())==getId())
 		{			
@@ -101,23 +99,23 @@ void GujaratWorld::createAgents()
  			oss << "HunterGatherer_" << i;
 			HunterGatherer * agent = new HunterGatherer(oss.str());
 			addAgent(agent);
-			//_config._hgInitializer->initialize(agent);
+			//gujaratConfig._hgInitializer->initialize(agent);
 			
-			agent->createInitialPopulation(_config._adulthoodAge);
+			agent->createInitialPopulation(gujaratConfig._adulthoodAge);
 
-			agent->setSocialRange( _config._socialRange );
-			agent->setHomeMobilityRange( _config._homeRange );
-			agent->setHomeRange( _config._homeRange );
-			//agent->setSurplusForReproductionThreshold( _config._surplusForReproductionThreshold );
-			//agent->setSurplusWanted( _config._surplusWanted );
-			//agent->setSurplusSpoilageFactor( _config._surplusSpoilage );
+			agent->setSocialRange( gujaratConfig._socialRange );
+			agent->setHomeMobilityRange( gujaratConfig._homeRange );
+			agent->setHomeRange( gujaratConfig._homeRange );
+			//agent->setSurplusForReproductionThreshold( gujaratConfig._surplusForReproductionThreshold );
+			//agent->setSurplusWanted( gujaratConfig._surplusWanted );
+			//agent->setSurplusSpoilageFactor( gujaratConfig._surplusSpoilage );
 			
-			//agent->setFoodNeedsForReproduction(_config._hgFoodNeedsForReproduction);			
-			agent->setWalkingSpeedHour( _config._walkingSpeedHour / _config._cellResolution );
-			agent->setForageTimeCost( _config._forageTimeCost );
-			//agent->setAvailableForageTime( _config._availableForageTime );
-			agent->setMassToCaloriesRate( _config._massToEnergyRate * _config._energyToCalRate );
-			agent->setNumSectors( _config._numSectors );
+			//agent->setFoodNeedsForReproduction(gujaratConfig._hgFoodNeedsForReproduction);			
+			agent->setWalkingSpeedHour( gujaratConfig._walkingSpeedHour / gujaratConfig._cellResolution );
+			agent->setForageTimeCost( gujaratConfig._forageTimeCost );
+			//agent->setAvailableForageTime( gujaratConfig._availableForageTime );
+			agent->setMassToCaloriesRate( gujaratConfig._massToEnergyRate * gujaratConfig._energyToCalRate );
+			agent->setNumSectors( gujaratConfig._numSectors );
 
 			agent->initializePosition();
 			log_DEBUG(logName.str(), getWallTime() << " new HG: " << agent);
@@ -178,17 +176,18 @@ void GujaratWorld::recomputeYearlyBiomass()
 	// 1. Compute factor between actual rain and average rain		
 	float raininessFactor = _climate.getRain() / _climate.getMeanAnnualRain();
 	
+    const GujaratConfig & gujaratConfig = (const GujaratConfig &)getConfig();
 	// each cell is 31.5m * 31.5m
-	double areaOfCell = _config._cellResolution * _config._cellResolution;
+	double areaOfCell = gujaratConfig._cellResolution * gujaratConfig._cellResolution;
 
 	// 2. For each soil type compute yearly biomass	
 
 	// data expressed in g/m2
 	_yearlyBiomass[WATER] = 0.0f;
-	_yearlyBiomass[DUNE] = areaOfCell*_config._duneBiomass * raininessFactor * _config._duneEfficiency;
-	_yearlyBiomass[INTERDUNE] = areaOfCell*_config._interduneBiomass * _config._interduneEfficiency * raininessFactor;
+	_yearlyBiomass[DUNE] = areaOfCell*gujaratConfig._duneBiomass * raininessFactor * gujaratConfig._duneEfficiency;
+	_yearlyBiomass[INTERDUNE] = areaOfCell*gujaratConfig._interduneBiomass * gujaratConfig._interduneEfficiency * raininessFactor;
 	
-	//std::cout << std::setprecision(2) << std::fixed << "area of cell: " << areaOfCell << " interdune biomass: " << _config._interduneBiomass << " efficiency: " << _config._interduneEfficiency << " raininess factor: " << raininessFactor << " yearly biomass: " << _yearlyBiomass[INTERDUNE] << std::endl;
+	//std::cout << std::setprecision(2) << std::fixed << "area of cell: " << areaOfCell << " interdune biomass: " << gujaratConfig._interduneBiomass << " efficiency: " << gujaratConfig._interduneEfficiency << " raininess factor: " << raininessFactor << " yearly biomass: " << _yearlyBiomass[INTERDUNE] << std::endl;
 	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " rain: " << _climate.getRain() << " with mean: " << _climate.getMeanAnnualRain());
 	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " yearly biomass of dune: " << _yearlyBiomass[DUNE] << " and interdune: " << _yearlyBiomass[INTERDUNE]);
 
@@ -197,21 +196,21 @@ void GujaratWorld::recomputeYearlyBiomass()
 	// dPS*h/2 + 2*dPS*h/2 = biomass, so h = biomass/1.5*dPS
 	// and A_2 = 2*A_1
 
-	double heightInterDune = (_yearlyBiomass[INTERDUNE] + 120.0f*_config._interduneMinimum-60.0*_remainingBiomass[INTERDUNE]) / (180+240*_config._interduneMinimum);
+	double heightInterDune = (_yearlyBiomass[INTERDUNE] + 120.0f*gujaratConfig._interduneMinimum-60.0*_remainingBiomass[INTERDUNE]) / (180+240*gujaratConfig._interduneMinimum);
 	_dailyRainSeasonBiomassIncrease[INTERDUNE] = (heightInterDune-_remainingBiomass[INTERDUNE])/120.0f;
-	_remainingBiomass[INTERDUNE] = heightInterDune *_config._interduneMinimum;
-	_dailyDrySeasonBiomassDecrease[INTERDUNE] = heightInterDune*(1-_config._interduneMinimum)/240.0f;
+	_remainingBiomass[INTERDUNE] = heightInterDune *gujaratConfig._interduneMinimum;
+	_dailyDrySeasonBiomassDecrease[INTERDUNE] = heightInterDune*(1-gujaratConfig._interduneMinimum)/240.0f;
 
 	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " biomass height interdune: " << heightInterDune << " increment: " << _dailyRainSeasonBiomassIncrease[INTERDUNE] << " and decrease: " << _dailyDrySeasonBiomassDecrease[INTERDUNE]);
-	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " calories height interdune: " << _config._massToEnergyRate*_config._energyToCalRate*heightInterDune << " increment: " << _config._massToEnergyRate*_config._energyToCalRate*_dailyRainSeasonBiomassIncrease[INTERDUNE] << " and decrease: " << _config._massToEnergyRate*_config._energyToCalRate*_dailyDrySeasonBiomassDecrease[INTERDUNE]);
+	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " calories height interdune: " << gujaratConfig._massToEnergyRate*gujaratConfig._energyToCalRate*heightInterDune << " increment: " << gujaratConfig._massToEnergyRate*gujaratConfig._energyToCalRate*_dailyRainSeasonBiomassIncrease[INTERDUNE] << " and decrease: " << gujaratConfig._massToEnergyRate*gujaratConfig._energyToCalRate*_dailyDrySeasonBiomassDecrease[INTERDUNE]);
 
-	double heightDune = (_yearlyBiomass[DUNE] + 120.0f*_config._duneMinimum-60.0*_remainingBiomass[DUNE]) / (180+240*_config._duneMinimum);
+	double heightDune = (_yearlyBiomass[DUNE] + 120.0f*gujaratConfig._duneMinimum-60.0*_remainingBiomass[DUNE]) / (180+240*gujaratConfig._duneMinimum);
 	_dailyRainSeasonBiomassIncrease[DUNE] = (heightDune-_remainingBiomass[DUNE])/120.0f;
-	_remainingBiomass[DUNE] = heightDune *_config._duneMinimum;
-	_dailyDrySeasonBiomassDecrease[DUNE] = heightDune*(1-_config._duneMinimum)/240.0f;
+	_remainingBiomass[DUNE] = heightDune *gujaratConfig._duneMinimum;
+	_dailyDrySeasonBiomassDecrease[DUNE] = heightDune*(1-gujaratConfig._duneMinimum)/240.0f;
 
 	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " biomass height dune: " << heightDune << " increment: " << _dailyRainSeasonBiomassIncrease[DUNE] << " and decrease: " << _dailyDrySeasonBiomassDecrease[DUNE]);
-	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " calories height dune: " << _config._massToEnergyRate*_config._energyToCalRate*heightDune << " increment: " << _config._massToEnergyRate*_config._energyToCalRate*_dailyRainSeasonBiomassIncrease[DUNE] << " and decrease: " << _config._massToEnergyRate*_config._energyToCalRate*_dailyDrySeasonBiomassDecrease[DUNE]);
+	log_INFO(logName.str(), getWallTime() << " timestep: " << getCurrentTimeStep() << " year: " << getCurrentTimeStep()/360 << " calories height dune: " << gujaratConfig._massToEnergyRate*gujaratConfig._energyToCalRate*heightDune << " increment: " << gujaratConfig._massToEnergyRate*gujaratConfig._energyToCalRate*_dailyRainSeasonBiomassIncrease[DUNE] << " and decrease: " << gujaratConfig._massToEnergyRate*gujaratConfig._energyToCalRate*_dailyDrySeasonBiomassDecrease[DUNE]);
 
 	_dailyRainSeasonBiomassIncrease[WATER] = 0.0f;
 	_dailyDrySeasonBiomassDecrease[WATER] = 0.0f;
@@ -251,7 +250,8 @@ long int GujaratWorld::getNewKey()
 float GujaratWorld::getBiomassVariation( bool wetSeason, Soils & cellSoil, const Engine::Point2D<int> & index ) const
 {
 	double variation = 0.0f;
-	if(_config._biomassDistribution.compare("standard")==0)
+    const GujaratConfig & gujaratConfig = (const GujaratConfig &)getConfig();
+	if(gujaratConfig._biomassDistribution.compare("standard")==0)
 	{
 		if(wetSeason)
 		{
@@ -262,9 +262,9 @@ float GujaratWorld::getBiomassVariation( bool wetSeason, Soils & cellSoil, const
 			variation = -_dailyDrySeasonBiomassDecrease.at(cellSoil);
 		}
 	}
-	else if(_config._biomassDistribution.compare("linDecayFromWater")==0 || _config._biomassDistribution.compare("logDecayFromWater")==0)
+	else if(gujaratConfig._biomassDistribution.compare("linDecayFromWater")==0 || gujaratConfig._biomassDistribution.compare("logDecayFromWater")==0)
 	{
-		variation = _config._waterDistConstant*getValue(eWeightWater, index);
+		variation = gujaratConfig._waterDistConstant*getValue(eWeightWater, index);
 		//variation = 1600.0f*1600.0f*float(getValue("weightWater", index))/16423239174.0f;
 		if(wetSeason)
 		{
@@ -274,13 +274,13 @@ float GujaratWorld::getBiomassVariation( bool wetSeason, Soils & cellSoil, const
 		{
 			variation *= -1.0f*(float)_dailyDrySeasonBiomassDecrease.at(cellSoil);
 		}
-		//std::cout << "variation: " << variation << " constant: " << _config._waterDistConstant << " weight: " << getValue("weightWater", index) << " increase: " <<_dailyRainSeasonBiomassIncrease.at(cellSoil) << " dist to water: " << getValue("distWater", index) << std::endl;
+		//std::cout << "variation: " << variation << " constant: " << gujaratConfig._waterDistConstant << " weight: " << getValue("weightWater", index) << " increase: " <<_dailyRainSeasonBiomassIncrease.at(cellSoil) << " dist to water: " << getValue("distWater", index) << std::endl;
 		//variation /= 100.0f;
 	}
 	else
 	{
 		std::stringstream oss;
-		oss << "GujaratWorld::getBiomassVariation - unknown biomass distribution: " << _config._biomassDistribution;
+		oss << "GujaratWorld::getBiomassVariation - unknown biomass distribution: " << gujaratConfig._biomassDistribution;
 		throw Engine::Exception(oss.str());
 
 	}

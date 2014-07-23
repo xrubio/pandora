@@ -51,9 +51,10 @@ void GujaratAgent::logAgentState()
 	log_DEBUG( logName.str(), "\tagent.nrAdults=" << getNrAvailableAdults());
 	log_DEBUG( logName.str(), "\tagent.adultAges=[");
 
+    const GujaratConfig & gujaratConfig = (const GujaratConfig &)(getWorld()->getConfig());
 	for ( unsigned k = 0; k < _populationAges.size(); k++ )
 	{
-		if ( _populationAges[k] >= ((GujaratWorld*)_world)->getConfig()._adulthoodAge )
+		if ( _populationAges[k] >= gujaratConfig._adulthoodAge )
 		{
 			log_DEBUG( logName.str(),  "\t" << _populationAges[k] );
 		}
@@ -64,7 +65,7 @@ void GujaratAgent::logAgentState()
 	log_DEBUG( logName.str(),"\tagent.childrenAges=[");
 	for ( unsigned k = 0; k < _populationAges.size(); k++ )
 	{
-		if ( _populationAges[k] >= 0 && _populationAges[k] < ((GujaratWorld*)_world)->getConfig()._adulthoodAge )
+		if ( _populationAges[k] >= 0 && _populationAges[k] < gujaratConfig._adulthoodAge )
 		{
 			log_DEBUG( logName.str(), "\t" << _populationAges[k]);
 		}
@@ -94,7 +95,8 @@ void GujaratAgent::updateState()
 	}
 	
 	// end of year, evaluate reproduction, mortality and update age
-	if((getWorld()->getCurrentTimeStep() % ((GujaratWorld*)_world)->getConfig()._daysPerYear == ((GujaratWorld*)_world)->getConfig()._daysPerYear -1))
+    const GujaratConfig & gujaratConfig = (const GujaratConfig &)(getWorld()->getConfig());
+	if((getWorld()->getCurrentTimeStep() % gujaratConfig._daysPerYear) == (gujaratConfig._daysPerYear -1))
 	{
 		updateAges();
 		checkMortality();
@@ -148,6 +150,7 @@ float GujaratAgent::getAvailableTime() const
 
 GujaratAgent * GujaratAgent::getMarriageCandidate()
 {
+    const GujaratConfig & gujaratConfig = (const GujaratConfig &)(getWorld()->getConfig());
 	Engine::AgentsVector possible;
 	Engine::AgentsVector neighbors = _world->getNeighbours(this, _socialRange, getType());
 	for(Engine::AgentsVector::iterator it=neighbors.begin(); it!=neighbors.end(); it++)
@@ -156,7 +159,7 @@ GujaratAgent * GujaratAgent::getMarriageCandidate()
 		for(unsigned i=2; i<possibleAgent->_populationAges.size(); i++)
 		{	
 			// it avoids dead children (-1)
-			if(possibleAgent->_populationAges[i]>((GujaratWorld*)_world)->getConfig()._adulthoodAge)
+			if(possibleAgent->_populationAges[i]>gujaratConfig._adulthoodAge)
 			{
 				possible.push_back(*it);
 			}
@@ -174,9 +177,10 @@ GujaratAgent * GujaratAgent::getMarriageCandidate()
 
 void GujaratAgent::checkMarriage()
 {
+    const GujaratConfig & gujaratConfig = (const GujaratConfig &)(getWorld()->getConfig());
 	for(unsigned i=2; i<_populationAges.size(); i++)
 	{
-		if(_populationAges[i]>((GujaratWorld*)_world)->getConfig()._adulthoodAge)
+		if(_populationAges[i]>gujaratConfig._adulthoodAge)
 		{
 			GujaratAgent * agent = getMarriageCandidate();
 
@@ -192,7 +196,7 @@ void GujaratAgent::checkMarriage()
 
 			for(unsigned int j=2; j<agent->_populationAges.size(); j++)
 			{
-				if(agent->_populationAges[j]>((GujaratWorld*)_world)->getConfig()._adulthoodAge)
+				if(agent->_populationAges[j]>gujaratConfig._adulthoodAge)
 				{
 					newAgent->_populationAges[1] = agent->_populationAges[j];
 					agent->_populationAges[j] = -1;
@@ -278,7 +282,7 @@ void GujaratAgent::checkMortality()
 	GujaratState::demographics().checkMortality(*this);
 }
 
-void	GujaratAgent::initializePosition( )
+void GujaratAgent::initializePosition( )
 {
 	// 1. select settlement area
 	GujaratWorld* world = dynamic_cast<GujaratWorld*>(getWorld());
@@ -308,9 +312,10 @@ void	GujaratAgent::initializePosition( )
 int	GujaratAgent::getNrAvailableAdults() const
 {
 	int numAdults = 0;
+    const GujaratConfig & gujaratConfig = (const GujaratConfig &)(getWorld()->getConfig());
 	for(unsigned i=0; i<_populationAges.size(); i++)
 	{
-		if(_populationAges[i] >= ((GujaratWorld*)_world)->getConfig()._adulthoodAge)
+		if(_populationAges[i] >= gujaratConfig._adulthoodAge)
 		{
 			numAdults++;
 		}
@@ -321,9 +326,10 @@ int	GujaratAgent::getNrAvailableAdults() const
 int	GujaratAgent::getNrChildren() const
 {
 	int numChildren = 0;
+    const GujaratConfig & gujaratConfig = (const GujaratConfig &)(getWorld()->getConfig());
 	for(unsigned i=0; i<_populationAges.size(); i++)
 	{
-		if(_populationAges[i] < ((GujaratWorld*)_world)->getConfig()._adulthoodAge)
+		if(_populationAges[i] < gujaratConfig._adulthoodAge)
 		{
 			numChildren++;
 		}
@@ -344,7 +350,7 @@ int	GujaratAgent::getPopulationSize() const
 	return popSize;	
 }
 
-void	GujaratAgent::checkDeath( int minAge, int maxAge, float chance )
+void GujaratAgent::checkDeath( int minAge, int maxAge, float chance )
 {
 	for( unsigned index = 0; index < _populationAges.size(); index++ )
 	{
@@ -361,7 +367,7 @@ void	GujaratAgent::checkDeath( int minAge, int maxAge, float chance )
 	}
 }
 
-bool	GujaratAgent::canReproduce() const
+bool GujaratAgent::canReproduce() const
 {
 	if(_populationAges[0] == -1 || _populationAges[1] == -1)
 	{
@@ -370,7 +376,7 @@ bool	GujaratAgent::canReproduce() const
 	return true;
 }
 
-void 	GujaratAgent::addNewIndividual( int age )
+void GujaratAgent::addNewIndividual( int age )
 {
 	for(unsigned int index=0; index < _populationAges.size(); index++)
 	{
@@ -384,7 +390,7 @@ void 	GujaratAgent::addNewIndividual( int age )
 	
 }
 
-void	GujaratAgent::addNewChild()
+void GujaratAgent::addNewChild()
 {
 	addNewIndividual(0);
 }
@@ -424,8 +430,8 @@ void GujaratAgent::createInitialPopulation( int adulthoodAge )
 	
 float GujaratAgent::getPercentageOfStarvingDays() const
 {
-	GujaratWorld * world = (GujaratWorld*)_world;
-	return (_starved*100.0f)/float((world->getConfig()._daysPerYear));
+    const GujaratConfig & gujaratConfig = (const GujaratConfig &)(getWorld()->getConfig());
+	return (_starved*100.0f)/float(gujaratConfig._daysPerYear);
 }
 
 } // namespace Gujarat

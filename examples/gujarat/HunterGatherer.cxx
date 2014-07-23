@@ -28,16 +28,11 @@ void HunterGatherer::registerAttributes()
 	log_DEBUG(logName.str(), "registering attributes for type: " << getType());
 
 	registerIntAttribute("MoveHome actions");
-//	registerIntAttribute("Forage actions");
 	registerIntAttribute("agent age");
-//	registerIntAttribute("male alive");
-//	registerIntAttribute("male age");
-//	registerIntAttribute("female alive");
-//	registerIntAttribute("female age");
+
 	registerIntAttribute("children");
 	registerIntAttribute("collected resources");
 	registerIntAttribute("starving %");
-//	registerIntAttribute("starving days x 100");
 	log_DEBUG(logName.str(), "registering attributes for type: " << getType() << " finished");
 }
 
@@ -163,14 +158,9 @@ GujaratAgent * HunterGatherer::createNewAgent()
 	agent->setSocialRange( _socialRange );
 	agent->setHomeMobilityRange( _homeMobilityRange );
 	agent->setHomeRange( _homeRange );
-	//agent->setSurplusForReproductionThreshold( _surplusForReproductionThreshold );
-	//agent->setSurplusWanted( _surplusWanted );
-	//agent->setSurplusSpoilageFactor( _surplusSpoilageFactor );
-	//agent->setFoodNeedsForReproduction( _foodNeedsForReproduction );			
 
 	agent->setWalkingSpeedHour( _walkingSpeedHour );
 	agent->setForageTimeCost( _forageTimeCost );
-	//agent->setAvailableForageTime( _availableForageTime );
 	agent->setMassToCaloriesRate( _massToCaloriesRate );
 	agent->setNumSectors( _sectors.size() );
 	
@@ -183,29 +173,6 @@ GujaratAgent * HunterGatherer::createNewAgent()
 void HunterGatherer::serialize()
 {
 	serializeAttribute("agent age", _age);
-/*
-	if(_populationAges[0]!=-1)
-	{
-		serializeAttribute("male alive", 1);
-		serializeAttribute("male age", _populationAges[0]);
-	}
-	else
-	{
-		serializeAttribute("male alive", 0);
-		serializeAttribute("male age", std::numeric_limits<int>::max());
-	}
-	
-	if(_populationAges[1]!=-1)
-	{
-		serializeAttribute("female alive", 1);
-		serializeAttribute("female age", _populationAges[1]);
-	}
-	else
-	{
-		serializeAttribute("female alive", 0);
-		serializeAttribute("female age", std::numeric_limits<int>::max());
-	}
-*/
 	int numChildren = 0;
 	for(unsigned i=2; i<_populationAges.size(); i++)
 	{
@@ -217,9 +184,7 @@ void HunterGatherer::serialize()
 	serializeAttribute("children", numChildren);
 	serializeAttribute("collected resources", _collectedResources);
 	serializeAttribute("starving %", getPercentageOfStarvingDays());
-//	serializeAttribute("starving days x 100", _starved*100.0f);
 	serializeAttribute("MoveHome actions", _moveHomeActionsExecuted);
-//	serializeAttribute("Forage actions", _forageActionsExecuted);
 }
 
 } // namespace Gujarat

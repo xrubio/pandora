@@ -1,7 +1,7 @@
 
 #include <TestWorld.hxx>
 #include <Exception.hxx>
-#include <Simulation.hxx>
+#include <Config.hxx>
 
 #include <iostream>
 #include <cstdlib>
@@ -10,13 +10,12 @@ int main(int argc, char *argv[])
 {
 	try
 	{	
-		Engine::Simulation sim(Engine::Size<int>(6,4), 6*4, 1);
-		Test::TestWorld worldSingle( sim, Test::TestWorld::useOpenMPSingleNode("single/results.h5"));
+		Test::TestWorld worldSingle( new Engine::Config(Engine::Size<int>(6,4), 6*4, "single/results.h5"), Test::TestWorld::useOpenMPSingleNode());
 	
 		worldSingle.initialize(argc, argv);
 		worldSingle.run();
 		
-		Test::TestWorld worldParallel( sim, Test::TestWorld::useSpacePartition("parallel/results.h5"));
+		Test::TestWorld worldParallel( new Engine::Config(Engine::Size<int>(6,4), 6*4, "parallel/results.h5"), Test::TestWorld::useSpacePartition());
 	
 		worldParallel.initialize(argc, argv);
 		worldParallel.run();

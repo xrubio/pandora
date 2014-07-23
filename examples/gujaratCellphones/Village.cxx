@@ -125,7 +125,7 @@ void Village::serialize()
 void Village::fission( Herder & original )
 {
 	HerderWorld & world = (HerderWorld &)*_world;
-	const HerderWorldConfig & config = world.getConfig();
+	const HerderWorldConfig & config = (const HerderWorldConfig &)world.getConfig();
 
 	std::ostringstream ossH;
 	ossH << "Herder_"<<getNewKey()<<"_vil" << _index;
