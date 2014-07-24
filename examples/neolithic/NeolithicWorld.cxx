@@ -27,11 +27,11 @@ void NeolithicWorld::createRasters()
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster(eInitPopulation), neolithicConfig._initPopulationFile, getBoundaries());
 
 	registerDynamicRaster("population", true, ePopulation);
-	getDynamicRaster(ePopulation).setDefaultInitValues(0,std::numeric_limits<int>::max(), 0);
+	getDynamicRaster(ePopulation).setInitValues(0,std::numeric_limits<int>::max(), 0);
 	registerDynamicRaster("populationBase", true, ePopulationBase);
-	getDynamicRaster(ePopulationBase).setDefaultInitValues(0,std::numeric_limits<int>::max(), 0);
+	getDynamicRaster(ePopulationBase).setInitValues(0,std::numeric_limits<int>::max(), 0);
 	registerDynamicRaster("arrivalTime", true, eArrivalTime);
-	getDynamicRaster(eArrivalTime).setDefaultInitValues(0,std::numeric_limits<int>::max(), 0);
+	getDynamicRaster(eArrivalTime).setInitValues(0,std::numeric_limits<int>::max(), 0);
 
     for(auto index : getBoundaries() )
     {

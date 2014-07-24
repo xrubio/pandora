@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<config>  
+	<!-- Global simulation parameters -->
+	<output  resultsFile="./data/degradedBattlefield.h5" logsDir="./logs"/>
+	<numSteps value="0" serializeResolution="1"/>
+    <size width="400" height="300"/>
+    <battle file="../battle/data/battle.h5" lossProbability="0.75"/>
+</config>
+

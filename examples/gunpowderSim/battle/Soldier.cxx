@@ -30,12 +30,12 @@ void Soldier::move()
 			// we check 5 meters after firing distance, in order to allow read lines to fire
 			for(front._y=_position._y+_fireDistance-10; front._y>_position._y; front._y--)
 			{
-				Engine::World::AgentsVector agents = _world->getAgent(front);
+				Engine::AgentsVector agents = _world->getAgent(front);
 				if(agents.size()==0)
 				{
 					continue;
 				}
-				Agent * agent = agents.at(0);
+				Agent * agent = agents.at(0).get();
 				if(agent->exists() && agent->isType("redSoldier"))
 				{
 					_moving = false;
@@ -57,12 +57,12 @@ void Soldier::move()
 			// we check 5 meters after firing distance, in order to allow read lines to fire
 			for(front._y=_position._y-_fireDistance+10; front._y<_position._y; front._y++)
 			{	
-				Engine::World::AgentsVector agents = _world->getAgent(front);
+				Engine::AgentsVector agents = _world->getAgent(front);
 				if(agents.size()==0)
 				{
 					continue;
 				}
-				Agent * agent = agents.at(0);
+				Agent * agent = agents.at(0).get();
 				if(agent->exists() && agent->isType("blueSoldier"))
 				{
 					_moving = false;
@@ -91,12 +91,12 @@ void Soldier::move()
 		for(int i=1; i<11; i++)
 		{
 			Engine::Point2D<int> forwardPos(_position._x, _position._y+advance*i);
-			Engine::World::AgentsVector forwardAgents = _world->getAgent(forwardPos);
+			Engine::AgentsVector forwardAgents = _world->getAgent(forwardPos);
 			if(forwardAgents.size()==0)
 			{
 				continue;
 			}
-			Agent * forward = forwardAgents.at(0);
+			Agent * forward = forwardAgents.at(0).get();
 			// if you found a soldier in front of you
 			if(forward->isType(getType()))
 			{
@@ -165,11 +165,11 @@ void Soldier::updateStress()
 	}
 	float globalThreat = 0.0f;
 
-	Engine::World::AgentsVector enemies = _world->getNeighbours(this, _fireDistance*1.5f, enemyType);
+	Engine::AgentsVector enemies = _world->getNeighbours(this, _fireDistance*1.5f, enemyType);
 	//std::cout << this << " number of enemies: " << enemies.size() << std::endl;
-	for(Engine::World::AgentsVector::iterator it=enemies.begin(); it!=enemies.end(); it++)
+	for(Engine::AgentsVector::iterator it=enemies.begin(); it!=enemies.end(); it++)
 	{
-		Soldier * enemy = (Soldier*)(*it);
+		Soldier * enemy = (Soldier*)(*it).get();
 		if(!enemy->isRouting())
 		{
 			//std::cout << "\t" << this << " will add stress: " << enemy->getThreatRating(_position.distance(enemy->getPosition())) << " due to enemy: " << enemy << " at distance: " << _position.distance(enemy->getPosition()) << std::endl;
@@ -192,12 +192,12 @@ void Soldier::updateStress()
 		*/
 	}
 	int globalCohesion = 0;	
-	Engine::World::AgentsVector friends = _world->getNeighbours(this, _cohesionDistance, friendType);
+	Engine::AgentsVector friends = _world->getNeighbours(this, _cohesionDistance, friendType);
 	
 	//std::cout << this << " number of friends: " << friends.size() << " at cohesion distance: " << _cohesionDistance << std::endl;
-	for(Engine::World::AgentsVector::iterator it=friends.begin(); it!=friends.end(); it++)
+	for(Engine::AgentsVector::iterator it=friends.begin(); it!=friends.end(); it++)
 	{
-		Soldier * friendly = (Soldier*)(*it);
+		Soldier * friendly = (Soldier*)(*it).get();
 		Engine::Point2D<int> friendPosition = friendly->getPosition();
 		// if in the same column
 		if(friendPosition._x==_position._x)
@@ -320,7 +320,7 @@ void Soldier::rout()
 		newPos._y = _position._y+1;
 	}
 	// there's another soldier rearguard, check against cohesion rating; if ok, it won't rout
-	Engine::World::AgentsVector agents = _world->getAgent(newPos);
+	Engine::AgentsVector agents = _world->getAgent(newPos);
 	if(agents.size()==0)
 	{		
 		if(_world->checkPosition(newPos))
@@ -333,7 +333,7 @@ void Soldier::rout()
 		}
 		return;
 	}
-	Engine::Agent * agent = agents.at(0);
+	Engine::Agent * agent = agents.at(0).get();
 	if(agent->isType(getType()))
 	{
 		if(Engine::GeneralState::statistics().getUniformDistValue(0, 100)<_cohesionRating)
@@ -355,7 +355,7 @@ void Soldier::rout()
 			{
 				newPos._x++;
 			}
-			Engine::World::AgentsVector agents2 = _world->getAgent(newPos);
+			Engine::AgentsVector agents2 = _world->getAgent(newPos);
 			if(agents2.size()==0)
 			{
 				if(_world->checkPosition(newPos))
@@ -369,7 +369,7 @@ void Soldier::rout()
 			}
 			else
 			{
-				Engine::Agent * agent2 = agents.at(0);
+				Engine::Agent * agent2 = agents.at(0).get();
 				if(agent2->isType(getType()))
 				{
 					_stress = _threshold*0.9f;
@@ -397,13 +397,13 @@ void Soldier::rout()
 void Soldier::casualty()
 {
 	// we disperse the stress of seeing a casualty unit to other soldiers near it.
-	Engine::World::AgentsVector affectedSoldier = _world->getNeighbours(this, _cohesionDistance, getType());
-	for(Engine::World::AgentsVector::iterator it=affectedSoldier.begin(); it!=affectedSoldier.end(); it++)
+	Engine::AgentsVector affectedSoldier = _world->getNeighbours(this, _cohesionDistance, getType());
+	for(Engine::AgentsVector::iterator it=affectedSoldier.begin(); it!=affectedSoldier.end(); it++)
 	{
-		Agent * agent = (*it);
+		Agent * agent = (*it).get();
 		if(agent->isType("blueSoldier") || agent->isType("redSoldier"))
 		{
-			Soldier * soldier = (Soldier*)(*it);
+			Soldier * soldier = (Soldier*)(*it).get();
 			soldier->addStress(100-soldier->getCohesionRating());
 		}
 	}

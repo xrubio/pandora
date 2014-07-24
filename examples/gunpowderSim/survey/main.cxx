@@ -1,7 +1,7 @@
 
-#include "RemoveBulletWorld.hxx"
-#include "RemoveBulletConfig.hxx"
 #include <Exception.hxx>
+#include "Survey.hxx"
+#include "SurveyConfig.hxx"
 
 #include <iostream>
 #include <cstdlib>
@@ -9,10 +9,10 @@
 int main(int argc, char *argv[])
 {
 	try
-	{	
+	{        
         if(argc>2)
 		{
-			throw Engine::Exception("USAGE: removeBullets [config file]");
+			throw Engine::Exception("USAGE: survey [config file]");
 		}
 		
 		std::string fileName("config.xml");
@@ -20,10 +20,9 @@ int main(int argc, char *argv[])
 		{
 			fileName = argv[1];
 		}
-		BattleSim::RemoveBulletWorld degradedWorld( new BattleSim::RemoveBulletConfig(fileName), degradedWorld.useOpenMPSingleNode());
-		
-        degradedWorld.initialize(argc, argv);
-		degradedWorld.run();
+		BattleSim::Survey survey( new BattleSim::SurveyConfig(fileName), survey.useOpenMPSingleNode());
+		survey.initialize(argc, argv);
+		survey.run();
 	}
 	catch( std::exception & exceptionThrown )
 	{

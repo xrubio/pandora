@@ -33,7 +33,7 @@ void RandomWorld::createRasters()
 
 void RandomWorld::createAgents()
 {
-    const RandomWorldConfig & randomConfig = (const RandomWorldConfig&)(*_config);
+    const RandomWorldConfig & randomConfig = (const RandomWorldConfig&)getConfig();
 	for(int i=0; i<randomConfig._numAgents; i++)
 	{
 		if((i%getNumTasks())==getId())

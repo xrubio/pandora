@@ -8,6 +8,7 @@
 #include <cstring>
 #include <Statistics.hxx>
 #include <GeneralState.hxx>
+#include <typedefs.hxx>
 
 namespace BattleSim
 {
@@ -60,7 +61,7 @@ void Bullet::updateState()
 
 bool Bullet::checkContinue( const Engine::Point2D<int> & newPos )
 {
-	Engine::World::AgentsVector targets = _world->getAgent(newPos);
+    Engine::AgentsVector targets = _world->getAgent(newPos);
 	// out of battlefield
 	if(targets.size()==0 || targets.at(0)->isType("blueBullet") || targets.at(0)->isType("redBullet"))
 	{
@@ -75,7 +76,7 @@ bool Bullet::checkContinue( const Engine::Point2D<int> & newPos )
 			return true;
 		}
 	}
-	Soldier * soldier = (Soldier*)targets.at(0);
+	Soldier * soldier = (Soldier*)targets.at(0).get();
 	// pass through ranks
 	if(_isBlueSide && soldier->isType("blueSoldier"))
 	{

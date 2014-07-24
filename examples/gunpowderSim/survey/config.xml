@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<config>  
+	<!-- Global simulation parameters -->
+	<output  resultsFile="./data/excavatedBattlefield.h5" logsDir="./logs"/>
+	<numSteps value="400" serializeResolution="100"/>
+    <size width="400" height="300"/>
+    <battle file="../removeBullets/data/degradedBattlefield.h5"/>
+    <survey distance="10" horizontal="1"/>
+</config>
+

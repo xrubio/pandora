@@ -1,11 +1,19 @@
 
-nameProgram = 'removeBullets'
+############# TEMPLATE FOR MODELS  ###################
+######################################################
+######################################################
+################ CUSTOM INFORMATION  #################
+##### please fill with information about your model ##
+######################################################
 
-agents = ['']
-world = 'RemoveBulletWorld'
-namespaceAgents = ['']
+nameProgram = 'excavation'
 
-srcFiles = Split('main.cxx RemoveBulletWorld.cxx RemoveBulletConfig.cxx')
+agents = ['Archaeologist']
+namespaceAgents = ['BattleSim']
+world = 'Survey'
+
+srcFiles = Split('main.cxx Survey.cxx SurveyConfig.cxx Archaeologist.cxx')
+
 
 ###################################################
 ########## END OF CUSTOM INFORMATION  #############

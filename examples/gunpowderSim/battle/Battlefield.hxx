@@ -17,14 +17,12 @@ enum Rasters
 
 class Battlefield : public Engine::World
 {
-	const BattlefieldConfig & _config;
-
 	void createRasters();
 	void createAgents();
 	
 	void stepEnvironment();
 public:
-	Battlefield( Engine::Simulation & simulation, const BattlefieldConfig & config );
+	Battlefield( BattlefieldConfig * config, Engine::Scheduler * scheduler = 0);
 	virtual ~Battlefield();
 };
 
