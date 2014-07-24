@@ -50,7 +50,8 @@ class Statistics
 public:
 	Statistics();
 	float getExponentialDistValue( float min, float max ) const;
-	float getNormalDistValue( float min, float max ) const;
+	float getNormalDistValueMinMax( float min, float max ) const;
+	float getNormalDistValue( float mean, float sd );
 
 	// uniform dist does not need to generate numbers, as randomNumbers itself is a 
 	int getUniformDistValue( int min, int max ) const;

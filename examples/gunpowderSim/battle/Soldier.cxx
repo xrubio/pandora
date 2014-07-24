@@ -149,7 +149,7 @@ void Soldier::fire()
 	Bullet * firedBullet = new Bullet(oss.str(), _accuracy);
 	firedBullet->setPosition(bulletPosition);
 	_world->addAgent(firedBullet);
-	firedBullet->setMuzzleVelocity(Engine::GeneralState::statistics().getNormalDistValue(50, 450));
+	firedBullet->setMuzzleVelocity(Engine::GeneralState::statistics().getNormalDistValueMinMax(50, 450));
 	
 	_timeUntilLoaded = _reloadingTime;
 }
