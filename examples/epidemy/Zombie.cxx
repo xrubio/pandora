@@ -24,7 +24,7 @@ void Zombie::selectActions()
 //	if(_target)
 	if(_hasHumans)
 	{
-		if(Engine::GeneralState::statistics().getUniformDistValue(0,10)<2)
+		if(Engine::GeneralState::statistics().getUniformDistValue()<0.1)
 		{
 			_actions.push_back(new MoveAction());
 		}

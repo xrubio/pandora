@@ -29,7 +29,6 @@ void Earth::createRasters()
 
 	registerStaticRaster("population", true);
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("population"), earthConfig._populationName, getBoundaries());		
-
 	registerDynamicRaster("humans", true);
 	getDynamicRaster("humans").setInitValues(0, std::numeric_limits<int>::max(), 0);
 	

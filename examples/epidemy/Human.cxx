@@ -68,11 +68,7 @@ void Human::updateState()
 	// check attacks
 	Earth & world = (Earth&)getWorldRef();
 	float probabilityAttack = _threatLevel*world.getZombieVirulence();
-	// until 10 million people...
-	// value entre with 0'00000001 precision
-	float randomValue = Engine::GeneralState::statistics().getUniformDistValue(0, 10000000);
-	randomValue /= 10000000.0f;
-	if(randomValue<probabilityAttack)
+	if(Engine::GeneralState::statistics().getUniformDistValue()<probabilityAttack)
 	{
 		std::ostringstream oss;
 		std::size_t endType = getId().find("_");
