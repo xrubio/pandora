@@ -104,7 +104,7 @@ void Display2D::paintEvent(QPaintEvent *event)
 	QPen pen;
 	pen.setWidth(_zoom);
 
-	imageToDraw.fill(QColor(100,100,100));
+	imageToDraw.fill(QColor("#E6D298"));
 
 	if(!_orderedRasters.empty())
 	{
