@@ -29,7 +29,7 @@
 #include <QGLWidget>
 #include <Point3D.hxx>
 #include <QTime>
-#include <StaticRaster.hxx>
+#include <DynamicRaster.hxx>
 
 class QListWidgetItem;
 
@@ -124,7 +124,7 @@ private:
 	Engine::Point3D<float> _vrp;
 
 	// helper raster used when no elevation raster is defined
-	Engine::StaticRaster _plane;
+	Engine::DynamicRaster _plane;
 
 	Engine::SimulationRecord * _simulationRecord;
 	int _viewedStep;
