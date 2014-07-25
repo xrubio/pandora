@@ -69,12 +69,8 @@ void TestAgent::updateState()
 
 	if(_world->checkPosition(newPosition))
 	{
-		_position = newPosition;
+	  setPosition(newPosition);
 	}
-}
-
-void TestAgent::serialize()
-{
 }
 
 void TestAgent::setMessage( const std::string & message )

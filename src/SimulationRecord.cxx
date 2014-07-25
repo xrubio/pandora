@@ -199,7 +199,7 @@ bool SimulationRecord::loadHDF5( const std::string & fileName, const bool & load
 						{
 							size_t index = i+j*dims[0];
 							int value = dset_data[index];
-							if(value>raster.getMaxValue())
+							if(value>raster.StaticRaster::getMaxValue())
 							{
 								raster.setMaxValue(value);
 							}

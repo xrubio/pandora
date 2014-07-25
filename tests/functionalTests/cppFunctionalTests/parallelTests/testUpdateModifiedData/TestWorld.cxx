@@ -24,14 +24,14 @@
 #include <DynamicRaster.hxx>
 #include <Point2D.hxx>
 #include <Exception.hxx>
-
+#include <Config.hxx>
 #include <assert.h>
 #include <iostream>
 
 namespace Test
 {
 
-TestWorld::TestWorld( const Engine::Simulation & sim ) : World(sim, 4, true, "data/test.h5")
+TestWorld::TestWorld( Engine::Config * config, Engine::Scheduler * scheduler ) : World(config, scheduler, true)
 {
 }
 
@@ -45,37 +45,16 @@ void TestWorld::createRasters()
 	getDynamicRaster("test").setInitValues(0, 2, 0);
 }
 
-void TestWorld::stepRaster( const std::string & key, Engine::DynamicRaster & raster )
+void TestWorld::stepEnvironment()
 {
 	assert(getValue("test", Engine::Point2D<int>(0,0))==std::min(2,_step));
-	/*
-	if(_step<5)
-	{
-		for(int i=0; i<_step; i++)
-		{
-			Engine::Point2D<int> pos(i,i);
-			if(_overlapBoundaries.isInside(pos))
-			{
-				assert(getValue("test", pos)==std::min(2,_step));
-			}
-		}
-	}
-	else*/
 	if(_step==5)
-	{	
-		Engine::Point2D<int> index;
-		for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
-		{
-			for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)			
-			{
-				setMaxValue("test", index, 4);
-			}
-		}
+	{
+	  for( auto index : getBoundaries())
+	  {
+	    setMaxValue("test", index, 4);	    
+	  }
 	}
-}
-
-void TestWorld::createAgents()
-{
 }
 
 } // namespace Test 

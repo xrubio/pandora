@@ -30,7 +30,6 @@ namespace Test
 class TestAgent: public Engine::Agent
 {	
 	void move();
-	void serialize();
 
 public:
 	TestAgent( const std::string & id );

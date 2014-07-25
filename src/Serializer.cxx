@@ -347,7 +347,7 @@ void Serializer::registerType( Agent * agent )
 		hid_t stepGroup = H5Gcreate(agentTypeGroup, oss.str().c_str(),  0, H5P_DEFAULT, H5P_DEFAULT);
 		for(Agent::AttributesList::iterator it=agent->beginIntAttributes(); it!=agent->endIntAttributes(); it++)
 		{	
-			log_DEBUG(logName.str(), "\tnew int attribute: " << *it);
+			log_DEBUG(logName.str(), "\tstep: " << i << " new int attribute: " << *it);
 			newTypeIntMap->insert( make_pair(*it, new std::vector<int>() ));
 			hid_t idDataset= H5Dcreate(stepGroup, (*it).c_str(), H5T_NATIVE_INT, agentFileSpace, H5P_DEFAULT, propertyListId, H5P_DEFAULT);
 			H5Dclose(idDataset);
@@ -355,7 +355,7 @@ void Serializer::registerType( Agent * agent )
 
         for(Agent::AttributesList::iterator it=agent->beginFloatAttributes(); it!=agent->endFloatAttributes(); it++)
 		{	
-			log_DEBUG(logName.str(), "\tnew float attribute: " << *it);
+			log_DEBUG(logName.str(), "\tstep: " << i << " new float attribute: " << *it);
 			newTypeFloatMap->insert( make_pair(*it, new std::vector<float>() ));
 			hid_t idDataset= H5Dcreate(stepGroup, (*it).c_str(), H5T_NATIVE_FLOAT, agentFileSpace, H5P_DEFAULT, propertyListId, H5P_DEFAULT);
 			H5Dclose(idDataset);
@@ -365,7 +365,7 @@ void Serializer::registerType( Agent * agent )
 		H5Tset_size (idType, H5T_VARIABLE);
 		for(Agent::AttributesList::iterator it=agent->beginStringAttributes(); it!=agent->endStringAttributes(); it++)
 		{		
-			log_DEBUG(logName.str(), "\tnew string attribute: " << *it);
+			log_DEBUG(logName.str(), "\tstep: " << i << " new string attribute: " << *it);
 			newTypeStringMap->insert( make_pair(*it, new std::vector<std::string>() ));
 			hid_t idDataset= H5Dcreate(stepGroup, (*it).c_str(), idType, agentFileSpace, H5P_DEFAULT, propertyListId, H5P_DEFAULT);
 			H5Dclose(idDataset);

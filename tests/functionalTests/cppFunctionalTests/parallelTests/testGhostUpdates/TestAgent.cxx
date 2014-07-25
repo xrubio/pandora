@@ -24,6 +24,7 @@
 #include <Point2D.hxx>
 #include <Logger.hxx>
 #include <GeneralState.hxx>
+#include <typedefs.hxx>
 
 namespace Test
 {
@@ -49,8 +50,7 @@ void TestAgent::move()
 	}
 	if(_world->checkPosition(newPosition))
 	{
-		_position = newPosition;
-		return;
+	  setPosition(newPosition);
 	}
 }
 
@@ -65,10 +65,10 @@ void TestAgent::updateTurnInformation()
 		std::stringstream logName;
 		logName << "agents_" << _world->getId() << "_" << getId();
 		log_DEBUG(logName.str(), "Agent: " << this << " on odd turn in step: " << _world->getCurrentStep());
-		Engine::World::AgentsVector neighbors = _world->getNeighbours(this, 1);
-		for(Engine::World::AgentsVector ::iterator it=neighbors.begin(); it!=neighbors.end(); it++)
+		Engine::AgentsVector neighbors = _world->getNeighbours(this, 1);
+		for(Engine::AgentsVector ::iterator it=neighbors.begin(); it!=neighbors.end(); it++)
 		{
-			TestAgent * agent = (TestAgent*)(*it);
+			TestAgent * agent = (TestAgent*)(*it).get();
 			log_DEBUG(logName.str(), "agent: " << this << " is updating: " << agent);
 			agent->setEvenTurn(false);
 		}
@@ -80,7 +80,7 @@ void TestAgent::setEvenTurn( const bool & evenTurn )
 	_evenTurn = evenTurn;
 }
 
-bool TestAgent::isEvenTurn()
+bool TestAgent::isEvenTurn() const
 {
 	return _evenTurn;
 }
@@ -89,10 +89,6 @@ void TestAgent::updateState()
 {
 	move();
 	updateTurnInformation();
-}
-
-void TestAgent::serialize()
-{
 }
 
 } // namespace Test

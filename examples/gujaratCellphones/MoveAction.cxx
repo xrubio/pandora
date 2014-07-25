@@ -62,20 +62,20 @@ void MoveAction::execute( Engine::Agent & agent )
 	// if the agent already visited the cell this year we will set the max value to an average value between both samples
 	else 
 	{	
-		if(herder.getWorld()->getDynamicRaster(herder.getResourcesMap()).getMaxValueAt(_newPosition)<modifiedValue)
+		if(herder.getWorld()->getDynamicRaster(herder.getResourcesMap()).getMaxValue(_newPosition)<modifiedValue)
 		{
 			herder.getWorld()->getDynamicRaster(herder.getResourcesMap()).setMaxValue(_newPosition, modifiedValue);
 		}
 		else
 		{
-			int previousMaxValue = herder.getWorld()->getDynamicRaster(herder.getResourcesMap()).getMaxValueAt(_newPosition);
+			int previousMaxValue = herder.getWorld()->getDynamicRaster(herder.getResourcesMap()).getMaxValue(_newPosition);
 			int newMaxValue = previousValue;
 			herder.getWorld()->getDynamicRaster(herder.getResourcesMap()).setMaxValue(_newPosition, (previousMaxValue+newMaxValue)/2);
 		}
 	}
 
 	/*
-	if(herder.getWorld()->getDynamicRaster(herder.getResourcesMap()).getMaxValueAt(_newPosition)<modifiedValue)
+	if(herder.getWorld()->getDynamicRaster(herder.getResourcesMap()).getMaxValue(_newPosition)<modifiedValue)
 	{
 		herder.getWorld()->getDynamicRaster(herder.getResourcesMap()).setMaxValue(_newPosition, modifiedValue);
 	}

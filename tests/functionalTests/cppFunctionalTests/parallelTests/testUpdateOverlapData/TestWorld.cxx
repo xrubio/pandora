@@ -21,19 +21,20 @@
 
 #include "TestWorld.hxx"
 
-#include "Raster.hxx"
-#include "Point2D.hxx"
-#include "Exception.hxx"
+#include <DynamicRaster.hxx>
+#include <Point2D.hxx>
+#include <Exception.hxx>
 
 #include "TestAgent.hxx"
 
+#include <Config.hxx>
 #include <assert.h>
 #include <iostream>
 
 namespace Test
 {
 
-TestWorld::TestWorld( const Engine::Simulation & sim ) : World(sim, 4, true, "data/test.h5")
+TestWorld::TestWorld( Engine::Config * config, Engine::Scheduler * scheduler ) : World(config, scheduler, true)
 {
 }
 
@@ -47,12 +48,12 @@ void TestWorld::createRasters()
 	getDynamicRaster("test").setInitValues(0, 64, 0);
 }
 
-void TestWorld::stepRaster( const std::string & key, Engine::DynamicRaster & raster)
+void TestWorld::stepEnvironment()
 {
 	for(int i=0; i<_step; i++)
 	{
 		Engine::Point2D<int> pos(i,i);
-		if(_overlapBoundaries.isInside(pos))
+		if(getBoundaries().contains(pos))
 		{
 			assert(getValue("test", pos)==i);
 		}
@@ -60,11 +61,11 @@ void TestWorld::stepRaster( const std::string & key, Engine::DynamicRaster & ras
 }
 void TestWorld::createAgents()
 {
-	if(_simulation.getId()==0)
+	if(getId()==0)
 	{
 		TestAgent * agent = new TestAgent("TestAgent_0");
-		agent->setPosition(Engine::Point2D<int>(0,0));
 		addAgent(agent);
+		agent->setPosition(Engine::Point2D<int>(0,0));		
 		return;
 	}
 }

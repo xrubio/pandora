@@ -44,7 +44,7 @@ public:
 
 	void 		setValue( const Point2D<int> & pos, int value );
 	const int& 	getValue( const Point2D<int> & pos ) const;
-	int getMaxValueAt( const Point2D<int> & position ) const;
+	int getMaxValue( const Point2D<int> & position ) const;
 
 	int			getCurrentMinValue() const { return _currentMinValue; }
 	int			getCurrentMaxValue() const { return _currentMaxValue; }

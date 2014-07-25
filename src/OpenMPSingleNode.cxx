@@ -231,14 +231,14 @@ int OpenMPSingleNode::getValue( const DynamicRaster & raster, const Point2D<int>
 	return raster.getValue(position);
 }
 
-void OpenMPSingleNode::setMaxValueAt( DynamicRaster & raster, const Point2D<int> & position, int value )
+void OpenMPSingleNode::setMaxValue( DynamicRaster & raster, const Point2D<int> & position, int value )
 {
 	raster.setMaxValue(position, value);
 }
 
-int OpenMPSingleNode::getMaxValueAt( const DynamicRaster & raster, const Point2D<int> & position ) const
+int OpenMPSingleNode::getMaxValue( const DynamicRaster & raster, const Point2D<int> & position ) const
 {
-	return raster.getMaxValueAt(position);
+	return raster.getMaxValue(position);
 }
 
 } // namespace Engine

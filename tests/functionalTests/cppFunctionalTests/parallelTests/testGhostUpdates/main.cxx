@@ -19,9 +19,9 @@
  * 
  */
 
-#include <TestWorld.hxx>
+#include "TestWorld.hxx"
 #include <Exception.hxx>
-#include <Simulation.hxx>
+#include <Config.hxx>
 
 #include <iostream>
 #include <cstdlib>
@@ -30,14 +30,12 @@
 // we create two pairs of agents that move (one couple in vertical, another in horizontal). 
 // On even turns, real agents modify a bool value to called "onEvenTurn" to true. 
 // On odd turns, agents look for adjacent agents and modify the value to 2
-
 int main(int argc, char *argv[])
 {
 	try
-	{	
-		Engine::Simulation testSim(64, 64);
-		Test::TestWorld world(testSim);
-		world.init(argc, argv);
+	{
+		Test::TestWorld world(new Engine::Config(Engine::Size<int>(64,64), 64), world.useSpacePartition(4));
+		world.initialize(argc, argv);
 		world.run();
 	}
 	catch( std::exception & exceptionThrown )

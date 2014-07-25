@@ -24,16 +24,19 @@
 
 #include <World.hxx>
 
+namespace Engine
+{
+	class Config;
+}
+
 namespace Test
 {
 
 class TestWorld : public Engine::World
 {
 	void createRasters();
-	void createAgents();
-	void stepRasters();
 public:
-	TestWorld( const Engine::Simulation & sim );
+	TestWorld(  Engine::Config * config, Engine::Scheduler * scheduler = 0 );
 	virtual ~TestWorld();
 };
 

@@ -25,16 +25,18 @@
 #include <Point2D.hxx>
 #include <Exception.hxx>
 
-#include <TestAgentA.hxx>
-#include <TestAgentB.hxx>
-
+#include "TestAgentA.hxx"
+#include "TestAgentB.hxx"
+#include <Config.hxx>
 #include <assert.h>
 #include <iostream>
+
+#include <SpacePartition.hxx>
 
 namespace Test
 {
 
-TestWorld::TestWorld( const Engine::Simulation & sim ) : World(sim, 4, true, "data/test.h5")
+TestWorld::TestWorld( Engine::Config * config, Engine::Scheduler * scheduler ) : World(config, scheduler, true), _testScheduler((Engine::SpacePartition *)scheduler)
 {
 }
 
@@ -42,56 +44,52 @@ TestWorld::~TestWorld()
 {
 }
 
-void TestWorld::createRasters()
+void TestWorld::stepEnvironment()
 {
-}
-
-void TestWorld::stepAgents()
-{
-	if(_simulation.getId()==2 || _simulation.getId()==3)
+	if(getId()==2 || getId()==3)
 	{
 		return;
 	}
-	if(_simulation.getNumTasks()==1)
+	if(getNumTasks()==1)
 	{
 		assert(_agents.size()==2);
 	}
-	else if(_simulation.getNumTasks()==4)
+	else if(getNumTasks()==4)
 	{
-		if(_simulation.getId()==0)
+		if(getId()==0)
 		{
 			if(_step<32)
 			{
 				assert(_agents.size()==2);
-				assert(_overlapAgents.size()==0);
+				assert(_testScheduler->getNumberOfOverlapAgents()==0);
 			}
 			else if(_step<36)
 			{
 				assert(_agents.size()==0);
-				assert(_overlapAgents.size()==2);
+				assert(_testScheduler->getNumberOfOverlapAgents()==2);
 			}
 			else
 			{
 				assert(_agents.size()==0);
-				assert(_overlapAgents.size()==0);
+				assert(_testScheduler->getNumberOfOverlapAgents()==0);
 			}
 		}
-		else if(_simulation.getId()==1)
+		else if(getId()==1)
 		{
 			if(_step<28)				
 			{
 				assert(_agents.size()==0);
-				assert(_overlapAgents.size()==0);
+				assert(_testScheduler->getNumberOfOverlapAgents()==0);
 			}
 			else if(_step<32)
 			{
 				assert(_agents.size()==0);
-				assert(_overlapAgents.size()==2);
+				assert(_testScheduler->getNumberOfOverlapAgents()==2);
 			}
 			else
 			{
 				assert(_agents.size()==2);
-				assert(_overlapAgents.size()==0);
+				assert(_testScheduler->getNumberOfOverlapAgents()==0);
 			}
 		}
 	}
@@ -112,16 +110,15 @@ void TestWorld::stepAgents()
 
 void TestWorld::createAgents()
 {
-	if(_simulation.getId()==0)
+	if(getId()==0)
 	{
 		TestAgentA * agent = new TestAgentA("TestAgentA_1");
-		agent->setPosition(Engine::Point2D<int>(0,10));
 		addAgent(agent);
+		agent->setPosition(Engine::Point2D<int>(0,10));		
 		
 		TestAgentB * agent2 = new TestAgentB("TestAgentB_1");
-		agent2->setPosition(Engine::Point2D<int>(0,20));
 		addAgent(agent2);
-		return;
+		agent2->setPosition(Engine::Point2D<int>(0,20));
 	}
 }
 

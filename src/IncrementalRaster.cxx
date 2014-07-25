@@ -96,9 +96,9 @@ Size<int> IncrementalRaster::getSize() const
 	return _baseRaster->getSize();
 }
 	
-int IncrementalRaster::getMaxValueAt( const Point2D<int> & position ) const
+int IncrementalRaster::getMaxValue( const Point2D<int> & position ) const
 {
-	return _baseRaster->getMaxValueAt(position);
+	return _baseRaster->getMaxValue(position);
 }
 
 }

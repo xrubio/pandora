@@ -157,14 +157,14 @@ void SpacePartition::stepSection( const int & sectionIndex )
 	log_DEBUG(logName.str(), getWallTime() << " beginning step: " << _world->getCurrentStep() << " section: " << sectionIndex);
 
 	AgentsList::iterator it = _world->beginAgents();
-	std::vector<Agent*> agentsToExecute;
+	AgentsVector agentsToExecute;
 	// we have to randomize the execution of agents in a given section index
 	while(it!=_world->endAgents())
 	{
 		Agent * agent = it->get();
 		if(_sections[sectionIndex].contains(agent->getPosition()) && !hasBeenExecuted(agent))
 		{
-			agentsToExecute.push_back(agent);
+			agentsToExecute.push_back(*it);
 		}
 		it++;
 	}
@@ -178,7 +178,7 @@ void SpacePartition::stepSection( const int & sectionIndex )
 #endif
 	for(size_t i=0; i<agentsToExecute.size(); i++)
 	{
-		Agent * agent = agentsToExecute[i];
+		Agent * agent = agentsToExecute.at(i).get();
 		agent->updateKnowledge();
 		agent->selectActions();
 	}
@@ -186,7 +186,7 @@ void SpacePartition::stepSection( const int & sectionIndex )
 	// execute actions
 	for(size_t i=0; i<agentsToExecute.size(); i++)
 	{
-		Agent * agent = agentsToExecute.at(i);
+		Agent * agent = agentsToExecute.at(i).get();
 		log_DEBUG(logName.str(), getWallTime() << " agent: " << agent << " being executed at index: " << sectionIndex << " of task: "<< _id << " in step: " << _world->getCurrentStep() );
 		agent->executeActions();
 		agent->updateState();
@@ -361,7 +361,7 @@ void SpacePartition::sendMaxOverlapZones()
 			for(size_t n=0; n<send->_data.size(); n++)
 			{
 				Point2D<int> index(overlapZone._origin._x+n%overlapZone._size._width, overlapZone._origin._y+n/overlapZone._size._width);
-				send->_data.at(n) = _world->getDynamicRaster(d).getMaxValueAt(index);
+				send->_data.at(n) = _world->getDynamicRaster(d).getMaxValue(index);
 				log_EDEBUG(logName.str(), "\t" << getWallTime() << " step: " << _world->getCurrentStep() << " send index: " << index << " in global pos: " << index+_boundaries._origin << " max value: " << send->_data.at(n));
 			}
 			MPI_Isend(&send->_data[0], send->_data.size(), MPI_INTEGER, _neighbors[i], eRasterMaxData, MPI_COMM_WORLD, &send->_request);
@@ -483,7 +483,7 @@ void SpacePartition::receiveGhostAgents( const int & sectionIndex )
 		for(size_t i=0; i<neighborsToUpdate.size(); i++)
 		{
 			AgentsList newGhostAgents;
-			size_t numAgentsToReceive;
+			int numAgentsToReceive;
 			MPI_Status status;
 
 			int error = MPI_Recv(&numAgentsToReceive, 1, MPI_INTEGER, neighborsToUpdate[i], eNumGhostAgents, MPI_COMM_WORLD, &status);			
@@ -576,7 +576,7 @@ void SpacePartition::receiveAgents( const int & sectionIndex )
 		{
 			log_DEBUG(logName.str(), getWallTime() << " step: " << _world->getCurrentStep() << " receiveAgent - checking mpi type: " << itType->first << " for neighbor: " << _neighbors[i] );
 
-			size_t numAgentsToReceive;
+			int numAgentsToReceive;
 			MPI_Status status;
 			int error = MPI_Recv(&numAgentsToReceive, 1, MPI_INTEGER, _neighbors[i], eNumAgents, MPI_COMM_WORLD, &status);			
 			if(error!=MPI_SUCCESS)
@@ -597,10 +597,10 @@ void SpacePartition::receiveAgents( const int & sectionIndex )
 					throw Exception(oss.str());
 				}
 				Agent * agent = MpiFactory::instance()->createAndFillAgent(itType->first, package);
-				log_DEBUG(logName.str(), getWallTime() << " step: " << _world->getCurrentStep() << " receiveAgents - received agent: " << agent << " number: " << j << " from: " << _neighbors[i]);
 				delete package;
 				agent->receiveVectorAttributes(_neighbors[i]);
 				_world->addAgent(agent, true);
+				log_DEBUG(logName.str(), getWallTime() << " step: " << _world->getCurrentStep() << " receiveAgents - received agent: " << agent << " number: " << j << " from: " << _neighbors[i]);
 			}
 		}
 	}
@@ -646,7 +646,6 @@ void SpacePartition::receiveOverlapData( const int & sectionIndex, const bool & 
 				receive->_overlap = getExternalOverlap(neighborsToUpdate[i]);
 				log_DEBUG(logName.str(), getWallTime() << " step: " << _world->getCurrentStep() << "/" << sectionIndex << " receive external overlap: " << receive->_overlap << " from " << neighborsToUpdate[i]);
 			}
-			log_DEBUG(logName.str(), getWallTime() << " step: " << _world->getCurrentStep() << "/" << sectionIndex << " AAA will receive overlap from: " << neighborsToUpdate[i] << " with size: " << receive->_data.size() << " and zone: " << receive->_overlap );
 			receive->_data.resize(receive->_overlap._size._width*receive->_overlap._size._height);
 			log_DEBUG(logName.str(), getWallTime() << " step: " << _world->getCurrentStep() << "/" << sectionIndex << " will receive overlap from: " << neighborsToUpdate[i] << " with size: " << receive->_data.size() << " and zone: " << receive->_overlap );
 			MPI_Irecv(&receive->_data[0], receive->_data.size(), MPI_INTEGER, neighborsToUpdate[i], eRasterData, MPI_COMM_WORLD, &receive->_request);
@@ -1614,14 +1613,14 @@ int SpacePartition::getValue( const DynamicRaster & raster, const Point2D<int> &
 	return raster.getValue(getRealPosition(position));
 }
 
-void SpacePartition::setMaxValueAt( DynamicRaster & raster, const Point2D<int> & position, int value )
+void SpacePartition::setMaxValue( DynamicRaster & raster, const Point2D<int> & position, int value )
 {
 	raster.setMaxValue(getRealPosition(position), value);
 }
 
-int SpacePartition::getMaxValueAt( const DynamicRaster & raster, const Point2D<int> & position ) const
+int SpacePartition::getMaxValue( const DynamicRaster & raster, const Point2D<int> & position ) const
 {
-	return raster.getMaxValueAt(getRealPosition(position));
+	return raster.getMaxValue(getRealPosition(position));
 }
 
 } // namespace Engine

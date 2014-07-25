@@ -83,8 +83,8 @@ public:
 	
 	void setValue( DynamicRaster & raster, const Point2D<int> & position, int value );
 	int getValue( const DynamicRaster & raster, const Point2D<int> & position ) const;
-	void setMaxValueAt( DynamicRaster & raster, const Point2D<int> & position, int value );
-	int getMaxValueAt( const DynamicRaster & raster, const Point2D<int> & position ) const;
+	void setMaxValue( DynamicRaster & raster, const Point2D<int> & position, int value );
+	int getMaxValue( const DynamicRaster & raster, const Point2D<int> & position ) const;
 
 //	friend class Serializer;
 };

@@ -6,6 +6,7 @@
 #include <DynamicRaster.hxx>
 #include <Point2D.hxx>
 #include <GeneralState.hxx>
+#include <Logger.hxx>
 
 namespace Examples 
 {
@@ -26,13 +27,16 @@ void RandomWorld::createRasters()
 	for(auto index:getBoundaries())
 	{
 		int value = Engine::GeneralState::statistics().getUniformDistValue(0,5);
-		getDynamicRaster("resources").setMaxValue(index, value);
+        setMaxValue("resources", index, value);
 	}
 	updateRasterToMaxValues("resources");
 }
 
 void RandomWorld::createAgents()
 {
+    std::stringstream logName;
+	logName << "agents_" << getId();
+
     const RandomWorldConfig & randomConfig = (const RandomWorldConfig&)getConfig();
 	for(int i=0; i<randomConfig._numAgents; i++)
 	{
@@ -43,6 +47,7 @@ void RandomWorld::createAgents()
 			RandomAgent * agent = new RandomAgent(oss.str());
 			addAgent(agent);
 			agent->setRandomPosition();
+	        log_INFO(logName.str(), getWallTime() << " new agent: " << agent);
 		}
 	}
 }

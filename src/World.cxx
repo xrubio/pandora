@@ -352,19 +352,19 @@ void World::setMaxValue( const std::string & key, const Point2D<int> & position,
 void World::setMaxValue( const int & index, const Point2D<int> & position, int value )
 {
 	DynamicRaster * raster = (DynamicRaster*)(_rasters.at(index));
-	_scheduler->setMaxValueAt(*raster, position, value);
+	_scheduler->setMaxValue(*raster, position, value);
 }
 
-int World::getMaxValueAt( const std::string & key, const Point2D<int> & position ) const
+int World::getMaxValue( const std::string & key, const Point2D<int> & position ) const
 {
 	RasterNameMap::const_iterator it = _rasterNames.find(key);
-	return getMaxValueAt(it->second, position);
+	return getMaxValue(it->second, position);
 }
 
-int World::getMaxValueAt( const int & index, const Point2D<int> & position ) const
+int World::getMaxValue( const int & index, const Point2D<int> & position ) const
 {
 	DynamicRaster * raster = (DynamicRaster*)(_rasters.at(index));
-	_scheduler->getMaxValueAt(*raster, position);
+	_scheduler->getMaxValue(*raster, position);
 }
 
 int World::countNeighbours( Agent * target, const double & radius, const std::string & type )

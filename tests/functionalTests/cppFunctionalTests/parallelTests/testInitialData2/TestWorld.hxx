@@ -22,11 +22,11 @@
 #ifndef __TestWorld_hxx__
 #define __TestWorld_hxx__
 
-#include "World.hxx"
+#include <World.hxx>
 
 namespace Engine
 {
-	class Simulation;
+	class Config;
 }
 
 namespace Test
@@ -35,10 +35,9 @@ namespace Test
 class TestWorld : public Engine::World
 {
 	void createRasters();
-	void createAgents();
-	void stepRasters();
+	void stepEnvironment();
 public:
-	TestWorld( const Engine::Simulation & sim );
+	TestWorld( Engine::Config * config, Engine::Scheduler * scheduler = 0 );
 	virtual ~TestWorld();
 };
 

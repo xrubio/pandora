@@ -13,7 +13,10 @@ if platform.system()=='Linux':
     vars.Add(PathVariable('hdf5', 'Path where HDF5 library was installed', '/usr/local/hdf5', PathVariable.PathIsDir))
 
 env = Environment(variables=vars, ENV=os.environ, CXX='mpicxx')
-env.VariantDir('build', '.')
+if env['debug'] == False:
+    env.VariantDir('build', '.')
+else:
+    env.VariantDir('buildDebug', '.')
 
 Help(vars.GenerateHelpText(env))
 
@@ -43,7 +46,11 @@ srcFiles = coreFiles + analysisFiles
 coreHeaders = [str(f) for f in Glob('include/*.hxx')]
 analysisHeaders = [str(f) for f in Glob('include/analysis/*.hxx')]
 
-srcBaseFiles = ['build/' + src for src in srcFiles]
+if env['debug'] == False:
+    srcBaseFiles = ['build/' + src for src in srcFiles]
+else:
+    srcBaseFiles = ['buildDebug/' + src for src in srcFiles]
+
 env.Append(CPPPATH = 'include include/analysis'.split())
 
 if platform.system()=='Linux':
@@ -59,9 +66,13 @@ envPython = env.Clone()
 if platform.system()=='Linux':
     envPython.Append(LINKFLAGS = '-Wl,--export-dynamic,-no-undefined'.split())
 
-envPython.VariantDir('build_py', '.')
+if env['debug'] == False:
+    envPython.VariantDir('build_py', '.')
+    srcPyFiles = ['build_py/' + src for src in srcFiles]
+else:    
+    envPython.VariantDir('buildDebug_py', '.')
+    srcPyFiles = ['buildDebug_py/' + src for src in srcFiles]
 
-srcPyFiles = ['build_py/' + src for src in srcFiles]
 srcPyFiles += [str(f) for f in Glob('src/pyPandora/*.cxx')]
 srcPyFiles += [str(f) for f in Glob('utils/*.cxx')]
 

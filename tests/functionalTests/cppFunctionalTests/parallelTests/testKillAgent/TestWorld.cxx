@@ -19,20 +19,22 @@
  * 
  */
 
-#include <TestWorld.hxx>
+#include "TestWorld.hxx"
 
 #include <Point2D.hxx>
 #include <Exception.hxx>
-
-#include <TestAgent.hxx>
+#include <Config.hxx>
+#include "TestAgent.hxx"
 
 #include <assert.h>
 #include <iostream>
 
+#include <SpacePartition.hxx>
+
 namespace Test
 {
 
-TestWorld::TestWorld( const Engine::Simulation & sim ) : World(sim, 4, true, "data/test.h5")
+TestWorld::TestWorld( Engine::Config * config, Engine::Scheduler * scheduler ) : World(config, scheduler, true), _testScheduler((Engine::SpacePartition *)scheduler)
 {
 }
 
@@ -40,58 +42,53 @@ TestWorld::~TestWorld()
 {
 }
 
-void TestWorld::createRasters()
-{	
-}
-
-void TestWorld::stepAgents()
+void TestWorld::stepEnvironment()
 {
-	if(_simulation.getNumTasks()==1)
+	if(getNumTasks()==1)
 	{
 		assert(_agents.size()==0);
-		assert(_overlapAgents.size()==0);
+		assert(_testScheduler->getNumberOfOverlapAgents()==0);
 		return;
 	}
 
-	if(_simulation.getId()==3)
+	if(getId()==3)
 	{
 		if(_step<31)
 		{	
 			assert(_agents.size()==1);
-			assert(_overlapAgents.size()==0);
+			assert(_testScheduler->getNumberOfOverlapAgents()==0);
 		}
 		else
 		{
 			assert(_agents.size()==0);
-			assert(_overlapAgents.size()==0);
+			assert(_testScheduler->getNumberOfOverlapAgents()==0);
 		}
 		return;
 	}
 	if(_step<28)
 	{	
 		assert(_agents.size()==0);
-		assert(_overlapAgents.size()==0);
+		assert(_testScheduler->getNumberOfOverlapAgents()==0);
 	}
 	else if(_step<31)
 	{	
 		assert(_agents.size()==0);
-		assert(_overlapAgents.size()==1);
+		assert(_testScheduler->getNumberOfOverlapAgents()==1);
 	}
 	else
 	{
 		assert(_agents.size()==0);
-		assert(_overlapAgents.size()==0);
+		assert(_testScheduler->getNumberOfOverlapAgents()==0);
 	}
 }
 
 void TestWorld::createAgents()
 {
-	if(_simulation.getId()==3)
+	if(getId()==3)
 	{
 		TestAgent * agent = new TestAgent("TestAgent_0");
-		agent->setPosition(Engine::Point2D<int>(63,63));
 		addAgent(agent);
-		return;
+		agent->setPosition(Engine::Point2D<int>(63,63));
 	}
 }
 

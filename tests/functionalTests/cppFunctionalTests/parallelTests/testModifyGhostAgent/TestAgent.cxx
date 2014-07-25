@@ -24,6 +24,7 @@
 #include <Point2D.hxx>
 #include <Logger.hxx>
 #include <GeneralState.hxx>
+#include <typedefs.hxx>
 
 namespace Test
 {
@@ -50,19 +51,15 @@ void TestAgent::updateState()
 {
 	if(_world->getId()==0)
 	{
-		Engine::World::AgentsVector neighbors = _world->getNeighbours( this, 100);
+		Engine::AgentsVector neighbors = _world->getNeighbours( this, 100);
 		if(neighbors.size()==0)
 		{
 			return;
 		}
-		TestAgent * agent = (TestAgent*)neighbors.at(0);
+		TestAgent * agent = (TestAgent*)neighbors.at(0).get();
 		agent->setFlag(true);
 		return;
 	}
-}
-
-void TestAgent::serialize()
-{
 }
 
 } // namespace Test

@@ -34,7 +34,6 @@ class TestAgentA: public Engine::Agent
 	std::string _testId; // MpiStringAttribute
 
 	void move();
-	void serialize();
 
 public:
 	TestAgentA( const std::string & id );

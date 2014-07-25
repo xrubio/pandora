@@ -18,12 +18,12 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-#include <TestWorld.hxx>
+#include "TestWorld.hxx"
 
 #include <Point2D.hxx>
 #include <Exception.hxx>
-
-#include <TestAgent.hxx>
+#include <Config.hxx>
+#include "TestAgent.hxx"
 
 #include <assert.h>
 #include <iostream>
@@ -31,7 +31,7 @@
 namespace Test
 {
 
-TestWorld::TestWorld( const Engine::Simulation & sim ) : World(sim, 4, true, "data/test.h5")
+TestWorld::TestWorld( Engine::Config * config, Engine::Scheduler * scheduler ) : World(config, scheduler, true)
 {
 }
 
@@ -39,34 +39,29 @@ TestWorld::~TestWorld()
 {
 }
 
-void TestWorld::createRasters()
-{	
-}
-
-void TestWorld::stepAgents()
+void TestWorld::stepEnvironment()
 {
-	if(_step<32 && _simulation.getId()==2)
+	if(_step<32 && getId()==2)
 	{
 		assert(_agents.size()==1);
-		Engine::Agent * agent = *(_agents.begin());
+		Engine::Agent * agent = (_agents.begin())->get();
 		assert(agent->getPosition()._x==_step);
 	}
-	else if(_step>=32 && _simulation.getId()==3)
+	else if(_step>=32 && getId()==3)
 	{
 		assert(_agents.size()==1);
-		Engine::Agent * agent = *(_agents.begin());
+		Engine::Agent * agent = (_agents.begin())->get();
 		assert(agent->getPosition()._x==_step);
 	}
 }
 
 void TestWorld::createAgents()
 {
-	if(_simulation.getId()==2)
+	if(getId()==2)
 	{
 		TestAgent * agent = new TestAgent("TestAgent_0");
-		agent->setPosition(Engine::Point2D<int>(0,32));
 		addAgent(agent);
-		return;
+		agent->setPosition(Engine::Point2D<int>(0,32));
 	}
 }
 

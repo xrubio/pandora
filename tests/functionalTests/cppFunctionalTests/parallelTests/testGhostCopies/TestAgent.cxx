@@ -47,8 +47,7 @@ void TestAgent::move()
 
 	if(_world->checkPosition(newPosition))
 	{
-		_position = newPosition;
-		return;
+	  setPosition(newPosition);
 	}
 }
 
@@ -57,9 +56,6 @@ void TestAgent::updateState()
 	move();
 }
 
-void TestAgent::serialize()
-{
-}
 
 } // namespace Test
 

@@ -58,12 +58,8 @@ void TestAgent::updateState()
 
 	if(_world->checkPosition(newPosition))
 	{
-		_position = newPosition;
+	  setPosition(_position);
 	}
-}
-
-void TestAgent::serialize()
-{
 }
 
 } // namespace Test

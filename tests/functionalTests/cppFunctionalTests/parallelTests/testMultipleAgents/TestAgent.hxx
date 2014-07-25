@@ -38,8 +38,9 @@ public:
 	TestAgent( const std::string & id, bool moveToDownLeft );
 	virtual ~TestAgent();
 	
-	void serialize();
 	void updateState();
+
+
 
 	////////////////////////////////////////////////
 	// This code has been automatically generated //

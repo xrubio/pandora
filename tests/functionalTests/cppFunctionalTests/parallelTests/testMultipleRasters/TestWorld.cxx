@@ -24,6 +24,7 @@
 #include <DynamicRaster.hxx>
 #include <Point2D.hxx>
 #include <Exception.hxx>
+#include <Config.hxx>
 
 #include <assert.h>
 #include <iostream>
@@ -34,7 +35,7 @@
 namespace Test
 {
 
-TestWorld::TestWorld( const Engine::Simulation & sim, const int & numRasters ) : World(sim, 199, true, "data/test.h5"), _numRasters(numRasters)
+TestWorld::TestWorld( Engine::Config * config, Engine::Scheduler * scheduler, const int & numRasters ) : World(config, scheduler, true), _numRasters(numRasters) 
 {
 }
 
@@ -53,13 +54,6 @@ void TestWorld::createRasters()
 	}
 }
 
-void TestWorld::stepEnvironment()
-{
-}
-
-void TestWorld::createAgents()
-{
-}
-
 } // namespace Test 
+
 

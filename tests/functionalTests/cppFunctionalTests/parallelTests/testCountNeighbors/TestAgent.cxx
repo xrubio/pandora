@@ -44,9 +44,6 @@ void TestAgent::updateState()
 	}
 }
 
-void TestAgent::serialize()
-{
-}
 
 } // namespace Test
 

@@ -38,10 +38,10 @@ void TestAgentB::move()
 {
 	Engine::Point2D<int> newPosition = _position;
 	newPosition._x++; // += 2;
-
+	
 	if(_world->checkPosition(newPosition))
 	{
-		_position = newPosition;
+	  	setPosition(newPosition);
 		return;
 	}
 }
@@ -51,9 +51,6 @@ void TestAgentB::updateState()
 	move();
 }
 
-void TestAgentB::serialize()
-{
-}
 
 const int & TestAgentB::getTestValueB()
 {

@@ -115,8 +115,8 @@ public:
 
 	virtual void setValue( DynamicRaster & raster, const Point2D<int> & position, int value ) = 0;
 	virtual int getValue( const DynamicRaster & raster, const Point2D<int> & position ) const = 0;
-	virtual void setMaxValueAt( DynamicRaster & raster, const Point2D<int> & position, int value ) = 0;
-	virtual int getMaxValueAt( const DynamicRaster & raster, const Point2D<int> & position ) const = 0;
+	virtual void setMaxValue( DynamicRaster & raster, const Point2D<int> & position, int value ) = 0;
+	virtual int getMaxValue( const DynamicRaster & raster, const Point2D<int> & position ) const = 0;
 
 };
 

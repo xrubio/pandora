@@ -42,8 +42,7 @@ void TestAgentA::move()
 
 	if(_world->checkPosition(newPosition))
 	{
-		_position = newPosition;
-		return;
+	  setPosition(newPosition);
 	}
 }
 
@@ -52,10 +51,6 @@ void TestAgentA::updateState()
 	move();
 }
 
-void TestAgentA::serialize()
-{
-}
-	
 const std::string & TestAgentA::getTestId()
 {
 	return _testId;

@@ -72,7 +72,7 @@ public:
 	//! Returns size of the raster codifying the horizontal and vertical dimensions in a Size object. 
 	virtual Size<int> getSize() const;
 	//! Reads attribute _maxValue.
-	const int & getMaxValue() const;
+	virtual const int & getMaxValue() const;
 	//! Reads the '_minValue' attribute.
 	const int & getMinValue() const;
 

@@ -19,29 +19,27 @@
  * 
  */
 
-#include <TestWorld.hxx>
+#include "TestWorld.hxx"
 
 #include <Point2D.hxx>
 #include <Exception.hxx>
 
-#include <TestAgent.hxx>
-
+#include "TestAgent.hxx"
+#include <Config.hxx>
 #include <assert.h>
 #include <iostream>
+#include <typedefs.hxx>
+#include <SpacePartition.hxx>
 
 namespace Test
 {
 
-TestWorld::TestWorld( const Engine::Simulation & sim ) : World(sim, 4, true, "data/test.h5")
+TestWorld::TestWorld( Engine::Config * config, Engine::Scheduler * scheduler ) : World(config, scheduler, true), _testScheduler((Engine::SpacePartition *)scheduler)
 {
 }
 
 TestWorld::~TestWorld()
 {
-}
-
-void TestWorld::createRasters()
-{	
 }
 
 void TestWorld::stepAgents()
@@ -60,53 +58,54 @@ void TestWorld::stepAgents()
 	}	
 	
 	// only one task, agents does not have any neighbor so always is even until step 32 (where they cross the paths)
-	if(_simulation.getNumTasks()==1)
+	if(getNumTasks()==1)
 	{
 		return;
 	}
 
 	// more than one task, agents turn the state of each other
-	for(AgentsList::iterator it=_agents.begin(); it!=_agents.end(); it++)
+	for(Engine::AgentsList::iterator it=_agents.begin(); it!=_agents.end(); it++)
 	{
-		TestAgent * agent = (TestAgent*)(*it);
+		TestAgent * agent = (TestAgent*)(it)->get();
 		assert(agent->isEvenTurn()==lastStepWasEven);
 	}
-	for(AgentsList::iterator it=_overlapAgents.begin(); it!=_overlapAgents.end(); it++)
+	for(Engine::AgentsList::const_iterator it=_testScheduler->beginOverlapAgents(); it!=_testScheduler->endOverlapAgents(); it++)
 	{
-		TestAgent * agent = (TestAgent*)(*it);
+		const TestAgent * agent = (TestAgent*)(it)->get();
 		assert(agent->isEvenTurn()==lastStepWasEven);
 	}
 }
 
 void TestWorld::createAgents()
 {
-	if(_simulation.getId()==0)
+	if(getId()==0)
 	{
 		TestAgent * agentVertical1 = new TestAgent("TestAgent_0", false);
 		Engine::Point2D<int> pos(31,0);
-		agentVertical1->setPosition(pos);
 		addAgent(agentVertical1);
+		agentVertical1->setPosition(pos);
+
 		TestAgent * agentHorizontal1 = new TestAgent("TestAgent_2", true);
 		Engine::Point2D<int> pos2(0,31);
-		agentHorizontal1->setPosition(pos2);
 		addAgent(agentHorizontal1);
+		agentHorizontal1->setPosition(pos2);
 		return;
 	}
-	if(_simulation.getId()==1)
+	if(getId()==1)
 	{
 		TestAgent * agentVertical2 = new TestAgent("TestAgent_1", false);
 		Engine::Point2D<int> pos(0,0);
-		agentVertical2->setPosition(pos+_boundaries._origin);
 		addAgent(agentVertical2);
+		agentVertical2->setPosition(pos+getBoundaries()._origin);
 		return;
 
 	}
-	if(_simulation.getId()==2)
+	if(getId()==2)
 	{
 		TestAgent * agentHorizontal2 = new TestAgent("TestAgent_3", true);
 		Engine::Point2D<int> pos(0,0);
-		agentHorizontal2->setPosition(pos+_boundaries._origin);
 		addAgent(agentHorizontal2);
+		agentHorizontal2->setPosition(pos+getBoundaries()._origin);
 		return;
 	}
 }

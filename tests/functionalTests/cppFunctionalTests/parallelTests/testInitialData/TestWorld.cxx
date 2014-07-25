@@ -19,19 +19,19 @@
  * 
  */
 
-#include <TestWorld.hxx>
+#include "TestWorld.hxx"
 
 #include <DynamicRaster.hxx>
 #include <Point2D.hxx>
 #include <Exception.hxx>
-
+#include <Config.hxx>
 #include <assert.h>
 #include <iostream>
 
 namespace Test
 {
 
-TestWorld::TestWorld( const Engine::Simulation & sim ) : World(sim, 4, true, "data/test.h5")
+TestWorld::TestWorld( Engine::Config * config, Engine::Scheduler * scheduler ) : World(config, scheduler, true)
 {
 }
 
@@ -39,39 +39,17 @@ TestWorld::~TestWorld()
 {
 }
 
-void TestWorld::stepRasters()
-{
-	/*
-	Engine::Point2D<int> index(0,0);
-	for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)		
-	{
-		for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)			
-		{
-			//assert(getValue("test", index)==_simulation.getId()+1);
-		}
-	}
-	*/
-}
-
 void TestWorld::createRasters()
 {
 	registerDynamicRaster("test", true);
-	getDynamicRaster("test").setInitValues(0, _simulation.getNumTasks(), 0);
+	getDynamicRaster("test").setInitValues(0, getNumTasks(), 0);
 
 	// at least each cell has value 1
-	Engine::Point2D<int> index(0,0);
-	for(index._x=_boundaries._origin._x; index._x<_boundaries._origin._x+_boundaries._size._x; index._x++)          
+	for( auto index : getBoundaries())
 	{
-		for(index._y=_boundaries._origin._y; index._y<_boundaries._origin._y+_boundaries._size._y; index._y++)                  
-		{
-			setMaxValue("test", index, _simulation.getId()+1);
-		}
+		setMaxValue("test", index, getId()+1);
 	}
 	updateRasterToMaxValues("test");
-}
-
-void TestWorld::createAgents()
-{
 }
 
 } // namespace Test 

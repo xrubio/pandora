@@ -42,19 +42,14 @@ void TestAgent::move()
 	
 	if(_world->checkPosition(newPosition))
 	{
-		_position = newPosition;
+	  setPosition(newPosition);
 		_world->setValue("test", _position, _world->getCurrentStep()+1);
-		return;
 	}
 }
 
 void TestAgent::updateState()
 {
 	move();
-}
-
-void TestAgent::serialize()
-{
 }
 
 } // namespace Test

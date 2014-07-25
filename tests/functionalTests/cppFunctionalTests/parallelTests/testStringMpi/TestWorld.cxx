@@ -19,17 +19,18 @@
  * 
  */
 
-#include <TestWorld.hxx>
+#include "TestWorld.hxx"
 
 #include <Exception.hxx>
-#include <TestAgent.hxx>
+#include "TestAgent.hxx"
+#include <Config.hxx>
 #include <assert.h>
 #include <sstream>
 
 namespace Test
 {
 
-TestWorld::TestWorld( Engine::Simulation & simulation ) : World( simulation, 1, true, "data/test.h5")
+TestWorld::TestWorld( Engine::Config * config, Engine::Scheduler * scheduler ) : World(config, scheduler, true)
 {
 }
 
@@ -37,7 +38,7 @@ TestWorld::~TestWorld()
 {
 }
 
-void TestWorld::stepAgents()
+void TestWorld::stepEnvironment()
 {
 	Engine::Agent * baseAgent = getAgent("TestAgent_0");
 	if(baseAgent)
@@ -60,25 +61,21 @@ void TestWorld::stepAgents()
 	}
 }
 
-void TestWorld::createRasters()
-{
-}
-
 void TestWorld::createAgents()
 {
-	if(_simulation.getId()==0)
+	if(getId()==0)
 	{
 		TestAgent * agent = new TestAgent("TestAgent_0", true);		
-		agent->setPosition(Engine::Point2D<int>(0,0));
 		addAgent(agent);
+		agent->setPosition(Engine::Point2D<int>(0,0));		
 		agent->setMessage("string_0");
 	}
-	if(_simulation.getId()==_simulation.getNumTasks()-1)
+	if(getId()==getNumTasks()-1)
 	{
 		TestAgent * agent = new TestAgent("TestAgent_1", false);	
-		Engine::Point2D<int> pos(_simulation.getSize()-1, _simulation.getSize()-1);
-		agent->setPosition(pos);
+		Engine::Point2D<int> pos(getConfig().getSize()._width-1, getConfig().getSize()._height-1);
 		addAgent(agent);
+		agent->setPosition(pos);		
 		agent->setMessage("string_199");
 	}
 }

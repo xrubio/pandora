@@ -81,7 +81,7 @@ void Forager::updateKnowledge()
 		{
 			if(_perfectInformation)
 			{
-				resources.setMaxValue(index, _world->getDynamicRaster(eResources).getValue(index));
+				resources.setMaxValue(index, _world->getValue(eResources, index));
 			}
 			else
 			{

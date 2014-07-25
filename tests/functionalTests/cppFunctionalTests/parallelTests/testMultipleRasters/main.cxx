@@ -1,7 +1,7 @@
 
 #include "TestWorld.hxx"
 #include <Exception.hxx>
-#include <Simulation.hxx>
+#include <Config.hxx>kjlñ
 
 #include <iostream>
 #include <cstdlib>
@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 		{
 			numRasters = atoi(argv[1]);
 		}
-		Engine::Simulation sim(1600, numTimeSteps);
+		Engine::Simulation sim(1600, numTimeSteps); //overlap 199
 		Test::TestWorld multipleRasters(sim,numRasters);
 		
 		multipleRasters.init(argc, argv);

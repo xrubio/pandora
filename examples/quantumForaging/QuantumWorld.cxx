@@ -51,7 +51,7 @@ void QuantumWorld::createRasters()
 	{
 		// value ranging from 0 to 100
 		int value = Engine::GeneralState::statistics().getUniformDistValue(0,100);
-		getDynamicRaster(eResources).setMaxValue(index, value);
+        setMaxValue(eResources, index, value);
 	}	
     
     for(int i=0; i<qConfig._numAgents; i++)

@@ -19,9 +19,9 @@
  * 
  */
 
-#include <TestWorld.hxx>
+#include "TestWorld.hxx"
 #include <Exception.hxx>
-#include <Simulation.hxx>
+#include <Config.hxx>
 
 #include <iostream>
 #include <cstdlib>
@@ -31,9 +31,8 @@ int main(int argc, char *argv[])
 {
 	try
 	{
-		Engine::Simulation sim(128,1);
-		Test::TestWorld world(sim);
-		world.init(argc, argv);
+		Test::TestWorld world(new Engine::Config(Engine::Size<int>(128,128), 1), world.useSpacePartition(9));
+		world.initialize(argc, argv);
 		world.run();
 	}
 	catch( std::exception & exceptionThrown )
