@@ -24,9 +24,11 @@
 #define __Config__hxx__
 
 #include <cstdlib>
-#include <tinyxml.h>
 #include <string>
 #include <Size.hxx>
+
+class TiXmlDocument;
+class TiXmlElement;
 
 namespace Engine
 {

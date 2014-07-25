@@ -11,7 +11,7 @@ agents = ['HunterGatherer']
 world = 'GujaratWorld'
 namespaceAgents = ['Gujarat']
 
-srcFiles = Split('main.cxx GujaratWorld.cxx GujaratConfig.cxx Climate.cxx GujaratAgent.cxx HunterGatherer.cxx MDPAction.cxx MoveHomeAction.cxx Sector.cxx ForageAction.cxx SettlementAreas.cxx HunterGathererMDPConfig.cxx HunterGathererMDPState.cxx HunterGathererMDPModel.cxx DoNothingAction.cxx AgentController.cxx HunterGathererProgrammedController.cxx HunterGathererDecisionTreeController.cxx HunterGathererMDPController.cxx OriginalDemographics.cxx CaloricRequirementsTable.cxx GujaratState.cxx')
+srcFiles = Split('main.cxx GujaratWorld.cxx GujaratConfig.cxx Climate.cxx GujaratAgent.cxx HunterGatherer.cxx MDPAction.cxx MoveHomeAction.cxx Sector.cxx ForageAction.cxx SettlementAreas.cxx HunterGathererMDPConfig.cxx HunterGathererMDPState.cxx HunterGathererMDPModel.cxx DoNothingAction.cxx AgentController.cxx HunterGathererProgrammedController.cxx HunterGathererDecisionTreeController.cxx HunterGathererMDPController.cxx OriginalDemographics.cxx GujaratState.cxx')
 
 ###################################################
 ########## END OF CUSTOM INFORMATION  #############
@@ -37,7 +37,6 @@ generateMPICodeBuilder = Builder(action=generateMpi.execute)
 env.Append( BUILDERS = {'GenerateMPICode' : generateMPICodeBuilder})
 
 env.Append(LINKFLAGS = '-fopenmp')
-env.Append(LIBS = 'tinyxml pthread mpl'.split())
 env.Append(CCFLAGS = '-std=c++0x -DTIXML_USE_STL'.split())
 if env['debug'] == True:
     env.Append(CCFLAGS = '-g -O0 -Wall -DPANDORADEBUG'.split())

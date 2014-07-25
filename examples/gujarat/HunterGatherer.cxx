@@ -183,7 +183,7 @@ void HunterGatherer::serialize()
 	}
 	serializeAttribute("children", numChildren);
 	serializeAttribute("collected resources", _collectedResources);
-	serializeAttribute("starving %", getPercentageOfStarvingDays());
+	serializeAttribute("starving %", (int)getPercentageOfStarvingDays());
 	serializeAttribute("MoveHome actions", _moveHomeActionsExecuted);
 }
 

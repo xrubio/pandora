@@ -3,7 +3,7 @@
 namespace QuantumExperiment
 {
 
-QuantumWorldConfig::QuantumWorldConfig()
+QuantumWorldConfig::QuantumWorldConfig( const std::string & fileName ) : Config(fileName)
 {
 }
 
@@ -11,30 +11,19 @@ QuantumWorldConfig::~QuantumWorldConfig()
 {
 }
 
-void QuantumWorldConfig::extractParticularAttribs(TiXmlElement * root)
+void QuantumWorldConfig::loadParams()
 {
-	//environment
-	TiXmlElement * element = root->FirstChildElement("environment");
-	retrieveAttributeMandatory(element, "width", _size._width);
-	retrieveAttributeMandatory(element, "height", _size._height);
-	
 	// agents
-	element = root->FirstChildElement("agents");
-	retrieveAttributeMandatory(element, "num", _numAgents);
-	retrieveAttributeMandatory(element, "neededResources", _neededResources);
-	retrieveAttributeMandatory(element, "perfectInformation", _perfectInformation);
-	retrieveAttributeMandatory(element, "riskAversion", _riskAversion);
+    _numAgents = getParamInt("agents", "num");
+    _neededResources = getParamInt("agents", "neededResources");
+    _perfectInformation = getParamBool("agents", "perfectInformation");
+    _riskAversion = getParamFloat("agents", "riskAversion");
 
 	//mdp
-	TiXmlElement * child = element->FirstChildElement("mdp");
-	retrieveAttributeMandatory(child, "horizon", _horizon);
-	retrieveAttributeMandatory(child, "width", _width);	
-	retrieveAttributeMandatory(child, "explorationBonus", _explorationBonus);	
-}
-
-const Engine::Size<int> & QuantumWorldConfig::getSize() const
-{
-	return _size;
+    _horizon = getParamInt("agents/mdp", "horizon");
+    _width = getParamInt("agents/mdp", "width");
+    _explorationBonus = getParamInt("agents/mdp", "explorationBonus");
 }
 
 } // namespace QuantumExperiment
+

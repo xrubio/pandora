@@ -5,7 +5,6 @@
 
 #include "MoveAction.hxx"
 #include "QuantumWorld.hxx"
-#include "QuantumWorldConfig.hxx"
 #include "DecisionModel.hxx"
 
 namespace QuantumExperiment

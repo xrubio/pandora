@@ -3,7 +3,6 @@
 
 #include <GujaratWorld.hxx>
 #include <OriginalDemographics.hxx>
-#include <CaloricRequirementsTable.hxx>
 #include <GujaratConfig.hxx>
 #include <Logger.hxx>
 #include <GeneralState.hxx>

@@ -27,6 +27,7 @@
 #include <Logger.hxx>
 #include <sstream>
 #include <cstring>
+#include <tinyxml.h>
 
 namespace Engine
 {

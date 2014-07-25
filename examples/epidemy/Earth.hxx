@@ -7,6 +7,15 @@
 namespace Examples 
 {
 
+enum Rasters
+{
+    eDem,
+    ePopulation,
+    eHumans,
+    eNewCases,
+    eZombies
+};
+
 class EarthConfig;
 
 class Earth : public Engine::World
@@ -16,8 +25,6 @@ class Earth : public Engine::World
 
 	std::list<Engine::Point2D<int> > _newCases;
 	void stepEnvironment();
-
-	int _indexZombies;
 public:
 	Earth( EarthConfig * config, Engine::Scheduler * scheduler = 0);
 	virtual ~Earth();

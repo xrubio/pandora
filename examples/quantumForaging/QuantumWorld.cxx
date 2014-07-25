@@ -1,10 +1,14 @@
-#include <QuantumWorld.hxx>
+#include "QuantumWorld.hxx"
+
 #include "Forager.hxx"
+#include "QuantumWorldConfig.hxx"
+#include <GeneralState.hxx>
+#include <Statistics.hxx>
 
 namespace QuantumExperiment
 {
 
-QuantumWorld::QuantumWorld(const QuantumWorldConfig & config, Engine::Simulation & simulation, Engine::Scheduler * scheduler ) : World(simulation, scheduler, false), _config(config)
+QuantumWorld::QuantumWorld( QuantumWorldConfig * config, Engine::Scheduler * scheduler ) : World(config, scheduler, false)
 {
 }
 
@@ -14,22 +18,23 @@ QuantumWorld::~QuantumWorld()
 
 void QuantumWorld::createAgents()
 {
-	for(int i=0; i<_config._numAgents; i++)
+    const QuantumWorldConfig & qConfig = (const QuantumWorldConfig &)getConfig();
+	for(int i=0; i<qConfig._numAgents; i++)
 	{
 		std::ostringstream oss;
 		oss << "Forager_"<<i;
 		Forager * forager = 0;
-		if(_config._riskAversion!=-1)
+		if(qConfig._riskAversion!=-1)
 		{
-			forager = new Forager(oss.str(), _config._neededResources, _config._perfectInformation, _config._riskAversion);
+			forager = new Forager(oss.str(), qConfig._neededResources, qConfig._perfectInformation, qConfig._riskAversion);
 		}
 		else
 		{
-			float riskAversion = (float)Engine::GeneralState::statistics().getUniformDistValue(0,100)/100.0f;
-			forager = new Forager(oss.str(), _config._neededResources, _config._perfectInformation, riskAversion);
+			float riskAversion = Engine::GeneralState::statistics().getUniformDistValue();
+			forager = new Forager(oss.str(), qConfig._neededResources, qConfig._perfectInformation, riskAversion);
 		}
 
-		forager->configureMDP(_config._horizon, _config._width, _config._explorationBonus);	
+		forager->configureMDP(qConfig._horizon, qConfig._width, qConfig._explorationBonus);	
 		addAgent(forager);
 		forager->setRandomPosition();
 		forager->createKnowledge();
@@ -38,6 +43,7 @@ void QuantumWorld::createAgents()
 
 void QuantumWorld::createRasters()
 {	
+    const QuantumWorldConfig & qConfig = (const QuantumWorldConfig &)getConfig();
 	registerDynamicRaster("resources", true, eResources);
 	getDynamicRaster(eResources).setInitValues(0, std::numeric_limits<int>::max(), 0);
 
@@ -48,7 +54,7 @@ void QuantumWorld::createRasters()
 		getDynamicRaster(eResources).setMaxValue(index, value);
 	}	
     
-    for(int i=0; i<_config._numAgents; i++)
+    for(int i=0; i<qConfig._numAgents; i++)
 	{
 		std::ostringstream oss;
 		oss << "Forager_"<<i;

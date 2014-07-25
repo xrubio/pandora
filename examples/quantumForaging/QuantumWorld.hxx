@@ -2,16 +2,11 @@
 #define __QuantumWorld_hxx
 
 #include <World.hxx>
-#include <GeneralState.hxx>
-#include "QuantumWorldConfig.hxx"
-
-namespace Engine
-{
-	class Simulation;
-}
 
 namespace QuantumExperiment 
 {
+
+class QuantumWorldConfig;
 
 enum Rasters
 {
@@ -22,13 +17,11 @@ enum Rasters
 
 class QuantumWorld: public Engine::World
 {
-	const QuantumWorldConfig & _config;
-
 	void createAgents();
 	void createRasters();
 
 public:
-	QuantumWorld( const QuantumWorldConfig &config, Engine::Simulation & simulation, Engine::Scheduler * scheduler = 0);
+	QuantumWorld( QuantumWorldConfig * config, Engine::Scheduler * scheduler = 0);
 	virtual ~QuantumWorld();
 	void stepEnvironment();
 };

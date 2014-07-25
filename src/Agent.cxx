@@ -182,5 +182,12 @@ void Agent::setRandomPosition()
 	_position = _world->getRandomPosition();
 }
 
+void Agent::changeType( const std::string & type )
+{
+    std::string oldType = getType();
+    size_t startPos = _id.find(oldType);
+    _id.replace(startPos, oldType.length(), type);
+}
+
 } // namespace Engine
 

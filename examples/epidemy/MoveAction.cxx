@@ -4,6 +4,7 @@
 #include <World.hxx>
 #include <GeneralState.hxx>
 #include <Agent.hxx>
+#include "Earth.hxx"
 
 namespace Examples
 {
@@ -26,7 +27,7 @@ void MoveAction::execute( Engine::Agent & agent )
 	int modY = Engine::GeneralState::statistics().getUniformDistValue(-10,10);
 	newPosition._y += modY;
 
-	if(world->checkPosition(newPosition) && world->getValue("dem", newPosition)>-1)
+	if(world->checkPosition(newPosition) && world->getValue(eDem, newPosition)>-1)
 	{
 		agent.setPosition(newPosition);
 	}

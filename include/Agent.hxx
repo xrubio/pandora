@@ -135,6 +135,7 @@ public:
 	AttributesList::iterator endFloatAttributes(){ return _floatAttributes.end(); }
 
     virtual void registerAttributes(){}
+    void changeType( const std::string & newType );
 };
 
 } // namespace Engine
