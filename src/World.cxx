@@ -94,10 +94,11 @@ void World::updateRasterToMaxValues( const int & index )
 void World::addAgent( Agent * agent, bool executedAgent )
 {
 	agent->setWorld(this);
-	_agents.push_back(AgentPtr(agent));
+    AgentPtr agentPtr(agent);
+	_agents.push_back(agentPtr);
 	if(executedAgent)
 	{
-		_scheduler->agentAdded(agent, executedAgent);
+		_scheduler->agentAdded(agentPtr, executedAgent);
 	}
 	
     std::stringstream logName;
