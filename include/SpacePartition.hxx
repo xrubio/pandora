@@ -56,7 +56,7 @@ class SpacePartition : public Scheduler
 	Point2D<int> _localRasterSize;
 
 	//! map of already executed agents
-	std::map<std::string, Agent *> _executedAgentsHash;	
+	std::map<std::string, std::weak_ptr<Agent> > _executedAgentsHash;	
 
 	//! position of World inside global limits 
 	Point2D<int> _worldPos;
@@ -132,7 +132,7 @@ class SpacePartition : public Scheduler
 	bool _finalize;
 
 	//! this method returns true if the agent is already in executedAgents list
-	bool hasBeenExecuted( Agent * agent );
+	bool hasBeenExecuted( const std::string & id ) const;
 	//! return an agent, if it is in the list of ghosts 
 	AgentsList::iterator getGhostAgent( const std::string & id );
 	//! this list has the agents that need to be removed at the end of step.
@@ -141,7 +141,7 @@ class SpacePartition : public Scheduler
 	AgentsList::iterator getOwnedAgent( const std::string & id );
 	
 	//! true if the agent is in the list of agents to remove
-	bool willBeRemoved( Agent * agent );
+	bool willBeRemoved( const std::string & id );
 	double _initialTime;
 	//! send overlapping data to neighbours before run
 	void initOverlappingData();
@@ -168,7 +168,7 @@ public:
 	//! responsible for executing the agents and update world 
 	void executeAgents();
 
-	void agentAdded( Agent * agent, bool executedAgent );
+	void agentAdded( AgentPtr agent, bool executedAgent );
 	void removeAgents();
 	void removeAgent(Agent * agent);
 	

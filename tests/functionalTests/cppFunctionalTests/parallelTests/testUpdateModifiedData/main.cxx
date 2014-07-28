@@ -26,13 +26,13 @@
 #include <iostream>
 #include <cstdlib>
 
-// check that data is correctly updated to overlapping nodes when it is modified during running time
+// check that data is correctly updated to overlapping nodes when it is modified during createRasters 
 
 int main(int argc, char *argv[])
 {
 	try
 	{
-		Test::TestWorld world(new Engine::Config(Engine::Size<int>(64,64), 4), world.useSpacePartition(4));
+		Test::TestWorld world(new Engine::Config(Engine::Size<int>(64,64), 1), world.useSpacePartition(4));
 		world.initialize(argc, argv);
 		world.run();
 	}

@@ -38,7 +38,6 @@ class TestWorld : public Engine::World
 public:
 	TestWorld( Engine::Config * config, Engine::Scheduler * scheduler = 0 );
 	virtual ~TestWorld();
-	void stepEnvironment();
 };
 
 } // namespace Test 

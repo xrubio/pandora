@@ -42,19 +42,7 @@ TestWorld::~TestWorld()
 void TestWorld::createRasters()
 {	
 	registerDynamicRaster("test", true);
-	getDynamicRaster("test").setInitValues(0, 2, 0);
-}
-
-void TestWorld::stepEnvironment()
-{
-	assert(getValue("test", Engine::Point2D<int>(0,0))==std::min(2,_step));
-	if(_step==5)
-	{
-	  for( auto index : getBoundaries())
-	  {
-	    setMaxValue("test", index, 4);	    
-	  }
-	}
+	getDynamicRaster("test").setInitValues(0, getId(), 0);
 }
 
 } // namespace Test 

@@ -11,9 +11,10 @@ namespace Engine
 
 class Agent;
 
-typedef std::list< std::shared_ptr<Agent> > AgentsList;
-typedef std::vector< std::shared_ptr<Agent> > AgentsVector;
-	
+typedef std::shared_ptr<Agent> AgentPtr;
+typedef std::list< AgentPtr > AgentsList;
+typedef std::vector< AgentPtr > AgentsVector;
+
 //! List of Mpi messages sent by the scheduler
 enum MpiMessageType
 {

@@ -26,7 +26,7 @@
 #include <assert.h>
 #include <sstream>
 #include <Config.hxx>
-
+#include <iostream>
 namespace Test
 {
 
@@ -40,14 +40,13 @@ TestWorld::~TestWorld()
 
 void TestWorld::stepEnvironment()
 {
-	Engine::Agent * baseAgent = getAgent("TestAgent_0");
-	if(baseAgent)
-	{
-		Engine::Point2D<int> position(getCurrentStep(), getCurrentStep());
-		assert(position._x==baseAgent->getPosition()._x);
-		assert(position._y==baseAgent->getPosition()._y);
-	}
-	
+    Engine::Agent * baseAgent = getAgent("TestAgent_0");
+    if(baseAgent)
+    {
+        Engine::Point2D<int> position(getCurrentStep(), getCurrentStep());
+        assert(position==baseAgent->getPosition());
+    }
+
 	baseAgent = getAgent("TestAgent_1");
 	if(baseAgent)
 	{

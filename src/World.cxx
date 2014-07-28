@@ -94,14 +94,14 @@ void World::updateRasterToMaxValues( const int & index )
 void World::addAgent( Agent * agent, bool executedAgent )
 {
 	agent->setWorld(this);
-	_agents.push_back(std::shared_ptr<Agent>(agent));
+	_agents.push_back(AgentPtr(agent));
 	if(executedAgent)
 	{
 		_scheduler->agentAdded(agent, executedAgent);
 	}
 	
-	std::stringstream logName;
-	logName << "agents_" << getId() << "_" << agent->getId();
+    std::stringstream logName;
+	logName << "simulation_" << getId();
 	log_EDEBUG( logName.str(), "agent: " << agent << " added at time step: " << getCurrentTimeStep());
 }
 

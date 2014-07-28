@@ -12,9 +12,9 @@ for test in listTests:
         os.system('rm -rf logs mpiCode data logClean logCompilation logExecution')
         os.system('scons -c > logClean')
         print('compiling test: ',test)
-        os.system('scons debug=1 > logCompilation')
+        os.system('scons > logCompilation')
         print('executing test: ',test)
-        os.system('./'+test + ' > logExecution')
+        os.system('mpirun -np 4 ./'+test + ' > logExecution')
         print('done: ',test)
         os.chdir('../')
 

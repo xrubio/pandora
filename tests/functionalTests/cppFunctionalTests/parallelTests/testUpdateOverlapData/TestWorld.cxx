@@ -55,6 +55,7 @@ void TestWorld::stepEnvironment()
 		Engine::Point2D<int> pos(i,i);
 		if(getBoundaries().contains(pos))
 		{
+            std::cout << getId() << " i: " << i << std::endl;
 			assert(getValue("test", pos)==i);
 		}
 	}

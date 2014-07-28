@@ -58,7 +58,7 @@ void TestAgent::updateState()
 
 	if(_world->checkPosition(newPosition))
 	{
-	  setPosition(_position);
+	  setPosition(newPosition);
 	}
 }
 

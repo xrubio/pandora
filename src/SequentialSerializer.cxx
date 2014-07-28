@@ -257,7 +257,7 @@ void SequentialSerializer::init( World & world )
 	serializeStaticRasters(staticRasters);
 }
 
-void SequentialSerializer::serializeAgents( const int & step, const AgentsList::const_iterator beginAgents, const AgentsList::const_iterator endAgents )
+void SequentialSerializer::serializeAgents( const int & step, const AgentsList::const_iterator & beginAgents, const AgentsList::const_iterator & endAgents )
 {
 	int i=0;
 	for(AgentsList::const_iterator it=beginAgents; it!=endAgents; it++)
@@ -302,7 +302,7 @@ void SequentialSerializer::finish()
 
 void SequentialSerializer::finishAgentsSerialization( int step)
 {
-	for(StringAttributesMap::iterator it=_stringAttributes.begin(); it!=_stringAttributes.end(); it++)
+	for(std::map<std::string, int>::iterator it=_agentIndexMap.begin(); it!=_agentIndexMap.end(); it++)
 	{
 		executeAgentSerialization(it->first, step);
 	}

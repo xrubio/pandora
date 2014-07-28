@@ -94,18 +94,18 @@ void TestWorld::createAgents()
 	if(getId()==1)
 	{
 		TestAgent * agentVertical2 = new TestAgent("TestAgent_1", false);
-		Engine::Point2D<int> pos(0,0);
+		Engine::Point2D<int> pos(32,0);
 		addAgent(agentVertical2);
-		agentVertical2->setPosition(pos+getBoundaries()._origin);
+		agentVertical2->setPosition(pos);
 		return;
 
 	}
 	if(getId()==2)
 	{
 		TestAgent * agentHorizontal2 = new TestAgent("TestAgent_3", true);
-		Engine::Point2D<int> pos(0,0);
+		Engine::Point2D<int> pos(32,0);
 		addAgent(agentHorizontal2);
-		agentHorizontal2->setPosition(pos+getBoundaries()._origin);
+		agentHorizontal2->setPosition(pos);
 		return;
 	}
 }
