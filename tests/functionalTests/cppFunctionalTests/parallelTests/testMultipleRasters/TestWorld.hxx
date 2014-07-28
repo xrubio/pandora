@@ -35,9 +35,8 @@ namespace Test
 class TestWorld : public Engine::World
 {
 	void createRasters();
-	int _numRasters;
 public:
-	TestWorld( Engine::Config * config, Engine::Scheduler * scheduler = 0, const int & numRasters );
+	TestWorld( Engine::Config * config, Engine::Scheduler * scheduler = 0 );
 	virtual ~TestWorld();
 };
 

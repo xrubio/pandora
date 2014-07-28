@@ -35,7 +35,7 @@
 namespace Test
 {
 
-TestWorld::TestWorld( Engine::Config * config, Engine::Scheduler * scheduler, const int & numRasters ) : World(config, scheduler, true), _numRasters(numRasters) 
+TestWorld::TestWorld( Engine::Config * config, Engine::Scheduler * scheduler ) : World(config, scheduler, true)
 {
 }
 
@@ -45,7 +45,8 @@ TestWorld::~TestWorld()
 
 void TestWorld::createRasters()
 {	
-	for(int i=0; i<_numRasters; i++)
+    int numRasters = 5;
+	for(int i=0; i<numRasters; i++)
 	{
 		std::stringstream logName;
 		logName << "raster_" << i;
