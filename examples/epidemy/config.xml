@@ -2,11 +2,11 @@
 <config>  
 	<!-- Global simulation parameters -->
 	<output resultsFile="data/epidemy.h5" logsDir="./logs"/>
-	<numSteps value="5" serializeResolution="1"/>
+	<numSteps value="100" serializeResolution="1"/>
 	<size width="260" height="260"/>
     <!-- raster with dem, population values and scale of simulation real individuals to sim ratio -->
     <inputData dem="resources/dem_1km.tiff" population="resources/population.tiff" scale="100"/>
     <!-- location and number of first outbreak, 168/164 is Barcelona -->
-    <outbreak initInfected="50" x="168" y="164" virulence="1"/>
+    <outbreak initInfected="50" x="168" y="164" virulence="0.1"/>
 </config>
 

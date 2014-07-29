@@ -81,9 +81,13 @@ void Earth::createAgents()
 		addAgent(newZombie);
 		newZombie->setPosition(earthConfig._firstCase);
 	}
-	setValue(eNewCases, earthConfig._firstCase, earthConfig._numCases);
-	setValue(eZombies, earthConfig._firstCase, earthConfig._numCases);
-	log_INFO(logName.str(), getWallTime() << " " << earthConfig._numCases << " zombies created at infection focus: " << earthConfig._firstCase);
+
+    if(getBoundaries().contains(earthConfig._firstCase))
+    {
+	    setValue(eNewCases, earthConfig._firstCase, earthConfig._numCases);
+    	setValue(eZombies, earthConfig._firstCase, earthConfig._numCases);
+	    log_INFO(logName.str(), getWallTime() << " " << earthConfig._numCases << " zombies created at infection focus: " << earthConfig._firstCase);
+    }
 }
 
 float Earth::getZombieVirulence() const
@@ -111,7 +115,7 @@ void Earth::stepEnvironment()
 	}
 	for(Engine::AgentsList::const_iterator it=beginAgents(); it!=endAgents(); it++)
 	{
-		if(!(*it)->exists())
+		if(!(*it)->exists() || !getBoundaries().contains((*it)->getPosition()))
 		{
 			continue;
 		}

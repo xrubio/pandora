@@ -22,9 +22,9 @@ void MoveAction::execute( Engine::Agent & agent )
 	Engine::World * world = agent.getWorld();
 	
 	Engine::Point2D<int> newPosition = agent.getPosition();
-	int modX = Engine::GeneralState::statistics().getUniformDistValue(-10,10);
+	int modX = Engine::GeneralState::statistics().getUniformDistValue(-1,1);
 	newPosition._x += modX;
-	int modY = Engine::GeneralState::statistics().getUniformDistValue(-10,10);
+	int modY = Engine::GeneralState::statistics().getUniformDistValue(-1,1);
 	newPosition._y += modY;
 
 	if(world->checkPosition(newPosition) && world->getValue(eDem, newPosition)>-1)

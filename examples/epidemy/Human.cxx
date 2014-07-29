@@ -14,7 +14,7 @@
 namespace Examples
 {
 
-Human::Human( const std::string & id, bool infected ) : Agent(id), _threatLevel(0.0f), _infected(infected), _hasHumans(false), _remainingTime(10)
+Human::Human( const std::string & id, bool infected ) : Agent(id), _threatLevel(0.0f), _infected(infected), _hasHumans(false), _remainingTime(30)
 {
 }
 
@@ -68,7 +68,7 @@ void Human::selectActions()
     }
     if(_hasHumans)
 	{
-		if(Engine::GeneralState::statistics().getUniformDistValue()<0.1)
+		if(Engine::GeneralState::statistics().getUniformDistValue()>_threatLevel)
 		{
 			_actions.push_back(new MoveAction());
 		}
