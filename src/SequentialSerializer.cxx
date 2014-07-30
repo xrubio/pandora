@@ -513,6 +513,12 @@ void SequentialSerializer::registerType( Agent * agent )
 			log_DEBUG(logName.str(), "\tnew int attribute: " << *it);
 			newTypeIntMap->insert( make_pair(*it, new std::vector<int>() ));
 			hid_t idDataset= H5Dcreate(stepGroup, (*it).c_str(), H5T_NATIVE_INT, agentFileSpace, H5P_DEFAULT, propertyListId, H5P_DEFAULT);
+            if(idDataset<0)
+            {
+                std::stringstream ossErr;
+        		ossErr << "SequentialSerializer::registerType - dataset not created for agent: " << agent << " step group: " << oss.str() << " and int attribute: " << *it;
+        		throw Exception(ossErr.str());
+            }   
 			H5Dclose(idDataset);
 		}      
         
@@ -520,7 +526,13 @@ void SequentialSerializer::registerType( Agent * agent )
 		{	
 			log_DEBUG(logName.str(), "\tnew float attribute: " << *it);
 			newTypeFloatMap->insert( make_pair(*it, new std::vector<float>() ));
-			hid_t idDataset= H5Dcreate(stepGroup, (*it).c_str(), H5T_NATIVE_FLOAT, agentFileSpace, H5P_DEFAULT, propertyListId, H5P_DEFAULT);
+			hid_t idDataset= H5Dcreate(stepGroup, (*it).c_str(), H5T_NATIVE_FLOAT, agentFileSpace, H5P_DEFAULT, propertyListId, H5P_DEFAULT);    
+            if(idDataset<0)
+            {
+                std::stringstream ossErr;
+        		ossErr<< "SequentialSerializer::registerType - dataset not created for agent: " << agent << " step group: " << oss.str() << " and float attribute: " << *it;
+        		throw Exception(ossErr.str());
+            }
 			H5Dclose(idDataset);
 		}
 
@@ -531,7 +543,13 @@ void SequentialSerializer::registerType( Agent * agent )
 		{		
 			log_DEBUG(logName.str(), "\tnew string attribute: " << *it);
 			newTypeStringMap->insert( make_pair(*it, new std::vector<std::string>() ));
-			hid_t idDataset= H5Dcreate(stepGroup, (*it).c_str(), idType, agentFileSpace, H5P_DEFAULT, propertyListId, H5P_DEFAULT);
+			hid_t idDataset= H5Dcreate(stepGroup, (*it).c_str(), idType, agentFileSpace, H5P_DEFAULT, propertyListId, H5P_DEFAULT);  
+            if(idDataset<0)
+            {
+                std::stringstream ossErr;
+        		ossErr<< "SequentialSerializer::registerType - dataset not created for agent: " << agent << " step group: " << oss.str() << " and string attribute: " << *it;
+        		throw Exception(ossErr.str());
+            }
 			H5Dclose(idDataset);
 		}
 		H5Gclose(stepGroup);
