@@ -33,7 +33,6 @@ class TestAgentB: public Engine::Agent
 	int _testValueB; // MpiBasicAttribute
 
 	void move();
-	void serialize();
 
 public:
 	TestAgentB( const std::string & id );
@@ -41,6 +40,7 @@ public:
 	
 	void updateState();
 	const int & getTestValueB();
+
 
 	////////////////////////////////////////////////
 	// This code has been automatically generated //

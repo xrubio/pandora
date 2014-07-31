@@ -151,7 +151,7 @@ void Herder::copyValue( const Herder & origin, const Herder & target, const Engi
 	Engine::DynamicRaster & resourcesTarget = _world->getDynamicRaster(target.getResourcesMap());
 
 	knowledgeTarget.setValue(index, knowledgeOrigin.getValue(index));
-	resourcesTarget.setMaxValue(index, resourcesOrigin.getMaxValueAt(index));
+	resourcesTarget.setMaxValue(index, resourcesOrigin.getMaxValue(index));
 	resourcesTarget.setValue(index, resourcesOrigin.getValue(index));
 }
 

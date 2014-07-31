@@ -140,9 +140,9 @@ public:
 	void setMaxValue( const int & index, const Point2D<int> & position, int value );
 
 	//! gets the maximum allowed value of raster "key" in global position "position"
-	int getMaxValueAt( const std::string & key, const Point2D<int> & position ) const;
+	int getMaxValue( const std::string & key, const Point2D<int> & position ) const;
 	//! gets the maximum allowed value of raster "index" in global position "position"
-	int getMaxValueAt( const int & index, const Point2D<int> & position ) const;
+	int getMaxValue( const int & index, const Point2D<int> & position ) const;
 
 	// get a raster name from its index
 	const std::string & getRasterName( const int & index ) const;

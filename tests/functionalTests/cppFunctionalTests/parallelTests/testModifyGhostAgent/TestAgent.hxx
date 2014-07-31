@@ -30,8 +30,6 @@ namespace Test
 
 class TestAgent: public Engine::Agent
 {	
-	void serialize();
-
 	bool _flag; // MpiBasicAttribute
 
 	void updateState();
@@ -41,6 +39,7 @@ public:
 	
 	void setFlag( const bool & flag );
 	bool getFlag();
+
 
 	////////////////////////////////////////////////
 	// This code has been automatically generated //

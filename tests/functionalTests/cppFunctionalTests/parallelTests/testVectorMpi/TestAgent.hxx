@@ -40,11 +40,11 @@ public:
 	TestAgent( const std::string & id, bool moveToDownLeft );
 	virtual ~TestAgent();
 	
-	void serialize();
 	void updateState();
 
 	std::vector<int> & getVectorInt();
 	std::vector<float> & getVectorFloat();
+
 
 	////////////////////////////////////////////////
 	// This code has been automatically generated //

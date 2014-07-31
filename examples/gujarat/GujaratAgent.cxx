@@ -3,7 +3,6 @@
 
 #include <GujaratWorld.hxx>
 #include <OriginalDemographics.hxx>
-#include <CaloricRequirementsTable.hxx>
 #include <GujaratConfig.hxx>
 #include <Logger.hxx>
 #include <GeneralState.hxx>
@@ -33,7 +32,7 @@ int	GujaratAgent::convertBiomassToCalories( int biomass ) const
 
 int	GujaratAgent::computeEffectiveBiomassForaged( int nominal ) const
 {
-	return Engine::GeneralState::statistics().getNormalDistValue(0, nominal);
+	return Engine::GeneralState::statistics().getNormalDistValueMinMax(0, nominal);
 	
 }
 

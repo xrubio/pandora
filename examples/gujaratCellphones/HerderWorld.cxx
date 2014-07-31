@@ -103,7 +103,7 @@ void HerderWorld::createRasters()
 		    value = Engine::GeneralState::statistics().getUniformDistValue(0, 10);
         }
         totalValue += value;
-		getDynamicRaster(eSoilQuality).setMaxValue(index, value);
+		setMaxValue(eSoilQuality, index, value);
 	}
     std::cout << "total value: " << totalValue << std::endl;
 	updateRasterToMaxValues(eSoilQuality);

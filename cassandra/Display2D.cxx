@@ -39,7 +39,6 @@
 
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
-
 namespace GUI
 {
 
@@ -94,26 +93,21 @@ QSize Display2D::getRealSize() const
 
 void Display2D::paintEvent(QPaintEvent *event)
 {
-	if(!_simulationRecord || _simulationRecord->getLoadingPercentageDone()!=100.0f) //|| _orderedRasters.empty())
+	if(!_simulationRecord || _simulationRecord->getLoadingPercentageDone()!=100.0f)
 	{
 		return;
 	}
-	QPixmap imageToDraw(getRealSize());
-	//QImage imageToDraw(_simulationRecord->getSize()*_zoom, _simulationRecord->getSize()*_zoom, QImage::Format_ARGB32_Premultiplied);
+	QPixmap imageToDraw(QSize(10*_simulationRecord->getSize()._width, 10*_simulationRecord->getSize()._height));
 	QPainter painter(&imageToDraw);
-	QPen pen;
-	pen.setWidth(_zoom);
+    painter.setPen(Qt::NoPen);
 
-	imageToDraw.fill(QColor(100,100,100));
-
+	imageToDraw.fill(QColor("#E6D298"));
+ 
 	if(!_orderedRasters.empty())
 	{
-		Engine::StaticRaster & rasterTmp(_simulationRecord->getRasterTmp(*(_orderedRasters.begin()), _viewedStep));
-		Engine::Size<int> size = rasterTmp.getSize();
-
-		for(int i=0; i<size._width; i++)
+		for(int i=0; i<_simulationRecord->getSize()._width; i++)
 		{
-			for(int j=0; j<size._height; j++)
+			for(int j=0; j<_simulationRecord->getSize()._height; j++)
 			{
 				std::list<std::string>::const_iterator it =_orderedRasters.end();
 				while(it!=_orderedRasters.begin())
@@ -123,6 +117,7 @@ void Display2D::paintEvent(QPaintEvent *event)
 					Engine::StaticRaster & raster(_simulationRecord->getRasterTmp(*it, _viewedStep));
 					int value = raster.getValue(Engine::Point2D<int>(i,j));
 			
+					QBrush brush(Qt::SolidPattern);
 					if(rasterConfig->isTransparentEnabled() && value==rasterConfig->getTransparentValue())
 					{
 						continue;
@@ -131,15 +126,15 @@ void Display2D::paintEvent(QPaintEvent *event)
 					if(raster.hasColorTable())
 					{
 						Engine::ColorEntry color = raster.getColorEntry(value);
-						pen.setColor(QColor(color._r, color._g, color._b, color._alpha));
+						brush.setColor(QColor(color._r, color._g, color._b, color._alpha));
 					}
 					else
 					{
 						ColorSelector & colorSelector = rasterConfig->getColorRamp();
-						pen.setColor(colorSelector.getColor(value));
+						brush.setColor(colorSelector.getColor(value));
 					}
-					painter.setPen(pen);
-					painter.drawPoint(i*_zoom+_zoom/2,j*_zoom+_zoom/2);
+					painter.setBrush(brush);
+                    painter.drawRect(10*i, 10*j, 10, 10);
 					break;
 				}
 			}
@@ -150,7 +145,7 @@ void Display2D::paintEvent(QPaintEvent *event)
 	{
 		QPainter screenPainter(this);	
 		screenPainter.save();
-		screenPainter.drawPixmap(_offset, imageToDraw); //.scaled(_simulationRecord->getSize()*_zoom, _simulationRecord->getSize()*_zoom));
+		screenPainter.drawPixmap(_offset, imageToDraw.scaled(getRealSize()));
 		screenPainter.restore();
 		return;
 	}
@@ -212,16 +207,14 @@ void Display2D::paintEvent(QPaintEvent *event)
 						painter.setBrush(brush);
 					}
 					int size = agentConfig->getSize();
-					int xPos = x*_zoom - ((size-1)*_zoom)/2;
-					int yPos = y*_zoom - ((size-1)*_zoom)/2;
-					painter.drawEllipse(xPos, yPos, size*_zoom, size*_zoom);
+					painter.drawEllipse(10*x-5*(size-1),10*y-5*(size-1),10*size, 10*size);
 				}
 			}
 		}
 	}
 	QPainter screenPainter(this);	
 	screenPainter.save();
-	screenPainter.drawPixmap(_offset, imageToDraw); //.scaled(_simulationRecord->getSize()*_zoom, _simulationRecord->getSize()*_zoom));
+    screenPainter.drawPixmap(_offset, imageToDraw.scaled(getRealSize()));
 	screenPainter.restore();
 }
 
@@ -329,8 +322,6 @@ void Display2D::mouseDoubleClickEvent(QMouseEvent *event)
     position._x /= _zoom;
     position._y /= _zoom;
 
-    std::cout << "position._x " << position._x << " position._y " << position._y << std::endl;
-
     agentList->close();
     agentList->clear();
 
@@ -421,7 +412,7 @@ bool Display2D::event(QEvent *event)
 	{
 		QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
 		Engine::Point2D<int> position(helpEvent->pos().x()-_offset.x(), helpEvent->pos().y()-_offset.y());
-		// TODO program /= i *= in Engine::Point2D
+        
 		position._x /= _zoom;
 		position._y /= _zoom;
 
@@ -457,7 +448,6 @@ int Display2D::getRadiusSelection() const
 void Display2D::radiusSelectionModified(int radiusSelection)
 {
 	_radiusSelection = radiusSelection;
-	std::cout << "radius selection: " << _radiusSelection << std::endl;
 }
 
 void Display2D::setViewedStep( int viewedStep )

@@ -8,6 +8,7 @@
 #include <cstring>
 #include <Statistics.hxx>
 #include <GeneralState.hxx>
+#include <typedefs.hxx>
 
 namespace BattleSim
 {
@@ -60,7 +61,7 @@ void Bullet::updateState()
 
 bool Bullet::checkContinue( const Engine::Point2D<int> & newPos )
 {
-	Engine::World::AgentsVector targets = _world->getAgent(newPos);
+    Engine::AgentsVector targets = _world->getAgent(newPos);
 	// out of battlefield
 	if(targets.size()==0 || targets.at(0)->isType("blueBullet") || targets.at(0)->isType("redBullet"))
 	{
@@ -75,7 +76,7 @@ bool Bullet::checkContinue( const Engine::Point2D<int> & newPos )
 			return true;
 		}
 	}
-	Soldier * soldier = (Soldier*)targets.at(0);
+	Soldier * soldier = (Soldier*)targets.at(0).get();
 	// pass through ranks
 	if(_isBlueSide && soldier->isType("blueSoldier"))
 	{
@@ -121,12 +122,12 @@ void Bullet::registerAttributes()
 
 void Bullet::setMuzzleVelocity( const int & standardVelocity )
 {
-	_velocity = Engine::GeneralState::statistics().getNormalDistValue(standardVelocity-100, standardVelocity+100);
+	_velocity = Engine::GeneralState::statistics().getNormalDistValueMinMax(standardVelocity-100, standardVelocity+100);
 	// normal height
-	float height = Engine::GeneralState::statistics().getNormalDistValue(1.3f,1.6f);	
+	float height = Engine::GeneralState::statistics().getNormalDistValueMinMax(1.3f,1.6f);	
 	_fallingTime = sqrt(2*height/9.8f);
 	// we remove some time, due to resistance
-	_fallingTime -= Engine::GeneralState::statistics().getNormalDistValue(0.0f, 0.2f);
+	_fallingTime -= Engine::GeneralState::statistics().getNormalDistValueMinMax(0.0f, 0.2f);
 }
 
 } // namespace BattleSim

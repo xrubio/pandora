@@ -31,7 +31,6 @@ namespace Test
 class TestAgent: public Engine::Agent
 {	
 	void move();
-	void serialize();
 
 	bool _horizontalMovement; // MpiBasicAttribute
 	bool _evenTurn; // MpiBasicAttribute
@@ -42,8 +41,9 @@ public:
 	TestAgent( const std::string & id, const bool & horizontalMovement );
 	virtual ~TestAgent();
 	
-	bool isEvenTurn();
+	bool isEvenTurn() const;
 	void updateState();
+
 
 	////////////////////////////////////////////////
 	// This code has been automatically generated //

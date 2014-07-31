@@ -4,6 +4,7 @@
 #include <World.hxx>
 #include <GeneralState.hxx>
 #include <Agent.hxx>
+#include "Earth.hxx"
 
 namespace Examples
 {
@@ -21,12 +22,12 @@ void MoveAction::execute( Engine::Agent & agent )
 	Engine::World * world = agent.getWorld();
 	
 	Engine::Point2D<int> newPosition = agent.getPosition();
-	int modX = Engine::GeneralState::statistics().getUniformDistValue(-10,10);
+	int modX = Engine::GeneralState::statistics().getUniformDistValue(-1,1);
 	newPosition._x += modX;
-	int modY = Engine::GeneralState::statistics().getUniformDistValue(-10,10);
+	int modY = Engine::GeneralState::statistics().getUniformDistValue(-1,1);
 	newPosition._y += modY;
 
-	if(world->checkPosition(newPosition) && world->getValue("dem", newPosition)>-1)
+	if(world->checkPosition(newPosition) && world->getValue(eDem, newPosition)>-1)
 	{
 		agent.setPosition(newPosition);
 	}

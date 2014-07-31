@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 		{
 			fileName = argv[1];
 		}
-		Examples::Earth earth( new Examples::EarthConfig(fileName), earth.useOpenMPSingleNode());
+		Examples::Earth earth( new Examples::EarthConfig(fileName), earth.useSpacePartition(15));
 	
 		earth.initialize(argc,argv);
 		earth.run();

@@ -30,7 +30,6 @@ namespace Test
 class TestAgent: public Engine::Agent
 {
 	void move();
-	void serialize();
 
 	bool _horizontalMovement; // MpiBasicAttribute
 public:
@@ -38,6 +37,7 @@ public:
 	virtual ~TestAgent();
 	
 	void updateState();
+
 
 	////////////////////////////////////////////////
 	// This code has been automatically generated //

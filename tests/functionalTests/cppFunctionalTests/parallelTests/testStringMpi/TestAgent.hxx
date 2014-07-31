@@ -39,11 +39,11 @@ public:
 	TestAgent( const std::string & id, bool moveToDownLeft );
 	virtual ~TestAgent();
 	
-	void serialize();
 	void updateState();
 
 	void setMessage( const std::string & message );
 	const std::string & getMessage();
+
 
 	////////////////////////////////////////////////
 	// This code has been automatically generated //

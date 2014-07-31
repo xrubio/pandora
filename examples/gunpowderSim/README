@@ -6,7 +6,7 @@ The structure is as follows:
 
 - battle -> Simulation of the engagement
 - removeBullets -> Algorithm removing material evidence from the battlefield, modelling the effect of post-depositional processes
-- excavation -> Simulation of the archaeological fieldworks, with agents collecting musket bullets under different survey conditions
+- survey -> Simulation of the archaeological fieldworks, with agents collecting musket bullets under different survey conditions
 
 References:
 

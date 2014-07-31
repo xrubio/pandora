@@ -3,7 +3,6 @@
 
 #include <EarthConfig.hxx>
 #include <Human.hxx>
-#include <Zombie.hxx>
 #include <DynamicRaster.hxx>
 #include <Point2D.hxx>
 #include <GeneralState.hxx>
@@ -13,7 +12,7 @@
 namespace Examples 
 {
 
-Earth::Earth( EarthConfig * config, Engine::Scheduler * scheduler ) : World(config, scheduler, true), _indexZombies(0)
+Earth::Earth( EarthConfig * config, Engine::Scheduler * scheduler ) : World(config, scheduler, true)
 {
 }
 
@@ -24,19 +23,18 @@ Earth::~Earth()
 void Earth::createRasters()
 {
     const EarthConfig & earthConfig = (const EarthConfig&)getConfig();
-	registerStaticRaster("dem", true);
+	registerStaticRaster("dem", true, eDem);
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("dem"), earthConfig._demName, getBoundaries());	
 
-	registerStaticRaster("population", true);
+	registerStaticRaster("population", true, ePopulation);
 	Engine::GeneralState::rasterLoader().fillGDALRaster(getStaticRaster("population"), earthConfig._populationName, getBoundaries());		
-
-	registerDynamicRaster("humans", true);
+	registerDynamicRaster("humans", true, eHumans);
 	getDynamicRaster("humans").setInitValues(0, std::numeric_limits<int>::max(), 0);
 	
-	registerDynamicRaster("newCases", true);
+	registerDynamicRaster("newCases", true, eNewCases);
 	getDynamicRaster("newCases").setInitValues(0, std::numeric_limits<int>::max(), 0);
 	
-	registerDynamicRaster("zombies", true);
+	registerDynamicRaster("zombies", true, eZombies);
 	getDynamicRaster("zombies").setInitValues(0, std::numeric_limits<int>::max(), 0);
 
 }
@@ -50,40 +48,46 @@ void Earth::createAgents()
 
 	Engine::Point2D<int> index;
 	int totalHumans = 0;
+    int indexHumans = 0;
     for(auto index : getBoundaries())
     {
-        int numHumans = getValue("population", index);
+        int numHumans = getValue(ePopulation, index);
         if(numHumans>0)
         {
             int scaledHumans = 0;
             for(int i=0; i<numHumans; i=i+earthConfig._scale)
             {	
                 std::ostringstream oss;
-                oss << "Human_" << totalHumans+scaledHumans;
+                oss << "Human_" << indexHumans;
                 Human * newHuman = new Human(oss.str());
                 addAgent(newHuman);
                 newHuman->setPosition(index);
                 scaledHumans++;
+                indexHumans++;
             }
             totalHumans += scaledHumans;
-            log_INFO(logName.str(), getWallTime() << " created: " << scaledHumans << " humans at pos: " << index);
-            setValue("humans", index, scaledHumans);
+            log_DEBUG(logName.str(), getWallTime() << " created: " << scaledHumans << " humans at pos: " << index);
+            setValue(eHumans, index, scaledHumans);
         }
 	}
-	log_INFO(logName.str(), getWallTime() << " " << totalHumans << " humans created");
+	log_INFO(logName.str(), getWallTime() << " " << indexHumans << " humans created");
 
 	for(int i=0; i<earthConfig._numCases; i++)
 	{
 		std::ostringstream oss;
-		oss << "Zombie_" << _indexZombies;
-		Zombie * newZombie = new Zombie(oss.str());
+		oss << "Zombie_" << indexHumans;
+        indexHumans++;
+		Human * newZombie = new Human(oss.str(), true);
 		addAgent(newZombie);
 		newZombie->setPosition(earthConfig._firstCase);
-		_indexZombies++;
 	}
-	setValue("newCases", earthConfig._firstCase, earthConfig._numCases);
-	setValue("zombies", earthConfig._firstCase, earthConfig._numCases);
-	log_INFO(logName.str(), getWallTime() << " " << earthConfig._numCases << " zombies created at infection focus: " << earthConfig._firstCase);
+
+    if(getBoundaries().contains(earthConfig._firstCase))
+    {
+	    setValue(eNewCases, earthConfig._firstCase, earthConfig._numCases);
+    	setValue(eZombies, earthConfig._firstCase, earthConfig._numCases);
+	    log_INFO(logName.str(), getWallTime() << " " << earthConfig._numCases << " zombies created at infection focus: " << earthConfig._firstCase);
+    }
 }
 
 float Earth::getZombieVirulence() const
@@ -106,26 +110,25 @@ void Earth::stepEnvironment()
 
     for(auto index : getBoundaries())
     {
-    	setValue("humans", index, 0);
-	    setValue("zombies", index, 0);
+    	setValue(eHumans, index, 0);
+	    setValue(eZombies, index, 0);
 	}
-	for(Engine::AgentsList::const_iterator it=_agents.begin(); it!=_agents.end(); it++)
+	for(Engine::AgentsList::const_iterator it=beginAgents(); it!=endAgents(); it++)
 	{
-		const Engine::Agent & agent = **it;	
-		if(!agent.exists())
+		if(!(*it)->exists() || !getBoundaries().contains((*it)->getPosition()))
 		{
 			continue;
 		}
-		if(agent.isType("Human"))
+		if((*it)->isType("Human"))
 		{
-			int previousHumans = getValue("humans", agent.getPosition());
-			setValue("humans", agent.getPosition(), previousHumans+1);
+			int previousHumans = getValue(eHumans, (*it)->getPosition());
+			setValue(eHumans, (*it)->getPosition(), previousHumans+1);
 			totalHumans++;
 		}
-		else if(agent.isType("Zombie"))
+		else
 		{	
-			int previousZombies = getValue("zombies", agent.getPosition());
-			setValue("zombies", agent.getPosition(), previousZombies+1);
+			int previousZombies = getValue(eZombies, (*it)->getPosition());
+			setValue(eZombies, (*it)->getPosition(), previousZombies+1);
 			totalZombies++;
 		}
 	}

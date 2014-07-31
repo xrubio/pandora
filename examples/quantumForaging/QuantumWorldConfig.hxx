@@ -9,8 +9,6 @@ namespace QuantumExperiment
 
 class QuantumWorldConfig : public Engine::Config
 {
-    Engine::Size<int> _size;
-
 	// agents
 	int _numAgents;
 	int _neededResources;
@@ -25,13 +23,11 @@ class QuantumWorldConfig : public Engine::Config
 	int _explorationBonus;
 
 public:
-	QuantumWorldConfig();
+	QuantumWorldConfig( const std::string & fileName );
 	virtual ~QuantumWorldConfig();
-	void extractParticularAttribs(TiXmlElement *pRoot);
-	const Engine::Size<int> & getSize() const;
+	void loadParams(); 
 	
 	friend class QuantumWorld;
-	friend class Forager;
 };
 
 } // namespace QuantumExperiment

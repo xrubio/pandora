@@ -25,11 +25,12 @@
 #include <TestAgent.hxx>
 #include <assert.h>
 #include <iostream>
+#include <Config.hxx>
 
 namespace Test
 {
 
-TestWorld::TestWorld( Engine::Simulation & simulation ) : World( simulation, 1, true, "data/test.h5")
+TestWorld::TestWorld( Engine::Config * config, Engine::Scheduler * scheduler ) : World(config, scheduler, true)
 {
 }
 
@@ -37,7 +38,7 @@ TestWorld::~TestWorld()
 {
 }
 
-void TestWorld::stepAgents()
+void TestWorld::stepEnvironment()
 {
 	TestAgent * agent = (TestAgent*)getAgent("TestAgent_0");
 	if(agent)
@@ -70,15 +71,12 @@ void TestWorld::stepAgents()
 	}
 }
 
-void TestWorld::createRasters()
-{
-}
-
 void TestWorld::createAgents()
 {
-	if(_simulation.getId()==0)
+	if(getId()==0)
 	{
 		TestAgent * agent = new TestAgent("TestAgent_0", true);
+		addAgent(agent);
 		agent->setPosition(Engine::Point2D<int>(00,0));
 		agent->getVectorInt().resize(200);
 		agent->getVectorFloat().resize(100);
@@ -89,13 +87,13 @@ void TestWorld::createAgents()
 		for(int i=0; i<100; i++)
 		{
 			agent->getVectorFloat()[i] = i+0.5f;
-		}
-		addAgent(agent);
+		}		
 	}
-	if(_simulation.getId()==_simulation.getNumTasks()-1)
+	if(getId()==getNumTasks()-1)
 	{
 		TestAgent * agent = new TestAgent("test_1", false);
-		Engine::Point2D<int> pos(_simulation.getSize()-1, _simulation.getSize()-1);
+		addAgent(agent);
+		Engine::Point2D<int> pos(getConfig().getSize()._width-1, getConfig().getSize()._height-1);
 		agent->setPosition(pos);
 		agent->getVectorInt().resize(300);
 		agent->getVectorFloat().resize(50);
@@ -106,8 +104,7 @@ void TestWorld::createAgents()
 		for(int i=0; i<50; i++)
 		{
 			agent->getVectorFloat()[i] = 2*i+0.3f;
-		}
-		addAgent(agent);
+		}		
 		
 		return;
 	}

@@ -31,13 +31,13 @@ namespace Test
 class TestAgent: public Engine::Agent
 {	
 	void move();
-	void serialize();
 
 public:
 	TestAgent( const std::string & id );
 	virtual ~TestAgent();
 	
 	void updateState();
+
 
 	////////////////////////////////////////////////
 	// This code has been automatically generated //

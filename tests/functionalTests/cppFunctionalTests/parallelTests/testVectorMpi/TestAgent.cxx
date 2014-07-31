@@ -75,12 +75,8 @@ void TestAgent::updateState()
 
 	if(_world->checkPosition(newPosition))
 	{
-		_position = newPosition;
+	  setPosition(newPosition);
 	}
-}
-
-void TestAgent::serialize()
-{
 }
 
 std::vector<int> & TestAgent::getVectorInt()

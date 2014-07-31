@@ -19,17 +19,17 @@
  * 
  */
 
-#include <TestWorld.hxx>
-
+#include "TestWorld.hxx"
+#include <Config.hxx>
 #include <Exception.hxx>
-#include <TestAgent.hxx>
+#include "TestAgent.hxx"
 #include <assert.h>
 #include <iostream>
 
 namespace Test
 {
 
-TestWorld::TestWorld( Engine::Simulation & simulation ) : World( simulation, 9, false, "data/test.h5")
+TestWorld::TestWorld( Engine::Config * config, Engine::Scheduler * scheduler ) : World(config, scheduler, false)
 {
 }
 
@@ -40,7 +40,7 @@ TestWorld::~TestWorld()
 void TestWorld::stepAgents()
 {
 
-	if(_simulation.getNumTasks()==1)
+	if(getNumTasks()==1)
 	{
 		Engine::Agent * agent = getAgent("TestAgent_0");
 		Engine::Agent * agent2 = getAgent("TestAgent_1");
@@ -53,8 +53,8 @@ void TestWorld::stepAgents()
 		assert(countNeighbours(agent, euclideanDistance, "TestAgent")==1);
 		assert(countNeighbours(agent, 9, "TestAgent")==1);
 
-		Engine::World::AgentsVector neighbors = getNeighbours(agent, euclideanDistance , "TestAgent");
-		Engine::Agent * neighbor = *neighbors.begin();
+		Engine::AgentsVector neighbors = getNeighbours(agent, euclideanDistance , "TestAgent");
+		Engine::Agent * neighbor = neighbors.at(0).get();
 		assert(neighbors.size()==1);
 		assert(neighbor->getId().compare("TestAgent_1")==0);
 
@@ -63,7 +63,7 @@ void TestWorld::stepAgents()
 		assert(countNeighbours(agent,1000)==500);
 		return;
 	}
-	if(_simulation.getId()==0)
+	if(getId()==0)
 	{
 		Engine::Agent * agent = getAgent("TestAgent_0");
 		std::cout << "dist 7: " << countNeighbours(agent,7, "TestAgent") << " dist 8: " << countNeighbours(agent,8, "TestAgent") << " 9: " << countNeighbours(agent, 9, "TestAgent") << " all: " << countNeighbours(agent, 1000, "TestAgent") << " --" <<  countNeighbours(agent, 1000) << std::endl;
@@ -73,25 +73,21 @@ void TestWorld::stepAgents()
 	
 }
 
-void TestWorld::createRasters()
-{
-}
-
 void TestWorld::createAgents()
 {
-	if(_simulation.getId()==0)
+	if(getId()==0)
 	{
 		TestAgent * agent = new TestAgent("TestAgent_0");
-		agent->setPosition(Engine::Point2D<int>(63,63));
 		addAgent(agent);
+		agent->setPosition(Engine::Point2D<int>(63,63));		
 		
 		TestAgent * agent2 = new TestAgent("TestAgent_1");
-		agent2->setPosition(Engine::Point2D<int>(57,57));
 		addAgent(agent2);
+		agent2->setPosition(Engine::Point2D<int>(57,57));
 		
 		TestAgent * agent3 = new TestAgent("TestAgent_2");
-		agent3->setPosition(Engine::Point2D<int>(0,0));
 		addAgent(agent3);
+		agent3->setPosition(Engine::Point2D<int>(0,0));		
 
 		// we will create several agents in order to test whether selection by type is working
 		for(int i=2; i<500; i++)
@@ -104,29 +100,27 @@ void TestWorld::createAgents()
 		}
 		return;
 	}
-	if(_simulation.getId()==1)
+	if(getId()==1)
 	{
 		TestAgent * agent = new TestAgent("TestAgent_3");
-		agent->setPosition(Engine::Point2D<int>(69,57));
 		addAgent(agent);
+		agent->setPosition(Engine::Point2D<int>(69,57));		
 		
 		TestAgent * agent2 = new TestAgent("TestAgent_4");
-		agent2->setPosition(Engine::Point2D<int>(127,0));
 		addAgent(agent2);
+		agent2->setPosition(Engine::Point2D<int>(127,0));		
 
 		return;
 	}
-	if(_simulation.getId()==3)
+	if(getId()==3)
 	{
 		TestAgent * agent = new TestAgent("TestAgent_5");
-		agent->setPosition(Engine::Point2D<int>(69,69));
 		addAgent(agent);
+		agent->setPosition(Engine::Point2D<int>(69,69));		
 		
 		TestAgent * agent2 = new TestAgent("TestAgent_6");
-		agent2->setPosition(Engine::Point2D<int>(127,128));
 		addAgent(agent2);
-
-		return;
+		agent2->setPosition(Engine::Point2D<int>(127,128));		
 	}
 
 

@@ -3,7 +3,6 @@
 
 #include <tinyxml.h>
 #include <Exception.hxx>
-#include <CaloricRequirementsTable.hxx>
 #include <OriginalDemographics.hxx>
 #include <AgentController.hxx>
 #include <Geometry.hxx>

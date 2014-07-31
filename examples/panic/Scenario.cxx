@@ -142,11 +142,11 @@ void Scenario::createRasters()
 
         if(index._x==0 || index._y==0)
         {
-            getDynamicRaster(eExits).setMaxValue(index, 1);
+            setMaxValue(eExits, index, 1);
         }
         if(index._x==getBoundaries()._size._width-1 || index._y==getBoundaries()._size._height-1)
         {
-            getDynamicRaster(eExits).setMaxValue(index, 1);
+            setMaxValue(eExits, index, 1);
         }
 	}
 	updateRasterToMaxValues(eExits);

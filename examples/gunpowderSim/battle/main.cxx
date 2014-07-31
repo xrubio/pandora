@@ -1,13 +1,11 @@
 
 #include "Battlefield.hxx"
-#include "Exception.hxx"
+#include <Exception.hxx>
 
 #include <iostream>
 #include <cstdlib>
 
-#include "Battlefield.hxx"
 #include "BattlefieldConfig.hxx"
-#include "Simulation.hxx"
 
 // this simulations tries to generate data of a XVIIIth century battlefield
 // basic engagament, 0.5m each cell
@@ -25,13 +23,9 @@ int main(int argc, char *argv[])
 		{
 			fileName = argv[1];
 		}
-		BattleSim::BattlefieldConfig config;		
-		config.deserialize(fileName);
-
-		Engine::Simulation sim(config._size, config.getNumSteps());
-		BattleSim::Battlefield battle(sim,config);
+		BattleSim::Battlefield battle(new BattleSim::BattlefieldConfig(fileName), battle.useOpenMPSingleNode());
 		
-		battle.init(argc, argv);
+		battle.initialize(argc, argv);
 		battle.run();
 	}
 	catch( std::exception & exceptionThrown )

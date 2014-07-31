@@ -18,21 +18,23 @@
  * License along with this library.  If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-#include <TestWorld.hxx>
+#include "TestWorld.hxx"
 
-#include <Simulation.hxx>
 #include <Point2D.hxx>
 #include <Exception.hxx>
 
-#include <TestAgent.hxx>
+#include "TestAgent.hxx"
+#include <Config.hxx>
 
 #include <assert.h>
 #include <iostream>
 
+#include <SpacePartition.hxx>
+
 namespace Test
 {
 
-TestWorld::TestWorld( const Engine::Simulation & sim ) : World(sim, 4, true, "data/test.h5")
+TestWorld::TestWorld( Engine::Config * config, Engine::Scheduler * scheduler ) : World(config, scheduler, true), _testScheduler((Engine::SpacePartition *)scheduler)
 {
 }
 
@@ -40,126 +42,121 @@ TestWorld::~TestWorld()
 {
 }
 
-void TestWorld::createRasters()
-{	
-}
-
-void TestWorld::stepAgents()
+void TestWorld::stepEnvironment()
 {
-	if(_simulation.getNumTasks()==1)
+	if(getNumTasks()==1)
 	{
 		assert(_agents.size()==2);
-		assert(_overlapAgents.size()==0);
+		assert(_testScheduler->getNumberOfOverlapAgents()==0);
 		return;
 	}
-	if(_simulation.getId()==0)
+	if(getId()==0)
 	{
 		if(_step<32)
 		{
 			assert(_agents.size()==2);
-			assert(_overlapAgents.size()==2);
+			assert(_testScheduler->getNumberOfOverlapAgents()==2);
 		}
 		else if(_step<36)
 		{
 			assert(_agents.size()==0);
-			assert(_overlapAgents.size()==4);
+			assert(_testScheduler->getNumberOfOverlapAgents()==4);
 		}
 		else
 		{
 			assert(_agents.size()==0);
-			assert(_overlapAgents.size()==0);
+			assert(_testScheduler->getNumberOfOverlapAgents()==0);
 		}
 		return;
 	}
-	if(_simulation.getId()==1)
+	if(getId()==1)
 	{
 		if(_step<28)
 		{
 			assert(_agents.size()==1);
-			assert(_overlapAgents.size()==1);
+			assert(_testScheduler->getNumberOfOverlapAgents()==1);
 		}
 		else if(_step<36)
 		{
 			assert(_agents.size()==1);
-			assert(_overlapAgents.size()==3);
+			assert(_testScheduler->getNumberOfOverlapAgents()==3);
 		}
 		else
 		{
 			assert(_agents.size()==1);
-			assert(_overlapAgents.size()==1);
+			assert(_testScheduler->getNumberOfOverlapAgents()==1);
 		}
 		return;
 	}
-	if(_simulation.getId()==2)
+	if(getId()==2)
 	{	
 		if(_step<28)
 		{
 			assert(_agents.size()==1);
-			assert(_overlapAgents.size()==1);
+			assert(_testScheduler->getNumberOfOverlapAgents()==1);
 		}
 		else if(_step<36)
 		{
 			assert(_agents.size()==1);
-			assert(_overlapAgents.size()==3);
+			assert(_testScheduler->getNumberOfOverlapAgents()==3);
 		}
 		else
 		{
 			assert(_agents.size()==1);
-			assert(_overlapAgents.size()==1);
+			assert(_testScheduler->getNumberOfOverlapAgents()==1);
 		}
 		return;
 	}
-	if(_simulation.getId()==3)
+	if(getId()==3)
 	{
 		if(_step<28)
 		{
 			assert(_agents.size()==0);
-			assert(_overlapAgents.size()==0);
+			assert(_testScheduler->getNumberOfOverlapAgents()==0);
 		}
 		else if(_step<32)
 		{
 			assert(_agents.size()==0);
-			assert(_overlapAgents.size()==4);
+			assert(_testScheduler->getNumberOfOverlapAgents()==4);
 		}
 		else
 		{
 			assert(_agents.size()==2);
-			assert(_overlapAgents.size()==2);
+			assert(_testScheduler->getNumberOfOverlapAgents()==2);
 		}
 	}
 }
 
 void TestWorld::createAgents()
 {
-	if(_simulation.getId()==0)
+	if(getId()==0)
 	{
 		TestAgent * agentVertical1 = new TestAgent("TestAgent_0", false);
 		Engine::Point2D<int> pos(31,0);
-		agentVertical1->setPosition(pos+_boundaries._origin);
 		addAgent(agentVertical1);
+		agentVertical1->setPosition(pos+getBoundaries()._origin);
 
 		TestAgent * agentHorizontal1 = new TestAgent("TestAgent_2", true);
 		Engine::Point2D<int> pos2(0,31);
-		agentHorizontal1->setPosition(pos2+_boundaries._origin);
 		addAgent(agentHorizontal1);
+		agentHorizontal1->setPosition(pos2+getBoundaries()._origin);
 		return;
 	}
-	if(_simulation.getId()==1)
+	if(getId()==1)
 	{
 		TestAgent * agentVertical2 = new TestAgent("TestAgent_1", false);
-		Engine::Point2D<int> pos(0,0);
-		agentVertical2->setPosition(pos+_boundaries._origin);
+		Engine::Point2D<int> pos(32,0);
 		addAgent(agentVertical2);
+		agentVertical2->setPosition(pos);
 		return;
 
 	}
-	if(_simulation.getId()==2)
+	if(getId()==2)
 	{
 		TestAgent * agentHorizontal2 = new TestAgent("TestAgent_3", true);
-		Engine::Point2D<int> pos(0,0);
-		agentHorizontal2->setPosition(pos+_boundaries._origin);
+		Engine::Point2D<int> pos(0,32);
 		addAgent(agentHorizontal2);
-		return;
+		agentHorizontal2->setPosition(pos);
 	}
 }
 

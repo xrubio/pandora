@@ -1,38 +1,33 @@
 
 #include "BattlefieldConfig.hxx"
-#include <tinyxml.h>
 
 namespace BattleSim
 {
 
-BattlefieldConfig::BattlefieldConfig() : _numBlueSoldiers(0), _blueRanks(0), _blueCohesionRating(0), _blueCohesionDistance(0), _blueAccuracy(0), _blueReloadingTime(0), _numRedSoldiers(0), _redRanks(0), _redCohesionRating(0), _redCohesionDistance(0), _redAccuracy(0), _redReloadingTime(0), _size(0,0)
+BattlefieldConfig::BattlefieldConfig( const std::string & xmlFile ) : Config(xmlFile), _numBlueSoldiers(0), _blueRanks(0), _blueCohesionRating(0), _blueCohesionDistance(0), _blueAccuracy(0), _blueReloadingTime(0), _numRedSoldiers(0), _redRanks(0), _redCohesionRating(0), _redCohesionDistance(0), _redAccuracy(0), _redReloadingTime(0)
 {
 }
 
-void BattlefieldConfig::extractParticularAttribs(TiXmlElement * root)
+void BattlefieldConfig::loadParams()
 {
-	TiXmlElement * element = root->FirstChildElement("blueSide");
-	_numBlueSoldiers = atoi(element->Attribute("numSoldiers"));
-	_blueRanks = atoi(element->Attribute("ranks"));
-	_blueCohesionRating = atoi(element->Attribute("cohesionRating"));
-	_blueCohesionDistance = atoi(element->Attribute("cohesionDistance"));
-	_blueAccuracy = atoi(element->Attribute("accuracy"));
-	_blueReloadingTime = atoi(element->Attribute("reloadingTime"));
-	_blueTactics = (Tactics)atoi(element->Attribute("tactic"));
+    _initialDistance = getParamInt("battlefield", "initialDistance");
 
-	element = root->FirstChildElement("redSide");
-	_numRedSoldiers = atoi(element->Attribute("numSoldiers"));
-	_redRanks = atoi(element->Attribute("ranks"));
-	_redCohesionRating = atoi(element->Attribute("cohesionRating"));
-	_redCohesionDistance = atoi(element->Attribute("cohesionDistance"));
-	_redAccuracy = atoi(element->Attribute("accuracy"));
-	_redReloadingTime = atoi(element->Attribute("reloadingTime"));
-	_redTactics = (Tactics)atoi(element->Attribute("tactic"));
-	
-	element = root->FirstChildElement("battlefield");
-	_size._x = atoi(element->Attribute("width"));
-	_size._y = atoi(element->Attribute("height"));
-	_initialDistance = atoi(element->Attribute("initialDistance"));
+    _numBlueSoldiers = getParamInt("blueSide", "numSoldiers");
+    _blueRanks = getParamInt("blueSide", "ranks");
+    _blueCohesionRating = getParamInt("blueSide", "cohesionRating");
+    _blueCohesionDistance = getParamInt("blueSide", "cohesionDistance");
+    _blueAccuracy = getParamInt("blueSide", "accuracy");
+    _blueTactics = (Tactics)getParamInt("blueSide", "tactic");
+    _blueReloadingTime = getParamInt("blueSide", "reloadingTime");
+    
+    _numRedSoldiers = getParamInt("redSide", "numSoldiers");
+    _redRanks = getParamInt("redSide", "ranks");
+    _redCohesionRating = getParamInt("redSide", "cohesionRating");
+    _redCohesionDistance = getParamInt("redSide", "cohesionDistance");
+    _redAccuracy = getParamInt("redSide", "accuracy");
+    _redTactics = (Tactics)getParamInt("redSide", "tactic");
+    _redReloadingTime = getParamInt("redSide", "reloadingTime");
+
 }
 
 BattlefieldConfig::~BattlefieldConfig()

@@ -40,9 +40,6 @@ TestAgent::~TestAgent()
 
 void TestAgent::updateState()	
 {	
-	std::stringstream logName;
-	logName << "agents_" << _world->getId() << "_" << getId();
-
 	Engine::Point2D<int> newPosition = _position;
 	if(_moveToDownLeft)
 	{
@@ -54,16 +51,10 @@ void TestAgent::updateState()
 		newPosition._x--;
 		newPosition._y--;
 	}
-	log_DEBUG(logName.str(), "Agent: " << this << " will move to: " << newPosition);
-
 	if(_world->checkPosition(newPosition))
 	{
-		_position = newPosition;
+	  setPosition(newPosition);
 	}
-}
-
-void TestAgent::serialize()
-{
 }
 
 } // namespace Test

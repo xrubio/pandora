@@ -79,7 +79,7 @@ public:
 	void addIntAttribute( const std::string & type, const std::string & key, int value );
 	void addFloatAttribute( const std::string & type, const std::string & key, float value );
 
-	void serializeAgents( const int & step, const AgentsList::const_iterator beginAgents, const AgentsList::const_iterator endAgents);
+	void serializeAgents( const int & step, const AgentsList::const_iterator & beginAgents, const AgentsList::const_iterator & endAgents);
 	void serializeStaticRasters( const StaticRastersRefMap & staticRasters);
 	void serializeRasters(int step);
 

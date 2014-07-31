@@ -24,7 +24,6 @@ void Neighborhood::createAgents()
     const NeighborConfig & neighborConfig = (const NeighborConfig &)getConfig();
 	int numAgents = neighborConfig._size._width * neighborConfig._size._height * neighborConfig._density;
 	int numDimes = numAgents * neighborConfig._dimePercentage;
-	std::cout << "creating : " << numAgents << " neighbors, dimes: " << numDimes << " and pennies: " << numAgents - numDimes  << std::endl;
 
 	int indexDimes = 0;
 	int indexPennies = 0;

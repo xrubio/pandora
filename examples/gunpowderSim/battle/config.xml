@@ -2,10 +2,11 @@
 <!-- rating -> %, accuracy -> %, distance -> m -->
 <config>  
 	<output resultsFile="./data/battle.h5" logsDir="./logs"/>
-	<numSteps value="300" serializeResolution="10"/>
-	<battlefield width="500" height="500" initialDistance="320"/>
+	<numSteps value="200" serializeResolution="1"/>
+    <size width="400" height="300"/>
+	<battlefield initialDistance="200"/>
 	<!-- tactics as follows: 1: volley; 2: ranks; 3: platoon; 4: catalan system -->
-	<blueSide numSoldiers="288" ranks="3" cohesionRating="50" cohesionDistance="20" accuracy="10" tactic="2" reloadingTime="48"/>
-	<redSide numSoldiers="288" ranks="3" cohesionRating="60" cohesionDistance="20" accuracy="10" tactic="3" reloadingTime="48"/>
+	<blueSide numSoldiers="600" ranks="4" cohesionRating="70" cohesionDistance="30" accuracy="5" tactic="2" reloadingTime="48"/>
+	<redSide numSoldiers="450" ranks="3" cohesionRating="80" cohesionDistance="30" accuracy="5" tactic="3" reloadingTime="48"/>
 </config>
 

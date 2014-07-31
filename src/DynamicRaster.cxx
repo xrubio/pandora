@@ -79,19 +79,19 @@ void DynamicRaster::updateRasterToMaxValues()
 	std::copy(_maxValues.begin(), _maxValues.end(), _values.begin());
 }
 
-int DynamicRaster::getMaxValueAt( const Point2D<int>& position ) const
+int DynamicRaster::getMaxValue( const Point2D<int>& position ) const
 {
 	if(position._x<0 || position._x>=_maxValues.size())
 	{
 		std::stringstream oss;
-		oss << "DynamicRaster::getMaxValueAt - " << position << " x out of bounds: " << _maxValues.size();
+		oss << "DynamicRaster::getMaxValue - " << position << " x out of bounds: " << _maxValues.size();
 		throw Exception(oss.str());
 		return -1;
 	}
 	if(position._y<0 || position._y>=_maxValues[position._x].size())
 	{
 		std::stringstream oss;
-		oss << "DynamicRaster::getMaxValueAt - " << position << " y out of bounds: " << _maxValues.size() << "/" << _maxValues[position._x].size();
+		oss << "DynamicRaster::getMaxValue - " << position << " y out of bounds: " << _maxValues.size() << "/" << _maxValues[position._x].size();
 		throw Exception(oss.str());
 		return -1;
 	}	

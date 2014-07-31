@@ -36,25 +36,20 @@ TestAgent::~TestAgent()
 
 void TestAgent::move()
 {
-	Engine::Point2D<int> newPosition = _position;
-	newPosition._x++;
-	newPosition._y++;
-	
-	if(_world->checkPosition(newPosition))
-	{
-		_position = newPosition;
-		_world->setValue("test", _position, _world->getCurrentStep()+1);
-		return;
-	}
+    Engine::Point2D<int> newPosition = _position;
+    newPosition._x++;
+    newPosition._y++;
+    
+    if(_world->checkPosition(newPosition))
+    {
+        setPosition(newPosition);
+        _world->setValue("test", _position, _world->getCurrentStep()+1);
+    }
 }
 
 void TestAgent::updateState()
 {
-	move();
-}
-
-void TestAgent::serialize()
-{
+    move();
 }
 
 } // namespace Test

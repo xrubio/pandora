@@ -6,8 +6,6 @@
 #include <Point2D.hxx>
 #include <string>
 
-class TiXmlElement;
-
 enum Tactics
 {
 	eVolley = 1,
@@ -22,7 +20,7 @@ class Battlefield;
 
 class BattlefieldConfig : public Engine::Config
 {
-	void extractParticularAttribs(TiXmlElement * root);
+	void loadParams(); 
 public:
 	int _numBlueSoldiers;
 	int _blueRanks;
@@ -40,12 +38,11 @@ public:
 	int _redReloadingTime;
 	Tactics _redTactics;
 
-	Engine::Point2D<int> _size;
 	// distance between opponent battle lines at the beginning of the simulation
 	int _initialDistance;
 
 public:
-	BattlefieldConfig();
+	BattlefieldConfig( const std::string & xmlFile );
 	virtual ~BattlefieldConfig();
 
 	friend class Battlefield;

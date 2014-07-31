@@ -7,11 +7,11 @@
 
 nameProgram = 'epidemy'
 
-agents = ['Human', 'Zombie']
-namespaceAgents = ['Examples', 'Examples']
+agents = ['Human']
+namespaceAgents = ['Examples']
 world = 'Earth'
 
-srcFiles = Split('main.cxx EarthConfig.cxx Earth.cxx Human.cxx Zombie.cxx MoveAction.cxx DoNothingAction.cxx')
+srcFiles = Split('main.cxx EarthConfig.cxx Earth.cxx Human.cxx MoveAction.cxx DoNothingAction.cxx')
 
 ###################################################
 ########## END OF CUSTOM INFORMATION  #############
@@ -37,7 +37,6 @@ generateMPICodeBuilder = Builder(action=generateMpi.execute)
 env.Append( BUILDERS = {'GenerateMPICode' : generateMPICodeBuilder})
 
 env.Append(LINKFLAGS = '-fopenmp')
-env.Append(LIBS = 'tinyxml pthread mpl'.split())
 env.Append(CCFLAGS = '-std=c++0x -DTIXML_USE_STL'.split())
 if env['debug'] == True:
     env.Append(CCFLAGS = '-g -O0 -Wall -DPANDORADEBUG'.split())

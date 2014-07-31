@@ -1,7 +1,7 @@
 
 #include "TestWorld.hxx"
 #include <Exception.hxx>
-#include <Simulation.hxx>
+#include <Config.hxx>
 
 #include <iostream>
 #include <cstdlib>
@@ -12,26 +12,9 @@ int main(int argc, char *argv[])
 {
 	try
 	{
-		if(argc>3)
-		{
-			throw Engine::Exception("USAGE: testMultipleRasters [number of rasters] [time steps]");
-		}
-		int numRasters = 1;
-		int numTimeSteps = 1;
-		if(argc==3)
-		{
-			numTimeSteps = atoi(argv[2]);
-			numRasters = atoi(argv[1]);
-		}
-		else if(argc==2)
-		{
-			numRasters = atoi(argv[1]);
-		}
-		Engine::Simulation sim(1600, numTimeSteps);
-		Test::TestWorld multipleRasters(sim,numRasters);
-		
-		multipleRasters.init(argc, argv);
-		multipleRasters.run();
+		Test::TestWorld world(new Engine::Config(Engine::Size<int>(1600,1600), 10), world.useSpacePartition(199));
+		world.initialize(argc, argv);
+		world.run();
 	}
 	catch( std::exception & exceptionThrown )
 	{

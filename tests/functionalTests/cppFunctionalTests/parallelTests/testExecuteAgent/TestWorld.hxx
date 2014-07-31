@@ -25,19 +25,18 @@
 
 namespace Engine
 {
-	class Simulation;
+	class Config;
 }
 
 namespace Test
 {
 
 class TestWorld : public Engine::World
-{
-	void createRasters();
+{	
 	void createAgents();
-	void stepAgents();
+	void stepEnvironment();
 public:
-	TestWorld( const Engine::Simulation & sim );
+	TestWorld( Engine::Config * config, Engine::Scheduler * scheduler = 0);
 	virtual ~TestWorld();
 };
 

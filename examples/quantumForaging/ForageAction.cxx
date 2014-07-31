@@ -44,7 +44,7 @@ void ForageAction::executeMDP( const Forager & forager, const ForagerState & sta
 	stateNext.getResourcesMap().setValue(localPos, previousValue-foragedResources);	
 	
 	int oldKnowledge = state.getKnowledgeMap().getValue(localPos);
-	if(oldKnowledge<state.getKnowledgeMap().getMaxValueAt(localPos))
+	if(oldKnowledge<state.getKnowledgeMap().getMaxValue(localPos))
 	{
 		stateNext.getKnowledgeMap().setValue(localPos, oldKnowledge+1);
 	}
@@ -64,22 +64,22 @@ void ForageAction::execute( Engine::Agent & agent )
 	// decrease the uncertainty of values
 	Engine::DynamicRaster & knowledge = forager.getWorld()->getDynamicRaster(forager.getKnowledgeMap());
 	int qualityKnowledge = knowledge.getValue(_position);
-	if(qualityKnowledge<knowledge.getMaxValueAt(_position))
+	if(qualityKnowledge<knowledge.getMaxValue(_position))
 	{
 		knowledge.setValue(_position, qualityKnowledge+1);
 	}
 
 	// finally, we test uncertainty in order to know if the agent gets the real value
-	int value = Engine::GeneralState::statistics().getUniformDistValue(0,knowledge.getMaxValueAt(_position));
+	int value = Engine::GeneralState::statistics().getUniformDistValue(0,knowledge.getMaxValue(_position));
 	if(value<knowledge.getValue(_position))
 	{
 		return;
 	}
-	if(forager.getWorld()->getDynamicRaster(forager.getResourcesMap()).getMaxValueAt(_position)<rest)
+	if(forager.getWorld()->getMaxValue(forager.getResourcesMap(), _position)<rest)
 	{
-		forager.getWorld()->getDynamicRaster(forager.getResourcesMap()).setMaxValue(_position, rest);
+		forager.getWorld()->setMaxValue(forager.getResourcesMap(), _position, rest);
 	}
-	forager.getWorld()->getDynamicRaster(forager.getResourcesMap()).setValue(_position, rest);
+	forager.getWorld()->setValue(forager.getResourcesMap(), _position, rest);
 }
 	
 std::string ForageAction::describe() const

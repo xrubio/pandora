@@ -570,7 +570,7 @@ void Display3D::resetView()
 	_orderedRasters.clear();
 	_viewedStep = 0;
 	_plane.resize(_simulationRecord->getSize());
-	_plane.setDefaultInitValues(1,1,1);
+	_plane.setInitValues(1,1,1);
 	initializeGL();
 }
 

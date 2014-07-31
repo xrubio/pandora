@@ -36,8 +36,7 @@ class TestAgent: public Engine::Agent
 public:
 	TestAgent( const std::string & id );
 	virtual ~TestAgent();
-	
-	void serialize();
+
 	void updateState();	
 
 	////////////////////////////////////////////////

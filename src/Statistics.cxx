@@ -115,7 +115,7 @@ float Statistics::getExponentialDistValue( float min, float max ) const
 	return value;
 }
 
-float Statistics::getNormalDistValue( float min, float max ) const 
+float Statistics::getNormalDistValueMinMax( float min, float max ) const 
 {
 	if(_normalDistribution.size()!=_distributionSize)
 	{
@@ -129,6 +129,14 @@ float Statistics::getNormalDistValue( float min, float max ) const
 	value *= diff;
 	value += min;
 	return value;
+}
+
+float Statistics::getNormalDistValue( float mean, float sd )
+{
+    boost::mt19937 rng(getNewSeed());
+    boost::normal_distribution<> nd(mean, sd);
+    boost::variate_generator<RandomEngine, boost::normal_distribution<> > var_nor(rng, nd);
+    return var_nor();
 }
 
 int Statistics::getUniformDistValue( int min, int max ) const

@@ -73,13 +73,13 @@ float DecisionModel::cost( const ForagerState & state, action_t action ) const
 	const Engine::DynamicRaster & knowledge = state.getKnowledgeMap();
 
 	float localKnowledgeIncrease = 0.0f;
-	if(state.getAvailableAction(action).getPosition()==state.getPosition() && knowledge.getValue(state.getPosition())<knowledge.getMaxValueAt(state.getPosition()))
+	if(state.getAvailableAction(action).getPosition()==state.getPosition() && knowledge.getValue(state.getPosition())<knowledge.getMaxValue(state.getPosition()))
 	{
 		localKnowledgeIncrease += 1.0f;	 
 	}
 
 	float neighborKnowledgeIncrease = 0.0f;
-	if(state.getAvailableAction(action).getPosition()!=state.getPosition() && knowledge.getValue(state.getAvailableAction(action).getPosition())<knowledge.getMaxValueAt(state.getAvailableAction(action).getPosition()))
+	if(state.getAvailableAction(action).getPosition()!=state.getPosition() && knowledge.getValue(state.getAvailableAction(action).getPosition())<knowledge.getMaxValue(state.getAvailableAction(action).getPosition()))
 	{
 		neighborKnowledgeIncrease += 1.0f;
 	}

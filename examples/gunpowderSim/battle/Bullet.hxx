@@ -34,16 +34,15 @@ public:
 	// this function will calculate initial velocity taking standardVelocity as a median, and creating a normal distribution of ranges
 	void setMuzzleVelocity( const int & standardVelocity );
 
+
 	////////////////////////////////////////////////
 	// This code has been automatically generated //
 	/////// Please do not modify it ////////////////
 	////////////////////////////////////////////////
-#ifdef PANDORAMPI
 	Bullet( void * );
 	void * fillPackage();
 	void sendVectorAttributes(int);
 	void receiveVectorAttributes(int);
-#endif // PANDORAMPI
 	////////////////////////////////////////////////
 	//////// End of generated code /////////////////
 	////////////////////////////////////////////////

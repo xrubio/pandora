@@ -17,7 +17,7 @@
 namespace BattleSim 
 {
 	
-Battlefield::Battlefield( Engine::Simulation & simulation, const BattlefieldConfig & config ) : World(simulation, 1, true, config._resultsFile), _config(config)
+Battlefield::Battlefield( BattlefieldConfig * config, Engine::Scheduler * scheduler ) : World(config, scheduler, false) 
 {
 }
 
@@ -36,19 +36,20 @@ void Battlefield::createRasters()
 
 void Battlefield::createAgents()
 {
+    const BattlefieldConfig & battleConfig = (const BattlefieldConfig&)getConfig();
 	// blue side, top zone
-	int numBlueSoldiers = _config._numBlueSoldiers;
-	int numBlueColumns = numBlueSoldiers/_config._blueRanks;
+	int numBlueSoldiers = battleConfig._numBlueSoldiers;
+	int numBlueColumns = numBlueSoldiers/battleConfig._blueRanks;
 
-	int numRedSoldiers = _config._numRedSoldiers;
-	int numRedColumns = numRedSoldiers/_config._redRanks;
+	int numRedSoldiers = battleConfig._numRedSoldiers;
+	int numRedColumns = numRedSoldiers/battleConfig._redRanks;
 
 
 	// 50 meters for each side
 	// 12 is 2 * 3 ranks * 2(0.5m)
-	int heightBoundary = _simulation.getSize()._y - _config._initialDistance- 12;
+	int heightBoundary = getConfig().getSize()._height - battleConfig._initialDistance- 12;
 	heightBoundary /= 2;
-	int widthBoundary = (_simulation.getSize()._x - std::max(numBlueColumns, numRedColumns)*2)/2;
+	int widthBoundary = (getConfig().getSize()._width - std::max(numBlueColumns, numRedColumns)*2)/2;
 
 	for(int i=0; i<numBlueSoldiers; i++)
 	{
@@ -58,28 +59,28 @@ void Battlefield::createAgents()
 		// each 1m.
 		Engine::Point2D<int> posInRegiment((column*2)+widthBoundary, heightBoundary - rank*2);
 	
-		if(_boundaries.isInside(posInRegiment))
+		if(getBoundaries().contains(posInRegiment))
 		{
 			std::ostringstream oss;
 			oss << "blueSoldier_" << i;
-			Soldier * newSoldier = new Soldier(oss.str(), rank+1, _config._blueCohesionRating, _config._blueCohesionDistance, _config._blueAccuracy, _config._blueReloadingTime );
+			Soldier * newSoldier = new Soldier(oss.str(), rank+1, battleConfig._blueCohesionRating, battleConfig._blueCohesionDistance, battleConfig._blueAccuracy, battleConfig._blueReloadingTime );
 			newSoldier->setPosition(posInRegiment);
 
 			int interval = 0;
 			int order = 0;	
 			int platoon = (column*16/numBlueColumns)+1;
-			switch((int)_config._blueTactics)
+			switch((int)battleConfig._blueTactics)
 			{
 				case eVolley:
 					newSoldier->setDelayBeforeFirstFire(0);
 					break;
 				case eRanks:
-					interval = _config._blueReloadingTime/_config._blueRanks;
-					order =  _config._blueRanks - rank - 1;
+					interval = battleConfig._blueReloadingTime/battleConfig._blueRanks;
+					order =  battleConfig._blueRanks - rank - 1;
 					newSoldier->setDelayBeforeFirstFire(order * interval); 
 					break;
 				case ePlatoon:
-					interval = _config._blueReloadingTime/4;
+					interval = battleConfig._blueReloadingTime/4;
 					if(rank!=0)
 					{
 						switch(platoon)
@@ -116,7 +117,7 @@ void Battlefield::createAgents()
 					newSoldier->setDelayBeforeFirstFire(order * interval); 
 					break;
 				case eCatalan:		
-					interval = _config._blueReloadingTime/8;
+					interval = battleConfig._blueReloadingTime/8;
 					switch(platoon)
 					{	
 						case 1:
@@ -170,29 +171,29 @@ void Battlefield::createAgents()
 		int rank = i/numRedColumns;
 		//std::cout << _id << " red soldier id: " << i << " of: "<< numRedSoldiers << " in rank: " << rank+1 << "/" << numRedLines << " and column: " << column << "/" << numRedColumns << std::endl;
 		// each 1m.
-		Engine::Point2D<int> posInRegiment((column*2)+widthBoundary, heightBoundary +_config._initialDistance+(rank*2));
-		if(_boundaries.isInside(posInRegiment))
+		Engine::Point2D<int> posInRegiment((column*2)+widthBoundary, heightBoundary +battleConfig._initialDistance+(rank*2));
+		if(getBoundaries().contains(posInRegiment))
 		{
 			std::ostringstream oss;
 			oss << "redSoldier_" << i;
-			Soldier * newSoldier = new Soldier(oss.str(), rank+1, _config._redCohesionRating, _config._redCohesionDistance, _config._redAccuracy, _config._redReloadingTime );
+			Soldier * newSoldier = new Soldier(oss.str(), rank+1, battleConfig._redCohesionRating, battleConfig._redCohesionDistance, battleConfig._redAccuracy, battleConfig._redReloadingTime );
 			newSoldier->setPosition(posInRegiment);	
 
 			int interval = 0;
 			int order = 0;	
 			int platoon = (column*16/numRedColumns)+1;
-			switch((int)_config._redTactics)
+			switch((int)battleConfig._redTactics)
 			{
 				case eVolley:
 					newSoldier->setDelayBeforeFirstFire(0);
 					break;
 				case eRanks:
-					interval = _config._redReloadingTime/_config._redRanks;
-					order =  _config._redRanks - rank - 1;
+					interval = battleConfig._redReloadingTime/battleConfig._redRanks;
+					order =  battleConfig._redRanks - rank - 1;
 					newSoldier->setDelayBeforeFirstFire(order * interval); 
 					break;
 				case ePlatoon:
-					interval = _config._redReloadingTime/4;
+					interval = battleConfig._redReloadingTime/4;
 					if(rank!=0)
 					{
 						switch(platoon)
@@ -229,7 +230,7 @@ void Battlefield::createAgents()
 					newSoldier->setDelayBeforeFirstFire(order * interval); 
 					break;
 				case eCatalan:		
-					interval = _config._redReloadingTime/8;
+					interval = battleConfig._redReloadingTime/8;
 					switch(platoon)
 					{	
 						case 1:

@@ -164,7 +164,7 @@ void PanicAgent::selectActions()
 			Engine::Point2D<int> newIntPos = Engine::Point2D<int>(std::floor(newPos._x), std::floor(newPos._y));
 			if(newIntPos!=_position || _consecutive<2)
 			{
-				if(_world->checkPosition(newIntPos) && _world->getDynamicRaster(eObstacles).getValue(newIntPos)==0)
+				if(_world->checkPosition(newIntPos) && _world->getValue(eObstacles, newIntPos)==0)
 				{
 					minValue = value;
 					finalDirection = direction;
@@ -181,7 +181,7 @@ void PanicAgent::selectActions()
 	_rest._y = newPos._y - newIntPos._y;
 
     const ScenarioConfig & scenarioConfig = (const ScenarioConfig &)getWorld()->getConfig();
-	if(_world->checkPosition(newIntPos) && _world->getDynamicRaster(eObstacles).getValue(newIntPos)==0)
+	if(_world->checkPosition(newIntPos) && _world->getValue(eObstacles, newIntPos)==0)
 	{
 		if(newIntPos!=_position)
 		{

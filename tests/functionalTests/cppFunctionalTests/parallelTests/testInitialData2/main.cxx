@@ -20,21 +20,19 @@
  */
 
 #include "TestWorld.hxx"
-#include "Exception.hxx"
-#include "Simulation.hxx"
+#include <Exception.hxx>
+#include <Config.hxx>
 
 #include <iostream>
 #include <cstdlib>
 
 // this test checks that all the initial data is being correctly copied to the neighbors in overlap zone
-
 int main(int argc, char *argv[])
 {
 	try
 	{
-		Engine::Simulation testSim(64, 1);
-		Test::TestWorld world(testSim);
-		world.init(argc, argv);
+		Test::TestWorld world(new Engine::Config(Engine::Size<int>(64,64), 1), world.useSpacePartition(4));
+		world.initialize(argc, argv);
 		world.run();
 	}
 	catch( std::exception & exceptionThrown )
@@ -44,4 +42,5 @@ int main(int argc, char *argv[])
 	}
 	return 0;
 }
+
 
