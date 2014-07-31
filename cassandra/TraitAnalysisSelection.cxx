@@ -36,7 +36,15 @@ TraitAnalysisSelection::TraitAnalysisSelection( QWidget * parent, Engine::Simula
 	QStringList traits;
 
 	Engine::AgentRecord * agentRecord = it->second;
-	for(Engine::AgentRecord::StatesMap::const_iterator itS=agentRecord->beginStates(); itS!=agentRecord->endStates(); itS++)
+	for(Engine::AgentRecord::IntAttributesMap::const_iterator itS=agentRecord->beginInt(); itS!=agentRecord->endInt(); itS++)
+	{
+		traits << QString(itS->first.c_str());
+	}
+    for(Engine::AgentRecord::FloatAttributesMap::const_iterator itS=agentRecord->beginFloat(); itS!=agentRecord->endFloat(); itS++)
+	{
+		traits << QString(itS->first.c_str());
+	}
+	for(Engine::AgentRecord::StrAttributesMap::const_iterator itS=agentRecord->beginStr(); itS!=agentRecord->endStr(); itS++)
 	{
 		traits << QString(itS->first.c_str());
 	}

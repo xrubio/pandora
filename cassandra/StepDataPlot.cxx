@@ -117,19 +117,30 @@ void StepDataPlot::fillHistogram( const std::string & type, const std::string & 
 	for(Engine::SimulationRecord::AgentRecordsMap::const_iterator it=_simulationRecord->beginAgents(type); it!=_simulationRecord->endAgents(type); it++)
 	{
 		Engine::AgentRecord * agentRecord = it->second;	
-		bool exists = agentRecord->getState(step, "exists");
+		bool exists = agentRecord->getInt(step, "exists");
 		if(exists)
 		{
-			int agentValue = agentRecord->getState(step, state);
-			if(agentValue!=std::numeric_limits<int>::max())
-			{
-				numSamples[agentValue-minValue]++;
-			}
+            if(agentRecord->isInt(state))
+            {
+			    int agentValue = agentRecord->getInt(step, state);
+    			if(agentValue!=std::numeric_limits<int>::max())
+	    		{
+		    		numSamples[agentValue-minValue]++;
+			    }
+            }
+            else if(agentRecord->isFloat(state))
+            {
+                float agentValue = agentRecord->getFloat(step, state);
+    			if(agentValue!=std::numeric_limits<float>::max())
+	    		{
+		    		numSamples[int(agentValue-minValue)]++;
+			    }
+            }
 		}
 	}
 }
 
-void StepDataPlot::fillStepMinMaxValues(  const std::string & type, const std::string & state, int step, int & minValue, int & maxValue )
+void StepDataPlot::fillStepMinMaxValues(  const std::string & type, const std::string & state, int step, float & minValue, float & maxValue )
 {
 	minValue = std::numeric_limits<double>::max();
 	maxValue = 0;
@@ -137,18 +148,34 @@ void StepDataPlot::fillStepMinMaxValues(  const std::string & type, const std::s
 	for(Engine::SimulationRecord::AgentRecordsMap::const_iterator it=_simulationRecord->beginAgents(type); it!=_simulationRecord->endAgents(type); it++)
 	{
 		Engine::AgentRecord * agentRecord = it->second;	
-		bool exists = agentRecord->getState(step, "exists");
+		bool exists = agentRecord->getInt(step, "exists");
 		if(exists)
-		{
-			int agentValue = agentRecord->getState(step, state);
-			if(agentValue<minValue)
-			{
-				minValue = agentValue;
-			}
-			if(agentValue>maxValue)
-			{
-				maxValue = agentValue;
-			}
+		{  
+            if(agentRecord->isInt(state))
+            {
+			    int agentValue = agentRecord->getInt(step, state);
+    			if(agentValue<minValue)
+	    		{
+		    		minValue = int(agentValue);
+			    }
+    			if(agentValue>maxValue)
+	    		{
+		    		maxValue = int(agentValue);
+			    }
+            }
+            else if(agentRecord->isFloat(state))
+            {
+                float agentValue = agentRecord->getFloat(step, state);
+    			if(agentValue<minValue)
+	    		{
+		    		minValue = agentValue;
+			    }
+    			if(agentValue>maxValue)
+	    		{
+		    		maxValue = agentValue;
+			    }
+
+            }
 		}
 	}
 	if(minValue==maxValue)

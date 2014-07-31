@@ -162,11 +162,11 @@ void Display2D::paintEvent(QPaintEvent *event)
 			if(agentConfig->useIcon() && !agentConfig->getFileName2D().empty())
 			{	
 				Engine::AgentRecord * agent = it->second;
-				bool exists = agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "exists");
+				bool exists = agent->getInt(_viewedStep/_simulationRecord->getFinalResolution(), "exists");
 				if(exists)
 				{
-					int x = agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "x");
-					int y = agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "y");
+					int x = agent->getInt(_viewedStep/_simulationRecord->getFinalResolution(), "x");
+					int y = agent->getInt(_viewedStep/_simulationRecord->getFinalResolution(), "y");
 					int size = (float)_zoom*agentConfig->getSize();
 					int xPos = x*_zoom - size/2;						
 					int yPos = y*_zoom - size/2;
@@ -177,34 +177,69 @@ void Display2D::paintEvent(QPaintEvent *event)
 			{
 				QColor colorToUse(agentConfig->getColor());
 				Engine::AgentRecord * agent = it->second;
-				bool exists = agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "exists");
+				bool exists = agent->getInt(_viewedStep/_simulationRecord->getFinalResolution(), "exists");
 				if(exists)
 				{
-					int x = agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "x");
-					int y = agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "y");
+					int x = agent->getInt(_viewedStep/_simulationRecord->getFinalResolution(), "x");
+					int y = agent->getInt(_viewedStep/_simulationRecord->getFinalResolution(), "y");
 					QBrush brush(Qt::SolidPattern);
-					if(_state=="unknown")
+					if(_state=="unknown" || agent->isStr(_state))
 					{
 						brush.setColor(colorToUse);
 						painter.setBrush(brush);
 					}
 					else
 					{
-						// we put this call between try/catch in order to avoid crashes about painting state in agents that don't have it
-						int value = 0;
-						try
-						{
-							value = agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), _state);
-							int max = _simulationRecord->getMaxValueForState(_state);
-							int min = _simulationRecord->getMinValueForState(_state);
-							int diff = std::max(1,max - min);
-							value = (value-min)*255/diff;
-						}
-						catch( Engine::Exception & exceptionThrown )
-						{
-						}
-						brush.setColor(QColor(255,255-value,255-value));
-						painter.setBrush(brush);
+                        if(agent->isInt(_state))
+                        {
+    						// we put this call between try/catch in order to avoid crashes about painting state in agents that don't have it
+	    					int value = 0;
+		    				try
+			    			{
+				    			value = agent->getInt(_viewedStep/_simulationRecord->getFinalResolution(), _state);
+					    		int max = _simulationRecord->getMaxInt(_state);
+						    	int min = _simulationRecord->getMinInt(_state);
+							    int diff = std::max(1,max - min);
+    							value = (value-min)*255/diff;
+	    					}
+		    				catch( Engine::Exception & exceptionThrown )
+			    			{
+				    		}
+				    		brush.setColor(QColor(255,255-value,255-value));
+					    	painter.setBrush(brush);
+                        }
+                        else if(agent->isFloat(_state))
+                        {   
+                            // we put this call between try/catch in order to avoid crashes about painting state in agents that don't have it
+	    					float value = 0;
+		    				try
+			    			{
+				    			value = agent->getFloat(_viewedStep/_simulationRecord->getFinalResolution(), _state);
+					    		float max = _simulationRecord->getMaxFloat(_state);
+						    	float min = _simulationRecord->getMinFloat(_state);
+							    float diff = std::max(1.0f,max - min);
+    							value = (value-min)*255.0f/diff;
+	    					}
+		    				catch( Engine::Exception & exceptionThrown )
+			    			{
+				    		}
+				    		brush.setColor(QColor(255,255-int(value),255-int(value)));
+					    	painter.setBrush(brush);
+                        }
+                        // string
+                        else
+                        {
+                            try
+			    			{
+                                std::string value = agent->getStr(_viewedStep/_simulationRecord->getFinalResolution(), _state);
+                                std::cout << "value: " << value << std::endl;
+	    					}
+		    				catch( Engine::Exception & exceptionThrown )
+			    			{
+				    		}
+                            brush.setColor(colorToUse);
+    						painter.setBrush(brush);
+                        }
 					}
 					int size = agentConfig->getSize();
 					painter.drawEllipse(10*x-5*(size-1),10*y-5*(size-1),10*size, 10*size);
@@ -336,7 +371,7 @@ void Display2D::mouseDoubleClickEvent(QMouseEvent *event)
 			for(size_t i=0; i<agents.size(); i++)
 			{
 				Engine::AgentRecord * agentRecord = agents.at(i);
-				if(!agentRecord->getState(_viewedStep/_simulationRecord->getFinalResolution(), "exists"))
+				if(!agentRecord->getInt(_viewedStep/_simulationRecord->getFinalResolution(), "exists"))
 				{
 					continue;
 				}
@@ -396,7 +431,7 @@ std::string Display2D::getAgentToolTip( const Engine::Point2D<int> & position )
 	for(size_t i=0; i<agents.size(); i++)
 	{
 		Engine::AgentRecord * agentRecord = agents.at(i);
-		if(agentRecord->getState(_viewedStep/_simulationRecord->getFinalResolution(), "exists")==false)
+		if(agentRecord->getInt(_viewedStep/_simulationRecord->getFinalResolution(), "exists")==false)
 		{
 			continue;
 		}

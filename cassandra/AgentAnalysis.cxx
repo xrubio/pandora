@@ -596,7 +596,17 @@ void AgentAnalysis::fillIndividualStats()
 
 	QVBoxLayout * layout = new QVBoxLayout;
 	Engine::AgentRecord * agentRecord = it->second; 
-	for(Engine::AgentRecord::StatesMap::const_iterator itS=agentRecord->beginStates(); itS!=agentRecord->endStates(); itS++)
+	for(Engine::AgentRecord::IntAttributesMap::const_iterator itS=agentRecord->beginInt(); itS!=agentRecord->endInt(); itS++)
+	{
+		QCheckBox * box = new QCheckBox(QString(itS->first.c_str()));
+		layout->addWidget(box);
+	}
+    for(Engine::AgentRecord::FloatAttributesMap::const_iterator itS=agentRecord->beginFloat(); itS!=agentRecord->endFloat(); itS++)
+	{
+		QCheckBox * box = new QCheckBox(QString(itS->first.c_str()));
+		layout->addWidget(box);
+	}
+    for(Engine::AgentRecord::StrAttributesMap::const_iterator itS=agentRecord->beginStr(); itS!=agentRecord->endStr(); itS++)
 	{
 		QCheckBox * box = new QCheckBox(QString(itS->first.c_str()));
 		layout->addWidget(box);
@@ -613,7 +623,15 @@ void AgentAnalysis::fillHistogram()
 	Engine::AgentRecord * agentRecord = it->second;
 	
 	QStringList traits;
-	for(Engine::AgentRecord::StatesMap::const_iterator itS=agentRecord->beginStates(); itS!=agentRecord->endStates(); itS++)
+	for(Engine::AgentRecord::IntAttributesMap::const_iterator itS=agentRecord->beginInt(); itS!=agentRecord->endInt(); itS++)
+	{
+		traits << QString(itS->first.c_str());
+	}
+    for(Engine::AgentRecord::FloatAttributesMap::const_iterator itS=agentRecord->beginFloat(); itS!=agentRecord->endFloat(); itS++)
+	{
+		traits << QString(itS->first.c_str());
+	}
+    for(Engine::AgentRecord::StrAttributesMap::const_iterator itS=agentRecord->beginStr(); itS!=agentRecord->endStr(); itS++)
 	{
 		traits << QString(itS->first.c_str());
 	}

@@ -20,12 +20,12 @@ void Paper::registerAttributes()
 	registerIntAttribute("citations");
 	registerIntAttribute("cited papers");
 	registerIntAttribute("time of creation");
+    registerFloatAttribute("p new paper");
 }
 
 void Paper::updateState()
 {
-	float randomValue = Engine::GeneralState::statistics().getUniformDistValue(0, 100000);
-	randomValue /= 100000;
+	float randomValue = Engine::GeneralState::statistics().getUniformDistValue();
 	if(randomValue>_probabilityNewPaper)
 	{
 		return;
@@ -39,6 +39,7 @@ void Paper::serialize()
 	serializeAttribute("citations", _citations);
 	serializeAttribute("cited papers", _citedPapers);
 	serializeAttribute("time of creation", _timeOfCreation);
+    serializeAttribute("p new paper", _probabilityNewPaper);
 }
 
 void Paper::setProbabilityNewPaper( float probabilityNewPaper )

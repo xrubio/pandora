@@ -50,8 +50,8 @@ protected:
 //	QwtArray<double> _values;
 //	QwtArray<double> _numSamples;
 
-	int _minValue;
-	int _maxValue;
+	float _minValue;
+	float _maxValue;
 
 	std::string _type;
 	std::string _state;
@@ -60,7 +60,7 @@ protected:
 	
 	//void fillHistogram( const std::string & type, const std::string & state, int step, QwtArray<double> & numSamples, const int & minValue );
 	void fillHistogram( const std::string & type, const std::string & state, int step, QVector<double> & numSamples, const int & minValue );
-	void fillStepMinMaxValues( const std::string & type, const std::string & state, int step, int & minValue, int & maxValue );
+	void fillStepMinMaxValues( const std::string & type, const std::string & state, int step, float & minValue, float & maxValue );
 public:
 	StepDataPlot(QWidget * parent = 0);
 	virtual ~StepDataPlot();

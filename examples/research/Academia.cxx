@@ -102,9 +102,7 @@ void Academia::generateNewPaper( Paper & paper )
 	
 	Paper * newPaper = 0;
 	
-	float randomValue = Engine::GeneralState::statistics().getUniformDistValue(0, 100000);
-	randomValue /= 100000;
-
+	float randomValue = Engine::GeneralState::statistics().getUniformDistValue();
 	Author * newAuthor = 0;
 	if(!paper.getAuthor()->isActive() || randomValue<academiaConfig._probabilityNewAuthor)
 	{

@@ -259,7 +259,7 @@ void Display3D::focus()
 	glRotatef(-_angle._z,0,0,1);
 	//cout << dist << " " << angleX << " " << angleY << " " << angleZ << endl;
 	
-	Engine::Point2D<int> position(_agentFocus->getState(_viewedStep/_simulationRecord->getFinalResolution(), "x"), _agentFocus->getState(_viewedStep/_simulationRecord->getFinalResolution(), "y"));
+	Engine::Point2D<int> position(_agentFocus->getInt(_viewedStep/_simulationRecord->getFinalResolution(), "x"), _agentFocus->getInt(_viewedStep/_simulationRecord->getFinalResolution(), "y"));
 	glTranslatef(-position._x, position._y, -_vrp._z);
 }
 
@@ -334,12 +334,12 @@ void Display3D::paintAgents()
 		for(Engine::SimulationRecord::AgentRecordsMap::const_iterator it= _simulationRecord->beginAgents(itType); it!=_simulationRecord->endAgents(itType); it++)
 		{
 			Engine::AgentRecord * agent = it->second;
-			bool exists = agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "exists");
+			bool exists = agent->getInt(_viewedStep/_simulationRecord->getFinalResolution(), "exists");
 			if(!exists)
 			{
 				continue;
 			}
-			Engine::Point3D<int> position(agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "x"), agent->getState(_viewedStep/_simulationRecord->getFinalResolution(), "y"), 0);
+			Engine::Point3D<int> position(agent->getInt(_viewedStep/_simulationRecord->getFinalResolution(), "x"), agent->getInt(_viewedStep/_simulationRecord->getFinalResolution(), "y"), 0);
             position._z = 1;
 			if(raster)
 			{
