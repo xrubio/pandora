@@ -354,7 +354,7 @@ void ProjectConfiguration::loadConfigs()
 	for(Engine::SimulationRecord::RasterMap::const_iterator itRaster = _simulationRecord->beginRasters(); itRaster!=_simulationRecord->endRasters(); itRaster++)
 	{
 		int minValue = itRaster->second[0].getMinValue();
-		int maxValue = itRaster->second[0].getMaxValue();
+		int maxValue = itRaster->second[0].Engine::StaticRaster::getMaxValue();
 		std::cout << itRaster->first << " dynamic, min: " << minValue << " max: " << maxValue << std::endl;
 		_rastersConfig.insert(make_pair( itRaster->first, new RasterConfiguration(minValue,maxValue) ));
 		rastersNames.push_back(itRaster->first);
