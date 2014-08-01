@@ -75,6 +75,15 @@ AgentConfigurator::AgentConfigurator( QWidget * parent, const std::string & type
 		_agentConfig.iconButton->setChecked(false);
 		_agentConfig.colorButton->setChecked(true);
 	}
+
+    if(_configuration.showValue())
+    {
+        _agentConfig.showValues->setChecked(true);
+    }
+    else
+    {
+        _agentConfig.showValues->setChecked(false);
+    }
 	connect(_agentConfig.colorChooserButton, SIGNAL(clicked()), this, SLOT(selectColor()));
 	connect(_agentConfig.iconChooserButton, SIGNAL(clicked()), this, SLOT(selectIcon()));
 	connect(_agentConfig.model3DButton, SIGNAL(clicked()), this, SLOT(selectModel3D()));
@@ -257,14 +266,9 @@ void AgentConfigurator::colorSelected(const QColor & color)
 
 void AgentConfigurator::accept()
 {
-	if(_agentConfig.iconButton->isChecked())
-	{
-		_configuration.setUseIcon(true);
-	}
-	else
-	{
-		_configuration.setUseIcon(false);
-	}
+    _configuration.setUseIcon(_agentConfig.iconButton->isChecked());
+    _configuration.showValue(_agentConfig.showValues->isChecked());
+
 	_configuration.setSize(_agentConfig.size2D->value());
 	Engine::Point3D<float> scale(_agentConfig.xSize->value(), _agentConfig.ySize->value(), _agentConfig.zSize->value());
 	_configuration.setSize3D(scale);
@@ -274,3 +278,4 @@ void AgentConfigurator::accept()
 }
 
 } // namespace GUI
+

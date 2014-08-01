@@ -159,6 +159,7 @@ void ProjectConfiguration::loadAgentsConfigs( TiXmlElement * agents )
 
 		agentConfig->setSize( atof(config2d->Attribute("size")));
 		agentConfig->setUseIcon( atoi(config2d->Attribute("useIcon")));
+		agentConfig->showValue( atoi(config2d->Attribute("showValue")));
 		agentConfig->setFileName2D( config2d->Attribute("iconPath"));
 		agentConfig->setColor(QColor(config2d->Attribute("color")));
 
@@ -223,6 +224,7 @@ TiXmlElement * ProjectConfiguration::storeAgentsConfigs()
 		config2d->SetAttribute("color", config->getColor().name().toStdString());
 		config2d->SetAttribute("iconPath", config->getFileName2D());
 		config2d->SetAttribute("useIcon", config->useIcon());
+		config2d->SetAttribute("showValue", config->showValue());
 
 		TiXmlElement * config3d = new TiXmlElement("shape3D");
 		config3d->SetAttribute("model3D", config->getFileName3D());

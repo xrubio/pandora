@@ -110,6 +110,7 @@ void HeatMapView::paintEvent( QPaintEvent * )
                     pixelSize--;
                     font.setPixelSize(pixelSize);
                 }
+                painter.setFont(font);
                 painter.drawText(QRect(50+i*_cellSize.width(),50+j*_cellSize.height(), _cellSize.width(), _cellSize.height()), Qt::AlignCenter, QString::number(_model.getValue(i,j), 'f', 2));
                 painter.setFont(previousFont);
         }

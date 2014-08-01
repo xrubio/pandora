@@ -42,7 +42,7 @@
 namespace GUI
 {
 
-Display2D::Display2D( QWidget * parent) : QWidget(parent), _simulationRecord(0), _viewedStep(0), _zoom(1), _showAgents(true), _radiusSelection(7), _offset(0,0), _clickedPos(0,0), _type("unknown"), _state("unknown")
+Display2D::Display2D( QWidget * parent) : QWidget(parent), _simulationRecord(0), _viewedStep(0), _zoom(1), _showAgents(true), _radiusSelection(7), _offset(0,0), _clickedPos(0,0), _type("unknown"), _state("unknown"), _sizePixel(50)
 {
 	setMouseTracking(true);
 	setAutoFillBackground(true);
@@ -97,7 +97,7 @@ void Display2D::paintEvent(QPaintEvent *event)
 	{
 		return;
 	}
-	QPixmap imageToDraw(QSize(10*_simulationRecord->getSize()._width, 10*_simulationRecord->getSize()._height));
+	QPixmap imageToDraw(QSize(_sizePixel*_simulationRecord->getSize()._width, _sizePixel*_simulationRecord->getSize()._height));
 	QPainter painter(&imageToDraw);
     painter.setPen(Qt::NoPen);
 
@@ -133,8 +133,44 @@ void Display2D::paintEvent(QPaintEvent *event)
 						ColorSelector & colorSelector = rasterConfig->getColorRamp();
 						brush.setColor(colorSelector.getColor(value));
 					}
+
+                    if(rasterConfig->showBorders())
+                    {
+                        QPen penRaster(Qt::black);
+                        penRaster.setWidth(2);
+                        painter.setPen(penRaster);
+                    }
 					painter.setBrush(brush);
-                    painter.drawRect(10*i, 10*j, 10, 10);
+                    painter.drawRect(_sizePixel*i, _sizePixel*j, _sizePixel, _sizePixel);
+                    if(rasterConfig->showBorders())
+                    {
+                        painter.setPen(Qt::NoPen);
+                    }
+
+                    if(!rasterConfig->showValues())
+                    {
+                        break;
+                    }     
+                    painter.setPen(Qt::black);
+                    painter.setFont(QFont("Arial", 48));
+                    QString valueStr = QString::number(value);
+                    QFont previousFont = painter.font();  
+                    QFont font = painter.font();
+                    int pixelSize = _sizePixel*0.75f;;
+
+                    QFontMetrics metrics(font);
+                    font.setPixelSize(pixelSize);
+                    while(pixelSize>1 && QFontMetrics(font).width(valueStr)>_sizePixel)
+                    {
+                        pixelSize--;
+                        font.setPixelSize(pixelSize);
+                    }
+                    painter.setFont(font);
+                    QRect insideRect(_sizePixel*i,_sizePixel*j,_sizePixel, _sizePixel);
+                    painter.drawText(insideRect, Qt::AlignCenter, valueStr);
+                    painter.setFont(previousFont);
+                    painter.setPen(Qt::NoPen);
+
 					break;
 				}
 			}
@@ -183,7 +219,7 @@ void Display2D::paintEvent(QPaintEvent *event)
 					int x = agent->getInt(_viewedStep/_simulationRecord->getFinalResolution(), "x");
 					int y = agent->getInt(_viewedStep/_simulationRecord->getFinalResolution(), "y");
 					QBrush brush(Qt::SolidPattern);
-					if(_state=="unknown" || agent->isStr(_state))
+					if(_state=="unknown")
 					{
 						brush.setColor(colorToUse);
 						painter.setBrush(brush);
@@ -226,23 +262,64 @@ void Display2D::paintEvent(QPaintEvent *event)
 				    		brush.setColor(QColor(255,255-int(value),255-int(value)));
 					    	painter.setBrush(brush);
                         }
-                        // string
-                        else
+                        else if(agent->isStr(_state))
                         {
-                            try
-			    			{
-                                std::string value = agent->getStr(_viewedStep/_simulationRecord->getFinalResolution(), _state);
-                                std::cout << "value: " << value << std::endl;
-	    					}
-		    				catch( Engine::Exception & exceptionThrown )
-			    			{
-				    		}
-                            brush.setColor(colorToUse);
-    						painter.setBrush(brush);
+                            std::string value = agent->getStr(_viewedStep/_simulationRecord->getFinalResolution(), _state);
+                            StringToColorMap::const_iterator colorIt = _strToColor.find(value);
+                            if(colorIt==_strToColor.end())
+                            {
+                                _strToColor.insert(make_pair(value, getRandomColor()));
+                                colorIt = _strToColor.find(value);
+                            }
+                            brush.setColor(colorIt->second);
+                            painter.setBrush(brush);
+
                         }
 					}
 					int size = agentConfig->getSize();
-					painter.drawEllipse(10*x-5*(size-1),10*y-5*(size-1),10*size, 10*size);
+					painter.drawEllipse(_sizePixel*x-5*(size-1),_sizePixel*y-5*(size-1),_sizePixel*size, _sizePixel*size);
+                    if(!agentConfig->showValue() || _state=="unknown")
+                    {
+                        continue;
+                    }
+                    painter.setPen(Qt::black);
+                    painter.setFont(QFont("Arial", 48));
+                    QFontMetrics fm(painter.font());
+                    if(agent->isStr(_state))
+                    {  
+                        std::string value = agent->getStr(_viewedStep/_simulationRecord->getFinalResolution(), _state);
+                        painter.drawText(_sizePixel*x-5*(size-1)-fm.width(value.c_str())/2,_sizePixel*y-5*(size-1), value.c_str());
+                        painter.setPen(Qt::NoPen);
+                        continue;
+                    }
+
+                    QString valueStr = "";
+                    if(agent->isInt(_state))
+                    {
+                        int value = agent->getInt(_viewedStep/_simulationRecord->getFinalResolution(), _state);
+                        valueStr = QString::number(value);
+                    }
+                    else if(agent->isFloat(_state))
+                    {
+                        float value = agent->getFloat(_viewedStep/_simulationRecord->getFinalResolution(), _state);
+                        valueStr = QString::number(value, 'f', 2);
+                    }
+                    QFont previousFont = painter.font();  
+                    QFont font = painter.font();
+                    int pixelSize = _sizePixel*0.75f;;
+
+                    QFontMetrics metrics(font);
+                    font.setPixelSize(pixelSize);
+                    while(pixelSize>1 && QFontMetrics(font).width(valueStr)>_sizePixel)
+                    {
+                        pixelSize--;
+                        font.setPixelSize(pixelSize);
+                    }
+                    painter.setFont(font);
+                    QRect insideRect(_sizePixel*x-5*(size-1),_sizePixel*y-5*(size-1),_sizePixel*size, _sizePixel*size);
+                    painter.drawText(insideRect, Qt::AlignCenter, valueStr);
+                    painter.setFont(previousFont);
+                    painter.setPen(Qt::NoPen);
 				}
 			}
 		}
@@ -253,15 +330,30 @@ void Display2D::paintEvent(QPaintEvent *event)
 	screenPainter.restore();
 }
 
+QColor Display2D::getRandomColor() const
+{
+    QColor mix(255, 100, 100);
+
+    int red = rand()%255;
+    int green = rand()%255;
+    int blue = rand()%255;
+    red = (red + mix.red())/2;
+    green = (green + mix.green())/2;
+    blue = (blue + mix.blue())/2;
+    return QColor(red,green,blue);
+}
+
 void Display2D::typeSelected( QListWidgetItem * item )
 {
 	_type = item->text().toStdString();
 	_state = "unknown";
+    _strToColor.clear();
 	// actualitzar estats
 	update();
 }
 void Display2D::stateSelected( QListWidgetItem * item )
 {
+    _strToColor.clear();
 	_state = item->text().toStdString();
 	if(_type!="unknown" && _state!="unknown")
 	{

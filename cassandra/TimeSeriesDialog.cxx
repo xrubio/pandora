@@ -84,7 +84,7 @@ TimeSeriesDialog::TimeSeriesDialog(QWidget * parent, const std::string & groupFi
     connect(_ts.result, SIGNAL(currentIndexChanged(int)), this, SLOT(selectVariable(int)));
     selectVariable(0);
 
-    QAction * screenshotAction = new QAction(QIcon(":/resources/icons/screenshot.png"), tr("Take &Screenshot"), this);
+    QAction * screenshotAction = new QAction(QIcon(":share/cassandra/icons/screenshot.png"), tr("Take &Screenshot"), this);
     screenshotAction->setStatusTip(tr("Take a screenshot"));
 	connect(screenshotAction, SIGNAL(triggered()), this, SLOT(takeScreenshot()));
 

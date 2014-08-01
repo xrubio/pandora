@@ -17,6 +17,9 @@ class CultureConfig : public Engine::Config
     float _transmission;
     // range of transmission
     float _range;
+    // if true distance between traits will be computed
+    // if false distance is always 1 unless they are identical
+    bool _useDistance;
 public:
 	CultureConfig( const std::string & xmlFile );
 	virtual ~CultureConfig();

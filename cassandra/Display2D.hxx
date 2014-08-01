@@ -53,6 +53,7 @@ class Display2D : public QWidget
 	
 	typedef std::map<std::string, AgentConfiguration *> AgentsConfigurationMap;
 	typedef std::map<std::string, RasterConfiguration *> RastersConfigurationMap;
+	typedef std::map<std::string, QColor > StringToColorMap;
 
 	Engine::SimulationRecord * _simulationRecord;
 	
@@ -68,12 +69,17 @@ class Display2D : public QWidget
 	// state being selected
 	std::string _type;
 	std::string _state;
+    StringToColorMap _strToColor;
 	// order of rasters
 	std::list<std::string> _orderedRasters;
 
 	std::string getRasterToolTip( const Engine::Point2D<int> & position );
 	std::string getAgentToolTip( const Engine::Point2D<int> & position );
 
+    // how many pixels correspond to one raster pixel
+    int _sizePixel;
+    
+    QColor getRandomColor() const;
 public:
 	void zoom( float value );
 	Display2D(QWidget * parent);

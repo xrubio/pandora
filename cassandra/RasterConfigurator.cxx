@@ -118,6 +118,22 @@ RasterConfigurator::RasterConfigurator(QWidget * parent, const std::string & typ
 
 	_rasterConfig.levelOfDetail->setValue(_configuration.getLOD());
 
+    if(_configuration.showValues())
+    {
+        _rasterConfig.showValues->setChecked(true);
+    }
+    else
+    {
+        _rasterConfig.showValues->setChecked(false);
+    }
+    if(_configuration.showBorders())
+    {
+        _rasterConfig.showBorders->setChecked(true);
+    }
+    else
+    {
+        _rasterConfig.showBorders->setChecked(false);
+    }
 	show();
 }
 
@@ -149,6 +165,8 @@ void RasterConfigurator::accept()
 	_configuration.setElevationRaster(_rasterConfig.elevationRaster->currentText().toStdString());
 	_configuration.setCellResolution(_rasterConfig.cellResolution->value());
 	_configuration.setElevationExaggeration(_rasterConfig.elevationExaggeration->value());
+    _configuration.showValues(_rasterConfig.showValues->isChecked());
+    _configuration.showBorders(_rasterConfig.showBorders->isChecked());
 
 	Engine::Point3D<float> offset(_rasterConfig.xOffset->value(), _rasterConfig.yOffset->value(), _rasterConfig.zOffset->value());
 	_configuration.setOffset(offset);

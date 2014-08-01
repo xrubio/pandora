@@ -2,8 +2,8 @@
 <config>  
 	<!-- Global simulation parameters -->
 	<output resultsFile="./data/cultureDissemination.h5" logsDir="./logs"/>
-	<numSteps value="5000" serializeResolution="1"/>
+	<numSteps value="300" serializeResolution="1"/>
 	<size width="30" height="30"/>
-    <culture features="5" traitsPerFeature="10" transmission="0.1" range="1.5"/>
+    <culture features="3" traitsPerFeature="4" transmission="0.1" range="1.5" useDistance="true"/>
 </config>
 

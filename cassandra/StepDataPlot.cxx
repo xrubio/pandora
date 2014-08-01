@@ -176,6 +176,10 @@ void StepDataPlot::fillStepMinMaxValues(  const std::string & type, const std::s
 			    }
 
             }
+            else
+            {
+                minValue = maxValue = 0.0f;
+            }
 		}
 	}
 	if(minValue==maxValue)

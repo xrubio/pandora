@@ -28,7 +28,7 @@
 namespace GUI
 {
 
-RasterConfiguration::RasterConfiguration( const int & minValue, const int & maxValue, bool init ) : _colorSelector(0), _minValue(minValue), _maxValue(maxValue), _transparentEnabled(false), _transparentValue(0), _elevationRaster("none (use plane)"), _cellResolution(1.0f), _elevationExaggeration(1.0f), _offset(0.0f, 0.0f, 0.0f), _lod(25), _hasElevationRaster(false)
+RasterConfiguration::RasterConfiguration( const int & minValue, const int & maxValue, bool init ) : _colorSelector(0), _minValue(minValue), _maxValue(maxValue), _transparentEnabled(false), _transparentValue(0), _elevationRaster("none (use plane)"), _cellResolution(1.0f), _elevationExaggeration(1.0f), _offset(0.0f, 0.0f, 0.0f), _lod(25), _hasElevationRaster(false), _showValues(false), _showBorders(false)
 {
 	resetColorRamp();
 
@@ -96,7 +96,7 @@ RasterConfiguration::RasterConfiguration( const int & minValue, const int & maxV
     */
 }
 
-RasterConfiguration::RasterConfiguration( const RasterConfiguration & prototype ) : _colorSelector(0), _minValue(prototype.getMinValue()), _maxValue(prototype.getMaxValue()), _transparentEnabled(prototype.isTransparentEnabled()), _transparentValue(prototype.getTransparentValue()), _elevationRaster(prototype.getElevationRaster()), _cellResolution(prototype.getCellResolution()), _elevationExaggeration(prototype.getElevationExaggeration()), _offset(prototype.getOffset()), _lod(prototype.getLOD()), _hasElevationRaster(prototype.hasElevationRaster())
+RasterConfiguration::RasterConfiguration( const RasterConfiguration & prototype ) : _colorSelector(0), _minValue(prototype.getMinValue()), _maxValue(prototype.getMaxValue()), _transparentEnabled(prototype.isTransparentEnabled()), _transparentValue(prototype.getTransparentValue()), _elevationRaster(prototype.getElevationRaster()), _cellResolution(prototype.getCellResolution()), _elevationExaggeration(prototype.getElevationExaggeration()), _offset(prototype.getOffset()), _lod(prototype.getLOD()), _hasElevationRaster(prototype.hasElevationRaster()), _showValues(prototype.showValues()), _showBorders(prototype.showBorders())
 {
 	_colorSelector =  prototype.getColorRamp().copy();
 }

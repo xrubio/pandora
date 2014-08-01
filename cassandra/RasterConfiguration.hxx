@@ -53,6 +53,10 @@ class RasterConfiguration
 	int _lod;	
 
 	bool _hasElevationRaster;
+    
+    bool _showValues;
+    bool _showBorders;
+
 public:
 	RasterConfiguration( const int & minValue = 0, const int & maxValue = 10, bool init = true);
 	RasterConfiguration( const RasterConfiguration & prototype );
@@ -69,6 +73,8 @@ public:
 	void setTransparentEnabled( const bool & transparentEnabled );
 	const int & getTransparentValue() const;
 	void setTransparentValue( const int & transparentValue );
+    void showValues( const bool & showValues ) { _showValues = showValues; }
+    void showBorders( const bool & showBorders ) { _showBorders = showBorders; }
 
 	void setElevationRaster( const std::string & elevationRaster );
 	const std::string & getElevationRaster() const;
@@ -84,7 +90,8 @@ public:
 	int getLOD() const;
 
 	bool hasElevationRaster() const;
-
+    const bool & showValues() const { return _showValues; }
+    const bool & showBorders() const { return _showBorders; }
 }; // class RasterConfiguration
 
 } // namespace GUI

@@ -62,23 +62,14 @@ void Site::transmitFeature( Engine::AgentPtr agent )
 
 void Site::registerAttributes()
 {
-	registerIntAttribute("culture");
-	registerIntAttribute("similarity");
+	registerFloatAttribute("similarity");
 	registerStringAttribute("cultureStr");
 }
 
 void Site::serialize()
 {
-    int value = 0;
-
-    for(size_t i=0; i<_features.size(); i++)
-    {
-        value *= 10;
-        value += _features[i];
-    }
-	serializeAttribute("culture", value);
 	serializeAttribute("cultureStr", getCultureString());
-	serializeAttribute("similarity", int(100.0f*getSimilarityNeighbors()));
+	serializeAttribute("similarity", getSimilarityNeighbors());
 }
 
 std::string Site::getCultureString() const
@@ -107,12 +98,23 @@ float Site::getSimilarityNeighbors()
 float Site::getSimilarity( Engine::AgentPtr agent )
 {
     Site & site = (Site &)(*agent);
+    const CultureConfig & cultureConfig = (const CultureConfig &)_world->getConfig();
+
     float simNeighbour = 0.0f;
     for( size_t i=0; i<_features.size(); i++)
     {
-        if(site.getFeature(i)==_features.at(i))
+        if(cultureConfig._useDistance)
         {
-            simNeighbour += 1.0f;
+            float diff = fabs(site.getFeature(i) - _features.at(i));
+            diff /= float(cultureConfig._traitsPerFeature);
+            simNeighbour += 1.0f - diff;
+        }
+        else
+        {
+            if(site.getFeature(i)==_features.at(i))
+            {
+                simNeighbour += 1.0f;
+            }
         }
     }
     return simNeighbour/float(_features.size());

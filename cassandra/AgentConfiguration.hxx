@@ -38,6 +38,7 @@ class AgentConfiguration
 	bool _useIcon;
 	std::string _fileName2D;
 	float _size;
+    bool _showValue;
 
 	Engine::Point3D<float> _size3D;
 	std::string _fileName3D;
@@ -55,6 +56,7 @@ public:
 	void setSize3D( const Engine::Point3D<float> & size3D );
 	void setFileName2D( const std::string & fileName2D);
 	void setFileName3D( const std::string & fileName3D);
+    void showValue( const bool & showValue ) { _showValue = showValue; }
 
 	const bool & useIcon() const;
 	const QColor & getColor() const;
@@ -64,6 +66,7 @@ public:
 	const std::string & getFileName2D() const;
 	const std::string & getFileName3D() const;
 	const Model3D & getModel() const;
+    const bool & showValue() const { return _showValue; }
 };
 
 } // namespace GUI

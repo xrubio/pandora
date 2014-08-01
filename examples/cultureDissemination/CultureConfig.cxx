@@ -18,6 +18,7 @@ void CultureConfig::loadParams()
 	_traitsPerFeature = getParamInt( "culture", "traitsPerFeature");
 	_transmission  = getParamFloat( "culture", "transmission");
 	_range = getParamFloat( "culture", "range");
+	_useDistance = getParamBool( "culture", "useDistance");
 }
 	
 } // namespace Examples

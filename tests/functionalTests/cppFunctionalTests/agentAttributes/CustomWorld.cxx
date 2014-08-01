@@ -25,10 +25,10 @@ void CustomWorld::createAgents()
         addAgent(newAgent);
         newAgent->setRandomPosition();
         std::stringstream oss2;
-        oss2 << "string attribute: " << i;
+        oss2 << "string attribute: " << i%10;
 		newAgent->setStringAttribute(oss2.str());
-		newAgent->setIntAttribute(i);
-		newAgent->setFloatAttribute(float(i)/100.0f);
+		newAgent->setIntAttribute(i%10);
+		newAgent->setFloatAttribute(float(i%10)/10.0f);
 	}
 }
 

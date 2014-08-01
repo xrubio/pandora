@@ -49,11 +49,11 @@ HeatMapDialog::HeatMapDialog(QWidget * parent, const std::string & groupFile ) :
     }
     fillMenus();   
     
-    QAction * screenshotAction = new QAction(QIcon(":/resources/icons/screenshot.png"), tr("Take &Screenshot"), this);
+    QAction * screenshotAction = new QAction(QIcon(":share/cassandra/icons/screenshot.png"), tr("Take &Screenshot"), this);
     screenshotAction->setStatusTip(tr("Take a screenshot"));
 	connect(screenshotAction, SIGNAL(triggered()), this, SLOT(takeScreenshot()));
 
-    QAction * textAction = new QAction(QIcon(":/resources/icons/text.png"), tr("Switch &Text"), this);
+    QAction * textAction = new QAction(QIcon(":share/cassandra/icons/text.png"), tr("Switch &Text"), this);
     textAction->setStatusTip(tr("Toggle text"));
 	connect(textAction, SIGNAL(triggered()), heatMap, SLOT(switchText()));
 

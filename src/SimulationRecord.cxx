@@ -386,7 +386,18 @@ void SimulationRecord::loadAttributes( const hid_t & stepGroup, hssize_t & numEl
 		}
 		else if(typeClass== H5T_STRING)
 		{
-            std::cout << "SimulationRecord::loadHDF5 - loading attribute: " << *itA << " of type string, not yet implemented" << std::endl;
+            hid_t stringType = H5Tcopy (H5T_C_S1);
+        	H5Tset_size(stringType, H5T_VARIABLE);
+            
+            char ** stringIds = (char **) malloc (numElements * sizeof (char *));	
+            H5Dread(attributeDatasetId, stringType, H5S_ALL, H5S_ALL, H5P_DEFAULT, stringIds);
+            for(int iAgent=0; iAgent<numElements; iAgent++)
+			{	
+                std::string agentName = indexAgents.at(iAgent);
+				AgentRecordsMap::iterator it = agents.find(agentName);
+				AgentRecord * agentRecord = it->second;
+				agentRecord->addStr( _loadingStep/getFinalResolution(), *itA, std::string(stringIds[iAgent]));
+            }
 		}
         else if(typeClass== H5T_FLOAT)
 		{	
@@ -705,12 +716,6 @@ double SimulationRecord::getMean( const std::string & type, const std::string & 
         {
 			agentValue = agentRecord->getFloat(step, attribute);
         }
-        else
-        {
-    		std::stringstream oss;
-    		oss << "SimulationRecord::getMean - computing non-numeric attribute: " << attribute;
-    		throw Exception(oss.str());
-        }
         value += agentValue;
 	    sample++;
 	}
@@ -747,95 +752,10 @@ double SimulationRecord::getSum( const std::string & type, const std::string & a
         {
 			agentValue = agentRecord->getFloat(step, attribute);
         }
-        else
-        {
-    		std::stringstream oss;
-    		oss << "SimulationRecord::getSum - computing non-numeric attribute: " << attribute;
-    		throw Exception(oss.str());
-        }
         value += agentValue;
 	}
 	return value;
 }
-
-/*
-void SimulationRecord::registerAgent( hid_t loc_id, const char * name )
-{
-	hid_t datasetId = H5Dopen(loc_id, name, H5P_DEFAULT);
-    hid_t datatype = H5Dget_type(datasetId);
-    H5T_class_t attributeType = H5Tget_class(datatype);
-
-    if(attributeType==H5T_NATIVE_INT)
-    {
-        std::cout << "int!!!" << std::endl;
-    }
-    else if(attributeType==H5T_NATIVE_FLOAT)
-    {
-        std::cout << "float!!!" << std::endl;
-    }
-    else
-    {
-        std::cout << "different!!!" << std::endl;
-    }
-	std::string agentName(name);
-
-	unsigned int typePos = agentName.find_first_of("_");
-	std::string type = agentName.substr(0,typePos);
-
-	AgentTypesMap::iterator typeIt = _types.find(type);
-	if(typeIt==_types.end())
-	{
-		_types.insert( make_pair( type, AgentRecordsMap()));
-		typeIt = _types.find(type);
-	}
-	AgentRecordsMap & agents = typeIt->second;
-	AgentRecordsMap::iterator it = agents.find(agentName);
-	// new agent
-	if(it==agents.end())
-	{
-		// +1 due to init state, new agent record with size of num steps +1
-		agents.insert( make_pair( agentName, new AgentRecord(agentName, 1+_numSteps/getFinalResolution())));
-		it = agents.find(agentName);
-	}
-
-	int numAttributes = H5Aget_num_attrs(datasetId);
-	for(int i=0; i<numAttributes; i++)
-	{
-		char nameAttribute[256];
-		hid_t attributeId= H5Aopen_idx(datasetId, i);
-		H5Aget_name(attributeId, 256, nameAttribute);
-		int value = 0;
-		H5Aread(attributeId, H5T_NATIVE_INT, &value);
-
-        // TODO read different typeS?
-	
-		AgentRecord * agentRecord = it->second;
-		agentRecord->addInt( _loadingStep/getFinalResolution(), std::string(nameAttribute), value );
-		H5Aclose(attributeId);
-
-		IntAttributesMap::iterator it = _minIntValues.find(nameAttribute);
-		if(it==_minIntValues.end())
-		{
-			_minIntValues.insert( make_pair(std::string(nameAttribute), value) );
-		}
-		else if(value<it->second)
-		{
-			it->second = value;
-		}
-
-		it = _maxIntValues.find(nameAttribute);
-		if(it==_maxIntValues.end())
-		{
-			_maxIntValues.insert( make_pair(std::string(nameAttribute), value) );
-		}
-		else if(value>it->second)
-		{
-			it->second = value;
-		}
-	}
-	H5Dclose(datasetId);
-}
-*/
 
 int SimulationRecord::getMinInt( const std::string & attribute)
 {
@@ -886,15 +806,6 @@ float SimulationRecord::getMaxFloat( const std::string & attribute)
 	return it->second;
 
 }
-
-/*
-herr_t SimulationRecord::registerAgentStep( hid_t loc_id, const char *name, void *opdata )
-{
-	SimulationRecord * record = (SimulationRecord*)opdata;
-	record->registerAgent(loc_id, name);
-    return 0;
-}
-*/
 
 const Size<int> & SimulationRecord::getSize() const
 {

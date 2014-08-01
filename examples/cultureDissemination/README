@@ -1,4 +1,5 @@
 Pandora implementation of the classical cultural model of Axelrod, published in:
 
 Axelrod, R. (1997) "The dissemination of culture - A model with local convergence and global polarization". In: Journal of Conflict Resolution 41(2), 203-226.
+There is a modification where similarity is measured as the distance between values, so the traits are in a continuous space where values 2 and 3 are culturally closer than values 2 and 5. This can be disabled in config.xml
 
