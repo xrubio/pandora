@@ -112,28 +112,9 @@ void Agent::setExists(bool exists)
 	_exists = exists;
 }
 
-std::ostream & operator<<( std::ostream & stream, Agent * agent )
-{
-	if(agent->getWorld())
-	{
-		return stream << "id: " << agent->getId() << " pos: " << agent->getPosition() << " exists: " << agent->exists();
-	}
-	else
-	{
-		return stream << "id: " << agent->getId() << " pos: " << agent->getPosition() << " exists: " << agent->exists() << " without world";
-	}
-}
-
-std::ostream & operator<<( std::ostream & stream, Agent & agent )
-{
-	if(agent.getWorld())
-	{
-		return stream << "id: " << agent.getId() << " pos: " << agent.getPosition() << " exists: " << agent.exists();
-	}
-	else
-	{
-		return stream << "id: " << agent.getId() << " pos: " << agent.getPosition() << " exists: " << agent.exists() << " without world";
-	}
+std::ostream& Agent::print(std::ostream& os) const {
+	os << "id: " << getId() << " pos: " << getPosition() << " exists: " << exists();
+	return getWorld() ? os << " without world" : os;
 }
 
 void Agent::remove()
