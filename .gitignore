@@ -3,6 +3,7 @@
 
 # Compiled source #
 *.o
+*.os
 *.sconsign.dblite
 pandora/build/
 pandora/build_py/
@@ -14,3 +15,13 @@ pandora/build_py/
 *.h5
 *moc_**
 *mpiCode*
+
+# Temporal folders
+.sconf_temp
+
+# Build folders
+lib
+build/
+buildDebug/
+buildDebug_py/
+build_py/
