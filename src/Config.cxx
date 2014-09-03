@@ -121,9 +121,9 @@ const int & Config::getSerializeResolution() const
 	return _serializeResolution;
 }
 
-std::string Config::getParamStr( const std::string & elementPath, const std::string & attrName)
+
+std::string Config::getParamStrFromElem(TiXmlElement* elem, const std::string & attrName)
 {
-    TiXmlElement * elem = findElement(elementPath);
 	const std::string * retrievedStr = elem->Attribute( attrName );
 	if (!retrievedStr) 
 	{
@@ -131,32 +131,46 @@ std::string Config::getParamStr( const std::string & elementPath, const std::str
 	}
 	return *retrievedStr;
 }
-
-bool Config::getParamBool( const std::string & elementPath, const std::string & attrName)
-{
-	const std::string value = getParamStr(elementPath, attrName);
-	return value.compare("yes") == 0 || value.compare("true") == 0 || value.compare("1") == 0;
+std::string Config::getParamStr( const std::string & elementPath, const std::string & attrName) {
+	return getParamStrFromElem(findElement(elementPath), attrName);
 }
 
-int Config::getParamInt( const std::string & elementPath, const std::string & attrName)
-{
-	return atoi(getParamStr(elementPath, attrName).c_str());
+bool Config::getParamBoolFromElem(TiXmlElement* elem, const std::string & attrName) {
+	const std::string value = getParamStrFromElem(elem, attrName);
+	return value.compare("yes") == 0 || value.compare("true") == 0 || value.compare("1") == 0;	
+}
+bool Config::getParamBool( const std::string & elementPath, const std::string & attrName) {
+	return getParamBoolFromElem(findElement(elementPath), attrName);
 }
 
-unsigned Config::getParamUnsigned(const std::string & elementPath, const std::string & attrName)
-{
-	return boost::lexical_cast<unsigned>(getParamStr(elementPath, attrName).c_str());
+int Config::getParamIntFromElem(TiXmlElement* elem, const std::string & attrName) {
+	return atoi(getParamStrFromElem(elem, attrName).c_str());
+}
+int Config::getParamInt( const std::string & elementPath, const std::string & attrName) {
+	return getParamIntFromElem(findElement(elementPath), attrName);
 }
 
-long int Config::getParamLongInt( const std::string & elementPath, const std::string & attrName )
-{
-	return atol(getParamStr(elementPath, attrName).c_str());
+unsigned Config::getParamUnsignedFromElem(TiXmlElement* elem, const std::string & attrName) {
+	return boost::lexical_cast<unsigned>(getParamStrFromElem(elem, attrName).c_str());
+}
+unsigned Config::getParamUnsigned(const std::string & elementPath, const std::string & attrName) {
+	return getParamUnsignedFromElem(findElement(elementPath), attrName);
 }
 
-float Config::getParamFloat( const std::string & elementPath, const std::string & attrName)
-{
-	return atof(getParamStr(elementPath, attrName).c_str());
+long int Config::getParamLongFromElem(TiXmlElement* elem, const std::string & attrName) {
+	return atol(getParamStrFromElem(elem, attrName).c_str());
 }
+long int Config::getParamLongInt( const std::string & elementPath, const std::string & attrName ) {
+	return  getParamLongFromElem(findElement(elementPath), attrName);
+}
+
+float Config::getParamFloatFromElem(TiXmlElement* elem, const std::string & attrName) {
+	return atof(getParamStrFromElem(elem, attrName).c_str());
+}
+float Config::getParamFloat( const std::string & elementPath, const std::string & attrName) {
+	return  getParamFloatFromElem(findElement(elementPath), attrName);
+}
+
     
 TiXmlElement * Config::findElement( const std::string & elementPath )
 {
