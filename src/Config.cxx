@@ -28,6 +28,7 @@
 #include <sstream>
 #include <cstring>
 #include <tinyxml.h>
+#include <boost/lexical_cast.hpp>
 
 namespace Engine
 {
@@ -124,71 +125,37 @@ std::string Config::getParamStr( const std::string & elementPath, const std::str
 {
     TiXmlElement * elem = findElement(elementPath);
 	const std::string * retrievedStr = elem->Attribute( attrName );
-	if (!retrievedStr)
+	if (!retrievedStr) 
 	{
-		std::stringstream sstr;
-		sstr << "[CONFIG]: ERROR: Param " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
-		throw Engine::Exception(sstr.str());
-		return "error";
+		throw Engine::Exception("[CONFIG]: ERROR - Parameter " + elem->ValueStr() + "." + attrName + " not found!");
 	}
 	return *retrievedStr;
 }
 
 bool Config::getParamBool( const std::string & elementPath, const std::string & attrName)
 {
-    TiXmlElement * elem = findElement(elementPath);
-	const std::string * retrievedStr = elem->Attribute( attrName );
-	if (!retrievedStr)
-	{
-		std::stringstream sstr;
-		sstr << "[CONFIG]: ERROR: Param " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
-		throw Engine::Exception(sstr.str());
-		return false;
-	}
-	if(!retrievedStr->compare("yes") || !retrievedStr->compare("true") || !retrievedStr->compare("1"))
-	{
-        return true;
-	}
-    return false;
+	const std::string value = getParamStr(elementPath, attrName);
+	return value.compare("yes") == 0 || value.compare("true") == 0 || value.compare("1") == 0;
 }
 
 int Config::getParamInt( const std::string & elementPath, const std::string & attrName)
 {
-    TiXmlElement * elem = findElement(elementPath);
-	const std::string * retrievedStr = elem->Attribute( attrName );
-	if(!retrievedStr)
-	{
-		std::stringstream sstr;
-		sstr << "[CONFIG]: ERROR: Param " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
-		throw Engine::Exception(sstr.str());
-	}
-	return atoi(retrievedStr->c_str());
+	return atoi(getParamStr(elementPath, attrName).c_str());
+}
+
+unsigned Config::getParamUnsigned(const std::string & elementPath, const std::string & attrName)
+{
+	return boost::lexical_cast<unsigned>(getParamStr(elementPath, attrName).c_str());
 }
 
 long int Config::getParamLongInt( const std::string & elementPath, const std::string & attrName )
 {
-    TiXmlElement * elem = findElement(elementPath);
-	const std::string * retrievedStr = elem->Attribute( attrName );
-	if(!retrievedStr)
-	{
-		std::stringstream sstr;
-		sstr << "[CONFIG]: ERROR: Param " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
-		throw Engine::Exception(sstr.str());
-	}
-	return atol(retrievedStr->c_str());
+	return atol(getParamStr(elementPath, attrName).c_str());
 }
 
 float Config::getParamFloat( const std::string & elementPath, const std::string & attrName)
 {
-    TiXmlElement * elem = findElement(elementPath);
-	const std::string * retrievedStr = elem->Attribute( attrName );
-	if(!retrievedStr)
-	{
-		std::stringstream sstr;
-		sstr << "[CONFIG]: ERROR: Param " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
-		throw Engine::Exception(sstr.str());
-	}
-	return atof(retrievedStr->c_str());
+	return atof(getParamStr(elementPath, attrName).c_str());
 }
     
 TiXmlElement * Config::findElement( const std::string & elementPath )

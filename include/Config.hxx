@@ -80,6 +80,7 @@ public:
   
     std::string getParamStr( const std::string & elementPath, const std::string & attrName);
 	int getParamInt( const std::string & elementPath, const std::string & attrName);
+	unsigned getParamUnsigned(const std::string & elementPath, const std::string & attrName);
 	long int getParamLongInt( const std::string & elementPath, const std::string & attrName);
 	float getParamFloat( const std::string & elementPath, const std::string & attrName);
 	bool getParamBool( const std::string & elementPath, const std::string & attrName);
