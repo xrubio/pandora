@@ -1,7 +1,8 @@
 
 version = '0.0.1'
 
-import os, platform
+import os, platform, SCons
+from distutils.version import LooseVersion
 
 vars = Variables('custom.py')
 vars.Add(BoolVariable('debug', 'compile with debug flags', 'no'))
@@ -109,8 +110,16 @@ installLibDir = env['installDir'] + '/lib/'
 installHeadersDir = env['installDir'] + '/include/'
 installAnalysisHeadersDir = installHeadersDir+'analysis'
 
-installedLib = env.InstallVersionedLib(installLibDir, sharedLib, SHLIBVERSION=version)
-installedPyLib = env.InstallVersionedLib(installLibDir, sharedPyLib, SHLIBVERSION=version)
+installedLib = ""
+installedPyLib = ""
+
+if(LooseVersion(SCons.__version__) < LooseVersion("2.3.0")):
+	installedLib = env.Install(installLibDir, sharedLib, SHLIBVERSION=version)
+	installedPyLib = env.Install(installLibDir, sharedPyLib, SHLIBVERSION=version)
+else:
+	installedLib = env.InstallVersionedLib(installLibDir, sharedLib, SHLIBVERSION=version)
+	installedPyLib = env.InstallVersionedLib(installLibDir, sharedPyLib, SHLIBVERSION=version)
+
 
 installedHeaders = env.Install(installHeadersDir, coreHeaders)
 installedAnalysisHeaders = env.Install(installAnalysisHeadersDir, analysisHeaders)
