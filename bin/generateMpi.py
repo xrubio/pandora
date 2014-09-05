@@ -244,9 +244,10 @@ def getMpiTypeConversion( typeInCpp ):
 def writeVectorAttributesPassing( f, agentName, vectorAttributesMap ):
     print 'writing vector attributes map'
     f.write('\n')
-    f.write('void '+agentName+'::sendVectorAttributes( int target)\n')
+    f.write('void '+agentName+'::sendVectorAttributes( int target )\n')
     f.write('{\n')
-    f.write('\tint sizeVector = 0;\n')
+    if len(vectorAttributesMap) > 0:
+        f.write('\tint sizeVector = 0;\n')
     for nameAttribute in vectorAttributesMap.keys():
         print 'sending vector: ' + nameAttribute + ' with type: ' + vectorAttributesMap[nameAttribute]
         f.write('\tsizeVector = '+nameAttribute+'.size();\n')
@@ -257,10 +258,11 @@ def writeVectorAttributesPassing( f, agentName, vectorAttributesMap ):
     f.write('}\n')
     f.write('\n')
 
-    f.write('void '+agentName+'::receiveVectorAttributes( int origin)\n')
+    f.write('void '+agentName+'::receiveVectorAttributes( int origin )\n')
     f.write('{\n')
-    f.write('\tint sizeVector = 0;\n')
-    f.write('\tMPI_Status status;\n')
+    if len(vectorAttributesMap) > 0:
+        f.write('\tint sizeVector = 0;\n')
+        f.write('\tMPI_Status status;\n')
     for nameAttribute in vectorAttributesMap.keys():        
         print 'receiving vector: ' + nameAttribute + ' with type: ' + vectorAttributesMap[nameAttribute]
         f.write('\tMPI_Recv(&sizeVector, 1, MPI_INTEGER, origin, Engine::eSizeVector, MPI_COMM_WORLD, &status);\n')
