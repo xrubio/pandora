@@ -40,9 +40,6 @@ protected:
 	TiXmlDocument * _doc;
     TiXmlElement * _root;
 	// general attributes
-    // xml config file (if it exists)
-    std::string _configFile;
-
 	// file where simulation results will be stored
 	std::string _resultsFile;
 
@@ -52,6 +49,8 @@ protected:
 	int _numSteps;
 	// number of steps to execute before serializing the state of the simulation
 	int _serializeResolution;
+	// xml config file (if it exists)
+	std::string _configFile;
 
 
     TiXmlElement * findElement( const std::string & elementPath );

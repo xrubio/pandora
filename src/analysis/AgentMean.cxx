@@ -16,7 +16,7 @@ AgentMean::~AgentMean()
 void AgentMean::preProcess()
 {
 	_numAgents.resize(_results.size());
-	for(int i=0; i<_numAgents.size(); i++)
+	for(unsigned i=0; i<_numAgents.size(); i++)
 	{
 		_numAgents.at(i) = 0;
 		_results.at(i) = 0.0f;
@@ -25,7 +25,7 @@ void AgentMean::preProcess()
 
 void AgentMean::computeAgent( const Engine::AgentRecord & agentRecord )
 {
-	for(int i=0; i<_results.size(); i++)
+	for(unsigned i=0; i<_results.size(); i++)
 	{
 		if(agentRecord.getInt(i, "exists"))
 		{
@@ -46,7 +46,7 @@ void AgentMean::computeAgent( const Engine::AgentRecord & agentRecord )
 
 void AgentMean::postProcess()
 {
-	for(int i=0; i<_results.size(); i++)
+	for(unsigned i=0; i<_results.size(); i++)
 	{
 		int numAgents = _numAgents.at(i);
 		if(numAgents>0)

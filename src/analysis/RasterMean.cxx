@@ -27,7 +27,7 @@ void RasterMean::computeRaster( const Engine::SimulationRecord::RasterHistory & 
 		_numCells = raster.getSize()._width * raster.getSize()._height;
 	}
 
-	for(int r=0; r<_results.size(); r++)
+	for(unsigned r=0; r<_results.size(); r++)
 	{
 		const Engine::DynamicRaster & raster = rasterHistory.at(r);
 		for(int i=0; i<raster.getSize()._width; i++)
@@ -42,7 +42,7 @@ void RasterMean::computeRaster( const Engine::SimulationRecord::RasterHistory & 
 
 void RasterMean::postProcess()
 {
-	for(int i=0; i<_results.size(); i++)
+	for(unsigned i=0; i<_results.size(); i++)
 	{
 		if(_numCells>0)
 		{
