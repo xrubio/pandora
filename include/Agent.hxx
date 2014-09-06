@@ -112,7 +112,7 @@ public:
 	
 	// this function returns true if the type of the agent is the one passed by reference
 	bool isType( const std::string & type ) const;
-	std::string getType() const;
+	virtual std::string getType() const;
 	
 	// defined in children, it must use serializeAttribute to save valuable data
 	virtual void serialize(){};
