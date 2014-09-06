@@ -28,6 +28,7 @@
 #include <sstream>
 #include <cstring>
 #include <tinyxml.h>
+#include <boost/lexical_cast.hpp>
 
 namespace Engine
 {
@@ -120,76 +121,56 @@ const int & Config::getSerializeResolution() const
 	return _serializeResolution;
 }
 
-std::string Config::getParamStr( const std::string & elementPath, const std::string & attrName)
+
+std::string Config::getParamStrFromElem(TiXmlElement* elem, const std::string & attrName)
 {
-    TiXmlElement * elem = findElement(elementPath);
 	const std::string * retrievedStr = elem->Attribute( attrName );
-	if (!retrievedStr)
+	if (!retrievedStr) 
 	{
-		std::stringstream sstr;
-		sstr << "[CONFIG]: ERROR: Param " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
-		throw Engine::Exception(sstr.str());
-		return "error";
+		throw Engine::Exception("[CONFIG]: ERROR - Parameter " + elem->ValueStr() + "." + attrName + " not found!");
 	}
 	return *retrievedStr;
 }
-
-bool Config::getParamBool( const std::string & elementPath, const std::string & attrName)
-{
-    TiXmlElement * elem = findElement(elementPath);
-	const std::string * retrievedStr = elem->Attribute( attrName );
-	if (!retrievedStr)
-	{
-		std::stringstream sstr;
-		sstr << "[CONFIG]: ERROR: Param " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
-		throw Engine::Exception(sstr.str());
-		return false;
-	}
-	if(!retrievedStr->compare("yes") || !retrievedStr->compare("true") || !retrievedStr->compare("1"))
-	{
-        return true;
-	}
-    return false;
+std::string Config::getParamStr( const std::string & elementPath, const std::string & attrName) {
+	return getParamStrFromElem(findElement(elementPath), attrName);
 }
 
-int Config::getParamInt( const std::string & elementPath, const std::string & attrName)
-{
-    TiXmlElement * elem = findElement(elementPath);
-	const std::string * retrievedStr = elem->Attribute( attrName );
-	if(!retrievedStr)
-	{
-		std::stringstream sstr;
-		sstr << "[CONFIG]: ERROR: Param " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
-		throw Engine::Exception(sstr.str());
-	}
-	return atoi(retrievedStr->c_str());
+bool Config::getParamBoolFromElem(TiXmlElement* elem, const std::string & attrName) {
+	const std::string value = getParamStrFromElem(elem, attrName);
+	return value.compare("yes") == 0 || value.compare("true") == 0 || value.compare("1") == 0;	
+}
+bool Config::getParamBool( const std::string & elementPath, const std::string & attrName) {
+	return getParamBoolFromElem(findElement(elementPath), attrName);
 }
 
-long int Config::getParamLongInt( const std::string & elementPath, const std::string & attrName )
-{
-    TiXmlElement * elem = findElement(elementPath);
-	const std::string * retrievedStr = elem->Attribute( attrName );
-	if(!retrievedStr)
-	{
-		std::stringstream sstr;
-		sstr << "[CONFIG]: ERROR: Param " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
-		throw Engine::Exception(sstr.str());
-	}
-	return atol(retrievedStr->c_str());
+int Config::getParamIntFromElem(TiXmlElement* elem, const std::string & attrName) {
+	return atoi(getParamStrFromElem(elem, attrName).c_str());
+}
+int Config::getParamInt( const std::string & elementPath, const std::string & attrName) {
+	return getParamIntFromElem(findElement(elementPath), attrName);
 }
 
-float Config::getParamFloat( const std::string & elementPath, const std::string & attrName)
-{
-    TiXmlElement * elem = findElement(elementPath);
-	const std::string * retrievedStr = elem->Attribute( attrName );
-	if(!retrievedStr)
-	{
-		std::stringstream sstr;
-		sstr << "[CONFIG]: ERROR: Param " << elem->ValueStr() << "." << attrName << " not found!" << std::endl;
-		throw Engine::Exception(sstr.str());
-	}
-	return atof(retrievedStr->c_str());
+unsigned Config::getParamUnsignedFromElem(TiXmlElement* elem, const std::string & attrName) {
+	return boost::lexical_cast<unsigned>(getParamStrFromElem(elem, attrName).c_str());
 }
+unsigned Config::getParamUnsigned(const std::string & elementPath, const std::string & attrName) {
+	return getParamUnsignedFromElem(findElement(elementPath), attrName);
+}
+
+long int Config::getParamLongFromElem(TiXmlElement* elem, const std::string & attrName) {
+	return atol(getParamStrFromElem(elem, attrName).c_str());
+}
+long int Config::getParamLongInt( const std::string & elementPath, const std::string & attrName ) {
+	return  getParamLongFromElem(findElement(elementPath), attrName);
+}
+
+float Config::getParamFloatFromElem(TiXmlElement* elem, const std::string & attrName) {
+	return atof(getParamStrFromElem(elem, attrName).c_str());
+}
+float Config::getParamFloat( const std::string & elementPath, const std::string & attrName) {
+	return  getParamFloatFromElem(findElement(elementPath), attrName);
+}
+
     
 TiXmlElement * Config::findElement( const std::string & elementPath )
 {
