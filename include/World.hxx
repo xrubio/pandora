@@ -44,7 +44,6 @@ class OpenMPSingleNode;
 
 class World
 {
-	Scheduler * _scheduler;
 public:
 	typedef std::map< std::string, int> RasterNameMap;
 protected:		
@@ -57,6 +56,8 @@ protected:
 
 	//! current simulation step
 	int _step;
+	
+	Scheduler * _scheduler;
 
 protected:
 	// rasters that won't change values during the simulation

@@ -19,7 +19,7 @@ void AgentStdDev::preProcess()
 	_values.clear();
 	_values.resize(_results.size());
 	
-	for(int i=0; i<_numAgents.size(); i++)
+	for(unsigned i=0; i<_numAgents.size(); i++)
 	{
 		_numAgents.at(i) = 0;
 		_results.at(i) = 0.0f;
@@ -28,7 +28,7 @@ void AgentStdDev::preProcess()
 
 void AgentStdDev::computeAgent( const Engine::AgentRecord & agentRecord )
 {
-	for(int i=0; i<_results.size(); i++)
+	for(unsigned i=0; i<_results.size(); i++)
 	{
 		if(agentRecord.getInt(i, "exists"))
 		{ 
@@ -52,10 +52,10 @@ void AgentStdDev::postProcess()
 	std::vector<float> averages;
 	averages.resize(_results.size());
 	// mean calculation
-	for(int i=0; i<_results.size(); i++)
+	for(unsigned i=0; i<_results.size(); i++)
 	{
 		int sum = 0;
-		for(int j=0; j<_values[i].size(); j++)
+		for(unsigned j=0; j<_values[i].size(); j++)
 		{
 			sum += _values[i][j];
 		}
@@ -69,11 +69,11 @@ void AgentStdDev::postProcess()
 		}
 	}
 	// diff calculations
-	for(int i=0; i<_results.size(); i++)
+	for(unsigned i=0; i<_results.size(); i++)
 	{
 		float diff = 0.0f;
 		float average = averages.at(i);
-		for(int j=0; j<_values[i].size(); j++)
+		for(unsigned j=0; j<_values[i].size(); j++)
 		{
 			float value = _values[i][j];
 			diff += (average-value)*(average-value);

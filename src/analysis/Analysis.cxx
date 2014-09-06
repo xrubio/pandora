@@ -35,7 +35,7 @@ Analysis::~Analysis()
 
 void Analysis::preProcess()
 {
-	for(int i=0; i<_results.size(); i++)
+	for(unsigned i=0; i<_results.size(); i++)
 	{
 		_results.at(i) = 0.0f;
 	}

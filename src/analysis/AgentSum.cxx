@@ -15,7 +15,7 @@ AgentSum::~AgentSum()
 
 void AgentSum::computeAgent( const Engine::AgentRecord & agentRecord )
 {
-	for(int i=0; i<_results.size(); i++)
+	for(unsigned i=0; i<_results.size(); i++)
 	{        
         double value = 0.0f;
         if(agentRecord.isInt(_attributeName))

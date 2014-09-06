@@ -29,7 +29,7 @@
 namespace Engine
 {
 
-SpacePartition::SpacePartition( const int & overlap, bool finalize ) : _worldPos(-1,-1), _finalize(finalize), _overlap(overlap), _initialTime(0.0f), _serializer(*this)
+SpacePartition::SpacePartition( const int & overlap, bool finalize ) : _serializer(*this), _worldPos(-1,-1), _overlap(overlap), _finalize(finalize), _initialTime(0.0f)
 {
 }
 
