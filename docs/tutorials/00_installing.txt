@@ -71,6 +71,22 @@ Ubuntu dependencies forces you to install the serial version of HDF5 as gdaldepe
         - if you want to use python2.7 type: $scons python2
         - you can check the full list of options with: $ scons -h
 
+- Installing Pandora
+	* Go to the folder where Pandora is deployed:
+		$ cd PATHTOPANDORA/pandora/
+	* execute:
+        $ sudo scons install (providing root password)
+        By default Pandora will be installed in /usr/local/pandora. If you want to use a different directory use the option installDir=$PATH, such ash:
+        $ sudo scons install installDir=/opt/
+
+    * You will need to add Pandora directory to your .bashrc, using these lines:
+        export PANDORAPATH=/usr/local/pandora
+        export PATH=$PATH:$PANDORAPATH/bin/
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PANDORAPATH/lib/
+        
+        Please change PANDORAPATH if you used a different installation directory.
+
+- Test with an example
 	* Go to any example or app and compile it:
 		$ cd examples/randomWalkers/
 		$ scons
@@ -87,18 +103,4 @@ Ubuntu dependencies forces you to install the serial version of HDF5 as gdaldepe
 		$ ./bin/cassandra
 	* Finally, check whether the results of randomWalkers (they should be inside a 'data' directory) are loaded correctly in cassandra.
 
-- Installing Pandora
-     * Go to the folder where Pandora is deployed:
-		$ cd PATHTOPANDORA/pandora/
-     * execute:
-        $ sudo scons install (providing root password)
-        By default Pandora will be installed in /usr/local/pandora. If you want to use a different directory use the option installDir=$PATH, such ash:
-        $ sudo scons install installDir=/opt/
-
-    * You will need to add Pandora directory to your .bashrc, using these lines:
-        export PANDORAPATH=/usr/local/pandora
-        export PATH=$PATH:$PANDORAPATH/bin/
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PANDORAPATH/lib/
-        
-        Please change PANDORAPATH if you used a different installation directory.
         
