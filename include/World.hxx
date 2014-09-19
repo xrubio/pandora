@@ -44,7 +44,6 @@ class OpenMPSingleNode;
 
 class World
 {
-	Scheduler * _scheduler;
 public:
 	typedef std::map< std::string, int> RasterNameMap;
 protected:		
@@ -57,6 +56,8 @@ protected:
 
 	//! current simulation step
 	int _step;
+	
+	Scheduler * _scheduler;
 
 protected:
 	// rasters that won't change values during the simulation
@@ -72,7 +73,7 @@ protected:
 	
 
 	//! dumps current state of the simulation. Then applies next simulation step.
-	void step();
+	virtual void step();
 
 public:
 	//! constructor.
@@ -89,7 +90,7 @@ public:
 	void run();
 	
 	//! add an agent to the world, and remove it from overlap agents if exist
-	void addAgent( Agent * agent, bool executedAgent = true );
+	virtual void addAgent( Agent * agent, bool executedAgent = true );
 
 	//! returns the number of neighbours of agent 'target' within the radius 'radius' using Euclidean Distance.
 	int countNeighbours( Agent * target, const double & radius, const std::string & type="all" );

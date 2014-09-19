@@ -105,12 +105,14 @@ public:
 	// method to locate the agent to a valid random position of _world
 	void setRandomPosition();
 
-	friend std::ostream & operator<<( std::ostream & stream, Agent * agent );
-	friend std::ostream & operator<<( std::ostream & stream, Agent & agent );
-
+	//! Prints a representation of the state to the given stream.
+	friend std::ostream& operator<<( std::ostream &os, const Agent&  agent) { return agent.print(os); }
+	friend std::ostream& operator<<( std::ostream &os, const Agent*  agent) { return agent->print(os); }
+	virtual std::ostream& print(std::ostream& os) const;
+	
 	// this function returns true if the type of the agent is the one passed by reference
 	bool isType( const std::string & type ) const;
-	std::string getType() const;
+	virtual std::string getType() const;
 	
 	// defined in children, it must use serializeAttribute to save valuable data
 	virtual void serialize(){};

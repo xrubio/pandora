@@ -3,6 +3,7 @@
 
 # Compiled source #
 *.o
+*.os
 *.sconsign.dblite
 pandora/build/
 pandora/build_py/
@@ -15,11 +16,8 @@ pandora/build_py/
 *moc_**
 *mpiCode*
 
-
 .sconf_temp/
 bin/cassandra
-build/
-build_py/
 cassandra/Makefile
 cassandra/qrc_cassandra.cpp
 cassandra/ui_AgentAnalysis.h
@@ -36,6 +34,14 @@ cassandra/ui_Settings.h
 cassandra/ui_TimeSeriesDialog.h
 cassandra/ui_TraitAnalysisSelection.h
 examples/randomWalkers/randomWalkers
-lib/
 src/pyPandora/pyBindings.os
 utils/MpiStubCode.os
+# Temporal folders
+.sconf_temp
+
+# Build folders
+lib
+build/
+buildDebug/
+buildDebug_py/
+build_py/

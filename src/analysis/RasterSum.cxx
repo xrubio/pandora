@@ -15,7 +15,7 @@ RasterSum::~RasterSum()
 
 void RasterSum::computeRaster( const Engine::SimulationRecord::RasterHistory & rasterHistory )
 {
-	for(int r=0; r<_results.size(); r++)
+	for(unsigned r=0; r<_results.size(); r++)
 	{
 		const Engine::DynamicRaster & raster = rasterHistory.at(r);
 		for(int i=0; i<raster.getSize()._width; i++)

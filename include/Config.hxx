@@ -40,9 +40,6 @@ protected:
 	TiXmlDocument * _doc;
     TiXmlElement * _root;
 	// general attributes
-    // xml config file (if it exists)
-    std::string _configFile;
-
 	// file where simulation results will be stored
 	std::string _resultsFile;
 
@@ -52,6 +49,8 @@ protected:
 	int _numSteps;
 	// number of steps to execute before serializing the state of the simulation
 	int _serializeResolution;
+	// xml config file (if it exists)
+	std::string _configFile;
 
 
     TiXmlElement * findElement( const std::string & elementPath );
@@ -78,10 +77,22 @@ public:
 	const std::string & getResultsFile() const{return _resultsFile; }
 	virtual void loadParams(){};    
   
+	std::string getParamStrFromElem(TiXmlElement* elem, const std::string & attrName);
     std::string getParamStr( const std::string & elementPath, const std::string & attrName);
+	
+	int getParamIntFromElem(TiXmlElement* elem, const std::string & attrName);
 	int getParamInt( const std::string & elementPath, const std::string & attrName);
+	
+	unsigned getParamUnsignedFromElem(TiXmlElement* elem, const std::string & attrName);
+	unsigned getParamUnsigned(const std::string & elementPath, const std::string & attrName);
+	
+	long int getParamLongFromElem(TiXmlElement* elem, const std::string & attrName);
 	long int getParamLongInt( const std::string & elementPath, const std::string & attrName);
+	
+	float getParamFloatFromElem(TiXmlElement* elem, const std::string & attrName);
 	float getParamFloat( const std::string & elementPath, const std::string & attrName);
+	
+	bool getParamBoolFromElem(TiXmlElement* elem, const std::string & attrName);
 	bool getParamBool( const std::string & elementPath, const std::string & attrName);
 };
 
