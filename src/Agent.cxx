@@ -114,7 +114,7 @@ void Agent::setExists(bool exists)
 
 std::ostream& Agent::print(std::ostream& os) const {
 	os << "id: " << getId() << " pos: " << getPosition() << " exists: " << exists();
-	return getWorld() ? os << " without world" : os;
+	return getWorld() ? os << " at world: " << getWorld()->getId() : os << " without world";
 }
 
 void Agent::remove()
