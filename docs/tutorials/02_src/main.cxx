@@ -1,19 +1,17 @@
 
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <iostream>
 
 #include "MyWorld.hxx"
-#include <Simulation.hxx>
+#include <Config.hxx>
 #include <Point2D.hxx>
 
 int main(int argc, char *argv[])
 {
 	try
 	{	
-		Engine::Simulation myWorldSim(Engine::Point2D<int>(64,64),10);
-		Tutorial::MyWorld world(myWorldSim);
-		
-		world.init(argc, argv);
+		Tutorial::MyWorld world(new Engine::Config(Engine::Size<int>(64,64),10));
+		world.initialize(argc, argv);
 		world.run();
 	}
 	catch( std::exception & exceptionThrown )

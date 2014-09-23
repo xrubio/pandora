@@ -1,12 +1,12 @@
 
 #include <HelloWorld.hxx>
 #include <HelloAgent.hxx>
-#include <Simulation.hxx>
+#include <Config.hxx>
 #include <DynamicRaster.hxx>
 #include <Point2D.hxx>
 #include <GeneralState.hxx>
 
-HelloWorld::HelloWorld(Engine::Simulation & simulation) : World(simulation)
+HelloWorld::HelloWorld(Engine::Config * config) : World(config)
 {
 }
 

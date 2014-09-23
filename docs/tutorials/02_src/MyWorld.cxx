@@ -2,12 +2,12 @@
 #include "MyWorld.hxx"
 #include "MyAgent.hxx"
 #include <iostream>
-#include <Simulation.hxx>
+#include <Config.hxx>
 
 namespace Tutorial 
 {
 
-MyWorld::MyWorld( Engine::Simulation & simulation) : World(simulation, 1, false, "data/results.h5")
+MyWorld::MyWorld( Engine::Config * config) : World(config)
 {
 }
 
@@ -27,7 +27,7 @@ void MyWorld::createAgents()
 	std::cout << "create agents" << std::endl;	
 	for(int i=0; i<10; i++)
 	{
-		if((i%_simulation.getNumTasks())==_simulation.getId())
+		if((i%getNumTasks())==getId())
 		{
 			std::ostringstream oss;
 			oss << "MyAgent_" << i;

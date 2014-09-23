@@ -1,7 +1,7 @@
 
 #include <HelloWorld.hxx>
 #include <Exception.hxx>
-#include <Simulation.hxx>
+#include <Config.hxx>
 #include <Size.hxx>
 
 #include <iostream>
@@ -13,8 +13,7 @@ int main(int argc, char *argv[])
         Engine::Size<int> size(10,10);
         int numSteps = 10;
 
-		Engine::Simulation simulationParams(size, numSteps);
-		HelloWorld world(simulationParams);
+		HelloWorld world(new Engine::Config(size, numSteps));
         world.initialize();
 		world.run();
 	}

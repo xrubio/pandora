@@ -6,7 +6,7 @@
 
 namespace Engine
 {
-	class Simulation;
+	class Config;
 }
 
 class HelloWorld : public Engine::World
@@ -16,7 +16,7 @@ class HelloWorld : public Engine::World
     void stepEnvironment();
 
 public:
-	HelloWorld(Engine::Simulation & simulation);
+	HelloWorld(Engine::Config * config);
 	virtual ~HelloWorld();
 };
 

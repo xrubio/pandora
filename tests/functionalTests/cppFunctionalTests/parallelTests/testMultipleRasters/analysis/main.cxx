@@ -1,5 +1,4 @@
 #include <Exception.hxx>
-#include <Simulation.hxx>
 
 #include <SimulationRecord.hxx>
 #include <analysis/Results.hxx>

@@ -6,13 +6,11 @@
 
 namespace Engine
 {
-	class Simulation;
+	class Config;
 }
 
 namespace Tutorial 
 {
-
-class MyWorldConfig;
 
 class MyWorld : public Engine::World
 {
@@ -20,8 +18,8 @@ class MyWorld : public Engine::World
 	void createAgents();
 
 public:
-	MyWorld( Engine::Simulation & simulation );
-	virtual ~MyWorld();
+	MyWorld( Engine::Config * config);
+    virtual ~MyWorld();
 };
 
 } // namespace Tutorial 
