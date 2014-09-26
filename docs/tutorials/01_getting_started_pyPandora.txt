@@ -81,9 +81,10 @@ In order to find World and Simulation, our code must define the place where thes
 
 #!/usr/bin/python3
 
-import sys
-sys.path.append('..')
-sys.path.append('../../')
+import sys,os
+pandoraPath = os.getenv('PANDORAPATH', '/usr/local/pandora')
+sys.path.append(pandoraPath+'/bin')
+sys.path.append(pandoraPath+'/lib')
 from pyPandora import Config, World, SizeInt
 
 After adding these lines, the execution of tutorial_pyPandora.py should throw an output like this:
@@ -120,7 +121,8 @@ creating agents
 simulation finished
 
 We can check that pyPandora has called our two init methods (createRasters and createAgents), and 1 task (with id=0) was created, that executed MyWorld for 10 time steps. If we take a closer look to the directory where tutorial_pyPandora.py is, we will see that a new 'data' directory has been created, containing to files: 'agents-0.abm' and 'results.h5'. You can view the results of the simulation using Cassandra application.
-Open cassandra, and go to File->Select Simulation. Look for the directory where you are working, and select 'results.h5' from 'data' folder. You will see a small square of 64x64 points, and a few more things, nothing spectacular. Anyway, it is the proof that your code works and is generating something, congratulations!
+Open cassandra, and go to File->Select Simulation. Look for the directory where you are working, and select 'results.h5' from 'data' folder. You will see a box asking you to choose the 'Resolution Step', click on ok.
+You will see a yellow square, and a few more things, nothing spectacular. Anyway, it is the proof that your code works and is generating something, congratulations!
 
 4) Create some rasters
 
@@ -132,7 +134,7 @@ self.getDynamicRaster("resources").setInitValues(0, 10, 0)
 The first line tells World that it needs to register a new dynamic raster map (it can be modified). The first parameter states that this raster map is called resources, and the second one that it must be stored in 'results.h5' file.
 The second line sets the initialized values of the entire raster map. The first two parameters are the minimum and maximum value for the entire world, and the third one is the default init value.
 
-If you execute again 'tutorial_pyPandora.py', and check 'results.h5' with cassandra you will realize that a 'resources' raster map has been created. Try to 'play' the simulation; the default behavior for a raster map is to increate the value of each cell 1 unit until reaching the maximum value, so if you check the step number 9 you can check that every cell has a value of '9'. (LINK A figure_01.png)
+If you execute again 'tutorial_pyPandora.py', and check 'results.h5' with cassandra. On your left you can see a box showing the list of rasters. It now contains the 'resources' raster map that has been created. Try to 'play' the simulation; the default behavior for a raster map is to increate the value of each cell 1 unit until reaching the maximum value, so if you check the step number 9 you can check that every cell has a value of '9'. You can also notice that the color of the square changes as the ressource value increases. (LINK A figure_01.png)
 
 5) Define MyAgent
 
@@ -160,6 +162,8 @@ If we execute this code we will get an error saying that Agent is not found. We 
 
 from pyPandora import Config, World, Agent, SizeInt 
 
+If the conde is executed now, the results of the simulation will remain the same. We need to modify a few more things
+
 6) Define behavior
 
 We will write some basic code inside updateState to modify its state. For now we will basically move our Agents randomly through the space defined in MyWorld:
@@ -173,7 +177,7 @@ We will write some basic code inside updateState to modify its state. For now we
         if self.getWorld().checkPosition(newPosition):        
             self.position = newPosition
 
-You can see that we have created a local variable called 'newPosition'. It is initialized to the current location of MyAgent (self.position), but we modify randomly these values with a value going of -1, 0 or 1. Finally, we check if the position is correct in terms of MyWorld (to ensure that it is inside boundaries), and we update self.position. It is worth to note that newPosition is an instance of class Point2DInt.
+You can see that we have created a local variable called 'newPosition'. It is initialized to the current location of MyAgent (self.position), but we modify randomly these values with a value going of -1, 0 or 1. Finally, by calling checkPosition(newPosition), we check if the position is correct in terms of MyWorld (to ensure that it is inside boundaries), and we update self.position. It is worth to note that newPosition is an instance of class Point2DInt.
 
 We also have to import random functionaly from Python core libraries:
 
