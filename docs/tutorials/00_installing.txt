@@ -99,10 +99,8 @@ Ubuntu dependencies forces you to install the serial version of HDF5 as gdaldepe
 		$ cd PATHTOPANDORA/pandora/
 	* execute:
         $ scons cassandra
-	* Finally, check whether the results of randomWalkers are loaded correctly in cassandra.
-	* Execute cassandra:
+	* Execute it:
 		$ ./bin/cassandra
-	* Go to File->Select Simulation. Look for the directory PATHTOPANDORA/examples/randomWalkers, and select 'results.h5' from 'data' folder. You will see a box asking you to choose the 'Resolution Step', click on ok.
-	* You should see a square square of 31 by 31 with multiple green circles on it. The squares are your environment and the circles the agents. Click on the blue arrow going to the right to see your simulation moving one step ahead and your agents moving randomly.
+	* Finally, check whether the results of randomWalkers (they should be inside a 'data' directory) are loaded correctly in cassandra.
+
         
-- Congratualations you have successfully install and run both pandora and cassandra. You can continue to the next tutorial to learn how to build your first simulation.
