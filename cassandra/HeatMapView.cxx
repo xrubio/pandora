@@ -96,16 +96,16 @@ void HeatMapView::paintEvent( QPaintEvent * )
                 pen.setWidth(1.0f);
                 painter.setPen(pen);
             }   
-            painter.drawRect(rect); 
+            painter.drawRect(rect);
             if(_showText || (i==size_t(_selectedCell.x()) && j==size_t(_selectedCell.y())))
-            {   
+            { 
                 QFont previousFont = painter.font();  
                 QFont font = painter.font();
                 int pixelSize = _cellSize.height()/2;
 
                 QFontMetrics metrics(font);
                 font.setPixelSize(pixelSize);
-                while(pixelSize>1 && QFontMetrics(font).width(QString::number(_model.getValue(i,j)>_cellSize.width())))
+                while(pixelSize>1 && QFontMetrics(font).width(QString::number(_model.getValue(i,j)))>(1.25f*_cellSize.width()))
                 {
                     pixelSize--;
                     font.setPixelSize(pixelSize);
@@ -113,7 +113,7 @@ void HeatMapView::paintEvent( QPaintEvent * )
                 painter.setFont(font);
                 painter.drawText(QRect(50+i*_cellSize.width(),50+j*_cellSize.height(), _cellSize.width(), _cellSize.height()), Qt::AlignCenter, QString::number(_model.getValue(i,j), 'f', 2));
                 painter.setFont(previousFont);
-        }
+            }
         }
     } 
     
@@ -178,6 +178,7 @@ void HeatMapView::mouseMoveEvent( QMouseEvent * event)
 void HeatMapView::switchText()
 {
     _showText = !_showText;
+    update();
 }
 
 } // namespace GUI
