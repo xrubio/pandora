@@ -105,7 +105,7 @@ void HeatMapView::paintEvent( QPaintEvent * )
 
                 QFontMetrics metrics(font);
                 font.setPixelSize(pixelSize);
-                while(pixelSize>1 && QFontMetrics(font).width(QString::number(_model.getValue(i,j)))>(1.25f*_cellSize.width()))
+                while(pixelSize>1 && QFontMetrics(font).width(QString::number(_model.getValue(i,j)))>(0.75f*_cellSize.width()))
                 {
                     pixelSize--;
                     font.setPixelSize(pixelSize);
