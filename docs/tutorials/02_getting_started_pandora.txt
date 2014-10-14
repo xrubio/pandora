@@ -1,7 +1,7 @@
 
 Getting started with C++ Pandora
 
-To begin this tutorial you will need to have Pandora installed on your computer. Take a look to the Installation (link INSTALLING PANDORA) documentation if you have not make it before. It is strongly recommended to have some background on object oriented programming (preferably using C++).
+To begin this tutorial you will need to have Pandora installed on your computer. Take a look to the Installation (see 02_src/INSTALLING_PANDORA) documentation if you have not make it before. It is strongly recommended to have some background on object oriented programming (preferably using C++).
 
 We will create a simple Agent-Based Model with a basic World and a type of agents. These agents will randomly move through the World, and collect resources from the environment.
 
@@ -20,7 +20,7 @@ We create a file called 'main.cxx' adding these lines into it:
 
 Add these lines to your file:
 
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <iostream>
 
 int main(int argc, char *argv[])
@@ -69,7 +69,7 @@ Start defining a class MyWorld, child of World, inside a file MyWorld.hxx:
 
 namespace Engine
 {
-	class Simulation;
+	class Config;
 }
 
 namespace Tutorial 
@@ -83,7 +83,7 @@ class MyWorld : public Engine::World
 	void createAgents();
 
 public:
-	MyWorld( Engine::Simulation & simulation );
+	MyWorld( Engine::Config * config );
 	virtual ~MyWorld();
 };
 
@@ -93,7 +93,7 @@ public:
 
 All our code will belong to a namespace called Tutorial in order to avoid any conflict. The classes that we need from Pandora belong to a different namespace, called Engine.
 As you can see, we have to define 3 methods:
-	1) The constructor of our class. World needs a 'Simulation' object where basic execution data will be stored (number of time steps, size of World), so we pass it to World's constructor. We also define a virtual destructor, and two additional pure virtual methods:
+	1) The constructor of our class. World needs a 'Config' object where basic execution data will be stored (number of time steps, size of World), so we pass it to World's constructor. We also define a virtual destructor, and two additional pure virtual methods:
 	2) createRasters is called at initialization time. Here we will define the different components of MyWorld that must be present once the execution begins.
 	3) createAgents is also called at init time. It is the method where initial Agents are created and configured.
 
@@ -102,13 +102,13 @@ The methods are defined in a file called 'MyWorld.cxx':
 
 #include "MyWorld.hxx"
 
-#include <Simulation.hxx>
+#include <Config.hxx>
 #include <iostream>
 
 namespace Tutorial 
 {
 
-MyWorld::MyWorld( Engine::Simulation & simulation) : World(simulation, 1, false, "data/results.h5")
+MyWorld::MyWorld( Engine::Config * config) : World(config)
 {
 }
 
@@ -129,22 +129,23 @@ void MyWorld::createAgents()
 } // namespace Tutorial 
 
 
+
 We will create and configure an instance of MyWorld inside the main method (file 'main.cxx'), that now will have this code:
 
-#include <Exceptions.hxx>
+#include <Exception.hxx>
 #include <iostream>
 
 #include "MyWorld.hxx"
-#include <Simulation.hxx>
+#include <Config.hxx>
 
 int main(int argc, char *argv[])
 {
 	try
 	{	
-		Engine::Simulation myWorldSim(64,10);
-		Tutorial::MyWorld world(myWorldSim);
+		Engine::Config* myWorldConfig = new Engine::Config(Engine::Size<int>(64,64),10);
+		Tutorial::MyWorld world(myWorldConfig);
 		
-		world.init(argc, argv);
+		world.initialize(argc, argv);
 		world.run();
 	}
 	catch( std::exception & exceptionThrown )
@@ -154,22 +155,21 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-We create an instance of Simulation class called mySimulation. It contains two parameters needed to execute our model: the number of time steps that the simulation will last, and the size of our world. mySimulations is passed to the constructor of MyWorld, and that's it.
+We create an instance of Simulation class called mySimulation. It contains two parameters needed to execute our model: the size of our world (64 by 64), and the number of time steps that the simulation will last (10). mySimulations is passed to the constructor of MyWorld, and that's it.
 
 Finally, the 'SConstruct' file must include 'MyWorld.cxx' in the list of sourceFiles to compile:
 
-srcFiles = ['main.cxx', 'MyWorld.cxx']
+srcFiles = Split('main.cxx MyWorld.cxx')
 
 If we recompile ('scons') and execute ('./tutorialPandora') you should receive this output:
 
 $ ./tutorialPandora 
 simulation: 0 of: 1 initialized
 create rasters
- id: 0 size: 64 num tasks: 1 and steps: 10
 create agents
 
 We can check that Pandora has called our two init methods (createRasters and createAgents), and 1 task (with id=0) was created. In addition, the execution should have created a directory called 'logs' with a file 'simulation_0.log', where you can follow the execution of the 10 time steps (see TUTORIAL LOGGER to understand how the Logger system works and use it in your simulations). If we take a closer look to the directory where the source is located, we will see that a new 'data' directory has been created, containing to files: 'agents-0.abm' and 'results.h5'. You can view the results of the simulation using Cassandra application (check what this app is in this document (TUTORIAL CASSANDRA).
-Open cassandra (COM OBRIR CASSANDRA), and go to File->Select Simulation. Look for the directory where you are working, and select 'results.h5' from 'data' folder. You will see a small square of 64x64 points, and a few more things, nothing spectacular. Anyway, it is the proof that your code works and is generating something, congratulations!
+Open cassandra (COM OBRIR CASSANDRA), and go to File->Select Simulation. Look for the directory where you are working, and select 'results.h5' from 'data' folder. You will see a yellow square of 64 by 64, and a few more things, nothing spectacular. Anyway, it is the proof that your code works and is generating something, congratulations!
 
 4) Create some rasters
 
@@ -181,7 +181,7 @@ getDynamicRaster("resources").setInitValues(0, 10, 0);
 The first line tells World that it needs to register a new dynamic raster map (it can be modified). The first parameter states that this raster map is called resources, and the second one that it must be stored in 'results.h5' file.
 The second line sets the initialized values of the entire raster map. The first two parameters are the minimum and maximum value for the entire world, and the third one is the default init value.
 
-If you compile and execute again 'tutorialPandora', and check 'results.h5' with cassandra you will realize that a 'resources' raster map has been created. Try to 'play' the simulation; the default behavior for a raster map is to increate the value of each cell 1 unit until reaching the maximum value, so if you check the step number 9 you can check that every cell has a value of '9'. (LINK A figure_01.png)
+If you compile and execute again 'tutorialPandora', and check 'results.h5' with cassandra you will realize that a 'resources' raster map has been created. Try to 'play' the simulation; the default behavior for a raster map is to increate the value of each cell 1 unit until reaching the maximum value, so if you check the step number 9 you can check that every cell has a value of '9' by leaving your cursor on a different cell. (LINK  02_src/figure_01.png)
 
 5) Define MyAgent
 
@@ -249,7 +249,7 @@ We will have to tell the building system that our system will have a new agent, 
 agents = ['MyAgent']
 namespaceAgents = ['Tutorial']
 
-srcFiles = ['main.cxx', 'MyWorld.cxx', 'MyAgent.cxx']
+srcFiles = Split('main.cxx MyWorld.cxx MyAgent.cxx')
 
 If you compile ('scons') this code and check the file 'MyAgent.hxx', you will see that some lines were added to your code:
 
@@ -269,7 +269,7 @@ Don't touch these lines! They are generated by Pandora when the system recognize
 
 6) Define behavior
 
-We will write some basic code inside updateState to modify its state. For now we will basically move our Agents randomly through the space defined in MyWorld:
+We will write some basic code inside updateState to modify its state. For now we will basically move our Agents randomly through the space defined in MyWorld. Modify the file MyAgent.cxx as follow:
 
 void MyAgent::updateState()
 {	
@@ -301,7 +301,7 @@ void MyWorld::createAgents()
 	std::cout << "create agents" << std::endl;	
 	for(int i=0; i<10; i++)
 	{
-		if((i%_simulation.getNumTasks())==_simulation.getId())
+#		if((i%getNumTasks())==getId())
 		{
 			std::ostringstream oss;
 			oss << "MyAgent_" << i;
@@ -314,7 +314,7 @@ void MyWorld::createAgents()
 
 We are creating 10 agents (called MyAgent_0, MyAgent_1, until MyAgent_9), adding them to the World, and setting initial positions for all of them. This line:
 
-if((i%_simulation.getNumTasks())==_simulation.getId())
+if((i%getNumTasks())==getId())
 
 it is important if you are working on a distributed environment. For example, if you execute this simulation using 4 computer nodes the first agent (MyAgent_0) would go to the first computer node (numbered 0), the second one to another (MyAgent_1 to 1), etc.
 
@@ -322,7 +322,7 @@ Finally MyAgent declaration must be included in MyWorld.cxx:
 
 #include "MyAgent.hxx"
 
-Everything ready! If we compile and execute again 'tutorialPandora' we will get a list of messages communicating us that 10 agents have been created, and a sequence of 'updateState' and 'serialize' methods have been executed. If we check 'results.h5' with cassandra we should see something like Figure 2 (LINK figure_02.png)
+Everything ready! If we compile and execute again 'tutorialPandora' we will get a list of messages communicating us that 10 agents have been created, and a sequence of 'updateState' and 'serialize' methods have been executed. If we check 'results.h5' with cassandra we should see something like Figure 2 (LINK 02_src/figure_02.png)
 
 8) Gathering resources
 To finish this tutorial we will modify MyAgent to gather 'resources' from MyWorld, and serialize this value. We go again to the 'updateState' method and add these lines:
@@ -380,7 +380,7 @@ void MyAgent::serialize()
 	serializeAttribute("resources", _gatheredResources);
 }
 
-You can compile and execute the simulation, and check that agents collect resources from the world and accumulate them from time step to time step, as can be seen in figure 3 (LINK figure_03.png)
+You can compile and execute the simulation, and check that agents collect resources from the world and accumulate them from time step to time step, as can be seen in figure 3 (LINK 02_src/figure_03.png)
 
 Congratulations, you have created your first Agent-Based Model using Pandora!
 
