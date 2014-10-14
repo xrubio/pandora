@@ -1,0 +1,26 @@
+8.05855e-05 pos: 0/0, global size: 32/32, boundaries: rect:0/0->31/31 and owned area: rect:0/0->31/31
+0.000179768 sections 0: rect:0/0->15/15 - 1: rect:16/0->31/15 - 2:rect:0/16->15/31 - 3: rect:16/16->31/31
+finished init at: 0.00266433
+0.00268102 executing 10 steps...
+0.0026865 executing step: 0
+0.0137334 finished step: 0
+0.0137672 executing step: 1
+0.016046 finished step: 1
+0.016063 executing step: 2
+0.0180099 finished step: 2
+0.0180218 executing step: 3
+0.0194788 finished step: 3
+0.01949 executing step: 4
+0.0211248 finished step: 4
+0.0211482 executing step: 5
+0.0226467 finished step: 5
+0.0226579 executing step: 6
+0.0241194 finished step: 6
+0.0241315 executing step: 7
+0.0256145 finished step: 7
+0.0256276 executing step: 8
+0.0270655 finished step: 8
+0.0270765 executing step: 9
+0.0286477 finished step: 9
+0.0299377 closing files
+0.0310559 simulation finished

@@ -2,8 +2,8 @@
 <config>
 	<!-- Global simulation parameters -->
 	<output resultsFile="./data/research.h5" logsDir="./logs"/>
-	<numSteps value="200" serializeResolution="1"/>
+	<numSteps value="150" serializeResolution="1"/>
 	<size width="100" height="100"/>
-    <research initialPapers="10" newAuthor="0.01" newPaper="0.03" originality="5" radius="20" researcherLife="50"/>
+    <research initialPapers="10" newAuthor="0.01" newPaper="0.05" originality="5" radius="20" researcherLife="50"/>
 </config>
 

@@ -67,8 +67,9 @@ class Empire(Agent):
         size = self.getWorld().config.size
         for index._x in range(0, size._width):
             for index._y in range(0, size._height):
-                if self.getWorld().getValue("id", index) == self._empireId:
-                    self._averageAsabiya = self._averageAsabiya + float(self.getWorld().getValue("asabiya", index)/1000.0)
+                if self.getWorld().getValue("id", index) != self._empireId:
+                    continue
+                self._averageAsabiya += float(self.getWorld().getValue("asabiya", index)/1000.0)
 
         self._averageAsabiya = self._averageAsabiya/self._numRegions
         #print('empire: ',self,' has average asabiya: ',self._averageAsabiya,' containing: ',self._numRegions,' regions')
@@ -141,24 +142,17 @@ class Frontier(World):
         newEmpire.updateState()
 
     def isEmpireBoundary(self, region):
-        index = Point2DInt(region._x-1, region._y)
-        if self.checkPosition(index) and self.getValue("id", index)!=self.getValue("id", region):
-            return True
+        index = Point2DInt(0,0)
+        idRegion = self.getValue('id', region)
+        for index._x in range(region._x-1, region._x+1):
+            for index._y in range(region._y-1, region._y+1):
 
-        index._x = region._x+1
-        if self.checkPosition(index) and self.getValue("id", index)!=self.getValue("id", region):
-            return True
-
-        index._x = region._x
-        index._y = region._y-1
-        if self.checkPosition(index) and self.getValue("id", index)!=self.getValue("id", region):
-            return True
-
-        index._y = region._y+1
-        if self.checkPosition(index) and self.getValue("id", index)!=self.getValue("id", region):
-            return True
+                if index==region or not self.checkPosition(index):
+                    continue
+                if self.getValue('id', index)!=idRegion:
+                    return True
         return False
-
+ 
     def calculateAsabiya(self):
         index = Point2DInt(0,0)
         for index._x in range(0, self.config.size._width):
@@ -213,7 +207,7 @@ class Frontier(World):
             return
 
         # same empire, not attack
-        if self.getValue("id", attacker)!=0 and self.getValue("id", defender)==self.getValue("id", attacker):
+        if self.getValue("id", defender)==self.getValue("id", attacker):
             return
         
         numAttackingRegions = 1
@@ -223,6 +217,7 @@ class Frontier(World):
         distToAttackingCentre = 0
         distToDefendingCentre = 0
 
+        WTF???
         # attacker not empire
         if self.getValue("id", attacker)!=0:
             attackingEmpire = self.getAgent("Empire_"+str(self.getValue("id", attacker)))
