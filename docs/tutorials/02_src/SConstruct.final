@@ -8,17 +8,17 @@
 ######################################################
 
 # program binary name
-nameProgram = 'nameProgram'
+nameProgram = 'pandoraTutorial'
 
 # user-defined agents (inherit from Engine::Agent)
-agents = ['']
+agents = ['MyAgent']
 # user-defined world (inherit from Engine::World)
-world = ''
+world = 'MyWorld'
 # please indicate the namespace of the custom agents classes
-namespaceAgents = ['']
+namespaceAgents = ['Tutorial']
 
 # list of src files
-srcFiles = Split('main.cxx')
+srcFiles = Split('main.cxx MyWorld.cxx MyAgent.cxx')
 
 ###################################################
 ########## END OF CUSTOM INFORMATION  #############
