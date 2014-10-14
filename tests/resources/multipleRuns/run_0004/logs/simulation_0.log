@@ -1,0 +1,24 @@
+finished init at: 0.00263739
+0.00267887 executing 10 steps...
+0.0026863 executing step: 0
+0.00742954 finished step: 0
+0.00746288 executing step: 1
+0.0128111 finished step: 1
+0.0128787 executing step: 2
+0.0163825 finished step: 2
+0.0164126 executing step: 3
+0.0187108 finished step: 3
+0.0187282 executing step: 4
+0.0210566 finished step: 4
+0.0210826 executing step: 5
+0.0235481 finished step: 5
+0.0235689 executing step: 6
+0.0264177 finished step: 6
+0.0264364 executing step: 7
+0.0292298 finished step: 7
+0.0292485 executing step: 8
+0.0320143 finished step: 8
+0.0320332 executing step: 9
+0.0347474 finished step: 9
+0.037419 closing files
+0.0388404 simulation finished

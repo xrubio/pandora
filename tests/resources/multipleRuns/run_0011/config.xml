@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<config>
+    <output resultsFile="./data/randomWalkers.h5" logsDir="./logs" />
+    <numSteps value="10" serializeResolution="1" />
+    <size width="10" height="10" />
+    <numAgents value="100" />
+</config>
