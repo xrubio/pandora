@@ -1,26 +1,26 @@
-0.000110865 pos: 0/0, global size: 32/32, boundaries: rect:0/0->31/31 and owned area: rect:0/0->31/31
-0.000245333 sections 0: rect:0/0->15/15 - 1: rect:16/0->31/15 - 2:rect:0/16->15/31 - 3: rect:16/16->31/31
-finished init at: 0.00404406
-0.00407338 executing 10 steps...
-0.00408363 executing step: 0
-0.0287774 finished step: 0
-0.0288131 executing step: 1
-0.0487897 finished step: 1
-0.0488262 executing step: 2
-0.0693374 finished step: 2
-0.0693715 executing step: 3
-0.0702572 finished step: 3
-0.0702713 executing step: 4
-0.0709865 finished step: 4
-0.0709987 executing step: 5
-0.0806012 finished step: 5
-0.0806367 executing step: 6
-0.0815415 finished step: 6
-0.0815563 executing step: 7
-0.0822821 finished step: 7
-0.0822945 executing step: 8
-0.0829988 finished step: 8
-0.0830114 executing step: 9
-0.0837204 finished step: 9
-0.0843244 closing files
-0.0854213 simulation finished
+0.000102282 pos: 0/0, global size: 10/10, boundaries: rect:0/0->9/9 and owned area: rect:0/0->9/9
+0.000223875 sections 0: rect:0/0->4/4 - 1: rect:5/0->9/4 - 2:rect:0/5->4/9 - 3: rect:5/5->9/9
+finished init at: 0.00329113
+0.00331044 executing 10 steps...
+0.0033164 executing step: 0
+0.0269902 finished step: 0
+0.0270286 executing step: 1
+0.0393267 finished step: 1
+0.0393593 executing step: 2
+0.041981 finished step: 2
+0.0419993 executing step: 3
+0.0437872 finished step: 3
+0.0438004 executing step: 4
+0.0455132 finished step: 4
+0.0455246 executing step: 5
+0.0478659 finished step: 5
+0.0478837 executing step: 6
+0.0544288 finished step: 6
+0.054456 executing step: 7
+0.0597878 finished step: 7
+0.0598183 executing step: 8
+0.0679581 finished step: 8
+0.0679884 executing step: 9
+0.0878627 finished step: 9
+0.0898004 closing files
+0.0909464 simulation finished

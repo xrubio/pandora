@@ -2,6 +2,6 @@
 <config>
     <output resultsFile="./data/randomWalkers.h5" logsDir="./logs" />
     <numSteps value="10" serializeResolution="1" />
-    <size width="32" height="32" />
-    <numAgents value="90" />
+    <size width="10" height="10" />
+    <numAgents value="50" />
 </config>
