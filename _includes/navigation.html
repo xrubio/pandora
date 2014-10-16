@@ -1,0 +1,21 @@
+<div class="navigation-wrapper">
+	<div class="site-name">
+	</div><!-- /.site-name -->
+	<div class="top-navigation">
+                
+		<nav role="navigation" id="site-nav" class="nav">
+    <a href="{{ site.url }}">{{ site.title }}</a>
+		    <ul>
+		        {% for link in site.data.navigation %}
+					    {% if link.url contains 'http' %}
+					        {% assign domain = '' %}
+					        {% else %}
+					        {% assign domain = site.url %}
+					    {% endif %}
+					    <li><a href="{{ domain }}{{ link.url }}" {% if link.url contains 'http' %}target="_blank"{% endif %}>{{ link.title }}</a></li>
+					  {% endfor %}
+		    </ul>
+		</nav>
+	</div><!-- /.top-navigation -->
+</div><!-- /.navigation-wrapper -->
+
