@@ -63,9 +63,17 @@ void Display2D::resetView()
 	_viewedStep = 0;
 	_offset.setX(0);
 	_offset.setY(0);
+    _sizePixel = 50;
 
     if(_simulationRecord)
     {
+        int maxExtent = std::max(_simulationRecord->getSize()._width, _simulationRecord->getSize()._height);
+        // qpixmap has a maximum size of 32767x32767; 10000 seems reasonable
+        if(maxExtent*_sizePixel>10000)
+        {
+            _sizePixel = (_sizePixel*maxExtent)/10000;
+        }
+
 	    _zoom = 600.0f/float(std::max(_simulationRecord->getSize()._width, _simulationRecord->getSize()._height));
     }
     else
@@ -102,8 +110,8 @@ void Display2D::paintEvent(QPaintEvent *event)
     painter.setPen(Qt::NoPen);
 
 	imageToDraw.fill(QColor("#E6D298"));
- 
-	if(!_orderedRasters.empty())
+	
+    if(!_orderedRasters.empty())
 	{
 		for(int i=0; i<_simulationRecord->getSize()._width; i++)
 		{
@@ -176,8 +184,8 @@ void Display2D::paintEvent(QPaintEvent *event)
 			}
 		}
 	}
-
-	if(!_showAgents)
+	
+    if(!_showAgents)
 	{
 		QPainter screenPainter(this);	
 		screenPainter.save();
