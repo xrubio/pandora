@@ -36,17 +36,17 @@ int main(int argc, char *argv[])
 	simRecord.loadHDF5("data/results.h5", true, true);
 
 	PostProcess::GlobalAgentStats agentResults;	
-	agentResults.addAnalysis(new PostProcess::AgentNum());
-	agentResults.addAnalysis(new PostProcess::AgentMean("x"));
-	agentResults.addAnalysis(new PostProcess::AgentMean("y"));
-	agentResults.addAnalysis(new PostProcess::AgentMean("resources"));
-	agentResults.addAnalysis(new PostProcess::AgentSum("resources"));
+	agentResults.addAnalysis(std::shared_ptr<PostProcess::AgentNum> (new PostProcess::AgentNum()));
+	agentResults.addAnalysis(std::shared_ptr<PostProcess::AgentMean> (new PostProcess::AgentMean("x")));
+	agentResults.addAnalysis(std::shared_ptr<PostProcess::AgentMean> (new PostProcess::AgentMean("y")));
+	agentResults.addAnalysis(std::shared_ptr<PostProcess::AgentMean> (new PostProcess::AgentMean("resources")));
+	agentResults.addAnalysis(std::shared_ptr<PostProcess::AgentSum> (new PostProcess::AgentSum("resources")));
+
 	agentResults.apply(simRecord, "agents.csv", "MyAgent");
 
 	PostProcess::GlobalRasterStats rasterResults;
-	rasterResults.addAnalysis(new PostProcess::RasterMean());
-	rasterResults.addAnalysis(new PostProcess::RasterSum());
-
+	rasterResults.addAnalysis(std::shared_ptr<PostProcess::RasterMean> (new PostProcess::RasterMean()));
+	rasterResults.addAnalysis(std::shared_ptr<PostProcess::RasterSum> (new PostProcess::RasterSum()));
 	rasterResults.apply(simRecord, "rasters.csv", "resources");
 	return 0;
 }
