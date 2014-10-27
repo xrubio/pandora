@@ -346,8 +346,8 @@ def getAttributesFromClass( className, attributesMap, vectorAttributesMap):
             addVectorAttribute( line, vectorAttributesMap ) 
         elif line.find(keyString) != -1:
             addStringAttribute( line, attributesMap )
-        # parse base class
-        elif line.find('class') != -1 and line.find(className) != -1:
+        # parse base class, it must inherit from Agent
+        elif line.find('class') != -1 and line.find(className) != -1 and line.find('public') != -1:
             splittedLine = line.rsplit()
             parentName = splittedLine[len(splittedLine)-1]
             # remove namespace in case it exists
