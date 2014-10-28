@@ -68,8 +68,8 @@ void Display2D::resetView()
     if(_simulationRecord)
     {
         int maxExtent = std::max(_simulationRecord->getSize()._width, _simulationRecord->getSize()._height);
-        // qpixmap has a maximum size of 32767x32767; 10000 seems reasonable
-        if(maxExtent*_sizePixel>10000)
+        // qpixmap has a maximum size of 32767x32767; 100.000 seems reasonable
+        if(maxExtent*_sizePixel>100000)
         {
             _sizePixel = (_sizePixel*maxExtent)/10000;
         }
@@ -80,6 +80,7 @@ void Display2D::resetView()
     {
 	    _zoom = 1.0f;
     }
+    std::cout << "size pixel: " << _sizePixel << std::endl;
 }
 
 void Display2D::setSimulationRecord( Engine::SimulationRecord * simulationRecord )
@@ -285,7 +286,7 @@ void Display2D::paintEvent(QPaintEvent *event)
                         }
 					}
 					int size = agentConfig->getSize();
-					painter.drawEllipse(_sizePixel*x-5*(size-1),_sizePixel*y-5*(size-1),_sizePixel*size, _sizePixel*size);
+                    painter.drawEllipse(_sizePixel*x-5*(size-1),_sizePixel*y-5*(size-1),_sizePixel*size, _sizePixel*size);
                     if(!agentConfig->showValue() || _state=="unknown")
                     {
                         continue;
