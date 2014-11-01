@@ -8,7 +8,7 @@ sys.path.append(pandoraPath+'/lib')
 
 import random
 
-from pyPandora import Simulation, Agent, World, Point2DInt, SizeInt
+from pyPandora import Config, Agent, World, Point2DInt, SizeInt
 
 class HelloAgent(Agent):
     def __init__(self, id):
@@ -29,9 +29,9 @@ class HelloAgent(Agent):
         return
 
 class HelloWorld(World):
-    def __init__(self, simulation ):
+    def __init__(self, config):
         """ constructor of class HelloWorld """
-        World.__init__( self, simulation)
+        World.__init__( self, config)
 
     def createRasters(self):
         """ init function where rasters are created """
@@ -55,9 +55,8 @@ def main():
 
     size = SizeInt(10,10)
     numSteps = 10
-
-    simulationParams = Simulation(size, numSteps)
-    world = HelloWorld(simulationParams)
+    myConfig = Config(size, numSteps)
+    world = HelloWorld(myConfig)
     world.initialize()
     world.run()
 

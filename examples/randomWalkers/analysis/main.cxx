@@ -36,14 +36,13 @@
 int main(int argc, char *argv[])
 {
 	try
-	{
+    {
         if(argc!=4)
-    	{
-	    	throw Engine::Exception("USAGE: analysis file.h5 agent.csv rasters.csv");
-    		return 0;
-	    }
-
-		Engine::SimulationRecord simRecord( 1, false);
+        {
+            throw Engine::Exception("USAGE: analysis file.h5 agent.csv rasters.csv");
+            return 0;
+        }
+        Engine::SimulationRecord simRecord( 1, false);
 		simRecord.loadHDF5(argv[1], true, true);
 
 		PostProcess::GlobalAgentStats agentResults;

@@ -51,6 +51,7 @@ public:
 
 	void setAnalysisOwnership( bool analysisOwnership );
 	void apply( const Engine::SimulationRecord & simRecord, const std::string & outputFile, const std::string & type );
+	void addAnalysis( RasterAnalysis * analysis );
 	void addAnalysis( std::shared_ptr<RasterAnalysis> analysis );
 
 	std::string getName() const;

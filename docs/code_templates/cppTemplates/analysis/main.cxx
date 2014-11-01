@@ -41,14 +41,14 @@ int main(int argc, char *argv[])
 		simRecord.loadHDF5("../simulation/data/results.h5", true, true);
 
 		PostProcess::GlobalAgentStats agentResults;
-		agentResults.addAnalysis(new PostProcess::AgentNum());
+        agentResults.addAnalysis(new PostProcess::AgentNum());
 		agentResults.addAnalysis(new PostProcess::AgentMean("value"));
 		agentResults.addAnalysis(new PostProcess::AgentStdDev("value"));
 		agentResults.addAnalysis(new PostProcess::AgentSum("value"));
 
 		agentResults.apply(simRecord, "agentOutput.csv", "HelloAgent");
-
-		PostProcess::GlobalRasterStats rasterResults;
+		
+        PostProcess::GlobalRasterStats rasterResults;
 		rasterResults.addAnalysis(new PostProcess::RasterMean());
 		rasterResults.addAnalysis(new PostProcess::RasterSum());
 

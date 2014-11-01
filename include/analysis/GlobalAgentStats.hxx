@@ -52,6 +52,7 @@ public:
 	void setAnalysisOwnership( bool analysisOwnership );
 	void apply( const Engine::SimulationRecord & simRecord, const std::string & outputFile, const std::string & type );
 	void addAnalysis( std::shared_ptr<AgentAnalysis> analysis );
+    void addAnalysis( AgentAnalysis * analysis );
 
 	std::string getName() const;
 	// set params for performing group analysis. If a single analysis is applied a time series file will be generated following resolution and numSteps.

@@ -197,6 +197,10 @@ void GlobalRasterStats::writeParams( std::stringstream & line, const std::string
 
 }
 
+void GlobalRasterStats::addAnalysis( RasterAnalysis * analysis )
+{
+	_analysisList.push_back(std::shared_ptr<RasterAnalysis>(analysis));
+}
 
 void GlobalRasterStats::addAnalysis( std::shared_ptr<RasterAnalysis> analysis )
 {

@@ -24,7 +24,7 @@ def main():
     rasterResults = GlobalRasterStats(';')
     rasterResults.addAnalysis(RasterMean())
     rasterResults.addAnalysis(RasterSum())
-    rasterResults.applyTo(record, 'resources.csv', 'test')
+    rasterResults.applyTo(record, 'values.csv', 'values')
 
 if __name__ == "__main__":
     main()  

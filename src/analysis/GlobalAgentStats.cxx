@@ -204,6 +204,10 @@ void GlobalAgentStats::writeParams( std::stringstream & line, const std::string 
 	}
 }
 
+void GlobalAgentStats::addAnalysis( AgentAnalysis * analysis )
+{
+	_analysisList.push_back(std::shared_ptr<AgentAnalysis>(analysis));
+}
 
 void GlobalAgentStats::addAnalysis( std::shared_ptr<AgentAnalysis> analysis )
 {
