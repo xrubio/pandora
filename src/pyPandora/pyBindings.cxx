@@ -363,6 +363,7 @@ Engine::StaticRaster & (Engine::World::*getStaticRaster)(const std::string&) = &
 
 int (Engine::World::*getValue)(const std::string&, const Engine::Point2D<int> &) const = &Engine::World::getValue;
 void (Engine::World::*setValue)(const std::string&, const Engine::Point2D<int> &, int) = &Engine::World::setValue;
+void (Engine::World::*setMaxValue)(const std::string&, const Engine::Point2D<int> &, int) = &Engine::World::setMaxValue;
 
 Engine::Agent * (Engine::World::*getAgent)(const std::string &) = &Engine::World::getAgent;
 
@@ -493,6 +494,7 @@ BOOST_PYTHON_MODULE(libpyPandora)
 		.staticmethod("useOpenMPSingleNode")
 		.def("addAgent", &WorldWrap::addAgentSimple,boost::python::with_custodian_and_ward<1,2>())
 		.def("setValue", setValue)
+		.def("setMaxValue", setMaxValue)
 		.def("getValue", getValue)
 		.def("getAgentIds", &WorldWrap::getAgentIds)
 		.def("getNeighboursIds", &WorldWrap::getNeighboursIds)
