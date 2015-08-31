@@ -9,40 +9,35 @@ srcFiles = Split('main.cxx')
 import os, sys
 from subprocess import call
 
-sys.path.append('../../scripts/')
+pandoraPath = os.getenv('PANDORAPATH', '/usr/local/pandora')
+sys.path.append(pandoraPath+'/bin')
+
 import generateMpi 
 
-release = ARGUMENTS.get('release', 1)
-extremeDebug = ARGUMENTS.get('edebug', 0)
-useMpi = ARGUMENTS.get('mpi', 1)
+vars = Variables('custom.py')
+vars.Add(BoolVariable('debug', 'compile with debug flags', 'no'))
+vars.Add(BoolVariable('edebug', 'compile with extreme debug logs', 'no'))
 
-if int(useMpi) == 1:
-	env = Environment(ENV=os.environ, CXX='mpicxx')
-else:
-	env = Environment(ENV=os.environ, CXX='g++')
+env = Environment(variables=vars, ENV=os.environ, CXX='mpicxx')
+Help(vars.GenerateHelpText(env))
 
 generateMPICodeBuilder = Builder(action=generateMpi.execute)
 env.Append( BUILDERS = {'GenerateMPICode' : generateMPICodeBuilder})
 
-linkFlags = Split('-fopenmp')
-libs = Split('tinyxml pthread')
-if int(release) == 0:
-	env['CCFLAGS'] = Split('-g -O0 -Wall -DTIXML_USE_STL -fopenmp -DPANDORADEBUG')
-	if int(extremeDebug)==1:
-		env['CCFLAGS'] += ['-DPANDORAEDEBUG']
-	libs += ['pandorad']
+env.Append(LINKFLAGS = '-fopenmp')
+env.Append(LIBS = 'tinyxml pthread mpl'.split())
+env.Append(CCFLAGS = '-std=c++0x -DTIXML_USE_STL'.split())
+if env['debug'] == True:
+    env.Append(CCFLAGS = '-g -O0 -Wall -DPANDORADEBUG'.split())
+    if env['edebug']==True:
+        env.Append(CCFLAGS = '-DPANDORAEDEBUG')
+    env.Append(LIBS = 'pandora')
 else:
-	env['CCFLAGS'] = Split('-O3 -DTIXML_USE_STL -fopenmp')
-	libs += ['pandora']
+    env.Append(CCFLAGS = '-Ofast'.split())
+    env.Append(LIBS = 'pandora')
 
-if int(useMpi)==1:
-	env['CCFLAGS'] += ['-DPANDORAMPI']
-
-includeDirs = Split('./ ../../')
-
-includeDirs += ['/usr/local/include','/usr/local/hdf5/include','/usr/include/gdal/']
-libDirs = Split('../../ /usr/local/lib /usr/local/hdf5/lib/')
-libs += ['mpl']
+env.Append(CPPPATH = ['.', pandoraPath+'/include'])
+env.Append(LIBPATH = [pandoraPath+'/lib'])
 
 # add the list of mpi code that must be generated & compiled
 mpiAgentsSrc = ['mpiCode/FactoryCode.cxx']
@@ -55,5 +50,5 @@ for agent in agents:
 env['namespaces'] = namespaceAgents
 env.GenerateMPICode( target=mpiAgentsSrc, source=agentsSrc)
 env.Depends(world+'.hxx',mpiAgentsSrc)
-env.Program(nameProgram, srcFiles+mpiAgentsSrc, CPPPATH=includeDirs, LIBS=libs, LIBPATH=libDirs, LINKFLAGS=linkFlags)
+env.Program(nameProgram, srcFiles+mpiAgentsSrc)
 

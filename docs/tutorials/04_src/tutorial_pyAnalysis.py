@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 
 import sys
-sys.path.append('../../../pandora/pyPandora/')
-sys.path.append('../../../pandora/')
+pandoraPath = os.getenv('PANDORAPATH', '/usr/local/pandora')
+sys.path.append(pandoraPath+'/bin')
+sys.path.append(pandoraPath+'/lib')
 from pyPandora import SimulationRecord, GlobalAgentStats, AgentMean, AgentSum, AgentNum, RasterMean, RasterSum, GlobalRasterStats
 
 record = SimulationRecord()
