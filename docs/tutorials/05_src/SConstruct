@@ -48,6 +48,9 @@ for agent in agents:
 		mpiAgentsSrc.append("mpiCode/"+agent+"_mpi.cxx")
 
 env['namespaces'] = namespaceAgents
+if (len(namespaceAgents) != len(agents)):
+	print("The number of agents and name spaces declared should match!")
+	sys.exit(1)
 env.GenerateMPICode( target=mpiAgentsSrc, source=agentsSrc)
 env.Depends(world+'.hxx',mpiAgentsSrc)
 env.Program(nameProgram, srcFiles+mpiAgentsSrc)
