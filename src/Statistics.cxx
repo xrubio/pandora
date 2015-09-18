@@ -151,6 +151,35 @@ int Statistics::getUniformDistValue( int min, int max ) const
 	return value;
 }
 
+void Statistics::addBetaDistribution(std::string name, double alpha, double beta, double scale)
+{
+	boost::gamma_distribution<> gd_alpha( alpha );
+  TypeGenerator gamma_alpha( _randomGenerator, gd_alpha );
+
+	 boost::gamma_distribution<> gd_beta( beta );
+  TypeGenerator gamma_beta( _randomGenerator, gd_beta );
+
+	std::tuple<TypeGenerator,TypeGenerator,double> tuple = std::make_tuple(gamma_alpha,gamma_beta,scale);
+	_mapBetaDistributions.insert(std::pair<std::string,std::tuple<TypeGenerator,TypeGenerator,double> >(name,tuple));
+}
+
+double Statistics::getBetaDistributionValue(std::string name)
+{
+	auto it = _mapBetaDistributions.find(name);
+	if(it != _mapBetaDistributions.end() )
+	{
+		TypeGenerator gamma_alpha = std::get<0>(it->second);
+		TypeGenerator gamma_beta = std::get<1>(it->second);
+		double scale = std::get<2>(it->second);
+		double x = gamma_alpha();
+		double y = gamma_beta();
+		return (x/(x+y))*scale;
+	}
+	std::stringstream oss;
+	oss << "Statistics::getBetaDistributionValue - ask value from unknown beta distribution: " << name;
+	throw Engine::Exception(oss.str());
+}
+
 float Statistics::getUniformDistValue()
 {
     return _next01Number();
