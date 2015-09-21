@@ -25,6 +25,8 @@
 
 #include <boost/random.hpp>
 #include <vector>
+#include <map>
+#include <tuple>
 
 namespace Engine
 {
@@ -32,6 +34,8 @@ namespace Engine
 class Statistics
 {
 	typedef boost::mt19937 RandomEngine;
+	typedef boost::variate_generator<boost::mt19937&,boost::gamma_distribution<> >  TypeGenerator;
+
 	RandomEngine _randomGenerator;
 	static const int _distributionSize = 100000;
 
@@ -47,6 +51,9 @@ class Statistics
 
 	std::vector<float> _normalDistribution;
 	void generateNormalDistribution();
+
+	std::map<std::string, std::tuple<TypeGenerator,TypeGenerator,double> > _mapBetaDistributions;
+
 public:
 	Statistics();
 	float getExponentialDistValue( float min, float max ) const;
@@ -55,10 +62,13 @@ public:
 
 	// uniform dist does not need to generate numbers, as randomNumbers itself is a 
 	int getUniformDistValue( int min, int max ) const;
-    // uniform float distribution between 0 and 1
-    float getUniformDistValue();
+	// uniform float distribution between 0 and 1
+	float getUniformDistValue();
 	//! Gets a random number from /dev/urandom to be used as a seed.
 	uint64_t getNewSeed();
+
+	void addBetaDistribution(std::string name, double alpha, double beta, double scale);
+	double getBetaDistributionValue(std::string name);
 
 };
 

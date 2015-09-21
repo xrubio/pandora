@@ -198,6 +198,27 @@ BOOST_AUTO_TEST_CASE( testGetUnknownRasterThrowsException)
 
 }
 
+BOOST_AUTO_TEST_CASE( testGetUnknownBetaDistributionThrowsException) 
+{      
+    try
+    {
+				double value = Engine::GeneralState::statistics().getBetaDistributionValue("test");
+				BOOST_FAIL("Statistics::getBetaDistributionValue - ask value from unknown beta distribution: test");
+    }
+    catch(Engine::Exception & exception)
+    {
+
+    }
+}
+
+BOOST_AUTO_TEST_CASE( testBetaDistributionReturnsValueWithinBounds ) 
+{      
+		Engine::GeneralState::statistics().addBetaDistribution("test",2.0,2.0,3.0);
+		double value = Engine::GeneralState::statistics().getBetaDistributionValue("test");
+		BOOST_CHECK_LE(value,3.0);
+		BOOST_CHECK_GE(value,0.0);
+}
+
 BOOST_AUTO_TEST_CASE( testLoadStaticRaster ) 
 {
     Engine::StaticRaster aRaster;
