@@ -230,14 +230,14 @@ void Serializer::init(World & world )
 	
 	//the real size of the matrix is sqrt(num simulator)*matrixsize	
 	hsize_t dimensions[2];
-	dimensions[0] = hsize_t(_config->getSize()._width);
-	dimensions[1] = hsize_t(_config->getSize()._height);
+	dimensions[0] = hsize_t(_config->getSize()._height);
+	dimensions[1] = hsize_t(_config->getSize()._width);
 
 	// we need to specify the size where each computer node will be writing
 	hsize_t chunkDimensions[2];
-	chunkDimensions[0] = _scheduler.getOwnedArea()._size._width/2;
+	chunkDimensions[0] = _scheduler.getOwnedArea()._size._height/2;
 	chunkDimensions[0] += 2*_scheduler.getOverlap();
-	chunkDimensions[1] = _scheduler.getOwnedArea()._size._height/2;
+	chunkDimensions[1] = _scheduler.getOwnedArea()._size._width/2;
 	chunkDimensions[1] += 2*_scheduler.getOverlap();
 	
 	propertyListId = H5Pcreate(H5P_DATASET_CREATE);
@@ -653,13 +653,15 @@ void Serializer::serializeRaster( const StaticRaster & raster, const std::string
 
 	// if it is not a border, it will copy from overlap
 	hsize_t	offset[2];
-    offset[0] = _scheduler.getOwnedArea()._origin._x;	
-    offset[1] = _scheduler.getOwnedArea()._origin._y;
+    offset[0] = _scheduler.getOwnedArea()._origin._y;	
+    offset[1] = _scheduler.getOwnedArea()._origin._x;
+
+	const hsize_t ownedAreaWidth = _scheduler.getOwnedArea()._size._width;
+	const hsize_t ownedAreaHeight = _scheduler.getOwnedArea()._size._height;
  
 	hsize_t	block[2];
-	block[0] = _scheduler.getOwnedArea()._size._width;
-	block[1] = _scheduler.getOwnedArea()._size._height;
-
+	block[0] = ownedAreaHeight;
+	block[1] = ownedAreaWidth;
 
 	hid_t dataSetId = H5Dopen(_fileId, datasetKey.c_str(), H5P_DEFAULT);
 	hid_t fileSpace = H5Dget_space(dataSetId);
@@ -677,15 +679,19 @@ void Serializer::serializeRaster( const StaticRaster & raster, const std::string
 	int * data = (int *) malloc(sizeof(int)*block[0]*block[1]);
 	Point2D<int> overlapDist = _scheduler.getOwnedArea()._origin-_scheduler.getBoundaries()._origin;
 	log_EDEBUG(logName.str(), "overlap dist: " << overlapDist << "owned area: " << _scheduler.getOwnedArea() << " and boundaries: " << _scheduler.getBoundaries());
-	for(size_t i=0; i<block[0]; i++)
+	size_t index = 0;
+	for(size_t y=0; y<ownedAreaHeight; y++)
 	{
-		for(size_t j=0; j<block[1]; j++)
+		for(size_t x=0; x<ownedAreaWidth; x++)
 		{	
-			size_t index = j*block[0]+i;
-			log_EDEBUG(logName.str(), "index: " << i << "/" << j << " - " << index);
-			log_EDEBUG(logName.str(), "getting value: " << Point2D<int> (i+overlapDist._x,j+overlapDist._y));
-			data[index] = raster.getValue(Point2D<int> (i+overlapDist._x,j+overlapDist._y));
+			log_EDEBUG(logName.str(), "index: " << x << "/" << y << " - " << index);
+			log_EDEBUG(logName.str(), "getting value: " << Point2D<int> (x+overlapDist._x,y+overlapDist._y));
+			data[index] = raster.getValue(Point2D<int> (x+overlapDist._x,y+overlapDist._y));
+			if (data[index] < -100) {
+				log_INFO(logName.str(), "low value: " << data[index] << " at pos: " << x << "/" << y);
+			}
 			log_EDEBUG(logName.str(), "value: " << data[index]);
+			++index;
 		}
 	}
     // Create property list for collective dataset write.
