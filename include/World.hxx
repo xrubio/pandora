@@ -164,6 +164,7 @@ public:
 	  * but if this is not the case it is the area owned by the instance plus the overlaps
 	  */
 	const Rectangle<int> & getBoundaries() const;
+	const Rectangle<int> & getOwnedArea() const;
 
 	// methods that need to be defined for current state of the code
 	AgentsList::iterator beginAgents() { return _agents.begin(); }

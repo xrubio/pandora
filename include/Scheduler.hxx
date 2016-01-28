@@ -85,6 +85,7 @@ public:
 
 	//! basic method to use while exploring boundaries of World 
 	virtual const Rectangle<int> & getBoundaries() const { return _boundaries; };
+	virtual const Rectangle<int> & getOwnedArea() const { return _boundaries; };
 	virtual Point2D<int> getRandomPosition() const = 0;
 
 	// ids

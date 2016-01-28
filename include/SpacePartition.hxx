@@ -146,7 +146,6 @@ class SpacePartition : public Scheduler
 	//! send overlapping data to neighbours before run
 	void initOverlappingData();
 
-	const Rectangle<int> & getOwnedArea() const;
 	//! returns the attribute _overlap
 	const int & getOverlap() const;
 	//! transform from global coordinates to real coordinates (in terms of world position)
@@ -159,6 +158,7 @@ public:
 	void finish();
 
 	const Rectangle<int> & getBoundaries() const;
+	const Rectangle<int> & getOwnedArea() const;
 	//! initialization of the object World for the simulation. Required to be called before calling run.
 
 	//! initializes everything needed before creation of agents and rasters (i.e. sizes)
