@@ -194,8 +194,8 @@ void SequentialSerializer::init( World & world )
 	
 	//the real size of the matrix is sqrt(num simulator)*matrixsize	
 	hsize_t dimensions[2];
-	dimensions[0] = hsize_t(_config->getSize()._width);
-	dimensions[1] = hsize_t(_config->getSize()._height);
+	dimensions[0] = hsize_t(_config->getSize()._height);
+	dimensions[1] = hsize_t(_config->getSize()._width);
 
 	// static rasters	
 	for(size_t i=0; i<world.getNumberOfRasters(); i++)
@@ -598,23 +598,23 @@ void SequentialSerializer::serializeRaster( const StaticRaster & raster, const s
 	hid_t dataSetId = H5Dopen(_fileId, datasetKey.c_str(), H5P_DEFAULT);
 	hid_t fileSpace = H5Dget_space(dataSetId);
 
+	const hsize_t ownedAreaWidth = _scheduler.getOwnedArea()._size._width;
+	const hsize_t ownedAreaHeight = _scheduler.getOwnedArea()._size._height;
+ 
 	hsize_t	block[2];
-	block[0] = _scheduler.getBoundaries()._size._width;
-	block[1] = _scheduler.getBoundaries()._size._height;
+	block[0] = ownedAreaHeight;
+	block[1] = ownedAreaWidth;
 	
 	int * data = (int *) malloc(sizeof(int)*block[0]*block[1]);
-	for(size_t i=0; i<block[0]; i++)
+	size_t index = 0;
+	for(size_t y=0; y<ownedAreaHeight; y++)
 	{
-		for(size_t j=0; j<block[1]; j++)
+		for(size_t x=0; x<ownedAreaWidth; x++)
 		{	
-			size_t index = j*block[0]+i;
-			log_EDEBUG(logName.str(), "index: " << i << "/" << j << " - " << index);
-			/*
-			log_EDEBUG(logName.str(), "getting value: " << Point2D<int> (i+overlapDist._x,j+overlapDist._y));
-			data[index] = raster.getValue(Point2D<int> (i+overlapDist._x,j+overlapDist._y));
-			*/
-			data[index] = raster.getValue(Point2D<int>(i,j));
+			log_EDEBUG(logName.str(), "index: " << x << "/" << y << " - " << index);
+			data[index] = raster.getValue(Point2D<int>(x,y));
 			log_EDEBUG(logName.str(), "value: " << data[index]);
+			++index;
 		}
 	}
     // Create property list for collective dataset write.
