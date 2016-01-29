@@ -687,9 +687,6 @@ void Serializer::serializeRaster( const StaticRaster & raster, const std::string
 			log_EDEBUG(logName.str(), "index: " << x << "/" << y << " - " << index);
 			log_EDEBUG(logName.str(), "getting value: " << Point2D<int> (x+overlapDist._x,y+overlapDist._y));
 			data[index] = raster.getValue(Point2D<int> (x+overlapDist._x,y+overlapDist._y));
-			if (data[index] < -100) {
-				log_INFO(logName.str(), "low value: " << data[index] << " at pos: " << x << "/" << y);
-			}
 			log_EDEBUG(logName.str(), "value: " << data[index]);
 			++index;
 		}
