@@ -424,6 +424,7 @@ Scheduler * World::useOpenMPSingleNode()
 const int & World::getId() const { return _scheduler->getId(); }
 const int & World::getNumTasks() const { return _scheduler->getNumTasks(); }
 const Rectangle<int> & World::getBoundaries() const{ return _scheduler->getBoundaries(); }
+const Rectangle<int> & World::getOwnedArea() const{ return _scheduler->getOwnedArea(); }
 void World::removeAgent( std::shared_ptr<Agent> agentPtr )
 {
     Agent * agent = agentPtr.get();

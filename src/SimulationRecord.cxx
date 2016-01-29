@@ -186,18 +186,18 @@ bool SimulationRecord::loadHDF5( const std::string & fileName, const bool & load
 					
 					// squared	
 					DynamicRaster & raster = it->second[i/getFinalResolution()];
-					raster.resize(Size<int>(dims[0], dims[1]));
+					raster.resize(Size<int>(dims[1], dims[0]));
 					// TODO max value!
 					raster.setInitValues(std::numeric_limits<int>::min(),std::numeric_limits<int>::max(), 0);
 
 					H5Dread(dset_id, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, dset_data);
 					H5Dclose(dset_id);
 
-					for(size_t i=0; i<dims[0]; i++)
+					size_t index = 0;
+					for(size_t y=0; y<dims[0]; y++)
 					{
-						for(size_t j=0; j<dims[1]; j++)
+						for(size_t x=0; x<dims[1]; x++)
 						{
-							size_t index = i+j*dims[0];
 							int value = dset_data[index];
 							if(value>raster.StaticRaster::getMaxValue())
 							{
@@ -215,8 +215,9 @@ bool SimulationRecord::loadHDF5( const std::string & fileName, const bool & load
 							{
 								minValue = value;
 							}
-							raster.setMaxValue(Point2D<int>(i,j), value);
-							raster.setValue(Point2D<int>(i,j), value); 
+							raster.setMaxValue(Point2D<int>(x,y), value);
+							raster.setValue(Point2D<int>(x,y), value); 
+							++index;
 						}
 					}
 					free(dset_data);
