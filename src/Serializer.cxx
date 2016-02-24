@@ -522,6 +522,17 @@ void Serializer::executeAgentSerialization( const std::string & type, int step)
 		hid_t idType = H5Tcopy(H5T_C_S1);
 		H5Tset_size (idType, H5T_VARIABLE);
   		hid_t memorySpace = H5Screate_simple(1, &simpleDimension, 0);
+		// Inline the strings contained in data. Passing &(data->at(0)) to H5Dwrite
+		// will not work in the case of a std::vector of std::string since the
+		// std::string objects contain more than only the poiner to the zero terminated
+		// c-strings in consecutive order.
+		std::vector<const char*> sbuffer(data->size());
+
+		for(int i=0; i<data->size(); i++) {
+		   sbuffer[i]=data->at(i).c_str();
+		}
+		// Since we use a std::vector that contains more than just its data content we have
+		// to use the start address of element 0 as the actual paramter for H5Dwrite 
 		H5Dwrite(datasetId, idType, memorySpace, fileSpace, H5P_DEFAULT, &(data->at(0)));
 		data->clear();
 
