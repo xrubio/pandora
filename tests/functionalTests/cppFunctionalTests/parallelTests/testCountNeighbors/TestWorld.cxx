@@ -37,7 +37,7 @@ TestWorld::~TestWorld()
 {
 }
 
-void TestWorld::stepAgents()
+void TestWorld::stepEnvironment()
 {
 
 	if(getNumTasks()==1)

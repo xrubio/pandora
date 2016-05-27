@@ -87,7 +87,10 @@ bool TestAgent::isEvenTurn() const
 
 void TestAgent::updateState()
 {
-	move();
+	if(_world->getCurrentStep()%2==0)
+	{
+		move();
+	}
 	updateTurnInformation();
 }
 

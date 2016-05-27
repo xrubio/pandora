@@ -35,7 +35,7 @@ namespace Test
 class TestWorld : public Engine::World
 {
 	void createAgents();
-	void stepAgents();
+	void stepEnvironment();
 public:
 	TestWorld( Engine::Config * config, Engine::Scheduler * scheduler = 0 );
 	virtual ~TestWorld();

@@ -49,17 +49,14 @@ bool TestAgent::getFlag()
 
 void TestAgent::updateState()
 {
-	if(_world->getId()==0)
-	{
-		Engine::AgentsVector neighbors = _world->getNeighbours( this, 100);
-		if(neighbors.size()==0)
+	Engine::AgentsVector neighbors = _world->getNeighbours( this, 100);
+	if(neighbors.size()==0)
 		{
 			return;
 		}
-		TestAgent * agent = (TestAgent*)neighbors.at(0).get();
-		agent->setFlag(true);
-		return;
-	}
+	TestAgent * agent = (TestAgent*)neighbors.at(0).get();
+	agent->setFlag(true);
+	return;
 }
 
 } // namespace Test
