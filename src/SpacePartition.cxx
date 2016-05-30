@@ -820,6 +820,8 @@ void SpacePartition::executeAgents()
 		receiveOverlapData(sectionIndex);
 		log_DEBUG(logNameMpi.str(), getWallTime() << " executing step: " << _world->getCurrentStep() << " and section: " << sectionIndex << " received overlap" );
 		MPI_Barrier(MPI_COMM_WORLD);
+
+		clearRequests(false);		
 	}
 }
 
@@ -828,10 +830,9 @@ void SpacePartition::initOverlappingData()
 	// we need to send the agents and data in overlap zone to adjacent computer nodes	
 	sendMaxOverlapZones();
 	receiveMaxOverlapData();
-
-	clearRequests(true);
 	// all nodes must finish receiving max values before receiving current values
 	MPI_Barrier(MPI_COMM_WORLD);
+	clearRequests(true);
 
 	for(int sectionIndex=0; sectionIndex<4; sectionIndex++)
 	{
@@ -840,10 +841,10 @@ void SpacePartition::initOverlappingData()
 		// TODO refactor? we are sending 4 times all the info
 		sendOverlapZones(sectionIndex, false);
 		receiveOverlapData(sectionIndex, false);
-		clearRequests(false);
-		
 		// all nodes must finish receiving max values before receiving current values
 		MPI_Barrier(MPI_COMM_WORLD);
+		clearRequests(false);
+		
 
 		sendGhostAgents(sectionIndex);
 		receiveGhostAgents(sectionIndex);
@@ -1040,7 +1041,7 @@ Rectangle<int> SpacePartition::getExternalOverlap( const int & id) const
 	}
 	else
 	{	
-		// if left border it doesn't have a left overlap		
+		// if lower border it doesn't have a lower overlap		
 		if(_ownedArea._origin._y==0)
 		{
 			result._origin._y = _ownedArea._size._height;
