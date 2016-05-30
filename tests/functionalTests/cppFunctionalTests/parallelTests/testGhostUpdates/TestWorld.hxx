@@ -38,7 +38,7 @@ class TestWorld : public Engine::World
     Engine::SpacePartition * _testScheduler;
 
 	void createAgents();
-	void stepAgents();
+	void stepEnvironment();
 public:
 	TestWorld( Engine::Config * config, Engine::Scheduler * scheduler = 0);
 	virtual ~TestWorld();

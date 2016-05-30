@@ -40,10 +40,10 @@ TestWorld::~TestWorld()
 {
 }
 
-void TestWorld::stepAgents()
+void TestWorld::stepEnvironment()
 {
 	// it is important to think that step agents is executed before agents, so each step must check the actions in the former step
-	if(getCurrentStep()!=1 || getId()!=3)
+	if(getCurrentStep()!=1)
 	{
 		return;
 	}

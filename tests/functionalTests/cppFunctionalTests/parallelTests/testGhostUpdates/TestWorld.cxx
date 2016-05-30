@@ -42,7 +42,7 @@ TestWorld::~TestWorld()
 {
 }
 
-void TestWorld::stepAgents()
+void TestWorld::stepEnvironment()
 {
 	// it is important to think that step agents is executed before agents, so each step must check the actions in the former step
 	if(getCurrentStep()==0)
@@ -103,7 +103,7 @@ void TestWorld::createAgents()
 	if(getId()==2)
 	{
 		TestAgent * agentHorizontal2 = new TestAgent("TestAgent_3", true);
-		Engine::Point2D<int> pos(32,0);
+		Engine::Point2D<int> pos(0,32);
 		addAgent(agentHorizontal2);
 		agentHorizontal2->setPosition(pos);
 		return;
