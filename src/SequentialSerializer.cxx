@@ -598,18 +598,18 @@ void SequentialSerializer::serializeRaster( const StaticRaster & raster, const s
 	hid_t dataSetId = H5Dopen(_fileId, datasetKey.c_str(), H5P_DEFAULT);
 	hid_t fileSpace = H5Dget_space(dataSetId);
 
-	const hsize_t ownedAreaWidth = _scheduler.getOwnedArea()._size._width;
-	const hsize_t ownedAreaHeight = _scheduler.getOwnedArea()._size._height;
+	const hsize_t boundariesWidth = _scheduler.getBoundaries()._size._width;
+	const hsize_t boundariesHeight = _scheduler.getBoundaries()._size._height;
  
 	hsize_t	block[2];
-	block[0] = ownedAreaHeight;
-	block[1] = ownedAreaWidth;
+	block[0] = boundariesHeight;
+	block[1] = boundariesWidth;
 	
 	int * data = (int *) malloc(sizeof(int)*block[0]*block[1]);
 	size_t index = 0;
-	for(size_t y=0; y<ownedAreaHeight; y++)
+	for(size_t y=0; y<boundariesHeight; y++)
 	{
-		for(size_t x=0; x<ownedAreaWidth; x++)
+		for(size_t x=0; x<boundariesWidth; x++)
 		{	
 			log_EDEBUG(logName.str(), "index: " << x << "/" << y << " - " << index);
 			data[index] = raster.getValue(Point2D<int>(x,y));
