@@ -91,18 +91,18 @@ Ubuntu dependencies forces you to install the serial version of HDF5 as gdaldepe
 	```bash
 	$ scons
 	```
-- if you want to compile in debug mode type: 
-```bash 
-$ scons debug=1
-``` 
-- if you want to use python2.7 type: 
-```bash 
-$scons python2 
-```
-- you can check the full list of options with: 
-```bash
-$ scons -h
-```
+		- if you want to compile in debug mode type: 
+		```bash 
+		$ scons debug=1
+		``` 
+		- if you want to use python2.7 type: 
+		```bash 
+		$scons python2 
+		```
+		- you can check the full list of options with: 
+		```bash
+		$ scons -h
+		```
 
 - Installing Pandora
 	* Go to the folder where Pandora is deployed:
