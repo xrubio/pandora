@@ -233,3 +233,4 @@ You can execute the simulation, and check that agents collect resources from the
 
 Congratulations, you have created your first Agent-Based Model using pyPandora!
 
+[Next - Log System](03_logging_system.md)

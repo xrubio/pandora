@@ -154,3 +154,5 @@ Ubuntu dependencies forces you to install the serial version of HDF5 as gdaldepe
 	* Finally, check whether the results of `randomWalkers` (they should be inside a 'data' directory) are loaded correctly in cassandra.
 
         
+[Next - Get Started with pyPandora](01_getting_started_pyPandora.md)
+Or [Next - Get Started with C++](02_getting_started_pandora.md)

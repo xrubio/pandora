@@ -21,4 +21,4 @@ Finally, Pandora has several ways to interact with other software packages. User
 
 
 [Next - install](00_installing.md)
-[Next - install](00_installing.md)
+Or [Next - install OSX](00_installing_osx.md)
