@@ -5,21 +5,22 @@ To begin this tutorial you will need to have Pandora installed on your computer.
 
 We will create a simple Agent-Based Model with a basic World and a type of agents. These agents will randomly move through the World, and collect resources from the environment.
 
-1) Create a new directory. We will store all the source code in a directory called '02_src' under 'examples', using this structure:
+1. Create a new directory. We will store all the source code in a directory called '02_src' under 'examples', using this structure:
 
-- PANDORA_ROOT
-	- examples
-		- 02_src
+     - PANDORA_ROOT
+  	- examples
+  		- 02_src
 
 Alternatively you can copy the entire tutorial source from PANDORA_ROOT/docs/tutorials/02_src into the examples dir and work with that.
 
-2) Create and execute a 'main' function
+2. Create and execute a 'main' function
 
 Next step is to create a 'main' function. This is the code that will be called once we execute the simulation, and the starting point for our model.
 We create a file called 'main.cxx' adding these lines into it:
 
 Add these lines to your file:
 
+```cpp
 #include <Exception.hxx>
 #include <iostream>
 
@@ -35,6 +36,7 @@ int main(int argc, char *argv[])
 	}
 	return 0;
 }
+```
 
 We will make sure that the building system is working before continuing. Pandora uses scons to compile the code (http://www.scons.org/), but any other building system could be used. Copy the file docs/code_templates/SConstruct into your working directory and open it. We will have to modify the list of agents and source files:
 	a) Check that the list of source files (variable 'srcFiles') contains only 'main.cxx' file:
@@ -62,6 +64,7 @@ Now that our building system is working we need to create our first World. We wi
 
 Start defining a class MyWorld, child of World, inside a file MyWorld.hxx:
 
+```cpp
 #ifndef __MyWorld_hxx
 #define __MyWorld_hxx
 
@@ -90,6 +93,8 @@ public:
 } // namespace Tutorial 
 
 #endif // __MyWorld_hxx
+```
+
 
 All our code will belong to a namespace called Tutorial in order to avoid any conflict. The classes that we need from Pandora belong to a different namespace, called Engine.
 As you can see, we have to define 3 methods:
@@ -99,7 +104,7 @@ As you can see, we have to define 3 methods:
 
 The methods are defined in a file called 'MyWorld.cxx':
 
-
+```cpp
 #include "MyWorld.hxx"
 
 #include <Config.hxx>
@@ -127,6 +132,7 @@ void MyWorld::createAgents()
 }
 
 } // namespace Tutorial 
+```
 
 
 
