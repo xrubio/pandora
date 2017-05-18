@@ -1,5 +1,5 @@
 
-Before beginning to use Pandora the user will need a general perspective to the different components of an Agent-Based Model. If you have not developed any ABM before we recommend you to read some [related bibliography](LINK A BIBLIOGRAPHY) before starting to program. You should also know some basic concepts of Object Oriented programming, [the programming paradigm behind Pandora](TUTORIAL OBJECT ORIENTED)
+Before beginning to use Pandora the user will need a general perspective to the different components of an Agent-Based Model. If you have not developed any ABM before we recommend you to read some [related bibliography](LINK_A_BIBLIOGRAPHY) before starting to program. You should also know some basic concepts of Object Oriented programming, [the programming paradigm behind Pandora](TUTORIAL_OBJECT_ORIENTED)
 
 In Pandora, the two main concepts that any ABM should model are:
 
@@ -16,7 +16,7 @@ As we said before, any Pandora ABM will define a World, and usually one or sever
 	1. pyPandora. This ready-to-use scripting interface uses Python language to access Pandora utilities. It is strongly advised that first users begins with it, as it will allow to create our first ABMs with a few lines.
 	2. C++ Pandora Library. Advanced users can program ABMs in C++ programming language. This interface allows to access the full power of the library, including automatic generation of parallelized code (ready to be executed in HPC).
 
-We recommend to start with [pyPandora tutorial](01_getting_started_pyPandora.md) and the introduction to the [pyAnalysis package](04_pyanalysis.md). C++ programmers and experienced users should follow the [C++ tutorial](02_getting_started_pandora.md),the [C++ Analysis package](05_analysis.md), the description of the [Parallel package](TUTORIAL PARALLELIZATION), and the way Pandora models agents with advanced behaviors and [decision making processes](TUTORIAL ADVANCED AI). To verify simulations you will also need to understand [how the Logger system works](03_logging_system.md).
-Finally, Pandora has several ways to interact with other software packages. Users can take a look to the tutorial on [GIS integration] (TUTORIAL GIS), and [statistical output](ANALYSIS R).
+We recommend to start with [pyPandora tutorial](01_getting_started_pyPandora.md) and the introduction to the [pyAnalysis package](04_pyanalysis.md). C++ programmers and experienced users should follow the [C++ tutorial](02_getting_started_pandora.md),the [C++ Analysis package](05_analysis.md), the description of the [Parallel package](TUTORIAL_PARALLELIZATION), and the way Pandora models agents with advanced behaviors and [decision making processes](TUTORIAL_ADVANCED_AI). To verify simulations you will also need to understand [how the Logger system works](03_logging_system.md).
+Finally, Pandora has several ways to interact with other software packages. Users can take a look to the tutorial on [GIS integration] (TUTORIAL_GIS), and [statistical output](ANALYSIS_R).
 
 
