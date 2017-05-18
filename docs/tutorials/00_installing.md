@@ -72,55 +72,85 @@ Ubuntu dependencies forces you to install the serial version of HDF5 as gdaldepe
 	```
 	* configure the library:
 	```bash
-		$ cd hdf5-1.8.17
-		$ ./configure --enable-parallel --prefix=/usr/local/hdf5 --disable-shared --with-pic
-		(if you want more information type ./configure --help)
-	```
+	$ cd hdf5-1.8.17
+    	$ ./configure --enable-parallel --prefix=/usr/local/hdf5 --disable-shared --with-pic
+(if you want more information type ./configure --help)
+    	```
 	* compile and install:
 	```bash
-		$ make
-		$ sudo make install
+	$ make
+	$ sudo make install
 	```
 
 - Compiling Pandora
 	* Go to the folder where Pandora is deployed:
-		$ cd PATHTOPANDORA/pandora/
+	```bash
+	$ cd PATHTOPANDORA/pandora/
+	```
 	* Compile:
-		$ scons
-		- if you want to compile in debug mode type: $ scons debug=1 
-        - if you want to use python2.7 type: $scons python2
-        - you can check the full list of options with: $ scons -h
+	```bash
+	$ scons
+	```
+		- if you want to compile in debug mode type: 
+		```bash 
+		$ scons debug=1
+		``` 
+        	- if you want to use python2.7 type: 
+		```bash 
+		$scons python2 
+		```
+        	- you can check the full list of options with: 
+		```bash
+		$ scons -h
+		```
 
 - Installing Pandora
 	* Go to the folder where Pandora is deployed:
-		$ cd PATHTOPANDORA/pandora/
+	```bash
+	$ cd PATHTOPANDORA/pandora/
+	```
 	* execute:
+	```bash
         $ sudo scons install (providing root password)
-        By default Pandora will be installed in /usr/local/pandora. If you want to use a different directory use the option installDir=$PATH, such ash:
+	```
+        By default Pandora will be installed in `/usr/local/pandora`. If you want to use a different directory use the option `installDir=$PATH`, such ash:
+	```bash
         $ sudo scons install installDir=/opt/
+	```
 
     * You will need to add Pandora directory to your .bashrc, using these lines:
+	```bash
         export PANDORAPATH=/usr/local/pandora
         export PATH=$PATH:$PANDORAPATH/bin/
         export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PANDORAPATH/lib/
-        
-        Please change PANDORAPATH if you used a different installation directory.
+	```
+        Please change `PANDORAPATH` if you used a different installation directory.
 
 - Test with an example
 	* Go to any example or app and compile it:
-		$ cd examples/randomWalkers/
-		$ scons
+	```bash
+	$ cd examples/randomWalkers/
+	$ scons
+	```
 	
 	* Execute it:
-		$ ./randomWalkers
+	```bash
+	$ ./randomWalkers
+	```
 	
 - Compiling cassandra
-    * Go to the folder where Pandora is deployed:
-		$ cd PATHTOPANDORA/pandora/
+	* Go to the folder where Pandora is deployed:
+	```bash
+	$ cd PATHTOPANDORA/pandora/
+	```
 	* execute:
+	```bash
         $ scons cassandra
+	```
 	* Execute it:
-		$ ./bin/cassandra
-	* Finally, check whether the results of randomWalkers (they should be inside a 'data' directory) are loaded correctly in cassandra.
+	```bash
+	$ ./bin/cassandra
+	```
+	* Finally, check whether the results of `randomWalkers` (they should be inside a 'data' directory) are loaded correctly in cassandra.
 
         
