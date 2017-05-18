@@ -13,9 +13,9 @@ Webpage: http://xrubio.github.io/pandora/
 Mailing List/Google Group: http://groups.google.com/d/forum/pandora_users
 
 Tutorial:
-	00.[Compile and Install pandora](docs/tutorials/00_installing.txt)
-	01.[Getting Started with pyPandora](docs/tutorials/01_getting_started_pyPandora.txt)
-	02.[Getting Started with Pandora](docs/tutorials/02_getting_started_pandora.txt)
-	03.[Pandora's loggin system](docs/tutorials/03_logging_system.txt)
-	04.[Analysis pandora's output with python](docs/tutorials/04_pyanalysis.txt)
-	04.[Analysis pandora's output](docs/tutorials/05_analysis.txt)
+	0.[Compile and Install pandora](docs/tutorials/00_installing.txt)
+	1.[Getting Started with pyPandora](docs/tutorials/01_getting_started_pyPandora.txt)
+	2.[Getting Started with Pandora](docs/tutorials/02_getting_started_pandora.txt)
+	3.[Pandora's loggin system](docs/tutorials/03_logging_system.txt)
+	4.[Analysis pandora's output with python](docs/tutorials/04_pyanalysis.txt)
+	5.[Analysis pandora's output](docs/tutorials/05_analysis.txt)
