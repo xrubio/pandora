@@ -124,7 +124,7 @@ Ubuntu dependencies forces you to install the serial version of HDF5 as gdaldepe
         export PATH=$PATH:$PANDORAPATH/bin/
         export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PANDORAPATH/lib/
 	```
-        Please change `PANDORAPATH` if you used a different installation directory.
+	Please change `PANDORAPATH` if you used a different installation directory.
 
 - Test with an example
 	* Go to any example or app and compile it:
