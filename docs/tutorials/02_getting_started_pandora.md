@@ -360,7 +360,8 @@ Finally MyAgent declaration must be included in MyWorld.cxx:
 #include "MyAgent.hxx"
 ```
 
-Everything ready! If we compile and execute again 'tutorialPandora' we will get a list of messages communicating us that 10 agents have been created, and a sequence of 'updateState' and 'serialize' methods have been executed. If we check 'results.h5' with cassandra we should see something like Figure 2 (LINK 02_src/figure_02.png)
+Everything ready! If we compile and execute again 'tutorialPandora' we will get a list of messages communicating us that 10 agents have been created, and a sequence of 'updateState' and 'serialize' methods have been executed. If we check 'results.h5' with cassandra we should see something like Figure 2 
+![Figure 2](02_src/figure_02.png)
 
 8) Gathering resources
 To finish this tutorial we will modify MyAgent to gather 'resources' from MyWorld, and serialize this value. We go again to the 'updateState' method and add these lines:
@@ -426,7 +427,8 @@ void MyAgent::serialize()
 }
 ```
 
-You can compile and execute the simulation, and check that agents collect resources from the world and accumulate them from time step to time step, as can be seen in figure 3 ![Fig 02](src/figure_03.png)
+You can compile and execute the simulation, and check that agents collect resources from the world and accumulate them from time step to time step, as can be seen in figure 3 
+![Fig 03](src/figure_03.png)
 
 Congratulations, you have created your first Agent-Based Model using Pandora!
 
