@@ -83,14 +83,14 @@ Ubuntu dependencies forces you to install the serial version of HDF5 as gdaldepe
 	```
 
 - Compiling Pandora
-	* Go to the folder where Pandora is deployed:
-	```bash
-	$ cd PATHTOPANDORA/pandora/
-	```
-	* Compile:
-	```bash
-	$ scons
-	```
+  1. Go to the folder where Pandora is deployed:
+  ```bash
+  $ cd PATHTOPANDORA/pandora/
+  ```
+  2. Compile:
+  ```bash
+  $ scons
+  ```
 	- if you want to compile in debug mode type: 
 	```bash 
 	$ scons debug=1
