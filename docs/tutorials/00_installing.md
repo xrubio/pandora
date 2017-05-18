@@ -73,8 +73,8 @@ Ubuntu dependencies forces you to install the serial version of HDF5 as gdaldepe
 	* configure the library:
 	```bash
 	$ cd hdf5-1.8.17
-    	$ ./configure --enable-parallel --prefix=/usr/local/hdf5 --disable-shared --with-pic
-(if you want more information type ./configure --help)
+	$ ./configure --enable-parallel --prefix=/usr/local/hdf5 --disable-shared --with-pic
+	#(if you want more information type `./configure --help11)
     	```
 	* compile and install:
 	```bash
