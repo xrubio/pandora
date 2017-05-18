@@ -14,11 +14,13 @@ Mailing List/Google Group: http://groups.google.com/d/forum/pandora_users
 
 Tutorial:
 
-00. [Compile and Install pandora](docs/tutorials/00_installing.txt) 
-01. [Getting Started with pyPandora](docs/tutorials/01_getting_started_pyPandora.txt) 
-02. [Getting Started with Pandora](docs/tutorials/02_getting_started_pandora.txt) 
-03. [Pandora's loggin system](docs/tutorials/03_logging_system.txt) 
-04. [Analysis pandora's output with python](docs/tutorials/04_pyanalysis.txt) 
-05. [Analysis pandora's output](docs/tutorials/05_analysis.txt) 
+00. [Introduction](docs/tutorials/00_introduction.md) 
+  00. a [Compile and Install ](docs/tutorials/00_installing.md) 
+  00. b [Compile and Install (OSx)](docs/tutorials/00_installing_osx.md) 
+01. [Getting Started with pyPandora (python)](docs/tutorials/01_getting_started_pyPandora.md) 
+02. [Getting Started with Pandora (C++)](docs/tutorials/02_getting_started_pandora.md) 
+03. [Pandora's loggin system](docs/tutorials/03_logging_system.md) 
+04. [Analysis pandora's output (python)](docs/tutorials/04_pyanalysis.md) 
+05. [Analysis pandora's output (C++)](docs/tutorials/05_analysis.md) 
 
 
