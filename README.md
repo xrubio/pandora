@@ -15,8 +15,9 @@ Mailing List/Google Group: http://groups.google.com/d/forum/pandora_users
 Tutorial:
 
 00. [Introduction](docs/tutorials/00_introduction.md) 
-  00. a [Compile and Install ](docs/tutorials/00_installing.md) 
-  00. b [Compile and Install (OSx)](docs/tutorials/00_installing_osx.md) 
+
+	00. a [Compile and Install ](docs/tutorials/00_installing.md) 
+	00. b [Compile and Install (OSx)](docs/tutorials/00_installing_osx.md) 
 01. [Getting Started with pyPandora (python)](docs/tutorials/01_getting_started_pyPandora.md) 
 02. [Getting Started with Pandora (C++)](docs/tutorials/02_getting_started_pandora.md) 
 03. [Pandora's loggin system](docs/tutorials/03_logging_system.md) 
