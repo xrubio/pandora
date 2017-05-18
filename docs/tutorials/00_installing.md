@@ -113,12 +113,12 @@ Ubuntu dependencies forces you to install the serial version of HDF5 as gdaldepe
 	```bash
         $ sudo scons install (providing root password)
 	```
-        By default Pandora will be installed in `/usr/local/pandora`. If you want to use a different directory use the option `installDir=$PATH`, such ash:
+	By default Pandora will be installed in `/usr/local/pandora`. If you want to use a different directory use the option `installDir=$PATH`, such ash:
 	```bash
         $ sudo scons install installDir=/opt/
 	```
 
-    * You will need to add Pandora directory to your .bashrc, using these lines:
+	* You will need to add Pandora directory to your .bashrc, using these lines:
 	```bash
         export PANDORAPATH=/usr/local/pandora
         export PATH=$PATH:$PANDORAPATH/bin/
