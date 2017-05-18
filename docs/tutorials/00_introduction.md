@@ -17,6 +17,6 @@ As we said before, any Pandora ABM will define a World, and usually one or sever
 	2. C++ Pandora Library. Advanced users can program ABMs in C++ programming language. This interface allows to access the full power of the library, including automatic generation of parallelized code (ready to be executed in HPC).
 
 We recommend to start with [pyPandora tutorial](01_getting_started_pyPandora.md) and the introduction to the [pyAnalysis package](04_pyanalysis.md). C++ programmers and experienced users should follow the [C++ tutorial](02_getting_started_pandora.md),the [C++ Analysis package](05_analysis.md), the description of the [Parallel package](TUTORIAL_PARALLELIZATION), and the way Pandora models agents with advanced behaviors and [decision making processes](TUTORIAL_ADVANCED_AI). To verify simulations you will also need to understand [how the Logger system works](03_logging_system.md).
-Finally, Pandora has several ways to interact with other software packages. Users can take a look to the tutorial on [GIS integration] (TUTORIAL_GIS), and [statistical output](ANALYSIS_R).
+Finally, Pandora has several ways to interact with other software packages. Users can take a look to the tutorial on [GIS integration](TUTORIAL_GIS), and [statistical output](ANALYSIS_R).
 
 
