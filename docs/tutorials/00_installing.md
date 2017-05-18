@@ -60,25 +60,27 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/hdf5/lib/
 - Compiling HDF5
 Ubuntu dependencies forces you to install the serial version of HDF5 as gdaldependency. For this reason, we will need to download, compile and install hdf5.
 	* Go to HDF5 webpage and download the sources:
-```bash
-$ cd ~/
-$ mkdir hdf5
-$ cd hdf5
-$ wget "http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.17.tar.bz2"
-```
+	```bash
+	$ cd ~/
+	$ mkdir hdf5
+	$ cd hdf5
+	$ wget "http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.17.tar.bz2"
+	```
 	* Unzip the file:
-```bash
-$ tar jxvf hdf5-1.8.17.tar.bz2
-```
-
+	```bash
+	$ tar jxvf hdf5-1.8.17.tar.bz2
+	```
 	* configure the library:
+	```bash
 		$ cd hdf5-1.8.17
 		$ ./configure --enable-parallel --prefix=/usr/local/hdf5 --disable-shared --with-pic
 		(if you want more information type ./configure --help)
-
+	```
 	* compile and install:
+	```bash
 		$ make
 		$ sudo make install
+	```
 
 - Compiling Pandora
 	* Go to the folder where Pandora is deployed:
