@@ -429,7 +429,7 @@ void MyAgent::serialize()
 
 You can compile and execute the simulation, and check that agents collect resources from the world and accumulate them from time step to time step, as can be seen in figure 3 
 
-![Fig 03](03_src/figure_03.png)
+![Fig 03](02_src/figure_03.png)
 
 Congratulations, you have created your first Agent-Based Model using Pandora!
 
