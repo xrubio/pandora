@@ -138,6 +138,7 @@ void MyWorld::createAgents()
 
 We will create and configure an instance of MyWorld inside the main method (file 'main.cxx'), that now will have this code:
 
+```c++
 #include <Exception.hxx>
 #include <iostream>
 
@@ -160,6 +161,7 @@ int main(int argc, char *argv[])
 	}
 	return 0;
 }
+```
 
 We create an instance of Simulation class called mySimulation. It contains two parameters needed to execute our model: the size of our world (64 by 64), and the number of time steps that the simulation will last (10). mySimulations is passed to the constructor of MyWorld, and that's it.
 
