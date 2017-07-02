@@ -16,7 +16,7 @@ Alternatively you can copy the entire tutorial source from `PANDORA_ROOT/docs/tu
 2. Create and execute a 'main' function
 
 Next step is to create a 'main' function. This is the code that will be called once we execute the simulation, and the starting point for our model.
-We create a file called 'main.cxx' adding these lines into it:
+We create a file called `main.cxx` adding these lines into it:
 
 Add these lines to your file:
 
@@ -38,15 +38,16 @@ int main(int argc, char *argv[])
 }
 ```
 
-We will make sure that the building system is working before continuing. Pandora uses scons to compile the code (http://www.scons.org/), but any other building system could be used. Copy the file docs/code_templates/SConstruct into your working directory and open it. We will have to modify the list of agents and source files:
-	a) Check that the list of source files (variable 'srcFiles') contains only 'main.cxx' file:
-		srcFiles = Split("main.cxx")
-	b) Remove any agent name from the list 'agents':
-		agents = ['']
-	c) Remove any agent namespace from the list 'namespaceAgents':
-		namespaceAgents = ['']
-	d) Change the name of the program 'nameProgram':
-		nameProgram = 'tutorialPandora'
+We will make sure that the building system is working before continuing. Pandora uses [scons](http://www.scons.org/) to compile the code, but any other building system could be used. Copy the file `docs/code_templates/SConstruct` into your working directory and open it. We will have to modify the list of agents and source files:
+
+	a. Check that the list of source files (variable 'srcFiles') contains only `main.cxx` file:
+		`srcFiles = Split("main.cxx")`
+	b. Remove any agent name from the list 'agents':
+		`agents = ['']`
+	c. Remove any agent namespace from the list 'namespaceAgents':
+		`namespaceAgents = ['']`
+	d. Change the name of the program 'nameProgram':
+		`nameProgram = 'tutorialPandora'`
 
 Finally compile and execute the code:
 
