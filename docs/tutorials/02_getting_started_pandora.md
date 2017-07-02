@@ -104,9 +104,10 @@ public:
 
 All our code will belong to a namespace called Tutorial in order to avoid any conflict. The classes that we need from Pandora belong to a different namespace, called Engine.
 As you can see, we have to define 3 methods:
-	1) The constructor of our class. World needs a 'Config' object where basic execution data will be stored (number of time steps, size of World), so we pass it to World's constructor. We also define a virtual destructor, and two additional pure virtual methods:
-	2) createRasters is called at initialization time. Here we will define the different components of MyWorld that must be present once the execution begins.
-	3) createAgents is also called at init time. It is the method where initial Agents are created and configured.
+
+	1. The constructor of our class. World needs a 'Config' object where basic execution data will be stored (number of time steps, size of World), so we pass it to World's constructor. We also define a virtual destructor, and two additional pure virtual methods:
+	2. createRasters is called at initialization time. Here we will define the different components of MyWorld that must be present once the execution begins.
+	3. createAgents is also called at init time. It is the method where initial Agents are created and configured.
 
 The methods are defined in a file called 'MyWorld.cxx':
 
