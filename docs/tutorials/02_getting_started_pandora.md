@@ -352,7 +352,7 @@ We are creating 10 agents (called MyAgent_0, MyAgent_1, until MyAgent_9), adding
 
 ```cpp
 if((i%getNumTasks())==getId())
-    ```
+```
 
 it is important if you are working on a distributed environment. For example, if you execute this simulation using 4 computer nodes the first agent (MyAgent_0) would go to the first computer node (numbered 0), the second one to another (MyAgent_1 to 1), etc.
 
