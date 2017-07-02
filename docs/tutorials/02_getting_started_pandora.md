@@ -40,13 +40,13 @@ int main(int argc, char *argv[])
 
 We will make sure that the building system is working before continuing. Pandora uses [scons](http://www.scons.org/) to compile the code, but any other building system could be used. Copy the file `docs/code_templates/SConstruct` into your working directory and open it. We will have to modify the list of agents and source files:
 
-a. Check that the list of source files (variable 'srcFiles') contains only `main.cxx` file:
-	`srcFiles = Split("main.cxx")`
-b. Remove any agent name from the list 'agents':
-	`agents = ['']`
-c. Remove any agent namespace from the list 'namespaceAgents':
-	`namespaceAgents = ['']`
-d. Change the name of the program 'nameProgram':
+  1. Check that the list of source files (variable 'srcFiles') contains only `main.cxx` file:
+  	`srcFiles = Split("main.cxx")`
+  2. Remove any agent name from the list 'agents':
+  	`agents = ['']`
+  3. Remove any agent namespace from the list 'namespaceAgents':
+  	`namespaceAgents = ['']`
+  4. Change the name of the program 'nameProgram':
 	`nameProgram = 'tutorialPandora'`
 
 Finally compile and execute the code:
