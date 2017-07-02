@@ -401,7 +401,8 @@ MyAgent::MyAgent( const std::string & id ) : Agent(id), _gatheredResources(0)
 ```
 
 Finally we want to store the value of `_gatheredResources` each time step, in order to check it in Cassandra. We have to do two things:
-	1. Declare the method as an integer attribute inside Pandora system. We have to declare a new method called 'registerAttributes', where we will need to record which attribute will be stored during the simulation. To do that, declare the method as public inside the class, in MyAgent.hxx:
+
+   1. Declare the method as an integer attribute inside Pandora system. We have to declare a new method called 'registerAttributes', where we will need to record which attribute will be stored during the simulation. To do that, declare the method as public inside the class, in MyAgent.hxx:
 
 ```cpp
 class MyAgent : public Engine::Agent
@@ -420,7 +421,7 @@ void MyAgent::registerAttributes()
 }
 ```
 
-	2. serialize the attribute in serialize method:
+   2. serialize the attribute in serialize method:
 
 ```cpp
 void MyAgent::serialize()
