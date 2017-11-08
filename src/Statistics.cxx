@@ -200,7 +200,6 @@ float Statistics::getPowerLawDistValue( float xmin, float xmax,float alpha ){
     //algorithm taken from:
     //https://stackoverflow.com/questions/918736/random-number-generator-that-produces-a-power-law-distribution#918827
 
-    std::cout<<"xmin:"<<xmin<<", xmax:"<<xmax<<", alpha"<<alpha<<std::endl;
     float y = getUniformDistValue();
 
     float x = std::pow(std::pow(xmax,(alpha+1)) - std::pow(xmin,(alpha+1))*y + std::pow(xmin,(alpha+1)),(1/(alpha+1))) ;
