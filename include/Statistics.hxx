@@ -60,6 +60,9 @@ public:
 	float getNormalDistValueMinMax( float min, float max ) const;
 	float getNormalDistValue( float mean, float sd );
 
+	//return a random number following a power law distribution 
+	float getPowerLawDistValue( float min, float max,float alpha );
+
 	// uniform dist does not need to generate numbers, as randomNumbers itself is a 
 	int getUniformDistValue( int min, int max ) const;
 	// uniform float distribution between 0 and 1
