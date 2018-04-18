@@ -11,23 +11,23 @@ git clone https://github.com/xrubio/pandora
 4. download and install xquartz from: http://xquartz.macosforge.org
 
 5.Install pandora dependencies
-brew install gcc
-HOMEBREW_CC=gcc-4.8 HOMEBREW_CXX=g++-4.8 brew install tinyxml devil qt gdal scons python3
-brew install qwt
-HOMEBREW_CC=gcc-4.8 HOMEBREW_CXX=g++-4.8 brew install mpich2
-HOMEBREW_CC=gcc-4.8 HOMEBREW_CXX=g++-4.8 brew install boost --c++11 --with-python3
-HOMEBREW_CC=gcc-4.8 HOMEBREW_CXX=g++-4.8 brew install hdf5 --enable-parallel
+  brew install gcc
+  HOMEBREW_CC=gcc-4.8 HOMEBREW_CXX=g++-4.8 brew install tinyxml devil qt gdal scons python3
+  brew install qwt
+  HOMEBREW_CC=gcc-4.8 HOMEBREW_CXX=g++-4.8 brew install mpich2
+  HOMEBREW_CC=gcc-4.8 HOMEBREW_CXX=g++-4.8 brew install boost --c++11 --with-python3
+  HOMEBREW_CC=gcc-4.8 HOMEBREW_CXX=g++-4.8 brew install hdf5 --enable-parallel
 
 Python 3 is used by default, but if you want to use python 2.7 this is also possible (just don't use the 'with-python3' flags for boost).
 
-6. To make sure that the operating system finds the needed libraries, add library directories that are not standard to DYLD_LIBRARY_PATH external variable. It can be done adding this line to the end of the file .bashrc inside your $HOME directory. You should also add Pandora directory
+6. To make sure that the operating system finds the needed libraries, add library directories that are not standard to `DYLD_LIBRARY_PATH` external variable. It can be done adding this line to the end of the file .bashrc inside your $HOME directory. You should also add Pandora directory
 
-export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/Users/xrubio/workspace/pandora/pandora/
+ export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/Users/xrubio/workspace/pandora/pandora/
 
 
 7. Compiling pandora:
     * Go to the folder where Pandora is deployed:
-		$ cd PATHTOPANDORA/pandora/
+		`$ cd PATHTOPANDORA/pandora/`
 	* Compile:
 		$ scons
 		- if you want to compile in debug mode type: $ scons debug=1 
